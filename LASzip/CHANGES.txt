@@ -1,0 +1,9 @@
+6 September 2014 -- removal of (unused) EntropyEncoder and EntropyDecoder purely virtual classes
+24 August 2014 -- when reading LAZ chunk table read is delayed until first read() or seek() is called
+18 September 2013 -- fixed small memory leak
+24 August 2013 -- fixed bug with explicit cast from LASitem:type to unsigned short and vice versa 
+11 August 2013 -- laszipdllexample: new EXAMPLE_THREE shows export of geo-referenced LAZ
+8 August 2013 -- LASzip: new DLL calls laszip_get_coordinates() and laszip_set_coordinates()
+6 August 2013 -- LASzip: new DLL calls laszip_auto_offset() and laszip_check_for_integer_overflow()
+1 August 2013 -- LASzip: new DLL calls unload_dll() and get_point_count() for FUSION integration
+29 July 2013 -- LASzip: created an easy-to-use DLL interface for LASzip integration
