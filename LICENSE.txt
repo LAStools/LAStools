@@ -1,0 +1,88 @@
+--------------------------------------------------------------------------
+
+  LICENSE AGREEMENT:
+
+  This software is distributed WITHOUT ANY WARRANTY and without even the
+  implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+--------------------------------------------------------------------------
+
+  There are TWO parts to LAStools. One part is OPEN source (LGPL 2.1). The
+  other part is CLOSED source and requires licensing for most commercial
+  or government use. If you're unsure please email 'martin@rapidlasso.com'
+  before using LAStools. For education and evaluation purposes you can use
+  and test LAStools as much as you need to ... (-:
+
+  Personal note: Although the open source parts of LAStools are licensed
+  standard LGPL 2.1, the author would be unhappy should this software be
+  used at two US Nuclear Weapons Labs, namely Lawrence Livermore National
+  Laboratory (LLNL) and Sandia National Laboratories. However, the author
+  would like to hear from you in case you have enough pull to resolve the
+  issues that are the reason for this note (so this note can be removed).
+
+--------------------------------------------------------------------------
+
+  This part of LAStools is open-source LGPL (see COPYING.txt). If want to
+  purchase a different licensing model for any particular use (commercial
+  or governmental) contact 'martin@rapidlasso.com'.
+
+    * laszip
+    * lasindex
+    * lasvalidate
+    * lasinfo
+    * las2las
+    * lasview
+    * lasdiff
+    * lasmerge
+    * las2txt & txt2las
+    * lasprecision
+    * LASzip
+    * LASlib (with LASzip) - the API used by LAStools.
+
+--------------------------------------------------------------------------
+
+  The following LAStools require licensing for all commercial & government
+  use. They can however be used freely for non-profit personal, non-profit
+  educational, or non-profit humanitarian purposes assuming that they are
+  strictly non-military.
+
+    * blast2dem
+    * blast2iso
+
+    * lasground
+    * lasheight
+    * lasclassify
+    * lasgrid & lascanopy
+    * lasboundary
+    * lascontrol
+    * lasoverlap
+    * lasoverage
+    * lasduplicate
+    * lassplit
+    * las2tin
+    * las2iso
+    * las2dem
+    * lasthin & lasnoise
+    * lassort
+    * lastile
+    * lascolor
+    * lasclip
+    * las2shp & shp2las.
+
+--------------------------------------------------------------------------
+
+  If you want to use LAStools please contact us for licensing. You can
+
+  (a) license the existing executables for production
+  (b) license the existing executables for inclusion in your software 
+ 
+  You can also contract with rapidlasso GmbH to create LAStools tailored
+  to your particular needs.
+  
+--------------------------------------------------------------------------
+
+  COPYRIGHT:
+  
+  (c) 2007-2014, rapidlasso GmbH, GERMANY - fast tools to catch reality
+
+--------------------------------------------------------------------------
