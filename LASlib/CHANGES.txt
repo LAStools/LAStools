@@ -1,0 +1,82 @@
+30 August 2014 -- LASlib: significantly less I/O overhead especially on '-merged' folders of LAZ
+12 August 2014 -- LASlib: fixed (another) small bug in on-the-fly BIL reader LASreader_bil.cpp
+30 July 2014 -- LASlib: fixed small bug in on-the-fly BIL reader LASreader_bil.cpp
+21 July 2014 -- LASlib: new filter called '-thin_with_time 0.0001', new '-unique' flag for input files
+9 July 2014 -- LASlib: make LASreader_txt parse piped ASCII text with '-stdin' and '-itxt'
+9 July 2014 -- LASlib: new transforms (-set_withheld_flag 0 -set_synthetic_flag 1 -set_keypoint_flag 0)
+22 March 2014 -- LASlib: allow more flavours of ASC grids for on-the-fly conversion to LAS
+21 February 2014 -- LASlib: renaming of clip filters (-clip_z to -keep_z, -clip_z_between to -drop_z) 
+7 February 2014 -- LASlib: renaming of several variables (xyz -> XYZ, ...) for github launch
+30 December 2013 -- lasinfo: produce histogram for attributes in extra bytes with '-histo 0 5' 
+9 December 2013 -- LASlib: bug fix and improved writing of new LAS 1.4 point types
+25 November 2013 -- LASlib: new capability to filter points based on RGB band ranges  
+10 October 2013 -- LASlib: can now read FUSION DTM rasters by on-the-fly conversion to LAS
+3 October 2013 -- LASlib: fix for reading and merging on-the-fly converted rasters (e.g. BIL, ASC)
+30 September 2013 -- txt2las: bug fixed for adding EXTRA_BYTES with scales and offsets
+22 September 2013 -- LASlib: input files paths can now contain both '/' and '\'
+18 September 2013 -- LASlib: output WARNING if -odir "c:\" or -odir "..\lidar\" is used (windows)
+29 July 2013 -- lasinfo: fixed output directory bug when running with multiple cores
+6 May 2013 -- lasinfo: improved handling of LAS 1.4 files
+1 May 2013 -- fixed LAZ reading bug (50000 points only) for download-truncated LAZ files
+9 April 2013 -- LASlib: output WARNING if -odir "c:\" or -odir "..\lidar\" is used (linux)
+15 March 2013 -- corrected interplay of '-ocut 2' and '-odix _g' when used at the same time
+28 December 2012 -- added '-clip_z_between 12 14.51' and '-clip_raw_z_between 1200 1451'
+30 September 2012 -- extended classification for new point types is written correctly
+13 September 2012 -- improved lasinfo output and fixed laszip bug for LAS 1.4 point types
+22 August 2012 -- added the '-pipe_on' option for a multi-stage LAStools pipeline
+11 August 2012 -- added on-the-fly buffered reading of LiDAR files (efficient with LAX)
+9 July 2012 -- fixed crash that occured when input had a corrupt VLRs without payload
+8 April 2012 -- added LASreader_bil for native read support of binary BIL grids
+27 March 2012 -- added LASreader_asc for native read support of ESRI ASC grids
+26 March 2012 -- even better output file naming with '-ocut 5' 
+19 March 2012 -- better output naming (-odix/-odir) + overwrite check for point producing tools
+14 February 2012 -- specify output directory with '-odir' and file name appedix '-odix'
+16 January 2012 -- basic LAS 1.4 write support (down-converted points are up-converted)
+28 December 2011 -- (limited) read support for LAS 1.4 (new point types are down-converted)
+16 December 2011 -- support for reading ESRI' SHP format for types 1,11,21,8,18,28 
+9 December 2011 -- laszip: added GUI (if called without arguments)
+1 December 2011 -- laszip: fixed seek bug for interrupted LAZ files (e.g. ftp, CTRL^C)
+26 October 2011 -- laszip: prototype for LAS 1.3 full waveform compression
+26 October 2011 -- read / write interface for full waveform LAS 1.3 data
+6 October 2011 -- large file support (fseek64) for spatial indexing and compression
+6 October 2011 -- laszip: ability to read LAZ with missing chunk table
+5 September 2011 -- support for reading and writing Terrasolid's BIN format
+23 June 2011 -- turned on LASzip version 2.0 compressor with chunking 
+11 June 2011 -- support for over 4,294,967,295 points in merged LAS/LAZ or for ASCII
+31 May 2011 -- new spatial data base functionality for folders of LAS/LAZ files
+21 May 2011 -- most tools can now batch process with wildcards or multiple file names
+17 May 2011 -- laszip: enabling batch processing 
+15 May 2011 -- laszip: improved GPS11v2 compression for interleaved flight-lines
+13 May 2011 -- all tools can now read spatially indexed data if LAX file
+13 May 2011 -- moved indexing, filtering, transforming into LASreader
+9 May 2011 -- laszip: the chunked compressor now allows variable chunk sizes
+27 April 2011 -- the LASreader of the LASlib interface now allows to seek()
+25 April 2011 -- laszip: chunked compression for random access decompression
+22 April 2011 -- lastransform: many more ways to transform 
+11 April 2011 -- added lasreader_txt and laswriter_txt for on-the-fly conversion
+20 March 2011 -- laszip: added POINT10 RGB, GPS, BYTE compressor versions 2 
+19 March 2011 -- lasfilter: added various simple thinning filters
+18 March 2011 -- all: added null output -nil and compressed input and output -v2
+28 January 2011 -- all: major clean up for LASlib (with LASzip) re-release
+24 January 2011 -- lasreader: introduced LASreadOpener
+21 January 2011 -- lasreader: turned into abstract reader to support multiple files
+21 January 2011 -- lastransform: (re-)created after matt told me about the optech dashmap bug
+20 January 2011 -- lasreadermerged: created missing Livermore and my Extra Virgin Olive Oil
+10 January 2011 -- all: licensing change for LGPL release and liblas integration
+7 January 2011 -- read/writeitemraw: introduced swap buffers to reduce number of fwrite calls
+25 December 2010 -- lasfilter & lasutility: created after swinging in Mara's hammock for hours
+16 December 2010 -- lasdefinitions: updated to support generic LASitem point formats
+12 December 2010 -- bytestream: refactored after Howard got pushy (-;
+10 December 2010 -- integercompressor: unified for all entropy coders at Baeckerei Schaefer
+8 December 2010 -- arithmetic & entropy: unified framework for all entropy coders
+7 December 2010 -- read & write in items after getting invited to KAUST in Saudi Arabia
+3 December 2010 -- all: updated to (somewhat) support LAS format 1.3
+30 October 2009 -- arithmetic: refactoring Amir Said's FastAC code
+31 October 2009 -- integercompressor: switched from the Rangecoder to the Entropycoder
+7 September 2008 -- all: updated to support LAS format 1.2 
+11 June 2007 -- lasdefinitions: number of return / scan direction bitfield order was wrong
+22 February 2007 -- lasreadpoint & laswritepoint: created about an hour before henna's birthdy
+21 February 2007 -- laswriter: created after eating Sarah's veggies with peanutsauce
+18 February 2007 -- lasreader: created after repairing 2 vacuum cleaners in the garden
+30 September 2005 -- integercompressor: now splitting the corrector into raw and compressed bits
+13 July 2005 -- integercompressor: created after returning with many mosquito bites from OBX
