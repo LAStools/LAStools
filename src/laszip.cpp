@@ -14,7 +14,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-14, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -397,7 +397,6 @@ int main(int argc, char *argv[])
 
     // check if compatible is on and how it makes sense
 
-    I32 compatible_start = -1;
     I32 compatible_start_scan_angle = -1;
     I32 compatible_start_extended_returns = -1;
     I32 compatible_start_classification = -1;
@@ -410,7 +409,6 @@ int main(int argc, char *argv[])
       fprintf(stderr, "         points is not complete. this is just an awesome prototype\n");
       fprintf(stderr, "         as proof of concept as we gather community input ... (-;\n");
 
-      I32 index;
       I32 index_scan_angle;
       I32 index_extended_returns;
       I32 index_classification;
@@ -1045,10 +1043,8 @@ int main(int argc, char *argv[])
               {
                 LASpoint laspoint;
                 laspoint.init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length, &lasreader->header);
-                I32 scan_angle_remainder;
                 I32 number_of_returns_increment;
                 I32 return_number_increment;
-                U8 classification_highest_three_bits;
                 I32 overlap_bit;
                 I32 scanner_channel;
                 if (compatible_version == 1)
