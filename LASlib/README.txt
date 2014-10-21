@@ -22,9 +22,9 @@ Linux users there are simple Makefiles.
 The best way is get LASlib is to download LAStools, which contains the
 full LASlib (with LASzip) distribution:
 
-wget http://www.lastools.org/download/lastools.zip
-unzip lastools.zip
-cd lastools/
+wget http://www.lastools.org/download/LAStools.zip
+unzip LAStools.zip
+cd LAStools/
 make
 
 --------------------
