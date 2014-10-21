@@ -23,9 +23,18 @@
   Isolines along the convex hull of the point cloud where triangles
   are very large are suppressed with the '-concavity 10' option.
   This will recursively remove all triangles with an edge length
-  of 10 units that are adjacent to the boundary. The default is
-  a concavity of 50. Use '-concavity 0' to disable this.
+  of 10 meters that are adjacent to the boundary. The default is
+  a concavity of 50 meter. Use '-concavity 0' to disable this. The
+  value is always assumed to be meters and will be multipled with
+  3.28 for LAS/LAZ files where x and y are known to be in feet.
  
+  Isolines crossing triangles whose edge length is larger than a
+  threshold can be eliminated with the '-kill 250' option. The
+  default is a kill of 50 meter. Use '-kill 1000000' to disable
+  this. The value is always assumed to be meters and will be
+  multipled with 3.28 for LAS/LAZ files where x and y are known
+  to be in feet.
+
   Closed breaklines can be supplied for hydro-enforcment of
   lakes, for example ('-lakes lakes.shp', '-lakes hydro.txt')
   but they must form proper closed polygons and have elevations.
@@ -272,7 +281,7 @@ usage:
 las2iso -i *.las -oshp
 las2iso -i flight1*.las flight2*.las -oshp -simplify 1 -clean 10
 las2iso -i *.las -okml -iso_range 400 600 20 -utm 14S
-las2iso -i *.txt -iparse ssxyz -owkt -iso_every 2 -simplify 0.5 -kill 100
+las2iso -i *.txt -iparse ssxyz -owkt -iso_every 2 -simplify 0.5 -concavity 100
 las2iso -i lidar.las -first_only -o contours.wkt -iso_number 20
 las2iso -i lidar.las -o contours.shp -last_only -iso_range 400 600 20
 las2iso -i lidar.las -otxt -stdout -keep_class 2 3 9 > lines.txt

@@ -37,7 +37,7 @@
   (x/y+0.66*step) (x+0.33*step/y+0.66*step) (x+0.66*step/y+0.66*step)
   and thereby "washes out" hard boundaries.
 
-  Please license from martin.isenburg@gmail.com to use lasoverlap
+  Please license from martin.isenburg@rapidlasso.com to use lasoverlap
   commercially.
 
   For updates check the website or join the LAStools mailing list.

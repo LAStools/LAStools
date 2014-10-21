@@ -54,6 +54,7 @@ static const int GEO_PROJECTION_TM       = 2;
 static const int GEO_PROJECTION_LONG_LAT = 3;
 static const int GEO_PROJECTION_LAT_LONG = 4;
 static const int GEO_PROJECTION_ECEF     = 5;
+static const int GEO_PROJECTION_NONE     = 6;
 
 class ReferenceEllipsoid
 {
@@ -1281,6 +1282,10 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
       else if (geo_keys[i].value_offset == 3) // ModelTypeGeocentric
       {
         has_projection = set_ecef_projection(description);
+      }
+      else if (geo_keys[i].value_offset == 0) // ModelTypeUndefined
+      {
+        has_projection = set_no_projection(description);
       }
       break;
     case 2048: // GeographicTypeGeoKey
@@ -2516,6 +2521,20 @@ bool GeoProjectionConverter::set_latlong_projection(char* description, bool sour
   if (description)
   {
     sprintf(description, "%s", latlong->name);
+  }
+  return true;
+}
+
+bool GeoProjectionConverter::set_no_projection(char* description, bool source)
+{
+  GeoProjectionParameters* no = new GeoProjectionParameters();
+  no->type = GEO_PROJECTION_NONE;
+  sprintf(no->name, "intentionally no projection");
+  set_projection(no, source);
+
+  if (description)
+  {
+    sprintf(description, "%s", no->name);
   }
   return true;
 }

@@ -38,6 +38,11 @@
   It is also possible to provide the georeferencing information
   in the command-line.
 
+  By default triangles whose edges are longer than 100 meters are
+  not rasterized. This value can be changed with '-kill 200'. The
+  value is always assumed to be meters and will be multipled with
+  3.28 for LAS/LAZ files where x and y are known to be in feet.
+
   For updates check the website or join the LAStools mailing list.
 
   http://rapidlasso.com/

@@ -182,6 +182,7 @@ public:
   int get_ellipsoid_id() const;
   const char* get_ellipsoid_name() const;
 
+  bool set_no_projection(char* description=0, bool source=true);
   bool set_latlong_projection(char* description=0, bool source=true);
   bool set_longlat_projection(char* description=0, bool source=true);
 

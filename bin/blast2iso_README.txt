@@ -11,6 +11,13 @@
   is geo-referencing information in the input file or if it is
   specified explicitely in the command line. 
 
+  Isolines crossing triangles whose edge length is larger than a
+  threshold can be eliminated with the '-kill 250' option. The
+  default is a kill of 50 meter. Use '-kill 1000000' to disable
+  this. The value is always assumed to be meters and will be
+  multipled with 3.28 for LAS/LAZ files where x and y are known
+  to be in feet.
+
   This is part of the BLAST extension pack of LAStools that is
   built on streaming TINs via spatial finalization & streaming
   Delaunay. Please license from martin@rapidlasso.com before
@@ -224,7 +231,7 @@ usage:
 blast2iso -i gigantic.laz -o contours.shp -iso_range 1510 1540 1
 blast2iso -i huge_lidar.las -o contours.shp -iso_number 20
 blast2iso -i huge_lidar.laz -keep_class 2 -iso 1200 -iso 1210 -iso 1220 -oshp
-blast2iso -i *.laz -iso_every 2 -oshp
+blast2iso -i *.laz -iso_every 2 -oshp -kill 250
 blast2iso -i *.laz -merged -iso_every 2 -o merged.shp
 blast2iso -i huge_lidar.las -keep_class 2 6 8 -o contours.shp -iso_every 0.5
 blast2iso -h

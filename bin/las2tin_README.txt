@@ -13,7 +13,9 @@
   point cloud can be suppressed with the '-concavity 10' option.
   This will recursively remove all triangles with an edge length
   of 10 units that are adjacent to the boundary. The default is
-  a concavity of 50. Use '-concavity 0' to disable this.
+  a concavity of 50 meter. Use '-concavity 0' to disable this. The
+  value is always assumed to be meters and will be multipled with
+  3.28 for LAS/LAZ files where x and y are known to be in feet.
  
   Closed breaklines can be supplied for hydro-enforcment of
   lakes, for example ('-lakes lakes.shp', '-lakes hydro.txt')

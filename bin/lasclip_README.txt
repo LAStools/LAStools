@@ -29,7 +29,7 @@
   can be used together with the TO_core_last_zoom.las or the
   TO_core_last.las data set to clip away the Toronto city hall.
 
-  Please license from martin.isenburg@gmail.com to use lasclip
+  Please license from martin.isenburg@rapidlasso.com to use lasclip
   commercially.
 
   For updates check the website or join the LAStools mailing list.
