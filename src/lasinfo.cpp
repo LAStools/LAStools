@@ -857,6 +857,9 @@ int main(int argc, char *argv[])
                   case 3:
                     fprintf(file_out, "GTModelTypeGeoKey: ModelTypeGeocentric\012");
                     break;
+                  case 0: // ModelTypeUndefined   
+                    fprintf(file_out, "GTModelTypeGeoKey: ModelTypeUndefined\012");
+                    break;
                   default:
                     fprintf(file_out, "GTModelTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
                  }

@@ -286,8 +286,6 @@ int main(int argc, char *argv[])
     {
       char printstring[128];
     
-      fprintf(stderr, "headers are different\n");
-
       LASheader* lasheader1 = &(lasreader1->header);
       LASheader* lasheader2 = &(lasreader2->header);
 

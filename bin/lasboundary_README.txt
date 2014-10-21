@@ -19,8 +19,9 @@
 
   The controlling value is '-concavity 100' that can be specified
   in the command line. The default is 50, meaning that voids with
-  distances of moew than 50 units are considered the exterior (or
-  part of an interior hole).
+  distances of more than 50 meters are considered the exterior (or
+  part of an interior hole). For files in feet the concavity value
+  that is always assumed to be meters will be multipled with 3.28.
 
   lasboundary can directly output in KML format for easy viewing
   in GE. In case there is no projection information in the LAS

@@ -1,6 +1,10 @@
+20 October 2014 -- las2iso: fixed miss-spelled '-set_file_source_ID' to '-set_file_source_id'
+20 October 2014 -- blast2iso: added missing '-kill 600' parameter 
+20 October 2014 -- las2dem, las2iso, las2tin, blast2dem, blast2iso: auto adapt kill/concavity to feet 
 17 October 2014 -- lascanopy: fixed "first-plot-only bug" for *.laz input in '-lor'/'-loc'/'-lop' mode   
 16 October 2014 -- lasground: serious bug removed for (rare) LAS/LAZ files with header.z_offset < 0 
 13 October 2014 -- las2las: more control over '-target_precision' and '-target_elevation_precision'
+13 October 2014 -- LASlib: allow relative paths of type '-i d:tiles\*.laz' as input
 13 October 2014 -- LASlib: bigger I/O buffers for LASreader_las & LASwriter_las to improve performance
 13 October 2014 -- las2dem, lasgrid, lascanopy, lasoverlap: fixed bug introduced on 15 September 2014
 29 September 2014 -- NEW: lasplanes to find planar patches in terrestrial and mobile (airborne?) scans

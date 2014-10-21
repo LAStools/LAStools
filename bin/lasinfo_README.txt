@@ -127,7 +127,7 @@ corrects missing or wrong bounding box info in the header.
 
 corrects missing or wrong point number info in the header.
 
->> lasinfo -i lidar.las -set_file_source_id 27
+>> lasinfo -i lidar.las -set_file_source_ID 27
 
 sets the file source ID in the LAS header to 27.
 

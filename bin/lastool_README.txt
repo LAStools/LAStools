@@ -4,7 +4,7 @@
 
   One tool to rule them all - a simple GUI for LAStools.
 
-  Please license from martin.isenburg@gmail.com to use lastool 
+  Please license from martin.isenburg@rapidlasso.com to use lastool 
   commercially.
 
   For updates check the website or join the LAStools mailing list.

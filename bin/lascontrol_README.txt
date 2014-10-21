@@ -29,7 +29,7 @@
  
   The output defaults to stdout if no output file is specified.
 
-  Please license from martin.isenburg@gmail.com to use lascontrol
+  Please license from martin.isenburg@rapidlasso.com to use lascontrol
   commercially.
 
   For updates check the website or join the LAStools mailing list.

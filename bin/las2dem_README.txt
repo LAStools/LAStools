@@ -44,6 +44,11 @@
   raster extend can also be defined by setting '-ll min_x min_y'
   together with '-ncols 512' and '-nrows 512'.    
 
+  By default triangles whose edges are longer than 100 meters are
+  not rasterized. This value can be changed with '-kill 200'. The
+  value is always assumed to be meters and will be multipled with
+  3.28 for LAS/LAZ files where x and y are known to be in feet.
+
   Automatically a KML file is generated to allow the resulting
   DEM to be displayed inside Google Earth (for TIF/PNG/JPG). In
   case the LAS/LAZ file contains projection information (i.e. a
@@ -163,7 +168,7 @@ generated KML file
 
 other commandline arguments are
 
--kill 50              : do not raster triangles with edges longer than 50 units
+-kill 50              : do not raster triangles with edges longer than 50 meters
 -step 2               : raster with stepsize 2 (the default is 1)
 -nrows 512            : raster at most 512 rows
 -ncols 512            : raster at most 512 columns
