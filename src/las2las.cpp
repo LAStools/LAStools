@@ -410,7 +410,7 @@ int main(int argc, char *argv[])
     usage(true, argc==1);
   }
   
-  BOOL extra_pass = laswriteopener.is_piped();
+  bool extra_pass = laswriteopener.is_piped();
 
   // for piped output we need an extra pass
 
@@ -812,7 +812,7 @@ int main(int argc, char *argv[])
 
     // do we need an extra pass
 
-    BOOL extra_pass = laswriteopener.is_piped();
+    bool extra_pass = laswriteopener.is_piped();
 
     // for piped output we need an extra pass
 

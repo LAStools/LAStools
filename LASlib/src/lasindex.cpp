@@ -77,7 +77,7 @@ void LASindex::prepare(LASspatial* spatial, I32 threshold)
   this->interval = new LASinterval(threshold);
 }
 
-BOOL LASindex::add(const LASpoint* point, const U32 p_index)
+bool LASindex::add(const LASpoint* point, const U32 p_index)
 {
   I32 cell = spatial->get_cell_index(point->get_x(), point->get_y());
   return interval->add(p_index, cell);
@@ -102,7 +102,7 @@ void LASindex::complete(U32 minimum_points, I32 maximum_intervals)
       I32 hash2 = (hash1+1)%2;
       cell_hash[hash2].clear();
       // coarsen if a coarser cell will still have fewer than minimum_points (and points in all subcells)
-      BOOL coarsened = FALSE;
+      bool coarsened = FALSE;
       U32 i, full;
       I32 coarser_index;
       U32 num_indices;
@@ -169,7 +169,7 @@ void LASindex::complete(U32 minimum_points, I32 maximum_intervals)
   }
 }
 
-void LASindex::print(BOOL verbose)
+void LASindex::print(bool verbose)
 {
   U32 total_cells = 0;
   U32 total_full = 0;
@@ -210,7 +210,7 @@ LASinterval* LASindex::get_interval() const
   return interval;
 }
 
-BOOL LASindex::intersect_rectangle(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y)
+bool LASindex::intersect_rectangle(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y)
 {
   have_interval = FALSE;
   cells = spatial->intersect_rectangle(r_min_x, r_min_y, r_max_x, r_max_y);
@@ -220,7 +220,7 @@ BOOL LASindex::intersect_rectangle(const F64 r_min_x, const F64 r_min_y, const F
   return FALSE;
 }
 
-BOOL LASindex::intersect_tile(const F32 ll_x, const F32 ll_y, const F32 size)
+bool LASindex::intersect_tile(const F32 ll_x, const F32 ll_y, const F32 size)
 {
   have_interval = FALSE;
   cells = spatial->intersect_tile(ll_x, ll_y, size);
@@ -230,7 +230,7 @@ BOOL LASindex::intersect_tile(const F32 ll_x, const F32 ll_y, const F32 size)
   return FALSE;
 }
 
-BOOL LASindex::intersect_circle(const F64 center_x, const F64 center_y, const F64 radius)
+bool LASindex::intersect_circle(const F64 center_x, const F64 center_y, const F64 radius)
 {
   have_interval = FALSE;
   cells = spatial->intersect_circle(center_x, center_y, radius);
@@ -240,13 +240,13 @@ BOOL LASindex::intersect_circle(const F64 center_x, const F64 center_y, const F6
   return FALSE;
 }
 
-BOOL LASindex::get_intervals()
+bool LASindex::get_intervals()
 {
   have_interval = FALSE;
   return interval->get_merged_cell();
 }
 
-BOOL LASindex::has_intervals()
+bool LASindex::has_intervals()
 {
   if (interval->has_intervals())
   {
@@ -260,7 +260,7 @@ BOOL LASindex::has_intervals()
   return FALSE;
 }
 
-BOOL LASindex::read(const char* file_name)
+bool LASindex::read(const char* file_name)
 {
   if (file_name == 0) return FALSE;
   char* name = strdup(file_name);
@@ -302,7 +302,7 @@ BOOL LASindex::read(const char* file_name)
   return TRUE;
 }
 
-BOOL LASindex::append(const char* file_name) const
+bool LASindex::append(const char* file_name) const
 {
   LASreadOpener lasreadopener;
 
@@ -437,7 +437,7 @@ BOOL LASindex::append(const char* file_name) const
   return TRUE;
 }
 
-BOOL LASindex::write(const char* file_name) const
+bool LASindex::write(const char* file_name) const
 {
   if (file_name == 0) return FALSE;
   char* name = strdup(file_name);
@@ -481,7 +481,7 @@ BOOL LASindex::write(const char* file_name) const
   return TRUE;
 }
 
-BOOL LASindex::read(ByteStreamIn* stream)
+bool LASindex::read(ByteStreamIn* stream)
 {
   if (spatial)
   {
@@ -534,7 +534,7 @@ BOOL LASindex::read(ByteStreamIn* stream)
   return TRUE;
 }
 
-BOOL LASindex::write(ByteStreamOut* stream) const
+bool LASindex::write(ByteStreamOut* stream) const
 {
   if (!stream->putBytes((U8*)"LASX", 4))
   {
@@ -564,7 +564,7 @@ BOOL LASindex::write(ByteStreamOut* stream) const
 }
 
 // read next interval point
-BOOL LASindex::read_next(LASreader* lasreader)
+bool LASindex::read_next(LASreader* lasreader)
 {
   if (!have_interval)
   {
@@ -579,7 +579,7 @@ BOOL LASindex::read_next(LASreader* lasreader)
 }
 
 // seek to next interval point
-BOOL LASindex::seek_next(LASreader* lasreader)
+bool LASindex::seek_next(LASreader* lasreader)
 {
   if (!have_interval)
   {
@@ -594,7 +594,7 @@ BOOL LASindex::seek_next(LASreader* lasreader)
 }
 
 // merge the intervals of non-empty cells
-BOOL LASindex::merge_intervals()
+bool LASindex::merge_intervals()
 {
   if (spatial->get_intersected_cells())
   {
@@ -610,7 +610,7 @@ BOOL LASindex::merge_intervals()
 //    fprintf(stderr,"LASindex: used %d cells of total %d\n", used_cells, interval->get_number_cells());
     if (used_cells)
     {
-      BOOL r = interval->merge();
+      bool r = interval->merge();
       full = interval->full;
       total = interval->total;
       interval->clear_merge_cell_set();

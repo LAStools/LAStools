@@ -38,7 +38,7 @@ class LAScriterion
 public:
   virtual const CHAR * name() const = 0;
   virtual I32 get_command(CHAR* string) const = 0;
-  virtual BOOL filter(const LASpoint* point) = 0;
+  virtual bool filter(const LASpoint* point) = 0;
   virtual void reset(){};
   virtual ~LAScriterion(){};
 };
@@ -49,15 +49,15 @@ public:
 
   void usage() const;
   void clean();
-  BOOL parse(int argc, char* argv[]);
+  bool parse(int argc, char* argv[]);
   I32 unparse(CHAR* string) const;
-  inline BOOL active() const { return (num_criteria != 0); };
+  inline bool active() const { return (num_criteria != 0); };
 
   void addClipCircle(F64 x, F64 y, F64 radius);
   void addClipBox(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y, F64 max_z);
   void addScanDirectionChangeOnly();
 
-  BOOL filter(const LASpoint* point);
+  bool filter(const LASpoint* point);
   void reset();
 
   LASfilter();

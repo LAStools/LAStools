@@ -16,9 +16,9 @@
   acceleration is also available to users of the LASlib API. The
   LASreader class has three new functions called
 
-    BOOL inside_tile(F32 ll_x, F32 ll_y, F32 size);
-    BOOL inside_circle(F64 center_x, F64 center_y, F64 radius);
-    BOOL inside_rectangle(F64 min_x, F64 min_y, F64 max_x, F64 max_y);
+    bool inside_tile(F32 ll_x, F32 ll_y, F32 size);
+    bool inside_circle(F64 center_x, F64 center_y, F64 radius);
+    bool inside_rectangle(F64 min_x, F64 min_y, F64 max_x, F64 max_y);
 
   if any of these functions is called the LASreader will only
   return the points that fall inside the specified region and

@@ -54,12 +54,12 @@ public:
   ~LASreadPoint();
 
   // should only be called *once*
-  BOOL setup(const U32 num_items, const LASitem* items, const LASzip* laszip=0);
+  bool setup(const U32 num_items, const LASitem* items, const LASzip* laszip=0);
 
-  BOOL init(ByteStreamIn* instream);
-  BOOL seek(const U32 current, const U32 target);
-  BOOL read(U8* const * point);
-  BOOL done();
+  bool init(ByteStreamIn* instream);
+  bool seek(const U32 current, const U32 target);
+  bool read(U8* const * point);
+  bool done();
 
 private:
   ByteStreamIn* instream;
@@ -76,8 +76,8 @@ private:
   U32 tabled_chunks;
   I64* chunk_starts;
   U32* chunk_totals;
-  BOOL init_dec();
-  BOOL read_chunk_table();
+  bool init_dec();
+  bool read_chunk_table();
   U32 search_chunk_table(const U32 index, const U32 lower, const U32 upper);
   // used for seeking
   I64 point_start;

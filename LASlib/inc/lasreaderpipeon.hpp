@@ -39,7 +39,7 @@ class LASreaderPipeOn : public LASreader
 {
 public:
 
-  BOOL open(LASreader* lasreader);
+  bool open(LASreader* lasreader);
   LASreader* get_lasreader() const { return lasreader; };
 
   I32 get_format() const;
@@ -49,20 +49,20 @@ public:
   void set_filter(LASfilter* filter);
   void set_transform(LAStransform* transform);
 
-  BOOL inside_tile(const F32 ll_x, const F32 ll_y, const F32 size);
-  BOOL inside_circle(const F64 center_x, const F64 center_y, const F64 radius);
-  BOOL inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
+  bool inside_tile(const F32 ll_x, const F32 ll_y, const F32 size);
+  bool inside_circle(const F64 center_x, const F64 center_y, const F64 radius);
+  bool inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
 
-  BOOL seek(const I64 p_index){ return FALSE; };
+  bool seek(const I64 p_index){ return FALSE; };
 
   ByteStreamIn* get_stream() const { return 0; };
-  void close(BOOL close_stream=TRUE);
+  void close(bool close_stream=TRUE);
 
   LASreaderPipeOn();
   ~LASreaderPipeOn();
 
 protected:
-  BOOL read_point_default();
+  bool read_point_default();
 
 private:
   LASreader* lasreader;

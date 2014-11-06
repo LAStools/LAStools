@@ -48,13 +48,13 @@ class LAStransform
 {
 public:
 
-  BOOL change_coordinates;
+  bool change_coordinates;
 
   void usage() const;
   void clean();
-  BOOL parse(int argc, char* argv[]);
+  bool parse(int argc, char* argv[]);
   I32 unparse(char* string) const;
-  inline BOOL active() const { return (num_operations != 0); };
+  inline bool active() const { return (num_operations != 0); };
 
   void setPointSource(U16 value);
 

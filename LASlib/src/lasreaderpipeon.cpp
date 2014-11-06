@@ -39,7 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-BOOL LASreaderPipeOn::open(LASreader* lasreader)
+bool LASreaderPipeOn::open(LASreader* lasreader)
 {
   if (lasreader == 0)
   {
@@ -128,17 +128,17 @@ void LASreaderPipeOn::set_transform(LAStransform* transform)
   if (lasreader) lasreader->set_transform(transform);
 }
 
-BOOL LASreaderPipeOn::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
+bool LASreaderPipeOn::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
 {
   return (lasreader ? lasreader->inside_tile(ll_x, ll_y, size) : FALSE);
 }
 
-BOOL LASreaderPipeOn::inside_circle(const F64 center_x, const F64 center_y, const F64 radius)
+bool LASreaderPipeOn::inside_circle(const F64 center_x, const F64 center_y, const F64 radius)
 {
   return (lasreader ? lasreader->inside_circle(center_x, center_y, radius) : FALSE);
 }
 
-BOOL LASreaderPipeOn::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y)
+bool LASreaderPipeOn::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y)
 {
   return (lasreader ? lasreader->inside_rectangle(min_x, min_y, max_x, max_y) : FALSE);
 }
@@ -148,7 +148,7 @@ I32 LASreaderPipeOn::get_format() const
   return (lasreader ? lasreader->get_format() : LAS_TOOLS_FORMAT_DEFAULT);
 }
 
-BOOL LASreaderPipeOn::read_point_default()
+bool LASreaderPipeOn::read_point_default()
 {
   while (true)
   {
@@ -173,7 +173,7 @@ BOOL LASreaderPipeOn::read_point_default()
   }
 }
 
-void LASreaderPipeOn::close(BOOL close_stream)
+void LASreaderPipeOn::close(bool close_stream)
 {
   if (lasreader) 
   {

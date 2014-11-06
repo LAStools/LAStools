@@ -18,9 +18,9 @@
      also available to users of the LASlib API. The LASreader class has three new
      functions called
 
-     BOOL inside_tile(const F32 ll_x, const F32 ll_y, const F32 size);
-     BOOL inside_circle(const F64 center_x, const F64 center_y, const F64 radius);
-     BOOL inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
+     bool inside_tile(const F32 ll_x, const F32 ll_y, const F32 size);
+     bool inside_circle(const F64 center_x, const F64 center_y, const F64 radius);
+     bool inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
 
      if any of these functions is called the LASreader will only return the points
      that fall inside the specified region and use - when available - the spatial
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
   U32 threshold = 1000;
   U32 minimum_points = 100000;
   I32 maximum_intervals = -20;
-  BOOL append = FALSE;
+  bool append = FALSE;
   F64 start_time = 0.0;
   F64 total_start_time = 0.0;
 

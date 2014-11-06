@@ -86,17 +86,17 @@ int main(int argc, char *argv[])
 {
   int i;
 #ifdef COMPILE_WITH_GUI
-  BOOL gui = FALSE;
+  bool gui = FALSE;
 #endif
 #ifdef COMPILE_WITH_MULTI_CORE
   I32 cores = 1;
 #endif
-  BOOL verbose = FALSE;
+  bool verbose = FALSE;
   bool report_file_size = false;
   bool projection_was_set = false;
   bool format_not_specified = false;
-  BOOL append = FALSE;
-  BOOL rearrange = FALSE;
+  bool append = FALSE;
+  bool rearrange = FALSE;
   F32 bucket_size = -1.0f;
   U32 tile_size = 100;
   U32 threshold = 1000;

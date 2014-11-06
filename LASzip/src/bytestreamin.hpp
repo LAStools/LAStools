@@ -71,13 +71,13 @@ public:
 /* read 64 bit big-endian field                              */
   virtual void get64bitsBE(U8* bytes) = 0;
 /* is the stream seekable (e.g. stdin is not)                */
-  virtual BOOL isSeekable() const = 0;
+  virtual bool isSeekable() const = 0;
 /* get current position of stream                            */
   virtual I64 tell() const = 0;
 /* seek to this position in the stream                       */
-  virtual BOOL seek(const I64 position) = 0;
+  virtual bool seek(const I64 position) = 0;
 /* seek to the end of the file                               */
-  virtual BOOL seekEnd(const I64 distance=0) = 0;
+  virtual bool seekEnd(const I64 distance=0) = 0;
 /* constructor                                               */
   inline ByteStreamIn() { bit_buffer = 0; num_buffer = 0; };
 /* destructor                                                */

@@ -77,7 +77,7 @@ LASspatial* LASspatialReadWrite::read(ByteStreamIn* stream) const
   return spatial;
 }
 
-BOOL LASspatialReadWrite::write(const LASspatial* spatial, ByteStreamOut* stream) const
+bool LASspatialReadWrite::write(const LASspatial* spatial, ByteStreamOut* stream) const
 {
   if (!stream->putBytes((U8*)"LASS", 4))
   {
