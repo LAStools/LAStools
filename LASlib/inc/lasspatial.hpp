@@ -45,18 +45,18 @@ public:
   virtual ~LASspatial() {};
 
   // read from file or write to file
-  virtual BOOL read(ByteStreamIn* stream) = 0;
-  virtual BOOL write(ByteStreamOut* stream) const = 0;
+  virtual bool read(ByteStreamIn* stream) = 0;
+  virtual bool write(ByteStreamOut* stream) const = 0;
 
   // create or finalize the cell (in the spatial hierarchy) 
-  virtual BOOL manage_cell(const U32 cell_index, const BOOL finalize=FALSE) = 0;
+  virtual bool manage_cell(const U32 cell_index, const bool finalize=FALSE) = 0;
 
   // map points to cells
-  virtual BOOL inside(const F64 x, const F64 y) const = 0;
+  virtual bool inside(const F64 x, const F64 y) const = 0;
   virtual U32 get_cell_index(const F64 x, const F64 y) const = 0;
 
   // map cells to coarser cells
-  virtual BOOL coarsen(const I32 cell_index, I32* coarser_cell_index, U32* num_cell_indices, I32** cell_indices) const = 0;
+  virtual bool coarsen(const I32 cell_index, I32* coarser_cell_index, U32* num_cell_indices, I32** cell_indices) const = 0;
 
   // describe cells
   virtual void get_cell_bounding_box(const I32 cell_index, F32* min, F32* max) const = 0;
@@ -74,9 +74,9 @@ public:
   virtual U32 intersect_circle(const F64 center_x, const F64 center_y, const F64 radius) = 0;
 
   // iterate over cells
-  virtual BOOL get_all_cells() = 0;
-  virtual BOOL get_intersected_cells() = 0;
-  virtual BOOL has_more_cells() = 0;
+  virtual bool get_all_cells() = 0;
+  virtual bool get_intersected_cells() = 0;
+  virtual bool has_more_cells() = 0;
 
   I32 current_cell;
 };
@@ -85,7 +85,7 @@ class LASspatialReadWrite
 {
 public:
   LASspatial* read(ByteStreamIn* stream) const;
-  BOOL write(const LASspatial* spatial, ByteStreamOut* stream) const;
+  bool write(const LASspatial* spatial, ByteStreamOut* stream) const;
 };
 
 #endif

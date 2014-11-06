@@ -50,7 +50,7 @@ public:
   ~ArithmeticEncoder();
 
 /* Manage encoding                                           */
-  BOOL init(ByteStreamOut* outstream);
+  bool init(ByteStreamOut* outstream);
   void done();
 
 /* Manage an entropy model for a single bit                  */

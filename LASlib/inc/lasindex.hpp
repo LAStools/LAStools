@@ -50,24 +50,24 @@ public:
 
   // create spatial index
   void prepare(LASspatial* spatial, I32 threshold=1000);
-  BOOL add(const LASpoint* point, const U32 index);
+  bool add(const LASpoint* point, const U32 index);
   void complete(U32 minimum_points=100000, I32 maximum_intervals=-1);
 
   // read from file or write to file
-  BOOL read(const char* file_name);
-  BOOL append(const char* file_name) const;
-  BOOL write(const char* file_name) const;
-  BOOL read(ByteStreamIn* stream);
-  BOOL write(ByteStreamOut* stream) const;
+  bool read(const char* file_name);
+  bool append(const char* file_name) const;
+  bool write(const char* file_name) const;
+  bool read(ByteStreamIn* stream);
+  bool write(ByteStreamOut* stream) const;
 
   // intersect
-  BOOL intersect_rectangle(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y);
-  BOOL intersect_tile(const F32 ll_x, const F32 ll_y, const F32 size);
-  BOOL intersect_circle(const F64 center_x, const F64 center_y, const F64 radius);
+  bool intersect_rectangle(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y);
+  bool intersect_tile(const F32 ll_x, const F32 ll_y, const F32 size);
+  bool intersect_circle(const F64 center_x, const F64 center_y, const F64 radius);
 
   // access the intersected intervals
-  BOOL get_intervals();
-  BOOL has_intervals();
+  bool get_intervals();
+  bool has_intervals();
 
   U32 start;
   U32 end;
@@ -76,22 +76,22 @@ public:
   U32 cells;
 
   // read or seek next interval point
-  BOOL read_next(LASreader* lasreader);
-  BOOL seek_next(LASreader* lasreader);
+  bool read_next(LASreader* lasreader);
+  bool seek_next(LASreader* lasreader);
 
   // for debugging
-  void print(BOOL verbose);
+  void print(bool verbose);
 
   // for visualization
   LASspatial* get_spatial() const;
   LASinterval* get_interval() const;
 
 private:
-  BOOL merge_intervals();
+  bool merge_intervals();
 
   LASspatial* spatial;
   LASinterval* interval;
-  BOOL have_interval;
+  bool have_interval;
 };
 
 #endif

@@ -39,7 +39,7 @@
 
 extern "C" FILE* fopen_compressed(const char* filename, const char* mode, bool* piped);
 
-BOOL LASreaderTXT::open(const char* file_name, const char* parse_string, I32 skip_lines, BOOL populate_header)
+bool LASreaderTXT::open(const char* file_name, const char* parse_string, I32 skip_lines, bool populate_header)
 {
   if (file_name == 0)
   {
@@ -57,7 +57,7 @@ BOOL LASreaderTXT::open(const char* file_name, const char* parse_string, I32 ski
   return open(file, file_name, parse_string, skip_lines, populate_header);
 }
 
-BOOL LASreaderTXT::open(FILE* file, const char* file_name, const char* parse_string, I32 skip_lines, BOOL populate_header)
+bool LASreaderTXT::open(FILE* file, const char* file_name, const char* parse_string, I32 skip_lines, bool populate_header)
 {
   int i;
 
@@ -650,14 +650,14 @@ BOOL LASreaderTXT::open(FILE* file, const char* file_name, const char* parse_str
   return TRUE;
 }
 
-void LASreaderTXT::set_pts(BOOL pts)
+void LASreaderTXT::set_pts(bool pts)
 {
   translate_intensity = 2048.0f;
   scale_intensity = 1.0f;
   this->ipts = pts;
 }
 
-void LASreaderTXT::set_ptx(BOOL ptx)
+void LASreaderTXT::set_ptx(bool ptx)
 {
   translate_intensity = 0.0f;
   scale_intensity = 4095.0f;
@@ -742,7 +742,7 @@ void LASreaderTXT::add_attribute(I32 data_type, const char* name, const char* de
   number_attributes++;
 }
 
-BOOL LASreaderTXT::seek(const I64 p_index)
+bool LASreaderTXT::seek(const I64 p_index)
 {
   U32 delta = 0;
   if (p_index > p_count)
@@ -793,7 +793,7 @@ BOOL LASreaderTXT::seek(const I64 p_index)
   return TRUE;
 }
 
-BOOL LASreaderTXT::read_point_default()
+bool LASreaderTXT::read_point_default()
 {
   if (p_count)
   {
@@ -879,7 +879,7 @@ ByteStreamIn* LASreaderTXT::get_stream() const
   return 0;
 }
 
-void LASreaderTXT::close(BOOL close_stream)
+void LASreaderTXT::close(bool close_stream)
 {
   if (file)
   {
@@ -889,7 +889,7 @@ void LASreaderTXT::close(BOOL close_stream)
   }
 }
 
-BOOL LASreaderTXT::reopen(const char* file_name)
+bool LASreaderTXT::reopen(const char* file_name)
 {
   int i;
 
@@ -991,7 +991,7 @@ LASreaderTXT::~LASreaderTXT()
   }
 }
 
-BOOL LASreaderTXT::parse_attribute(const char* l, I32 index)
+bool LASreaderTXT::parse_attribute(const char* l, I32 index)
 {
   if (index >= header.number_attributes)
   {
@@ -1163,7 +1163,7 @@ BOOL LASreaderTXT::parse_attribute(const char* l, I32 index)
   return TRUE;
 }
 
-BOOL LASreaderTXT::parse(const char* parse_string)
+bool LASreaderTXT::parse(const char* parse_string)
 {
   I32 temp_i;
   F32 temp_f;
@@ -1388,7 +1388,7 @@ BOOL LASreaderTXT::parse(const char* parse_string)
   return TRUE;
 }
 
-BOOL LASreaderTXT::check_parse_string(const char* parse_string)
+bool LASreaderTXT::check_parse_string(const char* parse_string)
 {
   const char* p = parse_string;
   while (p[0])
@@ -1582,7 +1582,7 @@ LASreaderTXTrescale::LASreaderTXTrescale(F64 x_scale_factor, F64 y_scale_factor,
   scale_factor[2] = z_scale_factor;
 }
 
-BOOL LASreaderTXTrescale::open(const char* file_name, const char* parse_string, I32 skip_lines, BOOL populate_header)
+bool LASreaderTXTrescale::open(const char* file_name, const char* parse_string, I32 skip_lines, bool populate_header)
 {
   if (!LASreaderTXT::open(file_name, parse_string, skip_lines, populate_header)) return FALSE;
   // do we need to change anything
@@ -1608,7 +1608,7 @@ LASreaderTXTreoffset::LASreaderTXTreoffset(F64 x_offset, F64 y_offset, F64 z_off
   this->offset[2] = z_offset;
 }
 
-BOOL LASreaderTXTreoffset::open(const char* file_name, const char* parse_string, I32 skip_lines, BOOL populate_header)
+bool LASreaderTXTreoffset::open(const char* file_name, const char* parse_string, I32 skip_lines, bool populate_header)
 {
   if (!LASreaderTXT::open(file_name, parse_string, skip_lines, populate_header)) return FALSE;
   // do we need to change anything
@@ -1631,7 +1631,7 @@ LASreaderTXTrescalereoffset::LASreaderTXTrescalereoffset(F64 x_scale_factor, F64
 {
 }
 
-BOOL LASreaderTXTrescalereoffset::open(const char* file_name, const char* parse_string, I32 skip_lines, BOOL populate_header)
+bool LASreaderTXTrescalereoffset::open(const char* file_name, const char* parse_string, I32 skip_lines, bool populate_header)
 {
   if (!LASreaderTXT::open(file_name, parse_string, skip_lines, populate_header)) return FALSE;
   // do we need to change anything

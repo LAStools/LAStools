@@ -327,11 +327,11 @@ bool LASzip::setup(const U16 num_items, const LASitem* items, const U16 compress
 bool LASzip::setup(U16* num_items, LASitem** items, const U8 point_type, const U16 point_size, const U16 compressor)
 {
   U32 compatible = 0;
-  BOOL have_point14 = FALSE;
-  BOOL have_gps_time = FALSE;
-  BOOL have_rgb = FALSE;
-  BOOL have_nir = FALSE;
-  BOOL have_wavepacket = FALSE;
+  bool have_point14 = FALSE;
+  bool have_gps_time = FALSE;
+  bool have_rgb = FALSE;
+  bool have_nir = FALSE;
+  bool have_wavepacket = FALSE;
   I32 extra_bytes_number = 0;
 
   // switch over the point types we know

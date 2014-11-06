@@ -57,7 +57,7 @@ const U32 DM__MaxCount    = 1 << DM__LengthShift;  // for adaptive models
 class ArithmeticModel
 {
 public:
-  ArithmeticModel(U32 symbols, BOOL compress);
+  ArithmeticModel(U32 symbols, bool compress);
   ~ArithmeticModel();
 
   I32 init(U32* table=0);
@@ -67,7 +67,7 @@ private:
   U32 * distribution, * symbol_count, * decoder_table;
   U32 total_count, update_cycle, symbols_until_update;
   U32 symbols, last_symbol, table_size, table_shift;
-  BOOL compress;
+  bool compress;
   friend class ArithmeticEncoder;
   friend class ArithmeticDecoder;
 };

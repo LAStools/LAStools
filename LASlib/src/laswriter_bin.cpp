@@ -78,14 +78,14 @@ struct TSheader
   I32 rgb;
 };
 
-BOOL LASwriterBIN::refile(FILE* file)
+bool LASwriterBIN::refile(FILE* file)
 {
   if (stream == 0) return FALSE;
   if (this->file) this->file = file;
   return ((ByteStreamOutFile*)stream)->refile(file);
 }
 
-BOOL LASwriterBIN::open(const char* file_name, const LASheader* header, const char* version, U32 io_buffer_size)
+bool LASwriterBIN::open(const char* file_name, const LASheader* header, const char* version, U32 io_buffer_size)
 {
   if (file_name == 0)
   {
@@ -115,7 +115,7 @@ BOOL LASwriterBIN::open(const char* file_name, const LASheader* header, const ch
   return open(out, header, version);
 }
 
-BOOL LASwriterBIN::open(FILE* file, const LASheader* header, const char* version)
+bool LASwriterBIN::open(FILE* file, const LASheader* header, const char* version)
 {
   if (file == 0)
   {
@@ -142,7 +142,7 @@ BOOL LASwriterBIN::open(FILE* file, const LASheader* header, const char* version
   return open(out, header, version);
 }
 
-BOOL LASwriterBIN::open(ByteStreamOut* stream, const LASheader* header, const char* version)
+bool LASwriterBIN::open(ByteStreamOut* stream, const LASheader* header, const char* version)
 {
   if (stream == 0)
   {
@@ -185,7 +185,7 @@ BOOL LASwriterBIN::open(ByteStreamOut* stream, const LASheader* header, const ch
   return stream->putBytes((U8*)&tsheader, sizeof(TSheader));
 }
 
-BOOL LASwriterBIN::write_point(const LASpoint* point)
+bool LASwriterBIN::write_point(const LASpoint* point)
 {
   U16 echo;
 
@@ -242,12 +242,12 @@ BOOL LASwriterBIN::write_point(const LASpoint* point)
   return TRUE;
 }
 
-BOOL LASwriterBIN::update_header(const LASheader* header, BOOL use_inventory, BOOL update_extra_bytes)
+bool LASwriterBIN::update_header(const LASheader* header, bool use_inventory, bool update_extra_bytes)
 {
   return TRUE;
 }
 
-I64 LASwriterBIN::close(BOOL update_header)
+I64 LASwriterBIN::close(bool update_header)
 {
   I64 bytes = 0;
   

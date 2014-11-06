@@ -99,7 +99,7 @@ LASwriteItemCompressed_POINT10_v1::~LASwriteItemCompressed_POINT10_v1()
   }
 }
 
-BOOL LASwriteItemCompressed_POINT10_v1::init(const U8* item)
+bool LASwriteItemCompressed_POINT10_v1::init(const U8* item)
 {
   U32 i;
 
@@ -129,7 +129,7 @@ BOOL LASwriteItemCompressed_POINT10_v1::init(const U8* item)
   return TRUE;
 }
 
-inline BOOL LASwriteItemCompressed_POINT10_v1::write(const U8* item)
+inline bool LASwriteItemCompressed_POINT10_v1::write(const U8* item)
 {
   // find median difference for x and y from 3 preceding differences
   I32 median_x;
@@ -281,7 +281,7 @@ LASwriteItemCompressed_GPSTIME11_v1::~LASwriteItemCompressed_GPSTIME11_v1()
   delete ic_gpstime;
 }
 
-BOOL LASwriteItemCompressed_GPSTIME11_v1::init(const U8* item)
+bool LASwriteItemCompressed_GPSTIME11_v1::init(const U8* item)
 {
   /* init state */
   last_gpstime_diff = 0;
@@ -297,7 +297,7 @@ BOOL LASwriteItemCompressed_GPSTIME11_v1::init(const U8* item)
   return TRUE;
 }
 
-inline BOOL LASwriteItemCompressed_GPSTIME11_v1::write(const U8* item)
+inline bool LASwriteItemCompressed_GPSTIME11_v1::write(const U8* item)
 {
   U64I64F64 this_gpstime;
   this_gpstime.i64 = *((I64*)item);
@@ -438,7 +438,7 @@ LASwriteItemCompressed_RGB12_v1::~LASwriteItemCompressed_RGB12_v1()
   delete [] last_item;
 }
 
-BOOL LASwriteItemCompressed_RGB12_v1::init(const U8* item)
+bool LASwriteItemCompressed_RGB12_v1::init(const U8* item)
 {
   /* init state */
 
@@ -451,7 +451,7 @@ BOOL LASwriteItemCompressed_RGB12_v1::init(const U8* item)
   return TRUE;
 }
 
-inline BOOL LASwriteItemCompressed_RGB12_v1::write(const U8* item)
+inline bool LASwriteItemCompressed_RGB12_v1::write(const U8* item)
 {
   U32 sym = ((((U16*)last_item)[0]&0x00FF) != (((U16*)item)[0]&0x00FF)) << 0;
   sym |= ((((U16*)last_item)[0]&0xFF00) != (((U16*)item)[0]&0xFF00)) << 1;
@@ -511,7 +511,7 @@ LASwriteItemCompressed_WAVEPACKET13_v1::~LASwriteItemCompressed_WAVEPACKET13_v1(
   delete [] last_item;
 }
 
-BOOL LASwriteItemCompressed_WAVEPACKET13_v1::init(const U8* item)
+bool LASwriteItemCompressed_WAVEPACKET13_v1::init(const U8* item)
 {
   /* init state */
   last_diff_32 = 0;
@@ -534,7 +534,7 @@ BOOL LASwriteItemCompressed_WAVEPACKET13_v1::init(const U8* item)
   return TRUE;
 }
 
-inline BOOL LASwriteItemCompressed_WAVEPACKET13_v1::write(const U8* item)
+inline bool LASwriteItemCompressed_WAVEPACKET13_v1::write(const U8* item)
 {
   enc->encodeSymbol(m_packet_index, (U32)(item[0]));
   item++;
@@ -612,7 +612,7 @@ LASwriteItemCompressed_BYTE_v1::~LASwriteItemCompressed_BYTE_v1()
   delete [] last_item;
 }
 
-BOOL LASwriteItemCompressed_BYTE_v1::init(const U8* item)
+bool LASwriteItemCompressed_BYTE_v1::init(const U8* item)
 {
   /* init state */
 
@@ -624,7 +624,7 @@ BOOL LASwriteItemCompressed_BYTE_v1::init(const U8* item)
   return TRUE;
 }
 
-inline BOOL LASwriteItemCompressed_BYTE_v1::write(const U8* item)
+inline bool LASwriteItemCompressed_BYTE_v1::write(const U8* item)
 {
   U32 i;
   for (i = 0; i < number; i++)

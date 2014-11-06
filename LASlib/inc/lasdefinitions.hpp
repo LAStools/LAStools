@@ -178,51 +178,51 @@ public:
     if (description) strncpy(this->description, description, 32);
   };
 
-  inline BOOL set_no_data(U8 no_data, I32 dim=0) { if ((0 == get_type()) && (dim < get_dim())) { this->no_data[dim].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(I8 no_data, I32 dim=0) { if ((1 == get_type()) && (dim < get_dim())) { this->no_data[dim].i64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(U16 no_data, I32 dim=0) { if ((2 == get_type()) && (dim < get_dim())) { this->no_data[dim].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(I16 no_data, I32 dim=0) { if ((3 == get_type()) && (dim < get_dim())) { this->no_data[dim].i64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(U32 no_data, I32 dim=0) { if ((4 == get_type()) && (dim < get_dim())) { this->no_data[dim].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(I32 no_data, I32 dim=0) { if ((5 == get_type()) && (dim < get_dim())) { this->no_data[dim].i64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(U64 no_data, I32 dim=0) { if ((6 == get_type()) && (dim < get_dim())) { this->no_data[dim].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(I64 no_data, I32 dim=0) { if ((7 == get_type()) && (dim < get_dim())) { this->no_data[dim].i64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(F32 no_data, I32 dim=0) { if ((8 == get_type()) && (dim < get_dim())) { this->no_data[dim].f64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(F64 no_data, I32 dim=0) { if ((9 == get_type()) && (dim < get_dim())) { this->no_data[dim].f64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(U8 no_data, I32 dim=0) { if ((0 == get_type()) && (dim < get_dim())) { this->no_data[dim].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(I8 no_data, I32 dim=0) { if ((1 == get_type()) && (dim < get_dim())) { this->no_data[dim].i64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(U16 no_data, I32 dim=0) { if ((2 == get_type()) && (dim < get_dim())) { this->no_data[dim].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(I16 no_data, I32 dim=0) { if ((3 == get_type()) && (dim < get_dim())) { this->no_data[dim].i64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(U32 no_data, I32 dim=0) { if ((4 == get_type()) && (dim < get_dim())) { this->no_data[dim].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(I32 no_data, I32 dim=0) { if ((5 == get_type()) && (dim < get_dim())) { this->no_data[dim].i64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(U64 no_data, I32 dim=0) { if ((6 == get_type()) && (dim < get_dim())) { this->no_data[dim].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(I64 no_data, I32 dim=0) { if ((7 == get_type()) && (dim < get_dim())) { this->no_data[dim].i64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(F32 no_data, I32 dim=0) { if ((8 == get_type()) && (dim < get_dim())) { this->no_data[dim].f64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline bool set_no_data(F64 no_data, I32 dim=0) { if ((9 == get_type()) && (dim < get_dim())) { this->no_data[dim].f64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
 
   inline void set_min(U8* min, I32 dim=0) { this->min[dim] = cast(min); options |= 0x02; };
   inline void update_min(U8* min, I32 dim=0) { this->min[dim] = smallest(cast(min), this->min[dim]); };
-  inline BOOL set_min(U8 min, I32 dim=0) { if ((0 == get_type()) && (dim < get_dim())) { this->min[dim].u64 = min; options |= 0x02; return TRUE; } return FALSE; };
-  inline BOOL set_min(I8 min, I32 dim=0) { if ((1 == get_type()) && (dim < get_dim())) { this->min[dim].i64 = min; options |= 0x02; return TRUE; } return FALSE; };
-  inline BOOL set_min(U16 min, I32 dim=0) { if ((2 == get_type()) && (dim < get_dim())) { this->min[dim].u64 = min; options |= 0x02; return TRUE; } return FALSE; };
-  inline BOOL set_min(I16 min, I32 dim=0) { if ((3 == get_type()) && (dim < get_dim())) { this->min[dim].i64 = min; options |= 0x02; return TRUE; } return FALSE; };
-  inline BOOL set_min(U32 min, I32 dim=0) { if ((4 == get_type()) && (dim < get_dim())) { this->min[dim].u64 = min; options |= 0x02; return TRUE; } return FALSE; };
-  inline BOOL set_min(I32 min, I32 dim=0) { if ((5 == get_type()) && (dim < get_dim())) { this->min[dim].i64 = min; options |= 0x02; return TRUE; } return FALSE; };
-  inline BOOL set_min(U64 min, I32 dim=0) { if ((6 == get_type()) && (dim < get_dim())) { this->min[dim].u64 = min; options |= 0x02; return TRUE; } return FALSE; };
-  inline BOOL set_min(I64 min, I32 dim=0) { if ((7 == get_type()) && (dim < get_dim())) { this->min[dim].i64 = min; options |= 0x02; return TRUE; } return FALSE; };
-  inline BOOL set_min(F32 min, I32 dim=0) { if ((8 == get_type()) && (dim < get_dim())) { this->min[dim].f64 = min; options |= 0x02; return TRUE; } return FALSE; };
-  inline BOOL set_min(F64 min, I32 dim=0) { if ((9 == get_type()) && (dim < get_dim())) { this->min[dim].f64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(U8 min, I32 dim=0) { if ((0 == get_type()) && (dim < get_dim())) { this->min[dim].u64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(I8 min, I32 dim=0) { if ((1 == get_type()) && (dim < get_dim())) { this->min[dim].i64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(U16 min, I32 dim=0) { if ((2 == get_type()) && (dim < get_dim())) { this->min[dim].u64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(I16 min, I32 dim=0) { if ((3 == get_type()) && (dim < get_dim())) { this->min[dim].i64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(U32 min, I32 dim=0) { if ((4 == get_type()) && (dim < get_dim())) { this->min[dim].u64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(I32 min, I32 dim=0) { if ((5 == get_type()) && (dim < get_dim())) { this->min[dim].i64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(U64 min, I32 dim=0) { if ((6 == get_type()) && (dim < get_dim())) { this->min[dim].u64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(I64 min, I32 dim=0) { if ((7 == get_type()) && (dim < get_dim())) { this->min[dim].i64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(F32 min, I32 dim=0) { if ((8 == get_type()) && (dim < get_dim())) { this->min[dim].f64 = min; options |= 0x02; return TRUE; } return FALSE; };
+  inline bool set_min(F64 min, I32 dim=0) { if ((9 == get_type()) && (dim < get_dim())) { this->min[dim].f64 = min; options |= 0x02; return TRUE; } return FALSE; };
 
   inline void set_max(U8* max, I32 dim=0) { this->max[dim] = cast(max); options |= 0x04; };
   inline void update_max(U8* max, I32 dim=0) { this->max[dim] = biggest(cast(max), this->max[dim]); };
-  inline BOOL set_max(U8 max, I32 dim=0) { if ((0 == get_type()) && (dim < get_dim())) { this->max[dim].u64 = max; options |= 0x04; return TRUE; } return FALSE; };
-  inline BOOL set_max(I8 max, I32 dim=0) { if ((1 == get_type()) && (dim < get_dim())) { this->max[dim].i64 = max; options |= 0x04; return TRUE; } return FALSE; };
-  inline BOOL set_max(U16 max, I32 dim=0) { if ((2 == get_type()) && (dim < get_dim())) { this->max[dim].u64 = max; options |= 0x04; return TRUE; } return FALSE; };
-  inline BOOL set_max(I16 max, I32 dim=0) { if ((3 == get_type()) && (dim < get_dim())) { this->max[dim].i64 = max; options |= 0x04; return TRUE; } return FALSE; };
-  inline BOOL set_max(U32 max, I32 dim=0) { if ((4 == get_type()) && (dim < get_dim())) { this->max[dim].u64 = max; options |= 0x04; return TRUE; } return FALSE; };
-  inline BOOL set_max(I32 max, I32 dim=0) { if ((5 == get_type()) && (dim < get_dim())) { this->max[dim].i64 = max; options |= 0x04; return TRUE; } return FALSE; };
-  inline BOOL set_max(U64 max, I32 dim=0) { if ((6 == get_type()) && (dim < get_dim())) { this->max[dim].u64 = max; options |= 0x04; return TRUE; } return FALSE; };
-  inline BOOL set_max(I64 max, I32 dim=0) { if ((7 == get_type()) && (dim < get_dim())) { this->max[dim].i64 = max; options |= 0x04; return TRUE; } return FALSE; };
-  inline BOOL set_max(F32 max, I32 dim=0) { if ((8 == get_type()) && (dim < get_dim())) { this->max[dim].f64 = max; options |= 0x04; return TRUE; } return FALSE; };
-  inline BOOL set_max(F64 max, I32 dim=0) { if ((9 == get_type()) && (dim < get_dim())) { this->max[dim].f64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(U8 max, I32 dim=0) { if ((0 == get_type()) && (dim < get_dim())) { this->max[dim].u64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(I8 max, I32 dim=0) { if ((1 == get_type()) && (dim < get_dim())) { this->max[dim].i64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(U16 max, I32 dim=0) { if ((2 == get_type()) && (dim < get_dim())) { this->max[dim].u64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(I16 max, I32 dim=0) { if ((3 == get_type()) && (dim < get_dim())) { this->max[dim].i64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(U32 max, I32 dim=0) { if ((4 == get_type()) && (dim < get_dim())) { this->max[dim].u64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(I32 max, I32 dim=0) { if ((5 == get_type()) && (dim < get_dim())) { this->max[dim].i64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(U64 max, I32 dim=0) { if ((6 == get_type()) && (dim < get_dim())) { this->max[dim].u64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(I64 max, I32 dim=0) { if ((7 == get_type()) && (dim < get_dim())) { this->max[dim].i64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(F32 max, I32 dim=0) { if ((8 == get_type()) && (dim < get_dim())) { this->max[dim].f64 = max; options |= 0x04; return TRUE; } return FALSE; };
+  inline bool set_max(F64 max, I32 dim=0) { if ((9 == get_type()) && (dim < get_dim())) { this->max[dim].f64 = max; options |= 0x04; return TRUE; } return FALSE; };
 
-  inline BOOL set_scale(F64 scale, I32 dim=0) { if (data_type) { this->scale[dim] = scale; options |= 0x08; return TRUE; } return FALSE; };
-  inline BOOL set_offset(F64 offset, I32 dim=0) { if (data_type) { this->offset[dim] = offset; options |= 0x10; return TRUE; } return FALSE; };
+  inline bool set_scale(F64 scale, I32 dim=0) { if (data_type) { this->scale[dim] = scale; options |= 0x08; return TRUE; } return FALSE; };
+  inline bool set_offset(F64 offset, I32 dim=0) { if (data_type) { this->offset[dim] = offset; options |= 0x10; return TRUE; } return FALSE; };
 
-  inline BOOL has_no_data() const { return options & 0x01; };
-  inline BOOL has_min() const { return options & 0x02; };
-  inline BOOL has_max() const { return options & 0x04; };
-  inline BOOL has_scale() const { return options & 0x08; };
-  inline BOOL has_offset() const { return options & 0x10; };
+  inline bool has_no_data() const { return options & 0x01; };
+  inline bool has_min() const { return options & 0x02; };
+  inline bool has_max() const { return options & 0x04; };
+  inline bool has_scale() const { return options & 0x08; };
+  inline bool has_offset() const { return options & 0x10; };
 
   inline U32 get_size() const
   {
@@ -367,7 +367,7 @@ public:
     }
   };
 
-  BOOL init_attributes(U32 number_attributes, LASattribute* attributes)
+  bool init_attributes(U32 number_attributes, LASattribute* attributes)
   {
     U32 i;
     clean_attributes();
@@ -464,7 +464,7 @@ public:
     return -1;
   }
 
-  BOOL remove_attribute(I32 index)
+  bool remove_attribute(I32 index)
   {
     if (index < 0 || index >= number_attributes)
     {
@@ -499,7 +499,7 @@ public:
     return TRUE;
   }
 
-  BOOL remove_attribute(const CHAR* name)
+  bool remove_attribute(const CHAR* name)
   {
     I32 index = get_attribute_index(name);
     if (index != -1)
@@ -567,10 +567,10 @@ public:
 
 // these fields describe the point format LAS specific
 
-  BOOL have_gps_time;
-  BOOL have_rgb;
-  BOOL have_nir;
-  BOOL have_wavepacket;
+  bool have_gps_time;
+  bool have_rgb;
+  bool have_nir;
+  bool have_wavepacket;
   I32 extra_bytes_number;
   U32 total_point_size;
 
@@ -673,7 +673,7 @@ public:
 
 // these functions set the desired point format (and maybe add on attributes in extra bytes)
 
-  BOOL init(const LASquantizer* quantizer, const U8 point_type, const U16 point_size, const LASattributer* attributer=0)
+  bool init(const LASquantizer* quantizer, const U8 point_type, const U16 point_size, const LASattributer* attributer=0)
   {
     // clean the point
 
@@ -731,7 +731,7 @@ public:
     return TRUE;
   };
 
-  BOOL init(const LASquantizer* quantizer, const U32 num_items, const LASitem* items, const LASattributer* attributer=0)
+  bool init(const LASquantizer* quantizer, const U32 num_items, const LASitem* items, const LASattributer* attributer=0)
   {
     U32 i,e;
 
@@ -787,7 +787,7 @@ public:
     return TRUE;
   };
 
-  BOOL inside_rectangle(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y) const
+  bool inside_rectangle(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y) const
   {
     F64 xy;
     xy = get_x();
@@ -797,7 +797,7 @@ public:
     return TRUE;
   }
 
-  BOOL inside_tile(const F32 ll_x, const F32 ll_y, const F32 ur_x, const F32 ur_y) const
+  bool inside_tile(const F32 ll_x, const F32 ll_y, const F32 ur_x, const F32 ur_y) const
   {
     F64 xy;
     xy = get_x();
@@ -807,14 +807,14 @@ public:
     return TRUE;
   }
 
-  BOOL inside_circle(const F64 center_x, const F64 center_y, F64 squared_radius) const
+  bool inside_circle(const F64 center_x, const F64 center_y, F64 squared_radius) const
   {
     F64 dx = center_x - get_x();
     F64 dy = center_y - get_y();
     return ((dx*dx+dy*dy) < squared_radius);
   }
 
-  BOOL inside_box(const F64 min_x, const F64 min_y, const F64 min_z, const F64 max_x, const F64 max_y, const F64 max_z) const
+  bool inside_box(const F64 min_x, const F64 min_y, const F64 min_z, const F64 max_x, const F64 max_y, const F64 max_z) const
   {
     F64 xyz;
     xyz = get_x();
@@ -826,7 +826,7 @@ public:
     return TRUE;
   }
 
-  BOOL inside_bounding_box(const F64 min_x, const F64 min_y, const F64 min_z, const F64 max_x, const F64 max_y, const F64 max_z) const
+  bool inside_bounding_box(const F64 min_x, const F64 min_y, const F64 min_z, const F64 max_x, const F64 max_y, const F64 max_z) const
   {
     F64 xyz;
     xyz = get_x();
@@ -838,7 +838,7 @@ public:
     return TRUE;
   }
 
-  BOOL is_zero() const
+  bool is_zero() const
   {
     if (((U32*)&(this->X))[0] || ((U32*)&(this->X))[1] || ((U32*)&(this->X))[2] || ((U32*)&(this->X))[3] || ((U32*)&(this->X))[4])
     {
@@ -937,8 +937,8 @@ public:
     clean();
   };
 
-  inline BOOL is_first() const { return get_return_number() == 1; };
-  inline BOOL is_last() const { return get_return_number() >= get_number_of_returns(); };
+  inline bool is_first() const { return get_return_number() == 1; };
+  inline bool is_last() const { return get_return_number() >= get_number_of_returns(); };
 
   inline I32 get_X() const { return X; };
   inline I32 get_Y() const { return Y; };
@@ -1008,7 +1008,7 @@ public:
 
   // generic functions for attributes in extra bytes
 
-  inline BOOL has_attribute(I32 index) const
+  inline bool has_attribute(I32 index) const
   {
     if (attributer)
     {
@@ -1020,7 +1020,7 @@ public:
     return FALSE;
   };
 
-  inline BOOL get_attribute(I32 index, U8* data) const
+  inline bool get_attribute(I32 index, U8* data) const
   {
     if (has_attribute(index))
     {
@@ -1030,7 +1030,7 @@ public:
     return FALSE;
   };
 
-  inline BOOL set_attribute(I32 index, const U8* data) 
+  inline bool set_attribute(I32 index, const U8* data) 
   {
     if (has_attribute(index))
     {
@@ -1251,7 +1251,7 @@ public:
 
   // set bounding box
 
-  void set_bounding_box(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y, F64 max_z, BOOL auto_scale=TRUE, BOOL auto_offset=TRUE)
+  void set_bounding_box(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y, F64 max_z, bool auto_scale=TRUE, bool auto_offset=TRUE)
   {
     if (auto_scale)
     {
@@ -1445,7 +1445,7 @@ public:
     return *this;
   };
 
-  BOOL check() const
+  bool check() const
   {
     if (strncmp(file_signature, "LASF", 4) != 0)
     {
@@ -1485,7 +1485,7 @@ public:
     return TRUE;
   };
 
-  BOOL is_lonlat() const
+  bool is_lonlat() const
   {
     if ((-360.0 <= min_x) && (-90.0 <= min_y) && (max_x <= 360.0) && (max_y <= 90.0))
     {
@@ -1496,10 +1496,10 @@ public:
 
   // note that data needs to be allocated with new [] and not malloc and that LASheader
   // will become the owner over this and manage its deallocation 
-  void add_vlr(const CHAR* user_id, const U16 record_id, const U16 record_length_after_header, U8* data, const BOOL keep_description=FALSE, const CHAR* description=0)
+  void add_vlr(const CHAR* user_id, const U16 record_id, const U16 record_length_after_header, U8* data, const bool keep_description=FALSE, const CHAR* description=0)
   {
     U32 i = 0;
-    BOOL found_description = FALSE;
+    bool found_description = FALSE;
     if (vlrs)
     {
       for (i = 0; i < number_of_variable_length_records; i++)
@@ -1569,7 +1569,7 @@ public:
     return 0;
   };
 
-  BOOL remove_vlr(U32 i)
+  bool remove_vlr(U32 i)
   {
     if (vlrs)
     {
@@ -1597,7 +1597,7 @@ public:
     return FALSE;
   };
 
-  BOOL remove_vlr(const CHAR* user_id, U16 record_id)
+  bool remove_vlr(const CHAR* user_id, U16 record_id)
   {
     U32 i;
     for (i = 0; i < number_of_variable_length_records; i++)
@@ -1610,7 +1610,7 @@ public:
     return FALSE;
   };
 
-  void set_lastiling(U32 level, U32 level_index, U32 implicit_levels, BOOL buffer, BOOL reversible, F32 min_x, F32 max_x, F32 min_y, F32 max_y)
+  void set_lastiling(U32 level, U32 level_index, U32 implicit_levels, bool buffer, bool reversible, F32 min_x, F32 max_x, F32 min_y, F32 max_y)
   {
     clean_lastiling();
     vlr_lastiling = new LASvlr_lastiling();
@@ -1665,7 +1665,7 @@ public:
     vlr_lasoriginal->min_z = min_z;
   }
 
-  BOOL restore_lasoriginal()
+  bool restore_lasoriginal()
   {
     if (vlr_lasoriginal)
     {
@@ -1786,7 +1786,7 @@ public:
     }
   }
 
-  void update_extra_bytes_vlr(const BOOL keep_description=FALSE)
+  void update_extra_bytes_vlr(const bool keep_description=FALSE)
   {
     if (number_attributes)
     {

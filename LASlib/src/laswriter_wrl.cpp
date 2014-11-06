@@ -34,7 +34,7 @@
 #include <string.h>
 
 
-BOOL LASwriterWRL::open(const CHAR* file_name, const LASheader* header, const CHAR* parse_string)
+bool LASwriterWRL::open(const CHAR* file_name, const LASheader* header, const CHAR* parse_string)
 {
   if (file_name == 0)
   {
@@ -55,7 +55,7 @@ BOOL LASwriterWRL::open(const CHAR* file_name, const LASheader* header, const CH
   return open(file, header, parse_string);
 }
 
-BOOL LASwriterWRL::open(FILE* file, const LASheader* header, const CHAR* parse_string)
+bool LASwriterWRL::open(FILE* file, const LASheader* header, const CHAR* parse_string)
 {
   if (file == 0)
   {
@@ -159,7 +159,7 @@ static void lidardouble2string(CHAR* string, double value, double precision)
     lidardouble2string(string, value);
 }
 
-BOOL LASwriterWRL::write_point(const LASpoint* point)
+bool LASwriterWRL::write_point(const LASpoint* point)
 {
   lidardouble2string(printstring, header->get_x(point->get_X()), header->x_scale_factor); fprintf(file, "%s ", printstring);
   lidardouble2string(printstring, header->get_y(point->get_Y()), header->y_scale_factor); fprintf(file, "%s ", printstring);
@@ -188,12 +188,12 @@ BOOL LASwriterWRL::write_point(const LASpoint* point)
   return TRUE;
 }
 
-BOOL LASwriterWRL::update_header(const LASheader* header, BOOL use_inventory, BOOL update_extra_bytes)
+bool LASwriterWRL::update_header(const LASheader* header, bool use_inventory, bool update_extra_bytes)
 {
   return TRUE;
 }
 
-I64 LASwriterWRL::close(BOOL update_header)
+I64 LASwriterWRL::close(bool update_header)
 {
   if (file == 0)
   {

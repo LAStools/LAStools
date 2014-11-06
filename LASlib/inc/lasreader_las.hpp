@@ -56,23 +56,23 @@ class LASreaderLAS : public LASreader
 {
 public:
 
-  BOOL open(const char* file_name, I32 io_buffer_size=262144, BOOL peek_only=FALSE);
-  BOOL open(FILE* file, BOOL peek_only=FALSE);
-  BOOL open(istream& stream, BOOL peek_only=FALSE);
+  bool open(const char* file_name, I32 io_buffer_size=262144, bool peek_only=FALSE);
+  bool open(FILE* file, bool peek_only=FALSE);
+  bool open(istream& stream, bool peek_only=FALSE);
 
   I32 get_format() const;
 
-  BOOL seek(const I64 p_index);
+  bool seek(const I64 p_index);
 
   ByteStreamIn* get_stream() const;
-  void close(BOOL close_stream=TRUE);
+  void close(bool close_stream=TRUE);
 
   LASreaderLAS();
   virtual ~LASreaderLAS();
 
 protected:
-  virtual BOOL open(ByteStreamIn* stream, BOOL peek_only=FALSE);
-  virtual BOOL read_point_default();
+  virtual bool open(ByteStreamIn* stream, bool peek_only=FALSE);
+  virtual bool read_point_default();
 
 private:
   FILE* file;
@@ -86,9 +86,9 @@ public:
   LASreaderLASrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor);
 
 protected:
-  virtual BOOL open(ByteStreamIn* stream, BOOL peek_only=FALSE);
-  virtual BOOL read_point_default();
-  BOOL rescale_x, rescale_y, rescale_z;
+  virtual bool open(ByteStreamIn* stream, bool peek_only=FALSE);
+  virtual bool read_point_default();
+  bool rescale_x, rescale_y, rescale_z;
   F64 scale_factor[3];
   F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
 };
@@ -100,10 +100,10 @@ public:
   LASreaderLASreoffset(); // auto reoffset
 
 protected:
-  virtual BOOL open(ByteStreamIn* stream, BOOL peek_only=FALSE);
-  virtual BOOL read_point_default();
-  BOOL auto_reoffset;
-  BOOL reoffset_x, reoffset_y, reoffset_z;
+  virtual bool open(ByteStreamIn* stream, bool peek_only=FALSE);
+  virtual bool read_point_default();
+  bool auto_reoffset;
+  bool reoffset_x, reoffset_y, reoffset_z;
   F64 offset[3];
   F64 orig_x_offset, orig_y_offset, orig_z_offset;
 };
@@ -115,8 +115,8 @@ public:
   LASreaderLASrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor); // auto reoffset
 
 protected:
-  BOOL open(ByteStreamIn* stream, BOOL peek_only=FALSE);
-  BOOL read_point_default();
+  bool open(ByteStreamIn* stream, bool peek_only=FALSE);
+  bool read_point_default();
 };
 
 #endif

@@ -285,7 +285,7 @@ static const unsigned short GCTP_NAD83_Puerto_Rico = 5200;
 #include <windows.h>
 #endif
 
-BOOL LASreaderDTM::open(const CHAR* file_name)
+bool LASreaderDTM::open(const CHAR* file_name)
 {
   if (file_name == 0)
   {
@@ -1191,12 +1191,12 @@ void LASreaderDTM::set_offset(const F64* offset)
   }
 }
 
-BOOL LASreaderDTM::seek(const I64 p_index)
+bool LASreaderDTM::seek(const I64 p_index)
 {
   return FALSE;
 }
 
-BOOL LASreaderDTM::read_point_default()
+bool LASreaderDTM::read_point_default()
 {
   while (p_count < npoints)
   {
@@ -1294,7 +1294,7 @@ ByteStreamIn* LASreaderDTM::get_stream() const
   return 0;
 }
 
-void LASreaderDTM::close(BOOL close_stream)
+void LASreaderDTM::close(bool close_stream)
 {
   if (file)
   {
@@ -1303,7 +1303,7 @@ void LASreaderDTM::close(BOOL close_stream)
   }
 }
 
-BOOL LASreaderDTM::reopen(const CHAR* file_name)
+bool LASreaderDTM::reopen(const CHAR* file_name)
 {
   if (file_name == 0)
   {
@@ -1509,7 +1509,7 @@ LASreaderDTMrescale::LASreaderDTMrescale(F64 x_scale_factor, F64 y_scale_factor,
   scale_factor[2] = z_scale_factor;
 }
 
-BOOL LASreaderDTMrescale::open(const CHAR* file_name)
+bool LASreaderDTMrescale::open(const CHAR* file_name)
 {
   if (!LASreaderDTM::open(file_name)) return FALSE;
   // do we need to change anything
@@ -1535,7 +1535,7 @@ LASreaderDTMreoffset::LASreaderDTMreoffset(F64 x_offset, F64 y_offset, F64 z_off
   this->offset[2] = z_offset;
 }
 
-BOOL LASreaderDTMreoffset::open(const CHAR* file_name)
+bool LASreaderDTMreoffset::open(const CHAR* file_name)
 {
   if (!LASreaderDTM::open(file_name)) return FALSE;
   // do we need to change anything
@@ -1558,7 +1558,7 @@ LASreaderDTMrescalereoffset::LASreaderDTMrescalereoffset(F64 x_scale_factor, F64
 {
 }
 
-BOOL LASreaderDTMrescalereoffset::open(const CHAR* file_name)
+bool LASreaderDTMrescalereoffset::open(const CHAR* file_name)
 {
   if (!LASreaderDTM::open(file_name)) return FALSE;
   // do we need to change anything

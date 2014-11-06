@@ -913,7 +913,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_rgb_up (by 256)\n");
 }
 
-BOOL LAStransform::parse(int argc, char* argv[])
+bool LAStransform::parse(int argc, char* argv[])
 {
   int i;
 

@@ -45,7 +45,7 @@ LASinventory::LASinventory()
   first = TRUE;
 }
 
-BOOL LASinventory::add(const LASpoint* point)
+bool LASinventory::add(const LASpoint* point)
 {
   number_of_point_records++;
   number_of_points_by_return[point->return_number]++;
@@ -88,7 +88,7 @@ LASsummary::LASsummary()
   first = TRUE;
 }
 
-BOOL LASsummary::add(const LASpoint* point)
+bool LASsummary::add(const LASpoint* point)
 {
   number_of_point_records++;
   number_of_points_by_return[point->get_return_number()]++;
@@ -615,7 +615,7 @@ LAShistogram::~LAShistogram()
   if (return_map_bin_intensity) delete return_map_bin_intensity;
 }
 
-BOOL LAShistogram::parse(int argc, char* argv[])
+bool LAShistogram::parse(int argc, char* argv[])
 {
   int i;
   for (i = 1; i < argc; i++)
@@ -683,7 +683,7 @@ I32 LAShistogram::unparse(CHAR* string) const
   return n;
 }
 
-BOOL LAShistogram::histo(const CHAR* name, F32 step)
+bool LAShistogram::histo(const CHAR* name, F32 step)
 {
   if (strcmp(name, "x") == 0)
     x_bin = new LASbin(step);
@@ -744,7 +744,7 @@ BOOL LAShistogram::histo(const CHAR* name, F32 step)
   return TRUE;
 }
 
-BOOL LAShistogram::histo_avg(const CHAR* name, F32 step, const CHAR* name_avg)
+bool LAShistogram::histo_avg(const CHAR* name, F32 step, const CHAR* name_avg)
 {
   if (strcmp(name, "classification") == 0)
   {
@@ -907,7 +907,7 @@ void LAShistogram::reset()
   if (return_map_bin_intensity) return_map_bin_intensity->reset();
 }
 
-BOOL LASoccupancyGrid::add(const LASpoint* point)
+bool LASoccupancyGrid::add(const LASpoint* point)
 {
   I32 pos_x, pos_y;
   if (grid_spacing < 0)
@@ -929,7 +929,7 @@ BOOL LASoccupancyGrid::add(const LASpoint* point)
   return add_internal(pos_x, pos_y);
 }
 
-BOOL LASoccupancyGrid::add(I32 pos_x, I32 pos_y)
+bool LASoccupancyGrid::add(I32 pos_x, I32 pos_y)
 {
   if (grid_spacing < 0)
   {
@@ -946,10 +946,10 @@ BOOL LASoccupancyGrid::add(I32 pos_x, I32 pos_y)
   return add_internal(pos_x, pos_y);
 }
 
-BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
+bool LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
 {
   pos_y = pos_y - anker;
-  BOOL no_x_anker = FALSE;
+  bool no_x_anker = FALSE;
   U32* array_size;
   I32** ankers;
   U32*** array;
@@ -1066,14 +1066,14 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
   return TRUE;
 }
 
-BOOL LASoccupancyGrid::occupied(const LASpoint* point) const
+bool LASoccupancyGrid::occupied(const LASpoint* point) const
 {
   I32 pos_x = I32_FLOOR(point->get_x() / grid_spacing);
   I32 pos_y = I32_FLOOR(point->get_y() / grid_spacing);
   return occupied(pos_x, pos_y);
 }
 
-BOOL LASoccupancyGrid::occupied(I32 pos_x, I32 pos_y) const
+bool LASoccupancyGrid::occupied(I32 pos_x, I32 pos_y) const
 {
   if (grid_spacing < 0)
   {
@@ -1151,7 +1151,7 @@ BOOL LASoccupancyGrid::occupied(I32 pos_x, I32 pos_y) const
   return FALSE;
 }
 
-BOOL LASoccupancyGrid::active() const
+bool LASoccupancyGrid::active() const
 {
   if (grid_spacing < 0) return FALSE;
   return TRUE;
@@ -1204,7 +1204,7 @@ void LASoccupancyGrid::reset()
   num_occupied = 0;
 }
 
-BOOL LASoccupancyGrid::write_asc_grid(const CHAR* file_name) const
+bool LASoccupancyGrid::write_asc_grid(const CHAR* file_name) const
 {
   FILE* file = fopen(file_name, "w");
   if (file == 0) return FALSE;

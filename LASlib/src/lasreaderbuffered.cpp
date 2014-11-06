@@ -85,13 +85,13 @@ void LASreaderBuffered::set_skip_lines(I32 skip_lines)
   lasreadopener_neighbors.set_skip_lines(skip_lines);
 }
 
-void LASreaderBuffered::set_populate_header(BOOL populate_header)
+void LASreaderBuffered::set_populate_header(bool populate_header)
 {
   lasreadopener.set_populate_header(populate_header);
   lasreadopener_neighbors.set_populate_header(populate_header);
 }
 
-BOOL LASreaderBuffered::set_file_name(const char* file_name)
+bool LASreaderBuffered::set_file_name(const char* file_name)
 {
   // do we have a file name
   if (file_name == 0)
@@ -112,7 +112,7 @@ BOOL LASreaderBuffered::set_file_name(const char* file_name)
   return TRUE;
 }
 
-BOOL LASreaderBuffered::add_neighbor_file_name(const char* file_name)
+bool LASreaderBuffered::add_neighbor_file_name(const char* file_name)
 {
   // do we have a file name
   if (file_name == 0)
@@ -138,7 +138,7 @@ void LASreaderBuffered::set_buffer_size(const F32 buffer_size)
   this->buffer_size = buffer_size;
 }
 
-BOOL LASreaderBuffered::open()
+bool LASreaderBuffered::open()
 {
   if (!lasreadopener.active())
   {
@@ -343,7 +343,7 @@ BOOL LASreaderBuffered::open()
   return TRUE;
 }
 
-BOOL LASreaderBuffered::reopen()
+bool LASreaderBuffered::reopen()
 {
   p_count = 0;
   point_count = 0;
@@ -354,7 +354,7 @@ BOOL LASreaderBuffered::reopen()
   return FALSE;
 }
 
-BOOL LASreaderBuffered::remove_buffer()
+bool LASreaderBuffered::remove_buffer()
 {
   clean_buffer();
   if (header.vlr_lasoriginal) npoints = header.vlr_lasoriginal->number_of_point_records;
@@ -383,7 +383,7 @@ void LASreaderBuffered::set_transform(LAStransform* transform)
   this->transform = transform;
 }
 
-BOOL LASreaderBuffered::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
+bool LASreaderBuffered::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
 {
   inside = 1;
   t_ll_x = ll_x;
@@ -398,7 +398,7 @@ BOOL LASreaderBuffered::inside_tile(const F32 ll_x, const F32 ll_y, const F32 si
   return TRUE;
 }
 
-BOOL LASreaderBuffered::inside_circle(const F64 center_x, const F64 center_y, const F64 radius)
+bool LASreaderBuffered::inside_circle(const F64 center_x, const F64 center_y, const F64 radius)
 {
   inside = 2;
   c_center_x = center_x;
@@ -412,7 +412,7 @@ BOOL LASreaderBuffered::inside_circle(const F64 center_x, const F64 center_y, co
   return TRUE;
 }
 
-BOOL LASreaderBuffered::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y)
+bool LASreaderBuffered::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y)
 {
   inside = 3;
   r_min_x = min_x;
@@ -431,7 +431,7 @@ I32 LASreaderBuffered::get_format() const
   return lasreader->get_format();
 }
 
-BOOL LASreaderBuffered::read_point_default()
+bool LASreaderBuffered::read_point_default()
 {
   while (true)
   {
@@ -453,7 +453,7 @@ BOOL LASreaderBuffered::read_point_default()
   }
 }
 
-void LASreaderBuffered::close(BOOL close_stream)
+void LASreaderBuffered::close(bool close_stream)
 {
   if (lasreader) 
   {
@@ -494,7 +494,7 @@ void LASreaderBuffered::clean_buffer()
   point_count = 0;
 }
 
-BOOL LASreaderBuffered::copy_point_to_buffer()
+bool LASreaderBuffered::copy_point_to_buffer()
 {
   U32 point_count_in_buffer = (buffered_points % points_per_buffer);
   if (point_count_in_buffer == 0)
@@ -519,7 +519,7 @@ BOOL LASreaderBuffered::copy_point_to_buffer()
   return TRUE;
 }
 
-BOOL LASreaderBuffered::copy_point_from_buffer()
+bool LASreaderBuffered::copy_point_from_buffer()
 {
   if (point_count >= buffered_points)
   {

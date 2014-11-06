@@ -100,7 +100,7 @@ LASreadItemCompressed_POINT10_v1::~LASreadItemCompressed_POINT10_v1()
   }
 }
 
-BOOL LASreadItemCompressed_POINT10_v1::init(const U8* item)
+bool LASreadItemCompressed_POINT10_v1::init(const U8* item)
 {
   U32 i;
 
@@ -276,7 +276,7 @@ LASreadItemCompressed_GPSTIME11_v1::~LASreadItemCompressed_GPSTIME11_v1()
   delete ic_gpstime;
 }
 
-BOOL LASreadItemCompressed_GPSTIME11_v1::init(const U8* item)
+bool LASreadItemCompressed_GPSTIME11_v1::init(const U8* item)
 {
   /* init state */
   last_gpstime_diff = 0;
@@ -389,7 +389,7 @@ LASreadItemCompressed_RGB12_v1::~LASreadItemCompressed_RGB12_v1()
   delete [] last_item;
 }
 
-BOOL LASreadItemCompressed_RGB12_v1::init(const U8* item)
+bool LASreadItemCompressed_RGB12_v1::init(const U8* item)
 {
   /* init state */
 
@@ -461,7 +461,7 @@ LASreadItemCompressed_WAVEPACKET13_v1::~LASreadItemCompressed_WAVEPACKET13_v1()
   delete [] last_item;
 }
 
-BOOL LASreadItemCompressed_WAVEPACKET13_v1::init(const U8* item)
+bool LASreadItemCompressed_WAVEPACKET13_v1::init(const U8* item)
 {
   /* init state */
   last_diff_32 = 0;
@@ -550,7 +550,7 @@ LASreadItemCompressed_BYTE_v1::~LASreadItemCompressed_BYTE_v1()
   delete [] last_item;
 }
 
-BOOL LASreadItemCompressed_BYTE_v1::init(const U8* item)
+bool LASreadItemCompressed_BYTE_v1::init(const U8* item)
 {
   /* init state */
 
