@@ -323,6 +323,7 @@ Filter points with simple thinning.
   -keep_every_nth 2
   -keep_random_fraction 0.1
   -thin_with_grid 1.0
+  -thin_with_time 0.001
 Transform coordinates.
   -translate_x -2.5
   -scale_z 0.3048
@@ -360,10 +361,14 @@ Modify the classification.
   -classify_z_between_as 2.0 5.0 4
   -classify_intensity_above_as 200 9
   -classify_intensity_below_as 30 11
+  -change_extended_classification_from_to 6 46
 Change the flags.
   -set_withheld_flag 0
   -set_synthetic_flag 1
   -set_keypoint_flag 0
+  -set_extended_overlap_flag 1
+Modify the extended scanner channel.
+  -set_extended_scanner_channel 2
 Modify the user data.
   -set_user_data 0
   -change_user_data_from_to 23 26
@@ -407,12 +412,13 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 140709
+LAStools (by martin@rapidlasso.com) version 150131
 usage:
 las2las -i *.las -utm 13N
 las2las -i *.laz -first_only -olaz
 las2las -i *.las -drop_return 4 5 -olaz
 las2las -latlong -target_utm 12T -i in.las -o out.las
+las2las -i in.laz -target_epsg 2972 -o out.laz
 las2las -point_type 0 -lof file_list.txt -merged -o out.las
 las2las -remove_vlr 2 -scale_rgb_up -i in.las -o out.las
 las2las -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las
