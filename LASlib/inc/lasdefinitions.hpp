@@ -45,7 +45,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 141021
+#define LAS_TOOLS_VERSION 150301
 
 #include <stdio.h>
 #include <string.h>
@@ -67,6 +67,9 @@
 #define LAS_TOOLS_FORMAT_BIL     9
 #define LAS_TOOLS_FORMAT_FLT    10
 #define LAS_TOOLS_FORMAT_DTM    11
+
+#define LAS_TOOLS_IO_IBUFFER_SIZE   262144
+#define LAS_TOOLS_IO_OBUFFER_SIZE   262144
 
 class LASwavepacket
 {
@@ -373,9 +376,21 @@ public:
     clean_attributes();
     this->number_attributes = number_attributes;
     this->attributes = (LASattribute*)malloc(sizeof(LASattribute)*number_attributes);
+    if (this->attributes == 0)
+    {
+      return FALSE;
+    }
     memcpy(this->attributes, attributes, sizeof(LASattribute)*number_attributes);
     attribute_starts = (I32*)malloc(sizeof(I32)*number_attributes);
+    if (attribute_starts == 0)
+    {
+      return FALSE;
+    }
     attribute_sizes = (I32*)malloc(sizeof(I32)*number_attributes);
+    if (attribute_sizes == 0)
+    {
+      return FALSE;
+    }
     attribute_starts[0] = 0;
     attribute_sizes[0] = attributes[0].get_size();
     for (i = 1; i < number_attributes; i++)
@@ -394,8 +409,20 @@ public:
       {
         number_attributes++;
         attributes = (LASattribute*)realloc(attributes, sizeof(LASattribute)*number_attributes);
+        if (attributes == 0)
+        {
+          return -1;
+        }
         attribute_starts = (I32*)realloc(attribute_starts, sizeof(I32)*number_attributes);
+        if (attribute_starts == 0)
+        {
+          return -1;
+        }
         attribute_sizes = (I32*)realloc(attribute_sizes, sizeof(I32)*number_attributes);
+        if (attribute_sizes == 0)
+        {
+          return -1;
+        }
         attributes[number_attributes-1] = attribute;
         attribute_starts[number_attributes-1] = attribute_starts[number_attributes-2] + attribute_sizes[number_attributes-2];
         attribute_sizes[number_attributes-1] = attributes[number_attributes-1].get_size();
@@ -404,8 +431,20 @@ public:
       {
         number_attributes = 1;
         attributes = (LASattribute*)malloc(sizeof(LASattribute));
+        if (attributes == 0)
+        {
+          return -1;
+        }
         attribute_starts = (I32*)malloc(sizeof(I32));
+        if (attribute_starts == 0)
+        {
+          return -1;
+        }
         attribute_sizes = (I32*)malloc(sizeof(I32));
+        if (attribute_sizes == 0)
+        {
+          return -1;
+        }
         attributes[0] = attribute;
         attribute_starts[0] = 0;
         attribute_sizes[0] = attributes[0].get_size();
@@ -937,6 +976,7 @@ public:
     clean();
   };
 
+  inline BOOL is_single() const { return get_number_of_returns() == 1; };
   inline BOOL is_first() const { return get_return_number() == 1; };
   inline BOOL is_last() const { return get_return_number() >= get_number_of_returns(); };
 
@@ -971,6 +1011,7 @@ public:
   inline void set_synthetic_flag(U8 synthetic_flag) { this->synthetic_flag = synthetic_flag; };
   inline void set_keypoint_flag(U8 keypoint_flag) { this->keypoint_flag = keypoint_flag; };
   inline void set_withheld_flag(U8 withheld_flag) { this->withheld_flag = withheld_flag; };
+  inline void set_scan_angle_rank(I8 scan_angle_rank) { this->scan_angle_rank = scan_angle_rank; };
   inline void set_user_data(U8 user_data) { this->user_data = user_data; };
   inline void set_point_source_ID(U16 point_source_ID) { this->point_source_ID = point_source_ID; };
   inline void set_deleted_flag(U8 deleted_flag) { this->deleted_flag = (U32)deleted_flag; };
@@ -984,6 +1025,16 @@ public:
   inline void set_x(const F64 x) { this->X = quantizer->get_X(x); };
   inline void set_y(const F64 y) { this->Y = quantizer->get_Y(y); };
   inline void set_z(const F64 z) { this->Z = quantizer->get_Z(z); };
+
+  inline U8 get_extended_classification() const { return extended_classification; };
+  inline I16 get_extended_scan_angle() const { return extended_scan_angle; };
+  inline U8 get_extended_overlap_flag() const { return (extended_classification_flags >> 3); };
+  inline U8 get_extended_scanner_channel() const { return extended_scanner_channel; };
+
+  inline void set_extended_classification(U8 extended_classification) { this->extended_classification = extended_classification; };
+  inline void set_extended_scan_angle(U16 extended_scan_angle) { this->extended_scan_angle = extended_scan_angle; };
+  inline void set_extended_overlap_flag(U8 extended_overlap_flag) { this->extended_classification_flags = (extended_overlap_flag << 3) | (this->extended_classification_flags & 7); };
+  inline void set_extended_scanner_channel(U8 extended_scanner_channel) { this->extended_scanner_channel = extended_scanner_channel; };
 
   inline void compute_coordinates()
   {
@@ -1449,7 +1500,7 @@ public:
   {
     if (strncmp(file_signature, "LASF", 4) != 0)
     {
-      fprintf(stderr,"ERROR: wrong file signature '%s'\n", file_signature);
+      fprintf(stderr,"ERROR: wrong file signature '%4s'\n", file_signature);
       return FALSE;
     }
     if ((version_major != 1) || (version_minor > 4))
@@ -1485,6 +1536,18 @@ public:
     return TRUE;
   };
 
+  BOOL is_compressed() const
+  {
+    if (laszip)
+    {
+      if (laszip->compressor)
+      {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  };
+
   BOOL is_lonlat() const
   {
     if ((-360.0 <= min_x) && (-90.0 <= min_y) && (max_x <= 360.0) && (max_y <= 90.0))
@@ -1492,7 +1555,7 @@ public:
       return TRUE;
     }
     return FALSE;
-  }
+  };
 
   // note that data needs to be allocated with new [] and not malloc and that LASheader
   // will become the owner over this and manage its deallocation 
