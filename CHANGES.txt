@@ -1,3 +1,16 @@
+2 February 2015 -- IMPORTANT: lasgrid, lasground, ...: fixed little bug introduced in version 150131
+31 January 2015 -- NEW: lasground_new: alternative to lasground for mix of mountains and buildings
+31 January 2015 -- lastile: '-remove_buffer' and '-refine_tiles' can now run on '-cores 4' or more
+31 January 2015 -- lasheight: bug fix for ground points stored in multiple '-classification 2 8'
+31 January 2015 -- las2las: better handling of ESPG codes in batch mode on '-cores 8' or more
+31 January 2015 -- all GUIs: fixed little bug introduced in version 141218
+31 January 2015 -- LASlib: new transforms for extended attributes of LAS 1.4 point types 6 - 10
+18 December 2014 -- lascanopy: added option '-all' and fixed scaling bug for '-int_d 0 64 128'
+18 December 2014 -- LASlib: different scale_factors/offsets are now possible with '-buffered 25'
+18 December 2014 -- lasgrid: fixed option '-rgb' and added new area-normalized '-point_density'
+18 December 2014 -- laszip: use '-check' to find truncations and/or bit-errors in LAZ files
+16 November 2014 -- LASlib: improved detection & reporting of file truncation and/or LAZ bit-errors
+16 November 2014 -- lascanopy: several minor bug fixes and significantly improved GUI menu options
 20 October 2014 -- las2iso: fixed miss-spelled '-set_file_source_ID' to '-set_file_source_id'
 20 October 2014 -- blast2iso: added missing '-kill 600' parameter 
 20 October 2014 -- las2dem, las2iso, las2tin, blast2dem, blast2iso: auto adapt kill/concavity to feet 

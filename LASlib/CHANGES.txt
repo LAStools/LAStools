@@ -1,3 +1,7 @@
+31 January 2015 -- LASlib: new transforms for extended attributes of LAS 1.4 point types 6 - 10
+18 December 2014 -- LASlib: different scale_factors/offsets are now possible with '-buffered 25'
+18 December 2014 -- laszip: use '-check' to find truncations and/or bit-errors in LAZ files
+16 November 2014 -- LASlib: improved detection & reporting of file truncation and/or LAZ bit-errors
 30 August 2014 -- LASlib: significantly less I/O overhead especially on '-merged' folders of LAZ
 12 August 2014 -- LASlib: fixed (another) small bug in on-the-fly BIL reader LASreader_bil.cpp
 30 July 2014 -- LASlib: fixed small bug in on-the-fly BIL reader LASreader_bil.cpp
