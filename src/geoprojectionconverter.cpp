@@ -800,8 +800,9 @@ static const StatePlaneTM state_plane_tm_nad83_list[] =
 static const short EPSG_IRENET95_Irish_Transverse_Mercator = 2157;
 static const short EPSG_ETRS89_Poland_CS92 = 2180;
 static const short EPSG_NZGD2000 = 2193;
-static const short EPSG_NAD83_Maryland_ftUS = 2248;
 static const short EPSG_NAD83_HARN_UTM2_South_American_Samoa = 2195;
+static const short EPSG_NAD83_Maryland_ftUS = 2248;
+static const short EPSG_NAD83_Texas_Central_ftUS = 2277;
 static const short EPSG_NAD83_HARN_Virginia_North_ftUS = 2924;
 static const short EPSG_NAD83_HARN_Virginia_South_ftUS = 2925;
 static const short EPSG_Reseau_Geodesique_Francais_Guyane_1995 = 2972;
@@ -817,7 +818,9 @@ static const short EPSG_Fiji_1956_UTM60_South = 3141;
 static const short EPSG_Fiji_1956_UTM1_South = 3142;
 static const short EPSG_Fiji_Map_Grid_1986 = 3460;
 static const short EPSG_NAD83_NSRS2007_Maryland_ftUS = 3582;
+static const short EPSG_ETRS89_Portugal_TM06 = 3763;
 static const short EPSG_Slovene_National_Grid_1996 = 3794;
+static const short EPSG_ETRS89_GK24FIN = 3878;
 static const short EPSG_MGI_1901_Slovene_National_Grid = 3912;
 static const short EPSG_RGF93_CC42 = 3942;
 static const short EPSG_RGF93_CC43 = 3943;
@@ -881,8 +884,9 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_IRENET95_Irish_Transverse_Mercator, "IRENET95 Irish Tran."),
   EPSGcode(EPSG_ETRS89_Poland_CS92, "ETRS89 Poland CS92"),
   EPSGcode(EPSG_NZGD2000, "NZGD2000"),
-  EPSGcode(EPSG_NAD83_Maryland_ftUS, "NAD83 Maryland"),
   EPSGcode(EPSG_NAD83_HARN_UTM2_South_American_Samoa, "Amer. Samoa UTM2"),
+  EPSGcode(EPSG_NAD83_Maryland_ftUS, "NAD83 Maryland"),
+  EPSGcode(EPSG_NAD83_Texas_Central_ftUS, "NAD83 Texas Central"),
   EPSGcode(EPSG_NAD83_HARN_Virginia_North_ftUS, "NAD83-H Virginia N"),
   EPSGcode(EPSG_NAD83_HARN_Virginia_South_ftUS, "NAD83-H Virginia S"),
   EPSGcode(EPSG_Reseau_Geodesique_Francais_Guyane_1995, "Francais Guyane 95"),
@@ -898,7 +902,9 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_Fiji_1956_UTM1_South, "Fiji 1956 UTM1"),
   EPSGcode(EPSG_Fiji_Map_Grid_1986, "Fiji Map Grid 1986"),
   EPSGcode(EPSG_NAD83_NSRS2007_Maryland_ftUS, "NSRS2007 Maryland"),
+  EPSGcode(EPSG_ETRS89_Portugal_TM06, "ETRS89 Portugal TM06"),
   EPSGcode(EPSG_Slovene_National_Grid_1996, "Slov. Nat. Grid 1996"),
+  EPSGcode(EPSG_ETRS89_GK24FIN, "ETRS89 / GK24FIN"),
   EPSGcode(EPSG_MGI_1901_Slovene_National_Grid, "Slov. Nat. Grid 1901"),
   EPSGcode(EPSG_RGF93_CC42, "RGF93 CC42"),
   EPSGcode(EPSG_RGF93_CC43, "RGF93 CC43"),
@@ -1651,7 +1657,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
     set_reference_ellipsoid(ellipsoid);
   }
 
-  if (!has_projection)
+  if (user_defined_projection)
   {
     if (user_defined_projection == 1)
     {
@@ -3360,9 +3366,6 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 26998: // PCS_NAD83_Missouri_West
     sp_nad27 = false; sp = "MO_W";
     break;
-  case 27700:
-
-    break;
   case 28348: // PCS_GDA94_MGA_zone_48
   case 28349:
   case 28350:
@@ -4171,6 +4174,15 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       if (description) sprintf(description, "NZGD2000");
       return true;
     }
+    else if (value == EPSG_NAD83_HARN_UTM2_South_American_Samoa)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_transverse_mercator_projection(500000.0, 10000000.0, 0.0, -171.0, 0.9996, 0, source); // "NAD83(HARN) / UTM zone 2S (American Samoa)"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "UTM zone 2S (American Samoa)");
+      return true;
+    }
     else if (value == EPSG_NAD83_Maryland_ftUS)
     {
       set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
@@ -4180,13 +4192,13 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       if (description) sprintf(description, "NAD83 / Maryland (ftUS)");
       return true;
     }
-    else if (value == EPSG_NAD83_HARN_UTM2_South_American_Samoa)
+    else if (value == EPSG_NAD83_Texas_Central_ftUS)
     {
       set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, 10000000.0, 0.0, -171.0, 0.9996, 0, source); // "NAD83(HARN) / UTM zone 2S (American Samoa)"
+      set_lambert_conformal_conic_projection(700000.0, 3000000.0, 29.66666666666667, -100.3333333333333, 31.88333333333333, 30.11666666666667, 0, source); // "NAD83 / Texas Central (ftUS)"
       set_geokey(value, source);
-      set_coordinates_in_meter(source);
-      if (description) sprintf(description, "UTM zone 2S (American Samoa)");
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83 / Texas Central (ftUS)");
       return true;
     }
     else if (value == EPSG_NAD83_HARN_Virginia_North_ftUS)
@@ -4322,6 +4334,15 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       if (description) sprintf(description, "NAD83(NSRS2007) / Maryland (ftUS)");
       return true;
     }
+    else if (value == EPSG_ETRS89_Portugal_TM06)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_transverse_mercator_projection(0.0, 0.0, 39.66825833333333, -8.133108333333334, 1.0, 0, source); // "ETRS89 / Portugal TM06"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "ETRS89 / Portugal TM06");
+      return true;
+    }
     else if (value == EPSG_Slovene_National_Grid_1996)
     {
       set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
@@ -4330,6 +4351,15 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "Slovenia 1996 / Slovene National Grid");
       return true;
+    }
+    else if (value == EPSG_ETRS89_GK24FIN)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_transverse_mercator_projection(24500000.0, 0.0, 0.0, 24.0, 1.0, 0, source); // "ETRS89 / GK24FIN"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "ETRS89 / GK24FIN");
+      return true;    
     }
     else if (value == EPSG_MGI_1901_Slovene_National_Grid)
     {
@@ -5993,6 +6023,14 @@ int GeoProjectionConverter::unparse(char* string) const
     {
       n += sprintf(&string[n], "-longlat ");
     }
+    else if (source_projection->type == GEO_PROJECTION_ECEF)
+    {
+      n += sprintf(&string[n], "-ecef ");
+    }
+    else if (source_projection->geokey != 0)
+    {
+      n += sprintf(&string[n], "-epsg %u ", source_projection->geokey);
+    }
     else if (source_projection->type == GEO_PROJECTION_UTM)
     {
       GeoProjectionParametersUTM* utm = (GeoProjectionParametersUTM*)source_projection;
@@ -6007,10 +6045,6 @@ int GeoProjectionConverter::unparse(char* string) const
     {
       GeoProjectionParametersTM* tm = (GeoProjectionParametersTM*)source_projection;
       n += sprintf(&string[n], "-tm %.10g %.10g m %.10g %.10g %.10g ", tm->tm_false_easting_meter, tm->tm_false_northing_meter, tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
-    }
-    else if (source_projection->type == GEO_PROJECTION_ECEF)
-    {
-      n += sprintf(&string[n], "-ecef ");
     }
   }
   if (ellipsoid)
@@ -6060,6 +6094,14 @@ int GeoProjectionConverter::unparse(char* string) const
     {
       n += sprintf(&string[n], "-target_longlat ");
     }
+    else if (target_projection->type == GEO_PROJECTION_ECEF)
+    {
+      n += sprintf(&string[n], "-target_ecef ");
+    }
+    else if (target_projection->geokey != 0)
+    {
+      n += sprintf(&string[n], "-target_epsg %u ", target_projection->geokey);
+    }
     else if (target_projection->type == GEO_PROJECTION_UTM)
     {
       GeoProjectionParametersUTM* utm = (GeoProjectionParametersUTM*)target_projection;
@@ -6081,10 +6123,6 @@ int GeoProjectionConverter::unparse(char* string) const
     {
       GeoProjectionParametersTM* tm = (GeoProjectionParametersTM*)target_projection;
       n += sprintf(&string[n], "-target_tm %g %g m %g %g %g ", tm->tm_false_easting_meter, tm->tm_false_northing_meter, tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
-    }
-    else if (target_projection->type == GEO_PROJECTION_ECEF)
-    {
-      n += sprintf(&string[n], "-target_ecef ");
     }
   }
   if (meter2coordinates != 1.0)
@@ -6298,7 +6336,7 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
     switch (source_projection->type)
     {
     case GEO_PROJECTION_UTM:
-      UTMtoLL(point[0], point[1], latitude, longitude, ellipsoid, (GeoProjectionParametersUTM*)source_projection);
+      UTMtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (GeoProjectionParametersUTM*)source_projection);
       break;
     case GEO_PROJECTION_LCC:
       LCCtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (GeoProjectionParametersLCC*)source_projection);

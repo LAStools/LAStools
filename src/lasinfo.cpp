@@ -674,9 +674,20 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-  if ((cores > 1) && (lasreadopener.get_file_name_number() > 1) && (!lasreadopener.is_merged()))
+  if (cores > 1)
   {
-    return lasinfo_multi_core(argc, argv, &lasreadopener, &lashistogram, &laswriteopener, cores);
+    if (lasreadopener.get_file_name_number() < 2)
+    {
+      fprintf(stderr,"WARNING: only %u input files. ignoring '-cores %d' ...\n", lasreadopener.get_file_name_number(), cores);
+    }
+    else if (lasreadopener.is_merged())
+    {
+      fprintf(stderr,"WARNING: input files merged on-the-fly. ignoring '-cores %d' ...\n", cores);
+    }
+    else
+    {
+      return lasinfo_multi_core(argc, argv, &lasreadopener, &lashistogram, &laswriteopener, cores);
+    }
   }
 #endif
 
@@ -3104,11 +3115,11 @@ int main(int argc, char *argv[])
         }
         if (lasreader->point.extended_point_type)
         {
-          fprintf(file_out, "  extended_number_of_returns %d %d\012",lassummary.min.extended_number_of_returns, lassummary.max.extended_number_of_returns);
-          fprintf(file_out, "  extended_return_number                    %d %d\012",lassummary.min.extended_return_number, lassummary.max.extended_return_number);
-          fprintf(file_out, "  extended_classification  %6d %6d\012",lassummary.min.extended_classification, lassummary.max.extended_classification);
-          fprintf(file_out, "  extended_scan_angle      %6.3f %6.3f\012",0.006*lassummary.min.extended_scan_angle, 0.006*lassummary.max.extended_scan_angle);
-          fprintf(file_out, "  extended_scanner_channel %6d %6d\012",lassummary.min.extended_scanner_channel, lassummary.max.extended_scanner_channel);
+          fprintf(file_out, "  extended_number_of_returns %6d %6d\012",lassummary.min.extended_number_of_returns, lassummary.max.extended_number_of_returns);
+          fprintf(file_out, "  extended_return_number     %6d %6d\012",lassummary.min.extended_return_number, lassummary.max.extended_return_number);
+          fprintf(file_out, "  extended_classification    %6d %6d\012",lassummary.min.extended_classification, lassummary.max.extended_classification);
+          fprintf(file_out, "  extended_scan_angle        %6d %6d\012",lassummary.min.extended_scan_angle, lassummary.max.extended_scan_angle);
+          fprintf(file_out, "  extended_scanner_channel   %6d %6d\012",lassummary.min.extended_scanner_channel, lassummary.max.extended_scanner_channel);
         }
         if (((number_of_point_records == 0) && (lasheader->number_of_point_records > 0)) || ((number_of_points_by_return0 == 0) && (lasheader->number_of_points_by_return[0] > 0)))
         {
@@ -3487,11 +3498,33 @@ int main(int argc, char *argv[])
           if (lassummary.classification_keypoint) fprintf(file_out,  " +-> flagged as keypoints: %I64d\n", lassummary.classification_keypoint);
           if (lassummary.classification_withheld) fprintf(file_out,  " +-> flagged as withheld:  %I64d\n", lassummary.classification_withheld);
 #else
-          for (i = 0; i < 32; i++) if (lassummary.classification[i]) fprintf(file_out, " %15lld %s (%u)\n", lassummary.classification[i], LASpointClassification[i], i);
+          for (i = 0; i < 32; i++) if (lassummary.classification[i]) fprintf(file_out, " %15lld  %s (%u)\n", lassummary.classification[i], LASpointClassification[i], i);
           if (lassummary.classification_synthetic) fprintf(file_out, " +-> flagged as synthetic: %lld\n", lassummary.classification_synthetic);
           if (lassummary.classification_keypoint) fprintf(file_out,  " +-> flagged as keypoints: %lld\n", lassummary.classification_keypoint);
           if (lassummary.classification_withheld) fprintf(file_out,  " +-> flagged as withheld:  %lld\n", lassummary.classification_withheld);
 #endif
+        }
+
+        if (lasreader->point.extended_point_type)
+        {
+#ifdef _WIN32
+          if (lassummary.classification_extended_overlap) fprintf(file_out, " +-> flagged as extended overlap: %I64d\n", lassummary.classification_extended_overlap);
+#else
+          if (lassummary.classification_extended_overlap) fprintf(file_out, " +-> flagged as extended overlap: %lld\n", lassummary.classification_extended_overlap);
+#endif
+
+          wrong_entry = false;
+          for (i = 32; i < 256; i++) if (lassummary.extended_classification[i]) wrong_entry = true;
+
+          if (wrong_entry)
+          {
+            fprintf(file_out, "histogram of extended classification of points:\n"); 
+  #ifdef _WIN32
+            for (i = 32; i < 256; i++) if (lassummary.extended_classification[i]) fprintf(file_out, " %15I64d  extended classification (%u)\n", lassummary.extended_classification[i], i);
+  #else
+            for (i = 32; i < 256; i++) if (lassummary.extended_classification[i]) fprintf(file_out, " %15lld  extended classification (%u)\n", lassummary.extended_classification[i], i);
+  #endif
+          }
         }
       }
 
