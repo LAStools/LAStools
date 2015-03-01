@@ -1,6 +1,6 @@
 ****************************************************************
 
-  The LAStools LiDAR processing toolbox for QGIS 1.8.0 - 2.4.0
+  The LAStools LiDAR processing toolbox for QGIS 1.8.0 - 2.6.1
 
   (c) 2013-2014 - martin.isenburg@rapidlasso.com
 
@@ -41,3 +41,10 @@ http://rapidlasso.com/2013/09/29/how-to-install-lastools-toolbox-in-qgis/
 
 If you have problems make sure you read *ALL* the comments to this
 blog article or add some new comments detailing your troubles.
+
+================================================================
+
+For QGIS 2.6 the results have been mixed so far. Follow what is
+happening in this discussion:
+
+http://groups.google.com/d/topic/lastools/ktyrnfDjrQ4/discussion
