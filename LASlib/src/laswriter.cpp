@@ -1002,7 +1002,7 @@ void LASwriteOpener::cut_characters(U32 cut)
 
 LASwriteOpener::LASwriteOpener()
 {
-  io_obuffer_size = 262144;
+  io_obuffer_size = LAS_TOOLS_IO_OBUFFER_SIZE;
   directory = 0;
   file_name = 0;
   appendix = 0;
