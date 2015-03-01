@@ -58,11 +58,12 @@ public:
   I64 number_of_point_records;
   I64 number_of_points_by_return[16];
   I64 number_of_returns[16];
-  I64 classification[256];
+  I64 classification[32];
+  I64 extended_classification[256];
   I64 classification_synthetic;
   I64 classification_keypoint;
   I64 classification_withheld;
-  I64 classification_overlap;
+  I64 classification_extended_overlap;
   LASpoint min;
   LASpoint max;
   I64 xyz_fluff_10[3];
