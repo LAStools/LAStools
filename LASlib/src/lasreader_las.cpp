@@ -298,6 +298,12 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
     return FALSE;
   }
 
+  // check core header contents
+  if (!header.check())
+  {
+    return FALSE;
+  }
+
   // special handling for LAS 1.3
   if ((header.version_major == 1) && (header.version_minor >= 3))
   {
@@ -385,12 +391,6 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
       fprintf(stderr,"ERROR: reading %d bytes of data into header.user_data_in_header\n", header.user_data_in_header_size);
       return FALSE;
     }
-  }
-
-  // check header contents
-  if (!header.check())
-  {
-    return FALSE;
   }
 
   npoints = (header.number_of_point_records ? header.number_of_point_records : header.extended_number_of_point_records);
@@ -1277,6 +1277,8 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
 
   if (!reader->init(stream)) return FALSE;
 
+  checked_end = FALSE;
+
   return TRUE;
 }
 
@@ -1291,12 +1293,15 @@ I32 LASreaderLAS::get_format() const
 
 BOOL LASreaderLAS::seek(const I64 p_index)
 {
-  if (p_index < npoints)
+  if (reader)
   {
-    if (reader->seek((U32)p_count, (U32)p_index))
+    if (p_index < npoints)
     {
-      p_count = p_index;
-      return TRUE;
+      if (reader->seek((U32)p_count, (U32)p_index))
+      {
+        p_count = p_index;
+        return TRUE;
+      }
     }
   }
   return FALSE;
@@ -1308,7 +1313,14 @@ BOOL LASreaderLAS::read_point_default()
   {
     if (reader->read(point.point) == FALSE)
     {
-      fprintf(stderr,"WARNING: end-of-file after %u of %u points\n", (U32)p_count, (U32)npoints);
+      if (reader->error())
+      {
+        fprintf(stderr,"ERROR: '%s' after %u of %u points\n", reader->error(), (U32)p_count, (U32)npoints);
+      }
+      else
+      {
+        fprintf(stderr,"WARNING: end-of-file after %u of %u points\n", (U32)p_count, (U32)npoints);
+      }
       return FALSE;
     }
 
@@ -1336,6 +1348,22 @@ BOOL LASreaderLAS::read_point_default()
 */
     p_count++;
     return TRUE;
+  }
+  else
+  {
+    if (!checked_end)
+    {
+      if (reader->check_end() == FALSE)
+      {
+        fprintf(stderr,"ERROR: '%s' when reaching end of encoding\n", reader->error());
+        p_count--;
+      }
+      if (reader->warning())
+      {
+        fprintf(stderr,"WARNING: '%s'\n", reader->warning());
+      }
+      checked_end = TRUE;
+    }
   }
   return FALSE;
 }
