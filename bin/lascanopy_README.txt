@@ -78,7 +78,7 @@
   produce a relative height density raster in which the counts are
   divided by the total number of points and scaled to a percentage.
 
-  Metrics alo exist for intensities and '-int_min' and '-int_max'
+  Metrics also exist for intensities and '-int_min' and '-int_max'
   do the obvious, just like '-int_avg', '-int_qav', '-int_std',
   '-int_ske' or '-int_kur'. Similarly you can produce intensity
   percentiles with '-int_p 25 50 75' or intensity counts as well

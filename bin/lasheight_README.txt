@@ -15,8 +15,8 @@
   to, for example, a UTM projection first.
 
   The tool reads LIDAR in LAS/LAZ/ASCII format, triangulates
-  the ground points into a TIN (or whatever other point class
-  was selected with '-class 4' or '-classification 3'), and then
+  the ground points into a TIN (or whatever point class(es)
+  were selected with '-class 8' or '-classification 2 8'), and
   calculates the elevation of each point with respect to this
   TIN. By default the resulting heights are scaled with a factor
   of 10.0, quantized & clamped into an unsigned char between
@@ -33,6 +33,10 @@
   that equals their relative height above (or below) the ground TIN
   at their x and y location. In a sense this will "normalize" the
   elevations of points in respect to their surrounding ground truth.
+  If you add the '-replace_z' option the resulting heights are *not*
+  scaled with a factor of 10.0, quantized & clamped into an unsigned
+  char between 0 and 255, and stored in the "user data" field of each
+  point ... unless you add the explicit '-store_in_user_data' option.
 
   You can also use the height to change the point classification
   with '-classify_below -1.0 7' or '-classify_above 100.0 10' and
