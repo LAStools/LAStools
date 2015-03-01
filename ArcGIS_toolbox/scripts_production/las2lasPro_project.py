@@ -150,7 +150,7 @@ if sys.argv[c] != "#":
     elif sys.argv[c] == "Longitude Latitude":
         command.append("-target_longlat")
     ### State Plane NAD83
-    elif sys.argv[c] == "State Plane NAD83":
+    elif sys.argv[c] == "State Plane NAD 83":
         ### if state plane was specified
         if sys.argv[c+3] != "#":
             command.append("-target_sp83")
@@ -159,7 +159,7 @@ if sys.argv[c] != "#":
             gp.AddMessage("ERROR: no target state plane 83 specified")
             sys.exit(1)
     ### State Plane NAD27
-    elif sys.argv[c] == "State Plane NAD27":
+    elif sys.argv[c] == "State Plane NAD 27":
         ### if state plane was specified
         if sys.argv[c+3] != "#":
             command.append("-target_sp27")
