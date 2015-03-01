@@ -18,7 +18,7 @@
   used at two US Nuclear Weapons Labs, namely Lawrence Livermore National
   Laboratory (LLNL) and Sandia National Laboratories. However, the author
   would like to hear from you in case you have enough pull to resolve the
-  issues that are the reason for this note (so this note can be removed).
+  issues that are the reason for this note (so the note can be removed).
 
 --------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@
     * blast2iso
 
     * lasground
-    * lasheight
+    * lasheight & lastrack
     * lasclassify
     * lasgrid & lascanopy
     * lasboundary
@@ -65,6 +65,7 @@
     * lasthin & lasnoise
     * lassort
     * lastile
+    * lasplanes
     * lascolor
     * lasclip
     * las2shp & shp2las.
@@ -83,6 +84,6 @@
 
   COPYRIGHT:
   
-  (c) 2007-2014, rapidlasso GmbH, GERMANY - fast tools to catch reality
+  (c) 2007-2015, rapidlasso GmbH, GERMANY - fast tools to catch reality
 
 --------------------------------------------------------------------------
