@@ -59,7 +59,11 @@ public:
   BOOL init(ByteStreamIn* instream);
   BOOL seek(const U32 current, const U32 target);
   BOOL read(U8* const * point);
+  BOOL check_end();
   BOOL done();
+
+  inline const CHAR* error() const { return last_error; };
+  inline const CHAR* warning() const { return last_warning; };
 
 private:
   ByteStreamIn* instream;
@@ -83,6 +87,9 @@ private:
   I64 point_start;
   U32 point_size;
   U8** seek_point;
+  // used for error and warning reporting
+  CHAR* last_error;
+  CHAR* last_warning;
 };
 
 #endif
