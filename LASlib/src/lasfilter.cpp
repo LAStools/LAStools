@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2014, martin isenburg, rapidlasso - tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -415,6 +415,14 @@ public:
   inline BOOL filter(const LASpoint* point) { return (point->return_number == 1); };
 };
 
+class LAScriterionDropFirstOfManyReturn : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_first_of_many"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns > 1) && (point->return_number == 1)); };
+};
+
 class LAScriterionDropMiddleReturn : public LAScriterion
 {
 public:
@@ -429,6 +437,14 @@ public:
   inline const CHAR* name() const { return "drop_last"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline BOOL filter(const LASpoint* point) { return (point->return_number >= point->number_of_returns); };
+};
+
+class LAScriterionDropLastOfManyReturn : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_last_of_many"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns > 1) && (point->return_number >= point->number_of_returns)); };
 };
 
 class LAScriterionKeepReturns : public LAScriterion
@@ -1735,6 +1751,11 @@ BOOL LASfilter::parse(int argc, char* argv[])
       add_criterion(new LAScriterionDropFirstReturn());
       *argv[i]='\0';
     }
+    else if (strcmp(argv[i],"-drop_first_of_many") == 0)
+    {
+      add_criterion(new LAScriterionDropFirstOfManyReturn());
+      *argv[i]='\0';
+    }
     else if (strcmp(argv[i],"-drop_middle") == 0)
     {
       add_criterion(new LAScriterionDropMiddleReturn());
@@ -1743,6 +1764,11 @@ BOOL LASfilter::parse(int argc, char* argv[])
     else if (strcmp(argv[i],"-drop_last") == 0)
     {
       add_criterion(new LAScriterionDropLastReturn());
+      *argv[i]='\0';
+    }
+    else if (strcmp(argv[i],"-drop_last_of_many") == 0)
+    {
+      add_criterion(new LAScriterionDropLastOfManyReturn());
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-keep_return") == 0)
