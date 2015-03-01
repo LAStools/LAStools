@@ -224,7 +224,7 @@ public:
 
     if (((LAStempWritePoint10*)item)->extended_point_type)
     {
-      ((LAStempWritePoint14*)buffer)->classification_flags = ((LAStempWritePoint10*)item)->extended_classification_flags | (((LAStempWritePoint10*)item)->classification >> 5);
+      ((LAStempWritePoint14*)buffer)->classification_flags = (((LAStempWritePoint10*)item)->extended_classification_flags & 8) | (((LAStempWritePoint10*)item)->classification >> 5);
       if (((LAStempWritePoint10*)item)->extended_classification > 31) ((LAStempWritePoint14*)buffer)->classification = ((LAStempWritePoint10*)item)->extended_classification;
       ((LAStempWritePoint14*)buffer)->scanner_channel = ((LAStempWritePoint10*)item)->extended_scanner_channel;
       ((LAStempWritePoint14*)buffer)->return_number = ((LAStempWritePoint10*)item)->extended_return_number;

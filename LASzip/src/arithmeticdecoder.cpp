@@ -198,6 +198,8 @@ U32 ArithmeticDecoder::decodeSymbol(ArithmeticModel* m)
   ++m->symbol_count[sym];
   if (--m->symbols_until_update == 0) m->update();    // periodic model update
 
+  assert(sym < m->symbols);
+
   return sym;
 }
 
@@ -207,6 +209,8 @@ U32 ArithmeticDecoder::readBit()
   value -= length * sym;                                    // update interval
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
+
+  assert(sym < 2);
 
   return sym;
 }
@@ -228,6 +232,14 @@ U32 ArithmeticDecoder::readBits(U32 bits)
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
+  assert(sym < (1u<<bits));
+
+  if (sym >= (1u<<bits))
+  {
+//    fprintf(stderr, "thrown here %I64d\n", instream->tell());
+    throw 4711;
+  }
+
   return sym;
 }
 
@@ -238,7 +250,12 @@ U8 ArithmeticDecoder::readByte()
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
-  assert(sym < (1<<8));
+  assert(sym < (1u<<8));
+  if (sym >= (1u<<8))
+  {
+//    fprintf(stderr, "thrown here %I64d\n", instream->tell());
+    throw 4711;
+  }
 
   return (U8)sym;
 }
@@ -250,7 +267,12 @@ U16 ArithmeticDecoder::readShort()
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
-  assert(sym < (1<<16));
+  assert(sym < (1u<<16));
+  if (sym >= (1u<<16))
+  {
+//    fprintf(stderr, "thrown here %I64d\n", instream->tell());
+    throw 4711;
+  }
 
   return (U16)sym;
 }

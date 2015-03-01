@@ -36,6 +36,7 @@
 #include "lasreaditemcompressed_v1.hpp"
 #include "lasreaditemcompressed_v2.hpp"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -59,6 +60,9 @@ LASreadPoint::LASreadPoint()
   // used for seeking
   point_start = 0;
   seek_point = 0;
+  // used for error and warning reporting
+  last_error = 0;
+  last_warning = 0;
 }
 
 BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* laszip)
@@ -73,7 +77,11 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
   }
 
   // create entropy decoder (if requested)
-  dec = 0;
+  if (dec)
+  {
+    delete dec;
+    dec = 0;
+  }
   if (laszip && laszip->compressor)
   {
     switch (laszip->coder)
@@ -249,6 +257,7 @@ BOOL LASreadPoint::seek(const U32 current, const U32 target)
     if (point_start == 0)
     {
       init_dec();
+      chunk_count = 0;
     }
     if (chunk_starts)
     {
@@ -328,11 +337,22 @@ BOOL LASreadPoint::read(U8* const * point)
       {
         if (point_start != 0)
         {
-          current_chunk++;
           dec->done();
+          current_chunk++;
+          // check integrity
+          if (current_chunk < tabled_chunks)
+          {
+            I64 here = instream->tell();
+            if (chunk_starts[current_chunk] != here)
+            {
+              // previous chunk was corrupt
+              current_chunk--;
+              throw 4711;
+            }
+          }
         }
         init_dec();
-        if (tabled_chunks == current_chunk) // no or incomplete chunk table?
+        if (current_chunk == tabled_chunks) // no or incomplete chunk table?
         {
           if (current_chunk == number_chunks)
           {
@@ -376,19 +396,69 @@ BOOL LASreadPoint::read(U8* const * point)
       }
     }
   }
-  catch (...)
+  catch (I32 exception) 
   {
+    // create error string
+    if (last_error == 0) last_error = new CHAR[128];
+    // report error
+    if (exception == EOF)
+    {
+      // end-of-file
+      if (dec)
+      {
+        sprintf(last_error, "end-of-file during chunk with index %u", current_chunk);
+      }
+      else
+      {
+        sprintf(last_error, "end-of-file");
+      }
+    }
+    else
+    {
+      // decompression error
+      sprintf(last_error, "chunk with index %u of %u is corrupt", current_chunk, tabled_chunks);
+      // if we know where the next chunk starts ...
+      if ((current_chunk+1) < tabled_chunks)
+      {
+        // ... try to seek to the next chunk
+        instream->seek(chunk_starts[(current_chunk+1)]);
+        // ... ready for next LASreadPoint::read()
+        chunk_count = chunk_size;
+      }
+    }
     return FALSE;
+  }
+  return TRUE;
+}
+
+BOOL LASreadPoint::check_end()
+{
+  if (readers == readers_compressed)
+  {
+    if (dec)
+    {
+      dec->done();
+      current_chunk++;
+      // check integrity
+      if (current_chunk < tabled_chunks)
+      {
+        I64 here = instream->tell();
+        if (chunk_starts[current_chunk] != here)
+        {
+          // create error string
+          if (last_error == 0) last_error = new CHAR[128];
+          // last chunk was corrupt
+          sprintf(last_error, "chunk with index %u of %u is corrupt", current_chunk, tabled_chunks);
+          return FALSE;
+        }
+      }
+    }
   }
   return TRUE;
 }
 
 BOOL LASreadPoint::done()
 {
-  if (readers == readers_compressed)
-  {
-    if (dec) dec->done();
-  }
   instream = 0;
   return TRUE;
 }
@@ -480,7 +550,7 @@ BOOL LASreadPoint::read_chunk_table()
     instream->get32bitsLE((U8*)&version);
     if (version != 0)
     {
-      throw;
+      throw 1;
     }
     instream->get32bitsLE((U8*)&number_chunks);
     if (chunk_totals) delete [] chunk_totals;
@@ -492,14 +562,14 @@ BOOL LASreadPoint::read_chunk_table()
       chunk_totals = new U32[number_chunks+1];
       if (chunk_totals == 0)
       {
-        throw;
+        throw 1;
       }
       chunk_totals[0] = 0;
     }
     chunk_starts = (I64*)malloc(sizeof(I64)*(number_chunks+1));
     if (chunk_starts == 0)
     {
-      throw;
+      throw 1;
     }
     chunk_starts[0] = chunks_start;
     tabled_chunks = 1;
@@ -520,6 +590,10 @@ BOOL LASreadPoint::read_chunk_table()
       {
         if (chunk_size == U32_MAX) chunk_totals[i] += chunk_totals[i-1];
         chunk_starts[i] += chunk_starts[i-1];
+        if (chunk_starts[i] <= chunk_starts[i-1])
+        {
+          throw 1;
+        }
       }
     }
   }
@@ -555,6 +629,10 @@ BOOL LASreadPoint::read_chunk_table()
         chunk_starts[i] += chunk_starts[i-1];
       }
     }
+    // create warning string
+    if (last_warning == 0) last_warning = new CHAR[128];
+    // report warning
+    sprintf(last_warning, "corrupt chunk table");
   }
   if (!instream->seek(chunks_start))
   {
@@ -608,4 +686,7 @@ LASreadPoint::~LASreadPoint()
     delete [] seek_point[0];
     delete [] seek_point;
   }
+
+  if (last_error) delete [] last_error;
+  if (last_warning) delete [] last_warning;
 }

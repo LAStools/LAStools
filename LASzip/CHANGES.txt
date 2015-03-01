@@ -1,3 +1,4 @@
+16 November 2014 -- improved detection & reporting of file truncation and/or LAZ bit-errors
 6 September 2014 -- removal of (unused) EntropyEncoder and EntropyDecoder purely virtual classes
 24 August 2014 -- when reading LAZ chunk table read is delayed until first read() or seek() is called
 18 September 2013 -- fixed small memory leak

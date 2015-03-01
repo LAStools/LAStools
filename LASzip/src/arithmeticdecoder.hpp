@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    13 November 2014 -- integrity check in readBits(), readByte(), readShort()
      6 September 2014 -- removed the (unused) inheritance from EntropyDecoder
     10 January 2011 -- licensing change for LGPL release and liblas integration
      8 December 2010 -- unified framework for all entropy coders
