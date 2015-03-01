@@ -483,6 +483,23 @@ private:
   U8 class_to;
 };
 
+class LASoperationChangeExtendedClassificationFromTo : public LASoperation
+{
+public:
+  inline const char* name() const { return "change_extended_classification_from_to"; };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %d %d ", name(), class_from, class_to); };
+  inline void transform(LASpoint* point) const {
+    if (point->extended_classification == class_from)
+    {
+      point->extended_classification = class_to;
+    }
+  };
+  LASoperationChangeExtendedClassificationFromTo(U8 class_from, U8 class_to) { this->class_from = class_from; this->class_to = class_to; };
+private:
+  U8 class_from;
+  U8 class_to;
+};
+
 class LASoperationClassifyZbelowAs : public LASoperation
 {
 public:
@@ -608,9 +625,9 @@ class LASoperationSetWithheldFlag : public LASoperation
 {
 public:
   inline const char* name() const { return "set_withheld_flag"; };
-  inline int get_command(char* string) const { return sprintf(string, "-%s %d ", name(), (flag ? 1 : 0)); };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %d ", name(), flag); };
   inline void transform(LASpoint* point) const { point->set_withheld_flag(flag); };
-  LASoperationSetWithheldFlag(U8 flag) { this->flag = flag; };
+  LASoperationSetWithheldFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
 private:
   U8 flag;
 };
@@ -619,9 +636,9 @@ class LASoperationSetSyntheticFlag : public LASoperation
 {
 public:
   inline const char* name() const { return "set_synthetic_flag"; };
-  inline int get_command(char* string) const { return sprintf(string, "-%s %d ", name(), (flag ? 1 : 0)); };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %d ", name(), flag); };
   inline void transform(LASpoint* point) const { point->set_synthetic_flag(flag); };
-  LASoperationSetSyntheticFlag(U8 flag) { this->flag = flag; };
+  LASoperationSetSyntheticFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
 private:
   U8 flag;
 };
@@ -630,11 +647,33 @@ class LASoperationSetKeypointFlag : public LASoperation
 {
 public:
   inline const char* name() const { return "set_keypoint_flag"; };
-  inline int get_command(char* string) const { return sprintf(string, "-%s %d ", name(), (flag ? 1 : 0)); };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %d ", name(), flag); };
   inline void transform(LASpoint* point) const { point->set_keypoint_flag(flag); };
-  LASoperationSetKeypointFlag(U8 flag) { this->flag = flag; };
+  LASoperationSetKeypointFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
 private:
   U8 flag;
+};
+
+class LASoperationSetExtendedOverlapFlag : public LASoperation
+{
+public:
+  inline const char* name() const { return "set_extended_overlap_flag"; };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %d ", name(), flag); };
+  inline void transform(LASpoint* point) const { point->set_extended_overlap_flag(flag); };
+  LASoperationSetExtendedOverlapFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
+private:
+  U8 flag;
+};
+
+class LASoperationSetExtendedScannerChannel : public LASoperation
+{
+public:
+  inline const char* name() const { return "set_extended_scanner_channel"; };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %d ", name(), channel); };
+  inline void transform(LASpoint* point) const { point->set_extended_scanner_channel(channel); };
+  LASoperationSetExtendedScannerChannel(U8 channel) { this->channel = (channel >= 3 ? 3 : channel); };
+private:
+  U8 channel;
 };
 
 class LASoperationSetUserData : public LASoperation
@@ -893,16 +932,21 @@ void LAStransform::usage() const
   fprintf(stderr,"  -classify_z_between_as 2.0 5.0 4\n");
   fprintf(stderr,"  -classify_intensity_above_as 200 9\n");
   fprintf(stderr,"  -classify_intensity_below_as 30 11 \n");
+  fprintf(stderr,"  -change_extended_classification_from_to 6 46\n");
   fprintf(stderr,"Change the flags.\n");
   fprintf(stderr,"  -set_withheld_flag 0\n");
   fprintf(stderr,"  -set_synthetic_flag 1\n");
   fprintf(stderr,"  -set_keypoint_flag 0\n");
+  fprintf(stderr,"  -set_extended_overlap_flag 1\n");
+  fprintf(stderr,"Modify the extended scanner channel.\n");
+  fprintf(stderr,"  -set_extended_scanner_channel 2\n");
   fprintf(stderr,"Modify the user data.\n");
   fprintf(stderr,"  -set_user_data 0\n");
   fprintf(stderr,"  -change_user_data_from_to 23 26\n");
   fprintf(stderr,"Modify the point source ID.\n");
   fprintf(stderr,"  -set_point_source 500\n");
   fprintf(stderr,"  -change_point_source_from_to 1023 1024\n");
+  fprintf(stderr,"  -copy_user_data_into_point_source\n");
   fprintf(stderr,"  -quantize_Z_into_point_source 200\n");
   fprintf(stderr,"Transform gps_time.\n");
   fprintf(stderr,"  -translate_gps_time 40.50\n");
@@ -1258,6 +1302,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
       add_operation(new LASoperationChangeClassificationFromTo(U8_CLAMP(atoi(argv[i+1])), U8_CLAMP(atoi(argv[i+2]))));
       *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
     }
+    else if (strcmp(argv[i],"-change_extended_classification_from_to") == 0)
+    {
+      if ((i+2) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value\n", argv[i]);
+        return FALSE;
+      }
+      add_operation(new LASoperationChangeExtendedClassificationFromTo(U8_CLAMP(atoi(argv[i+1])), U8_CLAMP(atoi(argv[i+2]))));
+      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+    }
     else if (strcmp(argv[i],"-classify_z_below_as") == 0)
     {
       if ((i+2) >= argc)
@@ -1336,6 +1390,26 @@ BOOL LAStransform::parse(int argc, char* argv[])
         return FALSE;
       }
       add_operation(new LASoperationSetKeypointFlag((U8)atoi(argv[i+1])));
+      *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+    }
+    else if (strcmp(argv[i],"-set_extended_overlap_flag") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
+        return FALSE;
+      }
+      add_operation(new LASoperationSetExtendedOverlapFlag((U8)atoi(argv[i+1])));
+      *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+    }
+    else if (strcmp(argv[i],"-set_extended_scanner_channel") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
+        return FALSE;
+      }
+      add_operation(new LASoperationSetExtendedScannerChannel((U8)atoi(argv[i+1])));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
     }
     else if (strcmp(argv[i],"-set_user_data") == 0)
