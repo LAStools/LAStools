@@ -74,7 +74,8 @@ LASsummary::LASsummary()
   number_of_point_records = 0;
   for (i = 0; i < 16; i++) number_of_points_by_return[i] = 0;
   for (i = 0; i < 16; i++) number_of_returns[i] = 0;
-  for (i = 0; i < 256; i++) classification[i] = 0;
+  for (i = 0; i < 32; i++) classification[i] = 0;
+  for (i = 0; i < 256; i++) extended_classification[i] = 0;
   for (i = 0; i < 3; i++)
   {
     xyz_fluff_10[i] = 0;
@@ -84,7 +85,7 @@ LASsummary::LASsummary()
   classification_synthetic = 0;
   classification_keypoint = 0;
   classification_withheld = 0;
-  classification_overlap = 0;
+  classification_extended_overlap = 0;
   first = TRUE;
 }
 
@@ -97,6 +98,11 @@ BOOL LASsummary::add(const LASpoint* point)
   if (point->get_synthetic_flag()) classification_synthetic++;
   if (point->get_keypoint_flag()) classification_keypoint++;
   if (point->get_withheld_flag()) classification_withheld++;
+  if (point->extended_point_type)
+  {
+    extended_classification[point->get_extended_classification()]++;
+    if (point->get_extended_overlap_flag()) classification_extended_overlap++;
+  }
   if (first)
   {
     min = *point;
