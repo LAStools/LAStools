@@ -259,9 +259,20 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-  if ((cores > 1) && (lasreadopener.get_file_name_number() > 1) && (!lasreadopener.is_merged()))
+  if (cores > 1)
   {
-    return lasoptimize_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, cores);
+    if (lasreadopener.get_file_name_number() < 2)
+    {
+      fprintf(stderr,"WARNING: only %u input files. ignoring '-cores %d' ...\n", lasreadopener.get_file_name_number(), cores);
+    }
+    else if (lasreadopener.is_merged())
+    {
+      fprintf(stderr,"WARNING: input files merged on-the-fly. ignoring '-cores %d' ...\n", cores);
+    }
+    else
+    {
+      return lasoptimize_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, cores);
+    }
   }
 #endif
 
