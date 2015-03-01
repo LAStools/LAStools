@@ -56,7 +56,7 @@ class LASreaderLAS : public LASreader
 {
 public:
 
-  BOOL open(const char* file_name, I32 io_buffer_size=262144, BOOL peek_only=FALSE);
+  BOOL open(const char* file_name, I32 io_buffer_size=LAS_TOOLS_IO_IBUFFER_SIZE, BOOL peek_only=FALSE);
   BOOL open(FILE* file, BOOL peek_only=FALSE);
   BOOL open(istream& stream, BOOL peek_only=FALSE);
 
@@ -78,6 +78,7 @@ private:
   FILE* file;
   ByteStreamIn* stream;
   LASreadPoint* reader;
+  BOOL checked_end;
 };
 
 class LASreaderLASrescale : public virtual LASreaderLAS
