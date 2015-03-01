@@ -414,7 +414,7 @@ BOOL LASreadOpener::is_inside() const
   return (inside_tile != 0 || inside_circle != 0 || inside_rectangle != 0);
 }
 
-I32 LASreadOpener::unparse_inside(CHAR* string) const
+I32 LASreadOpener::unparse(CHAR* string) const
 {
   I32 n = 0;
   if (inside_tile)
@@ -428,6 +428,47 @@ I32 LASreadOpener::unparse_inside(CHAR* string) const
   else if (inside_rectangle)
   {
     n = sprintf(string, "-inside_rectangle %lf %lf %lf %lf ", inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+  }
+  if (apply_file_source_ID)
+  {
+    n += sprintf(string + n, "-apply_file_source_ID ");
+  }
+  if (scale_factor)
+  {
+    if (scale_factor[2] == 0.0)
+    {
+      if ((scale_factor[0] != 0.0) && (scale_factor[1] != 0.0))
+      {
+        n += sprintf(string + n, "-rescale_xy %g %g ", scale_factor[0], scale_factor[1]);
+      }
+    }
+    else
+    {
+      if ((scale_factor[0] == 0.0) && (scale_factor[1] == 0.0))
+      {
+        n += sprintf(string + n, "-rescale_z %g ", scale_factor[2]);
+      }
+      else
+      {
+        n += sprintf(string + n, "-rescale %g %g %g ", scale_factor[0], scale_factor[1], scale_factor[2]);
+      }
+    }
+  }
+  if (offset)
+  {
+    n += sprintf(string + n, "-reoffset %g %g %g ", offset[0], offset[1], offset[2]);
+  }
+  else if (auto_reoffset)
+  {
+    n += sprintf(string + n, "-auto_reoffset ");
+  }
+  if (populate_header)
+  {
+    n += sprintf(string + n, "-populate ");
+  }
+  if (io_ibuffer_size != LAS_TOOLS_IO_IBUFFER_SIZE)
+  {
+    n += sprintf(string + n, "-io_ibuffer_size %d ", io_ibuffer_size);
   }
   return n;
 }
@@ -1282,6 +1323,10 @@ void LASreadOpener::usage() const
   fprintf(stderr,"  -rescale_xy 0.01 0.01\n");
   fprintf(stderr,"  -rescale_z 0.01\n");
   fprintf(stderr,"  -reoffset 600000 4000000 0\n");
+  fprintf(stderr,"Fast AOI Queries for LAS/LAZ with spatial indexing LAX files\n");
+  fprintf(stderr,"  -inside min_x min_y max_x max_y\n");
+  fprintf(stderr,"  -inside_tile ll_x ll_y size\n");
+  fprintf(stderr,"  -inside_circle center_x center_y radius\n");
 }
 
 BOOL LASreadOpener::parse(int argc, char* argv[])
@@ -1701,6 +1746,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
   return TRUE;
 }
 
+U32 LASreadOpener::get_file_name_number() const
+{
+  return file_name_number;
+}
+
+U32 LASreadOpener::get_file_name_current() const
+{
+  return file_name_current;
+}
+
 const CHAR* LASreadOpener::get_file_name() const
 {
   if (file_name)
@@ -1931,11 +1986,6 @@ BOOL LASreadOpener::set_file_name_current(U32 file_name_id)
   return FALSE;
 }
 
-U32 LASreadOpener::get_file_name_number() const
-{
-  return file_name_number;
-}
-
 #ifdef _WIN32
 #include <windows.h>
 BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique)
@@ -2144,7 +2194,7 @@ BOOL LASreadOpener::active() const
 
 LASreadOpener::LASreadOpener()
 {
-  io_ibuffer_size = 262144;
+  io_ibuffer_size = LAS_TOOLS_IO_IBUFFER_SIZE;
   file_names = 0;
   file_name = 0;
   neighbor_file_names = 0;
