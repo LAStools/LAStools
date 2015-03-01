@@ -45,7 +45,7 @@ public:
 
   BOOL refile(FILE* file);
 
-  BOOL open(const char* file_name, const LASheader* header, const char* version, U32 io_buffer_size=262144);
+  BOOL open(const char* file_name, const LASheader* header, const char* version, U32 io_buffer_size=LAS_TOOLS_IO_OBUFFER_SIZE );
   BOOL open(FILE* file, const LASheader* header, const char* version);
   BOOL open(ByteStreamOut* stream, const LASheader* header, const char* version);
 

@@ -191,6 +191,16 @@ BOOL LASreaderBuffered::open()
 
     header.set_lasoriginal();
 
+    // force identical scale on the neighbors
+
+    lasreadopener_neighbors.set_scale_factor(&header.x_scale_factor);
+
+    // force identical offset on the neighbors
+
+    lasreadopener_neighbors.set_offset(&header.x_offset);
+
+    // open neighbors
+
     LASreader* lasreader_neighbor = lasreadopener_neighbors.open();
     if (lasreader_neighbor == 0)
     {

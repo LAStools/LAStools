@@ -630,9 +630,17 @@ BOOL LASreaderMerged::open()
     if (first)
     {
       first = FALSE;
-      // usually we delete the lastiling information as it becomes meaningless
-      if (keep_lastiling == FALSE)
+      // check for tiling
+      if (keep_lastiling)
       {
+        if (lasreader->header.vlr_lastiling == 0)
+        {
+          fprintf(stderr, "WARNING: first file has no LAStiling VLR cannot '-keep_lastiling' ...\n");
+        }
+      }
+      else
+      {
+        // usually we delete the lastiling information as it becomes meaningless
         lasreader->header.clean_lastiling();
       }
       // use the entire header info from the first file
@@ -722,11 +730,11 @@ BOOL LASreaderMerged::open()
         }
       }
     }
-    if (buffer_warning)
-    {
-      fprintf(stderr, "WARNING: among merged files are %u tiles with buffer. remove buffers first?\n", buffer_warning);
-    }
     lasreader->close();
+  }
+  if (buffer_warning)
+  {
+    fprintf(stderr, "WARNING: among merged files %s %u tile%s with buffer. remove buffers first?\n", (buffer_warning == 1 ? "is" : "are"), buffer_warning, (buffer_warning == 1 ? "" : "s"));
   }
 
   // was it requested to rescale or reoffset
@@ -1183,7 +1191,7 @@ LASreaderMerged::LASreaderMerged()
   files_are_flightlines = FALSE;
   apply_file_source_ID = FALSE;
   parse_string = 0;
-  io_ibuffer_size = 262144;
+  io_ibuffer_size = LAS_TOOLS_IO_IBUFFER_SIZE;
   file_names = 0;
   bounding_boxes = 0;
   clean();

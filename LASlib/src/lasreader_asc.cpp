@@ -129,7 +129,7 @@ BOOL LASreaderASC::open(const char* file_name, BOOL comma_not_point)
     {
       sscanf(line, "%s %d", dummy, &ncols);
       free(line);
-      line_size = 1024+16*ncols;
+      line_size = 1024+50*ncols;
       line = (CHAR*)malloc(sizeof(CHAR)*line_size);
     }
     else if (strstr(line, "nrows") || strstr(line, "NROWS"))

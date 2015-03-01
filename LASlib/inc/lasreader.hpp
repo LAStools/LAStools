@@ -152,14 +152,15 @@ class LASreadOpener
 public:
   void set_io_ibuffer_size(I32 io_ibuffer_size);
   inline I32 get_io_ibuffer_size() const { return io_ibuffer_size; };
+  U32 get_file_name_number() const;
+  U32 get_file_name_current() const;
   const CHAR* get_file_name() const;
+  const CHAR* get_file_name(U32 number) const;
   void set_file_name(const CHAR* file_name, BOOL unique=FALSE);
   BOOL add_file_name(const CHAR* file_name, BOOL unique=FALSE);
   BOOL add_list_of_files(const CHAR* list_of_files, BOOL unique=FALSE);
   void delete_file_name(U32 file_name_id);
   BOOL set_file_name_current(U32 file_name_id);
-  U32 get_file_name_number() const;
-  const CHAR* get_file_name(U32 number) const;
   I32 get_file_format(U32 number) const;
   void set_merged(const BOOL merged);
   BOOL is_merged() const { return merged; };
@@ -198,7 +199,7 @@ public:
   BOOL is_header_populated() const;
   BOOL active() const;
   BOOL is_inside() const;
-  I32 unparse_inside(CHAR* string) const;
+  I32 unparse(CHAR* string) const;
   void set_filter(LASfilter* filter);
   const LASfilter* get_filter() { return filter; };
   void set_transform(LAStransform* transform);
