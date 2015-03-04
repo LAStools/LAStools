@@ -44,8 +44,10 @@
   // Check if on OS X and using cland (unordered map isn't part of tr1 namespace)
   #if defined(__APPLE__) && defined(__clang__)
     #include <unordered_map>
+    using namespace std;
   #else
     #include <tr1/unordered_map>
+    using namespace std;
     using namespace tr1;
   #endif
 typedef unordered_map<I32,U32> my_cell_hash;
