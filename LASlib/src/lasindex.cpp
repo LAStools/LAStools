@@ -40,8 +40,6 @@
 #include "bytestreamin_file.hpp"
 #include "bytestreamout_file.hpp"
 
-using namespace std;
-
 #ifdef UNORDERED
   // Check if on OS X and using cland (unordered map isn't part of tr1 namespace)
   #if defined(__APPLE__) && defined(__clang__)
