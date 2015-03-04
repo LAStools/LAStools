@@ -1,3 +1,5 @@
+04 March 2015 -- lasduplicate: new option to remove exact duplicates *and* '-nearby 0.005' points
+04 March 2015 -- GUIs: simultaneous use of '-lof' multi-file processing with unique'file_name.xxx.txt' 
 2 February 2015 -- IMPORTANT: lasgrid, lasground, ...: fixed little bug introduced in version 150131
 31 January 2015 -- NEW: lasground_new: alternative to lasground for mix of mountains and buildings
 31 January 2015 -- lastile: '-remove_buffer' and '-refine_tiles' can now run on '-cores 4' or more
