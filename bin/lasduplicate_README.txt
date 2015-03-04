@@ -11,6 +11,22 @@
   It is also possible to remove only xyz-duplicates points that
   have all x, y and z coordinates identical via '-unique_xyz'.
 
+  Another option is to identify '-nearby 0.005' points into one so
+  that multiple returns within a specified distance become a single
+  return. Given all pairs of points p1 and p2 (with p1 being before
+  p2 in the file), point p2 will not be part of the output if these
+  three conditions on their quantized coordinates are true
+
+    (1)   |p1.qx - p2.qx| <= 1
+    (2)   |p1.qy - p2.qy| <= 1
+    (3)   |p1.qz - p2.qz| <= 1 
+
+  after quantizing them as follows based on the '-nearby d' value 
+
+      p1.qx = round(p1.x / d)     p2.qx = round(p2.x / d)
+      p1.qy = round(p1.y / d)     p2.qy = round(p2.y / d)
+      p1.qz = round(p1.z / d)     p2.qz = round(p2.z / d)
+
   The special option '-single_returns' was added particularly to
   reconstruct the single versus multiple return information for
   the (unfortunate) case that the LiDAR points were delivered in
@@ -63,6 +79,12 @@ result to the LAS file 'out.las'.
 >> lasduplicate -i in.las -o out.las -v
 
 same as above but reports every removed point in the stderr.
+
+>> lasduplicate -i in.laz -nearby 0.005 -o out.laz 
+
+removes all duplicates and nearby points from fulfilling the criteria
+desribed above from the LAS file 'in.laz' and stores the result to the
+LAS file 'out.laz'.
 
 >> lasduplicate -i in.laz -o out.laz
 
