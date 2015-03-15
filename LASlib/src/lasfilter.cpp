@@ -1199,6 +1199,7 @@ void LASfilter::usage() const
   fprintf(stderr,"Filter points based on their return number.\n");
   fprintf(stderr,"  -first_only -keep_first -drop_first\n");
   fprintf(stderr,"  -last_only -keep_last -drop_last\n");
+  fprintf(stderr,"  -drop_first_of_many -drop_last_of_many\n");
   fprintf(stderr,"  -keep_middle -drop_middle\n");
   fprintf(stderr,"  -keep_return 1 2 3\n");
   fprintf(stderr,"  -drop_return 3 4\n");
