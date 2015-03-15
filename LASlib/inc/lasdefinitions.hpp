@@ -45,7 +45,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 150304
+#define LAS_TOOLS_VERSION 150315
 
 #include <stdio.h>
 #include <string.h>
@@ -772,7 +772,7 @@ public:
 
   BOOL init(const LASquantizer* quantizer, const U32 num_items, const LASitem* items, const LASattributer* attributer=0)
   {
-    U32 i,e;
+    U32 i;
 
     // clean the point
 
@@ -786,7 +786,7 @@ public:
     if (this->point) delete [] this->point;
     this->point = new U8*[num_items];
 
-    for (i = 0, e = 0; i < num_items; i++)
+    for (i = 0; i < num_items; i++)
     {
       this->items[i] = items[i];
       total_point_size += items[i].size;
