@@ -210,7 +210,10 @@ U32 ArithmeticDecoder::readBit()
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
-  assert(sym < 2);
+  if (sym >= 2)
+  {
+    throw 4711;
+  }
 
   return sym;
 }
@@ -232,11 +235,8 @@ U32 ArithmeticDecoder::readBits(U32 bits)
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
-  assert(sym < (1u<<bits));
-
   if (sym >= (1u<<bits))
   {
-//    fprintf(stderr, "thrown here %I64d\n", instream->tell());
     throw 4711;
   }
 
@@ -250,10 +250,8 @@ U8 ArithmeticDecoder::readByte()
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
-  assert(sym < (1u<<8));
   if (sym >= (1u<<8))
   {
-//    fprintf(stderr, "thrown here %I64d\n", instream->tell());
     throw 4711;
   }
 
@@ -267,10 +265,8 @@ U16 ArithmeticDecoder::readShort()
 
   if (length < AC__MinLength) renorm_dec_interval();        // renormalization
 
-  assert(sym < (1u<<16));
   if (sym >= (1u<<16))
   {
-//    fprintf(stderr, "thrown here %I64d\n", instream->tell());
     throw 4711;
   }
 

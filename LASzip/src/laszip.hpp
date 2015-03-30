@@ -55,9 +55,9 @@ typedef long long SIGNED_INT64;
 #endif
 
 #define LASZIP_VERSION_MAJOR                2
-#define LASZIP_VERSION_MINOR                2
+#define LASZIP_VERSION_MINOR                3
 #define LASZIP_VERSION_REVISION             0
-#define LASZIP_VERSION_BUILD_DATE      140907
+#define LASZIP_VERSION_BUILD_DATE      150329
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1
@@ -109,6 +109,7 @@ public:
   bool pack(unsigned char*& bytes, int& num);
 
   // setup
+  bool request_compatibility_mode(const unsigned short requested_compatibility_mode=0); // 0 = none, 1 = LAS 1.4 compatibility mode
   bool setup(const unsigned char point_type, const unsigned short point_size, const unsigned short compressor=LASZIP_COMPRESSOR_DEFAULT);
   bool setup(const unsigned short num_items, const LASitem* items, const unsigned short compressor);
   bool set_chunk_size(const unsigned int chunk_size);             /* for compressor only */
