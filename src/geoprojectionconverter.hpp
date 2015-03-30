@@ -30,7 +30,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2014, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2015, martin isenburg, rapidlasso - tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -41,6 +41,7 @@
   
   CHANGE HISTORY:
   
+    03 March 2015 -- LCC/TM custom projections write GeogGeodeticDatumGeoKey
     13 August 2014 -- added long overdue ECEF (geocentric) conversion
     08 February 2007 -- created after interviews with purdue and google
   
