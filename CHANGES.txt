@@ -1,3 +1,6 @@
+30 March 2015 -- laszip: compresses and decompresses LAS 1.4 files via new "compatibility mode"
+30 March 2015 -- GUIs: delete multiple files: pick a (red) box covering them and press <delete> 
+30 March 2015 -- las2txt: correct ASCII output for extended attributes of new LAS 1.4 point types
 04 March 2015 -- lasduplicate: new option to remove exact duplicates *and* '-nearby 0.005' points
 04 March 2015 -- GUIs: simultaneous use of '-lof' multi-file processing with unique'file_name.xxx.txt' 
 2 February 2015 -- IMPORTANT: lasgrid, lasground, ...: fixed little bug introduced in version 150131
