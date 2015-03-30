@@ -50,12 +50,12 @@ BOOL LASwriteOpener::is_piped() const
   return ((file_name == 0) && use_stdout);
 }
 
-LASwriter* LASwriteOpener::open(LASheader* header)
+LASwriter* LASwriteOpener::open(const LASheader* header)
 {
   if (use_nil)
   {
     LASwriterLAS* laswriterlas = new LASwriterLAS();
-    if (!laswriterlas->open(header, (format == LAS_TOOLS_FORMAT_LAZ ? (use_chunking ?  LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NOT_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
+    if (!laswriterlas->open(header, (format == LAS_TOOLS_FORMAT_LAZ ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
     {
       fprintf(stderr,"ERROR: cannot open laswriterlas to NULL\n");
       delete laswriterlas;
@@ -68,7 +68,7 @@ LASwriter* LASwriteOpener::open(LASheader* header)
     if (format <= LAS_TOOLS_FORMAT_LAZ)
     {
       LASwriterLAS* laswriterlas = new LASwriterLAS();
-      if (!laswriterlas->open(file_name, header, (format == LAS_TOOLS_FORMAT_LAZ ? (use_chunking ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NOT_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size, io_obuffer_size))
+      if (!laswriterlas->open(file_name, header, (format == LAS_TOOLS_FORMAT_LAZ ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NONE), 2, chunk_size, io_obuffer_size))
       {
         fprintf(stderr,"ERROR: cannot open laswriterlas with file name '%s'\n", file_name);
         delete laswriterlas;
@@ -134,7 +134,7 @@ LASwriter* LASwriteOpener::open(LASheader* header)
     if (format <= LAS_TOOLS_FORMAT_LAZ)
     {
       LASwriterLAS* laswriterlas = new LASwriterLAS();
-      if (!laswriterlas->open(stdout, header, (format == LAS_TOOLS_FORMAT_LAZ ? (use_chunking ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NOT_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
+      if (!laswriterlas->open(stdout, header, (format == LAS_TOOLS_FORMAT_LAZ ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
       {
         fprintf(stderr,"ERROR: cannot open laswriterlas to stdout\n");
         delete laswriterlas;
@@ -337,16 +337,6 @@ BOOL LASwriteOpener::parse(int argc, char* argv[])
     {
       use_nil = TRUE;
       use_stdout = FALSE;
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-no_chunk") == 0)
-    {
-      use_chunking = FALSE;
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-chunk") == 0)
-    {
-      use_chunking = TRUE;
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-chunk_size") == 0)
@@ -619,7 +609,6 @@ void LASwriteOpener::set_force(BOOL force)
 
 void LASwriteOpener::set_chunk_size(U32 chunk_size)
 {
-  this->use_chunking = TRUE;
   this->chunk_size = chunk_size;
 }
 
@@ -1016,7 +1005,6 @@ LASwriteOpener::LASwriteOpener()
   specified = FALSE;
   force = FALSE;
   chunk_size = LASZIP_CHUNK_SIZE_DEFAULT;
-  use_chunking = TRUE;
   use_stdout = FALSE;
   use_nil = FALSE;
 }

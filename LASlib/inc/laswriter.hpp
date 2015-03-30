@@ -5,7 +5,7 @@
   
   CONTENTS:
   
-    Interface to write LIDAR points to the LAS format versions 1.0 - 1.3 and
+    Interface to write LIDAR points to the LAS format versions 1.0 - 1.4 and
     per on-the-fly conversion to simple ASCII files.
 
   PROGRAMMERS:
@@ -14,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -27,7 +27,7 @@
   
     5 September 2011 -- support for writing Terrasolid's BIN format
     11 June 2011 -- billion point support: p_count & npoints are 64 bit counters
-    8 May 2011 -- added an option for variable chunking via chunk()
+    8 May 2011 -- DO NOT USE option for variable chunking via chunk()
     9 April 2011 -- added capability to write on-the-fly conversion to ASCII
     24 January 2011 -- introduced LASwriteOpener
     21 January 2011 -- turned into abstract reader to support multiple files
@@ -95,7 +95,7 @@ public:
   BOOL parse(int argc, char* argv[]);
   BOOL active() const;
   BOOL is_piped() const;
-  LASwriter* open(LASheader* header);
+  LASwriter* open(const LASheader* header);
   LASwaveform13writer* open_waveform13(const LASheader* lasheader);
   LASwriteOpener();
   ~LASwriteOpener();
@@ -117,7 +117,6 @@ private:
   BOOL specified;
   BOOL force;
   U32 chunk_size;
-  BOOL use_chunking;
   BOOL use_stdout;
   BOOL use_nil;
   BOOL buffered;

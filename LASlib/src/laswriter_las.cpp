@@ -154,10 +154,11 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
 
   // check if the requested point type is supported
 
-  BOOL point_is_standard = TRUE;
+  LASpoint point;
   U8 point_data_format;
   U16 point_data_record_length;
-  LASpoint point;
+  BOOL point_is_standard = TRUE;
+
   if (header->laszip)
   {
     if (!point.init(&quantizer, header->laszip->num_items, header->laszip->items, header)) return FALSE;
@@ -170,7 +171,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     point_data_record_length = header->point_data_record_length;
   }
 
-  // do we need a laszip VLR (because we compress or use non-standard points?) 
+  // do we need a LASzip VLR (because we compress or use non-standard points?) 
 
   LASzip* laszip = 0;
   U32 laszip_vlr_data_size = 0;
@@ -248,40 +249,28 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     return FALSE;
   }
   // check version major
+  U8 version_major = header->version_major;
   if (header->version_major != 1)
   {
     fprintf(stderr,"WARNING: header->version_major is %d. writing 1 instead.\n", header->version_major);
-    if (!stream->putByte(1))
-    {
-      fprintf(stderr,"ERROR: writing header->version_major\n");
-      return FALSE;
-    }
+    version_major = 1;
   }
-  else
+  if (!stream->putByte(header->version_major))
   {
-    if (!stream->putByte(header->version_major))
-    {
-      fprintf(stderr,"ERROR: writing header->version_major\n");
-      return FALSE;
-    }
+    fprintf(stderr,"ERROR: writing header->version_major\n");
+    return FALSE;
   }
   // check version minor
-  if (header->version_minor > 4)
+  U8 version_minor = header->version_minor;
+  if (version_minor > 4)
   {
-    fprintf(stderr,"WARNING: header->version_minor is %d. writing 4 instead.\n", header->version_minor);
-    if (!stream->putByte(4))
-    {
-      fprintf(stderr,"ERROR: writing header->version_minor\n");
-      return FALSE;
-    }
+    fprintf(stderr,"WARNING: header->version_minor is %d. writing 4 instead.\n", version_minor);
+    version_minor = 4;
   }
-  else
+  if (!stream->putByte(version_minor))
   {
-    if (!stream->putByte(header->version_minor))
-    {
-      fprintf(stderr,"ERROR: writing header->version_minor\n");
-      return FALSE;
-    }
+    fprintf(stderr,"ERROR: writing header->version_minor\n");
+    return FALSE;
   }
   if (!stream->putBytes((U8*)header->system_identifier, 32))
   {
@@ -412,7 +401,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   }
 
   // special handling for LAS 1.3 or higher.
-  if (header->version_minor >= 3)
+  if (version_minor >= 3)
   {
     U64 start_of_waveform_data_packet_record = header->start_of_waveform_data_packet_record;
     if (start_of_waveform_data_packet_record != 0)
@@ -432,7 +421,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   }
 
   // special handling for LAS 1.4 or higher.
-  if (header->version_minor >= 4)
+  if (version_minor >= 4)
   {
     writing_las_1_4 = TRUE;
 
@@ -462,23 +451,24 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
       fprintf(stderr,"ERROR: writing header->number_of_extended_variable_length_records\n");
       return FALSE;
     }
-    U64 value;
+    U64 extended_number_of_point_records;
     if (header->number_of_point_records)
-      value = header->number_of_point_records;
+      extended_number_of_point_records = header->number_of_point_records;
     else
-      value = header->extended_number_of_point_records;
-    if (!stream->put64bitsLE((U8*)&value))
+      extended_number_of_point_records = header->extended_number_of_point_records;
+    if (!stream->put64bitsLE((U8*)&extended_number_of_point_records))
     {
       fprintf(stderr,"ERROR: writing header->extended_number_of_point_records\n");
       return FALSE;
     }
+    U64 extended_number_of_points_by_return;
     for (i = 0; i < 15; i++)
     {
       if ((i < 5) && header->number_of_points_by_return[i])
-        value = header->number_of_points_by_return[i];
+        extended_number_of_points_by_return = header->number_of_points_by_return[i];
       else
-        value = header->extended_number_of_points_by_return[i];
-      if (!stream->put64bitsLE((U8*)&value))
+        extended_number_of_points_by_return = header->extended_number_of_points_by_return[i];
+      if (!stream->put64bitsLE((U8*)&extended_number_of_points_by_return))
       {
         fprintf(stderr,"ERROR: writing header->extended_number_of_points_by_return[%d]\n", i);
         return FALSE;
