@@ -16,7 +16,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -1007,7 +1007,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
       {
         GeoProjectionParametersLCC* lcc = (GeoProjectionParametersLCC*)projection;
 
-        num_geo_keys = 12 + (vertical_geokey ? 1 : 0);
+        num_geo_keys = 13 + (vertical_geokey ? 1 : 0);
         (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys)*num_geo_keys);
         num_geo_double_params = 6;
         (*geo_double_params) = (double*)malloc(sizeof(double)*num_geo_double_params);
@@ -1080,25 +1080,31 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         else
           (*geo_double_params)[5] = lcc->lcc_false_northing_meter * meter2coordinates;
 
-        // ellipsoid
-        (*geo_keys)[10].key_id = 2056; // GeogEllipsoidGeoKey
+        // datum
+        (*geo_keys)[10].key_id = 2050; // GeogGeodeticDatumGeoKey
         (*geo_keys)[10].tiff_tag_location = 0;
         (*geo_keys)[10].count = 1;
-        (*geo_keys)[10].value_offset = get_GeogEllipsoidGeoKey(source);
+        (*geo_keys)[10].value_offset = get_GeogGeodeticDatumGeoKey(source);
 
-        // vertical units
-        (*geo_keys)[11].key_id = 4099; // VerticalUnitsGeoKey
+        // ellipsoid
+        (*geo_keys)[11].key_id = 2056; // GeogEllipsoidGeoKey
         (*geo_keys)[11].tiff_tag_location = 0;
         (*geo_keys)[11].count = 1;
-        (*geo_keys)[11].value_offset = get_VerticalUnitsGeoKey(source);
+        (*geo_keys)[11].value_offset = get_GeogEllipsoidGeoKey(source);
+
+        // vertical units
+        (*geo_keys)[12].key_id = 4099; // VerticalUnitsGeoKey
+        (*geo_keys)[12].tiff_tag_location = 0;
+        (*geo_keys)[12].count = 1;
+        (*geo_keys)[12].value_offset = get_VerticalUnitsGeoKey(source);
 
         if (vertical_geokey)
         {
           // vertical datum
-          (*geo_keys)[12].key_id = 4096; // VerticalCSTypeGeoKey
-          (*geo_keys)[12].tiff_tag_location = 0;
-          (*geo_keys)[12].count = 1;
-          (*geo_keys)[12].value_offset = vertical_geokey;
+          (*geo_keys)[13].key_id = 4096; // VerticalCSTypeGeoKey
+          (*geo_keys)[13].tiff_tag_location = 0;
+          (*geo_keys)[13].count = 1;
+          (*geo_keys)[13].value_offset = vertical_geokey;
         }
         return true;
       }
@@ -1106,7 +1112,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
       {
         GeoProjectionParametersTM* tm = (GeoProjectionParametersTM*)projection;
 
-        num_geo_keys = 11 + (vertical_geokey ? 1 : 0);
+        num_geo_keys = 12 + (vertical_geokey ? 1 : 0);
         (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys)*num_geo_keys);
         num_geo_double_params = 5;
         (*geo_double_params) = (double*)malloc(sizeof(double)*num_geo_double_params);
@@ -1173,25 +1179,31 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         else
           (*geo_double_params)[4] = tm->tm_false_northing_meter * meter2coordinates;
 
-        // ellipsoid
-        (*geo_keys)[9].key_id = 2056; // GeogEllipsoidGeoKey
+        // datum
+        (*geo_keys)[9].key_id = 2050; // GeogGeodeticDatumGeoKey
         (*geo_keys)[9].tiff_tag_location = 0;
         (*geo_keys)[9].count = 1;
-        (*geo_keys)[9].value_offset = get_GeogEllipsoidGeoKey(source);
+        (*geo_keys)[9].value_offset = get_GeogGeodeticDatumGeoKey(source);
 
-        // vertical units
-        (*geo_keys)[10].key_id = 4099; // VerticalUnitsGeoKey
+        // ellipsoid
+        (*geo_keys)[10].key_id = 2056; // GeogEllipsoidGeoKey
         (*geo_keys)[10].tiff_tag_location = 0;
         (*geo_keys)[10].count = 1;
-        (*geo_keys)[10].value_offset = get_VerticalUnitsGeoKey(source);
+        (*geo_keys)[10].value_offset = get_GeogEllipsoidGeoKey(source);
+
+        // vertical units
+        (*geo_keys)[11].key_id = 4099; // VerticalUnitsGeoKey
+        (*geo_keys)[11].tiff_tag_location = 0;
+        (*geo_keys)[11].count = 1;
+        (*geo_keys)[11].value_offset = get_VerticalUnitsGeoKey(source);
 
         if (vertical_geokey)
         {
           // vertical datum
-          (*geo_keys)[11].key_id = 4096; // VerticalCSTypeGeoKey
-          (*geo_keys)[11].tiff_tag_location = 0;
-          (*geo_keys)[11].count = 1;
-          (*geo_keys)[11].value_offset = vertical_geokey;
+          (*geo_keys)[12].key_id = 4096; // VerticalCSTypeGeoKey
+          (*geo_keys)[12].tiff_tag_location = 0;
+          (*geo_keys)[12].count = 1;
+          (*geo_keys)[12].value_offset = vertical_geokey;
         }
         return true;
       }
