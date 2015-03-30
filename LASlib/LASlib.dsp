@@ -245,6 +245,10 @@ SOURCE=.\src\laswriter_wrl.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\laswritercompatible.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\laszip.cpp
 # End Source File
 # End Group
@@ -269,6 +273,10 @@ SOURCE=..\LASzip\src\bytestreamin.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\inc\bytestreamin_array.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\bytestreamin_file.hpp
 # End Source File
 # Begin Source File
@@ -278,6 +286,10 @@ SOURCE=..\LASzip\src\bytestreamin_istream.hpp
 # Begin Source File
 
 SOURCE=..\LASzip\src\bytestreamout.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\inc\bytestreamout_array.hpp
 # End Source File
 # Begin Source File
 
@@ -446,6 +458,10 @@ SOURCE=.\inc\laswriter_txt.hpp
 # Begin Source File
 
 SOURCE=.\inc\laswriter_wrl.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\inc\laswritercompatible.hpp
 # End Source File
 # Begin Source File
 

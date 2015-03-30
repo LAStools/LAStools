@@ -45,7 +45,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 150315
+#define LAS_TOOLS_VERSION 150330
 
 #include <stdio.h>
 #include <string.h>
@@ -1027,6 +1027,8 @@ public:
   inline void set_z(const F64 z) { this->Z = quantizer->get_Z(z); };
 
   inline U8 get_extended_classification() const { return extended_classification; };
+  inline U8 get_extended_return_number() const { return extended_return_number; };
+  inline U8 get_extended_number_of_returns() const { return extended_number_of_returns; };
   inline I16 get_extended_scan_angle() const { return extended_scan_angle; };
   inline U8 get_extended_overlap_flag() const { return (extended_classification_flags >> 3); };
   inline U8 get_extended_scanner_channel() const { return extended_scanner_channel; };
@@ -1035,6 +1037,8 @@ public:
   inline void set_extended_scan_angle(U16 extended_scan_angle) { this->extended_scan_angle = extended_scan_angle; };
   inline void set_extended_overlap_flag(U8 extended_overlap_flag) { this->extended_classification_flags = (extended_overlap_flag << 3) | (this->extended_classification_flags & 7); };
   inline void set_extended_scanner_channel(U8 extended_scanner_channel) { this->extended_scanner_channel = extended_scanner_channel; };
+
+  inline F32 get_scan_angle() const { if (extended_point_type) return 0.006f*extended_scan_angle; else return scan_angle_rank; };
 
   inline void compute_coordinates()
   {

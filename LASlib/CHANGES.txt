@@ -1,3 +1,5 @@
+30 March 2015 -- las2txt: correct ASCII output for extended attributes of new LAS 1.4 point types
+30 March 2015 -- LASlib: LASwriterCompatibleDown/LASwriterCompatibleUp for LAS 1.4 compatibility
 31 January 2015 -- LASlib: new transforms for extended attributes of LAS 1.4 point types 6 - 10
 18 December 2014 -- LASlib: different scale_factors/offsets are now possible with '-buffered 25'
 18 December 2014 -- laszip: use '-check' to find truncations and/or bit-errors in LAZ files
