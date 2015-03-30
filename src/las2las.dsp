@@ -378,10 +378,6 @@ SOURCE=..\src_full\linereader.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\mydefs.hpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\LASzip\src\mydefs.hpp
 # End Source File
 # Begin Source File
