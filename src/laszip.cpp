@@ -675,7 +675,7 @@ int main(int argc, char *argv[])
           laswriter->write_point(&lasreader->point);
           if (lax)
           {
-            lasindex.add(&lasreader->point, (U32)(laswriter->p_count));
+            lasindex.add(lasreader->point.get_x(), lasreader->point.get_y(), (U32)(laswriter->p_count));
           }
           if (!lasreadopener.is_header_populated())
           {
@@ -729,7 +729,7 @@ int main(int argc, char *argv[])
             // compress points and add to index
             while (lasreader->read_point())
             {
-              lasindex.add(&lasreader->point, (U32)(laswriter->p_count));
+              lasindex.add(lasreader->point.get_x(), lasreader->point.get_y(), (U32)(laswriter->p_count));
               laswriter->write_point(&lasreader->point);
             }
 
@@ -796,7 +796,7 @@ int main(int argc, char *argv[])
             // compress points and add to index
             while (lasreader->read_point())
             {
-              lasindex.add(&lasreader->point, (U32)(laswriter->p_count));
+              lasindex.add(lasreader->point.get_x(), lasreader->point.get_y(), (U32)(laswriter->p_count));
               laswriter->write_point(&lasreader->point);
               laswriter->update_inventory(&lasreader->point);
             }

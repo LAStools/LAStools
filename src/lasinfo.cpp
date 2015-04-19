@@ -3147,6 +3147,10 @@ int main(int argc, char *argv[])
           if (lassummary.has_very_serious_fluff())
           {
             fprintf(file_out, "WARNING: there is very serious coordinate resolution fluff (x1000) in %s%s%s\012", (lassummary.has_very_serious_fluff(0) ? "X" : ""), (lassummary.has_very_serious_fluff(1) ? "Y" : ""), (lassummary.has_very_serious_fluff(2) ? "Z" : ""));
+            if (lassummary.has_extremely_serious_fluff())
+            {
+              fprintf(file_out, "WARNING: there is extremely serious coordinate resolution fluff (x10000) in %s%s%s\012", (lassummary.has_extremely_serious_fluff(0) ? "X" : ""), (lassummary.has_extremely_serious_fluff(1) ? "Y" : ""), (lassummary.has_extremely_serious_fluff(2) ? "Z" : ""));
+            }
           }
         }
       }
