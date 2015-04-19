@@ -81,6 +81,7 @@ LASsummary::LASsummary()
     xyz_fluff_10[i] = 0;
     xyz_fluff_100[i] = 0;
     xyz_fluff_1000[i] = 0;
+    xyz_fluff_10000[i] = 0;
   }
   classification_synthetic = 0;
   classification_keypoint = 0;
@@ -194,6 +195,10 @@ BOOL LASsummary::add(const LASpoint* point)
       if ((point->get_X()%1000) == 0)
       {
         xyz_fluff_1000[0]++;
+        if ((point->get_X()%10000) == 0)
+        {
+          xyz_fluff_10000[0]++;
+        }
       }
     }
   }
@@ -206,6 +211,10 @@ BOOL LASsummary::add(const LASpoint* point)
       if ((point->get_Y()%1000) == 0)
       {
         xyz_fluff_1000[1]++;
+        if ((point->get_Y()%10000) == 0)
+        {
+          xyz_fluff_10000[1]++;
+        }
       }
     }
   }
@@ -218,6 +227,10 @@ BOOL LASsummary::add(const LASpoint* point)
       if ((point->get_Z()%1000) == 0)
       {
         xyz_fluff_1000[2]++;
+        if ((point->get_Z()%10000) == 0)
+        {
+          xyz_fluff_10000[2]++;
+        }
       }
     }
   }
