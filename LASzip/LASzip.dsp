@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LASZIPDLL_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "inc" /I "dll" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LASZIPDLL_EXPORTS" /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "inc" /I "dll" /I "stl" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LASZIPDLL_EXPORTS" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -57,7 +57,7 @@ LINK32=link.exe
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Release\LASzip.dll dll\LASzip.dll
+PostBuild_Cmds=copy Release\LASzip.dll dll\LASzip.dll	copy Debug\LASzip.dll example\Release\LASzip.dll
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "LASzip - Win32 Debug"
@@ -74,7 +74,7 @@ PostBuild_Cmds=copy Release\LASzip.dll dll\LASzip.dll
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LASZIPDLL_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /ML /W3 /Gm /GX /ZI /Od /I "inc" /I "dll" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LASZIPDLL_EXPORTS" /YX /FD /GZ /c
+# ADD CPP /nologo /ML /W3 /Gm /GX /ZI /Od /I "inc" /I "dll" /I "stl" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LASZIPDLL_EXPORTS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -87,7 +87,7 @@ LINK32=link.exe
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Debug\LASzip.dll dll\LASzip.dll
+PostBuild_Cmds=copy Debug\LASzip.dll dll\LASzip.dll	copy Debug\LASzip.dll example\Debug\LASzip.dll
 # End Special Build Tool
 
 !ENDIF 
@@ -114,6 +114,18 @@ SOURCE=.\src\arithmeticmodel.cpp
 # Begin Source File
 
 SOURCE=.\src\integercompressor.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\lasindex.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\lasinterval.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\lasquadtree.cpp
 # End Source File
 # Begin Source File
 
@@ -194,6 +206,18 @@ SOURCE=.\src\bytestreamout_ostream.hpp
 # Begin Source File
 
 SOURCE=.\src\integercompressor.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\lasindex.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\lasinterval.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\lasquadtree.hpp
 # End Source File
 # Begin Source File
 

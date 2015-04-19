@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "..\laszip\src" /I "inc" /I "..\laszip\inc" /I "stl" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "..\laszip\src" /I "inc" /I "..\laszip\inc" /I "..\laszip\stl" /D "WIN32" /D "NDEBUG" /D "_MBCS" /D "_LIB" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -68,7 +68,7 @@ PostBuild_Cmds=copy Release\LASlib.lib lib\LASlib.lib
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
-# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\laszip\src" /I "inc" /I "..\laszip\inc" /I "stl" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
+# ADD CPP /nologo /W3 /Gm /GX /ZI /Od /I "..\laszip\src" /I "inc" /I "..\laszip\inc" /I "..\laszip\stl" /D "WIN32" /D "_DEBUG" /D "_MBCS" /D "_LIB" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -117,15 +117,15 @@ SOURCE=.\src\lasfilter.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\lasindex.cpp
+SOURCE=..\LASzip\src\lasindex.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\lasinterval.cpp
+SOURCE=..\LASzip\src\lasinterval.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\lasquadtree.cpp
+SOURCE=..\LASzip\src\lasquadtree.cpp
 # End Source File
 # Begin Source File
 
@@ -186,10 +186,6 @@ SOURCE=..\LASzip\src\lasreaditemcompressed_v2.cpp
 # Begin Source File
 
 SOURCE=..\LASzip\src\lasreadpoint.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\lasspatial.cpp
 # End Source File
 # Begin Source File
 
@@ -317,15 +313,15 @@ SOURCE=.\inc\lasfilter.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\inc\lasindex.hpp
+SOURCE=..\LASzip\src\lasindex.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\inc\lasinterval.hpp
+SOURCE=..\LASzip\src\lasinterval.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\inc\lasquadtree.hpp
+SOURCE=..\LASzip\src\lasquadtree.hpp
 # End Source File
 # Begin Source File
 
@@ -394,10 +390,6 @@ SOURCE=..\LASzip\src\lasreaditemraw.hpp
 # Begin Source File
 
 SOURCE=..\LASzip\src\lasreadpoint.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\inc\lasspatial.hpp
 # End Source File
 # Begin Source File
 
