@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -589,6 +589,27 @@ BOOL LASquadtree::read(ByteStreamIn* stream)
   char signature[4];
   try { stream->getBytes((U8*)signature, 4); } catch(...)
   {
+    fprintf(stderr,"ERROR (LASquadtree): reading LASspatial signature\n");
+    return FALSE;
+  }
+  if (strncmp(signature, "LASS", 4) != 0)
+  {
+    fprintf(stderr,"ERROR (LASquadtree): wrong LASspatial signature %4s instead of 'LASS'\n", signature);
+    return FALSE;
+  }
+  U32 type;
+  try { stream->getBytes((U8*)&type, 4); } catch(...)
+  {
+    fprintf(stderr,"ERROR (LASquadtree): reading LASspatial type\n");
+    return 0;
+  }
+  if (type != LAS_SPATIAL_QUAD_TREE)
+  {
+    fprintf(stderr,"ERROR (LASquadtree): unknown LASspatial type %u\n", type);
+    return 0;
+  }
+  try { stream->getBytes((U8*)signature, 4); } catch(...)
+  {
     fprintf(stderr,"ERROR (LASquadtree): reading signature\n");
     return FALSE;
   }
@@ -658,6 +679,19 @@ BOOL LASquadtree::write(ByteStreamOut* stream) const
   //     F32  min_y           4 bytes 
   //     F32  max_y           4 bytes 
   // which totals 28 bytes
+
+  if (!stream->putBytes((U8*)"LASS", 4))
+  {
+    fprintf(stderr,"ERROR (LASquadtree): writing LASspatial signature\n");
+    return FALSE;
+  }
+
+  U32 type = LAS_SPATIAL_QUAD_TREE;
+  if (!stream->put32bitsLE((U8*)&type))
+  {
+    fprintf(stderr,"ERROR (LASquadtree): writing LASspatial type %u\n", type);
+    return FALSE;
+  }
 
   if (!stream->putBytes((U8*)"LASQ", 4))
   {

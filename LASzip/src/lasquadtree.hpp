@@ -26,6 +26,7 @@
   
   CHANGE HISTORY:
   
+    31 March 2015 -- remove unused LASquadtree inheritance of abstract LASspatial 
     11 May 2011 -- moved into LASlib so that LASreader supports spatial indexing
     19 January 2011 -- created after mara met with silke to talk about africa
   
@@ -34,9 +35,14 @@
 #ifndef LAS_QUADTREE_HPP
 #define LAS_QUADTREE_HPP
 
-#include "lasspatial.hpp"
+#include "mydefs.hpp"
 
-class LASquadtree : public LASspatial
+class ByteStreamIn;
+class ByteStreamOut;
+
+#define LAS_SPATIAL_QUAD_TREE 0
+
+class LASquadtree
 {
 public:
   LASquadtree();
@@ -128,6 +134,8 @@ public:
   U32 intersect_rectangle(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y, U32 level);
   U32 intersect_tile(const F32 ll_x, const F32 ll_y, const F32 size, U32 level);
   U32 intersect_circle(const F64 center_x, const F64 center_y, const F64 radius, U32 level);
+
+  I32 current_cell;
 
 private:
   U32 sub_level;

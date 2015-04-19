@@ -16,7 +16,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -27,6 +27,9 @@
   
   CHANGE HISTORY:
   
+     2 April 2015 -- add seek_next(LASreadPoint* reader, I64 &p_count) for DLL
+     2 April 2015 -- delete read_next(LASreader* lasreader) that was not used
+    31 March 2015 -- remove unused LASquadtree inheritance of abstract LASspatial 
     29 April 2011 -- created after cable outage during the royal wedding (-:
   
 ===============================================================================
@@ -34,11 +37,15 @@
 #ifndef LAS_INDEX_HPP
 #define LAS_INDEX_HPP
 
-#include "lasdefinitions.hpp"
+#include "mydefs.hpp"
 
-class LASspatial;
+class LASquadtree;
 class LASinterval;
+#ifdef LASZIPDLL_EXPORTS
+class LASreadPoint;
+#else
 class LASreader;
+#endif
 class ByteStreamIn;
 class ByteStreamOut;
 
@@ -49,9 +56,9 @@ public:
   ~LASindex();
 
   // create spatial index
-  void prepare(LASspatial* spatial, I32 threshold=1000);
-  BOOL add(const LASpoint* point, const U32 index);
-  void complete(U32 minimum_points=100000, I32 maximum_intervals=-1);
+  void prepare(LASquadtree* spatial, I32 threshold=1000);
+  BOOL add(const F64 x, const F64 y, const U32 index);
+  void complete(U32 minimum_points=100000, I32 maximum_intervals=-1, const BOOL verbose=TRUE);
 
   // read from file or write to file
   BOOL read(const char* file_name);
@@ -75,21 +82,24 @@ public:
   U32 total;
   U32 cells;
 
-  // read or seek next interval point
-  BOOL read_next(LASreader* lasreader);
+  // seek to next interval
+#ifdef LASZIPDLL_EXPORTS
+  BOOL seek_next(LASreadPoint* reader, I64 &p_count);
+#else
   BOOL seek_next(LASreader* lasreader);
+#endif
 
   // for debugging
   void print(BOOL verbose);
 
   // for visualization
-  LASspatial* get_spatial() const;
+  LASquadtree* get_spatial() const;
   LASinterval* get_interval() const;
 
 private:
   BOOL merge_intervals();
 
-  LASspatial* spatial;
+  LASquadtree* spatial;
   LASinterval* interval;
   BOOL have_interval;
 };

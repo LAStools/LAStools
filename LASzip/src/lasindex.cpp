@@ -13,7 +13,7 @@
   
   COPYRIGHT:
   
-    (c) 2011-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2011-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -34,9 +34,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lasspatial.hpp"
+#include "lasquadtree.hpp"
 #include "lasinterval.hpp"
+#ifdef LASZIPDLL_EXPORTS
+#include "lasreadpoint.hpp"
+#else
 #include "lasreader.hpp"
+#endif
 #include "bytestreamin_file.hpp"
 #include "bytestreamout_file.hpp"
 
@@ -75,7 +79,7 @@ LASindex::~LASindex()
   if (interval) delete interval;
 }
 
-void LASindex::prepare(LASspatial* spatial, I32 threshold)
+void LASindex::prepare(LASquadtree* spatial, I32 threshold)
 {
   if (this->spatial) delete this->spatial;
   this->spatial = spatial;
@@ -83,16 +87,19 @@ void LASindex::prepare(LASspatial* spatial, I32 threshold)
   this->interval = new LASinterval(threshold);
 }
 
-BOOL LASindex::add(const LASpoint* point, const U32 p_index)
+BOOL LASindex::add(const F64 x, const F64 y, const U32 p_index)
 {
-  I32 cell = spatial->get_cell_index(point->get_x(), point->get_y());
+  I32 cell = spatial->get_cell_index(x, y);
   return interval->add(p_index, cell);
 }
 
-void LASindex::complete(U32 minimum_points, I32 maximum_intervals)
+void LASindex::complete(U32 minimum_points, I32 maximum_intervals, const BOOL verbose)
 {
-  fprintf(stderr,"before complete %d %d\n", minimum_points, maximum_intervals);
-  print(FALSE);
+  if (verbose)
+  {
+    fprintf(stderr,"before complete %d %d\n", minimum_points, maximum_intervals);
+    print(FALSE);
+  }
   if (minimum_points)
   {
     I32 hash1 = 0;
@@ -160,8 +167,11 @@ void LASindex::complete(U32 minimum_points, I32 maximum_intervals)
     {
       spatial->manage_cell(interval->index);
     }
-    fprintf(stderr,"after minimum_points %d\n", minimum_points);
-    print(FALSE);
+    if (verbose)
+    {
+      fprintf(stderr,"after minimum_points %d\n", minimum_points);
+      print(FALSE);
+    }
   }
   if (maximum_intervals < 0)
   {
@@ -169,9 +179,12 @@ void LASindex::complete(U32 minimum_points, I32 maximum_intervals)
   }
   if (maximum_intervals)
   {
-    interval->merge_intervals(maximum_intervals);
-    fprintf(stderr,"after maximum_intervals %d\n", maximum_intervals);
-    print(FALSE);
+    interval->merge_intervals(maximum_intervals, verbose);
+    if (verbose)
+    {
+      fprintf(stderr,"after maximum_intervals %d\n", maximum_intervals);
+      print(FALSE);
+    }
   }
 }
 
@@ -203,10 +216,10 @@ void LASindex::print(BOOL verbose)
     total_total += interval->total;
     total_intervals += intervals;
   }
-  fprintf(stderr,"total cells/intervals %d/%d full %d (%.2f)\n", total_cells, total_intervals, total_full, 100.0f*total_full/total_total);
+  if (verbose) fprintf(stderr,"total cells/intervals %d/%d full %d (%.2f)\n", total_cells, total_intervals, total_full, 100.0f*total_full/total_total);
 }
 
-LASspatial* LASindex::get_spatial() const
+LASquadtree* LASindex::get_spatial() const
 {
   return spatial;
 }
@@ -288,7 +301,6 @@ BOOL LASindex::read(const char* file_name)
   free(name);
   if (file == 0)
   {
-//    fprintf(stderr,"ERROR (LASindex): cannot open '%s' for read\n", name);
     return FALSE;
   }
   ByteStreamIn* stream;
@@ -310,6 +322,9 @@ BOOL LASindex::read(const char* file_name)
 
 BOOL LASindex::append(const char* file_name) const
 {
+#ifdef LASZIPDLL_EXPORTS
+  return FALSE;
+#else
   LASreadOpener lasreadopener;
 
   if (file_name == 0) return FALSE;
@@ -441,6 +456,7 @@ BOOL LASindex::append(const char* file_name) const
   delete lasreader;
 
   return TRUE;
+#endif
 }
 
 BOOL LASindex::write(const char* file_name) const
@@ -516,12 +532,11 @@ BOOL LASindex::read(ByteStreamIn* stream)
     fprintf(stderr,"ERROR (LASindex): reading version\n");
     return FALSE;
   }
-  // read spatial
-  LASspatialReadWrite spatialRW;
-  spatial = spatialRW.read(stream);
-  if (!spatial)
+  // read spatial quadtree
+  spatial = new LASquadtree();
+  if (!spatial->read(stream))
   {
-    fprintf(stderr,"ERROR (LASindex): cannot read LASspatial\n");
+    fprintf(stderr,"ERROR (LASindex): cannot read LASspatial (LASquadtree)\n");
     return FALSE;
   }
   // read interval
@@ -553,11 +568,10 @@ BOOL LASindex::write(ByteStreamOut* stream) const
     fprintf(stderr,"ERROR (LASindex): writing version\n");
     return FALSE;
   }
-  // write spatial
-  LASspatialReadWrite spatialRW;
-  if (!spatialRW.write(spatial, stream))
+  // write spatial quadtree
+  if (!spatial->write(stream))
   {
-    fprintf(stderr,"ERROR (LASindex): cannot write LASspatial\n");
+    fprintf(stderr,"ERROR (LASindex): cannot write LASspatial (LASquadtree)\n");
     return FALSE;
   }
   // write interval
@@ -569,22 +583,24 @@ BOOL LASindex::write(ByteStreamOut* stream) const
   return TRUE;
 }
 
-// read next interval point
-BOOL LASindex::read_next(LASreader* lasreader)
+// seek to next interval point
+
+#ifdef LASZIPDLL_EXPORTS
+BOOL LASindex::seek_next(LASreadPoint* reader, I64 &p_count)
 {
   if (!have_interval)
   {
     if (!has_intervals()) return FALSE;
-    lasreader->seek(start);
+    reader->seek((U32)p_count, start);
+    p_count = start;
   }
-  if (lasreader->p_count == end)
+  if (p_count == end)
   {
     have_interval = FALSE;
   }
-  return lasreader->read_point();
+  return TRUE;
 }
-
-// seek to next interval point
+#else
 BOOL LASindex::seek_next(LASreader* lasreader)
 {
   if (!have_interval)
@@ -598,6 +614,7 @@ BOOL LASindex::seek_next(LASreader* lasreader)
   }
   return TRUE;
 }
+#endif
 
 // merge the intervals of non-empty cells
 BOOL LASindex::merge_intervals()
