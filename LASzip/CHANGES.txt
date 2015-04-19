@@ -1,3 +1,5 @@
+4 April 2015 -- added DLL functions for creation and exploitation of spatial indexing LAX files
+3 April 2015 -- moved spatial indexing (LAX file generation) from LASlib to LASzip 
 16 November 2014 -- improved detection & reporting of file truncation and/or LAZ bit-errors
 6 September 2014 -- removal of (unused) EntropyEncoder and EntropyDecoder purely virtual classes
 24 August 2014 -- when reading LAZ chunk table read is delayed until first read() or seek() is called

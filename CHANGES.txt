@@ -1,3 +1,5 @@
+4 April 2015 -- LASzip DLL: added functions for creation and exploitation of spatial index files
+3 April 2015 -- LASlib: moved spatial indexing (LAX file generation) from LASlib to LASzip 
 30 March 2015 -- laszip: compresses and decompresses LAS 1.4 files via new "compatibility mode"
 30 March 2015 -- GUIs: delete multiple files: pick a (red) box covering them and press <delete> 
 30 March 2015 -- las2txt: correct ASCII output for extended attributes of new LAS 1.4 point types
