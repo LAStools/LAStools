@@ -29,6 +29,7 @@ closed source tools:
 * lastool.exe is an old GUI for multiple LAStools (now each tool has its own GUI)
 
 * lasground.exe extracts the bare-earth by classifying all ground points
+* lasground_new.exe an improved version of lasground.exe for complex terrains
 * lasoverlap.exe checks overlap & vertical/horizontal alignment of flight lines
 * lascontrol.exe quality checks elevations for a list of control points 
 * lasclassify.exe finds buildings and the vegetation above the ground
@@ -73,4 +74,4 @@ Please read the "LICENSE.txt" file for information on the legal use and licensin
 of LAStools. I would also really like it if you would send me an email and tell me
 what you use LAStools for and what features and improvements you could need. 
 
-(c) 2007-2014 martin.isenburg@rapidlasso.com - http://rapidlasso.com
+(c) 2007-2015 martin.isenburg@rapidlasso.com - http://rapidlasso.com
