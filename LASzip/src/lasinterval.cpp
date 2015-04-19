@@ -13,7 +13,7 @@
   
   COPYRIGHT:
   
-    (c) 2011-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2011-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -192,7 +192,7 @@ BOOL LASinterval::merge_cells(const U32 num_indices, const I32* indices, const I
 }
 
 // merge adjacent intervals with small gaps in cells to reduce total interval number to maximum
-void LASinterval::merge_intervals(U32 maximum_intervals)
+void LASinterval::merge_intervals(U32 maximum_intervals, const BOOL verbose)
 {
   U32 diff;
   LASintervalCell* cell;
@@ -231,7 +231,7 @@ void LASinterval::merge_intervals(U32 maximum_intervals)
   // maybe nothing to do
   if (map.size() <= maximum_intervals)
   {
-    fprintf(stderr,"next largest interval gap is %u\n", diff);
+    if (verbose) fprintf(stderr,"next largest interval gap is %u\n", diff);
     return;
   }
 
