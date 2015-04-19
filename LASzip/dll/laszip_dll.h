@@ -13,7 +13,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2014, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    1 April 2015 -- adding exploitation and creation of spatial indexing information 
     8 August 2013 -- added laszip_get_coordinates() and laszip_set_coordinates()
     6 August 2013 -- added laszip_auto_offset() and laszip_check_for_integer_overflow()
     31 July 2013 -- added laszip_get_point_count() for FUSION integration
@@ -156,7 +157,10 @@ typedef struct laszip_point
   laszip_U8 number_of_returns_of_given_pulse : 3;
   laszip_U8 scan_direction_flag : 1;
   laszip_U8 edge_of_flight_line : 1;
-  laszip_U8 classification;
+  laszip_U8 classification : 5;
+  laszip_U8 synthetic_flag : 1;
+  laszip_U8 keypoint_flag  : 1;
+  laszip_U8 withheld_flag  : 1;
   laszip_I8 scan_angle_rank;
   laszip_U8 user_data;
   laszip_U16 point_source_ID;
@@ -325,15 +329,42 @@ laszip_add_vlr(
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
+laszip_create_spatial_index(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                create
+    , const laszip_BOOL                append
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_preserve_generating_software(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                preserve
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
 laszip_open_writer(
     laszip_POINTER                     pointer
     , const laszip_CHAR*               file_name
     , laszip_BOOL                      compress
-    );
+);
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
 laszip_write_point(
+    laszip_POINTER                     pointer
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_write_indexed_point(
+    laszip_POINTER                     pointer
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_update_inventory(
     laszip_POINTER                     pointer
 );
 
@@ -345,10 +376,36 @@ laszip_close_writer(
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
+laszip_exploit_spatial_index(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                exploit
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
 laszip_open_reader(
     laszip_POINTER                     pointer
     , const laszip_CHAR*               file_name
     , laszip_BOOL*                     is_compressed
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_has_spatial_index(
+    laszip_POINTER                     pointer
+    , laszip_BOOL*                     is_indexed
+    , laszip_BOOL*                     is_appended
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_inside_rectangle(
+    laszip_POINTER                     pointer
+    , laszip_F64                       min_x
+    , laszip_F64                       min_y
+    , laszip_F64                       max_x
+    , laszip_F64                       max_y
+    , laszip_BOOL*                     is_empty
 );
 
 /*---------------------------------------------------------------------------*/
@@ -362,6 +419,13 @@ laszip_seek_point(
 LASZIP_API laszip_I32
 laszip_read_point(
     laszip_POINTER                     pointer
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_read_inside_point(
+    laszip_POINTER                     pointer
+    , laszip_BOOL*                     is_done
 );
 
 /*---------------------------------------------------------------------------*/
