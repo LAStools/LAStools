@@ -69,6 +69,7 @@ public:
   I64 xyz_fluff_10[3];
   I64 xyz_fluff_100[3];
   I64 xyz_fluff_1000[3];
+  I64 xyz_fluff_10000[3];
   BOOL add(const LASpoint* point);
   BOOL has_fluff() const { return has_fluff(0) || has_fluff(1) || has_fluff(2); };
   BOOL has_fluff(U32 i) const { return (number_of_point_records && (number_of_point_records == xyz_fluff_10[i])); };
@@ -76,6 +77,8 @@ public:
   BOOL has_serious_fluff(U32 i) const { return (number_of_point_records && (number_of_point_records == xyz_fluff_100[i])); };
   BOOL has_very_serious_fluff() const { return has_very_serious_fluff(0) || has_very_serious_fluff(1) || has_very_serious_fluff(2); };
   BOOL has_very_serious_fluff(U32 i) const { return (number_of_point_records && (number_of_point_records == xyz_fluff_1000[i])); };
+  BOOL has_extremely_serious_fluff() const { return has_extremely_serious_fluff(0) || has_extremely_serious_fluff(1) || has_extremely_serious_fluff(2); };
+  BOOL has_extremely_serious_fluff(U32 i) const { return (number_of_point_records && (number_of_point_records == xyz_fluff_10000[i])); };
   LASsummary();
 private:
   BOOL first;
