@@ -1,3 +1,5 @@
+3 April 2015 -- LASzip & LASlib: move spatial indexing from LASlib to LASzip for DLL integration
+31 March 2015 -- LASlib: remove unused LASquadtree inheritance of abstract class LASspatial 
 30 March 2015 -- las2txt: correct ASCII output for extended attributes of new LAS 1.4 point types
 30 March 2015 -- LASlib: LASwriterCompatibleDown/LASwriterCompatibleUp for LAS 1.4 compatibility
 31 January 2015 -- LASlib: new transforms for extended attributes of LAS 1.4 point types 6 - 10
