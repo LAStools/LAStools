@@ -13,12 +13,12 @@
   before using LAStools. For education and evaluation purposes you can use
   and test LAStools as much as you need to ... (-:
 
-  Personal note: Although the open source parts of LAStools are licensed
-  standard LGPL 2.1, the author would be unhappy should this software be
-  used at two US Nuclear Weapons Labs, namely Lawrence Livermore National
-  Laboratory (LLNL) and Sandia National Laboratories. However, the author
-  would like to hear from you in case you have enough pull to resolve the
-  issues that are the reason for this note (so the note can be removed).
+  Personal note: The creator of LAStools and LASzip is currently not able
+  to attend LiDAR conferences or other scientific meetings in the US over
+  a somewhat unfortunate, kind of silly, and in many ways absurdly funny
+  incident involving "laser chickens" and a US Nuclear Weapons Lab. If you
+  have enough "pull" to rectify this ridiculous situation we would like to
+  hear from you ... (-;
 
 --------------------------------------------------------------------------
 
@@ -29,6 +29,7 @@
     * laszip
     * lasindex
     * lasvalidate
+    * lasliberate
     * lasinfo
     * las2las
     * lasview
@@ -49,7 +50,7 @@
     * blast2dem
     * blast2iso
 
-    * lasground
+    * lasground & lasground_new
     * lasheight & lastrack
     * lasclassify
     * lasgrid & lascanopy
