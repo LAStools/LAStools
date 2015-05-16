@@ -13,7 +13,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2013, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     3 May 2015 -- updated LASinventory to handle LAS 1.4 content 
     25 December 2010 -- created after swinging in Mara's hammock for hours
   
 ===============================================================================
@@ -37,8 +38,8 @@ class LASinventory
 {
 public:
   BOOL active() const { return (first == FALSE); }; 
-  U32 number_of_point_records;
-  U32 number_of_points_by_return[8];
+  I64 extended_number_of_point_records;
+  I64 extended_number_of_points_by_return[16];
   I32 max_X;
   I32 min_X;
   I32 max_Y;
@@ -46,6 +47,7 @@ public:
   I32 max_Z;
   I32 min_Z;
   BOOL add(const LASpoint* point);
+  BOOL update_header(LASheader* header) const;
   LASinventory();
 private:
   BOOL first;

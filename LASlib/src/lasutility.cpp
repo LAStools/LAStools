@@ -37,8 +37,8 @@
 LASinventory::LASinventory()
 {
   U32 i;
-  number_of_point_records = 0;
-  for (i = 0; i < 8; i++) number_of_points_by_return[i] = 0;
+  extended_number_of_point_records = 0;
+  for (i = 0; i < 16; i++) extended_number_of_points_by_return[i] = 0;
   max_X = min_X = 0;
   max_Y = min_Y = 0;
   max_Z = min_Z = 0;
@@ -47,8 +47,8 @@ LASinventory::LASinventory()
 
 BOOL LASinventory::add(const LASpoint* point)
 {
-  number_of_point_records++;
-  number_of_points_by_return[point->return_number]++;
+  extended_number_of_point_records++;
+  extended_number_of_points_by_return[point->return_number]++;
   if (first)
   {
     min_X = max_X = point->get_X();
@@ -64,6 +64,56 @@ BOOL LASinventory::add(const LASpoint* point)
     else if (point->get_Y() > max_Y) max_Y = point->get_Y();
     if (point->get_Z() < min_Z) min_Z = point->get_Z();
     else if (point->get_Z() > max_Z) max_Z = point->get_Z();
+  }
+  return TRUE;
+}
+
+BOOL LASinventory::update_header(LASheader* header) const
+{
+  int i;
+  if (extended_number_of_point_records > U32_MAX)
+  {
+    if (header->version_minor >= 4)
+    {
+      header->number_of_point_records = 0;
+    }
+    else
+    {
+      return FALSE;
+    }
+  }
+  else
+  {
+    header->number_of_point_records = (U32)extended_number_of_point_records;
+  }
+  for (i = 0; i < 5; i++)
+  {
+    if (extended_number_of_points_by_return[i+1] > U32_MAX)
+    {
+      if (header->version_minor >= 4)
+      {
+        header->number_of_points_by_return[i] = 0;
+      }
+      else
+      {
+        return FALSE;
+      }
+    }
+    else
+    {
+      header->number_of_points_by_return[i] = (U32)extended_number_of_points_by_return[i+1];
+    }
+  }
+  header->max_x = header->get_x(max_X);
+  header->min_x = header->get_x(min_X);
+  header->max_y = header->get_y(max_Y);
+  header->min_y = header->get_y(min_Y);
+  header->max_z = header->get_z(max_Z);
+  header->min_z = header->get_z(min_Z);
+  header->extended_number_of_point_records = extended_number_of_point_records;
+  for (i = 0; i < 15; i++)
+  {
+    header->extended_number_of_points_by_return[i] = extended_number_of_points_by_return[i+1];
   }
   return TRUE;
 }
