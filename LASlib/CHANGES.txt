@@ -1,3 +1,7 @@
+16 May 2015 -- LAStools: new projections Albers Equal Area Conic and Earth Centered Earth Fixed
+3 May 2015 -- las2las: improved up-conversion to LAS 1.4 via '-set_version 1.4 -point_type 6'
+3 May 2015 -- LASlib: fixed LASreader_merged to use file source ID of 0 when merging flightlines 
+3 May 2015 -- LASlib: updated LASwriter_las and LASinventory to better handle LAS 1.4 content
 3 April 2015 -- LASzip & LASlib: move spatial indexing from LASlib to LASzip for DLL integration
 31 March 2015 -- LASlib: remove unused LASquadtree inheritance of abstract class LASspatial 
 30 March 2015 -- las2txt: correct ASCII output for extended attributes of new LAS 1.4 point types
