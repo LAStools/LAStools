@@ -20,7 +20,7 @@
 
   COPYRIGHT:
 
-    (c) 2005-2014, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2005-2014, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -45,7 +45,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 150419
+#define LAS_TOOLS_VERSION 150516
 
 #include <stdio.h>
 #include <string.h>
@@ -1038,7 +1038,8 @@ public:
   inline void set_extended_overlap_flag(U8 extended_overlap_flag) { this->extended_classification_flags = (extended_overlap_flag << 3) | (this->extended_classification_flags & 7); };
   inline void set_extended_scanner_channel(U8 extended_scanner_channel) { this->extended_scanner_channel = extended_scanner_channel; };
 
-  inline F32 get_scan_angle() const { if (extended_point_type) return 0.006f*extended_scan_angle; else return scan_angle_rank; };
+  inline F32 get_scan_angle() const { if (extended_point_type) return 0.006f*extended_scan_angle; else return (F32)scan_angle_rank; };
+  inline F32 get_abs_scan_angle() const { if (extended_point_type) return (extended_scan_angle < 0 ? -0.006f*extended_scan_angle : 0.006f*extended_scan_angle) ; else return (scan_angle_rank < 0 ? (F32)-scan_angle_rank : (F32)scan_angle_rank); };
 
   inline void compute_coordinates()
   {
