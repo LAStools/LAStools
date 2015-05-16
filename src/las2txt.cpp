@@ -28,6 +28,8 @@
   
   CHANGE HISTORY:
   
+    24 April 2015 -- added 'k'eypoint and 'o'verlap flags for the parse string
+    30 March 2015 -- support LAS 1.4 extended return counts and number of returns 
     25 October 2011 -- changed LAS 1.3 parsing to use new LASwaveform13reader
     17 May 2011 -- enabling batch processing with wildcards or multiple file names
     13 May 2011 -- moved indexing, filtering, transforming into LASreader
@@ -814,6 +816,8 @@ int main(int argc, char *argv[])
       case 'p': // the point source ID
       case 'e': // the edge of flight line flag
       case 'd': // the direction of scan flag
+      case 'k': // the keypoint flag
+      case 'o': // // the (extended) overlap flag
       case 'm': // the index of the point (count starts at 0)
       case 'M': // the index of the point (count starts at 0)
         break;
@@ -970,7 +974,14 @@ int main(int argc, char *argv[])
         case 'c': // the classification
           if (header->point_data_format > 5)
           {
-            fprintf(file_out, "%d", lasreader->point.get_extended_classification());
+            if (lasreader->point.get_extended_classification())
+            {
+              fprintf(file_out, "%d", lasreader->point.get_extended_classification());
+            }
+            else
+            {
+              fprintf(file_out, "%d", lasreader->point.get_classification());
+            }
           }
           else
           {
@@ -998,6 +1009,12 @@ int main(int argc, char *argv[])
           break;
         case 'd': // the direction of scan flag
           fprintf(file_out, "%d", lasreader->point.get_scan_direction_flag());
+          break;
+        case 'k': // the keypoint flag
+          fprintf(file_out, "%d", lasreader->point.get_keypoint_flag());
+          break;
+        case 'o': // the (extended) overlap flag
+          fprintf(file_out, "%d", lasreader->point.get_extended_overlap_flag());
           break;
         case 'R': // the red channel of the RGB field
           fprintf(file_out, "%d", lasreader->point.rgb[0]);
