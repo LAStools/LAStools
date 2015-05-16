@@ -54,7 +54,8 @@ static const int GEO_PROJECTION_TM       = 2;
 static const int GEO_PROJECTION_LONG_LAT = 3;
 static const int GEO_PROJECTION_LAT_LONG = 4;
 static const int GEO_PROJECTION_ECEF     = 5;
-static const int GEO_PROJECTION_NONE     = 6;
+static const int GEO_PROJECTION_AEAC     = 6;
+static const int GEO_PROJECTION_NONE     = 7;
 
 class ReferenceEllipsoid
 {
@@ -808,6 +809,7 @@ static const short EPSG_NAD83_HARN_Virginia_South_ftUS = 2925;
 static const short EPSG_Reseau_Geodesique_Francais_Guyane_1995 = 2972;
 static const short EPSG_NAD83_Oregon_Lambert = 2991;
 static const short EPSG_NAD83_Oregon_Lambert_ft = 2992;
+static const short EPSG_NAD83_BC_Albers = 3005;
 static const short EPSG_SWEREF99_TM = 3006;
 static const short EPSG_ETRS89_ETRS_LCC = 3034;
 static const short EPSG_ETRS89_ETRS_TM34 = 3046;
@@ -836,6 +838,8 @@ static const short EPSG_ETRS89_DKTM2 = 4094;
 static const short EPSG_ETRS89_DKTM3 = 4095;
 static const short EPSG_ETRS89_DKTM4 = 4096;
 static const short EPSG_ETRS89_UTM32_north_zE_N = 4647;
+static const short EPSG_NAD83_HARN_Conus_Albers = 5071;
+static const short EPSG_NAD83_NSRS2007_Conus_Albers = 5072;
 static const short EPSG_ETRS89_NTM_zone_5 = 5105;
 static const short EPSG_ETRS89_NTM_zone_6 = 5106;
 static const short EPSG_ETRS89_NTM_zone_7 = 5107;
@@ -863,6 +867,7 @@ static const short EPSG_ETRS89_NTM_zone_28 = 5128;
 static const short EPSG_ETRS89_NTM_zone_29 = 5129;
 static const short EPSG_ETRS89_NTM_zone_30 = 5130;
 static const short EPSG_ETRS89_UTM33_north_zE_N = 5650;
+//static const short NAD83_2011_Conus_Albers = 6350;
 static const short EPSG_OSGB_1936 = 27700;
 static const short EPSG_Belgian_Lambert_1972 = 31370;
 
@@ -892,6 +897,7 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_Reseau_Geodesique_Francais_Guyane_1995, "Francais Guyane 95"),
   EPSGcode(EPSG_NAD83_Oregon_Lambert, "NAD83 Oregon Lambert"),
   EPSGcode(EPSG_NAD83_Oregon_Lambert_ft, "NAD83 Oregon Lamb.(ft)"),
+  EPSGcode(EPSG_NAD83_BC_Albers, "NAD83 / BC Albers"),
   EPSGcode(EPSG_SWEREF99_TM, "SWEREF99 TM"),
   EPSGcode(EPSG_ETRS89_ETRS_LCC, "ETRS89 LCC"),
   EPSGcode(EPSG_ETRS89_ETRS_TM34, "ETRS89 TM34"),
@@ -920,6 +926,8 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_ETRS89_DKTM3, "ETRS89 DKTM3"),
   EPSGcode(EPSG_ETRS89_DKTM4, "ETRS89 DKTM4"),
   EPSGcode(EPSG_ETRS89_UTM32_north_zE_N, "ETRS89 UTM32 zE-N"),
+  EPSGcode(EPSG_NAD83_HARN_Conus_Albers, "NAD83-H Conus Albers"),
+  EPSGcode(EPSG_NAD83_NSRS2007_Conus_Albers, "NSRS2007 Conus Albers"),
   EPSGcode(EPSG_ETRS89_NTM_zone_5, "ETRS89 NTM5"),
   EPSGcode(EPSG_ETRS89_NTM_zone_6, "ETRS89 NTM6"),
   EPSGcode(EPSG_ETRS89_NTM_zone_7, "ETRS89 NTM7"),
@@ -947,6 +955,7 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_ETRS89_NTM_zone_29, "ETRS89 NTM29"),
   EPSGcode(EPSG_ETRS89_NTM_zone_30, "ETRS89 NTM30"),
   EPSGcode(EPSG_ETRS89_UTM33_north_zE_N, "ETRS89 UTM33 zE-N"),
+//  EPSGcode(NAD83_2011_Conus_Albers, "NAD83 2011 Conus Albers"),
   EPSGcode(EPSG_OSGB_1936, "OSGB 1936"),
   EPSGcode(EPSG_Belgian_Lambert_1972, "Belgian Lambert 1972"),
   EPSGcode(0,0)
@@ -960,7 +969,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
   if (projection)
   {
     unsigned short vertical_geokey = get_VerticalCSTypeGeoKey();
-    if (projection->type == GEO_PROJECTION_UTM || projection->type == GEO_PROJECTION_LCC || projection->type == GEO_PROJECTION_TM)
+    if (projection->type == GEO_PROJECTION_UTM || projection->type == GEO_PROJECTION_LCC || projection->type == GEO_PROJECTION_TM || projection->type == GEO_PROJECTION_AEAC || projection->type == GEO_PROJECTION_AEAC)
     {
       unsigned short geokey = get_ProjectedCSTypeGeoKey(source);
       if (geokey && geokey != 32767)
@@ -1204,6 +1213,111 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
           (*geo_keys)[12].tiff_tag_location = 0;
           (*geo_keys)[12].count = 1;
           (*geo_keys)[12].value_offset = vertical_geokey;
+        }
+        return true;
+      }
+      else if (projection->type == GEO_PROJECTION_AEAC)
+      {
+        GeoProjectionParametersAEAC* aeac = (GeoProjectionParametersAEAC*)projection;
+
+        num_geo_keys = 13 + (vertical_geokey ? 1 : 0);
+        (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys)*num_geo_keys);
+        num_geo_double_params = 6;
+        (*geo_double_params) = (double*)malloc(sizeof(double)*num_geo_double_params);
+
+        // projected coordinates
+        (*geo_keys)[0].key_id = 1024; // GTModelTypeGeoKey
+        (*geo_keys)[0].tiff_tag_location = 0;
+        (*geo_keys)[0].count = 1;
+        (*geo_keys)[0].value_offset = 1; // ModelTypeProjected
+
+        // user-defined custom LCC projection 
+        (*geo_keys)[1].key_id = 3072; // ProjectedCSTypeGeoKey
+        (*geo_keys)[1].tiff_tag_location = 0;
+        (*geo_keys)[1].count = 1;
+        (*geo_keys)[1].value_offset = 32767; // user-defined
+
+        // which projection do we use
+        (*geo_keys)[2].key_id = 3075; // ProjCoordTransGeoKey
+        (*geo_keys)[2].tiff_tag_location = 0;
+        (*geo_keys)[2].count = 1;
+        (*geo_keys)[2].value_offset = 11; // CT_AlbersEqualArea 
+
+        // which units do we use
+        (*geo_keys)[3].key_id = 3076; // ProjCoordTransGeoKey
+        (*geo_keys)[3].tiff_tag_location = 0;
+        (*geo_keys)[3].count = 1;
+        (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source); 
+
+        // here come the 6 double parameters
+
+        (*geo_keys)[4].key_id = 3078; // ProjStdParallel1GeoKey
+        (*geo_keys)[4].tiff_tag_location = 34736;
+        (*geo_keys)[4].count = 1;
+        (*geo_keys)[4].value_offset = 0;
+        (*geo_double_params)[0] = aeac->aeac_first_std_parallel_degree;
+
+        (*geo_keys)[5].key_id = 3079; // ProjStdParallel2GeoKey
+        (*geo_keys)[5].tiff_tag_location = 34736;
+        (*geo_keys)[5].count = 1;
+        (*geo_keys)[5].value_offset = 1;
+        (*geo_double_params)[1] = aeac->aeac_second_std_parallel_degree;
+
+        (*geo_keys)[6].key_id = 3088; // ProjCenterLongGeoKey
+        (*geo_keys)[6].tiff_tag_location = 34736;
+        (*geo_keys)[6].count = 1;
+        (*geo_keys)[6].value_offset = 2;
+        (*geo_double_params)[2] = aeac->aeac_long_meridian_degree;
+
+        (*geo_keys)[7].key_id = 3081; // ProjNatOriginLatGeoKey
+        (*geo_keys)[7].tiff_tag_location = 34736;
+        (*geo_keys)[7].count = 1;
+        (*geo_keys)[7].value_offset = 3;
+        (*geo_double_params)[3] = aeac->aeac_lat_origin_degree;
+
+        (*geo_keys)[8].key_id = 3082; // ProjFalseEastingGeoKey
+        (*geo_keys)[8].tiff_tag_location = 34736;
+        (*geo_keys)[8].count = 1;
+        (*geo_keys)[8].value_offset = 4;
+        if (source)
+          (*geo_double_params)[4] = aeac->aeac_false_easting_meter / coordinates2meter;
+        else
+          (*geo_double_params)[4] = aeac->aeac_false_easting_meter * meter2coordinates;
+
+        (*geo_keys)[9].key_id = 3083; // ProjFalseNorthingGeoKey
+        (*geo_keys)[9].tiff_tag_location = 34736;
+        (*geo_keys)[9].count = 1;
+        (*geo_keys)[9].value_offset = 5;
+        if (source)
+          (*geo_double_params)[5] = aeac->aeac_false_northing_meter / coordinates2meter;
+        else
+          (*geo_double_params)[5] = aeac->aeac_false_northing_meter * meter2coordinates;
+
+        // datum
+        (*geo_keys)[10].key_id = 2050; // GeogGeodeticDatumGeoKey
+        (*geo_keys)[10].tiff_tag_location = 0;
+        (*geo_keys)[10].count = 1;
+        (*geo_keys)[10].value_offset = get_GeogGeodeticDatumGeoKey(source);
+
+        // ellipsoid
+        (*geo_keys)[11].key_id = 2056; // GeogEllipsoidGeoKey
+        (*geo_keys)[11].tiff_tag_location = 0;
+        (*geo_keys)[11].count = 1;
+        (*geo_keys)[11].value_offset = get_GeogEllipsoidGeoKey(source);
+
+        // vertical units
+        (*geo_keys)[12].key_id = 4099; // VerticalUnitsGeoKey
+        (*geo_keys)[12].tiff_tag_location = 0;
+        (*geo_keys)[12].count = 1;
+        (*geo_keys)[12].value_offset = get_VerticalUnitsGeoKey(source);
+
+        if (vertical_geokey)
+        {
+          // vertical datum
+          (*geo_keys)[13].key_id = 4096; // VerticalCSTypeGeoKey
+          (*geo_keys)[13].tiff_tag_location = 0;
+          (*geo_keys)[13].count = 1;
+          (*geo_keys)[13].value_offset = vertical_geokey;
         }
         return true;
       }
@@ -1552,6 +1666,9 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
       case 8: // CT_LambertConfConic_2SP
         user_defined_projection = 8;
         break;
+      case 11: // CT_AlbersEqualArea
+        user_defined_projection = 11;
+        break;
       case 2: // CT_TransvMercator_Modified_Alaska
         fprintf(stderr, "ProjCoordTransGeoKey: CT_TransvMercator_Modified_Alaska not implemented\n");
         break;
@@ -1575,9 +1692,6 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         break;
       case 10: // CT_LambertAzimEqualArea
         fprintf(stderr, "ProjCoordTransGeoKey: CT_LambertAzimEqualArea not implemented\n");
-        break;
-      case 11: // CT_AlbersEqualArea
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_AlbersEqualArea not implemented\n");
         break;
       case 12: // CT_AzimuthalEquidistant
         fprintf(stderr, "ProjCoordTransGeoKey: CT_AzimuthalEquidistant not implemented\n");
@@ -2254,6 +2368,17 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source)
     {
       return 4978;
     }
+    else if (projection->type == GEO_PROJECTION_AEAC)
+    {
+      if (projection->geokey)
+      {
+        return projection->geokey;
+      }
+      else
+      {
+        return 32767; // user-defined GCS
+      }
+    }
   }
   return 0;
 }
@@ -2648,9 +2773,9 @@ bool GeoProjectionConverter::set_target_utm_projection(char* description)
 
 // Configure a Lambert Conic Conformal Projection
 //
-// The function Set_Lambert_Parameters receives the ellipsoid parameters and
-// Lambert Conformal Conic projection parameters as inputs, and sets the
-// corresponding state variables.
+// The function set_lambert_conformal_conic_projection() receives the Lambert
+// Conformal Conic  projection parameters as inputs and sets the corresponding
+// state variables.
 //
 // falseEastingMeter & falseNorthingMeter are just an offset in meters added 
 // to the final coordinate calculated.
@@ -2686,7 +2811,7 @@ void GeoProjectionConverter::set_lambert_conformal_conic_projection(double false
 }
 
 /*
-  * The function set_transverse_mercator_projection receives the Tranverse
+  * The function set_transverse_mercator_projection() receives the Tranverse
   * Mercator projection parameters as input and sets the corresponding state
   * variables. 
   * falseEastingMeter   : Easting/X in meters at the center of the projection
@@ -2712,6 +2837,45 @@ void GeoProjectionConverter::set_transverse_mercator_projection(double falseEast
   if (description)
   {
     sprintf(description, "false east/north: %g/%g [m], origin lat/meridian long: %g/%g, scale: %g", tm->tm_false_easting_meter, tm->tm_false_northing_meter, tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
+  }
+}
+
+// Configure a Albers Equal Area Conic Projection
+//
+// The function set_albers_equal_area_conic_projection() receives the Albers 
+// Equal Area Conic projection parameters as inputs and sets the corresponding
+// state variables.
+//
+// falseEastingMeter & falseNorthingMeter are just an offset in meters added 
+// to the final coordinate calculated.
+//
+// latOriginDegree & longMeridianDegree are the "center" latitiude and
+// longitude in decimal degrees of the area being projected. All coordinates
+// will be calculated in meters relative to this point on the earth.
+//
+// firstStdParallelDegree & secondStdParallelDegree are the two lines of
+// longitude in decimal degrees (that is they run east-west) that define
+// where the "cone" intersects the earth. They bracket the area being projected.
+void GeoProjectionConverter::set_albers_equal_area_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description, bool source)
+{
+  GeoProjectionParametersAEAC* aeac = new GeoProjectionParametersAEAC();
+  aeac->type = GEO_PROJECTION_AEAC;
+  sprintf(aeac->name, "Albers Equal Area Conic");
+  aeac->aeac_false_easting_meter = falseEastingMeter;
+  aeac->aeac_false_northing_meter = falseNorthingMeter;
+  aeac->aeac_lat_origin_degree = latOriginDegree;
+  aeac->aeac_long_meridian_degree = longMeridianDegree;
+  aeac->aeac_first_std_parallel_degree = firstStdParallelDegree;
+  aeac->aeac_second_std_parallel_degree = secondStdParallelDegree;
+  aeac->aeac_lat_origin_radian = deg2rad*aeac->aeac_lat_origin_degree;
+  aeac->aeac_long_meridian_radian = deg2rad*aeac->aeac_long_meridian_degree;
+  aeac->aeac_first_std_parallel_radian = deg2rad*aeac->aeac_first_std_parallel_degree;
+  aeac->aeac_second_std_parallel_radian = deg2rad*aeac->aeac_second_std_parallel_degree;
+  set_projection(aeac, source);
+  compute_aeac_parameters(source);
+  if (description)
+  {
+    sprintf(description, "false east/north: %g/%g [m], origin lat/ meridian long: %g/%g, parallel 1st/2nd: %g/%g", aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter, aeac->aeac_lat_origin_degree, aeac->aeac_long_meridian_degree, aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree);
   }
 }
 
@@ -4258,6 +4422,15 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       if (description) sprintf(description, "NAD83 / Oregon Lambert (ft)");
       return true;
     }
+    else if (value == EPSG_NAD83_BC_Albers)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_albers_equal_area_conic_projection(1000000.0, 0.0, 45, -126, 50, 58.5, 0, source); // "NAD83 / BC Albers"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "NAD83 / BC Albers");
+      return true;
+    }
     else if (value == EPSG_SWEREF99_TM)
     {
       set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
@@ -4409,6 +4582,24 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / UTM zone 32N (zE-N)");
+      return true;
+    }
+    else if (value == EPSG_NAD83_HARN_Conus_Albers)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_albers_equal_area_conic_projection(0.0, 0.0, 23.0, -96, 29.5, 45.5, 0, source); // "NAD83(HARN) / Conus Albers"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "NAD83(HARN) / Conus Albers");
+      return true;
+    }
+    else if (value == EPSG_NAD83_NSRS2007_Conus_Albers)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_albers_equal_area_conic_projection(0.0, 0.0, 23.0, -96, 29.5, 45.5, 0, source); // "NAD83(NSRS2007) / Conus Albers"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "NAD83(NSRS2007) / Conus Albers");
       return true;
     }
     else if ((EPSG_ETRS89_NTM_zone_5 <= value) && (value <= EPSG_ETRS89_NTM_zone_30))
@@ -4781,6 +4972,50 @@ void GeoProjectionConverter::compute_tm_parameters(bool source)
   tm->tm_ep = 315.e0 * ellipsoid->equatorial_radius * (tn4 - tn5) / 512.e0;
 }
 
+void GeoProjectionConverter::compute_aeac_parameters(bool source)
+{
+  GeoProjectionParametersAEAC* aeac = (GeoProjectionParametersAEAC*)(source ? source_projection : target_projection);
+
+  if (!aeac || aeac->type != GEO_PROJECTION_AEAC) return;
+
+  aeac->aeac_one_MINUS_es2 = 1.0 - ellipsoid->eccentricity_squared;
+  aeac->aeac_two_es = 2 * ellipsoid->eccentricity;
+
+  double sin_lat = sin(aeac->aeac_lat_origin_radian);
+  double es_sin = sin_lat * ellipsoid->eccentricity;
+  double one_MINUS_SQRes_sin = 1.0 - (es_sin * es_sin);
+  double q0 = aeac->aeac_one_MINUS_es2 * (sin_lat / (one_MINUS_SQRes_sin) - (1.0/aeac->aeac_two_es)*log((1.0 - es_sin) / (1.0 + es_sin)));
+
+  double sin_lat_1 = sin(aeac->aeac_first_std_parallel_radian);
+  double cos_lat = cos(aeac->aeac_first_std_parallel_radian);
+  es_sin = sin_lat_1 * ellipsoid->eccentricity;
+  one_MINUS_SQRes_sin = 1.0 - (es_sin * es_sin);
+  double m1 = cos_lat / sqrt(one_MINUS_SQRes_sin);
+  double q1 = aeac->aeac_one_MINUS_es2 * (sin_lat_1 / (one_MINUS_SQRes_sin) - (1.0/aeac->aeac_two_es)*log((1.0 - es_sin) / (1.0 + es_sin)));
+
+  double SQRm1 = m1 * m1;
+  if (fabs(aeac->aeac_first_std_parallel_radian - aeac->aeac_second_std_parallel_radian) > 1.0e-10)
+  {
+    sin_lat = sin(aeac->aeac_second_std_parallel_radian);
+    cos_lat = cos(aeac->aeac_second_std_parallel_radian);
+    es_sin = sin_lat * ellipsoid->eccentricity;
+    one_MINUS_SQRes_sin = 1.0 - (es_sin * es_sin);
+    double m2 = cos_lat / sqrt(one_MINUS_SQRes_sin);
+    double q2 = aeac->aeac_one_MINUS_es2 * (sin_lat / (one_MINUS_SQRes_sin) - (1.0/aeac->aeac_two_es)*log((1.0 - es_sin) / (1.0 + es_sin)));
+    aeac->aeac_n = (SQRm1 - m2 * m2) / (q2 - q1);
+  }
+  else
+    aeac->aeac_n = sin_lat_1;
+
+  aeac->aeac_C = SQRm1 + aeac->aeac_n * q1;
+  aeac->aeac_Albers_a_OVER_n = ellipsoid->equatorial_radius / aeac->aeac_n;
+  double nq0 = aeac->aeac_n * q0;
+  if (aeac->aeac_C < nq0)
+    aeac->aeac_rho0 = 0;
+  else
+    aeac->aeac_rho0 = aeac->aeac_Albers_a_OVER_n * sqrt(aeac->aeac_C - nq0);
+}
+
 // converts UTM coords to lat/long.  Equations from USGS Bulletin 1532 
 // East Longitudes are positive, West longitudes are negative. 
 // North latitudes are positive, South latitudes are negative
@@ -5098,7 +5333,7 @@ bool GeoProjectionConverter::LCCtoLL(const double LCCEastingMeter, const double 
   *   LatDegree         : input Latitude in decimal degrees
   *   LongDegree        : input Longitude in decimal degrees
   *   LCCEastingMeter   : output Easting/X in meters 
-  *   LLCNorthingMeter  : output Northing/Y in meters
+  *   LCCNorthingMeter  : output Northing/Y in meters
   *
   * adapted from code by Garrett Potts ((C) 2000 ImageLinks Inc.)
 */
@@ -5662,6 +5897,189 @@ bool GeoProjectionConverter::LLtoECEF(const double LatDegree, const double LongD
   return true;
 }
 
+/*
+  * The function AEACtoLL() converts Albers Equal Area Conic projection
+  * (easting and northing) coordinates to Geodetic (latitude and longitude)
+  * coordinates, according to the current ellipsoid and Albers Equal Area 
+  * Conic projection parameters.
+  *
+  *   AEACEastingMeter  : input Easting/X in meters 
+  *   AEACNorthingMeter : input Northing/Y in meters
+  *   LatDegree         : output Latitude in decimal degrees
+  *   LongDegree        : output Longitude in decimal degrees
+  *
+  * adapted from ALBERS code of U.S. Army Topographic Engineering Center
+*/
+bool GeoProjectionConverter::AEACtoLL(const double AEACEastingMeter, const double AEACNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersAEAC* aeac) const
+{
+  double dy, dx;
+  double rho0_MINUS_dy;
+  double q, qconst, q_OVER_2;
+  double rho, rho_n;
+  double PHI, Delta_PHI = 1.0;
+  double sin_phi;
+  double es_sin, one_MINUS_SQRes_sin;
+  double theta = 0.0;
+  int count = 30;
+  const double tolerance = 4.85e-10; /* approximately 1/1000th of an arc second or 1/10th meter */
+  const double Albers_Delta_Northing = 40000000;
+  const double Albers_Delta_Easting = 40000000;
+
+  if ((AEACEastingMeter < (aeac->aeac_false_easting_meter - Albers_Delta_Easting)) || (AEACEastingMeter > aeac->aeac_false_easting_meter + Albers_Delta_Easting))
+  {
+    return false; /* Easting out of range  */
+  }
+
+  if ((AEACNorthingMeter < (aeac->aeac_false_northing_meter - Albers_Delta_Northing)) || (AEACNorthingMeter > aeac->aeac_false_northing_meter + Albers_Delta_Northing))
+  { 
+    return false; /* Northing out of range */
+  }
+
+  dy = AEACNorthingMeter - aeac->aeac_false_northing_meter;
+  dx = AEACEastingMeter - aeac->aeac_false_easting_meter;
+  rho0_MINUS_dy = aeac->aeac_rho0 - dy;
+  rho = sqrt(dx * dx + rho0_MINUS_dy * rho0_MINUS_dy);
+
+  if (aeac->aeac_n < 0)
+  {
+    rho *= -1.0;
+    dy *= -1.0;
+    dx *= -1.0;
+    rho0_MINUS_dy *= -1.0;
+  }
+
+  if (rho != 0.0)
+    theta = atan2(dx, rho0_MINUS_dy);
+  rho_n = rho * aeac->aeac_n;
+  q = (aeac->aeac_C - (rho_n * rho_n) / (ellipsoid->equatorial_radius * ellipsoid->equatorial_radius)) / aeac->aeac_n;
+  qconst = 1.0 - ((aeac->aeac_one_MINUS_es2) / (aeac->aeac_two_es)) * log((1.0 - ellipsoid->eccentricity) / (1.0 + ellipsoid->eccentricity));
+  if (fabs(fabs(qconst) - fabs(q)) > 1.0e-6)
+  {
+    q_OVER_2 = q / 2.0;
+    if (q_OVER_2 > 1.0)
+      LatDegree = PI_OVER_2;
+    else if (q_OVER_2 < -1.0)
+      LatDegree = -PI_OVER_2;
+    else
+    {
+      PHI = asin(q_OVER_2);
+      if (ellipsoid->eccentricity < 1.0e-10)
+        LatDegree = PHI;
+      else
+      {
+        while ((fabs(Delta_PHI) > tolerance) && count)
+        {
+          sin_phi = sin(PHI);
+          es_sin = ellipsoid->eccentricity * sin_phi;
+          one_MINUS_SQRes_sin = 1.0 - es_sin * es_sin;
+          Delta_PHI = (one_MINUS_SQRes_sin * one_MINUS_SQRes_sin) / (2.0 * cos(PHI)) *
+                      (q / (aeac->aeac_one_MINUS_es2) - sin_phi / one_MINUS_SQRes_sin +
+                       (log((1.0 - es_sin) / (1.0 + es_sin)) / (aeac->aeac_two_es)));
+          PHI += Delta_PHI;
+          count --;
+        }
+
+        if (!count)
+        {
+          return false; /* ALBERS_NORTHING_ERROR */
+        }
+
+        LatDegree = PHI;
+      }
+
+      if (LatDegree > PI_OVER_2)  /* force distorted values to 90, -90 degrees */
+        LatDegree = PI_OVER_2;
+      else if (LatDegree < -PI_OVER_2)
+        LatDegree = -PI_OVER_2;
+    }
+  }
+  else
+  {
+    if (q >= 0.0)
+      LatDegree = PI_OVER_2;
+    else
+      LatDegree = -PI_OVER_2;
+  }
+  
+  LongDegree = aeac->aeac_long_meridian_radian + theta / aeac->aeac_n;
+
+  if (LongDegree > PI)
+    LongDegree -= TWO_PI;
+  if (LongDegree < -PI)
+    LongDegree += TWO_PI;
+
+  if (LongDegree > PI) /* force distorted values to 180, -180 degrees */
+    LongDegree = PI;
+  else if (LongDegree < -PI)
+    LongDegree = -PI;
+
+  LatDegree = LatDegree * rad2deg;
+  LongDegree = LongDegree * rad2deg;
+
+  return true;
+}
+
+/*
+  * The function LLtoAEAC() converts Geodetic (latitude and longitude)
+  * coordinates to Albers Equal Area Conic projection (easting and
+  * northing) coordinates, according to the current ellipsoid and
+  * Albers Equal Area Conic projection parameters. 
+  *
+  *   LatDegree         : input Latitude in decimal degrees
+  *   LongDegree        : input Longitude in decimal degrees
+  *   AEACEastingMeter  : output Easting/X in meters 
+  *   AEACNorthingMeter : output Northing/Y in meters
+  *
+  * adapted from ALBERS code of U.S. Army Topographic Engineering Center
+*/
+bool GeoProjectionConverter::LLtoAEAC(const double LatDegree, const double LongDegree, double &AEACEastingMeter, double &AEACNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersAEAC* aeac) const
+{
+  double dlam;
+  double sin_lat;
+  double es_sin, one_MINUS_SQRes_sin;
+  double q;
+  double rho;
+  double theta;
+  double nq;
+
+  double LatRadian = LatDegree*deg2rad;
+  double LongRadian = LongDegree*deg2rad;
+
+  if ((LatRadian < -PI_OVER_2) || (LatRadian > PI_OVER_2))
+  {
+    return false; /* Latitude out of range */
+  }
+  if ((LongRadian < -PI) || (LongRadian > TWO_PI))
+  {
+    return false; /* Longitude out of range */
+  }
+
+  dlam = LongRadian - aeac->aeac_long_meridian_radian;
+  if (dlam > PI)
+  {
+    dlam -= TWO_PI;
+  }
+  else if (dlam < -PI)
+  {
+    dlam += TWO_PI;
+  }
+  sin_lat = sin(LatRadian);
+  es_sin = ellipsoid->eccentricity * sin_lat;
+  one_MINUS_SQRes_sin = 1.0 - es_sin * es_sin;
+  q = aeac->aeac_one_MINUS_es2 * (sin_lat / (one_MINUS_SQRes_sin) - (1.0/aeac->aeac_two_es) * log((1.0 - es_sin) / (1.0 + es_sin)));
+  nq = aeac->aeac_n * q;
+  if (aeac->aeac_C < nq)
+    rho = 0;
+  else
+    rho = aeac->aeac_Albers_a_OVER_n * sqrt(aeac->aeac_C - nq);
+
+  theta = aeac->aeac_n * dlam;
+  AEACEastingMeter = rho * sin(theta) + aeac->aeac_false_easting_meter;
+  AEACNorthingMeter = aeac->aeac_rho0 - rho * cos(theta) + aeac->aeac_false_northing_meter;
+
+  return true;
+}
+
 GeoProjectionConverter::GeoProjectionConverter()
 {
   num_geo_keys = 0;
@@ -5947,6 +6365,45 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       set_transverse_mercator_projection(falseEasting, falseNorthing, latOriginDeg, longMeridianDeg, scaleFactor, tmp, source);
       fprintf(stderr, "using TM %s '%s'\n", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0';  *argv[i+3]='\0';  *argv[i+4]='\0';  *argv[i+5]='\0';  *argv[i+6]='\0'; i+=6;
+    }
+    else if (strcmp(argv[i],"-aeac") == 0 || strcmp(argv[i],"-target_aeac") == 0)
+    {
+      bool source = (strcmp(argv[i],"-aeac") == 0);
+      double falseEasting; sscanf(argv[i+1], "%lf", &falseEasting);
+      double falseNorthing; sscanf(argv[i+2], "%lf", &falseNorthing);
+      if (strcmp(argv[i+3],"survey_feet") == 0 || strcmp(argv[i+3],"surveyfeet") == 0)
+      {
+        set_coordinates_in_survey_feet(source);
+        // the definition of the projection was in survey feet but we always calculate in meters
+        falseEasting *= 0.3048006096012;
+        falseNorthing *= 0.3048006096012;
+      }
+      else if (strcmp(argv[i+3],"feet") == 0 || strcmp(argv[i+3],"ft") == 0)
+      {
+        set_coordinates_in_feet(source);
+        // the definition of the projection was in feet but we always calculate in meters
+        falseEasting *= 0.3048;
+        falseNorthing *= 0.3048;
+      }
+      else if (strcmp(argv[i+3],"meter") == 0 || strcmp(argv[i+3],"m") == 0)
+      {
+        set_coordinates_in_meter(source);
+      }
+      else
+      {
+        fprintf(stderr,"ERROR: wrong options for '-aeac'. use like shown in these examples:\n");
+        fprintf(stderr,"  %s 609601.22 0 meter 33.75 -79 34.33333 36.16666\n", argv[i]);
+        fprintf(stderr,"  %s 1640416.666667 0 survey_feet 47.000000 -120.833333 47.5 48.733333\n", argv[i]);
+        fprintf(stderr,"  %s 1500000 0 feet 47.000000 -120.833333 47.5 48.733333\n", argv[i]);
+        return false;
+      }
+      double latOfOriginDeg = atof(argv[i+4]);
+      double longOfOriginDeg = atof(argv[i+5]);
+      double firstStdParallelDeg = atof(argv[i+6]);
+      double secondStdParallelDeg = atof(argv[i+7]);
+      set_albers_equal_area_conic_projection(falseEasting, falseNorthing, latOfOriginDeg, longOfOriginDeg, firstStdParallelDeg, secondStdParallelDeg, tmp, source);
+      fprintf(stderr, "using AEAC %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0';  *argv[i+3]='\0';  *argv[i+4]='\0';  *argv[i+5]='\0';  *argv[i+6]='\0';  *argv[i+7]='\0'; i+=7;
     }
     else if (strcmp(argv[i],"-surveyfeet") == 0 || strcmp(argv[i],"-survey_feet") == 0)
     {
@@ -6323,6 +6780,12 @@ bool GeoProjectionConverter::to_lon_lat_ele(const double* point, double& longitu
       longitude = point[1];
       latitude = point[0];
       break;
+    case GEO_PROJECTION_ECEF:
+      ECEFtoLL(coordinates2meter*point[0], coordinates2meter*point[1], coordinates2meter*point[2], latitude, longitude, elevation_in_meter, ellipsoid);
+      break;
+    case GEO_PROJECTION_AEAC:
+      AEACtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersAEAC*)source_projection);
+      break;
     }
     elevation_in_meter = elevation2meter*point[2] + elevation_offset_in_meter;
     return true;
@@ -6348,13 +6811,13 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
     switch (source_projection->type)
     {
     case GEO_PROJECTION_UTM:
-      UTMtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (GeoProjectionParametersUTM*)source_projection);
+      UTMtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersUTM*)source_projection);
       break;
     case GEO_PROJECTION_LCC:
-      LCCtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (GeoProjectionParametersLCC*)source_projection);
+      LCCtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersLCC*)source_projection);
       break;
     case GEO_PROJECTION_TM:
-      TMtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (GeoProjectionParametersTM*)source_projection);
+      TMtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersTM*)source_projection);
       break;
     case GEO_PROJECTION_LONG_LAT:
       longitude = point[0];
@@ -6367,23 +6830,26 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
     case GEO_PROJECTION_ECEF:
       ECEFtoLL(coordinates2meter*point[0], coordinates2meter*point[1], coordinates2meter*point[2], latitude, longitude, elevation, ellipsoid);
       break;
+    case GEO_PROJECTION_AEAC:
+      AEACtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersAEAC*)source_projection);
+      break;
     }
 
     switch (target_projection->type)
     {
     case GEO_PROJECTION_UTM:
       if (((GeoProjectionParametersUTM*)target_projection)->utm_zone_number == -1) compute_utm_zone(latitude, longitude, (GeoProjectionParametersUTM*)target_projection);
-      LLtoUTM(latitude, longitude, x, y, ellipsoid, (GeoProjectionParametersUTM*)target_projection);
+      LLtoUTM(latitude, longitude, x, y, ellipsoid, (const GeoProjectionParametersUTM*)target_projection);
       x = meter2coordinates * x;
       y = meter2coordinates * y;
       break;
     case GEO_PROJECTION_LCC:
-      LLtoLCC(latitude, longitude, x, y, ellipsoid, (GeoProjectionParametersLCC*)target_projection);
+      LLtoLCC(latitude, longitude, x, y, ellipsoid, (const GeoProjectionParametersLCC*)target_projection);
       x = meter2coordinates * x;
       y = meter2coordinates * y;
       break;
     case GEO_PROJECTION_TM:
-      LLtoTM(latitude, longitude, x, y, ellipsoid, (GeoProjectionParametersTM*)target_projection);
+      LLtoTM(latitude, longitude, x, y, ellipsoid, (const GeoProjectionParametersTM*)target_projection);
       x = meter2coordinates * x;
       y = meter2coordinates * y;
       break;
@@ -6400,6 +6866,11 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
       x = meter2coordinates * x;
       y = meter2coordinates * y;
       elevation = meter2coordinates * elevation;
+      break;
+    case GEO_PROJECTION_AEAC:
+      LLtoAEAC(latitude, longitude, x, y, ellipsoid, (const GeoProjectionParametersAEAC*)target_projection);
+      x = meter2coordinates * x;
+      y = meter2coordinates * y;
       break;
     }
     elevation = meter2elevation * (elevation2meter*point[2] + elevation_offset_in_meter);
@@ -7530,8 +8001,6 @@ static double Albers_Std_Parallel_2 = (50 * PI / 180);
 static double Albers_False_Easting = 0.0;
 static double Albers_False_Northing = 0.0;
 
-static double Albers_Delta_Northing = 40000000;
-static double Albers_Delta_Easting =  40000000;
 /*
  * These state variables are for optimization purposes.  The only function
  * that should modify them is Set_Albers_Parameters.
