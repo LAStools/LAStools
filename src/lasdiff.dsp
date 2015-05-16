@@ -279,7 +279,35 @@ SOURCE=..\src_full\shpreader.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\geoprojectionconverter.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\laslib\inc\lasdefinitions.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasindex.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasinterval.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\laslicense.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\lasoccupancy.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasquadtree.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\lasraster.hpp
 # End Source File
 # Begin Source File
 
@@ -307,11 +335,23 @@ SOURCE=..\laslib\inc\laswriter.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\laszip.hpp
+SOURCE=..\LASzip\src\laszip.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\mydefs.hpp
+SOURCE=..\src_full\linereader.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\mydefs.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\shpreader.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\txtreader.hpp
 # End Source File
 # End Group
 # Begin Group "Resource Files"
