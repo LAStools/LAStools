@@ -30,6 +30,7 @@
 
   CHANGE HISTORY:
 
+    16 May 2015 -- new option '-set_GUID F794F8A4-A23E-421E-A134-ACF7754E1C54'
      9 July 2012 -- fixed crash that occured when input had a corrupt VLRs
      7 January 2012 -- set bounding box / file source id / point type & size / ...
      6 January 2012 -- make area/density optional
@@ -209,6 +210,11 @@ int main(int argc, char *argv[])
   bool change_header = false;
   I32 set_file_source_ID = -1;
   I32 set_global_encoding = -1;
+  I64 set_project_ID_GUID_data_1 = -1;
+  I32 set_project_ID_GUID_data_2 = -1;
+  I32 set_project_ID_GUID_data_3 = -1;
+  I32 set_project_ID_GUID_data_4a = -1;
+  I64 set_project_ID_GUID_data_4b = -1;
   I8 set_version_major = -1;
   I8 set_version_minor = -1;
 	I8* set_system_identifier = 0;
@@ -419,6 +425,29 @@ int main(int argc, char *argv[])
       }
 			i++;
 			set_file_source_ID = atoi(argv[i]);
+      change_header = true;
+		}
+    else if (strcmp(argv[i],"-set_GUID") == 0)
+    {
+      lasreadopener.set_merged(FALSE);
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: value1\n", argv[i]);
+        byebye(true);
+      }
+			i++;
+#ifdef _WIN32
+      if (sscanf(argv[i], "%I64x-%x-%x-%x-%I64x", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
+#elif
+      if (sscanf(argv[i], "%llx-%x-%x-%x-%llx", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
+#endif
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs hexadecimal GUID in 'F794F8A4-A23E-421E-A134-ACF7754E1C54' format\n", argv[i]);
+          byebye(true);
+        }
+      }
       change_header = true;
 		}
     else if (strcmp(argv[i],"-set_system_identifier") == 0)
@@ -3245,6 +3274,22 @@ int main(int argc, char *argv[])
         fseek(file, 6, SEEK_SET);
         fwrite(&global_encoding, sizeof(U16), 1, file);
       }
+      if (set_project_ID_GUID_data_1 != -1)
+      {
+        fseek(file, 8, SEEK_SET);
+        U32 GUID_data_1 = U32_CLAMP(set_project_ID_GUID_data_1);
+        U16 GUID_data_2 = U16_CLAMP(set_project_ID_GUID_data_2);
+        U16 GUID_data_3 = U16_CLAMP(set_project_ID_GUID_data_3);
+        U16 GUID_data_4a = U16_CLAMP(set_project_ID_GUID_data_4a);
+        U16 GUID_data_4b_a = U16_CLAMP(set_project_ID_GUID_data_4b >> 32);
+        U32 GUID_data_4b_b = U32_CLAMP(set_project_ID_GUID_data_4b & 0xFFFFFFFF);
+        fwrite(&GUID_data_1, sizeof(U32), 1, file);
+        fwrite(&GUID_data_2, sizeof(U16), 1, file);
+        fwrite(&GUID_data_3, sizeof(U16), 1, file);
+        fwrite(&GUID_data_4a, sizeof(U16), 1, file);
+        fwrite(&GUID_data_4b_a, sizeof(U16), 1, file);
+        fwrite(&GUID_data_4b_b, sizeof(U32), 1, file);
+      }
       if (set_version_major != -1)
       {
         fseek(file, 24, SEEK_SET);
@@ -3372,7 +3417,7 @@ int main(int argc, char *argv[])
             fwrite(&number_of_point_records, sizeof(U32), 1, file);
             if (file_out)
             {
-              fprintf(file_out, "real number of points (%u) is different from header number of points (%u). it was repaired. \n", number_of_point_records, lasheader->number_of_point_records);
+              fprintf(file_out, "WARNING: real number of points (%u) is different from header number of points (%u). it was repaired. \n", number_of_point_records, lasheader->number_of_point_records);
             }
           }
         }
@@ -3391,9 +3436,9 @@ int main(int argc, char *argv[])
             else
             {
 #ifdef _WIN32
-              fprintf(file_out, "real number of points (%I64d) is different from header number of points (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
+              fprintf(file_out, "WARNING: real number of points (%I64d) is different from header number of points (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
 #else
-              fprintf(file_out, "real number of points (%lld) is different from header number of points (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
+              fprintf(file_out, "WARNING: real number of points (%lld) is different from header number of points (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
 #endif
             }
           }
@@ -3461,13 +3506,19 @@ int main(int argc, char *argv[])
       if (file_out && !no_min_max)
       {
 #ifdef _WIN32
-        if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there are %I64d points with return number 0\n", lassummary.number_of_points_by_return[0]); 
-        if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there are %I64d points with return number 6\n", lassummary.number_of_points_by_return[6]); 
-        if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there are %I64d points with return number 7\n", lassummary.number_of_points_by_return[7]); 
+        if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there are %I64d points with return number 0\n", lassummary.number_of_points_by_return[0]);
+        if (!lasreader->point.extended_point_type)
+        {
+          if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there are %I64d points with return number 6\n", lassummary.number_of_points_by_return[6]); 
+          if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there are %I64d points with return number 7\n", lassummary.number_of_points_by_return[7]); 
+        }
 #else
         if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there are %lld points with return number 0\n", lassummary.number_of_points_by_return[0]); 
-        if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there are %lld points with return number 6\n", lassummary.number_of_points_by_return[6]); 
-        if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there are %lld points with return number 7\n", lassummary.number_of_points_by_return[7]); 
+        if (!lasreader->point.extended_point_type)
+        {
+          if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there are %lld points with return number 6\n", lassummary.number_of_points_by_return[6]); 
+          if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there are %lld points with return number 7\n", lassummary.number_of_points_by_return[7]); 
+        }
 #endif
 
         wrong_entry = false;
