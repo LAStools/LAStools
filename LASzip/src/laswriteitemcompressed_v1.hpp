@@ -5,7 +5,7 @@
   
   CONTENTS:
   
-    Implementation of LASitemReadCompressed for *all* items (version 1).
+    Implementation of LASitemWriteCompressed for *all* items (version 1).
 
   PROGRAMMERS:
 
