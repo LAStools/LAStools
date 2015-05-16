@@ -909,15 +909,47 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
   if (use_inventory)
   {
     stream->seek(header_start_position+107);
-    if (!stream->put32bitsLE((U8*)&(inventory.number_of_point_records)))
+    U32 number;
+    if (inventory.extended_number_of_point_records > U32_MAX)
+    {
+      if (header->version_minor >= 4)
+      {
+        number = 0;
+      }
+      else
+      {
+        fprintf(stderr,"WARNING: too many points in LAS %d.%d file. limit is %u.\n", header->version_major, header->version_minor, U32_MAX);
+        number = U32_MAX;
+      }
+    }
+    else
+    {
+      number = (U32)inventory.extended_number_of_point_records;
+    }
+    if (!stream->put32bitsLE((U8*)&number))
     {
       fprintf(stderr,"ERROR: updating inventory.number_of_point_records\n");
       return FALSE;
     }
-    npoints = inventory.number_of_point_records;
+    npoints = inventory.extended_number_of_point_records;
     for (i = 0; i < 5; i++)
     {
-      if (!stream->put32bitsLE((U8*)&(inventory.number_of_points_by_return[i+1])))
+      if (inventory.extended_number_of_points_by_return[i+1] > U32_MAX)
+      {
+        if (header->version_minor >= 4)
+        {
+          number = 0;
+        }
+        else
+        {
+          number = U32_MAX;
+        }
+      }
+      else
+      {
+        number = (U32)inventory.extended_number_of_points_by_return[i+1];
+      }
+      if (!stream->put32bitsLE((U8*)&number))
       {
         fprintf(stderr,"ERROR: updating inventory.number_of_points_by_return[%d]\n", i);
         return FALSE;
@@ -960,6 +992,24 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
     {
       fprintf(stderr,"ERROR: updating inventory.min_Z\n");
       return FALSE;
+    }
+    // special handling for LAS 1.4 or higher.
+    if (header->version_minor >= 4)
+    {
+      stream->seek(header_start_position+247);
+      if (!stream->put64bitsLE((U8*)&(inventory.extended_number_of_point_records)))
+      {
+        fprintf(stderr,"ERROR: updating header->extended_number_of_point_records\n");
+        return FALSE;
+      }
+      for (i = 0; i < 15; i++)
+      {
+        if (!stream->put64bitsLE((U8*)&(inventory.extended_number_of_points_by_return[i+1])))
+        {
+          fprintf(stderr,"ERROR: updating header->extended_number_of_points_by_return[%d]\n", i);
+          return FALSE;
+        }
+      }
     }
   }
   else
@@ -1162,9 +1212,8 @@ I64 LASwriterLAS::close(BOOL update_header)
 	      stream->put32bitsLE((U8*)&value);
         if (writing_las_1_4)
         {
-          U64 value = (U64)p_count;
   	      stream->seek(header_start_position+235+12);
-  	      stream->put64bitsLE((U8*)&value);
+  	      stream->put64bitsLE((U8*)&p_count);
         }
         stream->seekEnd();
       }
