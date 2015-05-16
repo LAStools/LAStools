@@ -158,17 +158,6 @@ PostBuild_Cmds=copy Debug\lasinfo.exe ..\bin\lasinfo.exe
 # Begin Source File
 
 SOURCE=.\geoprojectionconverter.cpp
-
-!IF  "$(CFG)" == "lasinfo - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "lasinfo - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "lasinfo - Win32 Release with GUI"
-
-!ELSEIF  "$(CFG)" == "lasinfo - Win32 Debug with GUI"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -321,7 +310,39 @@ SOURCE=..\laslib\inc\lasdefinitions.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\laslib\inc\lasfilter.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasindex.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasinterval.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\laslicense.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\lasoccupancy.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasquadtree.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\lasraster.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\laslib\inc\lasreader.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\laslib\inc\lastransform.hpp
 # End Source File
 # Begin Source File
 
@@ -333,11 +354,31 @@ SOURCE=..\laslib\inc\laswaveform13reader.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\laszip.hpp
+SOURCE=..\laslib\inc\laswaveform13writer.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\mydefs.hpp
+SOURCE=..\laslib\inc\laswriter.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\laszip.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\linereader.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\mydefs.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\shpreader.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\txtreader.hpp
 # End Source File
 # End Group
 # Begin Group "Resource Files"
