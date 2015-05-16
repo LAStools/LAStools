@@ -655,6 +655,11 @@ BOOL LASreaderMerged::open()
         header.number_attributes = 0;
         header.init_attributes(lasreader->header.number_attributes, lasreader->header.attributes);
       }
+      // when merging multiple flightlines the merged header must have a file source ID of 0
+      if (files_are_flightlines || apply_file_source_ID)
+      {
+        header.file_source_ID = 0;
+      }      
     }
     else if (lasreader->npoints)
     {
