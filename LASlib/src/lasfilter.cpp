@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -691,6 +691,22 @@ public:
   inline BOOL filter(const LASpoint* point) { return (point->get_withheld_flag() == 0); };
 };
 
+class LAScriterionDropOverlap : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_overlap"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline BOOL filter(const LASpoint* point) { return (point->get_extended_overlap_flag() == 1); };
+};
+
+class LAScriterionKeepOverlap : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_overlap"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline BOOL filter(const LASpoint* point) { return (point->get_extended_overlap_flag() == 0); };
+};
+
 class LAScriterionKeepUserData : public LAScriterion
 {
 public:
@@ -1223,6 +1239,7 @@ void LASfilter::usage() const
   fprintf(stderr,"  -drop_synthetic -keep_synthetic\n");
   fprintf(stderr,"  -drop_keypoint -keep_keypoint\n");
   fprintf(stderr,"  -drop_withheld -keep_withheld\n");
+  fprintf(stderr,"  -drop_overlap -keep_overlap\n");
   fprintf(stderr,"Filter points based on their user data.\n");
   fprintf(stderr,"  -keep_user_data 1\n");
   fprintf(stderr,"  -drop_user_data 255\n");
@@ -2113,6 +2130,16 @@ BOOL LASfilter::parse(int argc, char* argv[])
     else if (strcmp(argv[i],"-keep_withheld") == 0)
     {
       add_criterion(new LAScriterionKeepWithheld());
+      *argv[i]='\0';
+    }
+    else if (strcmp(argv[i],"-drop_overlap") == 0)
+    {
+      add_criterion(new LAScriterionDropOverlap());
+      *argv[i]='\0';
+    }
+    else if (strcmp(argv[i],"-keep_overlap") == 0)
+    {
+      add_criterion(new LAScriterionKeepOverlap());
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-keep_wavepacket") == 0)
