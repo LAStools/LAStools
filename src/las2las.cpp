@@ -22,7 +22,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-14, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -33,6 +33,7 @@
   
   CHANGE HISTORY:
   
+     3 May 2015 -- improved up-conversion via '-set_version 1.4 -point_type 6'
      5 July 2012 -- added option to '-remove_original_vlr' 
      6 May 2012 -- added option to '-remove_tiling_vlr' 
      5 January 2012 -- added option to clip points to the bounding box
@@ -867,21 +868,15 @@ int main(int argc, char *argv[])
       }
       lasreader->close();
 
-      lasreader->header.number_of_point_records = lasinventory.number_of_point_records;
-      for (i = 0; i < 5; i++) lasreader->header.number_of_points_by_return[i] = lasinventory.number_of_points_by_return[i+1];
       if (reproject_quantizer) lasreader->header = *reproject_quantizer;
-      lasreader->header.max_x = lasreader->header.get_x(lasinventory.max_X);
-      lasreader->header.min_x = lasreader->header.get_x(lasinventory.min_X);
-      lasreader->header.max_y = lasreader->header.get_y(lasinventory.max_Y);
-      lasreader->header.min_y = lasreader->header.get_y(lasinventory.min_Y);
-      lasreader->header.max_z = lasreader->header.get_z(lasinventory.max_Z);
-      lasreader->header.min_z = lasreader->header.get_z(lasinventory.min_Z);
+
+      lasinventory.update_header(&lasreader->header);
 
       if (verbose) { fprintf(stderr,"extra pass took %g sec.\n", taketime()-start_time); start_time = taketime(); }
 #ifdef _WIN32
-      if (verbose) fprintf(stderr, "piped output: reading %I64d and writing %u points ...\n", lasreader->npoints, lasinventory.number_of_point_records);
+      if (verbose) fprintf(stderr, "piped output: reading %I64d and writing %I64d points ...\n", lasreader->npoints, lasinventory.extended_number_of_point_records);
 #else
-      if (verbose) fprintf(stderr, "piped output: reading %lld and writing %u points ...\n", lasreader->npoints, lasinventory.number_of_point_records);
+      if (verbose) fprintf(stderr, "piped output: reading %lld and writing %lld points ...\n", lasreader->npoints, lasinventory.extended_number_of_point_records);
 #endif
     }
     else
