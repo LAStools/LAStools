@@ -30,7 +30,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2015, martin isenburg, rapidlasso - tools to catch reality
+    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -41,6 +41,7 @@
   
   CHANGE HISTORY:
   
+    16 May 2015 -- attemting to add the Albers Equal Area Conic projection
     03 March 2015 -- LCC/TM custom projections write GeogGeodeticDatumGeoKey
     13 August 2014 -- added long overdue ECEF (geocentric) conversion
     08 February 2007 -- created after interviews with purdue and google
@@ -138,6 +139,27 @@ public:
   double tm_ep;
 };
 
+class GeoProjectionParametersAEAC : public GeoProjectionParameters
+{
+public:
+  double aeac_false_easting_meter;
+  double aeac_false_northing_meter;
+  double aeac_lat_origin_degree;
+  double aeac_long_meridian_degree;
+  double aeac_first_std_parallel_degree;
+  double aeac_second_std_parallel_degree;
+  double aeac_lat_origin_radian;
+  double aeac_long_meridian_radian;
+  double aeac_first_std_parallel_radian;
+  double aeac_second_std_parallel_radian;
+  double aeac_n;
+  double aeac_C;
+  double aeac_two_es;
+  double aeac_rho0;
+  double aeac_one_MINUS_es2;
+  double aeac_Albers_a_OVER_n;
+};
+
 class GeoProjectionConverter
 {
 public:
@@ -194,6 +216,7 @@ public:
   bool set_utm_projection(int zone, bool northern, char* description=0, bool source=true);
   void set_lambert_conformal_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true);
   void set_transverse_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor, char* description=0, bool source=true);
+  void set_albers_equal_area_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true);
 
   const char* get_state_plane_nad27_lcc_zone(int i) const;
   bool set_state_plane_nad27_lcc(const char* zone, char* description=0, bool source=true);
@@ -250,6 +273,9 @@ public:
 
   bool ECEFtoLL(const double ECEFMeterX, const double ECEFMeterY, const double ECEFMeterZ, double& LatDegree,  double& LongDegree, double& ElevationMeter, const GeoProjectionEllipsoid* ellipsoid) const;
   bool LLtoECEF(const double LatDegree, const double LongDegree, const double ElevationMeter, double &ECEFMeterX, double &ECEFMeterY, double &ECEFMeterZ, const GeoProjectionEllipsoid* ellipsoid) const;
+
+  bool AEACtoLL(const double AEACEastingMeter, const double AEACNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersAEAC* aeac) const;
+  bool LLtoAEAC(const double LatDegree, const double LongDegree, double &AEACEastingMeter, double &AEACNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersAEAC* aeac) const;
 
   GeoProjectionConverter();
   ~GeoProjectionConverter();
@@ -310,6 +336,7 @@ private:
   GeoProjectionParameters* get_projection(bool source) const;
   void compute_lcc_parameters(bool source);
   void compute_tm_parameters(bool source);
+  void compute_aeac_parameters(bool source);
 };
 
 #endif
