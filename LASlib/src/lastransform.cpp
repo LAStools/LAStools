@@ -912,7 +912,7 @@ class LASoperationBinAbsScanAngleIntoPointSource : public LASoperation
 {
 public:
   inline const char* name() const { return "bin_abs_scan_angle_into_point_source"; };
-  inline int get_command(char* string) const { return sprintf(string, "-%s %d", name(), bin_size); };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %g", name(), bin_size); };
   inline void transform(LASpoint* point) const { point->point_source_ID = U16_CLAMP(point->get_abs_scan_angle()/bin_size); };
   LASoperationBinAbsScanAngleIntoPointSource(F32 bin_size=1.0f) { this->bin_size = bin_size; };
 private:
