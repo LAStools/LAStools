@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     3 May 2015 -- header sets file source ID to 0 when merging flightlines 
     20 January 2011 -- created missing Livermore and my Extra Virgin Olive Oil
   
 ===============================================================================
