@@ -203,6 +203,24 @@ private:
   F64 cos_angle, sin_angle;
 };
 
+class LASoperationRotateXZ : public LASoperation
+{
+public:
+  inline const char* name() const { return "rotate_xz"; };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %g %g %g ", name(), angle, x_offset, z_offset); };
+  inline void transform(LASpoint* point) const {
+    F64 x = point->get_x() - x_offset;
+    F64 z = point->get_z() - z_offset;
+    point->set_x(cos_angle*x - sin_angle*z + x_offset);
+    point->set_z(cos_angle*z + sin_angle*x + z_offset);
+  };
+  LASoperationRotateXZ(F64 angle, F64 x_offset, F64 z_offset) { this->angle = angle; this->x_offset = x_offset; this->z_offset = z_offset; cos_angle = cos(3.141592653589793238462643383279502884197169/180*angle); sin_angle = sin(3.141592653589793238462643383279502884197169/180*angle); };
+private:
+  F64 angle;
+  F64 x_offset, z_offset;
+  F64 cos_angle, sin_angle;
+};
+
 class LASoperationClampZ : public LASoperation
 {
 public:
@@ -446,7 +464,7 @@ class LASoperationSetClassification : public LASoperation
 public:
   inline const char* name() const { return "set_classification"; };
   inline int get_command(char* string) const { return sprintf(string, "-%s %d ", name(), classification); };
-  inline void transform(LASpoint* point) const { point->classification = classification; };
+  inline void transform(LASpoint* point) const { if (classification > 31) point->extended_classification = classification; else point->classification = classification; };
   LASoperationSetClassification(U8 classification) { this->classification = classification; };
 private:
   U8 classification;
@@ -458,22 +476,33 @@ public:
   inline const char* name() const { return "change_classification_from_to"; };
   inline int get_command(char* string) const { return sprintf(string, "-%s %d %d ", name(), class_from, class_to); };
   inline void transform(LASpoint* point) const {
-    if (class_from >= 32)
+    if (class_from > 31)
     {
-      if (point->classification == class_from)
+      if (point->extended_classification == class_from)
       {
-        point->classification = class_to;
+        if (class_to > 31)
+        {
+          point->extended_classification = class_to;
+          point->classification = 0;
+        }
+        else
+        {
+          point->classification = class_to;
+          point->extended_classification = 0;
+        }
       }
     }
-    else if ((point->classification&31) == class_from)
+    else if (point->classification == class_from)
     {
-      if (class_to >= 32)
+      if (class_to > 31)
       {
-        point->classification = class_to;
+        point->extended_classification = class_to;
+        point->classification = 0;
       }
       else
       {
-        point->classification = (point->classification & 224) | class_to;
+        point->classification = class_to;
+        point->extended_classification = 0;
       }
     }
   };
@@ -868,15 +897,26 @@ public:
   inline void transform(LASpoint* point) const { point->point_source_ID = point->user_data; };
 };
 
-class LASoperationQuantizeZintoPointSource : public LASoperation
+class LASoperationBinZintoPointSource : public LASoperation
 {
 public:
-  inline const char* name() const { return "quantize_Z_into_point_source"; };
-  inline int get_command(char* string) const { return sprintf(string, "-%s %d", name(), divided_by); };
-  inline void transform(LASpoint* point) const { point->point_source_ID = U16_CLAMP(point->get_Z()/divided_by); };
-  LASoperationQuantizeZintoPointSource(I32 divided_by=1) { this->divided_by = divided_by; };
+  inline const char* name() const { return "bin_Z_into_point_source"; };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %d", name(), bin_size); };
+  inline void transform(LASpoint* point) const { point->point_source_ID = U16_CLAMP(point->get_Z()/bin_size); };
+  LASoperationBinZintoPointSource(I32 bin_size=1) { this->bin_size = bin_size; };
 private:
-  I32 divided_by;
+  I32 bin_size;
+};
+
+class LASoperationBinAbsScanAngleIntoPointSource : public LASoperation
+{
+public:
+  inline const char* name() const { return "bin_abs_scan_angle_into_point_source"; };
+  inline int get_command(char* string) const { return sprintf(string, "-%s %d", name(), bin_size); };
+  inline void transform(LASpoint* point) const { point->point_source_ID = U16_CLAMP(point->get_abs_scan_angle()/bin_size); };
+  LASoperationBinAbsScanAngleIntoPointSource(F32 bin_size=1.0f) { this->bin_size = bin_size; };
+private:
+  F32 bin_size;
 };
 
 void LAStransform::clean()
@@ -947,7 +987,8 @@ void LAStransform::usage() const
   fprintf(stderr,"  -set_point_source 500\n");
   fprintf(stderr,"  -change_point_source_from_to 1023 1024\n");
   fprintf(stderr,"  -copy_user_data_into_point_source\n");
-  fprintf(stderr,"  -quantize_Z_into_point_source 200\n");
+  fprintf(stderr,"  -bin_Z_into_point_source 200\n");
+  fprintf(stderr,"  -bin_abs_scan_angle_into_point_source 2\n");
   fprintf(stderr,"Transform gps_time.\n");
   fprintf(stderr,"  -translate_gps_time 40.50\n");
   fprintf(stderr,"  -adjusted_to_week\n");
@@ -1102,6 +1143,17 @@ BOOL LAStransform::parse(int argc, char* argv[])
       }
       change_coordinates = TRUE;
       add_operation(new LASoperationRotateXY((F64)atof(argv[i+1]), (F64)atof(argv[i+2]), (F64)atof(argv[i+3])));
+      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+    }
+    else if (strcmp(argv[i],"-rotate_xz") == 0)
+    {
+      if ((i+3) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle, x, y\n", argv[i]);
+        return FALSE;
+      }
+      change_coordinates = TRUE;
+      add_operation(new LASoperationRotateXZ((F64)atof(argv[i+1]), (F64)atof(argv[i+2]), (F64)atof(argv[i+3])));
       *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
     }
     else if (strcmp(argv[i],"-clamp_z") == 0)
@@ -1557,14 +1609,24 @@ BOOL LAStransform::parse(int argc, char* argv[])
       add_operation(new LASoperationCopyUserDataIntoPointSource());
       *argv[i]='\0'; 
     }
-    else if (strcmp(argv[i],"-quantize_Z_into_point_source") == 0)
+    else if (strcmp(argv[i],"-bin_Z_into_point_source") == 0)
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: divided_by\n", argv[i]);
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size\n", argv[i]);
         return FALSE;
       }
-      add_operation(new LASoperationQuantizeZintoPointSource(atoi(argv[i+1])));
+      add_operation(new LASoperationBinZintoPointSource(atoi(argv[i+1])));
+      *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+    }
+    else if (strcmp(argv[i],"-bin_abs_scan_angle_into_point_source") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size\n", argv[i]);
+        return FALSE;
+      }
+      add_operation(new LASoperationBinAbsScanAngleIntoPointSource((F32)atof(argv[i+1])));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
     }
   }
