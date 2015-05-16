@@ -438,7 +438,7 @@ int main(int argc, char *argv[])
 			i++;
 #ifdef _WIN32
       if (sscanf(argv[i], "%I64x-%x-%x-%x-%I64x", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
-#elif
+#else
       if (sscanf(argv[i], "%llx-%x-%x-%x-%llx", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
 #endif
       {
