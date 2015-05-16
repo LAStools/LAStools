@@ -1,5 +1,15 @@
+16 May 2015 -- all LAStools: projections Albers Equal Area Conic and Earth Centered Earth Fixed
+15 May 2015 -- lasclip: added '-flag_as_withheld' as an alternative to removing or reclassifying
+15 May 2015 -- lasoverage: added option '-recover_flightlines' for missing point_source_IDs
+14 May 2015 -- lasinfo: added a new option '-set_GUID F794F8A4-A23E-421E-A134-ACF7754E1C54'
+10 May 2015 -- lasoverlap: new '-min_diff 0.2' with '-max_diff 0.5' for more focused error coloring
+3 May 2015 -- lastile: small fix sets file source ID to 0 when tiling many flightlines into tiles
+3 May 2015 -- las2las: improved up-conversion to LAS 1.4 via '-set_version 1.4 -point_type 6'
+24 April 2015 -- las2txt: added 'k'eypoint and 'o'verlap flags as new parse string options
+24 April 2015 -- lasoverage: added 'flag_as_overlap' for the new flag in the LAS 1.4 point types
 4 April 2015 -- LASzip DLL: added functions for creation and exploitation of spatial index files
 3 April 2015 -- LASlib: moved spatial indexing (LAX file generation) from LASlib to LASzip 
+30 March 2015 -- NEW: toolbox for ERDAS IMAGINE 2014 
 30 March 2015 -- laszip: compresses and decompresses LAS 1.4 files via new "compatibility mode"
 30 March 2015 -- GUIs: delete multiple files: pick a (red) box covering them and press <delete> 
 30 March 2015 -- las2txt: correct ASCII output for extended attributes of new LAS 1.4 point types
