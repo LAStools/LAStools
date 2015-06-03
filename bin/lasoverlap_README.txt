@@ -86,6 +86,12 @@ of 3 units. The overlap raster uses the default range of 5 overlaps
 lines for the color ramp. The difference raster uses '-max_diff 2'
 and maps range (-2 ... 0 ... 2) to colors (blue ... white ... red).
 
+>> lasoverlap -i LDR*.las -files_are_flightlines -step 3 -min_diff 1 -max_diff 2
+
+same as above. But here the difference raster uses '-min_diff 1' and
+'-max_diff 2' to map range (-2 ... -1) to color ramp (blue ... white),
+range (-1 ... +1) to white and (+1 ... +2) to (white ... red).
+
 >> lasoverlap -i LDR*.las -files_are_flightlines -step 2 -max_diff 4 -no_over
 
 same as above but does not output an overlap raster ('-no_over') and

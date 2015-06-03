@@ -1,9 +1,14 @@
+26 May 2015 -- BLAST extension: updated to support recent additions for new LAS 1.4 point types
+26 May 2015 -- laszip: small bug fix for combination of '-cores n' with '-io_ibuffer xxxxxx'
+26 May 2015 -- all LAStools: error message for on-the-fly compression of new LAS 1.4 point types
+26 May 2015 -- lastile: small fix sets file source ID to 0 when tiling many flightlines into tiles
+26 May 2015 -- GUIs: fixed execution path issue when starting tool via "Windows Explorer search bar"
+20 May 2015 -- lassplit: fixed serious bug introduced in version 150516
 16 May 2015 -- all LAStools: projections Albers Equal Area Conic and Earth Centered Earth Fixed
 15 May 2015 -- lasclip: added '-flag_as_withheld' as an alternative to removing or reclassifying
 15 May 2015 -- lasoverage: added option '-recover_flightlines' for missing point_source_IDs
 14 May 2015 -- lasinfo: added a new option '-set_GUID F794F8A4-A23E-421E-A134-ACF7754E1C54'
 10 May 2015 -- lasoverlap: new '-min_diff 0.2' with '-max_diff 0.5' for more focused error coloring
-3 May 2015 -- lastile: small fix sets file source ID to 0 when tiling many flightlines into tiles
 3 May 2015 -- las2las: improved up-conversion to LAS 1.4 via '-set_version 1.4 -point_type 6'
 24 April 2015 -- las2txt: added 'k'eypoint and 'o'verlap flags as new parse string options
 24 April 2015 -- lasoverage: added 'flag_as_overlap' for the new flag in the LAS 1.4 point types

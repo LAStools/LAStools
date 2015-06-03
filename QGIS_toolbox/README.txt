@@ -42,6 +42,11 @@ http://rapidlasso.com/2013/09/29/how-to-install-lastools-toolbox-in-qgis/
 If you have problems make sure you read *ALL* the comments to this
 blog article or add some new comments detailing your troubles.
 
+For our Spanish-speaking LiDAR friends ... check these two blogs:
+
+http://digimapas.blogspot.com.es/2015/04/lidar-en-qgis-lastools.html
+http://mappinggis.com/2015/04/como-configurar-lastools-en-qgis/
+
 ================================================================
 
 For QGIS 2.6 the results have been mixed so far. Follow what is
