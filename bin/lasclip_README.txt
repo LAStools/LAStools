@@ -8,7 +8,7 @@
   and stores the surviving points to the output LAS/LAZ/TXT file.
 
   Instead of clipping the points they can also be reclassified with
-  the '-classify 6' option.
+  the '-classify 6' option or flagged with '-flag_as_withheld'.
 
   The input SHP/TXT file *must* contain clean polygons or polylines
   that are free of self-intersections, duplicate points, and/or
@@ -69,6 +69,10 @@ same as above but now it clips points falling *outside* of the polygon.
 
 classifies the points falling *inside* the polygon as "Building".
 
+>> lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -flag_as_withheld -interior
+
+flags the points falling *inside* the polygon as 'withheld'.
+
 >> lasclip -i city.las -poly buildings.txt -interior -o city_without_buildings.las
 
 clips the points from the inside of the buildings footprints specified
@@ -92,7 +96,7 @@ following format:
 
 for more info:
 
-D:\lastools\bin>lasclip -h
+D:\LAStools\bin>lasclip -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -115,6 +119,7 @@ Filter points based on their coordinates.
 Filter points based on their return number.
   -first_only -keep_first -drop_first
   -last_only -keep_last -drop_last
+  -drop_first_of_many -drop_last_of_many
   -keep_middle -drop_middle
   -keep_return 1 2 3
   -drop_return 3 4
@@ -138,6 +143,7 @@ Filter points based on their classification.
   -drop_synthetic -keep_synthetic
   -drop_keypoint -keep_keypoint
   -drop_withheld -keep_withheld
+  -drop_overlap -keep_overlap
 Filter points based on their user data.
   -keep_user_data 1
   -drop_user_data 255
@@ -170,6 +176,7 @@ Filter points with simple thinning.
   -keep_every_nth 2
   -keep_random_fraction 0.1
   -thin_with_grid 1.0
+  -thin_with_time 0.001
 Transform coordinates.
   -translate_x -2.5
   -scale_z 0.3048
@@ -207,13 +214,23 @@ Modify the classification.
   -classify_z_between_as 2.0 5.0 4
   -classify_intensity_above_as 200 9
   -classify_intensity_below_as 30 11
+  -change_extended_classification_from_to 6 46
+Change the flags.
+  -set_withheld_flag 0
+  -set_synthetic_flag 1
+  -set_keypoint_flag 0
+  -set_extended_overlap_flag 1
+Modify the extended scanner channel.
+  -set_extended_scanner_channel 2
 Modify the user data.
   -set_user_data 0
   -change_user_data_from_to 23 26
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
-  -quantize_Z_into_point_source 200
+  -copy_user_data_into_point_source
+  -bin_Z_into_point_source 200
+  -bin_abs_scan_angle_into_point_source 2
 Transform gps_time.
   -translate_gps_time 40.50
   -adjusted_to_week
@@ -238,6 +255,10 @@ Supported LAS Inputs
   -rescale_xy 0.01 0.01
   -rescale_z 0.01
   -reoffset 600000 4000000 0
+Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
+  -inside min_x min_y max_x max_y
+  -inside_tile ll_x ll_y size
+  -inside_circle center_x center_y radius
 Supported LAS Outputs
   -o lidar.las
   -o lidar.laz
@@ -250,15 +271,16 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 140527
+LAStools (by martin@rapidlasso.com) version 150526 (commercial)
 usage:
 lasclip -i *.las -poly polygon.shp -v
 lasclip -i *.txt -iparse xyzt -poly polygon.shp -otxt -oparse xyzt
 lasclip -i lidar.las -poly footprint.shp -o lidar_clipped.laz -v
 lasclip -i lidar.laz -poly buildings.shp -o lidar_clipped.laz -interior
-lasclip -i lidar.laz -poly swath.shp -o lidar_overlap.laz -classify 12
+lasclip -i lidar.laz -poly swath.shp -o lidar_overlap.laz -classify_as 12
 lasclip -i lidar.laz -poly hydro.shp -o clean.laz -ignore_class 2
-lasclip -h
+lasclip -i lidar.laz -poly noise.shp -o lidar_clean.laz -interior -flag_as_withheld
+lasclip -i forest\*.laz -merged -poly plots.shp -split -o plots.laz
 
 ---------------
 

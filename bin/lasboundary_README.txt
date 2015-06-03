@@ -100,7 +100,7 @@ projeciton 10T to store the boundary in geo-referenced KML format
 same as before but assumes geo-referencing is in the KML file. it
 also computes holes in the interior of the boundary.
 
-C:\lastools\bin>lasboundary -h
+D:\LAStools\bin>lasboundary -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -123,6 +123,7 @@ Filter points based on their coordinates.
 Filter points based on their return number.
   -first_only -keep_first -drop_first
   -last_only -keep_last -drop_last
+  -drop_first_of_many -drop_last_of_many
   -keep_middle -drop_middle
   -keep_return 1 2 3
   -drop_return 3 4
@@ -146,6 +147,7 @@ Filter points based on their classification.
   -drop_synthetic -keep_synthetic
   -drop_keypoint -keep_keypoint
   -drop_withheld -keep_withheld
+  -drop_overlap -keep_overlap
 Filter points based on their user data.
   -keep_user_data 1
   -drop_user_data 255
@@ -178,12 +180,14 @@ Filter points with simple thinning.
   -keep_every_nth 2
   -keep_random_fraction 0.1
   -thin_with_grid 1.0
+  -thin_with_time 0.001
 Transform coordinates.
   -translate_x -2.5
   -scale_z 0.3048
   -rotate_xy 15.0 620000 4100000 (angle + origin)
   -translate_xyz 0.5 0.5 0
   -translate_then_scale_y -0.5 1.001
+  -switch_x_y -switch_x_z -switch_y_z
   -clamp_z_below 70.5
   -clamp_z 70.5 72.5
 Transform raw xyz integers.
@@ -214,13 +218,23 @@ Modify the classification.
   -classify_z_between_as 2.0 5.0 4
   -classify_intensity_above_as 200 9
   -classify_intensity_below_as 30 11
+  -change_extended_classification_from_to 6 46
+Change the flags.
+  -set_withheld_flag 0
+  -set_synthetic_flag 1
+  -set_keypoint_flag 0
+  -set_extended_overlap_flag 1
+Modify the extended scanner channel.
+  -set_extended_scanner_channel 2
 Modify the user data.
   -set_user_data 0
   -change_user_data_from_to 23 26
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
-  -quantize_Z_into_point_source 200
+  -copy_user_data_into_point_source
+  -bin_Z_into_point_source 200
+  -bin_abs_scan_angle_into_point_source 2
 Transform gps_time.
   -translate_gps_time 40.50
   -adjusted_to_week
@@ -245,6 +259,10 @@ Supported LAS Inputs
   -rescale_xy 0.01 0.01
   -rescale_z 0.01
   -reoffset 600000 4000000 0
+Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
+  -inside min_x min_y max_x max_y
+  -inside_tile ll_x ll_y size
+  -inside_circle center_x center_y radius
 Supported Line Outputs
   -o lines.shp
   -o boundary.wkt
@@ -259,17 +277,19 @@ Optional Settings
   -only_2d
   -kml_absolute
   -kml_elevation_offset 17.5
-LAStools (by martin@rapidlasso.com) version 140301 (unlicensed)
+LAStools (by martin@rapidlasso.com) version 150526 (commercial)
 usage:
 lasboundary -i *.las -merged -o merged.shp
 lasboundary -i *.laz -owkt -concavity 100 (default is 50)
 lasboundary -i flight???.las -feet -oshp -disjoint
-lasboundary -i USACE_Merrick_lots_of_VLRs.las -o USACE.kml
-lasboundary -i Serpent.las -o boundary.kml -disjoint -holes
+lasboundary -i tiles\*.laz -use_bb -oshp
+lasboundary -i tiles\*.laz -use_lax -odir outlines -okml -utm 32N
+lasboundary -i Serpent.las -disjoint -concavity 10 -holes -o outline.kml
 lasboundary -i *.laz -merged -o merged.kml -disjoint -utm 17S
-lasboundary -i lidar.las -o boundary.kml -lonlat -concavity 0.00002
+lasboundary -i lidar.las -o boundary.kml -longlat -concavity 0.00002
 lasboundary -i *.txt -iparse ssxyz -otxt -first_only
-lasboundary -i lidar.las -keep_class 6 -o boundary.shp
+lasboundary -i tiles\*.laz -merged -keep_class 4 5 -convavity 2.5 -o vegetation_layer.shp
+lasboundary -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.shp
 lasboundary -h
 
 other possible transformations for KML generation:
