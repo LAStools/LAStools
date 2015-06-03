@@ -45,7 +45,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 150516
+#define LAS_TOOLS_VERSION 150526
 
 #include <stdio.h>
 #include <string.h>
@@ -929,6 +929,7 @@ public:
     extended_scan_angle = 0;
     extended_scanner_channel = 0;
     extended_classification_flags = 0;
+    extended_classification = 0;
     extended_return_number = 1;
     extended_number_of_returns = 1;
 
@@ -966,6 +967,7 @@ public:
 
     // LAS 1.4 only
     extended_point_type = 0;
+
   };
 
   LASpoint()
