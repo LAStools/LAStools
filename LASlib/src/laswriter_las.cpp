@@ -194,7 +194,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   {
     if (!writer->setup(laszip->num_items, laszip->items, laszip))
     {
-      fprintf(stderr,"ERROR: point type not supported\n");
+      fprintf(stderr,"ERROR: point type %d of size %d not supported (with LASzip)\n", header->point_data_format, header->point_data_record_length);
       return FALSE;
     }
   }
@@ -202,7 +202,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   {
     if (!writer->setup(point.num_items, point.items))
     {
-      fprintf(stderr,"ERROR: point type not supported\n");
+      fprintf(stderr,"ERROR: point type %d of size %d not supported\n", header->point_data_format, header->point_data_record_length);
       return FALSE;
     }
   }
@@ -896,6 +896,11 @@ BOOL LASwriterLAS::chunk()
 BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BOOL update_extra_bytes)
 {
   I32 i;
+  if (header == 0)
+  {
+    fprintf(stderr,"ERROR: header pointer is zero\n");
+    return FALSE;
+  }
   if (stream == 0)
   {
     fprintf(stderr,"ERROR: stream pointer is zero\n");
@@ -1014,11 +1019,6 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
   }
   else
   {
-    if (header == 0)
-    {
-      fprintf(stderr,"ERROR: header pointer is zero\n");
-      return FALSE;
-    }
     stream->seek(header_start_position+107);
     if (!stream->put32bitsLE((U8*)&(header->number_of_point_records)))
     {
