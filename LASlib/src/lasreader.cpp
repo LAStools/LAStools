@@ -468,7 +468,7 @@ I32 LASreadOpener::unparse(CHAR* string) const
   }
   if (io_ibuffer_size != LAS_TOOLS_IO_IBUFFER_SIZE)
   {
-    n += sprintf(string + n, "-io_ibuffer_size %d ", io_ibuffer_size);
+    n += sprintf(string + n, "-io_ibuffer %d ", io_ibuffer_size);
   }
   return n;
 }
