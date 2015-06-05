@@ -10,6 +10,38 @@
   accurate terrestrial scans using clean planar patches that are
   "seen" without obstruction by both scanners.
 
+  The algorithm divides the input into cells that are n by n by n
+  units big. It then performs an eigen value decomposition of the
+  covariance matrix of the points in each cell that has more than
+  the minimal number of points. The three eigenvalues have to pass
+  the small_eigen_max, middle_eigen_min, eigen_ratio_smallest, and
+  eigen_ratio_largest criteria. And the plane of points must be
+  sufficiently thin and formed by sufficiently many points after
+  removing no more than a certain percentage of them. Then a polygon
+  with a maximal number of points enclosing a subset of the points
+  is formed that is checked for having a minimal size and a maximal
+  off-planar standard deviation. The surviving planes are output
+  (optionally only if they are sufficiently far from another).
+  
+  Here what some of the parameters mean:
+
+  -cell_size n                sets cells to size n*n*n
+  -cell_size_xyx x y z        sets cells to size x*y*z
+  -cell_points min            skip if less than min points
+  -small_eigen_max max        skip if smallest eigenvalue > max
+  -middle_eigen_min min       skip if middle eigenvalue < min
+  -eigen_ratio_smallest r     skip if smallest eigenvalue over sum of all three eigenvalues > r
+  -eigen_ratio_largest r      skip if largest eigenvalue over sum of all three eigenvalues > r                  
+  -plane_thickness t          skip if points form plane thicker than t
+  -plane_exclusion p          skip if more than p % of points had to be excluded to make plane slim
+  -plane_points min           skip if plane is formed by less than min points
+  -polygon_distance dist      skip if polygon not sufficiently far from others
+  -polygon_area a             skip if area formed by points is less than a
+  -polygon_points max         simplify polygon to have no more than max points
+  -polygon_stddev stddev      skip if standard deviation of polygon points from plane > stddev
+  -polygon_name T_123_23      set polygon base name
+  -polygon_digits d           set number of digits used to enumerate polygon names
+
   Please license 'lasplanes' from martin.isenburg@rapidlasso.com
   before using it commercially.
 
