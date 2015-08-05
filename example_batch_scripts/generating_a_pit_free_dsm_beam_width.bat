@@ -26,7 +26,7 @@ set STEP=0.5
 :: specify the radius of the laser beam
 set BEAM_RADIUS=0.1
 
-:: specify the sub-resolution for the beam file (about half the step or less)
+:: specify the sub-resolution for the beam file (about half the step)
 set SUB_STEP=0.25
 
 :: specify the desired triangle kill (about 3 times the step)
