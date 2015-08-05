@@ -160,18 +160,19 @@ private:
 class LAStempWritePoint10
 {
 public:
-  I32 x;
-  I32 y;
-  I32 z;
+  I32 X;
+  I32 Y;
+  I32 Z;
   U16 intensity;
   U8 return_number : 3;
-  U8 number_of_returns_of_given_pulse : 3;
+  U8 number_of_returns : 3;
   U8 scan_direction_flag : 1;
   U8 edge_of_flight_line : 1;
   U8 classification;
   I8 scan_angle_rank;
   U8 user_data;
   U16 point_source_ID;
+
   // LAS 1.4 only
   I16 extended_scan_angle;
   U8 extended_point_type : 2;
@@ -179,23 +180,26 @@ public:
   U8 extended_classification_flags : 4;
   U8 extended_classification;
   U8 extended_return_number : 4;
-  U8 extended_number_of_returns_of_given_pulse : 4;
+  U8 extended_number_of_returns : 4;
+
   // for 8 byte alignment of the GPS time
   U8 dummy[3];
+
   // LASlib only
   U32 deleted_flag;
+
   F64 gps_time;
 };
 
 class LAStempWritePoint14
 {
 public:
-  I32 x;
-  I32 y;
-  I32 z;
+  I32 X;
+  I32 Y;
+  I32 Z;
   U16 intensity;
   U8 return_number : 4;
-  U8 number_of_returns_of_given_pulse : 4;
+  U8 number_of_returns : 4;
   U8 classification_flags : 4;
   U8 scanner_channel : 2;
   U8 scan_direction_flag : 1;
@@ -212,13 +216,13 @@ public:
   LASwriteItemRaw_POINT14_LE(){};
   inline BOOL write(const U8* item)
   {
-    ((LAStempWritePoint14*)buffer)->x = ((LAStempWritePoint10*)item)->x;
-    ((LAStempWritePoint14*)buffer)->y = ((LAStempWritePoint10*)item)->y;
-    ((LAStempWritePoint14*)buffer)->z = ((LAStempWritePoint10*)item)->z;
+    ((LAStempWritePoint14*)buffer)->X = ((LAStempWritePoint10*)item)->X;
+    ((LAStempWritePoint14*)buffer)->Y = ((LAStempWritePoint10*)item)->Y;
+    ((LAStempWritePoint14*)buffer)->Z = ((LAStempWritePoint10*)item)->Z;
     ((LAStempWritePoint14*)buffer)->intensity = ((LAStempWritePoint10*)item)->intensity;
     ((LAStempWritePoint14*)buffer)->scan_direction_flag = ((LAStempWritePoint10*)item)->scan_direction_flag;
     ((LAStempWritePoint14*)buffer)->edge_of_flight_line = ((LAStempWritePoint10*)item)->edge_of_flight_line;
-    ((LAStempWritePoint14*)buffer)->classification = ((LAStempWritePoint10*)item)->classification & 31;
+    ((LAStempWritePoint14*)buffer)->classification = (((LAStempWritePoint10*)item)->classification & 31);
     ((LAStempWritePoint14*)buffer)->user_data = ((LAStempWritePoint10*)item)->user_data;
     ((LAStempWritePoint14*)buffer)->point_source_ID = ((LAStempWritePoint10*)item)->point_source_ID;
 
@@ -228,7 +232,7 @@ public:
       if (((LAStempWritePoint10*)item)->extended_classification > 31) ((LAStempWritePoint14*)buffer)->classification = ((LAStempWritePoint10*)item)->extended_classification;
       ((LAStempWritePoint14*)buffer)->scanner_channel = ((LAStempWritePoint10*)item)->extended_scanner_channel;
       ((LAStempWritePoint14*)buffer)->return_number = ((LAStempWritePoint10*)item)->extended_return_number;
-      ((LAStempWritePoint14*)buffer)->number_of_returns_of_given_pulse = ((LAStempWritePoint10*)item)->extended_number_of_returns_of_given_pulse;
+      ((LAStempWritePoint14*)buffer)->number_of_returns = ((LAStempWritePoint10*)item)->extended_number_of_returns;
       ((LAStempWritePoint14*)buffer)->scan_angle = ((LAStempWritePoint10*)item)->extended_scan_angle;
     }
     else
@@ -236,7 +240,7 @@ public:
       ((LAStempWritePoint14*)buffer)->classification_flags = (((LAStempWritePoint10*)item)->classification >> 5);
       ((LAStempWritePoint14*)buffer)->scanner_channel = 0;
       ((LAStempWritePoint14*)buffer)->return_number = ((LAStempWritePoint10*)item)->return_number;
-      ((LAStempWritePoint14*)buffer)->number_of_returns_of_given_pulse = ((LAStempWritePoint10*)item)->number_of_returns_of_given_pulse;
+      ((LAStempWritePoint14*)buffer)->number_of_returns = ((LAStempWritePoint10*)item)->number_of_returns;
       ((LAStempWritePoint14*)buffer)->scan_angle = I16_QUANTIZE(((LAStempWritePoint10*)item)->scan_angle_rank/0.006f);
     }
 

@@ -27,7 +27,8 @@
   
   CHANGE HISTORY:
   
-     2 April 2015 -- fourth and fifth examples with integrated spatially indexing
+    19 July 2015 -- sixth and seventh example show LAS 1.4 compatibility mode
+     2 April 2015 -- fourth and fifth example with integrated spatially indexing
     11 August 2013 -- added third example for exporting geo-referenced points 
     29 July 2013 -- created for the LASzip DLL after returning to Sommerhausen 
   
@@ -95,8 +96,11 @@ static double taketime()
 #define EXAMPLE_THREE 3
 #define EXAMPLE_FOUR 4
 #define EXAMPLE_FIVE 5
+#define EXAMPLE_SIX 6
+#define EXAMPLE_SEVEN 7
+#define EXAMPLE_EIGHT 8
 
-#define EXAMPLE EXAMPLE_FIVE
+#define EXAMPLE EXAMPLE_EIGHT
 
 int main(int argc, char *argv[])
 {
@@ -156,7 +160,7 @@ int main(int argc, char *argv[])
 
   if (EXAMPLE == EXAMPLE_ONE)
   {
-    fprintf(stderr,"running EXAMPLE_ONE\n");
+    fprintf(stderr,"running EXAMPLE_ONE (reading *without* and writing *without* compatibility mode)\n");
 
     // create the reader
 
@@ -225,7 +229,7 @@ int main(int argc, char *argv[])
 
     if (laszip_open_writer(laszip_writer, file_name_out, compress))
     {
-      fprintf(stderr,"DLL ERROR: opening laszip writer for '%d'\n", file_name_out);
+      fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
   
@@ -304,7 +308,7 @@ int main(int argc, char *argv[])
   
   if (EXAMPLE == EXAMPLE_TWO)
   {
-    fprintf(stderr,"running EXAMPLE_TWO\n");
+    fprintf(stderr,"running EXAMPLE_TWO (another way of reading *without* and writing *without* compatibility mode)\n");
 
     // create the reader
 
@@ -426,7 +430,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"offset_to_point_data before adding %u VLRs is %d\n", header_read->number_of_variable_length_records, (laszip_I32)header_write->offset_to_point_data);
       for (i = 0; i < header_read->number_of_variable_length_records; i++)
       {
-        if (laszip_add_vlr(laszip_writer, &(header_read->vlrs[i])))
+        if (laszip_add_vlr(laszip_writer, header_read->vlrs[i].user_id, header_read->vlrs[i].record_id, header_read->vlrs[i].record_length_after_header, header_read->vlrs[i].description, header_read->vlrs[i].data))
         {
           fprintf(stderr,"DLL ERROR: adding VLR %u of %u to the header of the laszip writer\n", i+i, header_read->number_of_variable_length_records);
           byebye(true, argc==1, laszip_writer);
@@ -448,7 +452,7 @@ int main(int argc, char *argv[])
 
     if (laszip_open_writer(laszip_writer, file_name_out, compress))
     {
-      fprintf(stderr,"DLL ERROR: opening laszip writer for '%d'\n", file_name_out);
+      fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
   
@@ -495,7 +499,7 @@ int main(int argc, char *argv[])
       point_write->Z = point_read->Z;
       point_write->intensity = point_read->intensity;
       point_write->return_number = point_read->return_number;
-      point_write->number_of_returns_of_given_pulse = point_read->number_of_returns_of_given_pulse;
+      point_write->number_of_returns = point_read->number_of_returns;
       point_write->scan_direction_flag = point_read->scan_direction_flag;
       point_write->edge_of_flight_line = point_read->edge_of_flight_line;
       point_write->classification = point_read->classification;
@@ -513,7 +517,7 @@ int main(int argc, char *argv[])
       point_write->extended_classification_flags = point_read->extended_classification_flags;
       point_write->extended_classification = point_read->extended_classification;
       point_write->extended_return_number = point_read->extended_return_number;
-      point_write->extended_number_of_returns_of_given_pulse = point_read->extended_number_of_returns_of_given_pulse;
+      point_write->extended_number_of_returns = point_read->extended_number_of_returns;
       point_write->extended_scan_angle = point_read->extended_scan_angle;
 
       if (point_read->num_extra_bytes)
@@ -572,7 +576,7 @@ int main(int argc, char *argv[])
 
   if (EXAMPLE == EXAMPLE_THREE)
   {
-    fprintf(stderr,"running EXAMPLE_THREE\n");
+    fprintf(stderr,"running EXAMPLE_THREE (writing five points of type 1 to LAS 1.2 file)\n");
 
     // create the writer
 
@@ -621,20 +625,11 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
 
-    // create some funny VLR
-
-    laszip_vlr funny_vlr;
-    memset(&funny_vlr, 0, sizeof(laszip_vlr));
-    strcpy(funny_vlr.user_id, "funny");
-    funny_vlr.record_id = 12345;
-    funny_vlr.record_length_after_header = 0;
-    strcpy(funny_vlr.description, "just a funny VLR");
-
-    // add the funny VLR
-
     fprintf(stderr,"offset_to_point_data before adding funny VLR is    : %d\n", (laszip_I32)header->offset_to_point_data);
 
-    if (laszip_add_vlr(laszip_writer, &funny_vlr))
+    // add some funny VLR
+
+    if (laszip_add_vlr(laszip_writer, "funny", 12345, 0, "just a funny VLR", 0))
     {
       fprintf(stderr,"DLL ERROR: adding funny VLR to the header\n");
       byebye(true, argc==1, laszip_writer);
@@ -692,7 +687,7 @@ int main(int argc, char *argv[])
 
     if (laszip_open_writer(laszip_writer, file_name_out, compress))
     {
-      fprintf(stderr,"DLL ERROR: opening laszip writer for '%d'\n", file_name_out);
+      fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
   
@@ -727,7 +722,7 @@ int main(int argc, char *argv[])
 
     point->intensity = 60;
     point->return_number = 2;
-    point->number_of_returns_of_given_pulse = 2;
+    point->number_of_returns = 2;
     point->classification = 2;
     point->scan_angle_rank = 21;
     point->gps_time = 413162.560400;
@@ -755,7 +750,7 @@ int main(int argc, char *argv[])
 
     point->intensity = 90;
     point->return_number = 1;
-    point->number_of_returns_of_given_pulse = 1;
+    point->number_of_returns = 1;
     point->classification = 1;
     point->scan_angle_rank = 21;
     point->gps_time = 413162.563600;
@@ -783,7 +778,7 @@ int main(int argc, char *argv[])
 
     point->intensity = 70;
     point->return_number = 1;
-    point->number_of_returns_of_given_pulse = 1;
+    point->number_of_returns = 1;
     point->classification = 1;
     point->scan_angle_rank = 22;
     point->gps_time = 413162.566800;
@@ -811,7 +806,7 @@ int main(int argc, char *argv[])
 
     point->intensity = 20;
     point->return_number = 1;
-    point->number_of_returns_of_given_pulse = 2;
+    point->number_of_returns = 2;
     point->classification = 3;
     point->scan_angle_rank = 22;
     point->gps_time = 413162.580200;
@@ -839,7 +834,7 @@ int main(int argc, char *argv[])
 
     point->intensity = 110;
     point->return_number = 2;
-    point->number_of_returns_of_given_pulse = 2;
+    point->number_of_returns = 2;
     point->classification = 2;
     point->scan_angle_rank = 22;
     point->gps_time = 413162.580200;
@@ -885,7 +880,7 @@ int main(int argc, char *argv[])
 
   if (EXAMPLE == EXAMPLE_FOUR)
   {
-    fprintf(stderr,"running EXAMPLE_FOUR\n");
+    fprintf(stderr,"running EXAMPLE_FOUR (reading area-of-interest from a file exploiting possibly existing spatial indexing information)\n");
 
     // create the reader
 
@@ -1000,7 +995,7 @@ int main(int argc, char *argv[])
 
     if (laszip_open_writer(laszip_writer, file_name_out, compress))
     {
-      fprintf(stderr,"DLL ERROR: opening laszip writer for '%d'\n", file_name_out);
+      fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
   
@@ -1095,7 +1090,7 @@ int main(int argc, char *argv[])
 
   if (EXAMPLE == EXAMPLE_FIVE)
   {
-    fprintf(stderr,"running EXAMPLE_FIVE\n");
+    fprintf(stderr,"running EXAMPLE_FIVE (reading from one file and writing to another file while simultaneously generating a spatial index)\n");
  
     // create the reader
 
@@ -1175,7 +1170,7 @@ int main(int argc, char *argv[])
 
     if (laszip_open_writer(laszip_writer, file_name_out, compress))
     {
-      fprintf(stderr,"DLL ERROR: opening laszip writer for '%d'\n", file_name_out);
+      fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
   
@@ -1251,6 +1246,761 @@ int main(int argc, char *argv[])
     fprintf(stderr,"total time: %g sec for reading %scompressed and writing indexed & %scompressed\n", taketime()-start_time, (is_compressed ? "" : "un"), (compress ? "" : "un"));
 
   } // EXAMPLE_FIVE
+
+  if (EXAMPLE == EXAMPLE_SIX)
+  {
+    fprintf(stderr,"running EXAMPLE_SIX (writing LAS 1.4 without compatibility)\n");
+
+    // create the writer
+
+    laszip_POINTER laszip_writer;
+    if (laszip_create(&laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: creating laszip writer\n");
+      byebye(true, argc==1);
+    }
+
+    // get a pointer to the header of the writer so we can populate it
+
+    laszip_header* header;
+
+    if (laszip_get_header_pointer(laszip_writer, &header))
+    {
+      fprintf(stderr,"DLL ERROR: getting header pointer from laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // populate the header
+
+    header->global_encoding = 1;             // see LAS specification for details
+    header->version_major = 1;
+    header->version_minor = 4;
+    strncpy(header->system_identifier, "my LAS file writer", 32);
+    header->file_creation_day = 30;
+    header->file_creation_year = 2015;
+    header->header_size = 375;
+    header->offset_to_point_data = 375;
+    header->point_data_format = 6;
+    header->point_data_record_length = 30;
+    header->number_of_point_records = 5;
+    header->extended_number_of_point_records = 5;
+    header->number_of_points_by_return[0] = 1;
+    header->number_of_points_by_return[1] = 2;
+    header->extended_number_of_points_by_return[0] = 1;
+    header->extended_number_of_points_by_return[1] = 2;
+    header->extended_number_of_points_by_return[7] = 1;
+    header->extended_number_of_points_by_return[8] = 1;
+    header->max_x = 630499.95;
+    header->min_x = 630498.56;
+    header->max_y = 4834749.66;
+    header->min_y = 4834748.73;
+    header->max_z = 63.68;
+    header->min_z = 61.33;
+
+    // optional: use the bounding box and the scale factor to create a "good" offset
+
+    if (laszip_auto_offset(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: during automatic offset creation\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    fprintf(stderr,"offset_to_point_data before adding funny VLR is    : %d\n", (laszip_I32)header->offset_to_point_data);
+
+    // add some funny VLR
+
+    if (laszip_add_vlr(laszip_writer, "funny", 12345, 0, "just a funny VLR", 0))
+    {
+      fprintf(stderr,"DLL ERROR: adding funny VLR to the header\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+    
+    fprintf(stderr,"                     after adding funny VLR        : %d\n", (laszip_I32)header->offset_to_point_data);
+
+    // open the writer
+
+    laszip_BOOL compress = (strstr(file_name_out, ".laz") != 0);
+
+    // this should fail if compress is true
+
+    if (laszip_open_writer(laszip_writer, file_name_out, compress))
+    {
+      fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
+      byebye(true, argc==1, laszip_writer);
+    }
+  
+    fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
+
+    // get a pointer to the point of the writer that we will populate and write
+
+    laszip_point* point;
+
+    if (laszip_get_point_pointer(laszip_writer, &point))
+    {
+      fprintf(stderr,"DLL ERROR: getting point pointer from laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // set points to "extended type"
+
+    point->extended_point_type = 1;
+
+    // write five points
+
+    laszip_I64 count = 0;
+    laszip_F64 coordinates[3];
+
+    // populate the first point
+
+    coordinates[0] = 630499.95;
+    coordinates[1] = 4834749.17;
+    coordinates[2] = 62.15;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 60;
+    point->extended_return_number = 2;
+    point->extended_number_of_returns = 2;
+    point->classification = 2;                // it must be set because it "fits" in 5 bits
+    point->extended_classification = 2;
+    point->extended_scan_angle = 3500;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 8; // overflag flag is set
+    point->gps_time = 53413162.560400;
+
+    // write the first point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+
+    // populate the second point
+
+    coordinates[0] = 630499.83;
+    coordinates[1] = 4834748.88;
+    coordinates[2] = 62.68;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 90;
+    point->extended_return_number = 8;
+    point->extended_number_of_returns = 9;
+    point->classification = 0;                // it must be set to zero as the real value is stored in the extended field
+    point->extended_classification = 41;
+    point->extended_scan_angle = 3533;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 0; // no flag is not set
+    point->gps_time = 53413162.563600;
+
+    // write the second point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+    
+    // populate the third point
+
+    coordinates[0] = 630499.54;  
+    coordinates[1] = 4834749.66;
+    coordinates[2] = 62.66;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 70;
+    point->extended_return_number = 9;
+    point->extended_number_of_returns = 9;
+    point->classification = 0;                // it must be set to zero as the real value is stored in the extended field
+    point->extended_classification = 42;
+    point->extended_scan_angle = 3567;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 0; // no flag is not set
+    point->gps_time = 53413162.566800;
+
+    // write the third point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+
+    // populate the fourth point
+
+    coordinates[0] = 630498.56;     
+    coordinates[1] = 4834749.41;
+    coordinates[2] = 63.68;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 20;
+    point->extended_return_number = 1;
+    point->extended_number_of_returns = 2;
+    point->classification = 5;                // it must be set because it "fits" in 5 bits
+    point->extended_classification = 5;
+    point->extended_scan_angle = 3600;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 0; // no flag is not set
+    point->gps_time = 53413162.580200;
+
+    // write the fourth point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+
+    // populate the fifth point
+
+    coordinates[0] = 630498.80; 
+    coordinates[1] = 4834748.73;
+    coordinates[2] = 62.16;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 110;
+    point->extended_return_number = 2;
+    point->extended_number_of_returns = 2;
+    point->classification = 2;                // it must be set because it "fits" in 5 bits
+    point->extended_classification = 2;
+    point->extended_scan_angle = 3633;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 0; // no flag is not set
+    point->gps_time = 53413162.580200;
+
+    // write the fifth point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+    
+    // get the number of points written so far
+
+    if (laszip_get_point_count(laszip_writer, &count))
+    {
+      fprintf(stderr,"DLL ERROR: getting point count\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    fprintf(stderr,"successfully written %u points\n", (laszip_U32)count);
+
+    // close the writer
+
+    if (laszip_close_writer(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: closing laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // destroy the writer
+
+    if (laszip_destroy(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: destroying laszip writer\n");
+      byebye(true, argc==1);
+    }
+  
+    fprintf(stderr,"total time: %g sec for writing %scompressed\n", taketime()-start_time, (compress ? "" : "un"));
+
+  } // EXAMPLE_SIX
+
+  if (EXAMPLE == EXAMPLE_SEVEN)
+  {
+    fprintf(stderr,"running EXAMPLE_SEVEN (writing LAS 1.4 *with* compatibility to compressed LAZ *and* also uncompressed LAS)\n");
+
+    // create the writer
+
+    laszip_POINTER laszip_writer;
+    if (laszip_create(&laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: creating laszip writer\n");
+      byebye(true, argc==1);
+    }
+
+    // get a pointer to the header of the writer so we can populate it
+
+    laszip_header* header;
+
+    if (laszip_get_header_pointer(laszip_writer, &header))
+    {
+      fprintf(stderr,"DLL ERROR: getting header pointer from laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // populate the header
+
+    header->global_encoding = 1;             // see LAS specification for details
+    header->version_major = 1;
+    header->version_minor = 4;
+    strncpy(header->system_identifier, "my LAS file writer", 32);
+    header->file_creation_day = 30;
+    header->file_creation_year = 2015;
+    header->header_size = 375;
+    header->offset_to_point_data = 375;
+    header->point_data_format = 6;
+    header->point_data_record_length = 30;
+    header->number_of_point_records = 5;
+    header->extended_number_of_point_records = 5;
+    header->number_of_points_by_return[0] = 1;
+    header->number_of_points_by_return[1] = 2;
+    header->extended_number_of_points_by_return[0] = 1;
+    header->extended_number_of_points_by_return[1] = 2;
+    header->extended_number_of_points_by_return[7] = 1;
+    header->extended_number_of_points_by_return[8] = 1;
+    header->max_x = 630499.95;
+    header->min_x = 630498.56;
+    header->max_y = 4834749.66;
+    header->min_y = 4834748.73;
+    header->max_z = 63.68;
+    header->min_z = 61.33;
+
+    // optional: use the bounding box and the scale factor to create a "good" offset
+
+    if (laszip_auto_offset(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: during automatic offset creation\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    fprintf(stderr,"offset_to_point_data before adding funny VLR is    : %d\n", (laszip_I32)header->offset_to_point_data);
+
+    // add some funny VLR
+
+    if (laszip_add_vlr(laszip_writer, "funny", 12345, 0, "just a funny VLR", 0))
+    {
+      fprintf(stderr,"DLL ERROR: adding funny VLR to the header\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+    
+    fprintf(stderr,"                     after adding funny VLR        : %d\n", (laszip_I32)header->offset_to_point_data);
+
+    // enable the compatibility mode
+
+    laszip_BOOL request = 1;
+    if (laszip_request_compatibility_mode(laszip_writer, request))
+    {
+      fprintf(stderr,"DLL ERROR: enabling laszip LAS 1.4 compatibility mode\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // open the writer
+
+    laszip_BOOL compress = (strstr(file_name_out, ".laz") != 0);
+
+    if (laszip_open_writer(laszip_writer, file_name_out, compress))
+    {
+      fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
+      byebye(true, argc==1, laszip_writer);
+    }
+  
+    fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
+
+    // get a pointer to the point of the writer that we will populate and write
+
+    laszip_point* point;
+
+    if (laszip_get_point_pointer(laszip_writer, &point))
+    {
+      fprintf(stderr,"DLL ERROR: getting point pointer from laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // set points to "extended type"
+
+    point->extended_point_type = 1;
+
+    // write five points
+
+    laszip_I64 count = 0;
+    laszip_F64 coordinates[3];
+
+    // populate the first point
+
+    coordinates[0] = 630499.95;
+    coordinates[1] = 4834749.17;
+    coordinates[2] = 62.15;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 60;
+    point->extended_return_number = 2;
+    point->extended_number_of_returns = 2;
+    point->classification = 2;                // it must be set because it "fits" in 5 bits
+    point->extended_classification = 2;
+    point->extended_scan_angle = 3500;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 8; // overflag flag is set
+    point->gps_time = 53413162.560400;
+
+    // write the first point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+
+    // populate the second point
+
+    coordinates[0] = 630499.83;
+    coordinates[1] = 4834748.88;
+    coordinates[2] = 62.68;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 90;
+    point->extended_return_number = 8;
+    point->extended_number_of_returns = 9;
+    point->classification = 0;                // it must be set to zero as the real value is stored in the extended field
+    point->extended_classification = 41;
+    point->extended_scan_angle = 3533;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 0; // no flag is not set
+    point->gps_time = 53413162.563600;
+
+    // write the second point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+    
+    // populate the third point
+
+    coordinates[0] = 630499.54;  
+    coordinates[1] = 4834749.66;
+    coordinates[2] = 62.66;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 70;
+    point->extended_return_number = 9;
+    point->extended_number_of_returns = 9;
+    point->classification = 0;                // it must be set to zero as the real value is stored in the extended field
+    point->extended_classification = 42;
+    point->extended_scan_angle = 3567;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 0; // no flag is not set
+    point->gps_time = 53413162.566800;
+
+    // write the third point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+
+    // populate the fourth point
+
+    coordinates[0] = 630498.56;     
+    coordinates[1] = 4834749.41;
+    coordinates[2] = 63.68;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 20;
+    point->extended_return_number = 1;
+    point->extended_number_of_returns = 2;
+    point->classification = 5;                // it must be set because it "fits" in 5 bits
+    point->extended_classification = 5;
+    point->extended_scan_angle = 3600;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 0; // no flag is not set
+    point->gps_time = 53413162.580200;
+
+    // write the fourth point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+
+    // populate the fifth point
+
+    coordinates[0] = 630498.80; 
+    coordinates[1] = 4834748.73;
+    coordinates[2] = 62.16;
+
+    if (laszip_set_coordinates(laszip_writer, coordinates))
+    {
+      fprintf(stderr,"DLL ERROR: setting coordinates for point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    point->intensity = 110;
+    point->extended_return_number = 2;
+    point->extended_number_of_returns = 2;
+    point->classification = 2;                // it must be set because it "fits" in 5 bits
+    point->extended_classification = 2;
+    point->extended_scan_angle = 3633;
+    point->extended_scanner_channel = 1;
+    point->extended_classification_flags = 0; // no flag is not set
+    point->gps_time = 53413162.580200;
+
+    // write the fifth point
+
+    if (laszip_write_point(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: writing point %u\n", (laszip_U32)count);
+      byebye(true, argc==1, laszip_writer);
+    }
+    count++;
+
+    
+    // get the number of points written so far
+
+    if (laszip_get_point_count(laszip_writer, &count))
+    {
+      fprintf(stderr,"DLL ERROR: getting point count\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    fprintf(stderr,"successfully written %u points\n", (laszip_U32)count);
+
+    // close the writer
+
+    if (laszip_close_writer(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: closing laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // destroy the writer
+
+    if (laszip_destroy(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: destroying laszip writer\n");
+      byebye(true, argc==1);
+    }
+  
+    fprintf(stderr,"total time: %g sec for writing %scompressed\n", taketime()-start_time, (compress ? "" : "un"));
+
+  } // EXAMPLE_SEVEN
+  
+  if (EXAMPLE == EXAMPLE_EIGHT)
+  {
+    fprintf(stderr,"running EXAMPLE_EIGHT (always *with* compatibility mode when reading but when writing *only* for compressed output)\n");
+
+    // create the reader
+
+    laszip_POINTER laszip_reader;
+    if (laszip_create(&laszip_reader))
+    {
+      fprintf(stderr,"DLL ERROR: creating laszip reader\n");
+      byebye(true, argc==1);
+    }
+
+    // enable the compatibility mode for the reader
+
+    laszip_BOOL request_reader = 1;
+    if (laszip_request_compatibility_mode(laszip_reader, request_reader))
+    {
+      fprintf(stderr,"DLL ERROR: enabling laszip LAS 1.4 compatibility mode for the reader\n");
+      byebye(true, argc==1, laszip_reader);
+    }
+
+    // open the reader
+
+    laszip_BOOL is_compressed = 0;
+    if (laszip_open_reader(laszip_reader, file_name_in, &is_compressed))
+    {
+      fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
+      byebye(true, argc==1, laszip_reader);
+    }
+  
+    fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
+
+    // get a pointer to the header of the reader that was just populated
+
+    laszip_header* header;
+
+    if (laszip_get_header_pointer(laszip_reader, &header))
+    {
+      fprintf(stderr,"DLL ERROR: getting header pointer from laszip reader\n");
+      byebye(true, argc==1, laszip_reader);
+    }
+
+    // report how many points the file has
+
+    fprintf(stderr,"file '%s' contains %u points\n", file_name_in, header->number_of_point_records);
+
+    // get a pointer to the points that will be read
+
+    laszip_point* point;
+
+    if (laszip_get_point_pointer(laszip_reader, &point))
+    {
+      fprintf(stderr,"DLL ERROR: getting point pointer from laszip reader\n");
+      byebye(true, argc==1, laszip_reader);
+    }
+
+    // create the writer
+
+    laszip_POINTER laszip_writer;
+    if (laszip_create(&laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: creating laszip writer\n");
+      byebye(true, argc==1);
+    }
+
+    // check if the output is compressed
+
+    laszip_BOOL compress = (strstr(file_name_out, ".laz") != 0);
+
+    // *only* enable the compatibility mode for the writer for compressed output
+
+    if (compress)
+    {
+      laszip_BOOL request_writer = 1;
+      if (laszip_request_compatibility_mode(laszip_writer, request_writer))
+      {
+        fprintf(stderr,"DLL ERROR: enabling laszip LAS 1.4 compatibility mode for the writer\n");
+        byebye(true, argc==1, laszip_writer);
+      }
+    }
+
+    // initialize the header for the writer using the header of the reader 
+
+    if (laszip_set_header(laszip_writer, header))
+    {
+      fprintf(stderr,"DLL ERROR: setting header for laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // open the writer
+
+    if (laszip_open_writer(laszip_writer, file_name_out, compress))
+    {
+      fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
+      byebye(true, argc==1, laszip_writer);
+    }
+  
+    fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
+
+    // read the points
+
+    laszip_U32 count = 0;
+
+    while (count < header->number_of_point_records)
+    {
+      // read a point
+
+      if (laszip_read_point(laszip_reader))
+      {
+        fprintf(stderr,"DLL ERROR: reading point %u\n", count);
+        byebye(true, argc==1, laszip_reader);
+      }
+
+      // copy the point
+
+      if (laszip_set_point(laszip_writer, point))
+      {
+        fprintf(stderr,"DLL ERROR: setting point %u\n", count);
+        byebye(true, argc==1, laszip_writer);
+      }
+
+      // write the point
+
+      if (laszip_write_point(laszip_writer))
+      {
+        fprintf(stderr,"DLL ERROR: writing point %u\n", count);
+        byebye(true, argc==1, laszip_writer);
+      }
+
+      count++;
+    }
+
+    fprintf(stderr,"successfully read and written %u points\n", count);
+
+    // close the writer
+
+    if (laszip_close_writer(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: closing laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // destroy the writer
+
+    if (laszip_destroy(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: destroying laszip writer\n");
+      byebye(true, argc==1);
+    }
+
+    // close the reader
+
+    if (laszip_close_reader(laszip_reader))
+    {
+      fprintf(stderr,"DLL ERROR: closing laszip reader\n");
+      byebye(true, argc==1, laszip_reader);
+    }
+
+    // destroy the reader
+
+    if (laszip_destroy(laszip_reader))
+    {
+      fprintf(stderr,"DLL ERROR: destroying laszip reader\n");
+      byebye(true, argc==1);
+    }
+
+    fprintf(stderr,"total time: %g sec for reading %scompressed and writing %scompressed\n", taketime()-start_time, (is_compressed ? "" : "un"), (compress ? "" : "un"));
+
+  } // EXAMPLE_EIGHT
 
   // unload LASzip DLL
 
