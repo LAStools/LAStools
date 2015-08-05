@@ -24,6 +24,8 @@
   
   CHANGE HISTORY:
   
+    3 August 2015 -- incompatible change for QSI-sponsored "LAS 1.4 compatibility mode" in DLL
+    8 July 2015 -- adding support for NOAA-sponsored "LAS 1.4 compatibility mode"
     1 April 2015 -- adding exploitation and creation of spatial indexing information 
     8 August 2013 -- added laszip_get_coordinates() and laszip_set_coordinates()
     6 August 2013 -- added laszip_auto_offset() and laszip_check_for_integer_overflow()
@@ -154,7 +156,7 @@ typedef struct laszip_point
   laszip_I32 Z;
   laszip_U16 intensity;
   laszip_U8 return_number : 3;
-  laszip_U8 number_of_returns_of_given_pulse : 3;
+  laszip_U8 number_of_returns : 3;
   laszip_U8 scan_direction_flag : 1;
   laszip_U8 edge_of_flight_line : 1;
   laszip_U8 classification : 5;
@@ -165,18 +167,21 @@ typedef struct laszip_point
   laszip_U8 user_data;
   laszip_U16 point_source_ID;
 
-  laszip_F64 gps_time;
-  laszip_U16 rgb[4];
-  laszip_U8 wave_packet[29];
-
   // LAS 1.4 only
+  laszip_I16 extended_scan_angle;
   laszip_U8 extended_point_type : 2;
   laszip_U8 extended_scanner_channel : 2;
   laszip_U8 extended_classification_flags : 4;
   laszip_U8 extended_classification;
   laszip_U8 extended_return_number : 4;
-  laszip_U8 extended_number_of_returns_of_given_pulse : 4;
-  laszip_I16 extended_scan_angle;
+  laszip_U8 extended_number_of_returns : 4;
+
+  // for 8 byte alignment of the GPS time
+  laszip_U8 dummy[7];
+
+  laszip_F64 gps_time;
+  laszip_U16 rgb[4];
+  laszip_U8 wave_packet[29];
 
   laszip_I32 num_extra_bytes;
   laszip_U8* extra_bytes;
@@ -324,7 +329,19 @@ laszip_set_geoascii_params(
 LASZIP_API laszip_I32
 laszip_add_vlr(
     laszip_POINTER                     pointer
-    , const laszip_vlr_struct*         vlr
+    , const laszip_CHAR*               user_id
+    , laszip_U16                       record_id
+    , laszip_U16                       record_length_after_header
+    , const laszip_CHAR*               description
+    , const laszip_U8*                 data
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_remove_vlr(
+    laszip_POINTER                     pointer
+    , const laszip_CHAR*               user_id
+    , laszip_U16                       record_id
 );
 
 /*---------------------------------------------------------------------------*/
@@ -340,6 +357,13 @@ LASZIP_API laszip_I32
 laszip_preserve_generating_software(
     laszip_POINTER                     pointer
     , const laszip_BOOL                preserve
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_request_compatibility_mode(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                request
 );
 
 /*---------------------------------------------------------------------------*/

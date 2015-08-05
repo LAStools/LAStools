@@ -428,19 +428,50 @@ laszip_set_geoascii_params
 typedef laszip_I32 (*laszip_add_vlr_def)
 (
     laszip_POINTER                     pointer
-    , const laszip_vlr_struct*         vlr
+    , const laszip_CHAR*               user_id
+    , laszip_U16                       record_id
+    , laszip_U16                       record_length_after_header
+    , const laszip_CHAR*               description
+    , const laszip_U8*                 data
 );
 laszip_add_vlr_def laszip_add_vlr_ptr = 0;
 LASZIP_API laszip_I32
 laszip_add_vlr
 (
     laszip_POINTER                     pointer
-    , const laszip_vlr_struct*         vlr
+    , const laszip_CHAR*               user_id
+    , laszip_U16                       record_id
+    , laszip_U16                       record_length_after_header
+    , const laszip_CHAR*               description
+    , const laszip_U8*                 data
 )
 {
   if (laszip_add_vlr_ptr)
   {
-    return (*laszip_add_vlr_ptr)(pointer, vlr);
+    return (*laszip_add_vlr_ptr)(pointer, user_id, record_id, record_length_after_header, description, data);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_remove_vlr_def)
+(
+    laszip_POINTER                     pointer
+    , const laszip_CHAR*               user_id
+    , laszip_U16                       record_id
+);
+laszip_remove_vlr_def laszip_remove_vlr_ptr = 0;
+LASZIP_API laszip_I32
+laszip_remove_vlr
+(
+    laszip_POINTER                     pointer
+    , const laszip_CHAR*               user_id
+    , laszip_U16                       record_id
+)
+{
+  if (laszip_remove_vlr_ptr)
+  {
+    return (*laszip_remove_vlr_ptr)(pointer, user_id, record_id);
   }
   return 1;
 };
@@ -485,6 +516,27 @@ laszip_preserve_generating_software
   if (laszip_preserve_generating_software_ptr)
   {
     return (*laszip_preserve_generating_software_ptr)(pointer, preserve);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_request_compatibility_mode_def)
+(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                request
+);
+laszip_request_compatibility_mode_def laszip_request_compatibility_mode_ptr = 0;
+LASZIP_API laszip_I32
+laszip_request_compatibility_mode
+(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                request
+)
+{
+  if (laszip_request_compatibility_mode_ptr)
+  {
+    return (*laszip_request_compatibility_mode_ptr)(pointer, request);
   }
   return 1;
 };
@@ -875,6 +927,11 @@ laszip_I32 laszip_load_dll()
      FreeLibrary(laszip_HINSTANCE);
      return 1;
   }
+  laszip_remove_vlr_ptr = (laszip_remove_vlr_def)GetProcAddress(laszip_HINSTANCE, "laszip_remove_vlr");
+  if (laszip_remove_vlr_ptr == NULL) {
+     FreeLibrary(laszip_HINSTANCE);
+     return 1;
+  }
   laszip_create_spatial_index_ptr = (laszip_create_spatial_index_def)GetProcAddress(laszip_HINSTANCE, "laszip_create_spatial_index");
   if (laszip_create_spatial_index_ptr == NULL) {
      FreeLibrary(laszip_HINSTANCE);
@@ -882,6 +939,11 @@ laszip_I32 laszip_load_dll()
   }
   laszip_preserve_generating_software_ptr = (laszip_preserve_generating_software_def)GetProcAddress(laszip_HINSTANCE, "laszip_preserve_generating_software");
   if (laszip_preserve_generating_software_ptr == NULL) {
+     FreeLibrary(laszip_HINSTANCE);
+     return 1;
+  }
+  laszip_request_compatibility_mode_ptr = (laszip_request_compatibility_mode_def)GetProcAddress(laszip_HINSTANCE, "laszip_request_compatibility_mode");
+  if (laszip_request_compatibility_mode_ptr == NULL) {
      FreeLibrary(laszip_HINSTANCE);
      return 1;
   }
