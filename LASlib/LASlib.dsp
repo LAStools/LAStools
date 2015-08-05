@@ -305,6 +305,10 @@ SOURCE=..\LASzip\src\integercompressor.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASzip\src\lasattributer.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\inc\lasdefinitions.hpp
 # End Source File
 # Begin Source File
@@ -321,7 +325,15 @@ SOURCE=..\LASzip\src\lasinterval.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASzip\src\laspoint.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\lasquadtree.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasquantizer.hpp
 # End Source File
 # Begin Source File
 

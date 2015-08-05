@@ -141,7 +141,7 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
   header->add_vlr("lascompatible\0\0", 22204, 2+2+4+148, out->takeData());
   delete out;
 
-  // scan_angle (absolute or difference) is stored as a I16
+  // scan_angle (difference or remainder) is stored as a I16
   LASattribute lasattribute_scan_angle(3, "LAS 1.4 scan angle", "additional attributes");
   lasattribute_scan_angle.set_scale(0.006, 0);
   I32 index_scan_angle = header->add_attribute(lasattribute_scan_angle);
@@ -326,7 +326,7 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
   {
     return FALSE;
   }
-  else if (header->point_data_format == 0) // and not for the old point type 2
+  else if (header->point_data_format == 2) // and not for the old point type 2
   {
     return FALSE;
   }
