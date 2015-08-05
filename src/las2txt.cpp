@@ -352,7 +352,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
     return las2txt_gui(argc, argv, 0);
 #else
-    fprintf(stderr,"las2txt.exe is better run in the command line or via the lastool.exe GUI\n");
+    fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     CHAR file_name[256];
     fprintf(stderr,"enter input file: "); fgets(file_name, 256, stdin);
     file_name[strlen(file_name)-1] = '\0';

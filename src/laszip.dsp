@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=laszip - Win32 Debug with GUI
+CFG=laszip - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,14 +13,14 @@ CFG=laszip - Win32 Debug with GUI
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "laszip.mak" CFG="laszip - Win32 Debug with GUI"
+!MESSAGE NMAKE /f "laszip.mak" CFG="laszip - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
+!MESSAGE "laszip - Win32 Release without GUI" (based on "Win32 (x86) Console Application")
+!MESSAGE "laszip - Win32 Debug without GUI" (based on "Win32 (x86) Console Application")
 !MESSAGE "laszip - Win32 Release" (based on "Win32 (x86) Console Application")
 !MESSAGE "laszip - Win32 Debug" (based on "Win32 (x86) Console Application")
-!MESSAGE "laszip - Win32 Debug with GUI" (based on "Win32 (x86) Console Application")
-!MESSAGE "laszip - Win32 Release with GUI" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -30,21 +30,21 @@ CFG=laszip - Win32 Debug with GUI
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "laszip - Win32 Release"
+!IF  "$(CFG)" == "laszip - Win32 Release without GUI"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Output_Dir "Release without GUI"
+# PROP BASE Intermediate_Dir "Release without GUI"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release"
-# PROP Intermediate_Dir "Release"
+# PROP Output_Dir "Release_without_GUI"
+# PROP Intermediate_Dir "Release_without_GUI"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /w /W0 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /w /W0 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_MULTI_CORE" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /i "../src" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -52,27 +52,27 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 ../laslib/lib/LASlib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 ../laslib/lib/LASlib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"Release_without_GUI/laszip-cli.exe"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Release\laszip.exe ..\bin\laszip-cli.exe
+PostBuild_Cmds=copy Release_without_GUI\laszip-cli.exe ..\bin\laszip-cli.exe
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug without GUI"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "Debug_without_GUI"
+# PROP BASE Intermediate_Dir "Debug_without_GUI"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
+# PROP Output_Dir "Debug_without_GUI"
+# PROP Intermediate_Dir "Debug_without_GUI"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laszip\src" /I "..\laslib\inc" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_MULTI_CORE" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -80,47 +80,18 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ../laslib/lib/LASlibD.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ../laslib/lib/LASlibD.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"Debug_without_GUI/laszip-cli.exe" /pdbtype:sept
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Debug\laszip.exe ..\bin\laszip.exe
+PostBuild_Cmds=copy Debug_without_GUI\laszip-cli.exe ..\bin\laszip-cli.exe
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "laszip___Win32_Debug_with_GUI"
-# PROP BASE Intermediate_Dir "laszip___Win32_Debug_with_GUI"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laslib\inc" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /I "..\laszip\src" /I "..\laslib\inc" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD BASE RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
-# ADD RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 ../laslib/libD/LASlib.lib ../src_full/glui_api/glui32.lib ../src_full/glut_api/glutstatic.lib ../src_full/glut_api/glut32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ../laslib/lib/LASlibD.lib ../src_full/glui_api/glui32.lib ../src_full/glut_api/glutstatic.lib ../src_full/glut_api/glut32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# Begin Special Build Tool
-SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Debug\laszip.exe ..\bin\laszip.exe
-# End Special Build Tool
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
+!ELSEIF  "$(CFG)" == "laszip - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "laszip___Win32_Release_with_GUI"
-# PROP BASE Intermediate_Dir "laszip___Win32_Release_with_GUI"
+# PROP BASE Output_Dir "Release"
+# PROP BASE Intermediate_Dir "Release"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
@@ -130,7 +101,7 @@ PostBuild_Cmds=copy Debug\laszip.exe ..\bin\laszip.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /w /W0 /GX /O2 /I "..\laslib\inc" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /w /W0 /GX /O2 /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /I "..\laszip\src" /I "..\laslib\inc" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /w /W0 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /YX /FD /c
 # ADD BASE RSC /l 0x409 /i "../src" /d "NDEBUG"
 # ADD RSC /l 0x409 /i "../src" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -144,52 +115,65 @@ SOURCE="$(InputPath)"
 PostBuild_Cmds=copy Release\laszip.exe ..\bin\laszip.exe
 # End Special Build Tool
 
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "Debug"
+# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "Debug"
+# PROP Intermediate_Dir "Debug"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laslib\inc" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /YX /FD /GZ /c
+# ADD BASE RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
+# ADD RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 ../laslib/libD/LASlib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ../laslib/lib/LASlibD.lib ../src_full/glui_api/glui32.lib ../src_full/glut_api/glutstatic.lib ../src_full/glut_api/glut32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# Begin Special Build Tool
+SOURCE="$(InputPath)"
+PostBuild_Cmds=copy Debug\laszip.exe ..\bin\laszip.exe
+# End Special Build Tool
+
 !ENDIF 
 
 # Begin Target
 
+# Name "laszip - Win32 Release without GUI"
+# Name "laszip - Win32 Debug without GUI"
 # Name "laszip - Win32 Release"
 # Name "laszip - Win32 Debug"
-# Name "laszip - Win32 Debug with GUI"
-# Name "laszip - Win32 Release with GUI"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
 SOURCE=.\geoprojectionconverter.cpp
-
-!IF  "$(CFG)" == "laszip - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# ADD CPP /I "."
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-# ADD BASE CPP /I "."
-# ADD CPP /I "."
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\src_full\laslicense.cpp
 
-!IF  "$(CFG)" == "laszip - Win32 Release"
+!IF  "$(CFG)" == "laszip - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
 
 !ENDIF 
 
@@ -198,19 +182,17 @@ SOURCE=..\src_full\laslicense.cpp
 
 SOURCE=..\src_full\lasoccupancy.cpp
 
-!IF  "$(CFG)" == "laszip - Win32 Release"
+!IF  "$(CFG)" == "laszip - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
-
-# PROP BASE Exclude_From_Build 1
 
 !ENDIF 
 
@@ -219,23 +201,17 @@ SOURCE=..\src_full\lasoccupancy.cpp
 
 SOURCE=..\src_full\lastools_gui.cpp
 
-!IF  "$(CFG)" == "laszip - Win32 Release"
+!IF  "$(CFG)" == "laszip - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-# ADD CPP /I "."
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-# ADD BASE CPP /I "."
-# ADD CPP /I "."
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
-
-# PROP BASE Exclude_From_Build 1
 
 !ENDIF 
 
@@ -243,59 +219,26 @@ SOURCE=..\src_full\lastools_gui.cpp
 # Begin Source File
 
 SOURCE=..\src_full\lastools_multi_core.cpp
-
-!IF  "$(CFG)" == "laszip - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
-SOURCE=.\laszip.cpp
-
-!IF  "$(CFG)" == "laszip - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# ADD CPP /I "."
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-# ADD BASE CPP /I "."
-# ADD CPP /I "."
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
-
-!ENDIF 
-
+SOURCE=..\src\laszip.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\src_full\laszip_gui.cpp
 
-!IF  "$(CFG)" == "laszip - Win32 Release"
+!IF  "$(CFG)" == "laszip - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
-
-# PROP BASE Exclude_From_Build 1
 
 !ENDIF 
 
@@ -303,37 +246,22 @@ SOURCE=..\src_full\laszip_gui.cpp
 # Begin Source File
 
 SOURCE=..\src_full\laszip_multi_core.cpp
-
-!IF  "$(CFG)" == "laszip - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
 SOURCE=..\src_full\shpreader.cpp
 
-!IF  "$(CFG)" == "laszip - Win32 Release"
+!IF  "$(CFG)" == "laszip - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
 
 !ENDIF 
 
@@ -342,14 +270,6 @@ SOURCE=..\src_full\shpreader.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
-# Begin Source File
-
-SOURCE="C:\Program Files (x86)\Microsoft Visual Studio\VC98\Include\BASETSD.H"
-# End Source File
-# Begin Source File
-
-SOURCE=..\LASzip\src\bytestreamin.hpp
-# End Source File
 # Begin Source File
 
 SOURCE=.\geoprojectionconverter.hpp
@@ -369,10 +289,6 @@ SOURCE=..\laslib\inc\lasindex.hpp
 # Begin Source File
 
 SOURCE=..\laslib\inc\lasinterval.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\src_full\laslicense.hpp
 # End Source File
 # Begin Source File
 
@@ -416,6 +332,10 @@ SOURCE=..\laslib\inc\laswriter.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\laslib\inc\laswritercompatible.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\laszip.hpp
 # End Source File
 # Begin Source File
@@ -442,17 +362,17 @@ SOURCE=..\src_full\txtreader.hpp
 
 SOURCE=..\src_full\icon1.ico
 
-!IF  "$(CFG)" == "laszip - Win32 Release"
+!IF  "$(CFG)" == "laszip - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
 
 !ENDIF 
 
@@ -461,17 +381,17 @@ SOURCE=..\src_full\icon1.ico
 
 SOURCE=..\src_full\lastool.rc
 
-!IF  "$(CFG)" == "laszip - Win32 Release"
+!IF  "$(CFG)" == "laszip - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Debug with GUI"
-
-!ELSEIF  "$(CFG)" == "laszip - Win32 Release with GUI"
 
 !ENDIF 
 

@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
     return lasinfo_gui(argc, argv, 0);
 #else
-    fprintf(stderr,"lasinfo.exe is better run in the command line\n");
+    fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     char file_name[256];
     fprintf(stderr,"enter input file: "); fgets(file_name, 256, stdin);
     file_name[strlen(file_name)-1] = '\0';
@@ -3025,6 +3025,7 @@ int main(int argc, char *argv[])
     if (check_points)
     {
       I64 num_last_returns = 0;
+      I64 num_all_returns = 0;
       I64 outside_bounding_box = 0;
       LASoccupancyGrid* lasoccupancygrid = 0;
 
@@ -3062,10 +3063,11 @@ int main(int argc, char *argv[])
           lasoccupancygrid->add(&lasreader->point);
         }
 
-        if (lasreader->point.get_return_number() >= lasreader->point.get_number_of_returns())
+        if (lasreader->point.is_last())
         {
           num_last_returns++;
         }
+        num_all_returns++;
 
         if (lashistogram.active())
         {
@@ -3144,8 +3146,8 @@ int main(int argc, char *argv[])
         }
         if (lasreader->point.extended_point_type)
         {
-          fprintf(file_out, "  extended_number_of_returns %6d %6d\012",lassummary.min.extended_number_of_returns, lassummary.max.extended_number_of_returns);
           fprintf(file_out, "  extended_return_number     %6d %6d\012",lassummary.min.extended_return_number, lassummary.max.extended_return_number);
+          fprintf(file_out, "  extended_number_of_returns %6d %6d\012",lassummary.min.extended_number_of_returns, lassummary.max.extended_number_of_returns);
           fprintf(file_out, "  extended_classification    %6d %6d\012",lassummary.min.extended_classification, lassummary.max.extended_classification);
           fprintf(file_out, "  extended_scan_angle        %6d %6d\012",lassummary.min.extended_scan_angle, lassummary.max.extended_scan_angle);
           fprintf(file_out, "  extended_scanner_channel   %6d %6d\012",lassummary.min.extended_scanner_channel, lassummary.max.extended_scanner_channel);
@@ -3200,26 +3202,26 @@ int main(int argc, char *argv[])
           if (horizontal_units == 9001)
           {
             fprintf(file_out, "covered area in square meters/kilometers: %d/%.2f\012", 4*lasoccupancygrid->get_num_occupied(), 0.000004*lasoccupancygrid->get_num_occupied());
-            fprintf(file_out, "point density: all returns %.2f last only %.2f (per square meter)\012", ((F64)lasreader->p_count/(4.0*lasoccupancygrid->get_num_occupied())), ((F64)num_last_returns/(4.0*lasoccupancygrid->get_num_occupied())));
-            fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in meters)\012", sqrt(4.0*lasoccupancygrid->get_num_occupied()/(F64)lasreader->p_count), sqrt(4.0*lasoccupancygrid->get_num_occupied()/(F64)num_last_returns));
+            fprintf(file_out, "point density: all returns %.2f last only %.2f (per square meter)\012", ((F64)num_all_returns/(4.0*lasoccupancygrid->get_num_occupied())), ((F64)num_last_returns/(4.0*lasoccupancygrid->get_num_occupied())));
+            fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in meters)\012", sqrt(4.0*lasoccupancygrid->get_num_occupied()/(F64)num_all_returns), sqrt(4.0*lasoccupancygrid->get_num_occupied()/(F64)num_last_returns));
           }
           else if (horizontal_units == 9002)
           {
             fprintf(file_out, "covered area in square feet/miles: %d/%.2f\012", 36*lasoccupancygrid->get_num_occupied(),1.2913223e-6*lasoccupancygrid->get_num_occupied());
-            fprintf(file_out, "point density: all returns %.2f last only %.2f (per square foot)\012", ((F64)lasreader->p_count/(36.0*lasoccupancygrid->get_num_occupied())), ((F64)num_last_returns/(36.0*lasoccupancygrid->get_num_occupied())));
-            fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in feet)\012", sqrt(36.0*lasoccupancygrid->get_num_occupied()/(F64)lasreader->p_count), sqrt(36.0*lasoccupancygrid->get_num_occupied()/(F64)num_last_returns));
+            fprintf(file_out, "point density: all returns %.2f last only %.2f (per square foot)\012", ((F64)num_all_returns/(36.0*lasoccupancygrid->get_num_occupied())), ((F64)num_last_returns/(36.0*lasoccupancygrid->get_num_occupied())));
+            fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in feet)\012", sqrt(36.0*lasoccupancygrid->get_num_occupied()/(F64)num_all_returns), sqrt(36.0*lasoccupancygrid->get_num_occupied()/(F64)num_last_returns));
           }
           else if (horizontal_units == 9003)
           {
             fprintf(file_out, "covered area in square survey feet: %d\012", 36*lasoccupancygrid->get_num_occupied());
-            fprintf(file_out, "point density: all returns %.2f last only %.2f (per square survey foot)\012", ((F64)lasreader->p_count/(36.0*lasoccupancygrid->get_num_occupied())), ((F64)num_last_returns/(36.0*lasoccupancygrid->get_num_occupied())));
-            fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in survey feet)\012", sqrt(36.0*lasoccupancygrid->get_num_occupied()/(F64)lasreader->p_count), sqrt(36.0*lasoccupancygrid->get_num_occupied()/(F64)num_last_returns));
+            fprintf(file_out, "point density: all returns %.2f last only %.2f (per square survey foot)\012", ((F64)num_all_returns/(36.0*lasoccupancygrid->get_num_occupied())), ((F64)num_last_returns/(36.0*lasoccupancygrid->get_num_occupied())));
+            fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in survey feet)\012", sqrt(36.0*lasoccupancygrid->get_num_occupied()/(F64)num_all_returns), sqrt(36.0*lasoccupancygrid->get_num_occupied()/(F64)num_last_returns));
           }
           else
           {
             fprintf(file_out, "covered area in square units/kilounits: %d/%.2f\012", 4*lasoccupancygrid->get_num_occupied(), 0.000004*lasoccupancygrid->get_num_occupied());
-            fprintf(file_out, "point density: all returns %.2f last only %.2f (per square units)\012", ((F64)lasreader->p_count/(4.0*lasoccupancygrid->get_num_occupied())), ((F64)num_last_returns/(4.0*lasoccupancygrid->get_num_occupied())));
-            fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in units)\012", sqrt(4.0*lasoccupancygrid->get_num_occupied()/(F64)lasreader->p_count), sqrt(4.0*lasoccupancygrid->get_num_occupied()/(F64)num_last_returns));
+            fprintf(file_out, "point density: all returns %.2f last only %.2f (per square units)\012", ((F64)num_all_returns/(4.0*lasoccupancygrid->get_num_occupied())), ((F64)num_last_returns/(4.0*lasoccupancygrid->get_num_occupied())));
+            fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in units)\012", sqrt(4.0*lasoccupancygrid->get_num_occupied()/(F64)num_all_returns), sqrt(4.0*lasoccupancygrid->get_num_occupied()/(F64)num_last_returns));
           }
         }
         delete lasoccupancygrid;
@@ -3469,7 +3471,7 @@ int main(int argc, char *argv[])
           fwrite(&(number_of_points_by_return[0]), sizeof(U32), 5, file);
           if (file_out)
           {
-            fprintf(file_out, "number of points by return %s", was_set ? "is different than reported in header:" : "was not set in header:"); 
+            fprintf(file_out, "WARNING: number of points by return %s", was_set ? "is different than reported in header:" : "was not set in header:"); 
 #ifdef _WIN32
             for (i = 1; i < 6; i++) fprintf(file_out, " %I64d", lassummary.number_of_points_by_return[i]); 
 #else
@@ -3482,7 +3484,7 @@ int main(int argc, char *argv[])
         {
           if (!no_min_max && file_out)
           {
-            fprintf(file_out, "number of points by return %s", was_set ? "is different than reported in header:" : "was not set in header:"); 
+            fprintf(file_out, "WARNING: number of points by return %s", was_set ? "is different than reported in header:" : "was not set in header:"); 
 #ifdef _WIN32
             for (i = 1; i < 6; i++) fprintf(file_out, " %I64d", lassummary.number_of_points_by_return[i]); 
 #else

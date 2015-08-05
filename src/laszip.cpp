@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
     return laszip_gui(argc, argv, 0);
 #else
-    fprintf(stderr,"laszip.exe is better run in the command line or via the lastool.exe GUI\n");
+    fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     char file_name[256];
     fprintf(stderr,"enter input file: "); fgets(file_name, 256, stdin);
     file_name[strlen(file_name)-1] = '\0';
