@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     return lasdiff_gui(argc, argv, 0);
 #else
     char file_name[256];
-    fprintf(stderr,"lasdiff.exe is better run in the command line\n");
+    fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     fprintf(stderr,"enter input file1: "); fgets(file_name, 256, stdin);
     file_name[strlen(file_name)-1] = '\0';
     lasreadopener.set_file_name(file_name);
@@ -745,7 +745,7 @@ int main(int argc, char *argv[])
             }
             if (difference) if (different_points < shutup) fprintf(stderr, "point %u of %u is different\n", (U32)lasreader1->p_count, (U32)lasreader1->npoints);
           }
-          if (lasreader1->point.have_gps_time)
+          if (lasreader1->point.have_gps_time || lasreader2->point.have_gps_time)
           {
             if (lasreader1->point.gps_time != lasreader2->point.gps_time)
             {
@@ -753,9 +753,9 @@ int main(int argc, char *argv[])
               difference = true;
             }
           }
-          if (lasreader1->point.have_rgb)
+          if (lasreader1->point.have_rgb || lasreader2->point.have_rgb)
           {
-            if (lasreader1->point.have_nir)
+            if (lasreader1->point.have_nir || lasreader2->point.have_nir)
             {
               if (memcmp((const void*)&(lasreader1->point.rgb), (const void*)&(lasreader2->point.rgb), sizeof(short[4])))
               {
@@ -772,7 +772,7 @@ int main(int argc, char *argv[])
               }
             }
           }
-          if (lasreader1->point.have_wavepacket)
+          if (lasreader1->point.have_wavepacket || lasreader2->point.have_wavepacket)
           {
             if (memcmp((const void*)&(lasreader1->point.wavepacket), (const void*)&(lasreader2->point.wavepacket), sizeof(LASwavepacket)))
             {
@@ -788,7 +788,15 @@ int main(int argc, char *argv[])
               difference = true;
             }
           }
-          if (lasreader1->point.extended_point_type)
+          else if (lasreader2->point.extra_bytes_number)
+          {
+            if (memcmp((const void*)lasreader1->point.extra_bytes, (const void*)lasreader2->point.extra_bytes, lasreader2->point.extra_bytes_number))
+            {
+              if (different_points < shutup) fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d != %d %d %d %d\n", lasreader2->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3]);
+              difference = true;
+            }
+          }
+          if (lasreader1->point.extended_point_type || lasreader2->point.extended_point_type )
           {
             if (lasreader1->point.extended_scan_angle != lasreader2->point.extended_scan_angle)
             {

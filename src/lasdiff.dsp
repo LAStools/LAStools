@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=lasdiff - Win32 Debug with GUI
+CFG=lasdiff - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,14 +13,14 @@ CFG=lasdiff - Win32 Debug with GUI
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "lasdiff.mak" CFG="lasdiff - Win32 Debug with GUI"
+!MESSAGE NMAKE /f "lasdiff.mak" CFG="lasdiff - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
+!MESSAGE "lasdiff - Win32 Release without GUI" (based on "Win32 (x86) Console Application")
+!MESSAGE "lasdiff - Win32 Debug without GUI" (based on "Win32 (x86) Console Application")
 !MESSAGE "lasdiff - Win32 Release" (based on "Win32 (x86) Console Application")
 !MESSAGE "lasdiff - Win32 Debug" (based on "Win32 (x86) Console Application")
-!MESSAGE "lasdiff - Win32 Release with GUI" (based on "Win32 (x86) Console Application")
-!MESSAGE "lasdiff - Win32 Debug with GUI" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -30,21 +30,21 @@ CFG=lasdiff - Win32 Debug with GUI
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "lasdiff - Win32 Release"
+!IF  "$(CFG)" == "lasdiff - Win32 Release without GUI"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Output_Dir "Release without GUI"
+# PROP BASE Intermediate_Dir "Release without GUI"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release"
-# PROP Intermediate_Dir "Release"
+# PROP Output_Dir "Release_without_GUI"
+# PROP Intermediate_Dir "Release_without_GUI"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /w /W0 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /w /W0 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /i "../src" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -52,27 +52,27 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 ../laslib/lib/LASlib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 ../laslib/lib/LASlib.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"Release_without_GUI/lasdiff-cli.exe"
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Release\lasdiff.exe ..\bin\lasdiff.exe
+PostBuild_Cmds=copy Release_without_GUI\lasdiff-cli.exe ..\bin\lasdiff-cli.exe
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug without GUI"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "Debug_without_GUI"
+# PROP BASE Intermediate_Dir "Debug_without_GUI"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
+# PROP Output_Dir "Debug_without_GUI"
+# PROP Intermediate_Dir "Debug_without_GUI"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laszip\src" /I "..\laslib\inc" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -80,18 +80,18 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ../laslib/lib/LASlibD.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ../laslib/lib/LASlibD.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"Debug_without_GUI/lasdiff-cli.exe" /pdbtype:sept
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Debug\lasdiff.exe ..\bin\lasdiff.exe
+PostBuild_Cmds=copy Debug_without_GUI\lasdiff-cli.exe ..\bin\lasdiff-cli.exe
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release with GUI"
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "lasdiff___Win32_Release_with_GUI"
-# PROP BASE Intermediate_Dir "lasdiff___Win32_Release_with_GUI"
+# PROP BASE Output_Dir "Release"
+# PROP BASE Intermediate_Dir "Release"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
@@ -101,7 +101,7 @@ PostBuild_Cmds=copy Debug\lasdiff.exe ..\bin\lasdiff.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /w /W0 /GX /O2 /I "..\laslib\inc" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /w /W0 /GX /O2 /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /I "..\laszip\src" /I "..\laslib\inc" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_GUI" /YX /FD /c
+# ADD CPP /nologo /w /W0 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /D "NDEBUG" /D "COMPILE_WITH_GUI" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /i "../src" /d "NDEBUG"
 # ADD RSC /l 0x409 /i "../src" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -115,12 +115,12 @@ SOURCE="$(InputPath)"
 PostBuild_Cmds=copy Release\lasdiff.exe ..\bin\lasdiff.exe
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug with GUI"
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "lasdiff___Win32_Debug_with_GUI"
-# PROP BASE Intermediate_Dir "lasdiff___Win32_Debug_with_GUI"
+# PROP BASE Output_Dir "Debug"
+# PROP BASE Intermediate_Dir "Debug"
 # PROP BASE Ignore_Export_Lib 0
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
@@ -130,7 +130,7 @@ PostBuild_Cmds=copy Release\lasdiff.exe ..\bin\lasdiff.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laslib\inc" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /I "..\laszip\src" /I "..\laslib\inc" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_GUI" /YX /FD /GZ /c
+# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /D "_DEBUG" /D "COMPILE_WITH_GUI" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
 # ADD RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -148,31 +148,16 @@ PostBuild_Cmds=copy Debug\lasdiff.exe ..\bin\lasdiff.exe
 
 # Begin Target
 
+# Name "lasdiff - Win32 Release without GUI"
+# Name "lasdiff - Win32 Debug without GUI"
 # Name "lasdiff - Win32 Release"
 # Name "lasdiff - Win32 Debug"
-# Name "lasdiff - Win32 Release with GUI"
-# Name "lasdiff - Win32 Debug with GUI"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
 SOURCE=.\geoprojectionconverter.cpp
-
-!IF  "$(CFG)" == "lasdiff - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release with GUI"
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug with GUI"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -182,17 +167,17 @@ SOURCE=..\src\lasdiff.cpp
 
 SOURCE=..\src_full\lasdiff_gui.cpp
 
-!IF  "$(CFG)" == "lasdiff - Win32 Release"
+!IF  "$(CFG)" == "lasdiff - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release with GUI"
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug with GUI"
 
 !ENDIF 
 
@@ -201,17 +186,17 @@ SOURCE=..\src_full\lasdiff_gui.cpp
 
 SOURCE=..\src_full\laslicense.cpp
 
-!IF  "$(CFG)" == "lasdiff - Win32 Release"
+!IF  "$(CFG)" == "lasdiff - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release with GUI"
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug with GUI"
 
 !ENDIF 
 
@@ -220,17 +205,17 @@ SOURCE=..\src_full\laslicense.cpp
 
 SOURCE=..\src_full\lasoccupancy.cpp
 
-!IF  "$(CFG)" == "lasdiff - Win32 Release"
+!IF  "$(CFG)" == "lasdiff - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release with GUI"
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug with GUI"
 
 !ENDIF 
 
@@ -239,17 +224,17 @@ SOURCE=..\src_full\lasoccupancy.cpp
 
 SOURCE=..\src_full\lastools_gui.cpp
 
-!IF  "$(CFG)" == "lasdiff - Win32 Release"
+!IF  "$(CFG)" == "lasdiff - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release with GUI"
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug with GUI"
 
 !ENDIF 
 
@@ -258,17 +243,17 @@ SOURCE=..\src_full\lastools_gui.cpp
 
 SOURCE=..\src_full\shpreader.cpp
 
-!IF  "$(CFG)" == "lasdiff - Win32 Release"
+!IF  "$(CFG)" == "lasdiff - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release with GUI"
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug with GUI"
 
 !ENDIF 
 
@@ -287,7 +272,19 @@ SOURCE=..\laslib\inc\lasdefinitions.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\laslib\inc\lasfilter.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\laslib\inc\lasindex.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\lasindex.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\laslib\inc\lasinterval.hpp
 # End Source File
 # Begin Source File
 
@@ -303,6 +300,10 @@ SOURCE=..\src_full\lasoccupancy.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\laslib\inc\lasquadtree.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\lasquadtree.hpp
 # End Source File
 # Begin Source File
@@ -315,7 +316,11 @@ SOURCE=..\laslib\inc\lasreader.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\lasreadersingle.hpp
+SOURCE=..\laslib\inc\lasspatial.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\laslib\inc\lastransform.hpp
 # End Source File
 # Begin Source File
 
@@ -332,6 +337,10 @@ SOURCE=..\laslib\inc\laswaveform13writer.hpp
 # Begin Source File
 
 SOURCE=..\laslib\inc\laswriter.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\laslib\inc\laszip.hpp
 # End Source File
 # Begin Source File
 
@@ -361,17 +370,17 @@ SOURCE=..\src_full\txtreader.hpp
 
 SOURCE=..\src_full\icon1.ico
 
-!IF  "$(CFG)" == "lasdiff - Win32 Release"
+!IF  "$(CFG)" == "lasdiff - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release with GUI"
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug with GUI"
 
 !ENDIF 
 
@@ -380,17 +389,17 @@ SOURCE=..\src_full\icon1.ico
 
 SOURCE=..\src_full\lastool.rc
 
-!IF  "$(CFG)" == "lasdiff - Win32 Release"
+!IF  "$(CFG)" == "lasdiff - Win32 Release without GUI"
 
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Release with GUI"
-
-!ELSEIF  "$(CFG)" == "lasdiff - Win32 Debug with GUI"
 
 !ENDIF 
 
