@@ -414,9 +414,9 @@ Supported raster operations
   -number_returns_average
   -number_returns_stddev
   -occupancy
-  -count
-  -count_16bit
-  -count_32bit
+  -counter
+  -counter_16bit
+  -counter_32bit
   -scan_angle_lowest
   -scan_angle_highest
   -scan_angle_range
