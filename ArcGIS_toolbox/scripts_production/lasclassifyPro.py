@@ -132,9 +132,9 @@ if sys.argv[c] == "false":
     command.append("-small_buildings")
 c = c + 1
 
-### maybe keep tree overlap
+### maybe keep tree overhang
 if sys.argv[c] == "false":
-    command.append("-keep_overlap")
+    command.append("-keep_overhang")
 c = c + 1
 
 ### maybe an output format was selected

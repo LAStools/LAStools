@@ -379,9 +379,9 @@ command.append('"'+empty_temp_dir+"\\pit_free_temp_tile*_gh.laz"+'"')
 ### keep the highest
 command.append("-highest")
 
-### on a grid with four by four times the final step size
+### on a grid with two by two times the final step size
 command.append("-step")
-command.append(str(0.25*float(sys.argv[arg_step].replace(",","."))))
+command.append(str(0.5*float(sys.argv[arg_step].replace(",","."))))
 
 ### maybe splat with half the laser beam width
 if sys.argv[arg_beam_width] != "#":

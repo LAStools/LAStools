@@ -119,9 +119,9 @@ elif sys.argv[8] == "true":
 if sys.argv[9] == "false":
     command.append("-small_buildings")
 
-### maybe keep tree overlap
+### maybe keep tree overhang
 if sys.argv[10] == "false":
-    command.append("-keep_overlap")
+    command.append("-keep_overhang")
 
 ### this is where the output arguments start
 out = 11
