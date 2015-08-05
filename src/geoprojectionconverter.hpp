@@ -6,8 +6,9 @@
   CONTENTS:
 
     Easy conversion between horizontal datums: UTM coodinates, Transverse
-    Mercator, Lambert Conformal Conic, and Longitude/Latitude. Parameters
-    for all US stateplanes (TM and LLC, NAD27 and NAD83) are included.
+    Mercator, Lambert Conformal Conic, ECEF, Albers Equal Area Conic,
+    Oblique Mercator, and Longitude/Latitude. Parameters for all standard
+    US stateplanes (TM and LLC, NAD27 and NAD83) are included.
 
     Converting between UTM coodinates and latitude / longitude coodinates
     adapted from code written by Chuck Gantz (chuck.gantz@globalstar.com)
@@ -20,6 +21,12 @@
 
     Converting between ECEF (geocentric) and latitude / longitude
     adapted from code written by Craig Larrimore (craig.larrimore@noaa.gov), B. Archinal, and C. Goad
+
+    Converting between Albers Equal Area Conic and latitude / longitude
+    adapted from code written by U.S. Army Topographic Engineering Center
+
+    Converting between Oblique Mercator and latitude / longitude
+    adapted from code written by U.S. Army Topographic Engineering Center
 
   PROGRAMMERS:
   
@@ -41,7 +48,8 @@
   
   CHANGE HISTORY:
   
-    16 May 2015 -- attemting to add the Albers Equal Area Conic projection
+    28 June 2015 -- tried to add the Oblique Mercator projection (incomplete)
+    16 May 2015 -- added the Albers Equal Area Conic projection
     03 March 2015 -- LCC/TM custom projections write GeogGeodeticDatumGeoKey
     13 August 2014 -- added long overdue ECEF (geocentric) conversion
     08 February 2007 -- created after interviews with purdue and google
@@ -160,6 +168,27 @@ public:
   double aeac_Albers_a_OVER_n;
 };
 
+class GeoProjectionParametersOM : public GeoProjectionParameters
+{
+public:
+  double om_false_easting_meter;
+  double om_false_northing_meter;
+  double om_lat_origin_degree;
+  double om_long_meridian_degree;
+  double om_first_std_parallel_degree;
+  double om_second_std_parallel_degree;
+  double om_lat_origin_radian;
+  double om_long_meridian_radian;
+  double om_first_std_parallel_radian;
+  double om_second_std_parallel_radian;
+  double om_n;
+  double om_C;
+  double om_two_es;
+  double om_rho0;
+  double om_one_MINUS_es2;
+  double om_Albers_a_OVER_n;
+};
+
 class GeoProjectionConverter
 {
 public:
@@ -217,6 +246,7 @@ public:
   void set_lambert_conformal_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true);
   void set_transverse_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor, char* description=0, bool source=true);
   void set_albers_equal_area_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true);
+  void set_oblique_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true);
 
   const char* get_state_plane_nad27_lcc_zone(int i) const;
   bool set_state_plane_nad27_lcc(const char* zone, char* description=0, bool source=true);
@@ -276,6 +306,9 @@ public:
 
   bool AEACtoLL(const double AEACEastingMeter, const double AEACNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersAEAC* aeac) const;
   bool LLtoAEAC(const double LatDegree, const double LongDegree, double &AEACEastingMeter, double &AEACNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersAEAC* aeac) const;
+
+  bool OMtoLL(const double OMEastingMeter, const double OMNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOM* om) const;
+  bool LLtoOM(const double LatDegree, const double LongDegree, double &OMEastingMeter, double &OMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOM* om) const;
 
   GeoProjectionConverter();
   ~GeoProjectionConverter();
@@ -337,6 +370,7 @@ private:
   void compute_lcc_parameters(bool source);
   void compute_tm_parameters(bool source);
   void compute_aeac_parameters(bool source);
+  void compute_om_parameters(bool source);
 };
 
 #endif
