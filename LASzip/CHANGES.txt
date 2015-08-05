@@ -1,3 +1,4 @@
+31 July 2015 -- new DLL (incompatible with prior version) supports "LAS 1.4 compatibility mode"
 4 April 2015 -- added DLL functions for creation and exploitation of spatial indexing LAX files
 3 April 2015 -- moved spatial indexing (LAX file generation) from LASlib to LASzip 
 16 November 2014 -- improved detection & reporting of file truncation and/or LAZ bit-errors
