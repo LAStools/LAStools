@@ -1,3 +1,6 @@
+1 August 2015 -- LASlib: moving LASpoint, LASquantizer, and LASattributer to LASzip for "compatibility"
+25 July 2015 -- LAStools: EPSG codes (http://groups.google.com/d/topic/lastools/9fUZaLKPReg/discussion)
+6 June 2015 -- LASlib: added filters '-keep_overlap' and '-drop_overlap' for new LAS 1.4 point types
 16 May 2015 -- LAStools: new projections Albers Equal Area Conic and Earth Centered Earth Fixed
 3 May 2015 -- las2las: improved up-conversion to LAS 1.4 via '-set_version 1.4 -point_type 6'
 3 May 2015 -- LASlib: fixed LASreader_merged to use file source ID of 0 when merging flightlines 

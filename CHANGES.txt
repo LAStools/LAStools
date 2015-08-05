@@ -1,3 +1,10 @@
+1 August 2015 -- LASlib: moving LASpoint, LASquantizer, and LASattributer to LASzip for "compatibility"
+31 July 2015 -- LASzip: new DLL (incompatible with prior version) supports "LAS 1.4 compatibility mode"
+25 July 2015 -- LAStools: EPSG codes (http://groups.google.com/d/topic/lastools/9fUZaLKPReg/discussion)
+30 June 2015 -- las2tin: new option '-histo_edge_length 0.1' and '-histo_edge_length_only 0.1'
+30 June 2015 -- lasclassify: little bug fix after introduction of '-keep_overlap' filter for LAS 1.4
+6 June 2015 -- LASlib: added filters '-keep_overlap' and '-drop_overlap' for new LAS 1.4 point types
+6 June 2015 -- lasoverage: added option '-flag_as_overlap' for new LAS 1.4 point types 6 to 10
 26 May 2015 -- BLAST extension: updated to support recent additions for new LAS 1.4 point types
 26 May 2015 -- laszip: small bug fix for combination of '-cores n' with '-io_ibuffer xxxxxx'
 26 May 2015 -- all LAStools: error message for on-the-fly compression of new LAS 1.4 point types
