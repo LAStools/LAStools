@@ -57,7 +57,7 @@ LINK32=link.exe
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Release\LASzip.dll dll\LASzip.dll	copy Debug\LASzip.dll example\Release\LASzip.dll
+PostBuild_Cmds=copy Release\LASzip.dll dll\LASzip.dll	copy  Release\LASzip.dll example\Release\LASzip.dll
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "LASzip - Win32 Debug"
@@ -181,6 +181,10 @@ SOURCE=.\src\bytestreamin.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\bytestreamin_array.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\bytestreamin_file.hpp
 # End Source File
 # Begin Source File
@@ -190,6 +194,10 @@ SOURCE=.\src\bytestreamin_istream.hpp
 # Begin Source File
 
 SOURCE=.\src\bytestreamout.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\bytestreamout_array.hpp
 # End Source File
 # Begin Source File
 
@@ -209,6 +217,10 @@ SOURCE=.\src\integercompressor.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\lasattributer.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\lasindex.hpp
 # End Source File
 # Begin Source File
@@ -217,7 +229,15 @@ SOURCE=.\src\lasinterval.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\laspoint.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\lasquadtree.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\lasquantizer.hpp
 # End Source File
 # Begin Source File
 

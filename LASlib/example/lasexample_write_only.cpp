@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
   if (argc == 1)
   {
-    fprintf(stderr,"lasexample_write_only.exe is better run in the command line\n");
+    fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     char file_name[256];
     fprintf(stderr,"enter output file: "); fgets(file_name, 256, stdin);
     file_name[strlen(file_name)-1] = '\0';
