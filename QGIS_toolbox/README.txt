@@ -62,4 +62,6 @@ whatever path corresponds in your installation to this one:
 
 C:\Program Files\QGIS Wien\apps\qgis\python\plugins\processing\algs\lidar\lastools
 
+================================================================
 
+For QGIS 2.10 all is great.
