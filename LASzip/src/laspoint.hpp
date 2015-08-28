@@ -491,6 +491,7 @@ public:
 
   inline BOOL is_single() const { return get_number_of_returns() == 1; };
   inline BOOL is_first() const { return get_return_number() == 1; };
+  inline BOOL is_intermediate() const { return (!is_first() && !is_last()); };
   inline BOOL is_last() const { return get_return_number() >= get_number_of_returns(); };
 
   inline I32 get_X() const { return X; };
