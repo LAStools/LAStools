@@ -1,3 +1,5 @@
+28 August 2015 -- lasinfo: option '-repair_counters' corrected for 64 bit counters of LAS 1.4 files
+18 August 2015 -- lasdiff: fixed report for truncated files (fewer or more points) 
 1 August 2015 -- LASlib: moving LASpoint, LASquantizer, and LASattributer to LASzip for "compatibility"
 25 July 2015 -- LAStools: EPSG codes (http://groups.google.com/d/topic/lastools/9fUZaLKPReg/discussion)
 6 June 2015 -- LASlib: added filters '-keep_overlap' and '-drop_overlap' for new LAS 1.4 point types

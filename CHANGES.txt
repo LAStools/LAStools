@@ -1,3 +1,13 @@
+28 August 2015 -- lasinfo: option '-repair_counters' corrected for 64 bit counters of LAS 1.4 files
+28 August 2015 -- lasthin: added option '-central' to keep the most central point of each cell
+21 August 2015 -- lascontrol: adjust z coodinate using mean error with new LAS/LAZ or LAY files
+21 August 2015 -- lasgrid: new '-invert_ramp' for '-false' and '-gray' colorings
+20 August 2015 -- LASlayers: using '-olay' with a filter or transform adds them to the LAY file
+19 August 2015 -- lasground: new '-bulge 1.0' offers more control for what is added to the ground
+19 August 2015 -- lastile: new '-flag_as_withheld' or '-flag_as_synthetic' for buffer points
+
+19 August 2015 -- lastile: multi-core tiling to be used with spatially indexed input
+18 August 2015 -- lasdiff: fixed report for truncated files (fewer or more points) 
 1 August 2015 -- LASlib: moving LASpoint, LASquantizer, and LASattributer to LASzip for "compatibility"
 31 July 2015 -- LASzip: new DLL (incompatible with prior version) supports "LAS 1.4 compatibility mode"
 25 July 2015 -- LAStools: EPSG codes (http://groups.google.com/d/topic/lastools/9fUZaLKPReg/discussion)
