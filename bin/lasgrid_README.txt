@@ -28,7 +28,8 @@
   PNG, and JPG one usually chooses to express the variation with
   '-gray' or with '-false' colors for simple visualizion. Here
   the variation can be limited with '-set_min_max 10 100' to a
-  particular range or it can be set to '-compute_min_max'.
+  particular range or it can be set to '-compute_min_max'. The
+  color scheme can also be inverted with '-invert_ramp'
 
   Optionally, a KML file is generated that allows the resulting
   raster  to be immediately displayed inside a geospatial context

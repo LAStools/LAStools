@@ -6,7 +6,9 @@
   a uniform grid over the points and within each grid cell keeps
   only the point with the lowest (or '-highest' or '-random') Z
   coordinate. When keeping '-random' points you can in addition
-  specify a '-seed 232' for the random generator.
+  specify a '-seed 232' for the random generator. You can also
+  keep the point that is closest to the center of each cell with
+  the option '-central'.
 
   Instead of removing the thinned out points from the output file
   you can also request to classify them with '-classify_as 8' or

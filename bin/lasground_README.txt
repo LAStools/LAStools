@@ -51,6 +51,15 @@
   '-spike 0.5' will remove up-spikes above 50 centimeter and
   down-spikes below 5 meters in the coarsest TIN.
 
+  Another parameter of interest is the '-bulge 1.0' parameter
+  that specifies how much the TIN is allowed to bulge up when
+  including points as it is getting refined. The default bulge
+  is one tenth of the step for step sizes larger than 5 meters
+  and one fifth of the step otherwise. Especially for ground-
+  classification of non-LiDAR points such as dense-matching or
+  photogrammetry output by Agisoft of Pix4D the fine-tuning of
+  this parameter can produce great results.
+
   The maximal standard deviation for planar patches in centimeter
   can be set with '-stddev 10'. The maximal offset in meters up
   to which points above the current ground estimate get included

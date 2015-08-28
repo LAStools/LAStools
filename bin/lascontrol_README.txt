@@ -27,7 +27,13 @@
   LIDAR file contains proper projection information this can be
   automatically detected by the tool.
  
-  The output defaults to stdout if no output file is specified.
+  The output report defaults to stdout unless you specify an output
+  file with '-cp_out report.txt'.
+
+  One handy feature is the option to apply the resulting average error
+  as a vertical adjustment to all of the input files. This can be done
+  with the '-adjust_z' command switch and should go hand in hand with
+  specifying where the output should go with '-odir ...' or '-odix ...'
 
   Please license from martin.isenburg@rapidlasso.com to use lascontrol
   commercially.
@@ -47,10 +53,21 @@
 
 example usage:
 
->> lascontrol -i *.las -cp cp.csv -keep_class 2 8
+>> lascontrol -i *.laz -cp cp.csv -cp_out report.txt -keep_class 2 8 -adjust_z -odix _adjusted
 
 assumes the x/y/z coordinates of the control points are stored as
 the 1nd/2nd/3rd entry on each line of the 'cp.csv' file and only
+points with ground and keypoint classification (class 2 or 8)
+are used to construct the reference TIN. all LAZ files that match
+'*.laz' get merged on the fly into one to construct the reference
+TIN. the output is written to the file 'report.txt' and the average
+error is used to adjust the z coordinate of all LAZ files that are
+then written to files with the same name and appendix "_adjusted"
+
+>> lascontrol -i *.las -cp cp.csv -keep_class 2 8 -parse sssxyz
+
+assumes the x/y/z coordinates of the control points are stored as
+the 4th/5th/6rth entry on each line of the 'cp.csv' file and only
 points with ground and mass-point classification (class 2 or 8)
 are used to construct the reference TIN. all LAS files that match
 '*.las' get merged on the fly into one. output goes to stdout.
