@@ -515,9 +515,9 @@ class LAScriterionKeepRGB : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_RGB"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : "blue")),  below_RGB, above_RGB); };
-  inline BOOL filter(const LASpoint* point) { return (point->rgb[channel] < below_RGB) || (above_RGB < point->rgb[channel]); };
-  LAScriterionKeepRGB(I32 below_RGB, I32 above_RGB, I32 channel) { if (above_RGB < below_RGB) { this->below_RGB = above_RGB; this->above_RGB = below_RGB; } else { this->below_RGB = below_RGB; this->above_RGB = above_RGB; this->channel = channel; } };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))),  below_RGB, above_RGB); };
+  inline BOOL filter(const LASpoint* point) { return ((point->rgb[channel] < below_RGB) || (above_RGB < point->rgb[channel])); };
+  LAScriterionKeepRGB(I32 below_RGB, I32 above_RGB, I32 channel) { if (above_RGB < below_RGB) { this->below_RGB = above_RGB; this->above_RGB = below_RGB; } else { this->below_RGB = below_RGB; this->above_RGB = above_RGB; }; this->channel = channel; };
 private:
   I32 below_RGB, above_RGB, channel;
 };
@@ -1265,6 +1265,11 @@ void LASfilter::usage() const
   fprintf(stderr,"  -drop_gps_time_below 11.125\n");
   fprintf(stderr,"  -drop_gps_time_above 130.725\n");
   fprintf(stderr,"  -drop_gps_time_between 22.0 48.0\n");
+  fprintf(stderr,"Filter points based on their RGB/NIR channel.\n");
+  fprintf(stderr,"  -keep_RGB_red 1 1\n");
+  fprintf(stderr,"  -keep_RGB_green 30 100\n");
+  fprintf(stderr,"  -keep_RGB_blue 0 0\n");
+  fprintf(stderr,"  -keep_RGB_nir 64 127\n");
   fprintf(stderr,"Filter points based on their wavepacket.\n");
   fprintf(stderr,"  -keep_wavepacket 0\n");
   fprintf(stderr,"  -drop_wavepacket 3\n");
@@ -1990,6 +1995,16 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 2));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
       }
+      else if (strcmp(argv[i]+10,"nir") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 3));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+      }
       else
       {
         fprintf(stderr,"ERROR: '%s' unknown color band\n", argv[i]);
@@ -2381,6 +2396,29 @@ BOOL LASfilter::parse(int argc, char* argv[])
   if (keep_classification_mask) add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
 
   return TRUE;
+}
+
+BOOL LASfilter::parse(CHAR* string)
+{
+  int p = 0;
+  int argc = 1;
+  char* argv[64];
+  int len = strlen(string);
+
+  while (p < len)
+  {
+    while ((p < len) && (string[p] == ' ')) p++;
+    if (p < len)
+    {
+      argv[argc] = string + p;
+      argc++;
+      while ((p < len) && (string[p] != ' ')) p++;
+      string[p] = '\0';
+      p++;
+    }
+  }
+
+  return parse(argc, argv);
 }
 
 I32 LASfilter::unparse(CHAR* string) const

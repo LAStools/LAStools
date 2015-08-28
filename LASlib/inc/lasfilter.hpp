@@ -50,6 +50,7 @@ public:
   void usage() const;
   void clean();
   BOOL parse(int argc, char* argv[]);
+  BOOL parse(CHAR* string);
   I32 unparse(CHAR* string) const;
   inline BOOL active() const { return (num_criteria != 0); };
 

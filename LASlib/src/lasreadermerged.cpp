@@ -537,7 +537,7 @@ BOOL LASreaderMerged::open()
 
   U32 i,j;
   BOOL first = TRUE;
-  U32 buffer_warning = 0;
+
   for (i = 0; i < file_name_number; i++)
   {
     // open the lasreader with the next file name
@@ -628,19 +628,19 @@ BOOL LASreaderMerged::open()
       bounding_boxes[4*i+2] = lasreader->header.max_x;
       bounding_boxes[4*i+3] = lasreader->header.max_y;
     }
-    // check for buffer
-    if (lasreader->header.vlr_lastiling)
-    {
-      if (lasreader->header.vlr_lastiling->buffer)
-      {
-        buffer_warning++;
-      }
-    }
     // populate the merged header
     if (first)
     {
       first = FALSE;
-      // check for tiling
+      // check for lastiling buffer
+      if (lasreader->header.vlr_lastiling)
+      {
+        if (lasreader->header.vlr_lastiling->buffer)
+        {
+          fprintf(stderr, "WARNING: first file is a buffered tile. maybe remove buffers first?\n");
+        }
+      }
+      // maybe we should keep the tiling
       if (keep_lastiling)
       {
         if (lasreader->header.vlr_lastiling == 0)
@@ -762,10 +762,6 @@ BOOL LASreaderMerged::open()
       }
     }
     lasreader->close();
-  }
-  if (buffer_warning)
-  {
-    fprintf(stderr, "WARNING: among merged files %s %u tile%s with buffer. remove buffers first?\n", (buffer_warning == 1 ? "is" : "are"), buffer_warning, (buffer_warning == 1 ? "" : "s"));
   }
 
   // was it requested to rescale or reoffset

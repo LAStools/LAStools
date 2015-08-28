@@ -45,6 +45,26 @@ LASinventory::LASinventory()
   first = TRUE;
 }
 
+BOOL LASinventory::init(const LASheader* header)
+{
+  if (header)
+  {
+    U32 i;
+    extended_number_of_point_records = (header->number_of_point_records ? header->number_of_point_records : header->extended_number_of_point_records);
+    for (i = 0; i < 5; i++) extended_number_of_points_by_return[i] = (header->number_of_points_by_return[i] ? header->number_of_points_by_return[i] : header->extended_number_of_points_by_return[i]);
+    for (i = 5; i < 16; i++) extended_number_of_points_by_return[i] = header->extended_number_of_points_by_return[i];
+    max_X = header->get_X(header->max_x);
+    min_X = header->get_X(header->min_x);
+    max_Y = header->get_Y(header->max_y);
+    min_Y = header->get_Y(header->min_y);
+    max_Z = header->get_Z(header->max_z);
+    min_Z = header->get_Z(header->min_z);
+    first = FALSE;
+    return TRUE;
+  }
+  return FALSE;
+}
+
 BOOL LASinventory::add(const LASpoint* point)
 {
   extended_number_of_point_records++;
@@ -70,29 +90,14 @@ BOOL LASinventory::add(const LASpoint* point)
 
 BOOL LASinventory::update_header(LASheader* header) const
 {
-  int i;
-  if (extended_number_of_point_records > U32_MAX)
+  if (header)
   {
-    if (header->version_minor >= 4)
-    {
-      header->number_of_point_records = 0;
-    }
-    else
-    {
-      return FALSE;
-    }
-  }
-  else
-  {
-    header->number_of_point_records = (U32)extended_number_of_point_records;
-  }
-  for (i = 0; i < 5; i++)
-  {
-    if (extended_number_of_points_by_return[i+1] > U32_MAX)
+    int i;
+    if (extended_number_of_point_records > U32_MAX)
     {
       if (header->version_minor >= 4)
       {
-        header->number_of_points_by_return[i] = 0;
+        header->number_of_point_records = 0;
       }
       else
       {
@@ -101,21 +106,43 @@ BOOL LASinventory::update_header(LASheader* header) const
     }
     else
     {
-      header->number_of_points_by_return[i] = (U32)extended_number_of_points_by_return[i+1];
+      header->number_of_point_records = (U32)extended_number_of_point_records;
     }
+    for (i = 0; i < 5; i++)
+    {
+      if (extended_number_of_points_by_return[i+1] > U32_MAX)
+      {
+        if (header->version_minor >= 4)
+        {
+          header->number_of_points_by_return[i] = 0;
+        }
+        else
+        {
+          return FALSE;
+        }
+      }
+      else
+      {
+        header->number_of_points_by_return[i] = (U32)extended_number_of_points_by_return[i+1];
+      }
+    }
+    header->max_x = header->get_x(max_X);
+    header->min_x = header->get_x(min_X);
+    header->max_y = header->get_y(max_Y);
+    header->min_y = header->get_y(min_Y);
+    header->max_z = header->get_z(max_Z);
+    header->min_z = header->get_z(min_Z);
+    header->extended_number_of_point_records = extended_number_of_point_records;
+    for (i = 0; i < 15; i++)
+    {
+      header->extended_number_of_points_by_return[i] = extended_number_of_points_by_return[i+1];
+    }
+    return TRUE;
   }
-  header->max_x = header->get_x(max_X);
-  header->min_x = header->get_x(min_X);
-  header->max_y = header->get_y(max_Y);
-  header->min_y = header->get_y(min_Y);
-  header->max_z = header->get_z(max_Z);
-  header->min_z = header->get_z(min_Z);
-  header->extended_number_of_point_records = extended_number_of_point_records;
-  for (i = 0; i < 15; i++)
+  else
   {
-    header->extended_number_of_points_by_return[i] = extended_number_of_points_by_return[i+1];
+    return FALSE;
   }
-  return TRUE;
 }
 
 LASsummary::LASsummary()
@@ -432,6 +459,7 @@ void LASbin::add(I32 item, I32 value)
       {
         size_pos = 1024;
         bins_pos = (U32*)malloc(sizeof(U32)*size_pos);
+        values_pos = (F64*)malloc(sizeof(F64)*size_pos);
         if (bins_pos == 0)
         {
           fprintf(stderr, "ERROR: allocating %u pos bins\012", size_pos);
@@ -442,7 +470,108 @@ void LASbin::add(I32 item, I32 value)
           fprintf(stderr, "ERROR: allocating %u pos values\012", size_pos);
           exit(1);
         }
+        for (i = 0; i < size_pos; i++) { bins_pos[i] = 0; values_pos[i] = 0; }
+      }
+      else
+      {
+        I32 new_size = bin + 1024;
+        bins_pos = (U32*)realloc(bins_pos, sizeof(U32)*new_size);
+        values_pos = (F64*)realloc(values_pos, sizeof(F64)*new_size);
+        if (bins_pos == 0)
+        {
+          fprintf(stderr, "ERROR: reallocating %u pos bins\012", new_size);
+          exit(1);
+        }
+        if (values_pos == 0)
+        {
+          fprintf(stderr, "ERROR: reallocating %u pos values\012", new_size);
+          exit(1);
+        }
+        for (i = size_pos; i < new_size; i++) { bins_pos[i] = 0; values_pos[i] = 0; }
+        size_pos = new_size;
+      }
+    }
+    bins_pos[bin]++;
+    values_pos[bin] += value;
+  }
+  else
+  {
+    bin = -(bin+1);
+    if (bin >= size_neg)
+    {
+      I32 i;
+      if (size_neg == 0)
+      {
+        size_neg = 1024;
+        bins_neg = (U32*)malloc(sizeof(U32)*size_neg);
+        values_neg = (F64*)malloc(sizeof(F64)*size_neg);
+        if (bins_neg == 0)
+        {
+          fprintf(stderr, "ERROR: allocating %u neg bins\012", size_neg);
+          exit(1);
+        }
+        if (values_neg == 0)
+        {
+          fprintf(stderr, "ERROR: allocating %u neg values\012", size_neg);
+          exit(1);
+        }
+        for (i = 0; i < size_neg; i++) { bins_neg[i] = 0; values_neg[i] = 0; }
+      }
+      else
+      {
+        I32 new_size = bin + 1024;
+        bins_neg = (U32*)realloc(bins_neg, sizeof(U32)*new_size);
+        values_neg = (F64*)realloc(values_neg, sizeof(F64)*new_size);
+        if (bins_neg == 0)
+        {
+          fprintf(stderr, "ERROR: reallocating %u neg bins\012", new_size);
+          exit(1);
+        }
+        if (values_neg == 0)
+        {
+          fprintf(stderr, "ERROR: reallocating %u neg values\012", new_size);
+          exit(1);
+        }
+        for (i = size_neg; i < new_size; i++) { bins_neg[i] = 0; values_neg[i] = 0; }
+        size_neg = new_size;
+      }
+    }
+    bins_neg[bin]++;
+    values_neg[bin] += value;
+  }
+}
+
+void LASbin::add(F64 item, F64 value)
+{
+  total += item;
+  count++;
+  I32 bin = I32_FLOOR(one_over_step*item);
+  if (first)
+  {
+    anker = bin;
+    first = FALSE;
+  }
+  bin = bin - anker;
+  if (bin >= 0)
+  {
+    if (bin >= size_pos)
+    {
+      I32 i;
+      if (size_pos == 0)
+      {
+        size_pos = 1024;
+        bins_pos = (U32*)malloc(sizeof(U32)*size_pos);
         values_pos = (F64*)malloc(sizeof(F64)*size_pos);
+        if (bins_pos == 0)
+        {
+          fprintf(stderr, "ERROR: allocating %u pos bins\012", size_pos);
+          exit(1);
+        }
+        if (values_pos == 0)
+        {
+          fprintf(stderr, "ERROR: allocating %u pos values\012", size_pos);
+          exit(1);
+        }
         for (i = 0; i < size_pos; i++) { bins_pos[i] = 0; values_pos[i] = 0; }
       }
       else

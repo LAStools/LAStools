@@ -46,6 +46,7 @@ public:
   I32 min_Y;
   I32 max_Z;
   I32 min_Z;
+  BOOL init(const LASheader* header);
   BOOL add(const LASpoint* point);
   BOOL update_header(LASheader* header) const;
   LASinventory();
@@ -93,6 +94,7 @@ public:
   void add(I64 item);
   void add(F64 item);
   void add(I32 item, I32 value);
+  void add(F64 item, F64 value);
   void report(FILE* file, const CHAR* name=0, const CHAR* name_avg=0) const;
   void reset();
   F32 get_step() const;
