@@ -823,6 +823,7 @@ static const short EPSG_ETRS89_ETRS_TM36 = 3048;
 static const short EPSG_ETRS89_ETRS_TM35FIN = 3067;
 static const short EPSG_Fiji_1956_UTM60_South = 3141;
 static const short EPSG_Fiji_1956_UTM1_South = 3142;
+static const short EPSG_GDA94_NSW_Lambert = 3308;
 static const short EPSG_Fiji_Map_Grid_1986 = 3460;
 static const short EPSG_NAD83_NSRS2007_California_zone_3_ftUS = 3494;
 static const short EPSG_NAD83_NSRS2007_California_zone_4_ftUS = 3496;
@@ -920,6 +921,7 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_ETRS89_ETRS_TM35FIN, "ETRS89 TM35FIN"),
   EPSGcode(EPSG_Fiji_1956_UTM60_South, "Fiji 1956 UTM60"),
   EPSGcode(EPSG_Fiji_1956_UTM1_South, "Fiji 1956 UTM1"),
+  EPSGcode(EPSG_GDA94_NSW_Lambert, "GDA94 NSW Lambert"),
   EPSGcode(EPSG_Fiji_Map_Grid_1986, "Fiji Map Grid 1986"),
   EPSGcode(EPSG_NAD83_NSRS2007_California_zone_3_ftUS, "NSRS2007 Calif 3 ft"),
   EPSGcode(EPSG_NAD83_NSRS2007_California_zone_4_ftUS, "NSRS2007 Calif 4 ft"),
@@ -4714,6 +4716,15 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "Fiji 1956 / UTM zone 1S");
+    }
+    else if (value == EPSG_GDA94_NSW_Lambert)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_GDA94); // GRS 1980
+      set_lambert_conformal_conic_projection(9300000.0, 4500000.0, -33.25, 147, -30.75, -35.75, 0, source); // "GDA94 / NSW Lambert"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "GDA94 / NSW Lambert");
+      return true;
     }
     else if (value == EPSG_Fiji_Map_Grid_1986)
     {
