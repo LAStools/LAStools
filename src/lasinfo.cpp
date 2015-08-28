@@ -396,28 +396,23 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-repair") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       repair_bb = true;
       repair_counters = true;
     }
     else if (strcmp(argv[i],"-repair_bb") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       repair_bb = true;
     }
     else if (strcmp(argv[i],"-repair_counters") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       repair_counters = true;
     }
     else if (strcmp(argv[i],"-auto_date") == 0 || strcmp(argv[i],"-auto_creation_date") == 0 || strcmp(argv[i],"-auto_creation") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       auto_date_creation = true;
     }
     else if (strcmp(argv[i],"-set_file_source_ID") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
@@ -429,7 +424,6 @@ int main(int argc, char *argv[])
 		}
     else if (strcmp(argv[i],"-set_GUID") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: value1\n", argv[i]);
@@ -452,7 +446,6 @@ int main(int argc, char *argv[])
 		}
     else if (strcmp(argv[i],"-set_system_identifier") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: name\n", argv[i]);
@@ -466,7 +459,6 @@ int main(int argc, char *argv[])
 		}
     else if (strcmp(argv[i],"-set_generating_software") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: name\n", argv[i]);
@@ -480,7 +472,6 @@ int main(int argc, char *argv[])
 		}
     else if (strcmp(argv[i],"-set_bb") == 0 || strcmp(argv[i],"-set_bounding_box") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+6) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z\n", argv[i]);
@@ -503,7 +494,6 @@ int main(int argc, char *argv[])
 		}
     else if (strcmp(argv[i],"-set_offset") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+3) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i]);
@@ -520,7 +510,6 @@ int main(int argc, char *argv[])
 		}
     else if (strcmp(argv[i],"-set_scale") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+3) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i]);
@@ -537,7 +526,6 @@ int main(int argc, char *argv[])
 		}
     else if (strcmp(argv[i],"-set_global_encoding") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
@@ -549,7 +537,6 @@ int main(int argc, char *argv[])
 		}
     else if (strcmp(argv[i],"-set_version") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: major.minor\n", argv[i]);
@@ -569,7 +556,6 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-set_creation_date") == 0 || strcmp(argv[i],"-set_file_creation") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+2) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 2 arguments: day year\n", argv[i]);
@@ -583,7 +569,6 @@ int main(int argc, char *argv[])
 		}
     else if (strcmp(argv[i],"-set_number_of_point_records") == 0 )
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
@@ -595,7 +580,6 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-set_number_of_points_by_return") == 0 )
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+5) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 5 arguments: ret1 ret2 ret3 ret4 ret5\n", argv[i]);
@@ -615,7 +599,6 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-set_header_size") == 0 )
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
@@ -627,7 +610,6 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-set_offset_to_point_data") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
@@ -639,7 +621,6 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-set_point_data_format") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: type\n", argv[i]);
@@ -651,7 +632,6 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-set_point_data_record_length") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
@@ -663,7 +643,6 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-set_start_of_waveform_data_packet_record") == 0)
     {
-      lasreadopener.set_merged(FALSE);
       if ((i+1) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 1 argument: start\n", argv[i]);
@@ -732,6 +711,24 @@ int main(int argc, char *argv[])
 
   while (lasreadopener.active())
   {
+    // print name of input
+
+    if (file_out)
+    {
+      if (lasreadopener.is_merged())
+      {
+        fprintf(file_out, "lasinfo report for %u merged files\012", lasreadopener.get_file_name_number());
+      }
+      else if (lasreadopener.is_piped())
+      {
+        fprintf(file_out, "lasinfo report for piped input\012");
+      }
+      else if (lasreadopener.get_file_name())
+      {
+        fprintf(file_out, "lasinfo report for %s\012", lasreadopener.get_file_name(lasreadopener.get_file_name_current()));
+      }
+    }
+
     // open lasreader
 
     LASreader* lasreader = lasreadopener.open();
@@ -793,24 +790,20 @@ int main(int argc, char *argv[])
     U32 number_of_point_records = lasheader->number_of_point_records;
     U32 number_of_points_by_return0 = lasheader->number_of_points_by_return[0];
 
-    // print name of file
-
-    if (file_out && lasreadopener.get_file_name())
-    {
-      fprintf(file_out, "lasinfo for %s\012", lasreadopener.get_file_name());
-    }
-
     // print header info
 
     CHAR printstring[4096];
 
     if (file_out && !no_header)
     {
+      if (lasreadopener.is_merged() && (lasreader->header.version_minor < 4))
+      {
 #ifdef _WIN32
-      if (lasreader->npoints > number_of_point_records) fprintf(file_out, "extended LAS file has %I64d points, more than 32 bits can count.\012", lasreader->npoints);
+        if (lasreader->npoints > number_of_point_records) fprintf(file_out, "WARNING: merged file has %I64d points, more than the 32 bits counters of LAS 1.%d can handle.\012", lasreader->npoints, lasreader->header.version_minor);
 #else
-      if (lasreader->npoints > number_of_point_records) fprintf(file_out, "extended LAS file has %lld points, more than 32 bits can count.\012", lasreader->npoints);
+        if (lasreader->npoints > number_of_point_records) fprintf(file_out, "WARNING: merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.\012", lasreader->npoints, lasreader->header.version_minor);
 #endif
+      }
       fprintf(file_out, "reporting all LAS header entries:\012");
       fprintf(file_out, "  file signature:             '%.4s'\012", lasheader->file_signature);
       fprintf(file_out, "  file source ID:             %d\012", lasheader->file_source_ID);
@@ -3400,107 +3393,270 @@ int main(int argc, char *argv[])
 
     if (check_points)
     {
-      if (lassummary.number_of_point_records != lasheader->number_of_point_records)
+      // check number_of_point_records
+
+      if ((lasheader->point_data_format < 6) && (lassummary.number_of_point_records != lasheader->number_of_point_records))
       {
         if (repair_counters)
         {
-          if (lassummary.number_of_point_records > U32_MAX)
+          if (lassummary.number_of_point_records <= U32_MAX)
           {
-#ifdef _WIN32
-            fprintf(file_out, "WARNING: real number of points (%I64d) exceeds 4,294,967,295. cannot repair. too big.\n", lassummary.number_of_point_records);
-#else
-            fprintf(file_out, "WARNING: real number of points (%lld) exceeds 4,294,967,295. cannot repair. too big.\n", lassummary.number_of_point_records);
-#endif
-          }
-          else
-          {
-            U32 number_of_point_records = (U32)lassummary.number_of_point_records;
+            U32 number_of_point_records = (U32)lassummary.number_of_point_records;;
             fseek(file, 107, SEEK_SET);
             fwrite(&number_of_point_records, sizeof(U32), 1, file);
             if (file_out)
             {
-              fprintf(file_out, "WARNING: real number of points (%u) is different from header number of points (%u). it was repaired. \n", number_of_point_records, lasheader->number_of_point_records);
+              fprintf(file_out, "WARNING: real number of point records (%u) is different from header entry (%u). it was repaired. \n", number_of_point_records, lasheader->number_of_point_records);
+            }
+          }
+          else if (lasheader->version_minor < 4)
+          {
+            if (file_out)
+            {
+#ifdef _WIN32
+              fprintf(file_out, "WARNING: real number of point records (%I64d) exceeds 4,294,967,295. cannot repair. too big.\n", lassummary.number_of_point_records);
+#else
+              fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.\n", lassummary.number_of_point_records);
+#endif
+            }
+          }
+          else if (lasheader->number_of_point_records != 0)
+          {
+            U32 number_of_point_records = 0;
+            fseek(file, 107, SEEK_SET);
+            fwrite(&number_of_point_records, sizeof(U32), 1, file);
+            if (file_out)
+            {
+#ifdef _WIN32
+              fprintf(file_out, "WARNING: real number of point records (%I64d) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
+#else
+              fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
+#endif
+            }
+          }
+          else
+          {
+            if (file_out)
+            {
+              fprintf(file_out, "number of point records in header is correct.\n");
             }
           }
         }
         else
         {
-          if (!no_min_max && file_out)
+          if (file_out)
           {
-            if (lassummary.number_of_point_records > U32_MAX)
+            if (lassummary.number_of_point_records <= U32_MAX)
             {
 #ifdef _WIN32
-              fprintf(file_out, "WARNING: real number of points (%I64d) exceeds 4,294,967,295.\n", lassummary.number_of_point_records);
+              fprintf(file_out, "WARNING: real number of point records (%I64d) is different from header entry (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
 #else
-              fprintf(file_out, "WARNING: real number of points (%lld) exceeds 4,294,967,295.\n", lassummary.number_of_point_records);
+              fprintf(file_out, "WARNING: real number of point records (%lld) is different from header entry (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
+#endif
+            }
+            else if (lasheader->version_minor < 4)
+            {
+#ifdef _WIN32
+              fprintf(file_out, "WARNING: real number of point records (%I64d) exceeds 4,294,967,295.\n", lassummary.number_of_point_records);
+#else
+              fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295.\n", lassummary.number_of_point_records);
+#endif
+            }
+            else if (lasheader->number_of_point_records != 0)
+            {
+#ifdef _WIN32
+              fprintf(file_out, "WARNING: real number of point records (%I64d) exceeds 4,294,967,295. but header entry is %u instead of zero.\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
+#else
+              fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead of zero.\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
+#endif
+            }
+          }
+        }
+      }
+      else if ((lasheader->point_data_format >= 6) && (lasheader->number_of_point_records != 0))
+      {
+        if (repair_counters)
+        {
+          U32 number_of_point_records = 0;
+          fseek(file, 107, SEEK_SET);
+          fwrite(&number_of_point_records, sizeof(U32), 1, file);
+        }
+        if (file_out)
+        {
+          fprintf(file_out, "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s\n", lasheader->point_data_format, lasheader->number_of_point_records, (repair_counters ? "it was repaired." : ""));
+        }
+      }
+      else
+      {
+        if (repair_counters)
+        {
+          if (file_out)
+          {
+            fprintf(file_out, "number of point records in header is correct.\n");
+          }
+        }
+      }
+
+      // check extended_number_of_point_records
+
+      if (lasheader->version_minor > 3)
+      {
+        if (lassummary.number_of_point_records != lasheader->extended_number_of_point_records)
+        {
+          if (repair_counters)
+          {
+            I64 extended_number_of_point_records = lassummary.number_of_point_records;
+            fseek(file, 235 + 12, SEEK_SET);
+            fwrite(&extended_number_of_point_records, sizeof(I64), 1, file);
+          }
+          if (file_out)
+          {
+#ifdef _WIN32
+            fprintf(file_out, "WARNING: real number of point records (%I64d) is different from extended header entry (%I64d).%s\n", lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
+#else
+            fprintf(file_out, "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s\n", lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
+#endif
+          }
+        }
+        else
+        {
+          if (repair_counters)
+          {
+            if (file_out)
+            {
+              fprintf(file_out, "extended number of point records in header is correct.\n");
+            }
+          }
+        }
+      }
+
+      // check number_of_points_by_return[5]
+
+      bool was_set = false;
+      for (i = 1; i < 6; i++) if (lasheader->number_of_points_by_return[i-1]) was_set = true;
+
+      bool wrong_entry = false;
+
+      U32 number_of_points_by_return[5];
+      for (i = 1; i < 6; i++)
+      {
+        if ((lasheader->point_data_format < 6) && (lasheader->number_of_points_by_return[i-1] != lassummary.number_of_points_by_return[i]))
+        {
+          if (lassummary.number_of_points_by_return[i-1] <= U32_MAX)
+          {
+            number_of_points_by_return[i-1] = (U32)lassummary.number_of_points_by_return[i];
+            wrong_entry = true;
+            if (file_out)
+            {
+              if (was_set)
+              {
+                fprintf(file_out, "WARNING: for return %d real number of points by return (%u) is different from header entry (%u).%s\n", i, number_of_points_by_return[i-1], lasheader->number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
+              }
+              else
+              {
+                fprintf(file_out, "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i, (U32)lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
+              }
+            }
+          }
+          else if (lasheader->version_minor < 4)
+          {
+            if (file_out)
+            {
+#ifdef _WIN32
+              fprintf(file_out, "WARNING: for return %d real number of points by return (%I64d) exceeds 4,294,967,295.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
+#else
+              fprintf(file_out, "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
+#endif
+            }
+          }
+          else if (lasheader->number_of_points_by_return[i-1] != 0)
+          {
+            number_of_points_by_return[i-1] = 0;
+            wrong_entry = true;
+            if (file_out)
+            {
+#ifdef _WIN32
+              fprintf(file_out, "WARNING: for return %d real number of points by return (%I64d) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
+#else
+              fprintf(file_out, "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
+#endif
+            }
+          }
+          else
+          {
+            number_of_points_by_return[i-1] = 0;
+          }
+        }
+        else if ((lasheader->point_data_format >= 6) && (lasheader->number_of_points_by_return[i-1] != 0))
+        {
+          number_of_points_by_return[i-1] = 0;
+          wrong_entry = true;
+          if (file_out)
+          {
+            fprintf(file_out, "WARNING: for return %d point type is %d but (legacy) number of points by return in header is %u instead zero.%s\n", lasheader->point_data_format, i, lasheader->number_of_points_by_return[i-1], (repair_counters ? "it was repaired." : ""));
+          }
+        }
+      }
+
+      if (repair_counters)
+      {
+        if (wrong_entry)
+        {
+          fseek(file, 111, SEEK_SET);
+          fwrite(&(number_of_points_by_return[0]), sizeof(U32), 5, file);
+        }
+        else if (file_out)
+        {
+          fprintf(file_out, "number of points by return in header is correct.\n");
+        }
+      }
+      
+      // check extended_number_of_points_by_return[15]
+
+      if (lasheader->version_minor > 3)
+      {
+        bool was_set = false;
+        for (i = 1; i < 15; i++) if (lasheader->extended_number_of_points_by_return[i-1]) was_set = true;
+
+        bool wrong_entry = false;
+
+        I64 extended_number_of_points_by_return[15];
+
+        for (i = 1; i < 16; i++)
+        {
+          extended_number_of_points_by_return[i-1] = lassummary.number_of_points_by_return[i];
+          if (lasheader->extended_number_of_points_by_return[i-1] != lassummary.number_of_points_by_return[i])
+          {
+            wrong_entry = true;
+            if (was_set)
+            {
+#ifdef _WIN32
+              fprintf(file_out, "WARNING: for return %d real extended number of points by return (%I64d) is different from header entry (%I64d).%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
+#else
+              fprintf(file_out, "WARNING: for return %d real extended number of points by return (%lld) is different from header entry (%lld).%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
 #endif
             }
             else
             {
 #ifdef _WIN32
-              fprintf(file_out, "WARNING: real number of points (%I64d) is different from header number of points (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
+              fprintf(file_out, "WARNING: for return %d real extended number of points by return is %I64d but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
 #else
-              fprintf(file_out, "WARNING: real number of points (%lld) is different from header number of points (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
+              fprintf(file_out, "WARNING: for return %d real extended number of points by return is %lld but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
 #endif
             }
           }
         }
-      }
-      else
-      {
-        if (repair_counters)
-        {
-          if (file_out)
-          {
-            fprintf(file_out, "number of points in header is correct.\n");
-          }
-        }
-      }
 
-      bool wrong_entry = false;
-      bool was_set = false;
-      for (i = 1; i < 6; i++) if (lasheader->number_of_points_by_return[i-1] != lassummary.number_of_points_by_return[i]) wrong_entry = true;
-      for (i = 1; i < 6; i++) if (lasheader->number_of_points_by_return[i-1]) was_set = true;
-      if (wrong_entry)
-      {
         if (repair_counters)
         {
-          U32 number_of_points_by_return[5];
-          for (i = 1; i < 6; i++) number_of_points_by_return[i-1] = (U32)lassummary.number_of_points_by_return[i];
-          fseek(file, 111, SEEK_SET);
-          fwrite(&(number_of_points_by_return[0]), sizeof(U32), 5, file);
-          if (file_out)
+          if (wrong_entry)
           {
-            fprintf(file_out, "WARNING: number of points by return %s", was_set ? "is different than reported in header:" : "was not set in header:"); 
-#ifdef _WIN32
-            for (i = 1; i < 6; i++) fprintf(file_out, " %I64d", lassummary.number_of_points_by_return[i]); 
-#else
-            for (i = 1; i < 6; i++) fprintf(file_out, " %lld", lassummary.number_of_points_by_return[i]); 
-#endif
-            fprintf(file_out, ". repairing ...\n");
+            fseek(file, 235 + 20, SEEK_SET);
+            fwrite(&(extended_number_of_points_by_return[0]), sizeof(I64), 15, file);
           }
-        }
-        else
-        {
-          if (!no_min_max && file_out)
+          else if (file_out)
           {
-            fprintf(file_out, "WARNING: number of points by return %s", was_set ? "is different than reported in header:" : "was not set in header:"); 
-#ifdef _WIN32
-            for (i = 1; i < 6; i++) fprintf(file_out, " %I64d", lassummary.number_of_points_by_return[i]); 
-#else
-            for (i = 1; i < 6; i++) fprintf(file_out, " %lld", lassummary.number_of_points_by_return[i]); 
-#endif
-            fprintf(file_out, "\n");
-          }
-        }
-      }
-      else
-      {
-        if (repair_counters)
-        {
-          if (file_out)
-          {
-            fprintf(file_out, "number of points by return in header is correct.\n");
+            fprintf(file_out, "extended number of points by return in header is correct.\n");
           }
         }
       }
@@ -3509,14 +3665,14 @@ int main(int argc, char *argv[])
       {
 #ifdef _WIN32
         if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there are %I64d points with return number 0\n", lassummary.number_of_points_by_return[0]);
-        if (!lasreader->point.extended_point_type)
+        if (lasheader->version_minor < 4)
         {
           if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there are %I64d points with return number 6\n", lassummary.number_of_points_by_return[6]); 
           if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there are %I64d points with return number 7\n", lassummary.number_of_points_by_return[7]); 
         }
 #else
         if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there are %lld points with return number 0\n", lassummary.number_of_points_by_return[0]); 
-        if (!lasreader->point.extended_point_type)
+        if (lasheader->version_minor < 4)
         {
           if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there are %lld points with return number 6\n", lassummary.number_of_points_by_return[6]); 
           if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there are %lld points with return number 7\n", lassummary.number_of_points_by_return[7]); 
@@ -3524,16 +3680,34 @@ int main(int argc, char *argv[])
 #endif
 
         wrong_entry = false;
-        for (i = 1; i < 8; i++) if (lassummary.number_of_returns[i]) wrong_entry = true;
-        if (wrong_entry)
+
+        if (lasheader->version_minor > 3)
         {
-          fprintf(file_out, "overview over number of returns of given pulse:"); 
+          for (i = 1; i < 16; i++) if (lassummary.number_of_returns[i]) wrong_entry = true;
+          if (wrong_entry)
+          {
+           fprintf(file_out, "overview over extended number of returns of given pulse:"); 
 #ifdef _WIN32
-          for (i = 1; i < 8; i++) fprintf(file_out, " %I64d", lassummary.number_of_returns[i]);
+            for (i = 1; i < 16; i++) fprintf(file_out, " %I64d", lassummary.number_of_returns[i]);
 #else
-          for (i = 1; i < 8; i++) fprintf(file_out, " %lld", lassummary.number_of_returns[i]);
+            for (i = 1; i < 16; i++) fprintf(file_out, " %lld", lassummary.number_of_returns[i]);
 #endif
-          fprintf(file_out, "\n"); 
+            fprintf(file_out, "\n"); 
+          }
+        }
+        else
+        {
+          for (i = 1; i < 8; i++) if (lassummary.number_of_returns[i]) wrong_entry = true;
+          if (wrong_entry)
+          {
+           fprintf(file_out, "overview over number of returns of given pulse:"); 
+#ifdef _WIN32
+            for (i = 1; i < 8; i++) fprintf(file_out, " %I64d", lassummary.number_of_returns[i]);
+#else
+            for (i = 1; i < 8; i++) fprintf(file_out, " %lld", lassummary.number_of_returns[i]);
+#endif
+            fprintf(file_out, "\n"); 
+          }
         }
 
 #ifdef _WIN32
