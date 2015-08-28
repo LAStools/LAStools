@@ -26,6 +26,7 @@
 
   CHANGE HISTORY:
 
+    18 August 2015 -- fixed report for truncated files (fewer or more points) 
     11 September 2014 -- added missing checks for LAS 1.4 files and points
     27 July 2011 -- added capability to create a difference output file
     2 December 2010 -- updated to merely warn when the point scaling is off  
@@ -832,7 +833,8 @@ int main(int argc, char *argv[])
         }
         else
         {
-          fprintf(stderr, "%s (%u) has fewer points than %s (%u)\n", file_name1, (U32)lasreader2->p_count, file_name2, (U32)lasreader1->p_count);
+          while (lasreader1->read_point());
+          fprintf(stderr, "%s (%u) has %u fewer points than %s (%u)\n", file_name2, (U32)lasreader2->p_count, (U32)(lasreader1->p_count - lasreader2->p_count), file_name1, (U32)lasreader1->p_count);
           break;
         }
       }
@@ -840,7 +842,8 @@ int main(int argc, char *argv[])
       {
         if (lasreader2->read_point())
         {
-          fprintf(stderr, "%s (%u) has more points than %s (%u)\n", file_name1, (U32)lasreader2->p_count, file_name2, (U32)lasreader1->p_count);
+          while (lasreader2->read_point());
+          fprintf(stderr, "%s (%u) has %u more points than %s (%u)\n", file_name2, (U32)lasreader2->p_count, (U32)(lasreader2->p_count - lasreader1->p_count), file_name1, (U32)lasreader1->p_count);
           break;
         }
         else
