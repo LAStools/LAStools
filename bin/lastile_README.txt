@@ -30,8 +30,10 @@
   Optionally the tool can also create a small '-buffer 10' 
   around every tile where the parameter 10 specifies the number
   of units each tile is (temporarily) grown in each direction. It
-  is possible to remove the buffer from a tile by running with
-  '-remove_buffer' option.
+  is possible to remove the buffer from a tile by running lastile
+  across all tiles again but with the '-remove_buffer' option. You
+  can also '-flag_as_withheld' or '-flag_as_synthetic' all of the
+  buffer points to drop them more easily with the standard filters.
 
   Optionally the tool can also create an '-reversible' tiling
   that will allow to recreate the original file from all the
@@ -61,6 +63,12 @@
   To shift the tiling off its standard modulo tile_size tiling
   you can use the '-tile_ll 25 75' option.
 
+  If you run lastile in parallel using '-cores 4' or so it is
+  really important that your input data is spatially indexed
+  or things will slow down a lot (as each tile requires reading
+  the entire input). Make sure you run lasindex to create a LAX
+  file for each input file before lastiling on mutiple cores.
+
   Please license from martin.isenburg@rapidlasso.com to use LAStools
   commercially.
 
@@ -81,6 +89,14 @@ example usage:
 >> lastile -i *.las -o tile.las
 
 tiles all points from all files using the default tile size of 1000.
+
+>> lasindex -i *.laz -cores 8
+>> lastile -i *.laz -files_are_flightlines -buffer 25 -o tiles\tile.laz -cores 4
+
+spatially indexes all compressed LAZ files and then tiles them on 4
+cores using the default tile size of 1000 and a buffer of 25 while
+setting the point source ID of each point to the file number it is
+from.
 
 >> lastile -i *.las -full_bb -o tile.laz
 
