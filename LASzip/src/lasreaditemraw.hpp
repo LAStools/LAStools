@@ -244,7 +244,7 @@ public:
     ((LAStempReadPoint10*)item)->edge_of_flight_line = ((LAStempReadPoint14*)buffer)->edge_of_flight_line;
     ((LAStempReadPoint10*)item)->classification = (((LAStempReadPoint14*)buffer)->classification_flags << 5);
     if (((LAStempReadPoint14*)buffer)->classification < 32) ((LAStempReadPoint10*)item)->classification |= ((LAStempReadPoint14*)buffer)->classification;
-    ((LAStempReadPoint10*)item)->scan_angle_rank = I8_CLAMP(I16_QUANTIZE(((LAStempReadPoint14*)buffer)->scan_angle*0.006f));
+    ((LAStempReadPoint10*)item)->scan_angle_rank = I8_CLAMP(I16_QUANTIZE(0.006f*((LAStempReadPoint14*)buffer)->scan_angle));
     ((LAStempReadPoint10*)item)->user_data = ((LAStempReadPoint14*)buffer)->user_data;
     ((LAStempReadPoint10*)item)->point_source_ID = ((LAStempReadPoint14*)buffer)->point_source_ID;
     ((LAStempReadPoint10*)item)->extended_scanner_channel = ((LAStempReadPoint14*)buffer)->scanner_channel;
