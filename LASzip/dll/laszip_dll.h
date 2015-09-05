@@ -24,7 +24,8 @@
   
   CHANGE HISTORY:
   
-    3 August 2015 -- incompatible change for QSI-sponsored "LAS 1.4 compatibility mode" in DLL
+    5 September 2015 -- "LAS 1.4 compatibility mode" now allows pre-existing "extra bytes"
+    3 August 2015 -- incompatible DLL change for QSI-sponsored "LAS 1.4 compatibility mode"
     8 July 2015 -- adding support for NOAA-sponsored "LAS 1.4 compatibility mode"
     1 April 2015 -- adding exploitation and creation of spatial indexing information 
     8 August 2013 -- added laszip_get_coordinates() and laszip_set_coordinates()
@@ -323,6 +324,17 @@ laszip_set_geoascii_params(
     laszip_POINTER                     pointer
     , laszip_U32                       number
     , const laszip_CHAR*               geoascii_params
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_add_attribute(
+    laszip_POINTER                     pointer
+    , laszip_U32                       type
+    , const laszip_CHAR*               name
+    , const laszip_CHAR*               description
+    , laszip_F64                       scale
+    , laszip_F64                       offset
 );
 
 /*---------------------------------------------------------------------------*/

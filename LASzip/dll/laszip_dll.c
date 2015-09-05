@@ -425,6 +425,35 @@ laszip_set_geoascii_params
 };
 
 /*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_add_attribute_def)
+(
+    laszip_POINTER                     pointer
+    , laszip_U32                       type
+    , const laszip_CHAR*               name
+    , const laszip_CHAR*               description
+    , laszip_F64                       scale
+    , laszip_F64                       offset
+);
+laszip_add_attribute_def laszip_add_attribute_ptr = 0;
+LASZIP_API laszip_I32
+laszip_add_attribute
+(
+    laszip_POINTER                     pointer
+    , laszip_U32                       type
+    , const laszip_CHAR*               name
+    , const laszip_CHAR*               description
+    , laszip_F64                       scale
+    , laszip_F64                       offset
+)
+{
+  if (laszip_add_attribute_ptr)
+  {
+    return (*laszip_add_attribute_ptr)(pointer, type, name, description, scale, offset);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
 typedef laszip_I32 (*laszip_add_vlr_def)
 (
     laszip_POINTER                     pointer
@@ -919,6 +948,11 @@ laszip_I32 laszip_load_dll()
   }
   laszip_set_geoascii_params_ptr = (laszip_set_geoascii_params_def)GetProcAddress(laszip_HINSTANCE, "laszip_set_geoascii_params");
   if (laszip_set_geoascii_params_ptr == NULL) {
+     FreeLibrary(laszip_HINSTANCE);
+     return 1;
+  }
+  laszip_add_attribute_ptr = (laszip_add_attribute_def)GetProcAddress(laszip_HINSTANCE, "laszip_add_attribute");
+  if (laszip_add_attribute_ptr == NULL) {
      FreeLibrary(laszip_HINSTANCE);
      return 1;
   }

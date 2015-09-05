@@ -164,7 +164,7 @@ public:
   I32 z;
   U16 intensity;
   U8 return_number : 3;
-  U8 number_of_returns_of_given_pulse : 3;
+  U8 number_of_returns : 3;
   U8 scan_direction_flag : 1;
   U8 edge_of_flight_line : 1;
   U8 classification;
@@ -178,7 +178,7 @@ public:
   U8 extended_classification_flags : 4;
   U8 extended_classification;
   U8 extended_return_number : 4;
-  U8 extended_number_of_returns_of_given_pulse : 4;
+  U8 extended_number_of_returns : 4;
   // for 8 byte alignment of the GPS time
   U8 dummy[3];
   // LASlib only
@@ -194,7 +194,7 @@ public:
   I32 z;
   U16 intensity;
   U8 return_number : 4;
-  U8 number_of_returns_of_given_pulse : 4;
+  U8 number_of_returns : 4;
   U8 classification_flags : 4;
   U8 scanner_channel : 2;
   U8 scan_direction_flag : 1;
@@ -216,29 +216,29 @@ public:
     ((LAStempReadPoint10*)item)->y = ((LAStempReadPoint14*)buffer)->y;
     ((LAStempReadPoint10*)item)->z = ((LAStempReadPoint14*)buffer)->z;
     ((LAStempReadPoint10*)item)->intensity = ((LAStempReadPoint14*)buffer)->intensity;
-    if (((LAStempReadPoint14*)buffer)->number_of_returns_of_given_pulse > 7)
+    if (((LAStempReadPoint14*)buffer)->number_of_returns > 7)
     {
       if (((LAStempReadPoint14*)buffer)->return_number > 6)
       {
-        if (((LAStempReadPoint14*)buffer)->return_number >= ((LAStempReadPoint14*)buffer)->number_of_returns_of_given_pulse)
+        if (((LAStempReadPoint14*)buffer)->return_number >= ((LAStempReadPoint14*)buffer)->number_of_returns)
         {
-          ((LAStempReadPoint10*)item)->number_of_returns_of_given_pulse = 7;
+          ((LAStempReadPoint10*)item)->return_number = 7;
         }
         else
         {
-          ((LAStempReadPoint10*)item)->number_of_returns_of_given_pulse = 6;
+          ((LAStempReadPoint10*)item)->return_number = 6;
         }
       }
       else
       {
         ((LAStempReadPoint10*)item)->return_number = ((LAStempReadPoint14*)buffer)->return_number;
       }
-      ((LAStempReadPoint10*)item)->number_of_returns_of_given_pulse = 7;
+      ((LAStempReadPoint10*)item)->number_of_returns = 7;
     }
     else
     {
       ((LAStempReadPoint10*)item)->return_number = ((LAStempReadPoint14*)buffer)->return_number;
-      ((LAStempReadPoint10*)item)->number_of_returns_of_given_pulse = ((LAStempReadPoint14*)buffer)->number_of_returns_of_given_pulse;
+      ((LAStempReadPoint10*)item)->number_of_returns = ((LAStempReadPoint14*)buffer)->number_of_returns;
     }
     ((LAStempReadPoint10*)item)->scan_direction_flag = ((LAStempReadPoint14*)buffer)->scan_direction_flag;
     ((LAStempReadPoint10*)item)->edge_of_flight_line = ((LAStempReadPoint14*)buffer)->edge_of_flight_line;
@@ -251,7 +251,7 @@ public:
     ((LAStempReadPoint10*)item)->extended_classification_flags = ((LAStempReadPoint14*)buffer)->classification_flags;
     ((LAStempReadPoint10*)item)->extended_classification = ((LAStempReadPoint14*)buffer)->classification;
     ((LAStempReadPoint10*)item)->extended_return_number = ((LAStempReadPoint14*)buffer)->return_number;
-    ((LAStempReadPoint10*)item)->extended_number_of_returns_of_given_pulse = ((LAStempReadPoint14*)buffer)->number_of_returns_of_given_pulse;
+    ((LAStempReadPoint10*)item)->extended_number_of_returns = ((LAStempReadPoint14*)buffer)->number_of_returns;
     ((LAStempReadPoint10*)item)->extended_scan_angle = ((LAStempReadPoint14*)buffer)->scan_angle;
     ((LAStempReadPoint10*)item)->gps_time = *((F64*)&buffer[22]);
   }
