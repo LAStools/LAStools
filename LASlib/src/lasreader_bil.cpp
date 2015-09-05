@@ -99,6 +99,11 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
     return FALSE;
   }
 
+  if (setvbuf(file, NULL, _IOFBF, 2*LAS_TOOLS_IO_IBUFFER_SIZE) != 0)
+  {
+    fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", 2*LAS_TOOLS_IO_IBUFFER_SIZE);
+  }
+
   // populate the header as much as it makes sense
 
   sprintf(header.system_identifier, "LAStools (c) by rapidlasso GmbH");
@@ -691,6 +696,11 @@ BOOL LASreaderBIL::reopen(const CHAR* file_name)
     return FALSE;
   }
 
+  if (setvbuf(file, NULL, _IOFBF, 2*LAS_TOOLS_IO_IBUFFER_SIZE) != 0)
+  {
+    fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", 2*LAS_TOOLS_IO_IBUFFER_SIZE);
+  }
+
   col = 0;
   row = 0;
   p_count = 0;
@@ -870,20 +880,8 @@ LASreaderBILrescale::LASreaderBILrescale(F64 x_scale_factor, F64 y_scale_factor,
 
 BOOL LASreaderBILrescale::open(const CHAR* file_name)
 {
+  LASreaderBIL::set_scale_factor(scale_factor);
   if (!LASreaderBIL::open(file_name)) return FALSE;
-  // do we need to change anything
-  if (scale_factor[0] && (header.x_scale_factor != scale_factor[0]))
-  {
-    header.x_scale_factor = scale_factor[0];
-  }
-  if (scale_factor[1] && (header.y_scale_factor != scale_factor[1]))
-  {
-    header.y_scale_factor = scale_factor[1];
-  }
-  if (scale_factor[2] && (header.z_scale_factor != scale_factor[2]))
-  {
-    header.z_scale_factor = scale_factor[2];
-  }
   return TRUE;
 }
 
@@ -896,20 +894,8 @@ LASreaderBILreoffset::LASreaderBILreoffset(F64 x_offset, F64 y_offset, F64 z_off
 
 BOOL LASreaderBILreoffset::open(const CHAR* file_name)
 {
+  LASreaderBIL::set_offset(offset);
   if (!LASreaderBIL::open(file_name)) return FALSE;
-  // do we need to change anything
-  if (header.x_offset != offset[0])
-  {
-    header.x_offset = offset[0];
-  }
-  if (header.y_offset != offset[1])
-  {
-    header.y_offset = offset[1];
-  }
-  if (header.z_offset != offset[2])
-  {
-    header.z_offset = offset[2];
-  }
   return TRUE;
 }
 
@@ -919,31 +905,8 @@ LASreaderBILrescalereoffset::LASreaderBILrescalereoffset(F64 x_scale_factor, F64
 
 BOOL LASreaderBILrescalereoffset::open(const CHAR* file_name)
 {
+  LASreaderBIL::set_scale_factor(scale_factor);
+  LASreaderBIL::set_offset(offset);
   if (!LASreaderBIL::open(file_name)) return FALSE;
-  // do we need to change anything
-  if (scale_factor[0] && (header.x_scale_factor != scale_factor[0]))
-  {
-    header.x_scale_factor = scale_factor[0];
-  }
-  if (scale_factor[1] && (header.y_scale_factor != scale_factor[1]))
-  {
-    header.y_scale_factor = scale_factor[1];
-  }
-  if (scale_factor[2] && (header.z_scale_factor != scale_factor[2]))
-  {
-    header.z_scale_factor = scale_factor[2];
-  }
-  if (header.x_offset != offset[0])
-  {
-    header.x_offset = offset[0];
-  }
-  if (header.y_offset != offset[1])
-  {
-    header.y_offset = offset[1];
-  }
-  if (header.z_offset != offset[2])
-  {
-    header.z_offset = offset[2];
-  }
   return TRUE;
 }

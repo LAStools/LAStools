@@ -1283,6 +1283,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 LASwaveform13reader* LASreadOpener::open_waveform13(const LASheader* lasheader)
 {
   if (lasheader->point_data_format < 4) return 0;
+  if ((lasheader->point_data_format > 5) && (lasheader->point_data_format < 9)) return 0;
   if (lasheader->vlr_wave_packet_descr == 0) return 0;
   if (get_file_name() == 0) return 0;
   LASwaveform13reader* waveform13reader = new LASwaveform13reader();

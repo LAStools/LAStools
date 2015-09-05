@@ -424,6 +424,14 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   if (version_minor >= 4)
   {
     writing_las_1_4 = TRUE;
+    if (header->point_data_format >= 6)
+    {
+      writing_new_point_type = TRUE;
+    }
+    else
+    {
+      writing_new_point_type = FALSE;
+    }
 
     U64 start_of_first_extended_variable_length_record = header->start_of_first_extended_variable_length_record;
     if (start_of_first_extended_variable_length_record != 0)
@@ -478,6 +486,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   else
   {
     writing_las_1_4 = FALSE;
+    writing_new_point_type = FALSE;
   }
 
   // write any number of user-defined bytes that might have been added into the header
@@ -876,7 +885,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
 
   if (!writer->init(stream)) return FALSE;
 
-  npoints = header->number_of_point_records;
+  npoints = (header->number_of_point_records ? header->number_of_point_records : header->extended_number_of_point_records);
   p_count = 0;
 
   return TRUE;
@@ -913,9 +922,13 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
   }
   if (use_inventory)
   {
-    stream->seek(header_start_position+107);
     U32 number;
-    if (inventory.extended_number_of_point_records > U32_MAX)
+    stream->seek(header_start_position+107);
+    if (header->point_data_format >= 6)
+    {
+      number = 0; // legacy counters are zero for new point types
+    }
+    else if (inventory.extended_number_of_point_records > U32_MAX)
     {
       if (header->version_minor >= 4)
       {
@@ -939,7 +952,11 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
     npoints = inventory.extended_number_of_point_records;
     for (i = 0; i < 5; i++)
     {
-      if (inventory.extended_number_of_points_by_return[i+1] > U32_MAX)
+      if (header->point_data_format >= 6)
+      {
+        number = 0; // legacy counters are zero for new point types
+      }
+      else if (inventory.extended_number_of_points_by_return[i+1] > U32_MAX)
       {
         if (header->version_minor >= 4)
         {
@@ -1019,8 +1036,17 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
   }
   else
   {
+    U32 number;
     stream->seek(header_start_position+107);
-    if (!stream->put32bitsLE((U8*)&(header->number_of_point_records)))
+    if (header->point_data_format >= 6)
+    {
+      number = 0; // legacy counters are zero for new point types
+    }
+    else
+    {
+      number = header->number_of_point_records;
+    }
+    if (!stream->put32bitsLE((U8*)&number))
     {
       fprintf(stderr,"ERROR: updating header->number_of_point_records\n");
       return FALSE;
@@ -1028,7 +1054,15 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
     npoints = header->number_of_point_records;
     for (i = 0; i < 5; i++)
     {
-      if (!stream->put32bitsLE((U8*)&(header->number_of_points_by_return[i])))
+      if (header->point_data_format >= 6)
+      {
+        number = 0; // legacy counters are zero for new point types
+      }
+      else
+      {
+        number = header->number_of_points_by_return[i];
+      }
+      if (!stream->put32bitsLE((U8*)&number))
       {
         fprintf(stderr,"ERROR: updating header->number_of_points_by_return[%d]\n", i);
         return FALSE;
@@ -1206,10 +1240,28 @@ I64 LASwriterLAS::close(BOOL update_header)
       }
       else
       {
+        U32 number;
+        if (writing_new_point_type)
+        {
+          number = 0;
+        }
+        else if (p_count > U32_MAX)
+        {
+          if (writing_las_1_4)
+          {
+            number = 0;
+          }
+          else
+          {
+            number = U32_MAX;
+          }
+        }
+        else
+        {
+          number = (U32)p_count;
+        }
 	      stream->seek(header_start_position+107);
-        U32 value = (U32)p_count;
-        if (writing_las_1_4 && (p_count > U32_MAX)) value = 0;
-	      stream->put32bitsLE((U8*)&value);
+	      stream->put32bitsLE((U8*)&number);
         if (writing_las_1_4)
         {
   	      stream->seek(header_start_position+235+12);
@@ -1241,6 +1293,7 @@ LASwriterLAS::LASwriterLAS()
   stream = 0;
   writer = 0;
   writing_las_1_4 = FALSE;
+  writing_new_point_type = FALSE;
 }
 
 LASwriterLAS::~LASwriterLAS()

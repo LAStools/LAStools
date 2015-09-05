@@ -74,6 +74,10 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
     header->header_size -= 140;
     header->offset_to_point_data -= 140;
   }
+
+  // turn off the bit indicating the presence of the OGC WKT
+  header->global_encoding &= ~(1<<4);
+
   // old point type is two bytes shorter
   header->point_data_record_length -= 2;
   // but we add 5 bytes of attributes
@@ -394,6 +398,16 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
   }
   header->version_minor = 4;
 
+  // maybe turn on the bit indicating the presence of the OGC WKT
+  for (i = 0; i < header->number_of_variable_length_records; i++)
+  {
+    if ((strncmp(header->vlrs[i].user_id, "LASF_Projection", 16) == 0) && (header->vlrs[i].record_id == 2112))
+    {
+      header->global_encoding |= (1<<4);
+      break;
+    }
+  }
+
   // read the 2+2+4+148 bytes payload from the compatibility VLR
   ByteStreamInArray* in;
   if (IS_LITTLE_ENDIAN())
@@ -427,6 +441,12 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
   // delete the compatibility VLR
   header->remove_vlr("lascompatible", 22204);
   delete in;
+  // zero the 32-bit legary counters as we have new point types
+  header->number_of_point_records = 0;
+  for (i = 0; i < 5; i++)
+  {
+    header->number_of_points_by_return[i] = 0;
+  }
   // new point type is two bytes longer
   header->point_data_record_length += 2;
   // but we subtract 5 bytes of attributes

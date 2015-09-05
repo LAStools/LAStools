@@ -39,7 +39,7 @@
 
 extern "C" FILE* fopen_compressed(const char* filename, const char* mode, bool* piped);
 
-BOOL LASreaderASC::open(const char* file_name, BOOL comma_not_point)
+BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
 {
   if (file_name == 0)
   {
@@ -55,6 +55,11 @@ BOOL LASreaderASC::open(const char* file_name, BOOL comma_not_point)
   {
     fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
     return FALSE;
+  }
+
+  if (setvbuf(file, NULL, _IOFBF, 10*LAS_TOOLS_IO_IBUFFER_SIZE) != 0)
+  {
+    fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", 10*LAS_TOOLS_IO_IBUFFER_SIZE);
   }
 
   // clean the header
@@ -428,7 +433,7 @@ void LASreaderASC::close(BOOL close_stream)
   }
 }
 
-BOOL LASreaderASC::reopen(const char* file_name)
+BOOL LASreaderASC::reopen(const CHAR* file_name)
 {
   if (file_name == 0)
   {
@@ -441,6 +446,11 @@ BOOL LASreaderASC::reopen(const char* file_name)
   {
     fprintf(stderr, "ERROR: cannot reopen file '%s'\n", file_name);
     return FALSE;
+  }
+
+  if (setvbuf(file, NULL, _IOFBF, 10*LAS_TOOLS_IO_IBUFFER_SIZE) != 0)
+  {
+    fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", 10*LAS_TOOLS_IO_IBUFFER_SIZE);
   }
 
   // read the header lines
@@ -649,22 +659,10 @@ LASreaderASCrescale::LASreaderASCrescale(F64 x_scale_factor, F64 y_scale_factor,
   scale_factor[2] = z_scale_factor;
 }
 
-BOOL LASreaderASCrescale::open(const char* file_name)
+BOOL LASreaderASCrescale::open(const CHAR* file_name, BOOL comma_not_point)
 {
-  if (!LASreaderASC::open(file_name)) return FALSE;
-  // do we need to change anything
-  if (scale_factor[0] && (header.x_scale_factor != scale_factor[0]))
-  {
-    header.x_scale_factor = scale_factor[0];
-  }
-  if (scale_factor[1] && (header.y_scale_factor != scale_factor[1]))
-  {
-    header.y_scale_factor = scale_factor[1];
-  }
-  if (scale_factor[2] && (header.z_scale_factor != scale_factor[2]))
-  {
-    header.z_scale_factor = scale_factor[2];
-  }
+  LASreaderASC::set_scale_factor(scale_factor);
+  if (!LASreaderASC::open(file_name, comma_not_point)) return FALSE;
   return TRUE;
 }
 
@@ -675,22 +673,10 @@ LASreaderASCreoffset::LASreaderASCreoffset(F64 x_offset, F64 y_offset, F64 z_off
   this->offset[2] = z_offset;
 }
 
-BOOL LASreaderASCreoffset::open(const char* file_name)
+BOOL LASreaderASCreoffset::open(const CHAR* file_name, BOOL comma_not_point)
 {
-  if (!LASreaderASC::open(file_name)) return FALSE;
-  // do we need to change anything
-  if (header.x_offset != offset[0])
-  {
-    header.x_offset = offset[0];
-  }
-  if (header.y_offset != offset[1])
-  {
-    header.y_offset = offset[1];
-  }
-  if (header.z_offset != offset[2])
-  {
-    header.z_offset = offset[2];
-  }
+  LASreaderASC::set_offset(offset);
+  if (!LASreaderASC::open(file_name, comma_not_point)) return FALSE;
   return TRUE;
 }
 
@@ -698,33 +684,10 @@ LASreaderASCrescalereoffset::LASreaderASCrescalereoffset(F64 x_scale_factor, F64
 {
 }
 
-BOOL LASreaderASCrescalereoffset::open(const char* file_name)
+BOOL LASreaderASCrescalereoffset::open(const CHAR* file_name, BOOL comma_not_point)
 {
-  if (!LASreaderASC::open(file_name)) return FALSE;
-  // do we need to change anything
-  if (scale_factor[0] && (header.x_scale_factor != scale_factor[0]))
-  {
-    header.x_scale_factor = scale_factor[0];
-  }
-  if (scale_factor[1] && (header.y_scale_factor != scale_factor[1]))
-  {
-    header.y_scale_factor = scale_factor[1];
-  }
-  if (scale_factor[2] && (header.z_scale_factor != scale_factor[2]))
-  {
-    header.z_scale_factor = scale_factor[2];
-  }
-  if (header.x_offset != offset[0])
-  {
-    header.x_offset = offset[0];
-  }
-  if (header.y_offset != offset[1])
-  {
-    header.y_offset = offset[1];
-  }
-  if (header.z_offset != offset[2])
-  {
-    header.z_offset = offset[2];
-  }
+  LASreaderASC::set_scale_factor(scale_factor);
+  LASreaderASC::set_offset(offset);
+  if (!LASreaderASC::open(file_name, comma_not_point)) return FALSE;
   return TRUE;
 }

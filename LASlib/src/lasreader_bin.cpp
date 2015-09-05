@@ -95,6 +95,11 @@ BOOL LASreaderBIN::open(const char* file_name)
     return FALSE;
   }
 
+  if (setvbuf(file, NULL, _IOFBF, 2*LAS_TOOLS_IO_IBUFFER_SIZE) != 0)
+  {
+    fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", 2*LAS_TOOLS_IO_IBUFFER_SIZE);
+  }
+
   // create input stream
 
   ByteStreamIn* in;

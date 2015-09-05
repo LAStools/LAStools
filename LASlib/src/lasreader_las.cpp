@@ -352,29 +352,12 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
         fprintf(stderr,"ERROR: reading header.extended_number_of_point_records\n");
         return FALSE;
       }
-      if (header.number_of_point_records == 0)
-      {
-        if (header.extended_number_of_point_records < U32_MAX)
-        {
-          header.number_of_point_records = (U32)header.extended_number_of_point_records;
-        }
-      }
       for (i = 0; i < 15; i++)
       {
         try { stream->get64bitsLE((U8*)&(header.extended_number_of_points_by_return[i])); } catch(...)
         {
           fprintf(stderr,"ERROR: reading header.extended_number_of_points_by_return[%d]\n", i);
           return FALSE;
-        }
-        if (i < 5)
-        {
-          if (header.number_of_points_by_return[i] == 0)
-          {
-            if (header.extended_number_of_points_by_return[i] < U32_MAX)
-            {
-              header.number_of_points_by_return[i] = (U32)header.extended_number_of_points_by_return[i];
-            }
-          }
         }
       }
       header.user_data_in_header_size = header.header_size - 375;
@@ -743,18 +726,14 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
             }
             header.vlr_geo_double_params = (F64*)header.vlrs[i].data;
           }
-          else if (header.vlrs[i].record_id == 34737) // GeoAsciiParamsTag
+          else if (header.vlrs[i].record_id != 2112) // GeoAsciiParamsTag
           {
-            if (header.vlr_geo_ascii_params)
-            {
-              fprintf(stderr,"WARNING: variable length records contain more than one GeoAsciiParamsTag\n");
-            }
-            header.vlr_geo_ascii_params = (CHAR*)header.vlrs[i].data;
-          }
+            fprintf(stderr,"WARNING: unknown LASF_Projection VLR with record_id %d.\n", header.vlrs[i].record_id);
+          } 
         }
-        else
+        else if (header.vlrs[i].record_id != 2112) // GeoAsciiParamsTag
         {
-          fprintf(stderr,"WARNING: no payload for LASF_Projection (not specification-conform).\n");
+          fprintf(stderr,"WARNING: no payload for LASF_Projection VLR with record_id %d.\n", header.vlrs[i].record_id);
         }
       }
       else if (strcmp(header.vlrs[i].user_id, "LASF_Spec") == 0)
