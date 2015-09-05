@@ -407,7 +407,7 @@ int main(int argc, char *argv[])
     if (report_file_size)
     {
       // maybe only report uncompressed file size
-      I64 uncompressed_file_size = (I64)lasreader->header.number_of_point_records * (I64)lasreader->header.point_data_record_length + lasreader->header.offset_to_point_data;
+      I64 uncompressed_file_size = lasreader->npoints * lasreader->header.point_data_record_length + lasreader->header.offset_to_point_data;
       if (uncompressed_file_size == (I64)((U32)uncompressed_file_size))
         fprintf(stderr,"uncompressed file size is %u bytes or %.2f MB for '%s'\n", (U32)uncompressed_file_size, (F64)uncompressed_file_size/1024.0/1024.0, lasreadopener.get_file_name());
       else
