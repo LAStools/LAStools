@@ -1006,7 +1006,7 @@ int main(int argc, char *argv[])
     {
       if (reproject_quantizer) lasreader->header = *reproject_quantizer;
       laswriter->update_header(&lasreader->header, TRUE);
-      if (verbose) { fprintf(stderr,"total time: %g sec. written %u surviving points.\n", taketime()-start_time, (U32)laswriter->p_count); }
+      if (verbose) { fprintf(stderr,"total time: %g sec. written %u surviving points to '%s'.\n", taketime()-start_time, (U32)laswriter->p_count, laswriteopener.get_file_name()); }
     }
     else
     {

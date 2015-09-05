@@ -3017,7 +3017,10 @@ int main(int argc, char *argv[])
 
     if (check_points)
     {
+      I64 num_first_returns = 0;
+      I64 num_intermediate_returns = 0;
       I64 num_last_returns = 0;
+      I64 num_single_returns = 0;
       I64 num_all_returns = 0;
       I64 outside_bounding_box = 0;
       LASoccupancyGrid* lasoccupancygrid = 0;
@@ -3056,9 +3059,21 @@ int main(int argc, char *argv[])
           lasoccupancygrid->add(&lasreader->point);
         }
 
+        if (lasreader->point.is_first())
+        {
+          num_first_returns++;
+        }
+        if (lasreader->point.is_intermediate())
+        {
+          num_intermediate_returns++;
+        }
         if (lasreader->point.is_last())
         {
           num_last_returns++;
+        }
+        if (lasreader->point.is_single())
+        {
+          num_single_returns++;
         }
         num_all_returns++;
 
@@ -3183,13 +3198,19 @@ int main(int argc, char *argv[])
         lashistogram.report(file_out);
         lashistogram.reset();
       }
+#ifdef _WIN32
+      fprintf(file_out, "number of first returns:        %I64d\012", num_first_returns);
+      fprintf(file_out, "number of intermediate returns: %I64d\012", num_intermediate_returns);
+      fprintf(file_out, "number of last returns:         %I64d\012", num_last_returns);
+      fprintf(file_out, "number of single returns:       %I64d\012", num_single_returns);
+#else
+      fprintf(file_out, "number of first returns:        %lld\012", num_first_returns);
+      fprintf(file_out, "number of intermediate returns: %lld\012", num_intermediate_returns);
+      fprintf(file_out, "number of last returns:         %lld\012", num_last_returns);
+      fprintf(file_out, "number of single returns:       %I64d\012", num_single_returns);
+#endif
       if (file_out && lasoccupancygrid)
       {
-#ifdef _WIN32
-        fprintf(file_out, "number of last returns: %I64d\012", num_last_returns);
-#else
-        fprintf(file_out, "number of last returns: %lld\012", num_last_returns);
-#endif
         if (num_last_returns)
         {
           if (horizontal_units == 9001)
@@ -3542,7 +3563,7 @@ int main(int argc, char *argv[])
       {
         if ((lasheader->point_data_format < 6) && (lasheader->number_of_points_by_return[i-1] != lassummary.number_of_points_by_return[i]))
         {
-          if (lassummary.number_of_points_by_return[i-1] <= U32_MAX)
+          if (lassummary.number_of_points_by_return[i] <= U32_MAX)
           {
             number_of_points_by_return[i-1] = (U32)lassummary.number_of_points_by_return[i];
             wrong_entry = true;
@@ -3554,7 +3575,7 @@ int main(int argc, char *argv[])
               }
               else
               {
-                fprintf(file_out, "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i, (U32)lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
+                fprintf(file_out, "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i, number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
               }
             }
           }
@@ -3664,18 +3685,18 @@ int main(int argc, char *argv[])
       if (file_out && !no_min_max)
       {
 #ifdef _WIN32
-        if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there are %I64d points with return number 0\n", lassummary.number_of_points_by_return[0]);
+        if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there %s %I64d point%s with return number 0\n", (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[0], (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
         if (lasheader->version_minor < 4)
         {
-          if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there are %I64d points with return number 6\n", lassummary.number_of_points_by_return[6]); 
-          if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there are %I64d points with return number 7\n", lassummary.number_of_points_by_return[7]); 
+          if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there %s %I64d point%s with return number 6\n", (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[6], (lassummary.number_of_points_by_return[6] > 1 ? "s" : "")); 
+          if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there %s %I64d point%s with return number 7\n", (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[7], (lassummary.number_of_points_by_return[7] > 1 ? "s" : "")); 
         }
 #else
-        if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there are %lld points with return number 0\n", lassummary.number_of_points_by_return[0]); 
+        if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there %s %lld point%s with return number 0\n", (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[0], (lassummary.number_of_points_by_return[0] > 1 ? "s" : "")); 
         if (lasheader->version_minor < 4)
         {
-          if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there are %lld points with return number 6\n", lassummary.number_of_points_by_return[6]); 
-          if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there are %lld points with return number 7\n", lassummary.number_of_points_by_return[7]); 
+          if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there %s %lld point%s with return number 6\n", (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[6], (lassummary.number_of_points_by_return[6] > 1 ? "s" : ""));
+          if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there %s %lld point%s with return number 7\n", (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[7], (lassummary.number_of_points_by_return[7] > 1 ? "s" : ""));
         }
 #endif
 
