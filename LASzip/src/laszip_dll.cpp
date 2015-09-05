@@ -2005,6 +2005,11 @@ laszip_open_writer(
       return 1;
     }
 
+    if (setvbuf(laszip_dll->file, NULL, _IOFBF, 262144) != 0)
+    {
+      sprintf(laszip_dll->warning, "setvbuf() failed with buffer size 262144\n");
+    }
+
     if (IS_LITTLE_ENDIAN())
       laszip_dll->streamout = new ByteStreamOutFileLE(laszip_dll->file);
     else
@@ -2897,6 +2902,11 @@ laszip_open_reader(
     {
       sprintf(laszip_dll->error, "cannot open file '%s'", file_name);
       return 1;
+    }
+
+    if (setvbuf(laszip_dll->file, NULL, _IOFBF, 262144) != 0)
+    {
+      sprintf(laszip_dll->warning, "setvbuf() failed with buffer size 262144\n");
     }
 
     if (IS_LITTLE_ENDIAN())
