@@ -54,6 +54,11 @@ BOOL LASreaderTXT::open(const char* file_name, const char* parse_string, I32 ski
     return FALSE;
   }
 
+  if (setvbuf(file, NULL, _IOFBF, 10*LAS_TOOLS_IO_IBUFFER_SIZE) != 0)
+  {
+    fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", 10*LAS_TOOLS_IO_IBUFFER_SIZE);
+  }
+
   return open(file, file_name, parse_string, skip_lines, populate_header);
 }
 
@@ -348,6 +353,11 @@ BOOL LASreaderTXT::open(FILE* file, const char* file_name, const char* parse_str
     {
       fprintf(stderr, "ERROR: could not open '%s' for second pass\n", file_name);
       return FALSE;
+    }
+
+    if (setvbuf(file, NULL, _IOFBF, 10*LAS_TOOLS_IO_IBUFFER_SIZE) != 0)
+    {
+      fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", 10*LAS_TOOLS_IO_IBUFFER_SIZE);
     }
   }
 
@@ -904,6 +914,11 @@ BOOL LASreaderTXT::reopen(const char* file_name)
   {
     fprintf(stderr, "ERROR: cannot reopen file '%s'\n", file_name);
     return FALSE;
+  }
+
+  if (setvbuf(file, NULL, _IOFBF, 10*LAS_TOOLS_IO_IBUFFER_SIZE) != 0)
+  {
+    fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", 10*LAS_TOOLS_IO_IBUFFER_SIZE);
   }
 
   // skip lines if we have to

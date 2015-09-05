@@ -68,7 +68,14 @@ BOOL LASinventory::init(const LASheader* header)
 BOOL LASinventory::add(const LASpoint* point)
 {
   extended_number_of_point_records++;
-  extended_number_of_points_by_return[point->return_number]++;
+  if (point->extended_point_type)
+  {
+    extended_number_of_points_by_return[point->extended_return_number]++;
+  }
+  else
+  {
+    extended_number_of_points_by_return[point->return_number]++;
+  }
   if (first)
   {
     min_X = max_X = point->get_X();
@@ -170,17 +177,22 @@ LASsummary::LASsummary()
 BOOL LASsummary::add(const LASpoint* point)
 {
   number_of_point_records++;
-  number_of_points_by_return[point->get_return_number()]++;
-  number_of_returns[point->get_number_of_returns()]++;
+  if (point->extended_point_type)
+  {
+    number_of_points_by_return[point->get_extended_return_number()]++;
+    number_of_returns[point->get_extended_number_of_returns()]++;
+    extended_classification[point->get_extended_classification()]++;
+    if (point->get_extended_overlap_flag()) classification_extended_overlap++;
+  }
+  else
+  {
+    number_of_points_by_return[point->get_return_number()]++;
+    number_of_returns[point->get_number_of_returns()]++;
+  }
   classification[point->get_classification()]++;
   if (point->get_synthetic_flag()) classification_synthetic++;
   if (point->get_keypoint_flag()) classification_keypoint++;
   if (point->get_withheld_flag()) classification_withheld++;
-  if (point->extended_point_type)
-  {
-    extended_classification[point->get_extended_classification()]++;
-    if (point->get_extended_overlap_flag()) classification_extended_overlap++;
-  }
   if (first)
   {
     min = *point;

@@ -205,6 +205,7 @@ LASwriter* LASwriteOpener::open(const LASheader* header)
 LASwaveform13writer* LASwriteOpener::open_waveform13(const LASheader* lasheader)
 {
   if (lasheader->point_data_format < 4) return 0;
+  if ((lasheader->point_data_format > 5) && (lasheader->point_data_format < 9)) return 0;
   if (lasheader->vlr_wave_packet_descr == 0) return 0;
   if (get_file_name() == 0) return 0;
   LASwaveform13writer* waveform13writer = new LASwaveform13writer();

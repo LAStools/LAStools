@@ -89,7 +89,9 @@ public:
   I32 get_format() const;
   const CHAR* get_format_name() const;
   void set_parse_string(const CHAR* parse_string);
+  inline const CHAR* get_parse_string() const { return parse_string; };
   void set_separator(const CHAR* separator);
+  inline const CHAR* get_separator() const { return separator; };
   void set_scale_rgb(F32 scale_rgb);
   void usage() const;
   BOOL parse(int argc, char* argv[]);

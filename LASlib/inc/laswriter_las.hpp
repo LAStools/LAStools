@@ -80,6 +80,7 @@ private:
   FILE* file;
   I64 header_start_position;
   BOOL writing_las_1_4;
+  BOOL writing_new_point_type;
 };
 
 #endif
