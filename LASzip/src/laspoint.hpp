@@ -489,10 +489,13 @@ public:
     clean();
   };
 
-  inline BOOL is_single() const { return get_number_of_returns() == 1; };
-  inline BOOL is_first() const { return get_return_number() == 1; };
+  inline BOOL is_first() const { return get_return_number() <= 1; };
   inline BOOL is_intermediate() const { return (!is_first() && !is_last()); };
   inline BOOL is_last() const { return get_return_number() >= get_number_of_returns(); };
+  inline BOOL is_single() const { return get_number_of_returns() <= 1; };
+
+  inline BOOL is_first_of_many() const { return !is_single() && is_first(); };
+  inline BOOL is_last_of_many() const { return !is_single() && is_last(); };
 
   inline I32 get_X() const { return X; };
   inline I32 get_Y() const { return Y; };
