@@ -548,7 +548,7 @@ bool LASzip::request_version(const U16 requested_version)
         items[i].version = 1; // no version 2
         break;
     default:
-        return return_error("itrm type not supported");
+        return return_error("item type not supported");
     }
   }
   return true;

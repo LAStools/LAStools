@@ -1,3 +1,4 @@
+22 September 2015 -- bug fix for not overwriting description of pre-existing "extra bytes"
 5 September 201 -- the "LAS 1.4 compatibility mode" now allows pre-existing "extra bytes"
 31 July 2015 -- new DLL (incompatible with prior version) supports "LAS 1.4 compatibility mode"
 4 April 2015 -- added DLL functions for creation and exploitation of spatial indexing LAX files

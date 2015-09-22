@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    22 September 2015 -- bug fix for not overwriting description of pre-existing "extra bytes"
     5 September 2015 -- "LAS 1.4 compatibility mode" now allows pre-existing "extra bytes"
     3 August 2015 -- incompatible DLL change for QSI-sponsored "LAS 1.4 compatibility mode"
     8 July 2015 -- adding support for NOAA-sponsored "LAS 1.4 compatibility mode"
