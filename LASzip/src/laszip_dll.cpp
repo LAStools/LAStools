@@ -1778,7 +1778,7 @@ laszip_open_writer(
         }
         delete out;
 
-        // create an attributer to describe the "extra bytes"
+        // if needed create an attributer to describe the "extra bytes"
 
         if (laszip_dll->attributer == 0)
         {
@@ -1794,7 +1794,7 @@ laszip_open_writer(
 
         if (number_of_existing_extrabytes > 0)
         {
-          // if yes, then make sure the existing "extra bytes" are documented
+          // make sure the existing "extra bytes" are documented
 
           if (laszip_dll->attributer->get_attributes_size() > number_of_existing_extrabytes)
           {
@@ -1803,13 +1803,28 @@ laszip_open_writer(
           }
           else if (laszip_dll->attributer->get_attributes_size() < number_of_existing_extrabytes)
           {
-            // describe extra "extra bytes" as "unknown" U8  attributes
+            // maybe the existing "extra bytes" are documented in a VLR
+            if (laszip_dll->header.vlrs)
+            {
+              for (i = 0; i < laszip_dll->header.number_of_variable_length_records; i++)
+              {
+                if ((strcmp(laszip_dll->header.vlrs[i].user_id, "LASF_Spec") == 0) && (laszip_dll->header.vlrs[i].record_id == 4))
+                {
+                  laszip_dll->attributer->init_attributes(laszip_dll->header.vlrs[i].record_length_after_header/sizeof(LASattribute), (LASattribute*)laszip_dll->header.vlrs[i].data);
+                }
+              }
+            }
+
+            // describe any undocumented "extra bytes" as "unknown" U8  attributes
             for (I32 i = (I32)(laszip_dll->attributer->get_attributes_size()); i < number_of_existing_extrabytes; i++)
             {
-              LASattribute lasattribute_unknown(LAS_ATTRIBUTE_U8, "unknown", "unknown");
+              CHAR unknown_name[16];
+              memset(unknown_name, 0, 16);
+              sprintf(unknown_name, "unknown %d", i);
+              LASattribute lasattribute_unknown(LAS_ATTRIBUTE_U8, unknown_name, unknown_name);
               if (laszip_dll->attributer->add_attribute(lasattribute_unknown) == -1)
               {
-                sprintf(laszip_dll->error, "cannot add unknown U8 attribute %f of %d to attributer", i, number_of_existing_extrabytes);
+                sprintf(laszip_dll->error, "cannot add unknown U8 attribute '%s' of %d to attributer", unknown_name, number_of_existing_extrabytes);
                 return 1;
               }
             }
