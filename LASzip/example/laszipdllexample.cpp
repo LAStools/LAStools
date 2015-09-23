@@ -27,6 +27,7 @@
   
   CHANGE HISTORY:
   
+    23 September 2015 -- 11th example writes without a-priori bounding box or counters
     22 September 2015 -- 10th upconverts to LAS 1.4 with pre-existing "extra bytes"
      5 September 2015 -- eighth and nineth example show pre-existing "extra bytes"
     19 July 2015 -- sixth and seventh example show LAS 1.4 compatibility mode
