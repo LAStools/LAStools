@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    23 September 2015 -- correct update of bounding box and counters from inventory on closing
     22 September 2015 -- bug fix for not overwriting description of pre-existing "extra bytes"
     5 September 2015 -- "LAS 1.4 compatibility mode" now allows pre-existing "extra bytes"
     3 August 2015 -- incompatible DLL change for QSI-sponsored "LAS 1.4 compatibility mode"
