@@ -721,9 +721,9 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
   if (count)
   {
     if (name)
-      fprintf(file, "  average %s %g\012", name, total/count);
+      fprintf(file, "  average %s %g for %u element(s)\012", name, total/count, count);
     else
-      fprintf(file, "  average %g\012", total/count);
+      fprintf(file, "  average %g for %u element(s)\012", total/count, count);
   }
 }
 

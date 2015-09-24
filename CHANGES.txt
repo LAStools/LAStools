@@ -1,3 +1,10 @@
+24 September 2015 -- prototype implementing "uprising" of the n>1 returns against 1st return supremacy
+24 September 2015 -- lasclip: new options '-ignore_first_of_many', '-ignore_intermediate', '-ignore_single' ...
+24 September 2015 -- LASlib: upgrade to LAS 1.4 when '-merged'ing more points than older LAS allows
+24 September 2015 -- LASlib: consistant zeroing of legacy counters for new LAS 1.4 point types
+24 September 2015 -- LASzip: better DLL supports streaming and "extra bytes" in "compatibility mode"
+24 September 2015 -- lasclip: fixed bug for '-split' that was introduced in version 140828 
+24 September 2015 -- las2tin: new option '-histo edge_length 0.1' or '-histo edge_length_max 0.1'
 28 August 2015 -- lasinfo: option '-repair_counters' corrected for 64 bit counters of LAS 1.4 files
 28 August 2015 -- lasthin: added option '-central' to keep the most central point of each cell
 21 August 2015 -- lascontrol: adjust z coodinate using mean error with new LAS/LAZ or LAY files

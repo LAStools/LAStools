@@ -262,7 +262,14 @@ BOOL LASreaderBuffered::open()
     lasreader_neighbor->close();
     delete lasreader_neighbor;
 
-    header.number_of_point_records += buffered_points;
+    if (header.number_of_point_records)
+    {
+      header.number_of_point_records += buffered_points;
+    }
+    else
+    {
+      header.extended_number_of_point_records += buffered_points;
+    }
 
     fprintf(stderr, "LASreaderBuffered: adding %u buffer points.\n", buffered_points);
   }
@@ -347,7 +354,7 @@ BOOL LASreaderBuffered::open()
     }
   }
 
-  npoints = header.number_of_point_records;
+  npoints = (header.number_of_point_records ? header.number_of_point_records : header.extended_number_of_point_records);
   p_count = 0;
 
   return TRUE;
