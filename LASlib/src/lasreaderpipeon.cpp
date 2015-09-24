@@ -102,7 +102,7 @@ BOOL LASreaderPipeOn::open(LASreader* lasreader)
 
   laswriter = laswriterlas;
 
-  npoints = header.number_of_point_records;
+  npoints = (header.number_of_point_records ? header.number_of_point_records : header.extended_number_of_point_records);
   p_count = 0;
 
   return TRUE;

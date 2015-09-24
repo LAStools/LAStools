@@ -807,6 +807,7 @@ static const short EPSG_NAD83_Maryland_ftUS = 2248;
 static const short EPSG_NAD83_Texas_Central_ftUS = 2277;
 static const short EPSG_NAD83_HARN_Washington_North = 2855;
 static const short EPSG_NAD83_HARN_Washington_South = 2856;
+static const short EPSG_NAD83_HARN_California_6_ftUS = 2875;
 static const short EPSG_NAD83_HARN_Virginia_North_ftUS = 2924;
 static const short EPSG_NAD83_HARN_Virginia_South_ftUS = 2925;
 static const short EPSG_NAD83_HARN_Washington_North_ftUS = 2926;
@@ -905,6 +906,7 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_NAD83_Texas_Central_ftUS, "NAD83 Texas Central ft"),
   EPSGcode(EPSG_NAD83_HARN_Washington_North, "NAD83-H Washington N"),
   EPSGcode(EPSG_NAD83_HARN_Washington_South, "NAD83-H Washington S"),
+  EPSGcode(EPSG_NAD83_HARN_California_6_ftUS, "NAD83-H California 6 ft"),
   EPSGcode(EPSG_NAD83_HARN_Virginia_North_ftUS, "NAD83-H Virginia N ft"),
   EPSGcode(EPSG_NAD83_HARN_Virginia_South_ftUS, "NAD83-H Virginia S ft"),
   EPSGcode(EPSG_NAD83_HARN_Washington_North_ftUS, "NAD83-H Washington N ft"),
@@ -4573,6 +4575,15 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "NAD83(HARN) / Washington South");
+      return true;
+    }
+    else if (value == EPSG_NAD83_HARN_California_6_ftUS)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 32.16666666666666, -116.25, 33.88333333333333, 32.78333333333333, 0, source); // "NAD83(HARN) / California zone 6 (ftUS)"
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83(HARN) / California zone 6 (ftUS)");
       return true;
     }
     else if (value == EPSG_NAD83_HARN_Virginia_North_ftUS)

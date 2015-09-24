@@ -316,6 +316,19 @@ int main(int argc, char *argv[])
   }
   else
   {
+    if (lasreader->npoints > U32_MAX)
+    {
+      if (lasreader->header.version_minor < 4)
+      {
+#ifdef _WIN32
+        fprintf(stderr, "ERROR: cannot merge %I64d points into single LAS 1.%d file. maximum is %u\n", lasreader->npoints, lasreader->header.version_minor, U32_MAX);
+#else
+        fprintf(stderr, "ERROR: cannot merge %lld points into single LAS 1.%d file. maximum is %u\n", lasreader->npoints, lasreader->header.version_minor, U32_MAX);
+#endif
+        byebye(true, argc==1);
+      }
+    }
+
     // open the writer
     LASwriter* laswriter = laswriteopener.open(&lasreader->header);
     if (laswriter == 0)

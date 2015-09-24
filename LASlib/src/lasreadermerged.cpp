@@ -698,11 +698,15 @@ BOOL LASreaderMerged::open()
         header.x_offset = lasreader->header.x_offset;
         header.y_offset = lasreader->header.y_offset;
         header.z_offset = lasreader->header.z_offset;
-        // for LAS 1.4
+        // for LAS 1.4 (and 32-bit counter overflows)
+        header.extended_number_of_point_records = (lasreader->header.number_of_point_records ? lasreader->header.number_of_point_records : lasreader->header.extended_number_of_point_records);
+        for (j = 0; j < 5; j++)
+        {
+          header.extended_number_of_points_by_return[j] = (lasreader->header.number_of_points_by_return[j] ? lasreader->header.number_of_points_by_return[j] : lasreader->header.extended_number_of_points_by_return[j]);
+        }
         if (header.version_minor >= 4)
         {
-          header.extended_number_of_point_records = (lasreader->header.extended_number_of_point_records ? lasreader->header.extended_number_of_point_records : lasreader->header.number_of_point_records);
-          for (j = 0; j < 15; j++)
+          for (j = 5; j < 15; j++)
           {
             header.extended_number_of_points_by_return[j] = lasreader->header.extended_number_of_points_by_return[j];
           }
@@ -723,11 +727,15 @@ BOOL LASreaderMerged::open()
         if (header.min_x > lasreader->header.min_x) header.min_x = lasreader->header.min_x;
         if (header.min_y > lasreader->header.min_y) header.min_y = lasreader->header.min_y;
         if (header.min_z > lasreader->header.min_z) header.min_z = lasreader->header.min_z;
-        // for LAS 1.4
+        // for LAS 1.4 (and 32-bit counter overflows)
+        header.extended_number_of_point_records += (lasreader->header.number_of_point_records ? lasreader->header.number_of_point_records : lasreader->header.extended_number_of_point_records);
+        for (j = 0; j < 5; j++)
+        {
+          header.extended_number_of_points_by_return[j] += (lasreader->header.number_of_points_by_return[j] ? lasreader->header.number_of_points_by_return[j] : lasreader->header.extended_number_of_points_by_return[j]);
+        }
         if (header.version_minor >= 4)
         {
-          header.extended_number_of_point_records += (lasreader->header.extended_number_of_point_records ? lasreader->header.extended_number_of_point_records : lasreader->header.number_of_point_records);
-          for (j = 0; j < 15; j++)
+          for (j = 5; j < 15; j++)
           {
             header.extended_number_of_points_by_return[j] += lasreader->header.extended_number_of_points_by_return[j];
           }
@@ -762,6 +770,26 @@ BOOL LASreaderMerged::open()
       }
     }
     lasreader->close();
+  }
+
+  if ((npoints > U32_MAX) && (header.version_minor < 4))
+  {
+#ifdef _WIN32
+    fprintf(stderr,"WARNING: merged LAS 1.%d files contains too many points (%I64d). upgrading to LAS 1.4\n", header.version_minor, npoints);
+#else
+    fprintf(stderr,"WARNING: merged LAS 1.%d files contains too many points (%lld). upgrading to LAS 1.4\n", header.version_minor, npoints);
+#endif
+    if (header.version_minor == 3)
+    {
+      header.header_size += 140;
+      header.offset_to_point_data += 140;
+    }
+    else
+    {
+      header.header_size += 148;
+      header.offset_to_point_data += 148;
+    }
+    header.version_minor = 4;
   }
 
   // was it requested to rescale or reoffset

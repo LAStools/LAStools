@@ -1,3 +1,5 @@
+24 September 2015 -- LASlib: upgrade to LAS 1.4 when '-merged'ing more points than older LAS allows
+24 September 2015 -- LASlib: consistant zeroing of legacy counters for new LAS 1.4 point types
 28 August 2015 -- lasinfo: option '-repair_counters' corrected for 64 bit counters of LAS 1.4 files
 18 August 2015 -- lasdiff: fixed report for truncated files (fewer or more points) 
 1 August 2015 -- LASlib: moving LASpoint, LASquantizer, and LASattributer to LASzip for "compatibility"

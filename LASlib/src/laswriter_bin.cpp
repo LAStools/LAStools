@@ -171,7 +171,7 @@ BOOL LASwriterBIN::open(ByteStreamOut* stream, const LASheader* header, const ch
   tsheader.version = this->version;
   tsheader.recog_val = 970401;
   strncpy(tsheader.recog_str, "CXYZ", 4);
-  tsheader.npoints = header->number_of_point_records;
+  tsheader.npoints = (header->number_of_point_records ? header->number_of_point_records : (U32)header->extended_number_of_point_records);
   double scale = header->x_scale_factor;
   if (header->y_scale_factor < scale) scale = header->y_scale_factor; 
   if (header->z_scale_factor < scale) scale = header->z_scale_factor; 

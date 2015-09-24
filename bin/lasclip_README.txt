@@ -25,6 +25,10 @@
   the reclassified file. Then the clipping or the reclassifying
   will be applied exclusively to the other points.
 
+  You can also ignore points based on their return counts with
+  '-ignore_first_of_many', '-ignore_intermediate', '-ignore_last',
+  '-ignore_last_of_many', '-ignore_first', '-ignore_single'.
+
   There is an example SHP file called "TO_city_hall.shp" that
   can be used together with the TO_core_last_zoom.las or the
   TO_core_last.las data set to clip away the Toronto city hall.

@@ -275,6 +275,44 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
       fprintf(file, "%d", value);
     }
   }
+  else if (header->attributes[index].data_type == 7)
+  {
+    U64 value;
+    point->get_attribute(attribute_starts[index], value);
+    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    {
+      F64 temp_d = header->attributes[index].scale[0]*((I64)value) + header->attributes[index].offset[0];
+      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+      fprintf(file, "%s", printstring);
+    }
+    else
+    {
+#ifdef _WIN32
+        fprintf(file, "%I64d", (I64)value);
+#else
+        fprintf(file, "%lld", (I64)value);
+#endif
+    }
+  }
+  else if (header->attributes[index].data_type == 8)
+  {
+    I64 value;
+    point->get_attribute(attribute_starts[index], value);
+    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    {
+      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+      fprintf(file, "%s", printstring);
+    }
+    else
+    {
+#ifdef _WIN32
+        fprintf(file, "%I64d", value);
+#else
+        fprintf(file, "%lld", value);
+#endif
+    }
+  }
   else if (header->attributes[index].data_type == 9)
   {
     F32 value;

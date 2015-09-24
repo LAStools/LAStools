@@ -16,6 +16,13 @@
   a concavity of 50 meter. Use '-concavity 0' to disable this. The
   value is always assumed to be meters and will be multipled with
   3.28 for LAS/LAZ files where x and y are known to be in feet.
+
+  It is also possible to compute histograms over the length of
+  edges with '-histo' or '-histo_only'. As arguments this command
+  takes first what should be measured: either each 'edge_length'
+  or the 'min_edge_length' or the 'max_edge_length' around each
+  vertex or the 'min_max_edge_length_diff' around each vertex. The
+  last argument specifies the bin size of the histogram.
  
   Closed breaklines can be supplied for hydro-enforcment of
   lakes, for example ('-lakes lakes.shp', '-lakes hydro.txt')
@@ -41,6 +48,20 @@
 ****************************************************************
 
 example usage:
+
+>> las2tin -i lidar.laz -last_only -histo_only edge_length 0.1
+
+computes an edge length histogram for the last-return TIN
+
+>> las2tin -i lidar.laz -last_only -histo_only min_edge_length 0.1
+
+computes a histogram of the shortest edge length found around
+each vertex in the last-return TIN
+
+>> las2tin -i lidar.laz -last_only -histo_only max_edge_length 0.5
+
+computes a histogram of the longest edge length found around
+each vertex in the last-return TIN
 
 >> las2tin -i *.las
 
@@ -78,7 +99,7 @@ stores the resulting TIN in ESRI's Shapefile format to file tin.shp.
 
 for more info:
 
-C:\lastools\bin>las2tin -h
+D:\LAStools\bin>las2tin -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -101,6 +122,7 @@ Filter points based on their coordinates.
 Filter points based on their return number.
   -first_only -keep_first -drop_first
   -last_only -keep_last -drop_last
+  -drop_first_of_many -drop_last_of_many
   -keep_middle -drop_middle
   -keep_return 1 2 3
   -drop_return 3 4
@@ -124,6 +146,7 @@ Filter points based on their classification.
   -drop_synthetic -keep_synthetic
   -drop_keypoint -keep_keypoint
   -drop_withheld -keep_withheld
+  -drop_overlap -keep_overlap
 Filter points based on their user data.
   -keep_user_data 1
   -drop_user_data 255
@@ -149,6 +172,11 @@ Filter points based on their gps time.
   -drop_gps_time_below 11.125
   -drop_gps_time_above 130.725
   -drop_gps_time_between 22.0 48.0
+Filter points based on their RGB/NIR channel.
+  -keep_RGB_red 1 1
+  -keep_RGB_green 30 100
+  -keep_RGB_blue 0 0
+  -keep_RGB_nir 64 127
 Filter points based on their wavepacket.
   -keep_wavepacket 0
   -drop_wavepacket 3
@@ -156,12 +184,14 @@ Filter points with simple thinning.
   -keep_every_nth 2
   -keep_random_fraction 0.1
   -thin_with_grid 1.0
+  -thin_with_time 0.001
 Transform coordinates.
   -translate_x -2.5
   -scale_z 0.3048
   -rotate_xy 15.0 620000 4100000 (angle + origin)
   -translate_xyz 0.5 0.5 0
   -translate_then_scale_y -0.5 1.001
+  -switch_x_y -switch_x_z -switch_y_z
   -clamp_z_below 70.5
   -clamp_z 70.5 72.5
 Transform raw xyz integers.
@@ -192,13 +222,23 @@ Modify the classification.
   -classify_z_between_as 2.0 5.0 4
   -classify_intensity_above_as 200 9
   -classify_intensity_below_as 30 11
+  -change_extended_classification_from_to 6 46
+Change the flags.
+  -set_withheld_flag 0
+  -set_synthetic_flag 1
+  -set_keypoint_flag 0
+  -set_extended_overlap_flag 1
+Modify the extended scanner channel.
+  -set_extended_scanner_channel 2
 Modify the user data.
   -set_user_data 0
   -change_user_data_from_to 23 26
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
-  -quantize_Z_into_point_source 200
+  -copy_user_data_into_point_source
+  -bin_Z_into_point_source 200
+  -bin_abs_scan_angle_into_point_source 2
 Transform gps_time.
   -translate_gps_time 40.50
   -adjusted_to_week
@@ -223,6 +263,10 @@ Supported LAS Inputs
   -rescale_xy 0.01 0.01
   -rescale_z 0.01
   -reoffset 600000 4000000 0
+Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
+  -inside min_x min_y max_x max_y
+  -inside_tile ll_x ll_y size
+  -inside_circle center_x center_y radius
 Supported LAS Outputs
   -o lidar.las
   -o lidar.laz
@@ -235,7 +279,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 140301 (unlicensed)
+LAStools (by martin@rapidlasso.com) version 150905 (commercial)
 usage:
 las2tin -i *.las
 las2tin -i *.las -concavity 25 -oobj
@@ -244,6 +288,8 @@ las2tin -i lidar.laz -first_only -o mesh.obj
 las2tin -i lidar.laz -last_only -o indices_only.txt
 las2tin -i lidar.las -last_only -keep_class 2 6 8 -o tin.shp
 las2tin -i lidar.laz -keep_class 8
+las2tin -i lidar.laz -last_only -histo_only edge_length 0.1
+las2tin -i lidar.laz -last_only -histo_only min_edge_length 0.1
 las2tin -h
 
 ---------------

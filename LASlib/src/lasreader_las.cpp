@@ -726,7 +726,15 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
             }
             header.vlr_geo_double_params = (F64*)header.vlrs[i].data;
           }
-          else if (header.vlrs[i].record_id != 2112) // GeoAsciiParamsTag
+          else if (header.vlrs[i].record_id == 34737) // GeoAsciiParamsTag
+          {
+            if (header.vlr_geo_ascii_params)
+            {
+              fprintf(stderr,"WARNING: variable length records contain more than one GeoAsciiParamsTag\n");
+            }
+            header.vlr_geo_ascii_params = (CHAR*)header.vlrs[i].data;
+          }
+          else if ((header.vlrs[i].record_id != 2111) && (header.vlrs[i].record_id != 2112)) // WKT OGC MATH TRANSFORM or WKT OGC COORDINATE SYSTEM
           {
             fprintf(stderr,"WARNING: unknown LASF_Projection VLR with record_id %d.\n", header.vlrs[i].record_id);
           } 
