@@ -3207,7 +3207,7 @@ int main(int argc, char *argv[])
       fprintf(file_out, "number of first returns:        %lld\012", num_first_returns);
       fprintf(file_out, "number of intermediate returns: %lld\012", num_intermediate_returns);
       fprintf(file_out, "number of last returns:         %lld\012", num_last_returns);
-      fprintf(file_out, "number of single returns:       %I64d\012", num_single_returns);
+      fprintf(file_out, "number of single returns:       %lld\012", num_single_returns);
 #endif
       if (file_out && lasoccupancygrid)
       {
@@ -3522,7 +3522,7 @@ int main(int argc, char *argv[])
 
       if (lasheader->version_minor > 3)
       {
-        if (lassummary.number_of_point_records != lasheader->extended_number_of_point_records)
+        if (lassummary.number_of_point_records != (I64)lasheader->extended_number_of_point_records)
         {
           if (repair_counters)
           {
@@ -3646,7 +3646,7 @@ int main(int argc, char *argv[])
         for (i = 1; i < 16; i++)
         {
           extended_number_of_points_by_return[i-1] = lassummary.number_of_points_by_return[i];
-          if (lasheader->extended_number_of_points_by_return[i-1] != lassummary.number_of_points_by_return[i])
+          if ((I64)lasheader->extended_number_of_points_by_return[i-1] != lassummary.number_of_points_by_return[i])
           {
             wrong_entry = true;
             if (was_set)

@@ -720,10 +720,17 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
   }
   if (count)
   {
+#ifdef _WIN32
     if (name)
-      fprintf(file, "  average %s %g for %u element(s)\012", name, total/count, count);
+      fprintf(file, "  average %s %g for %I64d element(s)\012", name, total/count, count);
     else
-      fprintf(file, "  average %g for %u element(s)\012", total/count, count);
+      fprintf(file, "  average %g for %I64d element(s)\012", total/count, count);
+#else
+    if (name)
+      fprintf(file, "  average %s %g for %lld element(s)\012", name, total/count, (U32)count);
+    else
+      fprintf(file, "  average %g for %lld element(s)\012", total/count, (U32)count);
+#endif
   }
 }
 
