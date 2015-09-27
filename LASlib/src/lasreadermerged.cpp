@@ -657,6 +657,19 @@ BOOL LASreaderMerged::open()
       header = lasreader->header;
       // unlink the pointers for other header so they don't get deallocated twice
       lasreader->header.unlink();
+      // for LAS 1.4 (and 32-bit counter overflows)
+      header.extended_number_of_point_records = (lasreader->header.number_of_point_records ? lasreader->header.number_of_point_records : lasreader->header.extended_number_of_point_records);
+      for (j = 0; j < 5; j++)
+      {
+        header.extended_number_of_points_by_return[j] = (lasreader->header.number_of_points_by_return[j] ? lasreader->header.number_of_points_by_return[j] : lasreader->header.extended_number_of_points_by_return[j]);
+      }
+      if (header.version_minor >= 4)
+      {
+        for (j = 5; j < 15; j++)
+        {
+          header.extended_number_of_points_by_return[j] = lasreader->header.extended_number_of_points_by_return[j];
+        }
+      }
       // count the points up to 64 bits
       npoints = lasreader->npoints;
       // special check for attributes in extra bytes
@@ -774,22 +787,33 @@ BOOL LASreaderMerged::open()
 
   if ((npoints > U32_MAX) && (header.version_minor < 4))
   {
-#ifdef _WIN32
-    fprintf(stderr,"WARNING: merged LAS 1.%d files contains too many points (%I64d). upgrading to LAS 1.4\n", header.version_minor, npoints);
-#else
-    fprintf(stderr,"WARNING: merged LAS 1.%d files contains too many points (%lld). upgrading to LAS 1.4\n", header.version_minor, npoints);
-#endif
-    if (header.version_minor == 3)
+    if (0) // (auto_upgrade)
     {
-      header.header_size += 140;
-      header.offset_to_point_data += 140;
+#ifdef _WIN32
+      fprintf(stderr,"WARNING: on-the-fly merged LAS 1.%d files contain too many points (%I64d). upgrading to LAS 1.4\n", header.version_minor, npoints);
+#else
+      fprintf(stderr,"WARNING: on-the-fly merged LAS 1.%d files contain too many points (%lld). upgrading to LAS 1.4\n", header.version_minor, npoints);
+#endif
+      if (header.version_minor == 3)
+      {
+        header.header_size += 140;
+        header.offset_to_point_data += 140;
+      }
+      else
+      {
+        header.header_size += 148;
+        header.offset_to_point_data += 148;
+      }
+      header.version_minor = 4;
     }
     else
     {
-      header.header_size += 148;
-      header.offset_to_point_data += 148;
+#ifdef _WIN32
+      fprintf(stderr,"WARNING: on-the-fly merged LAS 1.%d files contain too many points (%I64d) for single LAS 1.%d file.\n", header.version_minor, npoints, header.version_minor);
+#else
+      fprintf(stderr,"WARNING: on-the-fly merged LAS 1.%d files contain too many points (%lld) for single LAS 1.%d file.\n", header.version_minor, npoints, header.version_minor);
+#endif
     }
-    header.version_minor = 4;
   }
 
   // was it requested to rescale or reoffset

@@ -1,3 +1,4 @@
+25 September 2015 -- LASlib: disabling auto-upgrade to LAS 1.4 introduced in 150924. now it just warns.
 24 September 2015 -- LASlib: upgrade to LAS 1.4 when '-merged'ing more points than older LAS allows
 24 September 2015 -- LASlib: consistant zeroing of legacy counters for new LAS 1.4 point types
 28 August 2015 -- lasinfo: option '-repair_counters' corrected for 64 bit counters of LAS 1.4 files
