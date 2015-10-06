@@ -624,8 +624,8 @@ BOOL LASreaderTXT::open(FILE* file, const char* file_name, const char* parse_str
   if (i != 1)
   {
     fprintf(stderr, "ERROR: could not parse any lines with '%s'\n", this->parse_string);
-    fclose(file);
-    file = 0;
+    fclose(this->file);
+    this->file = 0;
     free(this->parse_string);
     this->parse_string = 0;
     return FALSE;
