@@ -1,3 +1,5 @@
+9 October 2015 -- lasground, lasclassify: now '-feet' and '-elevation_feet' works with '-cores 2'
+9 October 2015 -- lasclip: fixed bug introduced for '-split' option in version 150924
 25 September 2015 -- LASlib: disabling auto-upgrade to LAS 1.4 introduced in 150924. now it just warns.
 24 September 2015 -- prototype implementing "uprising" of the n>1 returns against 1st return supremacy
 24 September 2015 -- lasclip: new options '-ignore_first_of_many', '-ignore_intermediate', '-ignore_single' ...

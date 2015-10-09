@@ -1491,7 +1491,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_auto_reoffset(TRUE);
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-files_are_flightlines") == 0)
+    else if (strcmp(argv[i],"-files_are_flightlines") == 0 || strcmp(argv[i],"-faf") == 0)
     {
       set_files_are_flightlines(TRUE);
       *argv[i]='\0';
