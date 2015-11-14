@@ -332,6 +332,19 @@ private:
   I32 below, above;
 };
 
+class LASoperationSetIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), (I32)intensity); };
+  inline void transform(LASpoint* point) const {
+    point->set_intensity(intensity);
+  };
+  LASoperationSetIntensity(U16 intensity) { this->intensity = intensity; };
+private:
+  U16 intensity;
+};
+
 class LASoperationScaleIntensity : public LASoperation
 {
 public:
@@ -949,6 +962,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -translate_raw_xyz 1 1 0\n");
   fprintf(stderr,"  -clamp_raw_z 500 800\n");
   fprintf(stderr,"Transform intensity.\n");
+  fprintf(stderr,"  -set_intensity 0\n");
   fprintf(stderr,"  -scale_intensity 2.5\n");
   fprintf(stderr,"  -translate_intensity 50\n");
   fprintf(stderr,"  -translate_then_scale_intensity 0.5 3.1\n");
@@ -1243,6 +1257,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
       change_coordinates = TRUE;
       add_operation(new LASoperationClampRawZ((I32)atoi(argv[i+1]), (I32)atoi(argv[i+2])));
       *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+    }
+    else if (strcmp(argv[i],"-set_intensity") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
+        return FALSE;
+      }
+      add_operation(new LASoperationSetIntensity(U16_CLAMP(atof(argv[i+1]))));
+      *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
     }
     else if (strcmp(argv[i],"-scale_intensity") == 0)
     {
