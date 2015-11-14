@@ -46,7 +46,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 151009
+#define LAS_TOOLS_VERSION 151111
 
 #include <stdio.h>
 #include <string.h>
@@ -544,7 +544,7 @@ public:
     }
     else if (description)
     {
-      sprintf(vlrs[i].description, "%31s", description);
+      sprintf(vlrs[i].description, "%.31s", description);
     }
     else
     {

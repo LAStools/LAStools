@@ -37,7 +37,7 @@
 class LASwriterCompatibleDown : public LASwriter
 {
 public:
-  BOOL open(LASheader* header, LASwriteOpener* laswriteopener);
+  BOOL open(LASheader* header, LASwriteOpener* laswriteopener, BOOL moveCRSfromEVLRtoVLR=FALSE, BOOL moveEVLRtoVLR=FALSE);
 
   BOOL write_point(const LASpoint* point);
   BOOL chunk() { return FALSE; };
