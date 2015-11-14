@@ -24,13 +24,26 @@
   
   CHANGE HISTORY:
   
-    10 January 2011 -- licensing change for LGPL release and liblas integration
+    28 October 2015 -- adding DLL bindings via 'COMPILE_AS_DLL' and 'USE_AS_DLL'
+    10 January 2011 -- licensing change for LGPL release and libLAS integration
     13 July 2005 -- created after returning with many mosquito bites from OBX
   
 ===============================================================================
 */
 #ifndef MYDEFS_HPP
 #define MYDEFS_HPP
+
+#ifndef _WIN32
+#define LASLIB_DLL
+#else  // _WIN32
+#ifdef COMPILE_AS_DLL
+#define LASLIB_DLL __declspec(dllexport)
+#elif USE_AS_DLL
+#define LASLIB_DLL __declspec(dllimport)
+#else
+#define LASLIB_DLL
+#endif
+#endif // _WIN32
 
 typedef char               CHAR;
 

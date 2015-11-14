@@ -44,7 +44,7 @@
 
 #include "lasutility.hpp"
 
-class LASwriter
+class LASLIB_DLL LASwriter
 {
 public:
   LASquantizer quantizer;
@@ -65,7 +65,7 @@ public:
 
 #include "laswaveform13writer.hpp"
 
-class LASwriteOpener
+class LASLIB_DLL LASwriteOpener
 {
 public:
   void set_io_obuffer_size(I32 io_obuffer_size);
