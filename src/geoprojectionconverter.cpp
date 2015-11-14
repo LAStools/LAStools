@@ -822,9 +822,11 @@ static const short EPSG_ETRS89_ETRS_TM34 = 3046;
 static const short EPSG_ETRS89_ETRS_TM35 = 3047;
 static const short EPSG_ETRS89_ETRS_TM36 = 3048;
 static const short EPSG_ETRS89_ETRS_TM35FIN = 3067;
+static const short EPSG_MAGNA_SIRGAS_Colombia_Bogoto = 3116;
 static const short EPSG_Fiji_1956_UTM60_South = 3141;
 static const short EPSG_Fiji_1956_UTM1_South = 3142;
 static const short EPSG_GDA94_NSW_Lambert = 3308;
+static const short EPSG_SVY21_Singapore_TM = 3414;
 static const short EPSG_Fiji_Map_Grid_1986 = 3460;
 static const short EPSG_NAD83_NSRS2007_California_zone_3_ftUS = 3494;
 static const short EPSG_NAD83_NSRS2007_California_zone_4_ftUS = 3496;
@@ -921,9 +923,11 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_ETRS89_ETRS_TM35, "ETRS89 TM35"),
   EPSGcode(EPSG_ETRS89_ETRS_TM36, "ETRS89 TM36"),
   EPSGcode(EPSG_ETRS89_ETRS_TM35FIN, "ETRS89 TM35FIN"),
+  EPSGcode(EPSG_MAGNA_SIRGAS_Colombia_Bogoto, "MAGNA SIRGAS Colom Bog"),
   EPSGcode(EPSG_Fiji_1956_UTM60_South, "Fiji 1956 UTM60"),
   EPSGcode(EPSG_Fiji_1956_UTM1_South, "Fiji 1956 UTM1"),
   EPSGcode(EPSG_GDA94_NSW_Lambert, "GDA94 NSW Lambert"),
+  EPSGcode(EPSG_SVY21_Singapore_TM, "SVY21 / Singapore TM"),
   EPSGcode(EPSG_Fiji_Map_Grid_1986, "Fiji Map Grid 1986"),
   EPSGcode(EPSG_NAD83_NSRS2007_California_zone_3_ftUS, "NSRS2007 Calif 3 ft"),
   EPSGcode(EPSG_NAD83_NSRS2007_California_zone_4_ftUS, "NSRS2007 Calif 4 ft"),
@@ -4712,6 +4716,15 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       if (description) sprintf(description, "ETRS89 / ETRS-TM35FIN");
       return true;
     }
+    else if (value == EPSG_MAGNA_SIRGAS_Colombia_Bogoto)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_transverse_mercator_projection(1000000.0, 1000000.0, 4.596200416666666, -74.07750791666666, 1.0, 0, source); // "MAGNA-SIRGAS / Colombia Bogota zone"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "MAGNA-SIRGAS / Colombia Bogota zone");
+      return true;
+    }
     else if (value == EPSG_Fiji_1956_UTM60_South)
     {
       set_reference_ellipsoid(GEO_ELLIPSOID_Inter);
@@ -4735,6 +4748,15 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "GDA94 / NSW Lambert");
+      return true;
+    }
+    else if (value == EPSG_SVY21_Singapore_TM)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_WGS84);
+      set_transverse_mercator_projection(28001.642, 38744.572, 1.366666666666667, 103.8333333333333, 1.0, 0, source); // "SVY21 / Singapore TM"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "SVY21 / Singapore TM");
       return true;
     }
     else if (value == EPSG_Fiji_Map_Grid_1986)
