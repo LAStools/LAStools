@@ -49,7 +49,7 @@ class LASfilter;
 class LAStransform;
 class ByteStreamIn;
 
-class LASreader
+class LASLIB_DLL LASreader
 {
 public:
   LASheader header;
@@ -147,7 +147,7 @@ private:
 
 #include "laswaveform13reader.hpp"
 
-class LASreadOpener
+class LASLIB_DLL LASreadOpener
 {
 public:
   void set_io_ibuffer_size(I32 io_ibuffer_size);
