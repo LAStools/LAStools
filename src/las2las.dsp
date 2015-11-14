@@ -276,6 +276,10 @@ SOURCE=.\geoprojectionconverter.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASzip\src\lasattributer.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\laslib\inc\lasdefinitions.hpp
 # End Source File
 # Begin Source File
@@ -284,11 +288,15 @@ SOURCE=..\laslib\inc\lasfilter.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\lasindex.hpp
+SOURCE=..\LASzip\src\lasindex.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\lasinterval.hpp
+SOURCE=..\LASzip\src\lasinterval.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\laslicense.hpp
 # End Source File
 # Begin Source File
 
@@ -296,7 +304,15 @@ SOURCE=..\src_full\lasoccupancy.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\lasquadtree.hpp
+SOURCE=..\LASzip\src\laspoint.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasquadtree.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasquantizer.hpp
 # End Source File
 # Begin Source File
 
@@ -329,10 +345,6 @@ SOURCE=..\laslib\inc\laswaveform13writer.hpp
 # Begin Source File
 
 SOURCE=..\laslib\inc\laswriter.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\laslib\inc\laszip.hpp
 # End Source File
 # Begin Source File
 

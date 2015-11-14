@@ -127,14 +127,14 @@ static void lidardouble2string(CHAR* string, double value)
 
 static void lidardouble2string(CHAR* string, double value, double precision)
 {
-  if (precision == 0.1)
-    sprintf(string, "%.1f", value);
-  else if (precision == 0.01)
+  if (precision == 0.01)
     sprintf(string, "%.2f", value);
   else if (precision == 0.001)
     sprintf(string, "%.3f", value);
   else if (precision == 0.0001)
     sprintf(string, "%.4f", value);
+  else if (precision == 0.1)
+    sprintf(string, "%.1f", value);
   else if (precision == 0.00001)
     sprintf(string, "%.5f", value);
   else if (precision == 0.000001)
@@ -145,6 +145,18 @@ static void lidardouble2string(CHAR* string, double value, double precision)
     sprintf(string, "%.8f", value);
   else if (precision == 0.000000001)
     sprintf(string, "%.9f", value);
+  else if (precision == 0.0025)
+    sprintf(string, "%.4f", value);
+  else if (precision == 0.00025)
+    sprintf(string, "%.5f", value);
+  else if (precision == 0.000025)
+    sprintf(string, "%.6f", value);
+  else if (precision == 0.005)
+    sprintf(string, "%.3f", value);
+  else if (precision == 0.0005)
+    sprintf(string, "%.4f", value);
+  else if (precision == 0.00005)
+    sprintf(string, "%.5f", value);
   else
     lidardouble2string(string, value);
 }
