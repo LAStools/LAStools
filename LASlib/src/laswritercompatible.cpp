@@ -33,7 +33,7 @@
 #include "bytestreamout_array.hpp"
 #include "bytestreamin_array.hpp"
 
-BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteopener)
+BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteopener, BOOL moveCRSfromEVLRtoVLR, BOOL moveEVLRtoVLR)
 {
   U32 i;
 
@@ -185,6 +185,68 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
   else // 9->4 and 10->5 
   {
     header->point_data_format -= 5;
+  }
+
+  // look for CRS in EVLRs and move them to VLRs
+
+  if (moveEVLRtoVLR || moveCRSfromEVLRtoVLR)
+  {
+    if (header->evlrs)
+    {
+      for (int i = 0; i < (int)header->number_of_extended_variable_length_records; i++)
+      {
+        if (moveEVLRtoVLR)
+        {
+          if (header->evlrs[i].record_length_after_header <= U16_MAX)
+          {
+            header->add_vlr("LASF_Projection", header->evlrs[i].record_id, (U16)header->evlrs[i].record_length_after_header, header->evlrs[i].data);
+            header->evlrs[i].record_length_after_header = 0;
+            header->evlrs[i].data = 0;
+          }
+          else
+          {
+            fprintf(stderr,"large EVLR with user ID '%s' and record ID %d with payload size %u not moved to VLRs.\n", header->evlrs[i].user_id, header->evlrs[i].record_id, header->evlrs[i].record_length_after_header);
+          }
+        }
+        else if (strcmp(header->evlrs[i].user_id, "LASF_Projection") == 0)
+        {
+          if (header->evlrs[i].record_id == 34735) // GeoKeyDirectoryTag
+          {
+            header->add_vlr("LASF_Projection", header->evlrs[i].record_id, (U16)header->evlrs[i].record_length_after_header, header->evlrs[i].data);
+            header->evlrs[i].record_length_after_header = 0;
+            header->evlrs[i].data = 0;
+          }
+          else if (header->evlrs[i].record_id == 34736) // GeoDoubleParamsTag
+          {
+            header->add_vlr("LASF_Projection", header->evlrs[i].record_id, (U16)header->evlrs[i].record_length_after_header, header->evlrs[i].data);
+            header->evlrs[i].record_length_after_header = 0;
+            header->evlrs[i].data = 0;
+          }
+          else if (header->evlrs[i].record_id == 34737) // GeoAsciiParamsTag
+          {
+            header->add_vlr("LASF_Projection", header->evlrs[i].record_id, (U16)header->evlrs[i].record_length_after_header, header->evlrs[i].data);
+            header->evlrs[i].record_length_after_header = 0;
+            header->evlrs[i].data = 0;
+          }
+          else if (header->evlrs[i].record_id == 2111) // OGC MATH TRANSFORM WKT
+          {
+            header->add_vlr("LASF_Projection", header->evlrs[i].record_id, (U16)header->evlrs[i].record_length_after_header, header->evlrs[i].data);
+            header->evlrs[i].record_length_after_header = 0;
+            header->evlrs[i].data = 0;
+          }
+          else if (header->evlrs[i].record_id == 2112) // OGC COORDINATE SYSTEM WKT
+          {
+            header->add_vlr("LASF_Projection", header->evlrs[i].record_id, (U16)header->evlrs[i].record_length_after_header, header->evlrs[i].data);
+            header->evlrs[i].record_length_after_header = 0;
+            header->evlrs[i].data = 0;
+          }
+          else
+          {
+            fprintf(stderr,"unknown LASF_Projection EVLR with record ID %d not moved to VLRs.\n", header->evlrs[i].record_id);
+          }
+        }
+      }
+    }
   }
 
   writer = laswriteopener->open(header);
