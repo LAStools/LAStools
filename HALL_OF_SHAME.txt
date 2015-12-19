@@ -1,0 +1,34 @@
+HALL OF SHAME
+=============
+
+1) Slovenian Environment Agency or ARSO (Agencija Republike Slovenije za okolje)
+
+   for providing "pseudo-open" access to their national LiDAR data by only
+   offering downloads in the proprietary "Optimized LAS" or "zLAS" format
+   also known as the "LAZ clone"
+
+   use the "LASliberator" [1,2,3] to set the enslaved Slovenian LiDAR free 
+   
+2) ...
+
+
+
+The "HALL OF SHAME" is our funny-provocative and dicussion-starting way to
+assure that our "open LiDAR data" is stored and distributed in our "open
+LiDAR formats" to the benefits of users on any platform using any software. 
+
+We list agencies or portals that are distributers of "locked-up LiDAR"
+and promote proprietary LiDAR formats by providing raw "pseudo-open" point
+clouds exclusively in closed formats such as *.sid, *.zlas, *.rar, ... 
+
+
+
+
+We are taking "HALL OF SHAME" nominations ... (-;
+
+
+
+
+[1] http://rapidlasso.com/2015/04/20/new-lasliberator-frees-lidar-from-closed-format/
+[2] http://github.com/LASliberator
+[3] http://github.com/LASliberator/lasliberate/archive/master.zip
