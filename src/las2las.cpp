@@ -33,6 +33,7 @@
   
   CHANGE HISTORY:
   
+     1 January 2016 -- option '-set_ogc_wkt' to store CRS as OGC WKT string
      3 May 2015 -- improved up-conversion via '-set_version 1.4 -point_type 6'
      5 July 2012 -- added option to '-remove_original_vlr' 
      6 May 2012 -- added option to '-remove_tiling_vlr' 
@@ -146,6 +147,7 @@ int main(int argc, char *argv[])
   int set_point_data_record_length = -1;
   int set_gps_time_endcoding = -1;
   // variable header changes
+  bool set_ogc_wkt = false;
   bool remove_extra_header = false;
   bool remove_all_variable_length_records = false;
   int remove_variable_length_record = -1;
@@ -314,6 +316,10 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[i],"-remove_extra") == 0)
     {
       remove_extra_header = true;
+    }
+    else if (strcmp(argv[i],"-set_ogc_wkt") == 0)
+    {
+      set_ogc_wkt = true;
     }
     else if (strcmp(argv[i],"-remove_all_vlrs") == 0)
     {
@@ -819,6 +825,51 @@ int main(int argc, char *argv[])
           lasreader->header.del_geo_double_params();
         }
         lasreader->header.del_geo_ascii_params();
+      }
+
+      if (set_ogc_wkt) // maybe also set the OCG WKT 
+      {
+        I32 len = 0;
+        CHAR* ogc_wkt = 0;
+        if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false)))
+        {
+          lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt);
+          free(ogc_wkt);
+          if ((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6))
+          {
+            lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+          }
+        }
+        else
+        {
+          fprintf(stderr, "WARNING: cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'\n", lasreadopener.get_file_name());
+        }
+      }
+    }
+    else if (set_ogc_wkt) // maybe only set the OCG WKT 
+    {
+      if (lasreader->header.vlr_geo_keys)
+      {
+        geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+        I32 len = 0;
+        CHAR* ogc_wkt = 0;
+        if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
+        {
+          lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt);
+          free(ogc_wkt);
+          if ((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6))
+          {
+            lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+          }
+        }
+        else
+        {
+          fprintf(stderr, "WARNING: cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'\n", lasreadopener.get_file_name());
+        }
+      }
+      else
+      {
+        fprintf(stderr, "WARNING: no projection information. ignoring '-set_ogc_wkt' for '%s'\n", lasreadopener.get_file_name());
       }
     }
 
