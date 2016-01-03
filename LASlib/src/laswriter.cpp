@@ -832,6 +832,27 @@ CHAR* LASwriteOpener::get_file_name_base() const
   return file_name_base;
 }
 
+const CHAR* LASwriteOpener::get_file_name_only() const
+{
+  const CHAR* file_name_only = 0;
+
+  if (file_name)
+  {
+    int len = strlen(file_name);
+    while ((len > 0) && (file_name[len] != '\\') && (file_name[len] != '/') && (file_name[len] != ':')) len--;
+    if (len)
+    {
+      file_name_only = file_name + len + 1;
+    }
+    else
+    {
+      file_name_only = file_name;
+    }
+  }
+
+  return file_name_only;
+}
+
 const CHAR* LASwriteOpener::get_appendix() const
 {
   return appendix;
