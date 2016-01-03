@@ -473,7 +473,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
   {
     unsigned short geokey = 0;
 
-    if (horizontal_datum == 1) // GEO_ELLIPSOID_NAD27
+    if (horizontal_datum == 1) // GEO_DATUM_NAD27
     {
       if ((3 <= coordinate_zone) && (coordinate_zone <= 22))
       {
@@ -484,7 +484,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
         fprintf(stderr, "UTM zone %d for NAD27 out-of-range\n", (int)coordinate_zone);
       }
     }
-    else if (horizontal_datum == 2) // GEO_ELLIPSOID_NAD83
+    else if (horizontal_datum == 2) // GEO_DATUM_NAD83
     {
       if ((3 <= coordinate_zone) && (coordinate_zone <= 22))
       {
@@ -499,7 +499,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
         fprintf(stderr, "UTM zone %d for NAD83 out-of-range\n", (int)coordinate_zone);
       }
     }
-    else if (horizontal_datum == 3) // GEO_ELLIPSOID_WGS84
+    else if (horizontal_datum == 3) // GEO_DATUM_WGS84
     {
       if (coordinate_zone < 100)
       {
@@ -531,7 +531,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
   else if (coordinate_system == 3) // state plane
   {
     unsigned short geokey = 0;
-    if (horizontal_datum == 2) // GEO_ELLIPSOID_NAD83
+    if (horizontal_datum == 2) // GEO_DATUM_NAD83
     {
       switch(coordinate_zone)
       {
