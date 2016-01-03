@@ -1,0 +1,8 @@
+LICENSE AGREEMENT:
+
+  The BLAST extension pack as well as LAStools requires a license for
+  commercial and/or any type of production use be it by a government
+  or an industry entity. Please contact martin@rapidlasso.com if you
+  need to clarify the licensing terms.
+
+(c) 2007-2015 martin isenburg, rapidlasso - fast tools to catch reality
