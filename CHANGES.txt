@@ -1,3 +1,11 @@
+ 2 January 2016 -- LAStools: parse 'pcs.csv' file whenever an unknown EPSG code is encountered
+ 1 January 2016 -- las2las & txt2las: create OGC WKT string for CRS for full LAS 1.4 compliance 
+ 1 January 2016 -- all GUIs: can create a directory when browsing for one via pop-up window
+29 December 2015 -- NEW: laspublish to visualize and download LiDAR in a Web browser with Potree
+20 December 2015 -- LAStools: new EPSG codes 2945(MTM3) to 2952 (MTM10) and 3753/3754 (Ohio)
+18 December 2015 -- lastile: attempted fix of "excessive empty tile" problem in multi-core mode
+6 December 2015 -- lasboundary: new '-use_tile_bb' and '-largest_only' (only with '-use_lax')
+6 December 2015 -- lasoverlap: new '-use_tile_bb' to easier process buffered tiles
 9 October 2015 -- lasground, lasclassify: now '-feet' and '-elevation_feet' works with '-cores 2'
 9 October 2015 -- lasclip: fixed bug introduced for '-split' option in version 150924
 25 September 2015 -- LASlib: disabling auto-upgrade to LAS 1.4 introduced in 150924. now it just warns.
