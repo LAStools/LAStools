@@ -48,11 +48,12 @@
   
   CHANGE HISTORY:
   
-    28 June 2015 -- tried to add the Oblique Mercator projection (incomplete)
+     2 January 2016 -- parse 'pcs.csv' file when unknown EPSG code is encountered
+    28 June 2015 -- tried to add the Oblique Mercator projection (very incomplete)
     16 May 2015 -- added the Albers Equal Area Conic projection
-    03 March 2015 -- LCC/TM custom projections write GeogGeodeticDatumGeoKey
+     3 March 2015 -- LCC/TM custom projections write GeogGeodeticDatumGeoKey
     13 August 2014 -- added long overdue ECEF (geocentric) conversion
-    08 February 2007 -- created after interviews with purdue and google
+     8 February 2007 -- created after interviews with purdue and google
   
 ===============================================================================
 */
@@ -67,14 +68,45 @@ struct GeoProjectionGeoKeys
   unsigned short value_offset;
 };
 
-#define GEO_ELLIPSOID_NAD27 5
-#define GEO_ELLIPSOID_NAD83 11
-#define GEO_ELLIPSOID_Inter 14
-#define GEO_ELLIPSOID_SAD69 19
-#define GEO_ELLIPSOID_WGS72 22
-#define GEO_ELLIPSOID_WGS84 23
-#define GEO_ELLIPSOID_ID74  24
-#define GEO_ELLIPSOID_GDA94 GEO_ELLIPSOID_NAD83
+#define GEO_ELLIPSOID_AIRY           1
+#define GEO_ELLIPSOID_BESSEL_1841    3
+#define GEO_ELLIPSOID_CLARKE1866     5
+#define GEO_ELLIPSOID_CLARKE1880     6
+#define GEO_ELLIPSOID_GRS1967       10
+#define GEO_ELLIPSOID_GRS1980       11
+#define GEO_ELLIPSOID_INTERNATIONAL 14
+#define GEO_ELLIPSOID_KRASSOWSKY    15
+#define GEO_ELLIPSOID_SAD69         19
+#define GEO_ELLIPSOID_WGS72         22
+#define GEO_ELLIPSOID_WGS84         23
+#define GEO_ELLIPSOID_ID74          24
+
+#define GEO_DATUM_NAD83_CSRS     6140
+#define GEO_DATUM_CH1903         6149
+#define GEO_DATUM_NAD83_HARN     6152
+#define GEO_DATUM_NZGD2000       6167
+#define GEO_DATUM_RGF93          6171
+#define GEO_DATUM_IRENET95       6173
+#define GEO_DATUM_HD72           6237
+#define GEO_DATUM_ETRS89         6258
+#define GEO_DATUM_NAD27          6267
+#define GEO_DATUM_NAD83          6269
+#define GEO_DATUM_OSGB_1936      6277
+#define GEO_DATUM_GDA94          6283
+#define GEO_DATUM_SAD69          6291
+#define GEO_DATUM_MGI_1901       6312
+#define GEO_DATUM_BELGE_1972     6313
+#define GEO_DATUM_WGS72          6322
+#define GEO_DATUM_WGS72BE        6324
+#define GEO_DATUM_WGS84          6326
+#define GEO_DATUM_RGFG95         6619
+#define GEO_DATUM_SWEREF99       6624
+#define GEO_DATUM_MAGNA_SIRGAS   6686
+#define GEO_DATUM_FIJI_1986      6720
+#define GEO_DATUM_FIJI_1956      6721
+#define GEO_DATUM_SVY21          6757
+#define GEO_DATUM_NAD83_NSRS2007 6759
+#define GEO_DATUM_SLOVENIA_1996  6765
 
 #define GEO_VERTICAL_WGS84   5030
 #define GEO_VERTICAL_NAVD29  5102
@@ -152,8 +184,8 @@ class GeoProjectionParametersAEAC : public GeoProjectionParameters
 public:
   double aeac_false_easting_meter;
   double aeac_false_northing_meter;
-  double aeac_lat_origin_degree;
-  double aeac_long_meridian_degree;
+  double aeac_latitude_of_center;
+  double aeac_longitude_of_center;
   double aeac_first_std_parallel_degree;
   double aeac_second_std_parallel_degree;
   double aeac_lat_origin_radian;
@@ -202,6 +234,9 @@ public:
 
   bool set_projection_from_geo_keys(int num_geo_keys, GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description=0);
   bool get_geo_keys_from_projection(int& num_geo_keys, GeoProjectionGeoKeys** geo_keys, int& num_geo_double_params, double** geo_double_params, bool source=true);
+  bool set_projection_from_ogc_wkt(int len, char* ogc_wkt);
+  bool get_ogc_wkt_from_projection(int& len, char** ogc_wkt, bool source=true);
+  bool get_proj4_string_from_projection(int& len, char** proj4, bool source=true);
   short get_GTModelTypeGeoKey();
   short get_GTRasterTypeGeoKey();
   short get_GeographicTypeGeoKey(bool source=true);
@@ -221,7 +256,7 @@ public:
   bool set_ProjectedCSTypeGeoKey(short value, char* description=0);
   short get_ProjectedCSTypeGeoKey(bool source=true);
 
-  void set_ProjLinearUnitsGeoKey(short value);
+  bool set_ProjLinearUnitsGeoKey(short value);
   short get_ProjLinearUnitsGeoKey(bool source=true);
 
   void set_VerticalUnitsGeoKey(short value);
@@ -234,19 +269,21 @@ public:
   int get_ellipsoid_id() const;
   const char* get_ellipsoid_name() const;
 
+  bool set_datum(int id, char* description=0);
+
   bool set_no_projection(char* description=0, bool source=true);
   bool set_latlong_projection(char* description=0, bool source=true);
   bool set_longlat_projection(char* description=0, bool source=true);
 
   bool set_ecef_projection(char* description, bool source=true);
 
-  bool set_target_utm_projection(char* description);
-  bool set_utm_projection(char* zone, char* description=0, bool source=true);
-  bool set_utm_projection(int zone, bool northern, char* description=0, bool source=true);
-  void set_lambert_conformal_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true);
-  void set_transverse_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor, char* description=0, bool source=true);
-  void set_albers_equal_area_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true);
-  void set_oblique_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true);
+  bool set_target_utm_projection(char* description, const char* name=0);
+  bool set_utm_projection(char* zone, char* description=0, bool source=true, const char* name=0);
+  bool set_utm_projection(int zone, bool northern, char* description=0, bool source=true, const char* name=0);
+  void set_lambert_conformal_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true, const char* name=0);
+  void set_transverse_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor, char* description=0, bool source=true, const char* name=0);
+  void set_albers_equal_area_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latCenterDegree, double longCenterDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true, const char* name=0);
+  void set_oblique_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true, const char* name=0);
 
   const char* get_state_plane_nad27_lcc_zone(int i) const;
   bool set_state_plane_nad27_lcc(const char* zone, char* description=0, bool source=true);
@@ -336,6 +373,9 @@ public:
   bool set_dtm_projection_parameters(short horizontal_units, short vertical_units, short coordinate_system, short coordinate_zone, short horizontal_datum, short vertical_datum, bool source=true);
   
 private:
+  // helps us to find the 'pcs.csv' file
+  char* argv_zero;
+
   // parameters for gtiff
   int num_geo_keys;
   GeoProjectionGeoKeys* geo_keys;
@@ -344,6 +384,9 @@ private:
 
   // parameters for the reference ellipsoid
   GeoProjectionEllipsoid* ellipsoid;
+
+  // parameters for the datum
+  int datum;
 
   // parameters for the projection
   GeoProjectionParameters* source_projection;
