@@ -46,7 +46,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 151111
+#define LAS_TOOLS_VERSION 160102
 
 #include <stdio.h>
 #include <string.h>
@@ -69,6 +69,12 @@
 #define LAS_TOOLS_FORMAT_BIL     9
 #define LAS_TOOLS_FORMAT_FLT    10
 #define LAS_TOOLS_FORMAT_DTM    11
+
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE 0
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_WDP_INTERNAL  1
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_WDP_EXTERNAL  2
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_SYNTHETIC     3
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS   4
 
 #define LAS_TOOLS_IO_IBUFFER_SIZE   262144
 #define LAS_TOOLS_IO_OBUFFER_SIZE   262144
@@ -235,7 +241,7 @@ public:
     clean_las_header();
   };
 
-  // set bounding box
+  // set functions
 
   void set_bounding_box(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y, F64 max_z, BOOL auto_scale=TRUE, BOOL auto_offset=TRUE)
   {
@@ -275,6 +281,16 @@ public:
     this->max_y = y_offset + y_scale_factor*I32_QUANTIZE((max_y-y_offset)/y_scale_factor);
     this->max_z = z_offset + z_scale_factor*I32_QUANTIZE((max_z-z_offset)/z_scale_factor);
   };
+
+  void set_global_encoding_bit(I32 bit)
+  {
+    global_encoding |= (1 << bit);
+  }
+
+  BOOL get_global_encoding_bit(I32 bit) const
+  {
+    return (BOOL)(global_encoding & (1 << bit));
+  }
 
   // clean functions
 
