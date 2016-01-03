@@ -83,6 +83,7 @@ public:
   const CHAR* get_directory() const;
   const CHAR* get_file_name() const;
   const CHAR* get_appendix() const;
+  const CHAR* get_file_name_only() const;
   CHAR* get_file_name_base() const;
   U32 get_cut() const;
   BOOL format_was_specified() const;
