@@ -16,7 +16,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -37,6 +37,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 static const double PI = 3.141592653589793238462643383279502884197169;
 static const double TWO_PI = PI * 2;
@@ -84,13 +87,13 @@ static const ReferenceEllipsoid ellipsoid_list[] =
   ReferenceEllipsoid( 2, "Australian National", 6378160.0, 0.006694542, 298.25),
   ReferenceEllipsoid( 3, "Bessel 1841", 6377397.155, 0.006674372, 299.1528128),
   ReferenceEllipsoid( 4, "Bessel 1841 (Nambia) ", 6377483.865, 0.006674372, 299.1528128),
-  ReferenceEllipsoid( 5, "Clarke 1866 (NAD-27)", 6378206.4, 0.006768658, 294.9786982),
+  ReferenceEllipsoid( 5, "Clarke 1866", 6378206.4, 0.006768658, 294.9786982),
   ReferenceEllipsoid( 6, "Clarke 1880", 6378249.145, 0.006803511, 293.465),
   ReferenceEllipsoid( 7, "Everest 1830", 6377276.345, 0.006637847, 300.8017),
   ReferenceEllipsoid( 8, "Fischer 1960 (Mercury) ", 6378166, 0.006693422, 298.3),
   ReferenceEllipsoid( 9, "Fischer 1968", 6378150, 0.006693422, 298.3),
   ReferenceEllipsoid( 10, "GRS 1967", 6378160, 0.006694605, 298.247167427),
-  ReferenceEllipsoid( 11, "GRS 1980 (NAD-83,GDA-94)", 6378137, 0.00669438002290, 298.257222101),
+  ReferenceEllipsoid( 11, "GRS 1980", 6378137, 0.00669438002290, 298.257222101),
   ReferenceEllipsoid( 12, "Helmert 1906", 6378200, 0.006693422, 298.3),
   ReferenceEllipsoid( 13, "Hough", 6378270, 0.00672267, 297.0),
   ReferenceEllipsoid( 14, "International", 6378388, 0.00672267, 297.0),
@@ -803,6 +806,12 @@ static const short EPSG_IRENET95_Irish_Transverse_Mercator = 2157;
 static const short EPSG_ETRS89_Poland_CS92 = 2180;
 static const short EPSG_NZGD2000 = 2193;
 static const short EPSG_NAD83_HARN_UTM2_South_American_Samoa = 2195;
+static const short EPSG_NAD83_California_1_ftUS = 2225;
+static const short EPSG_NAD83_California_2_ftUS = 2226;
+static const short EPSG_NAD83_California_3_ftUS = 2227;
+static const short EPSG_NAD83_California_4_ftUS = 2228;
+static const short EPSG_NAD83_California_5_ftUS = 2229;
+static const short EPSG_NAD83_California_6_ftUS = 2230;
 static const short EPSG_NAD83_Maryland_ftUS = 2248;
 static const short EPSG_NAD83_Texas_Central_ftUS = 2277;
 static const short EPSG_NAD83_HARN_Washington_North = 2855;
@@ -812,6 +821,14 @@ static const short EPSG_NAD83_HARN_Virginia_North_ftUS = 2924;
 static const short EPSG_NAD83_HARN_Virginia_South_ftUS = 2925;
 static const short EPSG_NAD83_HARN_Washington_North_ftUS = 2926;
 static const short EPSG_NAD83_HARN_Washington_South_ftUS = 2927;
+static const short EPSG_NAD83_CSRS_MTM_zone_3 = 2945;
+static const short EPSG_NAD83_CSRS_MTM_zone_4 = 2946;
+static const short EPSG_NAD83_CSRS_MTM_zone_5 = 2947;
+static const short EPSG_NAD83_CSRS_MTM_zone_6 = 2948;
+static const short EPSG_NAD83_CSRS_MTM_zone_7 = 2949;
+static const short EPSG_NAD83_CSRS_MTM_zone_8 = 2950;
+static const short EPSG_NAD83_CSRS_MTM_zone_9 = 2951;
+static const short EPSG_NAD83_CSRS_MTM_zone_10 = 2952;
 static const short EPSG_Reseau_Geodesique_Francais_Guyane_1995 = 2972;
 static const short EPSG_NAD83_Oregon_Lambert = 2991;
 static const short EPSG_NAD83_Oregon_Lambert_ft = 2992;
@@ -822,6 +839,8 @@ static const short EPSG_ETRS89_ETRS_TM34 = 3046;
 static const short EPSG_ETRS89_ETRS_TM35 = 3047;
 static const short EPSG_ETRS89_ETRS_TM36 = 3048;
 static const short EPSG_ETRS89_ETRS_TM35FIN = 3067;
+static const short EPSG_NAD83_HARN_Kentucky_Single_Zone = 3090;
+static const short EPSG_NAD83_HARN_Kentucky_Single_Zone_ftUS = 3091;
 static const short EPSG_MAGNA_SIRGAS_Colombia_Bogoto = 3116;
 static const short EPSG_Fiji_1956_UTM60_South = 3141;
 static const short EPSG_Fiji_1956_UTM1_South = 3142;
@@ -831,6 +850,8 @@ static const short EPSG_Fiji_Map_Grid_1986 = 3460;
 static const short EPSG_NAD83_NSRS2007_California_zone_3_ftUS = 3494;
 static const short EPSG_NAD83_NSRS2007_California_zone_4_ftUS = 3496;
 static const short EPSG_NAD83_NSRS2007_Maryland_ftUS = 3582;
+static const short EPSG_NAD83_HARN_Ohio_North_ftUS = 3753;
+static const short EPSG_NAD83_HARN_Ohio_South_ftUS = 3754;
 static const short EPSG_ETRS89_Portugal_TM06 = 3763;
 static const short EPSG_Slovene_National_Grid_1996 = 3794;
 static const short EPSG_ETRS89_GK24FIN = 3878;
@@ -904,6 +925,12 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_ETRS89_Poland_CS92, "ETRS89 Poland CS92"),
   EPSGcode(EPSG_NZGD2000, "NZGD2000"),
   EPSGcode(EPSG_NAD83_HARN_UTM2_South_American_Samoa, "Amer. Samoa UTM2"),
+  EPSGcode(EPSG_NAD83_California_1_ftUS, "NAD83 California 1 ft"),
+  EPSGcode(EPSG_NAD83_California_2_ftUS, "NAD83 California 2 ft"),
+  EPSGcode(EPSG_NAD83_California_3_ftUS, "NAD83 California 3 ft"),
+  EPSGcode(EPSG_NAD83_California_4_ftUS, "NAD83 California 4 ft"),
+  EPSGcode(EPSG_NAD83_California_5_ftUS, "NAD83 California 5 ft"),
+  EPSGcode(EPSG_NAD83_California_6_ftUS, "NAD83 California 6 ft"),
   EPSGcode(EPSG_NAD83_Maryland_ftUS, "NAD83 Maryland ft"),
   EPSGcode(EPSG_NAD83_Texas_Central_ftUS, "NAD83 Texas Central ft"),
   EPSGcode(EPSG_NAD83_HARN_Washington_North, "NAD83-H Washington N"),
@@ -913,6 +940,14 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_NAD83_HARN_Virginia_South_ftUS, "NAD83-H Virginia S ft"),
   EPSGcode(EPSG_NAD83_HARN_Washington_North_ftUS, "NAD83-H Washington N ft"),
   EPSGcode(EPSG_NAD83_HARN_Washington_South_ftUS, "NAD83-H Washington S ft"),
+  EPSGcode(EPSG_NAD83_CSRS_MTM_zone_3, "NAD83 CSRS MTM zone 3"),
+  EPSGcode(EPSG_NAD83_CSRS_MTM_zone_4, "NAD83 CSRS MTM zone 4"),
+  EPSGcode(EPSG_NAD83_CSRS_MTM_zone_5, "NAD83 CSRS MTM zone 5"),
+  EPSGcode(EPSG_NAD83_CSRS_MTM_zone_6, "NAD83 CSRS MTM zone 6"),
+  EPSGcode(EPSG_NAD83_CSRS_MTM_zone_7, "NAD83 CSRS MTM zone 7"),
+  EPSGcode(EPSG_NAD83_CSRS_MTM_zone_8, "NAD83 CSRS MTM zone 8"),
+  EPSGcode(EPSG_NAD83_CSRS_MTM_zone_9, "NAD83 CSRS MTM zone 9"),
+  EPSGcode(EPSG_NAD83_CSRS_MTM_zone_10, "NAD83 CSRS MTM zone 10"),
   EPSGcode(EPSG_Reseau_Geodesique_Francais_Guyane_1995, "Francais Guyane 95"),
   EPSGcode(EPSG_NAD83_Oregon_Lambert, "NAD83 Oregon Lambert"),
   EPSGcode(EPSG_NAD83_Oregon_Lambert_ft, "NAD83 Oregon Lamb.(ft)"),
@@ -923,6 +958,8 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_ETRS89_ETRS_TM35, "ETRS89 TM35"),
   EPSGcode(EPSG_ETRS89_ETRS_TM36, "ETRS89 TM36"),
   EPSGcode(EPSG_ETRS89_ETRS_TM35FIN, "ETRS89 TM35FIN"),
+  EPSGcode(EPSG_NAD83_HARN_Kentucky_Single_Zone, "NAD83 Kentucky Single"),
+  EPSGcode(EPSG_NAD83_HARN_Kentucky_Single_Zone_ftUS, "NAD83 Kentucky Single ft"),
   EPSGcode(EPSG_MAGNA_SIRGAS_Colombia_Bogoto, "MAGNA SIRGAS Colom Bog"),
   EPSGcode(EPSG_Fiji_1956_UTM60_South, "Fiji 1956 UTM60"),
   EPSGcode(EPSG_Fiji_1956_UTM1_South, "Fiji 1956 UTM1"),
@@ -932,6 +969,8 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_NAD83_NSRS2007_California_zone_3_ftUS, "NSRS2007 Calif 3 ft"),
   EPSGcode(EPSG_NAD83_NSRS2007_California_zone_4_ftUS, "NSRS2007 Calif 4 ft"),
   EPSGcode(EPSG_NAD83_NSRS2007_Maryland_ftUS, "NSRS2007 Maryland ft"),
+  EPSGcode(EPSG_NAD83_HARN_Ohio_North_ftUS, "NAD83-H Ohio North ft"),
+  EPSGcode(EPSG_NAD83_HARN_Ohio_South_ftUS, "NAD83-H Ohio South ft"),
   EPSGcode(EPSG_ETRS89_Portugal_TM06, "ETRS89 Portugal TM06"),
   EPSGcode(EPSG_Slovene_National_Grid_1996, "Slov. Nat. Grid 1996"),
   EPSGcode(EPSG_ETRS89_GK24FIN, "ETRS89 / GK24FIN"),
@@ -987,6 +1026,463 @@ static const EPSGcode epsg_code_list[] =
   EPSGcode(EPSG_Belgian_Lambert_1972, "Belgian Lambert 1972"),
   EPSGcode(0,0)
 };
+
+bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description)
+{
+  bool user_defined_ellipsoid = false;
+  int user_defined_projection = 0;
+  int offsetProjStdParallel1GeoKey = -1;
+  int offsetProjStdParallel2GeoKey = -1;
+  int offsetProjNatOriginLatGeoKey = -1;
+  int offsetProjFalseEastingGeoKey = -1;
+  int offsetProjFalseNorthingGeoKey = -1;
+  int offsetProjCenterLongGeoKey = -1;
+  int offsetProjScaleAtNatOriginGeoKey = -1;
+  bool has_projection = false;
+  int ellipsoid = -1;
+  int datum = -1;
+
+  this->num_geo_keys = num_geo_keys;
+  this->geo_keys = geo_keys;
+  this->geo_ascii_params = geo_ascii_params;
+  this->geo_double_params = geo_double_params;
+
+  for (int i = 0; i < num_geo_keys; i++)
+  {
+    switch (geo_keys[i].key_id)
+    {
+    case 1024: // GTModelTypeGeoKey
+      if (geo_keys[i].value_offset == 2) // ModelTypeGeographic
+      {
+        has_projection = set_longlat_projection(description);
+      }
+      else if (geo_keys[i].value_offset == 3) // ModelTypeGeocentric
+      {
+        has_projection = set_ecef_projection(description);
+      }
+      else if (geo_keys[i].value_offset == 0) // ModelTypeUndefined
+      {
+        has_projection = set_no_projection(description);
+      }
+      break;
+    case 2048: // GeographicTypeGeoKey
+      switch (geo_keys[i].value_offset)
+      {
+      case 32767: // user-defined GCS
+        user_defined_ellipsoid = true;
+        break;
+      case 4001: // GCSE_Airy1830
+        ellipsoid = 1;
+        break;
+      case 4002: // GCSE_AiryModified1849 
+        ellipsoid = 16;
+        break;
+      case 4003: // GCSE_AustralianNationalSpheroid
+        ellipsoid = 2;
+        break;
+      case 4004: // GCSE_Bessel1841
+      case 4005: // GCSE_Bessel1841Modified
+        ellipsoid = GEO_ELLIPSOID_BESSEL_1841;
+        break;
+      case 4006: // GCSE_BesselNamibia
+        ellipsoid = 4;
+        break;
+      case 4008: // GCSE_Clarke1866 (unknown datum based on Clarke1866 ellipsoid)
+      case 4009: // GCSE_Clarke1866Michigan (unknown datum based on Clarke1866Michigan ellipsoid)
+        ellipsoid = GEO_ELLIPSOID_CLARKE1866;
+        break;
+      case 4010: // GCSE_Clarke1880_Benoit
+      case 4011: // GCSE_Clarke1880_IGN
+      case 4012: // GCSE_Clarke1880_RGS
+      case 4013: // GCSE_Clarke1880_Arc
+      case 4014: // GCSE_Clarke1880_SGA1922
+      case 4034: // GCSE_Clarke1880
+        ellipsoid = 6;
+        break;
+      case 4015: // GCSE_Everest1830_1937Adjustment
+      case 4016: // GCSE_Everest1830_1967Definition
+      case 4017: // GCSE_Everest1830_1975Definition
+        ellipsoid = 7;
+        break;
+      case 4018: // GCSE_Everest1830Modified
+        ellipsoid = 17;
+        break;
+      case 4019: // GCSE_GRS1980 (unknown datum based on GRS1980 ellipsoid)
+        ellipsoid = GEO_ELLIPSOID_GRS1980;
+        break;
+      case 4020: // GCSE_Helmert1906
+        ellipsoid = 12;
+        break;
+      case 4022: // GCSE_International1924
+      case 4023: // GCSE_International1967
+        ellipsoid = 14;
+        break;
+      case 4024: // GCSE_Krassowsky1940
+        ellipsoid = 15;
+        break;
+      case 4030: // GCSE_WGS84 (unknown datum based on WGS 84 ellipsoid)
+        ellipsoid = GEO_ELLIPSOID_WGS84;
+        break;
+      case 4267: // GCS_NAD27
+//      case 4268: // GCS_NAD27_Michigan
+        datum = GEO_DATUM_NAD27;
+        break;
+      case 4269: // GCS_NAD83
+        datum = GEO_DATUM_NAD83;
+        break;
+      case 4283: // GCS_GDA94
+        datum = GEO_DATUM_GDA94;
+        break;
+      case 4322: // GCS_WGS_72
+        datum = GEO_DATUM_WGS72;
+        break;
+      case 4326: // GCS_WGS_84
+        datum = GEO_DATUM_WGS84;
+        break;
+      default:
+        fprintf(stderr, "GeographicTypeGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
+      }
+      break;
+    case 2050: // GeogGeodeticDatumGeoKey 
+      switch (geo_keys[i].value_offset)
+      {
+      case 32767: // user-defined GCS
+        user_defined_ellipsoid = true;
+        break;
+      case 6202: // Datum_Australian_Geodetic_Datum_1966
+      case 6203: // Datum_Australian_Geodetic_Datum_1984
+        ellipsoid = 2;
+        break;
+      case 6267: // Datum_North_American_Datum_1927
+        datum = GEO_DATUM_NAD27;
+        break;
+      case 6269: // Datum_North_American_Datum_1983
+        datum = GEO_DATUM_NAD83;
+        break;
+      case 6283: // Datum_Geocentric_Datum_of_Australia_1994
+        datum = GEO_DATUM_GDA94;
+        break;
+      case 6322: // Datum_WGS72
+        datum = GEO_DATUM_WGS72;
+        break;
+      case 6326: // Datum_WGS84
+        datum = GEO_DATUM_WGS84;
+        break;
+      case 6001: // DatumE_Airy1830
+        ellipsoid = GEO_ELLIPSOID_AIRY;
+        break;
+      case 6002: // DatumE_AiryModified1849
+        ellipsoid = 16;
+        break;
+      case 6003: // DatumE_AustralianNationalSpheroid
+        ellipsoid = 2;
+        break;
+      case 6004: // DatumE_Bessel1841
+      case 6005: // DatumE_BesselModified
+        ellipsoid = GEO_ELLIPSOID_BESSEL_1841;
+        break;
+      case 6006: // DatumE_BesselNamibia
+        ellipsoid = 4;
+        break;
+      case 6008: // DatumE_Clarke1866
+      case 6009: // DatumE_Clarke1866Michigan
+        ellipsoid = GEO_ELLIPSOID_CLARKE1866;
+        break;
+      case 6010: // DatumE_Clarke1880_Benoit
+      case 6011: // DatumE_Clarke1880_IGN
+      case 6012: // DatumE_Clarke1880_RGS
+      case 6013: // DatumE_Clarke1880_Arc
+      case 6014: // DatumE_Clarke1880_SGA1922
+      case 6034: // DatumE_Clarke1880
+        ellipsoid = 6;
+        break;
+      case 6015: // DatumE_Everest1830_1937Adjustment
+      case 6016: // DatumE_Everest1830_1967Definition
+      case 6017: // DatumE_Everest1830_1975Definition
+        ellipsoid = 7;
+        break;
+      case 6018: // DatumE_Everest1830Modified
+        ellipsoid = 17;
+        break;
+      case 6019: // DatumE_GRS1980
+        ellipsoid = GEO_ELLIPSOID_GRS1980;
+        break;
+      case 6020: // DatumE_Helmert1906
+        ellipsoid = 12;
+        break;
+      case 6022: // DatumE_International1924
+      case 6023: // DatumE_International1967
+        ellipsoid = GEO_ELLIPSOID_INTERNATIONAL;
+        break;
+      case 6024: // DatumE_Krassowsky1940
+        ellipsoid = 15;
+        break;
+      case 6030: // DatumE_WGS84
+        ellipsoid = GEO_ELLIPSOID_WGS84;
+        break;
+      default:
+        fprintf(stderr, "GeogGeodeticDatumGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
+      }
+      break;
+    case 2052: // GeogLinearUnitsGeoKey 
+      switch (geo_keys[i].value_offset)
+      {
+      case 9001: // Linear_Meter
+        set_coordinates_in_meter();
+        break;
+      case 9002: // Linear_Foot
+        set_coordinates_in_feet();
+        break;
+      case 9003: // Linear_Foot_US_Survey
+        set_coordinates_in_survey_feet();
+        break;
+      default:
+        fprintf(stderr, "GeogLinearUnitsGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
+      }
+      break;
+    case 2056: // GeogEllipsoidGeoKey
+      switch (geo_keys[i].value_offset)
+      {
+      case 7001: // Ellipse_Airy_1830
+        ellipsoid = 1;
+        break;
+      case 7002: // Ellipse_Airy_Modified_1849
+        ellipsoid = 16;
+        break;
+      case 7003: // Ellipse_Australian_National_Spheroid
+        ellipsoid = 2;
+        break;
+      case 7004: // Ellipse_Bessel_1841
+      case 7005: // Ellipse_Bessel_Modified
+        ellipsoid = GEO_ELLIPSOID_BESSEL_1841;
+        break;
+      case 7006: // Ellipse_Bessel_Namibia
+        ellipsoid = 4;
+        break;
+      case 7008: // Ellipse_Clarke_1866
+      case 7009: // Ellipse_Clarke_1866_Michigan
+        ellipsoid = GEO_ELLIPSOID_CLARKE1866;
+        break;
+      case 7010: // Ellipse_Clarke1880_Benoit
+      case 7011: // Ellipse_Clarke1880_IGN
+      case 7012: // Ellipse_Clarke1880_RGS
+      case 7013: // Ellipse_Clarke1880_Arc
+      case 7014: // Ellipse_Clarke1880_SGA1922
+      case 7034: // Ellipse_Clarke1880
+        ellipsoid = 6;
+        break;
+      case 7015: // Ellipse_Everest1830_1937Adjustment
+      case 7016: // Ellipse_Everest1830_1967Definition
+      case 7017: // Ellipse_Everest1830_1975Definition
+        ellipsoid = 7;
+        break;
+      case 7018: // Ellipse_Everest1830Modified
+        ellipsoid = 17;
+        break;
+      case 7019: // Ellipse_GRS_1980
+        ellipsoid = GEO_ELLIPSOID_GRS1980;
+        break;
+      case 7020: // Ellipse_Helmert1906
+        ellipsoid = 12;
+        break;
+      case 7022: // Ellipse_International1924
+      case 7023: // Ellipse_International1967
+        ellipsoid = 14;
+        break;
+      case 7024: // Ellipse_Krassowsky1940
+        ellipsoid = 15;
+        break;
+      case 7030: // Ellipse_WGS_84
+        ellipsoid = GEO_ELLIPSOID_WGS84;
+        break;
+      default:
+        fprintf(stderr, "GeogEllipsoidGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
+      }
+      break;
+    case 3072: // ProjectedCSTypeGeoKey
+      has_projection = set_ProjectedCSTypeGeoKey(geo_keys[i].value_offset, description);
+      break;
+    case 3075: // ProjCoordTransGeoKey
+      user_defined_projection = 0;
+      switch (geo_keys[i].value_offset)
+      {
+      case 1: // CT_TransverseMercator
+        user_defined_projection = 1;
+        break;
+      case 8: // CT_LambertConfConic_2SP
+        user_defined_projection = 8;
+        break;
+      case 11: // CT_AlbersEqualArea
+        user_defined_projection = 11;
+        break;
+      case 2: // CT_TransvMercator_Modified_Alaska
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_TransvMercator_Modified_Alaska not implemented\n");
+        break;
+      case 3: // CT_ObliqueMercator
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator not implemented\n");
+        break;
+      case 4: // CT_ObliqueMercator_Laborde
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Laborde not implemented\n");
+        break;
+      case 5: // CT_ObliqueMercator_Rosenmund
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Rosenmund not implemented\n");
+        break;
+      case 6: // CT_ObliqueMercator_Spherical
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Spherical not implemented\n");
+        break;
+      case 7: // CT_Mercator
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_Mercator not implemented\n");
+        break;
+      case 9: // CT_LambertConfConic_Helmert
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_LambertConfConic_Helmert not implemented\n");
+        break;
+      case 10: // CT_LambertAzimEqualArea
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_LambertAzimEqualArea not implemented\n");
+        break;
+      case 12: // CT_AzimuthalEquidistant
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_AzimuthalEquidistant not implemented\n");
+        break;
+      case 13: // CT_EquidistantConic
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_EquidistantConic not implemented\n");
+        break;
+      case 14: // CT_Stereographic
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_Stereographic not implemented\n");
+        break;
+      case 15: // CT_PolarStereographic
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_PolarStereographic not implemented\n");
+        break;
+      case 16: // CT_ObliqueStereographic
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueStereographic not implemented\n");
+        break;
+      case 17: // CT_Equirectangular
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_Equirectangular not implemented\n");
+        break;
+      case 18: // CT_CassiniSoldner
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_CassiniSoldner not implemented\n");
+        break;
+      case 19: // CT_Gnomonic
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_Gnomonic not implemented\n");
+        break;
+      case 20: // CT_MillerCylindrical
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_MillerCylindrical not implemented\n");
+        break;
+      case 21: // CT_Orthographic
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_Orthographic not implemented\n");
+        break;
+      case 22: // CT_Polyconic
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_Polyconic not implemented\n");
+        break;
+      case 23: // CT_Robinson
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_Robinson not implemented\n");
+        break;
+      case 24: // CT_Sinusoidal
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_Sinusoidal not implemented\n");
+        break;
+      case 25: // CT_VanDerGrinten
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_VanDerGrinten not implemented\n");
+        break;
+      case 26: // CT_NewZealandMapGrid
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_NewZealandMapGrid not implemented\n");
+        break;
+      case 27: // CT_TransvMercator_SouthOriented
+        fprintf(stderr, "ProjCoordTransGeoKey: CT_TransvMercator_SouthOriented not implemented\n");
+        break;
+      default:
+        fprintf(stderr, "ProjCoordTransGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
+      }
+      break;
+    case 3076: // ProjLinearUnitsGeoKey
+      set_ProjLinearUnitsGeoKey(geo_keys[i].value_offset);
+      break;
+    case 3078: // ProjStdParallel1GeoKey
+      offsetProjStdParallel1GeoKey = geo_keys[i].value_offset;
+      break;
+    case 3079: // ProjStdParallel2GeoKey
+      offsetProjStdParallel2GeoKey = geo_keys[i].value_offset;
+      break;        
+    case 3081: // ProjNatOriginLatGeoKey
+      offsetProjNatOriginLatGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3082: // ProjFalseEastingGeoKey
+      offsetProjFalseEastingGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3083: // ProjFalseNorthingGeoKey
+      offsetProjFalseNorthingGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3088: // ProjCenterLongGeoKey
+      offsetProjCenterLongGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3092: // ProjScaleAtNatOriginGeoKey
+      offsetProjScaleAtNatOriginGeoKey = geo_keys[i].value_offset;
+      break;
+    case 4096: // VerticalCSTypeGeoKey 
+      set_VerticalCSTypeGeoKey(geo_keys[i].value_offset);
+      break;
+    case 4099: // VerticalUnitsGeoKey
+      set_VerticalUnitsGeoKey(geo_keys[i].value_offset);
+      break;
+    }
+  }
+
+  if (datum != -1)
+  {
+    set_datum(datum);
+  }
+  else if (ellipsoid != -1)
+  {
+    set_reference_ellipsoid(ellipsoid);
+  }
+
+  if (user_defined_projection)
+  {
+    if (user_defined_projection == 1)
+    {
+      if ((offsetProjFalseEastingGeoKey >= 0) &&
+          (offsetProjFalseNorthingGeoKey >= 0) &&
+          (offsetProjNatOriginLatGeoKey >= 0) &&
+          (offsetProjCenterLongGeoKey >= 0) &&
+          (offsetProjScaleAtNatOriginGeoKey >= 0))
+      {
+        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
+        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
+        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
+        double longMeridianDeg = geo_double_params[offsetProjCenterLongGeoKey];
+        double scaleFactor = geo_double_params[offsetProjScaleAtNatOriginGeoKey];
+        set_transverse_mercator_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longMeridianDeg, scaleFactor);
+        if (description)
+        {
+          sprintf(description, "generic transverse mercator");
+        }
+        has_projection = true;
+      }
+    }
+    else if (user_defined_projection == 8)
+    {
+      if ((offsetProjFalseEastingGeoKey >= 0) &&
+          (offsetProjFalseNorthingGeoKey >= 0) &&
+          (offsetProjNatOriginLatGeoKey >= 0) &&
+          (offsetProjCenterLongGeoKey >= 0) &&
+          (offsetProjStdParallel1GeoKey >= 0) &&
+          (offsetProjStdParallel2GeoKey >= 0))
+      {
+        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
+        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
+        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
+        double longOriginDeg = geo_double_params[offsetProjCenterLongGeoKey];
+        double firstStdParallelDeg = geo_double_params[offsetProjStdParallel1GeoKey];
+        double secondStdParallelDeg = geo_double_params[offsetProjStdParallel2GeoKey];
+        set_lambert_conformal_conic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg);
+        if (description)
+        {
+          sprintf(description, "generic lambert conformal conic");
+        }
+        has_projection = true;
+      }
+    }
+  }
+
+  return has_projection;
+}
 
 bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, GeoProjectionGeoKeys** geo_keys, int& num_geo_double_params, double** geo_double_params, bool source)
 {
@@ -1258,7 +1754,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[0].count = 1;
         (*geo_keys)[0].value_offset = 1; // ModelTypeProjected
 
-        // user-defined custom LCC projection 
+        // user-defined custom AEAC projection 
         (*geo_keys)[1].key_id = 3072; // ProjectedCSTypeGeoKey
         (*geo_keys)[1].tiff_tag_location = 0;
         (*geo_keys)[1].count = 1;
@@ -1294,13 +1790,13 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[6].tiff_tag_location = 34736;
         (*geo_keys)[6].count = 1;
         (*geo_keys)[6].value_offset = 2;
-        (*geo_double_params)[2] = aeac->aeac_long_meridian_degree;
+        (*geo_double_params)[2] = aeac->aeac_longitude_of_center;
 
-        (*geo_keys)[7].key_id = 3081; // ProjNatOriginLatGeoKey
+        (*geo_keys)[7].key_id = 3081; // ProjCenterLatGeoKey
         (*geo_keys)[7].tiff_tag_location = 34736;
         (*geo_keys)[7].count = 1;
         (*geo_keys)[7].value_offset = 3;
-        (*geo_double_params)[3] = aeac->aeac_lat_origin_degree;
+        (*geo_double_params)[3] = aeac->aeac_latitude_of_center;
 
         (*geo_keys)[8].key_id = 3082; // ProjFalseEastingGeoKey
         (*geo_keys)[8].tiff_tag_location = 34736;
@@ -1515,7 +2011,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
   return false;
 }
 
-bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description)
+bool GeoProjectionConverter::set_projection_from_ogc_wkt(int len, char* ogc_wkt)
 {
   bool user_defined_ellipsoid = false;
   int user_defined_projection = 0;
@@ -1528,442 +2024,342 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
   int offsetProjScaleAtNatOriginGeoKey = -1;
   bool has_projection = false;
   int ellipsoid = -1;
+  int datum = -1;
 
-  this->num_geo_keys = num_geo_keys;
-  this->geo_keys = geo_keys;
-  this->geo_ascii_params = geo_ascii_params;
-  this->geo_double_params = geo_double_params;
+  return false;
+}
 
-  for (int i = 0; i < num_geo_keys; i++)
+bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wkt, bool source)
+{
+  GeoProjectionParameters* projection = (source ? source_projection : target_projection);
+  if (projection)
   {
-    switch (geo_keys[i].key_id)
+    int n = 0;
+    char* string = (char*)malloc(4096);
+    memset(string, 0, 4096);
+    // maybe geocentric
+    if (projection->type == GEO_PROJECTION_ECEF)
     {
-    case 1024: // GTModelTypeGeoKey
-      if (geo_keys[i].value_offset == 2) // ModelTypeGeographic
-      {
-        has_projection = set_longlat_projection(description);
-      }
-      else if (geo_keys[i].value_offset == 3) // ModelTypeGeocentric
-      {
-        has_projection = set_ecef_projection(description);
-      }
-      else if (geo_keys[i].value_offset == 0) // ModelTypeUndefined
-      {
-        has_projection = set_no_projection(description);
-      }
-      break;
-    case 2048: // GeographicTypeGeoKey
-      switch (geo_keys[i].value_offset)
-      {
-      case 32767: // user-defined GCS
-        user_defined_ellipsoid = true;
-        break;
-      case 4001: // GCSE_Airy1830
-        ellipsoid = 1;
-        break;
-      case 4002: // GCSE_AiryModified1849 
-        ellipsoid = 16;
-        break;
-      case 4003: // GCSE_AustralianNationalSpheroid
-        ellipsoid = 2;
-        break;
-      case 4004: // GCSE_Bessel1841
-      case 4005: // GCSE_Bessel1841Modified
-        ellipsoid = 3;
-        break;
-      case 4006: // GCSE_BesselNamibia
-        ellipsoid = 4;
-        break;
-      case 4008: // GCSE_Clarke1866
-      case 4009: // GCSE_Clarke1866Michigan
-        ellipsoid = GEO_ELLIPSOID_NAD27;
-        break;
-      case 4010: // GCSE_Clarke1880_Benoit
-      case 4011: // GCSE_Clarke1880_IGN
-      case 4012: // GCSE_Clarke1880_RGS
-      case 4013: // GCSE_Clarke1880_Arc
-      case 4014: // GCSE_Clarke1880_SGA1922
-      case 4034: // GCSE_Clarke1880
-        ellipsoid = 6;
-        break;
-      case 4015: // GCSE_Everest1830_1937Adjustment
-      case 4016: // GCSE_Everest1830_1967Definition
-      case 4017: // GCSE_Everest1830_1975Definition
-        ellipsoid = 7;
-        break;
-      case 4018: // GCSE_Everest1830Modified
-        ellipsoid = 17;
-        break;
-      case 4019: // GCSE_GRS1980
-        ellipsoid = GEO_ELLIPSOID_NAD83;
-        break;
-      case 4020: // GCSE_Helmert1906
-        ellipsoid = 12;
-        break;
-      case 4022: // GCSE_International1924
-      case 4023: // GCSE_International1967
-        ellipsoid = 14;
-        break;
-      case 4024: // GCSE_Krassowsky1940
-        ellipsoid = 15;
-        break;
-      case 4030: // GCSE_WGS84
-        ellipsoid = GEO_ELLIPSOID_WGS84;
-        break;
-      case 4267: // GCS_NAD27
-        ellipsoid = GEO_ELLIPSOID_NAD27;
-        break;
-      case 4269: // GCS_NAD83
-        ellipsoid = GEO_ELLIPSOID_NAD83;
-        break;
-      case 4283: // GCS_GDA94
-        ellipsoid = GEO_ELLIPSOID_GDA94;
-        break;
-      case 4322: // GCS_WGS_72
-        ellipsoid = GEO_ELLIPSOID_WGS72;
-        break;
-      case 4326: // GCS_WGS_84
-        ellipsoid = GEO_ELLIPSOID_WGS84;
-        break;
-      default:
-        fprintf(stderr, "GeographicTypeGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
-      }
-      break;
-    case 2050: // GeogGeodeticDatumGeoKey 
-      switch (geo_keys[i].value_offset)
-      {
-      case 32767: // user-defined GCS
-        user_defined_ellipsoid = true;
-        break;
-      case 6202: // Datum_Australian_Geodetic_Datum_1966
-      case 6203: // Datum_Australian_Geodetic_Datum_1984
-        ellipsoid = 2;
-        break;
-      case 6267: // Datum_North_American_Datum_1927
-        ellipsoid = GEO_ELLIPSOID_NAD27;
-        break;
-      case 6269: // Datum_North_American_Datum_1983
-        ellipsoid = GEO_ELLIPSOID_NAD83;
-        break;
-      case 6283: // Datum_Geocentric_Datum_of_Australia_1994
-        ellipsoid = GEO_ELLIPSOID_GDA94;
-        break;
-      case 6322: // Datum_WGS72
-        ellipsoid = GEO_ELLIPSOID_WGS72;
-        break;
-      case 6326: // Datum_WGS84
-        ellipsoid = GEO_ELLIPSOID_WGS84;
-        break;
-      case 6001: // DatumE_Airy1830
-        ellipsoid = 1;
-        break;
-      case 6002: // DatumE_AiryModified1849
-        ellipsoid = 16;
-        break;
-      case 6003: // DatumE_AustralianNationalSpheroid
-        ellipsoid = 2;
-        break;
-      case 6004: // DatumE_Bessel1841
-      case 6005: // DatumE_BesselModified
-        ellipsoid = 3;
-        break;
-      case 6006: // DatumE_BesselNamibia
-        ellipsoid = 4;
-        break;
-      case 6008: // DatumE_Clarke1866
-      case 6009: // DatumE_Clarke1866Michigan
-        ellipsoid = GEO_ELLIPSOID_NAD27;
-        break;
-      case 6010: // DatumE_Clarke1880_Benoit
-      case 6011: // DatumE_Clarke1880_IGN
-      case 6012: // DatumE_Clarke1880_RGS
-      case 6013: // DatumE_Clarke1880_Arc
-      case 6014: // DatumE_Clarke1880_SGA1922
-      case 6034: // DatumE_Clarke1880
-        ellipsoid = 6;
-        break;
-      case 6015: // DatumE_Everest1830_1937Adjustment
-      case 6016: // DatumE_Everest1830_1967Definition
-      case 6017: // DatumE_Everest1830_1975Definition
-        ellipsoid = 7;
-        break;
-      case 6018: // DatumE_Everest1830Modified
-        ellipsoid = 17;
-        break;
-      case 6019: // DatumE_GRS1980
-        ellipsoid = GEO_ELLIPSOID_NAD83;
-        break;
-      case 6020: // DatumE_Helmert1906
-        ellipsoid = 12;
-        break;
-      case 6022: // DatumE_International1924
-      case 6023: // DatumE_International1967
-        ellipsoid = 14;
-        break;
-      case 6024: // DatumE_Krassowsky1940
-        ellipsoid = 15;
-        break;
-      case 6030: // DatumE_WGS84
-        ellipsoid = GEO_ELLIPSOID_WGS84;
-        break;
-      default:
-        fprintf(stderr, "GeogGeodeticDatumGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
-      }
-      break;
-    case 2052: // GeogLinearUnitsGeoKey 
-      switch (geo_keys[i].value_offset)
-      {
-      case 9001: // Linear_Meter
-        set_coordinates_in_meter();
-        break;
-      case 9002: // Linear_Foot
-        set_coordinates_in_feet();
-        break;
-      case 9003: // Linear_Foot_US_Survey
-        set_coordinates_in_survey_feet();
-        break;
-      default:
-        fprintf(stderr, "GeogLinearUnitsGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
-      }
-      break;
-    case 2056: // GeogEllipsoidGeoKey
-      switch (geo_keys[i].value_offset)
-      {
-      case 7001: // Ellipse_Airy_1830
-        ellipsoid = 1;
-        break;
-      case 7002: // Ellipse_Airy_Modified_1849
-        ellipsoid = 16;
-        break;
-      case 7003: // Ellipse_Australian_National_Spheroid
-        ellipsoid = 2;
-        break;
-      case 7004: // Ellipse_Bessel_1841
-      case 7005: // Ellipse_Bessel_Modified
-        ellipsoid = 3;
-        break;
-      case 7006: // Ellipse_Bessel_Namibia
-        ellipsoid = 4;
-        break;
-      case 7008: // Ellipse_Clarke_1866
-      case 7009: // Ellipse_Clarke_1866_Michigan
-        ellipsoid = GEO_ELLIPSOID_NAD27;
-        break;
-      case 7010: // Ellipse_Clarke1880_Benoit
-      case 7011: // Ellipse_Clarke1880_IGN
-      case 7012: // Ellipse_Clarke1880_RGS
-      case 7013: // Ellipse_Clarke1880_Arc
-      case 7014: // Ellipse_Clarke1880_SGA1922
-      case 7034: // Ellipse_Clarke1880
-        ellipsoid = 6;
-        break;
-      case 7015: // Ellipse_Everest1830_1937Adjustment
-      case 7016: // Ellipse_Everest1830_1967Definition
-      case 7017: // Ellipse_Everest1830_1975Definition
-        ellipsoid = 7;
-        break;
-      case 7018: // Ellipse_Everest1830Modified
-        ellipsoid = 17;
-        break;
-      case 7019: // Ellipse_GRS_1980
-        ellipsoid = GEO_ELLIPSOID_NAD83;
-        break;
-      case 7020: // Ellipse_Helmert1906
-        ellipsoid = 12;
-        break;
-      case 7022: // Ellipse_International1924
-      case 7023: // Ellipse_International1967
-        ellipsoid = 14;
-        break;
-      case 7024: // Ellipse_Krassowsky1940
-        ellipsoid = 15;
-        break;
-      case 7030: // Ellipse_WGS_84
-        ellipsoid = GEO_ELLIPSOID_WGS84;
-        break;
-      default:
-        fprintf(stderr, "GeogEllipsoidGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
-      }
-      break;
-    case 3072: // ProjectedCSTypeGeoKey
-      has_projection = set_ProjectedCSTypeGeoKey(geo_keys[i].value_offset, description);
-      break;
-    case 3075: // ProjCoordTransGeoKey
-      user_defined_projection = 0;
-      switch (geo_keys[i].value_offset)
-      {
-      case 1: // CT_TransverseMercator
-        user_defined_projection = 1;
-        break;
-      case 8: // CT_LambertConfConic_2SP
-        user_defined_projection = 8;
-        break;
-      case 11: // CT_AlbersEqualArea
-        user_defined_projection = 11;
-        break;
-      case 2: // CT_TransvMercator_Modified_Alaska
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_TransvMercator_Modified_Alaska not implemented\n");
-        break;
-      case 3: // CT_ObliqueMercator
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator not implemented\n");
-        break;
-      case 4: // CT_ObliqueMercator_Laborde
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Laborde not implemented\n");
-        break;
-      case 5: // CT_ObliqueMercator_Rosenmund
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Rosenmund not implemented\n");
-        break;
-      case 6: // CT_ObliqueMercator_Spherical
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Spherical not implemented\n");
-        break;
-      case 7: // CT_Mercator
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Mercator not implemented\n");
-        break;
-      case 9: // CT_LambertConfConic_Helmert
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_LambertConfConic_Helmert not implemented\n");
-        break;
-      case 10: // CT_LambertAzimEqualArea
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_LambertAzimEqualArea not implemented\n");
-        break;
-      case 12: // CT_AzimuthalEquidistant
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_AzimuthalEquidistant not implemented\n");
-        break;
-      case 13: // CT_EquidistantConic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_EquidistantConic not implemented\n");
-        break;
-      case 14: // CT_Stereographic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Stereographic not implemented\n");
-        break;
-      case 15: // CT_PolarStereographic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_PolarStereographic not implemented\n");
-        break;
-      case 16: // CT_ObliqueStereographic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueStereographic not implemented\n");
-        break;
-      case 17: // CT_Equirectangular
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Equirectangular not implemented\n");
-        break;
-      case 18: // CT_CassiniSoldner
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_CassiniSoldner not implemented\n");
-        break;
-      case 19: // CT_Gnomonic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Gnomonic not implemented\n");
-        break;
-      case 20: // CT_MillerCylindrical
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_MillerCylindrical not implemented\n");
-        break;
-      case 21: // CT_Orthographic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Orthographic not implemented\n");
-        break;
-      case 22: // CT_Polyconic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Polyconic not implemented\n");
-        break;
-      case 23: // CT_Robinson
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Robinson not implemented\n");
-        break;
-      case 24: // CT_Sinusoidal
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Sinusoidal not implemented\n");
-        break;
-      case 25: // CT_VanDerGrinten
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_VanDerGrinten not implemented\n");
-        break;
-      case 26: // CT_NewZealandMapGrid
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_NewZealandMapGrid not implemented\n");
-        break;
-      case 27: // CT_TransvMercator_SouthOriented
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_TransvMercator_SouthOriented not implemented\n");
-        break;
-      default:
-        fprintf(stderr, "ProjCoordTransGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
-      }
-      break;
-    case 3076: // ProjLinearUnitsGeoKey
-      set_ProjLinearUnitsGeoKey(geo_keys[i].value_offset);
-      break;
-    case 3078: // ProjStdParallel1GeoKey
-      offsetProjStdParallel1GeoKey = geo_keys[i].value_offset;
-      break;
-    case 3079: // ProjStdParallel2GeoKey
-      offsetProjStdParallel2GeoKey = geo_keys[i].value_offset;
-      break;        
-    case 3081: // ProjNatOriginLatGeoKey
-      offsetProjNatOriginLatGeoKey = geo_keys[i].value_offset;
-      break;
-    case 3082: // ProjFalseEastingGeoKey
-      offsetProjFalseEastingGeoKey = geo_keys[i].value_offset;
-      break;
-    case 3083: // ProjFalseNorthingGeoKey
-      offsetProjFalseNorthingGeoKey = geo_keys[i].value_offset;
-      break;
-    case 3088: // ProjCenterLongGeoKey
-      offsetProjCenterLongGeoKey = geo_keys[i].value_offset;
-      break;
-    case 3092: // ProjScaleAtNatOriginGeoKey
-      offsetProjScaleAtNatOriginGeoKey = geo_keys[i].value_offset;
-      break;
-    case 4096: // VerticalCSTypeGeoKey 
-      set_VerticalCSTypeGeoKey(geo_keys[i].value_offset);
-      break;
-    case 4099: // VerticalUnitsGeoKey
-      set_VerticalUnitsGeoKey(geo_keys[i].value_offset);
-      break;
+      n += sprintf(&string[n], "GEOCCS[\"WGS 84\",DATUM[\"World Geodetic System 1984\",SPHEROID[\"WGS 84\",6378137.0,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0.0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"m\",1.0],AXIS[\"Geocentric X\",OTHER],AXIS[\"Geocentric Y\",EAST],AXIS[\"Geocentric Z\",NORTH],AUTHORITY[\"EPSG\",\"4978\"]]");
     }
-  }
-
-  if (ellipsoid != -1)
-  {
-    set_reference_ellipsoid(ellipsoid);
-  }
-
-  if (user_defined_projection)
-  {
-    if (user_defined_projection == 1)
+    else 
     {
-      if ((offsetProjFalseEastingGeoKey >= 0) &&
-          (offsetProjFalseNorthingGeoKey >= 0) &&
-          (offsetProjNatOriginLatGeoKey >= 0) &&
-          (offsetProjCenterLongGeoKey >= 0) &&
-          (offsetProjScaleAtNatOriginGeoKey >= 0))
+      // if not geographic we have a projection
+      if ((projection->type != GEO_PROJECTION_LAT_LONG) && (projection->type != GEO_PROJECTION_LONG_LAT))
       {
-        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
-        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
-        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
-        double longMeridianDeg = geo_double_params[offsetProjCenterLongGeoKey];
-        double scaleFactor = geo_double_params[offsetProjScaleAtNatOriginGeoKey];
-        set_transverse_mercator_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longMeridianDeg, scaleFactor);
-        if (description)
+        n += sprintf(&string[n], "PROJCS[\"%s\",", projection->name);
+      }
+      // which datum
+      if (datum == GEO_DATUM_WGS84)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],");
+      }
+      else if (datum == GEO_DATUM_NAD83)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"NAD83\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6269\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4269\"]],");
+      }
+      else if (datum == GEO_DATUM_ETRS89)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"ETRS89\",DATUM[\"European_Terrestrial_Reference_System_1989\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6258\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4258\"]],");
+      }
+      else if (datum == GEO_DATUM_GDA94)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"GDA94\",DATUM[\"Geocentric_Datum_of_Australia_1994\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6283\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4283\"]],");
+      }
+      else if (datum == GEO_DATUM_NAD83_HARN)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"NAD83(HARN)\",DATUM[\"NAD83_High_Accuracy_Regional_Network\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6152\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4152\"]],");
+      }
+      else if (datum == GEO_DATUM_NAD83_CSRS)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"NAD83(CSRS)\",DATUM[\"NAD83_Canadian_Spatial_Reference_System\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6140\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4617\"]],");
+      }
+      else if (datum == GEO_DATUM_NAD83_NSRS2007)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"NAD83(NSRS2007)\",DATUM[\"NAD83_National_Spatial_Reference_System_2007\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6759\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4759\"]],");
+      }
+      else if (datum == GEO_DATUM_WGS72)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"WGS 72\",DATUM[\"WGS_1972\",SPHEROID[\"WGS 72\",6378135,298.26,AUTHORITY[\"EPSG\",\"7043\"]],TOWGS84[0,0,4.5,0,0,0.554,0.2263],AUTHORITY[\"EPSG\",\"6322\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4322\"]],");
+      }
+      else if (datum == GEO_DATUM_NAD27)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"NAD27\",DATUM[\"North_American_Datum_1927\",SPHEROID[\"Clarke 1866\",6378206.4,294.9786982139006,AUTHORITY[\"EPSG\",\"7008\"]],AUTHORITY[\"EPSG\",\"6267\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4267\"]],");
+      }
+      else if (datum == GEO_DATUM_NZGD2000)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6167\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],");
+      }
+      else if (datum == GEO_DATUM_SLOVENIA_1996)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"Slovenia 1996\",DATUM[\"Slovenia_Geodetic_Datum_1996\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6765\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4765\"]],");
+      }
+      else if (datum == GEO_DATUM_SWEREF99)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"SWEREF99\",DATUM[\"SWEREF99\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6619\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4619\"]],");
+      }
+      else if (datum == GEO_DATUM_RGF93)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"RGF93\",DATUM[\"Reseau_Geodesique_Francais_1993\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6171\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4171\"]],");
+      }
+      else if (datum == GEO_DATUM_IRENET95)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"IRENET95\",DATUM[\"IRENET95\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6173\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4173\"]],");
+      }
+      else if (datum == GEO_DATUM_SVY21)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"SVY21\",DATUM[\"SVY21\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6757\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4757\"]],");
+      }
+      else if (datum == GEO_DATUM_RGFG95)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"RGFG95\",DATUM[\"Reseau_Geodesique_Francais_Guyane_1995\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6624\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4624\"]],");
+      }
+      else if (datum == GEO_DATUM_WGS72BE)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"WGS 72BE\",DATUM[\"WGS_1972_Transit_Broadcast_Ephemeris\",SPHEROID[\"WGS 72\",6378135,298.26,AUTHORITY[\"EPSG\",\"7043\"]],AUTHORITY[\"EPSG\",\"6324\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4324\"]],");
+      }
+      else if (datum == GEO_DATUM_SAD69)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"SAD69\",DATUM[\"South_American_Datum_1969\",SPHEROID[\"GRS 1967\",6378160,298.247167427,AUTHORITY[\"EPSG\",\"7036\"]],AUTHORITY[\"EPSG\",\"6291\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AUTHORITY[\"EPSG\",\"4291\"]],");
+      }
+      else if (datum == GEO_DATUM_HD72)
+      {
+        n += sprintf(&string[n], "GEOGCS[\"HD72\",DATUM[\"Hungarian_Datum_1972\",SPHEROID[\"GRS 1967\",6378160,298.247167427,AUTHORITY[\"EPSG\",\"7036\"]],AUTHORITY[\"EPSG\",\"6237\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4237\"]],");
+      }
+      else
+      {
+        free(string);
+        return false;
+      }
+      // maybe geographic (long/lat)
+      if (projection->type == GEO_PROJECTION_LONG_LAT)
+      {
+        n--; // remove comma
+        n--; // remove bracket
+        n += sprintf(&string[n], ",AXIS[\"Longitude\",EAST],AXIS[\"Latitude\",NORTH]]");
+      }
+      else if (projection->type == GEO_PROJECTION_LAT_LONG) // or maybe geographic with reversed coordinates
+      {
+        n--; // remove comma
+        n--; // remove bracket
+        n += sprintf(&string[n], ",AXIS[\"Latitude\",NORTH],AXIS[\"Longitude\",EAST]]");
+      }
+      else // some real projection
+      {
+        if (projection->type == GEO_PROJECTION_UTM)
         {
-          sprintf(description, "generic transverse mercator");
+          GeoProjectionParametersUTM* utm = (GeoProjectionParametersUTM*)projection;
+          n += sprintf(&string[n], "PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",%d],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",%d],", -183 + 6 * utm->utm_zone_number, (utm->utm_northern_hemisphere ? 0 : 10000000));
         }
-        has_projection = true;
-      }
-    }
-    else if (user_defined_projection == 8)
-    {
-      if ((offsetProjFalseEastingGeoKey >= 0) &&
-          (offsetProjFalseNorthingGeoKey >= 0) &&
-          (offsetProjNatOriginLatGeoKey >= 0) &&
-          (offsetProjCenterLongGeoKey >= 0) &&
-          (offsetProjStdParallel1GeoKey >= 0) &&
-          (offsetProjStdParallel2GeoKey >= 0))
-      {
-        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
-        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
-        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
-        double longOriginDeg = geo_double_params[offsetProjCenterLongGeoKey];
-        double firstStdParallelDeg = geo_double_params[offsetProjStdParallel1GeoKey];
-        double secondStdParallelDeg = geo_double_params[offsetProjStdParallel2GeoKey];
-        set_lambert_conformal_conic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg);
-        if (description)
+        else if (projection->type == GEO_PROJECTION_LCC)
         {
-          sprintf(description, "generic lambert conformal conic");
+          GeoProjectionParametersLCC* lcc = (GeoProjectionParametersLCC*)projection;
+          n += sprintf(&string[n], "PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"standard_parallel_1\",%.15g],PARAMETER[\"standard_parallel_2\",%.15g],PARAMETER[\"latitude_of_origin\",%.15g],PARAMETER[\"central_meridian\",%.15g],", lcc->lcc_first_std_parallel_degree, lcc->lcc_second_std_parallel_degree, lcc->lcc_lat_origin_degree, lcc->lcc_long_meridian_degree);
+          if (source)
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", lcc->lcc_false_easting_meter/coordinates2meter, lcc->lcc_false_northing_meter/coordinates2meter);
+          }
+          else
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", lcc->lcc_false_easting_meter*meter2coordinates, lcc->lcc_false_northing_meter*meter2coordinates);
+          }
         }
-        has_projection = true;
+        else if (projection->type == GEO_PROJECTION_TM)
+        {
+          GeoProjectionParametersTM* tm = (GeoProjectionParametersTM*)projection;
+          n += sprintf(&string[n], "PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",%.15g],PARAMETER[\"central_meridian\",%.15g],PARAMETER[\"scale_factor\",%.15g],", tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
+          if (source)
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", tm->tm_false_easting_meter/coordinates2meter, tm->tm_false_northing_meter/coordinates2meter);
+          }
+          else
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", tm->tm_false_easting_meter*meter2coordinates, tm->tm_false_northing_meter*meter2coordinates);
+          }
+        }
+        else if (projection->type == GEO_PROJECTION_AEAC)
+        {
+          GeoProjectionParametersAEAC* aeac = (GeoProjectionParametersAEAC*)projection;
+          n += sprintf(&string[n], "PROJECTION[\"Albers_Conic_Equal_Area\"],PARAMETER[\"standard_parallel_1\",%.15g],PARAMETER[\"standard_parallel_2\",%.15g],PARAMETER[\"latitude_of_center\",%.15g],PARAMETER[\"longitude_of_center\",%.15g],", aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree, aeac->aeac_latitude_of_center, aeac->aeac_longitude_of_center);
+          if (source)
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", aeac->aeac_false_easting_meter/coordinates2meter, aeac->aeac_false_northing_meter/coordinates2meter);
+          }
+          else
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", aeac->aeac_false_easting_meter*meter2coordinates, aeac->aeac_false_northing_meter*meter2coordinates);
+          }
+        }
+        else if (projection->type == GEO_PROJECTION_OM)
+        {
+          free(string);
+          return false;
+        }
+        else 
+        {
+          free(string);
+          return false;
+        }
+        // units
+        if (source)
+        {
+          if (coordinates2meter == 1.0)
+          {
+            n += sprintf(&string[n], "UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],");
+          }
+          else if (coordinates2meter == 0.3048)
+          {
+            n += sprintf(&string[n], "UNIT[\"foot\",0.3048,AUTHORITY[\"EPSG\",\"9002\"]]");
+          }
+          else
+          {
+            n += sprintf(&string[n], "UNIT[\"US survey foot\",0.3048006096012192,AUTHORITY[\"EPSG\",\"9003\"]],");
+          }
+        }
+        else
+        {
+          if (meter2coordinates == 1.0)
+          {
+            n += sprintf(&string[n], "UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],");
+          }
+          else if (meter2coordinates == 0.3048)
+          {
+            n += sprintf(&string[n], "UNIT[\"foot\",0.3048,AUTHORITY[\"EPSG\",\"9002\"]]");
+          }
+          else
+          {
+            n += sprintf(&string[n], "UNIT[\"US survey foot\",0.3048006096012192,AUTHORITY[\"EPSG\",\"9003\"]],");
+          }
+        }
+        // axis and authority
+        n += sprintf(&string[n], "AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"%d\"]]", projection->geokey);
       }
     }
+    len = n+1;
+    *ogc_wkt = string;
+    return true;
   }
+  return false;
+}
 
-  return has_projection;
+bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** proj4, bool source)
+{
+  GeoProjectionParameters* projection = (source ? source_projection : target_projection);
+  if (projection)
+  {
+    int n = 0;
+    char* string = (char*)malloc(1024);
+    memset(string, 0, 1024);
+    if (projection->type == GEO_PROJECTION_UTM)
+    {
+      GeoProjectionParametersUTM* utm = (GeoProjectionParametersUTM*)projection;
+      n += sprintf(&string[n], "+proj=utm +zone=%d%s ", utm->utm_zone_number, (utm->utm_northern_hemisphere ? "" : " +south"));
+    }
+    else if (projection->type == GEO_PROJECTION_LCC)
+    {
+      GeoProjectionParametersLCC* lcc = (GeoProjectionParametersLCC*)projection;
+      n += sprintf(&string[n], "+proj=lcc +lat_1=%.15g +lat_2=%.15g +lat_0=%.15g +lon_0=%.15g +x_0=%.15g +y_0=%.15g ", lcc->lcc_first_std_parallel_degree, lcc->lcc_second_std_parallel_degree, lcc->lcc_lat_origin_degree, lcc->lcc_long_meridian_degree, lcc->lcc_false_easting_meter, lcc->lcc_false_northing_meter);
+    }
+    else if (projection->type == GEO_PROJECTION_TM)
+    {
+      GeoProjectionParametersTM* tm = (GeoProjectionParametersTM*)projection;
+      n += sprintf(&string[n], "+proj=tmerc +lat_0=%.15g +lon_0=%.15g +k=%.15g +x_0=%.15g +y_0=%.15g ", tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor, tm->tm_false_easting_meter, tm->tm_false_northing_meter);
+    }
+    else if (projection->type == GEO_PROJECTION_AEAC)
+    {
+      GeoProjectionParametersAEAC* aeac = (GeoProjectionParametersAEAC*)projection;
+      n += sprintf(&string[n], "+proj=albers +lat_1=%.15g +lat_2=%.15g +lat_0=%.15g +lon_0=%.15g +x_0=%.15g +y_0=%.15g ", aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree, aeac->aeac_latitude_of_center, aeac->aeac_longitude_of_center, aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter);
+    }
+    else if (projection->type == GEO_PROJECTION_OM)
+    {
+      free(string);
+      return false;
+    }
+    else if (projection->type == GEO_PROJECTION_LONG_LAT)
+    {
+      n += sprintf(&string[n], "+proj=longlat ");
+    }
+    else if (projection->type == GEO_PROJECTION_LAT_LONG)
+    {
+      n += sprintf(&string[n], "+proj=latlong ");
+    }
+    else if (projection->type == GEO_PROJECTION_ECEF)
+    {
+      n += sprintf(&string[n], "+proj=geocent ");
+    }
+    else
+    {
+      free(string);
+      return false;
+    }
+    if (datum == GEO_DATUM_WGS84)
+    {
+      n += sprintf(&string[n], "+datum=WGS84 ");
+    }
+    else if (datum == GEO_DATUM_NAD83)
+    {
+      n += sprintf(&string[n], "+datum=NAD83 ");
+    }
+    else if (datum == GEO_DATUM_WGS72)
+    {
+      n += sprintf(&string[n], "+datum=WGS72 ");
+    }
+    else if (datum == GEO_DATUM_NAD27)
+    {
+      n += sprintf(&string[n], "+datum=NAD27 ");
+    }
+    else if (ellipsoid->id == GEO_ELLIPSOID_WGS84)
+    {
+      n += sprintf(&string[n], "+ellps=WGS84 ");
+    }
+    else if (ellipsoid->id == GEO_ELLIPSOID_GRS1980)
+    {
+      n += sprintf(&string[n], "+datum=NAD83 ");
+    }
+    else if (ellipsoid->id == GEO_ELLIPSOID_WGS72)
+    {
+      n += sprintf(&string[n], "+ellps=WGS72 ");
+    }
+    else if (ellipsoid->id == GEO_ELLIPSOID_CLARKE1866)
+    {
+      n += sprintf(&string[n], "+datum=NAD27 ");
+    }
+    else 
+    {
+      free(string);
+      return false;
+    }
+    if (has_coordinate_units(source))
+    {
+      if (source)
+      {
+        if (coordinates2meter == 1.0)
+        {
+          n += sprintf(&string[n], "+units=m ");
+        }
+        else
+        {
+          n += sprintf(&string[n], "+to_meter=%.15g ", coordinates2meter);
+        }
+      }
+      else
+      {
+        if (meter2coordinates == 1.0)
+        {
+          n += sprintf(&string[n], "+units=m ");
+        }
+        else
+        {
+          n += sprintf(&string[n], "+to_meter=%.15g ", meter2coordinates);
+        }
+      }
+    }
+    n += sprintf(&string[n], "+no_defs");
+    len = n;
+    *proj4 = string;
+    return true;
+  }
+  return false;
 }
 
 short GeoProjectionConverter::get_GTModelTypeGeoKey()
@@ -2016,15 +2412,15 @@ short GeoProjectionConverter::get_GeographicTypeGeoKey(bool source)
     return 4001;
   case 2: // GCSE_AustralianNationalSpheroid
     return 4003;
-  case 3: // GCSE_Bessel1841
+  case GEO_ELLIPSOID_BESSEL_1841: // GCSE_Bessel1841
     return 4004;
   case 4: // GCSE_BesselNamibia
     return 4006;
-  case GEO_ELLIPSOID_NAD27: // GCS_NAD27
+  case GEO_ELLIPSOID_CLARKE1866: // GCS_NAD27
     return 4267;
   case 6: // GCSE_Clarke1880
     return 4034;
-  case GEO_ELLIPSOID_NAD83: // GCS_NAD83
+  case GEO_ELLIPSOID_GRS1980: // GCS_NAD83
     return 4269;
   case 12: // GCSE_Helmert1906
     return 4020;
@@ -2058,38 +2454,45 @@ short GeoProjectionConverter::get_GeogGeodeticDatumGeoKey(bool source)
       }
     }
   }
-  switch (ellipsoid->id)
+  if (datum != -1)
   {
-  case 1: // DatumE_Airy1830
-    return 6001;
-  case 2: // DatumE_AustralianNationalSpheroid
-    return 6003;
-  case 3: // DatumE_Bessel1841
-    return 6004;
-  case 4: // DatumE_BesselNamibia
-    return 6006;
-  case 5: // Datum_North_American_Datum_1927
-    return 6267;
-  case 6: // DatumE_Clarke1880
-    return 6034;
-  case 11: // Datum_North_American_Datum_1983
-    return 6269;
-  case 12: // DatumE_Helmert1906
-    return 6020;
-  case 14: // DatumE_International1924
-    return 6022;
-  case 15: // DatumE_Krassowsky1940
-    return 6024;
-  case 16: // DatumE_AiryModified1849 
-    return 6002;
-  case 17: // DatumE_Everest1830Modified
-    return 6018;
-  case 22: // Datum_WGS72
-    return 6322;
-  case 23: // Datum_WGS84
-    return 6326;
-  default:
-    fprintf(stderr, "GeogGeodeticDatumGeoKey: look-up for ellipsoid with id %d not implemented\n", ellipsoid->id);
+    return datum;
+  }
+  else
+  {
+    switch (ellipsoid->id)
+    {
+      case GEO_ELLIPSOID_AIRY: // DatumE_Airy1830
+        return 6001;
+      case 2: // DatumE_AustralianNationalSpheroid
+        return 6003;
+      case GEO_ELLIPSOID_BESSEL_1841: // DatumE_Bessel1841
+        return 6004;
+      case 4: // DatumE_BesselNamibia
+        return 6006;
+      case GEO_ELLIPSOID_CLARKE1866: // Datum_North_American_Datum_1927
+        return 6267;
+      case GEO_ELLIPSOID_CLARKE1880: // DatumE_Clarke1880
+        return 6034;
+      case GEO_ELLIPSOID_GRS1980: // Datum_North_American_Datum_1983
+        return 6269;
+      case 12: // DatumE_Helmert1906
+        return 6020;
+      case GEO_ELLIPSOID_INTERNATIONAL: // DatumE_International1924
+        return 6022;
+      case GEO_ELLIPSOID_KRASSOWSKY: // DatumE_Krassowsky1940
+        return 6024;
+      case 16: // DatumE_AiryModified1849 
+        return 6002;
+      case 17: // DatumE_Everest1830Modified
+        return 6018;
+      case GEO_ELLIPSOID_WGS72: // Datum_WGS72
+        return 6322;
+      case GEO_ELLIPSOID_WGS84: // Datum_WGS84
+        return 6326;
+      default:
+        fprintf(stderr, "GeogGeodeticDatumGeoKey: look-up for ellipsoid with id %d not implemented\n", ellipsoid->id);
+    }
   }
   return 0;
 }
@@ -2189,7 +2592,7 @@ short GeoProjectionConverter::get_GeogEllipsoidGeoKey(bool source)
     return 7001;
   case 2: // Ellipse_Australian_National_Spheroid
     return 7003;
-  case 3: // Ellipse_Bessel_1841
+  case GEO_ELLIPSOID_BESSEL_1841: // Ellipse_Bessel_1841
     return 7004;
   case 4: // Ellipse_Bessel_Namibia
     return 7006;
@@ -2356,7 +2759,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source)
             return utm->utm_zone_number + 32300;
           }
         }
-        else if (ellipsoid->id == GEO_ELLIPSOID_NAD83)
+        else if (ellipsoid->id == GEO_ELLIPSOID_GRS1980)
         {
           if (utm->utm_northern_hemisphere)
           {
@@ -2378,7 +2781,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source)
             fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD83 does not exist\n", utm->utm_zone_number);
           }
         }
-        else if (ellipsoid->id == GEO_ELLIPSOID_NAD27)
+        else if (ellipsoid->id == GEO_ELLIPSOID_CLARKE1866)
         {
           if (utm->utm_northern_hemisphere)
           {
@@ -2396,7 +2799,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source)
             fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD27 does not exist\n", utm->utm_zone_number);
           }
         }
-        else if (ellipsoid->id == GEO_ELLIPSOID_SAD69)
+        else if (ellipsoid->id == GEO_ELLIPSOID_GRS1967)
         {
           if (utm->utm_northern_hemisphere)
           {
@@ -2421,7 +2824,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source)
             }
           }
         }
-        else if (ellipsoid->id == GEO_ELLIPSOID_Inter)
+        else if (ellipsoid->id == GEO_ELLIPSOID_INTERNATIONAL)
         {
           if (utm->utm_northern_hemisphere)
           {
@@ -2530,7 +2933,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source)
   return 0;
 }
 
-void GeoProjectionConverter::set_ProjLinearUnitsGeoKey(short value)
+bool GeoProjectionConverter::set_ProjLinearUnitsGeoKey(short value)
 {
   switch (value)
   {
@@ -2545,7 +2948,9 @@ void GeoProjectionConverter::set_ProjLinearUnitsGeoKey(short value)
     break;
   default:
     fprintf(stderr, "set_ProjLinearUnitsGeoKey: look-up for %d not implemented\n", value);
+    return false;
   }
+  return true;
 }
 
 short GeoProjectionConverter::get_ProjLinearUnitsGeoKey(bool source)
@@ -2718,6 +3123,149 @@ const char* GeoProjectionConverter::get_ellipsoid_name() const
   return ellipsoid->name;
 }
 
+
+bool GeoProjectionConverter::set_datum(int id, char* description)
+{
+  datum = id;
+
+  if (id == GEO_DATUM_ETRS89)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "ETRS89");
+  }
+  else if (id == GEO_DATUM_WGS84)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_WGS84);
+    if (description) sprintf(description, "WGS84");
+  }
+  else if (id == GEO_DATUM_NAD83)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "NAD83");
+  }
+  else if (id == GEO_DATUM_GDA94)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "GDA84");
+  }
+  else if (id == GEO_DATUM_WGS72)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_WGS72);
+    if (description) sprintf(description, "WGS72");
+  }
+  else if (id == GEO_DATUM_NAD83_HARN)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "NAD83(HARN)");
+  }
+  else if (id == GEO_DATUM_NAD83_CSRS)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "NAD83(CSRS)");
+  }
+  else if (id == GEO_DATUM_NZGD2000)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "NZGD2000");
+  }
+  else if (id == GEO_DATUM_NAD27)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_CLARKE1866);
+    if (description) sprintf(description, "NAD27");
+  }
+  else if (id == GEO_DATUM_SWEREF99)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "SWEREF99");
+  }
+  else if (id == GEO_DATUM_RGFG95)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "RGFG95");
+  }
+  else if (id == GEO_DATUM_RGF93)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "RGF93");
+  }
+  else if (id == GEO_DATUM_SVY21)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_WGS84);
+    if (description) sprintf(description, "SVY21");
+  }
+  else if (id == GEO_DATUM_NAD83_NSRS2007)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "NAD83(NSRS2007)");
+  }
+  else if (id == GEO_DATUM_SLOVENIA_1996)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "Slovenia 1996");
+  }
+  else if (id == GEO_DATUM_IRENET95)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "IRENET95");
+  }
+  else if (id == GEO_DATUM_MAGNA_SIRGAS)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    if (description) sprintf(description, "MAGNA-SIRGAS");
+  }
+  else if (id == GEO_DATUM_WGS72BE)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_WGS72);
+    if (description) sprintf(description, "WGS72BE");
+  }
+  else if (id == GEO_DATUM_FIJI_1986)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_WGS72);
+    if (description) sprintf(description, "Fiji 1986");
+  }
+  else if (id == GEO_DATUM_SAD69)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1967);
+    if (description) sprintf(description, "SAD69");
+  }
+  else if (id == GEO_DATUM_HD72)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1967);
+    if (description) sprintf(description, "HD72");
+  }
+  else if (id == GEO_DATUM_FIJI_1956)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_INTERNATIONAL);
+    if (description) sprintf(description, "Fiji 1956");
+  }
+  else if (id == GEO_DATUM_BELGE_1972)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_INTERNATIONAL);
+    if (description) sprintf(description, "Belge 1972");
+  }
+  else if (id == GEO_DATUM_MGI_1901)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_BESSEL_1841);
+    if (description) sprintf(description, "MGI 1901");
+  }
+  else if (id == GEO_DATUM_CH1903)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_BESSEL_1841);
+    if (description) sprintf(description, "CH1903");
+  }
+  else if (id == GEO_DATUM_OSGB_1936)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_AIRY);
+    if (description) sprintf(description, "OSGB 1936");
+  }
+  else
+  {
+    if (description) sprintf(description, "unknown");
+    return false;
+  }
+  return true;
+}
+
 void GeoProjectionConverter::set_projection(GeoProjectionParameters* projection, bool source)
 {
   if (source)
@@ -2857,7 +3405,7 @@ bool GeoProjectionConverter::set_ecef_projection(char* description, bool source)
   return true;
 }
 
-bool GeoProjectionConverter::set_utm_projection(char* zone, char* description, bool source)
+bool GeoProjectionConverter::set_utm_projection(char* zone, char* description, bool source, const char* name)
 {
   int zone_number;
   char* zone_letter;
@@ -2878,7 +3426,14 @@ bool GeoProjectionConverter::set_utm_projection(char* zone, char* description, b
   {
     utm->utm_northern_hemisphere = false; //point is in southern hemisphere
   }
-  sprintf(utm->name, "UTM zone %s (%s)", zone, (utm->utm_northern_hemisphere ? "northern hemisphere" : "southern hemisphere"));
+  if (name)
+  {
+    sprintf(utm->name, "%.255s", name);
+  }
+  else
+  {
+    sprintf(utm->name, "UTM zone %s (%s)", zone, (utm->utm_northern_hemisphere ? "northern hemisphere" : "southern hemisphere"));
+  }
   utm->utm_long_origin = (zone_number - 1) * 6 - 180 + 3; // + 3 puts origin in middle of zone
   set_projection(utm, source);
   if (description)
@@ -2888,14 +3443,21 @@ bool GeoProjectionConverter::set_utm_projection(char* zone, char* description, b
   return true;
 }
 
-bool GeoProjectionConverter::set_utm_projection(int zone, bool northern, char* description, bool source)
+bool GeoProjectionConverter::set_utm_projection(int zone, bool northern, char* description, bool source, const char* name)
 {
   GeoProjectionParametersUTM* utm = new GeoProjectionParametersUTM();
   utm->type = GEO_PROJECTION_UTM;
   utm->utm_zone_number = zone;
   utm->utm_zone_letter = ' ';
   utm->utm_northern_hemisphere = northern;
-  sprintf(utm->name, "UTM zone %d (%s)", zone, (utm->utm_northern_hemisphere ? "northern hemisphere" : "southern hemisphere"));
+  if (name)
+  {
+    sprintf(utm->name, "%.255s", name);
+  }
+  else
+  {
+    sprintf(utm->name, "UTM zone %d (%s)", zone, (utm->utm_northern_hemisphere ? "northern hemisphere" : "southern hemisphere"));
+  }
   utm->utm_long_origin = (zone - 1) * 6 - 180 + 3;  // + 3 puts origin in middle of zone
   set_projection(utm, source);
   if (description)
@@ -2905,11 +3467,15 @@ bool GeoProjectionConverter::set_utm_projection(int zone, bool northern, char* d
   return true;
 }
 
-bool GeoProjectionConverter::set_target_utm_projection(char* description)
+bool GeoProjectionConverter::set_target_utm_projection(char* description, const char* name)
 {
   GeoProjectionParametersUTM* utm = new GeoProjectionParametersUTM();
   utm->type = GEO_PROJECTION_UTM;
   utm->utm_zone_number = -1;
+  if (name)
+  {
+    sprintf(utm->name, "%.255s", name);
+  }
   set_projection(utm, false);
   if (description)
   {
@@ -2934,11 +3500,18 @@ bool GeoProjectionConverter::set_target_utm_projection(char* description)
 // firstStdParallelDegree & secondStdParallelDegree are the two lines of
 // longitude in decimal degrees (that is they run east-west) that define
 // where the "cone" intersects the earth. They bracket the area being projected.
-void GeoProjectionConverter::set_lambert_conformal_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description, bool source)
+void GeoProjectionConverter::set_lambert_conformal_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description, bool source, const char* name)
 {
   GeoProjectionParametersLCC* lcc = new GeoProjectionParametersLCC();
   lcc->type = GEO_PROJECTION_LCC;
-  sprintf(lcc->name, "Lambert Conformal Conic");
+  if (name)
+  {
+    sprintf(lcc->name, "%.255s", name);
+  }
+  else
+  {
+    sprintf(lcc->name, "Lambert Conformal Conic");
+  }
   lcc->lcc_false_easting_meter = falseEastingMeter;
   lcc->lcc_false_northing_meter = falseNorthingMeter;
   lcc->lcc_lat_origin_degree = latOriginDegree;
@@ -2967,11 +3540,18 @@ void GeoProjectionConverter::set_lambert_conformal_conic_projection(double false
   * longMeridianDegree  : Longitude n decimal degree at the center of the projection
   * scaleFactor         : Projection scale factor
 */
-void GeoProjectionConverter::set_transverse_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor, char* description, bool source)
+void GeoProjectionConverter::set_transverse_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor, char* description, bool source, const char* name)
 {
   GeoProjectionParametersTM* tm = new GeoProjectionParametersTM();
   tm->type = GEO_PROJECTION_TM;
-  sprintf(tm->name, "Transverse Mercator");
+  if (name)
+  {
+    sprintf(tm->name, "%.255s", name);
+  }
+  else
+  {
+    sprintf(tm->name, "Transverse Mercator");
+  }
   tm->tm_false_easting_meter = falseEastingMeter;
   tm->tm_false_northing_meter = falseNorthingMeter;
   tm->tm_lat_origin_degree = latOriginDegree;
@@ -2996,39 +3576,46 @@ void GeoProjectionConverter::set_transverse_mercator_projection(double falseEast
 // falseEastingMeter & falseNorthingMeter are just an offset in meters added 
 // to the final coordinate calculated.
 //
-// latOriginDegree & longMeridianDegree are the "center" latitiude and
+// latCenterDegree & longCenterDegree are the "center" latitiude and
 // longitude in decimal degrees of the area being projected. All coordinates
 // will be calculated in meters relative to this point on the earth.
 //
 // firstStdParallelDegree & secondStdParallelDegree are the two lines of
 // longitude in decimal degrees (that is they run east-west) that define
 // where the "cone" intersects the earth. They bracket the area being projected.
-void GeoProjectionConverter::set_albers_equal_area_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description, bool source)
+void GeoProjectionConverter::set_albers_equal_area_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latCenterDegree, double longCenterDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description, bool source, const char* name)
 {
   GeoProjectionParametersAEAC* aeac = new GeoProjectionParametersAEAC();
   aeac->type = GEO_PROJECTION_AEAC;
-  sprintf(aeac->name, "Albers Equal Area Conic");
+  if (name)
+  {
+    sprintf(aeac->name, "%.255s", name);
+  }
+  else
+  {
+    sprintf(aeac->name, "Albers Equal Area Conic");
+  }
   aeac->aeac_false_easting_meter = falseEastingMeter;
   aeac->aeac_false_northing_meter = falseNorthingMeter;
-  aeac->aeac_lat_origin_degree = latOriginDegree;
-  aeac->aeac_long_meridian_degree = longMeridianDegree;
+  aeac->aeac_latitude_of_center = latCenterDegree;
+  aeac->aeac_longitude_of_center = longCenterDegree;
   aeac->aeac_first_std_parallel_degree = firstStdParallelDegree;
   aeac->aeac_second_std_parallel_degree = secondStdParallelDegree;
-  aeac->aeac_lat_origin_radian = deg2rad*aeac->aeac_lat_origin_degree;
-  aeac->aeac_long_meridian_radian = deg2rad*aeac->aeac_long_meridian_degree;
+  aeac->aeac_lat_origin_radian = deg2rad*aeac->aeac_latitude_of_center;
+  aeac->aeac_long_meridian_radian = deg2rad*aeac->aeac_longitude_of_center;
   aeac->aeac_first_std_parallel_radian = deg2rad*aeac->aeac_first_std_parallel_degree;
   aeac->aeac_second_std_parallel_radian = deg2rad*aeac->aeac_second_std_parallel_degree;
   set_projection(aeac, source);
   compute_aeac_parameters(source);
   if (description)
   {
-    sprintf(description, "false east/north: %g/%g [m], origin lat/ meridian long: %g/%g, parallel 1st/2nd: %g/%g", aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter, aeac->aeac_lat_origin_degree, aeac->aeac_long_meridian_degree, aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree);
+    sprintf(description, "false east/north: %g/%g [m], origin lat/ meridian long: %g/%g, parallel 1st/2nd: %g/%g", aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter, aeac->aeac_latitude_of_center, aeac->aeac_longitude_of_center, aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree);
   }
 }
 
 // Configure an Oblique Mercator Projection
 //
-// The function set_albers_equal_area_conic_projection() receives the Oblique  
+// The function set_oblique_mercator_projection() receives the Oblique  
 // Mercator projection parameters as inputs and sets the corresponding state
 // variables.
 //
@@ -3042,11 +3629,18 @@ void GeoProjectionConverter::set_albers_equal_area_conic_projection(double false
 // firstStdParallelDegree & secondStdParallelDegree are the two lines of
 // longitude in decimal degrees (that is they run east-west) that define
 // where the "cone" intersects the earth. They bracket the area being projected.
-void GeoProjectionConverter::set_oblique_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description, bool source)
+void GeoProjectionConverter::set_oblique_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description, bool source, const char* name)
 {
   GeoProjectionParametersOM* om = new GeoProjectionParametersOM();
   om->type = GEO_PROJECTION_OM;
-  sprintf(om->name, "Oblique Mercator");
+  if (name)
+  {
+    sprintf(om->name, "%.255s", name);
+  }
+  else
+  {
+    sprintf(om->name, "Oblique Mercator");
+  }
   om->om_false_easting_meter = falseEastingMeter;
   om->om_false_northing_meter = falseNorthingMeter;
   om->om_lat_origin_degree = latOriginDegree;
@@ -3083,9 +3677,71 @@ short GeoProjectionConverter::get_epsg_code_value(int i) const
   return 0;
 }
 
+static FILE* open_pcs_file(const char* program_name)
+{
+  FILE* file = 0;
+
+  // create path to 'pcs.csv' file
+
+  char path[4096];
+  int path_len = 0;
+
+  path[path_len] = '.'; path_len++;
+
+#ifdef _WIN32
+  if (program_name)
+  {
+    GetModuleFileName(GetModuleHandle(program_name),(LPTSTR)path, MAX_PATH);
+    path_len = strlen(path);
+    while ((path_len > 0) && (path[path_len] != '\\') && (path[path_len] != '/')) path_len--;
+    path[path_len] = '\\'; path_len++;
+    path[path_len] = 's'; path_len++;
+    path[path_len] = 'e'; path_len++;
+    path[path_len] = 'r'; path_len++;
+    path[path_len] = 'f'; path_len++;
+    path[path_len] = '\\'; path_len++;
+    path[path_len] = 'g'; path_len++;
+    path[path_len] = 'e'; path_len++;
+    path[path_len] = 'o'; path_len++;
+  }
+#endif //_WIN32
+
+  path[path_len] = '\\'; path_len++;
+  path[path_len] = 'p'; path_len++;
+  path[path_len] = 'c'; path_len++;
+  path[path_len] = 's'; path_len++;
+  path[path_len] = '.'; path_len++;
+  path[path_len] = 'c'; path_len++;
+  path[path_len] = 's'; path_len++;
+  path[path_len] = 'v'; path_len++;
+  path[path_len] = '\0';
+
+  file = fopen(path, "r");
+
+  return file;
+}
+
+static double min2dec(double min)
+{
+  double dec, fraction;
+  if (min > 0)
+  {
+    dec = floor(min);
+  }
+  else
+  {
+    dec = ceil(min);
+  }
+  fraction = min - dec;
+  dec += (fraction / 60.0) * 100.0;
+//  fprintf(stderr, "min: %.10g dec: %.10g \n", min, dec);
+  return dec;
+}
+
 bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool source)
 {
   int ellipsoid = -1;
+  int datum = -1;
   bool utm_northern = false;
   int utm_zone = -1;
   bool is_mga = false;
@@ -3100,58 +3756,68 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 3156: // NAD83(CSRS) / UTM zone 9N
   case 3157: // NAD83(CSRS) / UTM zone 10N
     utm_northern = true; utm_zone = value - 3154 + 7;
-    ellipsoid = GEO_ELLIPSOID_NAD83;
+    datum = GEO_DATUM_NAD83_CSRS;
     break;
   case 3158: // NAD83(CSRS) / UTM zone 14N
   case 3159: // NAD83(CSRS) / UTM zone 15N
   case 3160: // NAD83(CSRS) / UTM zone 16N
     utm_northern = true; utm_zone = value - 3158 + 14;
-    ellipsoid = GEO_ELLIPSOID_NAD83;
+    datum = GEO_DATUM_NAD83_CSRS;
     break;
-  case 4978:
+  case 4978: // WGS 84
     ecef = true;
-    ellipsoid = GEO_ELLIPSOID_WGS84;
+    datum = GEO_DATUM_WGS84;
     break;
   case 20137: // PCS_Adindan_UTM_zone_37N
   case 20138: // PCS_Adindan_UTM_zone_38N
     utm_northern = true; utm_zone = value-20100;
+    ellipsoid = GEO_ELLIPSOID_CLARKE1880;
     break;
   case 20437: // PCS_Ain_el_Abd_UTM_zone_37N
   case 20438: // PCS_Ain_el_Abd_UTM_zone_38N
   case 20439: // PCS_Ain_el_Abd_UTM_zone_39N
     utm_northern = true; utm_zone = value-20400;
+    ellipsoid = GEO_ELLIPSOID_INTERNATIONAL;
     break;                
   case 20538: // PCS_Afgooye_UTM_zone_38N
   case 20539: // PCS_Afgooye_UTM_zone_39N
     utm_northern = true; utm_zone = value-20500;
+    ellipsoid = GEO_ELLIPSOID_KRASSOWSKY;
     break;
   case 20822: // PCS_Aratu_UTM_zone_22S
   case 20823: // PCS_Aratu_UTM_zone_23S
   case 20824: // PCS_Aratu_UTM_zone_24S
     utm_northern = false; utm_zone = value-20800;
+    ellipsoid = GEO_ELLIPSOID_INTERNATIONAL;
     break;
   case 21148: // PCS_Batavia_UTM_zone_48S
   case 21149: // PCS_Batavia_UTM_zone_49S
   case 21150: // PCS_Batavia_UTM_zone_50S
     utm_northern = false; utm_zone = value-21100;
+    ellipsoid = GEO_ELLIPSOID_BESSEL_1841;
     break;
   case 21817: // PCS_Bogota_UTM_zone_17N
   case 21818: // PCS_Bogota_UTM_zone_18N
     utm_northern = true; utm_zone = value-21800;
+    ellipsoid = GEO_ELLIPSOID_INTERNATIONAL;
     break;
   case 22032: // PCS_Camacupa_UTM_32S
   case 22033: // PCS_Camacupa_UTM_33S
     utm_northern = false; utm_zone = value-22000;
+    ellipsoid = GEO_ELLIPSOID_CLARKE1880;
     break; 
   case 22332: // PCS_Carthage_UTM_zone_32N
     utm_northern = true; utm_zone = 32;
+    ellipsoid = GEO_ELLIPSOID_CLARKE1880;
     break; 
   case 22523: // PCS_Corrego_Alegre_UTM_23S
   case 22524: // PCS_Corrego_Alegre_UTM_24S
     utm_northern = false; utm_zone = value-22500;
+    ellipsoid = GEO_ELLIPSOID_INTERNATIONAL;
     break;
   case 22832: // PCS_Douala_UTM_zone_32N
     utm_northern = true; utm_zone = 32;
+    ellipsoid = GEO_ELLIPSOID_CLARKE1880;
     break;
   case 23028: // PCS_ED50_UTM_zone_28N
   case 23029: // PCS_ED50_UTM_zone_29N
@@ -3165,7 +3831,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 23037: 
   case 23038: // PCS_ED50_UTM_zone_38N
     utm_northern = true; utm_zone = value-23000;
-    ellipsoid = GEO_ELLIPSOID_Inter;
+    ellipsoid = GEO_ELLIPSOID_INTERNATIONAL;
     break;
   case 23239: // PCS_Fahud_UTM_zone_39N
   case 23240: // PCS_Fahud_UTM_zone_40N
@@ -3240,7 +3906,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 25837: // PCS_ETRS89_UTM_zone_37N
   case 25838: // PCS_ETRS89_UTM_zone_38N
     utm_northern = true; utm_zone = value-25800;
-    ellipsoid = GEO_ELLIPSOID_NAD83;
+    datum = GEO_DATUM_ETRS89;
     break;
   case 25932: // PCS_Malongo_1987_UTM_32S
     utm_northern = false; utm_zone = 32;
@@ -3266,7 +3932,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 26705: // PCS_NAD27_UTM_zone_5N
   case 26706: // PCS_NAD27_UTM_zone_6N
   case 26707: // PCS_NAD27_UTM_zone_7N
-  case 26708: // PCS_NAD27_UTM_zone_7N
+  case 26708: // PCS_NAD27_UTM_zone_8N
   case 26709: // PCS_NAD27_UTM_zone_9N
   case 26710: // PCS_NAD27_UTM_zone_10N
   case 26711: // PCS_NAD27_UTM_zone_11N
@@ -3282,7 +3948,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 26721: // PCS_NAD27_UTM_zone_21N
   case 26722: // PCS_NAD27_UTM_zone_22N
     utm_northern = true; utm_zone = value-26700;
-    ellipsoid = GEO_ELLIPSOID_NAD27;
+    datum = GEO_DATUM_NAD27;
     break;
   case 26729: // PCS_NAD27_Alabama_East
     sp_nad27 = true; sp = "AL_E";
@@ -3499,7 +4165,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 26905: // PCS_NAD83_UTM_zone_5N
   case 26906: // PCS_NAD83_UTM_zone_6N
   case 26907: // PCS_NAD83_UTM_zone_7N
-  case 26908: // PCS_NAD83_UTM_zone_7N
+  case 26908: // PCS_NAD83_UTM_zone_8N
   case 26909: // PCS_NAD83_UTM_zone_9N
   case 26910: // PCS_NAD83_UTM_zone_10N
   case 26911: // PCS_NAD83_UTM_zone_11N
@@ -3516,7 +4182,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 26922: // PCS_NAD83_UTM_zone_22N
   case 26923: // PCS_NAD83_UTM_zone_23N
     utm_northern = true; utm_zone = value-26900;
-    ellipsoid = GEO_ELLIPSOID_NAD83;
+    datum = GEO_DATUM_NAD83;
     break;
   case 26929: // PCS_NAD83_Alabama_East
     sp_nad27 = false; sp = "AL_E";
@@ -3740,7 +4406,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 28357: // PCS_GDA94_MGA_zone_57
   case 28358: // PCS_GDA94_MGA_zone_58
     utm_northern = false; utm_zone = value-28300; is_mga = true;
-    ellipsoid = GEO_ELLIPSOID_GDA94;
+    datum = GEO_DATUM_GDA94;
     break;
   case 29118: // PCS_SAD69_UTM_zone_18N
   case 29119: // PCS_SAD69_UTM_zone_19N
@@ -3748,7 +4414,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 29121: // PCS_SAD69_UTM_zone_21N
   case 29122: // PCS_SAD69_UTM_zone_22N
     utm_northern = true; utm_zone = value-29100;
-    ellipsoid = GEO_ELLIPSOID_SAD69;
+    datum = GEO_DATUM_SAD69;
     break;
   case 29177: // PCS_SAD69_UTM_zone_17S
   case 29178: // PCS_SAD69_UTM_zone_18S
@@ -3760,7 +4426,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 29184: // PCS_SAD69_UTM_zone_24S
   case 29185: // PCS_SAD69_UTM_zone_25S
     utm_northern = false; utm_zone = value-29160;
-    ellipsoid = GEO_ELLIPSOID_SAD69;
+    datum = GEO_DATUM_SAD69;
     break;
   case 29220: // PCS_Sapper_Hill_UTM_20S
   case 29221: // PCS_Sapper_Hill_UTM_21S
@@ -4191,7 +4857,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 32259: // PCS_WGS72_UTM_zone_59N 
   case 32260: // PCS_WGS72_UTM_zone_60N 
     utm_northern = true; utm_zone = value-32200;
-    ellipsoid = GEO_ELLIPSOID_WGS72;
+    datum = GEO_DATUM_WGS72;
     break;
   case 32301: // PCS_WGS72_UTM_zone_1S
   case 32302: // PCS_WGS72_UTM_zone_2S
@@ -4254,7 +4920,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 32359: // PCS_WGS72_UTM_zone_59S
   case 32360: // PCS_WGS72_UTM_zone_60S
     utm_northern = false; utm_zone = value-32300;
-    ellipsoid = GEO_ELLIPSOID_WGS72;
+    datum = GEO_DATUM_WGS72;
     break;
   case 32401: // PCS_WGS72BE_UTM_zone_1N
   case 32402: // PCS_WGS72BE_UTM_zone_2N
@@ -4317,7 +4983,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 32459: // PCS_WGS72BE_UTM_zone_59N
   case 32460: // PCS_WGS72BE_UTM_zone_60N
     utm_northern = true; utm_zone = value-32400;
-    ellipsoid = GEO_ELLIPSOID_WGS72;
+    datum = GEO_DATUM_WGS72BE;
     break;
   case 32501: // PCS_WGS72BE_UTM_zone_1S
   case 32502: // PCS_WGS72BE_UTM_zone_2S
@@ -4380,7 +5046,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 32559: // PCS_WGS72BE_UTM_zone_59S
   case 32560: // PCS_WGS72BE_UTM_zone_60S
     utm_northern = false; utm_zone = value-32500;
-    ellipsoid = GEO_ELLIPSOID_WGS72;
+    datum = GEO_DATUM_WGS72BE;
     break;
   case 32601: // PCS_WGS84_UTM_zone_1N
   case 32602: // PCS_WGS84_UTM_zone_2N
@@ -4443,7 +5109,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 32659: // PCS_WGS84_UTM_zone_59N
   case 32660: // PCS_WGS84_UTM_zone_60N
     utm_northern = true; utm_zone = value-32600;
-    ellipsoid = GEO_ELLIPSOID_WGS84;
+    datum = GEO_DATUM_WGS84;
     break;
   case 32701: // PCS_WGS84_UTM_zone_1S
   case 32702: // PCS_WGS84_UTM_zone_2S
@@ -4506,13 +5172,13 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   case 32759: // PCS_WGS84_UTM_zone_59S
   case 32760: // PCS_WGS84_UTM_zone_60S
     utm_northern = false; utm_zone = value-32700;
-    ellipsoid = GEO_ELLIPSOID_WGS84;
+    datum = GEO_DATUM_WGS84;
     break;
   default:
     if (value == EPSG_IRENET95_Irish_Transverse_Mercator)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(600000.0, 750000.0, 53.5, -8.0, 0.99982, 0, source); // "IRENET95 / Irish Transverse Mercator"
+      set_datum(GEO_DATUM_IRENET95);
+      set_transverse_mercator_projection(600000.0, 750000.0, 53.5, -8.0, 0.99982, 0, source, "IRENET95 / Irish Transverse Mercator");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "IRENET95 / Irish Transverse Mercator");
@@ -4520,8 +5186,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_ETRS89_Poland_CS92)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, -5300000.0, 0.0, 19.0, 0.9993, 0, source); // "ETRS89 / Poland CS92"
+      set_datum(GEO_DATUM_ETRS89);
+      set_transverse_mercator_projection(500000.0, -5300000.0, 0.0, 19.0, 0.9993, 0, source, "ETRS89 / Poland CS92");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / Poland CS92");
@@ -4529,8 +5195,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NZGD2000)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(1600000.0, 10000000.0, 0.0, 173.0, 0.9996, 0, source); // "NZGD2000 / New Zealand Transverse Mercator 2000"
+      set_datum(GEO_DATUM_NZGD2000);
+      set_transverse_mercator_projection(1600000.0, 10000000.0, 0.0, 173.0, 0.9996, 0, source, "NZGD2000 / New Zealand Transverse Mercator 2000");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "NZGD2000");
@@ -4538,17 +5204,71 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_HARN_UTM2_South_American_Samoa)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, 10000000.0, 0.0, -171.0, 0.9996, 0, source); // "NAD83(HARN) / UTM zone 2S (American Samoa)"
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_transverse_mercator_projection(500000.0, 10000000.0, 0.0, -171.0, 0.9996, 0, source, "NAD83(HARN) / UTM zone 2S (American Samoa)");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
-      if (description) sprintf(description, "UTM zone 2S (American Samoa)");
+      if (description) sprintf(description, "NAD83(HARN) / UTM zone 2S (American Samoa)");
+      return true;
+    }
+    else if (value == EPSG_NAD83_California_1_ftUS)
+    {
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 39.33333333333334, -122, 41.66666666666666, 40, 0, source, "NAD83 / California zone 1 (ftUS)");
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83 / California zone 1 (ftUS)");
+      return true;
+    }
+    else if (value == EPSG_NAD83_California_2_ftUS)
+    {
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 37.66666666666666, -122, 39.83333333333334, 38.33333333333334, 0, source, "NAD83 / California zone 2 (ftUS)");
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83 / California zone 2 (ftUS)");
+      return true;
+    }
+    else if (value == EPSG_NAD83_California_3_ftUS)
+    {
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 36.5, -120.5, 38.43333333333333, 37.06666666666667, 0, source, "NAD83 / California zone 3 (ftUS)");
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83 / California zone 3 (ftUS)");
+      return true;
+    }
+    else if (value == EPSG_NAD83_California_4_ftUS)
+    {
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 35.33333333333334, -119, 37.25, 36, 0, source, "NAD83 / California zone 4 (ftUS)");
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83 / California zone 4 (ftUS)");
+      return true;
+    }
+    else if (value == EPSG_NAD83_California_5_ftUS)
+    {
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 33.5, -118, 35.46666666666667, 34.03333333333333, 0, source, "NAD83 / California zone 5 (ftUS)");
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83 / California zone 5 (ftUS)");
+      return true;
+    }
+    else if (value == EPSG_NAD83_California_6_ftUS)
+    {
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 32.16666666666666, -116.25, 33.88333333333333, 32.78333333333333, 0, source, "NAD83 / California zone 6 (ftUS)");
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83 / California zone 6 (ftUS)");
       return true;
     }
     else if (value == EPSG_NAD83_Maryland_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(400000.0, 0.0, 37.66666666666666, -77, 37.66666666666666, 38.3, 0, source); // "NAD83 / Maryland (ftUS)"
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(400000.0, 0.0, 37.66666666666666, -77, 37.66666666666666, 38.3, 0, source, "NAD83 / Maryland (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83 / Maryland (ftUS)");
@@ -4556,8 +5276,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_Texas_Central_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(700000.0, 3000000.0, 29.66666666666667, -100.3333333333333, 31.88333333333333, 30.11666666666667, 0, source); // "NAD83 / Texas Central (ftUS)"
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(700000.0, 3000000.0, 29.66666666666667, -100.3333333333333, 31.88333333333333, 30.11666666666667, 0, source, "NAD83 / Texas Central (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83 / Texas Central (ftUS)");
@@ -4565,8 +5285,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_HARN_Washington_North)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(500000.0, 0.0, 47, -120.8333333333333, 48.73333333333333, 47.5, 0, source); // "NAD83(HARN) / Washington North"
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(500000.0, 0.0, 47, -120.8333333333333, 48.73333333333333, 47.5, 0, source, "NAD83(HARN) / Washington North");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "NAD83(HARN) / Washington North");
@@ -4574,8 +5294,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_HARN_Washington_South)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(500000.0, 0.0, 45.33333333333334, -120.5, 47.33333333333334, 45.83333333333334, 0, source); // "NAD83(HARN) / Washington South"
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(500000.0, 0.0, 45.33333333333334, -120.5, 47.33333333333334, 45.83333333333334, 0, source, "NAD83(HARN) / Washington South");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "NAD83(HARN) / Washington South");
@@ -4583,8 +5303,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_HARN_California_6_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 32.16666666666666, -116.25, 33.88333333333333, 32.78333333333333, 0, source); // "NAD83(HARN) / California zone 6 (ftUS)"
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 32.16666666666666, -116.25, 33.88333333333333, 32.78333333333333, 0, source, "NAD83(HARN) / California zone 6 (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83(HARN) / California zone 6 (ftUS)");
@@ -4592,8 +5312,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_HARN_Virginia_North_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(3500000.0, 2000000.0, 37.66666666666666, -78.5, 39.2, 38.03333333333333, 0, source); // "NAD83(HARN) / Virginia North (ftUS)"
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(3500000.0, 2000000.0, 37.66666666666666, -78.5, 39.2, 38.03333333333333, 0, source, "NAD83(HARN) / Virginia North (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83(HARN) / Virginia North (ftUS)");
@@ -4601,8 +5321,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_HARN_Virginia_South_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(3500000.0, 1000000.0, 36.33333333333334, -78.5, 37.96666666666667, 36.76666666666667, 0, source); // "NAD83(HARN) / Virginia South (ftUS)"
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(3500000.0, 1000000.0, 36.33333333333334, -78.5, 37.96666666666667, 36.76666666666667, 0, source, "NAD83(HARN) / Virginia South (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83(HARN) / Virginia South (ftUS)");
@@ -4610,8 +5330,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_HARN_Washington_North_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(500000.0, 0.0, 47, -120.8333333333333, 48.73333333333333, 47.5, 0, source); // "NAD83(HARN) / Washington North (ftUS)"
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(500000.0, 0.0, 47, -120.8333333333333, 48.73333333333333, 47.5, 0, source, "NAD83(HARN) / Washington North (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83(HARN) / Washington North (ftUS)");
@@ -4619,17 +5339,26 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_HARN_Washington_South_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(500000.0, 0.0, 45.33333333333334, -120.5, 47.33333333333334, 45.83333333333334, 0, source); // "NAD83(HARN) / Washington South (ftUS)"
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(500000.0, 0.0, 45.33333333333334, -120.5, 47.33333333333334, 45.83333333333334, 0, source, "NAD83(HARN) / Washington South (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83(HARN) / Washington South (ftUS)");
       return true;
     }
+    else if ((EPSG_NAD83_CSRS_MTM_zone_3 <= value) && (value <= EPSG_NAD83_CSRS_MTM_zone_10))
+    {
+      set_datum(GEO_DATUM_NAD83_CSRS);
+      set_transverse_mercator_projection(304800.0, 0.0, 0.0, -58.5 - (3.0*(value - EPSG_NAD83_CSRS_MTM_zone_3)), 0.9999, 0, source); // "NAD83(CSRS) / MTM zone 3" - "NAD83(CSRS) / MTM zone 10"
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "NAD83(CSRS) / MTM zone %d", 3 + value - EPSG_NAD83_CSRS_MTM_zone_3);
+      return true;
+    }
     else if (value == EPSG_Reseau_Geodesique_Francais_Guyane_1995)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, 0.0, 0.0, -51.0, 0.9996, 0, source); // "Reseau Geodesique Francais Guyane 1995"
+      set_datum(GEO_DATUM_RGFG95);
+      set_transverse_mercator_projection(500000.0, 0.0, 0.0, -51.0, 0.9996, 0, source, "Reseau Geodesique Francais Guyane 1995");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "Reseau Geodesique Francais Guyane 1995");
@@ -4637,8 +5366,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_Oregon_Lambert)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(400000.0, 0.0, 41.75, -120.5, 43.0, 45.5, 0, source); // "NAD83 / Oregon Lambert"
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(400000.0, 0.0, 41.75, -120.5, 43.0, 45.5, 0, source, "NAD83 / Oregon Lambert");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "NAD83 / Oregon Lambert");
@@ -4646,8 +5375,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_Oregon_Lambert_ft)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(400000.0, 0.0, 41.75, -120.5, 43.0, 45.5, 0, source); // "NAD83 / Oregon Lambert (ft)"
+      set_datum(GEO_DATUM_NAD83);
+      set_lambert_conformal_conic_projection(400000.0, 0.0, 41.75, -120.5, 43.0, 45.5, 0, source, "NAD83 / Oregon Lambert (ft)");
       set_geokey(value, source);
       set_coordinates_in_feet(source);
       if (description) sprintf(description, "NAD83 / Oregon Lambert (ft)");
@@ -4655,8 +5384,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_BC_Albers)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_albers_equal_area_conic_projection(1000000.0, 0.0, 45, -126, 50, 58.5, 0, source); // "NAD83 / BC Albers"
+      set_datum(GEO_DATUM_NAD83);
+      set_albers_equal_area_conic_projection(1000000.0, 0.0, 45, -126, 50, 58.5, 0, source, "NAD83 / BC Albers");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "NAD83 / BC Albers");
@@ -4664,8 +5393,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_SWEREF99_TM)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 15.0, 0.9996, 0, source); // "SWEREF99 TM"
+      set_datum(GEO_DATUM_SWEREF99);
+      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 15.0, 0.9996, 0, source, "SWEREF99 TM");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "SWEREF99 TM");
@@ -4673,8 +5402,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_ETRS89_ETRS_LCC)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(4000000.0, 2800000.0, 52.0, 10.0, 35.0, 65.0, 0, source); // "ETRS89 / ETRS-LCC"
+      set_datum(GEO_DATUM_ETRS89);
+      set_lambert_conformal_conic_projection(4000000.0, 2800000.0, 52.0, 10.0, 35.0, 65.0, 0, source, "ETRS89 / ETRS-LCC");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / ETRS-LCC");
@@ -4682,8 +5411,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_ETRS89_ETRS_TM34)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 21.0, 0.9996, 0, source); // "ETRS89 / ETRS-TM34"
+      set_datum(GEO_DATUM_ETRS89);
+      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 21.0, 0.9996, 0, source, "ETRS89 / ETRS-TM34");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / ETRS-TM34");
@@ -4691,8 +5420,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_ETRS89_ETRS_TM35)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 27.0, 0.9996, 0, source); // "ETRS89 / ETRS-TM35"
+      set_datum(GEO_DATUM_ETRS89);
+      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 27.0, 0.9996, 0, source, "ETRS89 / ETRS-TM35");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / ETRS-TM35");
@@ -4700,8 +5429,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_ETRS89_ETRS_TM36)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 33.0, 0.9996, 0, source); // "ETRS89 / ETRS-TM36"
+      set_datum(GEO_DATUM_ETRS89);
+      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 33.0, 0.9996, 0, source, "ETRS89 / ETRS-TM36");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / ETRS-TM36");
@@ -4709,17 +5438,35 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_ETRS89_ETRS_TM35FIN)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 27.0, 0.9996, 0, source); // "ETRS89 / ETRS-TM35FIN"
+      set_datum(GEO_DATUM_ETRS89);
+      set_transverse_mercator_projection(500000.0, 0.0, 0.0, 27.0, 0.9996, 0, source, "ETRS89 / ETRS-TM35FIN");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / ETRS-TM35FIN");
       return true;
     }
+    else if (value == EPSG_NAD83_HARN_Kentucky_Single_Zone)
+    {
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(1500000.0, 1000000.0, 36.33333333333334, -85.75, 37.08333333333334, 38.66666666666666, 0, source, "NAD83(HARN) / Kentucky Single Zone");
+      set_geokey(value, source);
+      set_coordinates_in_meter(source);
+      if (description) sprintf(description, "NAD83(HARN) / Kentucky Single Zone");
+      return true;
+    }
+    else if (value == EPSG_NAD83_HARN_Kentucky_Single_Zone_ftUS)
+    {
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(1500000.0, 1000000.0, 36.33333333333334, -85.75, 37.08333333333334, 38.66666666666666, 0, source, "NAD83(HARN) / Kentucky Single Zone (ftUS)");
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83(HARN) / Kentucky Single Zone (ftUS)");
+      return true;
+    }
     else if (value == EPSG_MAGNA_SIRGAS_Colombia_Bogoto)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(1000000.0, 1000000.0, 4.596200416666666, -74.07750791666666, 1.0, 0, source); // "MAGNA-SIRGAS / Colombia Bogota zone"
+      set_datum(GEO_DATUM_MAGNA_SIRGAS);
+      set_transverse_mercator_projection(1000000.0, 1000000.0, 4.596200416666666, -74.07750791666666, 1.0, 0, source, "MAGNA-SIRGAS / Colombia Bogota zone");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "MAGNA-SIRGAS / Colombia Bogota zone");
@@ -4727,24 +5474,24 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_Fiji_1956_UTM60_South)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_Inter);
-      set_utm_projection(60, false, 0, source); // "Fiji 1956 / UTM zone 60S"
+      set_datum(GEO_DATUM_FIJI_1956);
+      set_utm_projection(60, false, 0, source, "Fiji 1956 / UTM zone 60S");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "Fiji 1956 / UTM zone 60S");
     }
     else if (value == EPSG_Fiji_1956_UTM1_South)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_Inter);
-      set_utm_projection(1, false, 0, source); // "Fiji 1956 / UTM zone 1S"
+      set_datum(GEO_DATUM_FIJI_1956);
+      set_utm_projection(1, false, 0, source, "Fiji 1956 / UTM zone 1S");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "Fiji 1956 / UTM zone 1S");
     }
     else if (value == EPSG_GDA94_NSW_Lambert)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_GDA94); // GRS 1980
-      set_lambert_conformal_conic_projection(9300000.0, 4500000.0, -33.25, 147, -30.75, -35.75, 0, source); // "GDA94 / NSW Lambert"
+      set_datum(GEO_DATUM_GDA94);
+      set_lambert_conformal_conic_projection(9300000.0, 4500000.0, -33.25, 147, -30.75, -35.75, 0, source, "GDA94 / NSW Lambert");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "GDA94 / NSW Lambert");
@@ -4752,8 +5499,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_SVY21_Singapore_TM)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_WGS84);
-      set_transverse_mercator_projection(28001.642, 38744.572, 1.366666666666667, 103.8333333333333, 1.0, 0, source); // "SVY21 / Singapore TM"
+      set_datum(GEO_DATUM_SVY21);
+      set_transverse_mercator_projection(28001.642, 38744.572, 1.366666666666667, 103.8333333333333, 1.0, 0, source, "SVY21 / Singapore TM");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "SVY21 / Singapore TM");
@@ -4761,8 +5508,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_Fiji_Map_Grid_1986)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_WGS72);
-      set_transverse_mercator_projection(2000000.0, 4000000.0, -17.0, 178.75, 0.99985, 0, source); // "Fiji 1986 / Fiji Map Grid"
+      set_datum(GEO_DATUM_FIJI_1986);
+      set_transverse_mercator_projection(2000000.0, 4000000.0, -17.0, 178.75, 0.99985, 0, source, "Fiji 1986 / Fiji Map Grid");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "Fiji 1986 / Fiji Map Grid");
@@ -4770,8 +5517,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_NSRS2007_California_zone_3_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 36.5, -120.5, 38.43333333333333, 37.06666666666667, 0, source); // "NAD83(NSRS2007) / California zone 3 (ftUS)"
+      set_datum(GEO_DATUM_NAD83_NSRS2007);
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 36.5, -120.5, 38.43333333333333, 37.06666666666667, 0, source, "NAD83(NSRS2007) / California zone 3 (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83(NSRS2007) / California zone 3 (ftUS)");
@@ -4779,8 +5526,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_NSRS2007_California_zone_4_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 35.33333333333334, -119, 37.25, 36, 0, source); // "NAD83(NSRS2007) / California zone 4 (ftUS)"
+      set_datum(GEO_DATUM_NAD83_NSRS2007);
+      set_lambert_conformal_conic_projection(2000000.0, 500000.0, 35.33333333333334, -119, 37.25, 36, 0, source, "NAD83(NSRS2007) / California zone 4 (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83(NSRS2007) / California zone 4 (ftUS)");
@@ -4788,17 +5535,35 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_NSRS2007_Maryland_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(400000.0, 0.0, 37.66666666666666, -77, 39.45, 38.3, 0, source); // "NAD83(NSRS2007) / Maryland (ftUS)"
+      set_datum(GEO_DATUM_NAD83_NSRS2007);
+      set_lambert_conformal_conic_projection(400000.0, 0.0, 37.66666666666666, -77, 39.45, 38.3, 0, source, "NAD83(NSRS2007) / Maryland (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83(NSRS2007) / Maryland (ftUS)");
       return true;
     }
+    else if (value == EPSG_NAD83_HARN_Ohio_North_ftUS)
+    {
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(600000.0, 0.0, 39.66666666666666, -82.5, 41.7, 40.43333333333333, 0, source, "NAD83(HARN) / Ohio North (ftUS)");
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83(HARN) / Ohio North (ftUS)");
+      return true;
+    }
+    else if (value == EPSG_NAD83_HARN_Ohio_South_ftUS)
+    {
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_lambert_conformal_conic_projection(600000.0, 0.0, 38, -82.5, 40.03333333333333, 38.73333333333333, 0, source, "NAD83(HARN) / Ohio South (ftUS)");
+      set_geokey(value, source);
+      set_coordinates_in_survey_feet(source);
+      if (description) sprintf(description, "NAD83(HARN) / Ohio South (ftUS)");
+      return true;
+    }
     else if (value == EPSG_ETRS89_Portugal_TM06)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(0.0, 0.0, 39.66825833333333, -8.133108333333334, 1.0, 0, source); // "ETRS89 / Portugal TM06"
+      set_datum(GEO_DATUM_ETRS89);
+      set_transverse_mercator_projection(0.0, 0.0, 39.66825833333333, -8.133108333333334, 1.0, 0, source, "ETRS89 / Portugal TM06");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / Portugal TM06");
@@ -4806,8 +5571,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_Slovene_National_Grid_1996)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(500000.0, -5000000.0, 0.0, 15.0, 0.9999, 0, source); // "Slovenia 1996 / Slovene National Grid"
+      set_datum(GEO_DATUM_SLOVENIA_1996);
+      set_transverse_mercator_projection(500000.0, -5000000.0, 0.0, 15.0, 0.9999, 0, source, "Slovenia 1996 / Slovene National Grid");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "Slovenia 1996 / Slovene National Grid");
@@ -4815,8 +5580,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_ETRS89_GK24FIN)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(24500000.0, 0.0, 0.0, 24.0, 1.0, 0, source); // "ETRS89 / GK24FIN"
+      set_datum(GEO_DATUM_ETRS89);
+      set_transverse_mercator_projection(24500000.0, 0.0, 0.0, 24.0, 1.0, 0, source, "ETRS89 / GK24FIN");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / GK24FIN");
@@ -4824,8 +5589,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_MGI_1901_Slovene_National_Grid)
     {
-      set_reference_ellipsoid(3); // Bessel 1841
-      set_transverse_mercator_projection(500000.0, -5000000.0, 0.0, 15.0, 0.9999, 0, source); // "MGI 1901 / Slovene National Grid"
+      set_datum(GEO_DATUM_MGI_1901);
+      set_transverse_mercator_projection(500000.0, -5000000.0, 0.0, 15.0, 0.9999, 0, source, "MGI 1901 / Slovene National Grid");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "MGI 1901 / Slovene National Grid");
@@ -4834,7 +5599,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     else if ((EPSG_RGF93_CC42 <= value) && (value <= EPSG_RGF93_CC50))
     {
       int v = value - EPSG_RGF93_CC42;
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_datum(GEO_DATUM_RGF93);
       set_lambert_conformal_conic_projection(1700000.0, 1200000.0+v*1000000, 42.0+v, 3.0, 41.25+v, 42.75+v, 0, source);
       set_geokey(value, source);
       set_coordinates_in_meter(source);
@@ -4844,7 +5609,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     else if ((EPSG_ETRS89_DKTM1 <= value) && (value <= EPSG_ETRS89_DKTM4))
     {
       int v = ((value - EPSG_ETRS89_DKTM1)%4) + 1;
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_datum(GEO_DATUM_ETRS89);
       set_transverse_mercator_projection(200000.0*v, -5000000.0, 0.0, 9.0 + (v == 1 ? 0.0 : (v == 2 ? 1.0 : (v == 3 ? 2.75 : 6.0))), 0.99998, 0, source);
       set_geokey(value, source);
       set_coordinates_in_meter(source);
@@ -4853,8 +5618,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_ETRS89_UTM32_north_zE_N)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(32500000.0, 0.0, 0.0, 9.0, 0.9996, 0, source); // "ETRS89 / UTM zone 32N (zE-N)"
+      set_datum(GEO_DATUM_ETRS89);
+      set_transverse_mercator_projection(32500000.0, 0.0, 0.0, 9.0, 0.9996, 0, source, "ETRS89 / UTM zone 32N (zE-N)");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / UTM zone 32N (zE-N)");
@@ -4862,8 +5627,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_HARN_Conus_Albers)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_albers_equal_area_conic_projection(0.0, 0.0, 23.0, -96, 29.5, 45.5, 0, source); // "NAD83(HARN) / Conus Albers"
+      set_datum(GEO_DATUM_NAD83_HARN);
+      set_albers_equal_area_conic_projection(0.0, 0.0, 23.0, -96, 29.5, 45.5, 0, source, "NAD83(HARN) / Conus Albers");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "NAD83(HARN) / Conus Albers");
@@ -4871,8 +5636,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_NSRS2007_Conus_Albers)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_albers_equal_area_conic_projection(0.0, 0.0, 23.0, -96, 29.5, 45.5, 0, source); // "NAD83(NSRS2007) / Conus Albers"
+      set_datum(GEO_DATUM_NAD83_NSRS2007);
+      set_albers_equal_area_conic_projection(0.0, 0.0, 23.0, -96, 29.5, 45.5, 0, source, "NAD83(NSRS2007) / Conus Albers");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "NAD83(NSRS2007) / Conus Albers");
@@ -4881,7 +5646,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     else if ((EPSG_ETRS89_NTM_zone_5 <= value) && (value <= EPSG_ETRS89_NTM_zone_30))
     {
       int v = value - 5100;
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
+      set_datum(GEO_DATUM_ETRS89);
       set_transverse_mercator_projection(100000.0, 1000000.0, 58.0, 0.3+v, 1.0, 0, source);
       set_geokey(value, source);
       set_coordinates_in_meter(source);
@@ -4890,8 +5655,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_ETRS89_UTM33_north_zE_N)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_transverse_mercator_projection(33500000.0, 0.0, 0.0, 15.0, 0.9996, 0, source); // "ETRS89 / UTM zone 33N (zE-N)"
+      set_datum(GEO_DATUM_ETRS89);
+      set_transverse_mercator_projection(33500000.0, 0.0, 0.0, 15.0, 0.9996, 0, source, "ETRS89 / UTM zone 33N (zE-N)");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "ETRS89 / UTM zone 33N (zE-N)");
@@ -4899,25 +5664,25 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_NAD83_2011_North_Carolina_ftUS)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83); // GRS 1980
-      set_lambert_conformal_conic_projection(609601.2192024384, 0.0, 33.75, -79, 36.16666666666666, 34.33333333333334, 0, source); // "NAD83(2011) / North Carolina (ftUS)"
+      set_datum(GEO_DATUM_NAD83); // should be NAD83(2011)
+      set_lambert_conformal_conic_projection(609601.2192024384, 0.0, 33.75, -79, 36.16666666666666, 34.33333333333334, 0, source, "NAD83(2011) / North Carolina (ftUS)");
       set_geokey(value, source);
       set_coordinates_in_survey_feet(source);
       if (description) sprintf(description, "NAD83(2011) / North Carolina (ftUS)");
     }
-    else if (value == EPSG_CH1903_LV03) // should really be Hotine_Oblique_Mercator (but is special case with 90 degree angle that reduced to TM)
+    else if (value == EPSG_CH1903_LV03) // should really be Hotine_Oblique_Mercator (but is special case with 90 degree angle that reduces to TM)
     {
-      set_reference_ellipsoid(3); // Bessel 1841
-      set_transverse_mercator_projection(600000.0, 200000.0, 46.95240555555556, 7.439583333333333, 1.0, 0, source); // "CH1903 / LV03"
+      set_datum(GEO_DATUM_CH1903);
+      set_transverse_mercator_projection(600000.0, 200000.0, 46.95240555555556, 7.439583333333333, 1.0, 0, source, "CH1903 / LV03");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "CH1903 / LV03");
       return true;
     }
-    else if (value == EPSG_EOV_HD72) // should really be Hotine_Oblique_Mercator (but is special case with 90 degree angle that reduced to TM)
+    else if (value == EPSG_EOV_HD72) // should really be Hotine_Oblique_Mercator (but is special case with 90 degree angle that reduces to TM)
     {
-      set_reference_ellipsoid(10); // Hungarian EOV / HD72
-      set_transverse_mercator_projection(650000.0, 200000.0, 47.14439372222222, 19.04857177777778, 0.99993, 0, source); // "EOV / HD72 / Hungarian National Grid"
+      set_datum(GEO_DATUM_HD72);
+      set_transverse_mercator_projection(650000.0, 200000.0, 47.14439372222222, 19.04857177777778, 0.99993, 0, source, "EOV / HD72 / Hungarian National Grid");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "EOV / HD72 / Hungarian National Grid");
@@ -4925,8 +5690,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else if (value == EPSG_OSGB_1936)
     {
-      set_reference_ellipsoid(1); // Airy 1830
-      set_transverse_mercator_projection(400000.0, -100000.0, 49.0, -2.0, 0.9996012717, 0, source); // "OSGB 1936 / British National Grid"
+      set_datum(GEO_DATUM_OSGB_1936);
+      set_transverse_mercator_projection(400000.0, -100000.0, 49.0, -2.0, 0.9996012717, 0, source, "OSGB 1936 / British National Grid");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "OSGB 1936 / British National Grid");
@@ -4934,8 +5699,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     } 
     else if (value == EPSG_Belgian_Lambert_1972)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_Inter);
-      set_lambert_conformal_conic_projection(150000.013, 5400088.438, 90, 4.367486666666666, 51.16666723333333, 49.8333339, 0, source); // "Belge 1972 / Belgian Lambert 72"
+      set_datum(GEO_DATUM_BELGE_1972);
+      set_lambert_conformal_conic_projection(150000.013, 5400088.438, 90, 4.367486666666666, 51.16666723333333, 49.8333339, 0, source, "Belge 1972 / Belgian Lambert 72");
       set_geokey(value, source);
       set_coordinates_in_meter(source);
       if (description) sprintf(description, "Belge 1972 / Belgian Lambert 72");
@@ -4944,16 +5709,154 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     else
     {
       fprintf(stderr, "set_epsg_code: look-up for %d not implemented\n", value);
+      // try to look it up in 'pcs.csv' file
+      FILE* file = open_pcs_file(argv_zero);
+      if (file == 0)
+      {
+        fprintf(stderr, "ERROR: cannot open 'pcs.csv' file. maybe your LAStools distribution\n");
+        fprintf(stderr, "       has no .\\LAStools\\bin\\serf\\geo\\pcs.csv file. download the\n");
+        fprintf(stderr, "       latest version at http://lastools.org/download/LAStools.zip\n");
+        return false;
+      }
+      int epsg_code = 0;
+      char line[2048];
+      while (fgets(line, 2048, file))
+      {
+        if (sscanf(line, "%d,", &epsg_code) == 1)
+        {
+          if (epsg_code == value)
+          {
+            char* name;
+            int dummy, units, datum, transform, run = 0;;
+            // skip until name
+            while (line[run] != '\"') run++;
+            run++;
+            name = &line[run];
+            // skip to end of string and put zero
+            while (line[run] != '\"') run++;
+            line[run] = '\0';
+            run++;
+            run++;
+            // scan
+            if (sscanf(&line[run], "%d,%d,%d,%d,%d", &units, &datum, &dummy, &transform, &dummy) != 5)
+            {
+              fprintf(stderr, "failed to scan units, datum, and transform from '%s'", line);
+              return false;
+            }
+            if (!set_ProjLinearUnitsGeoKey(units))
+            {
+              fprintf(stderr, "units %d of EPSG code %d not implemented.\n", units, value);
+              return false;
+            }
+            if (!set_datum(datum + 2000))
+            {
+              fprintf(stderr, "datum %d of EPSG code %d not implemented.\n", datum, value);
+              return false;
+            }
+            // skip eight commas
+            while (line[run] != ',') run++;
+            run++;
+            while (line[run] != ',') run++;
+            run++;
+            while (line[run] != ',') run++;
+            run++;
+            while (line[run] != ',') run++;
+            run++;
+            while (line[run] != ',') run++;
+            run++;
+            while (line[run] != ',') run++;
+            run++;
+            while (line[run] != ',') run++;
+            run++;
+            while (line[run] != ',') run++;
+            run++;
+            if (transform == 9807) // CT_TransverseMercator
+            {
+              double latitude_of_origin_min;
+              double central_meridian_min;
+              double scale_factor;
+              double false_easting;
+              double false_northing;
+              if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf", &latitude_of_origin_min, &dummy, &dummy, &central_meridian_min, &dummy, &dummy, &scale_factor, &dummy, &dummy, &false_easting, &dummy, &dummy, &false_northing) != 13)
+              {
+                fprintf(stderr, "failed to scan TM parameters from '%s'", line);
+                return false;
+              }
+              double latitude_of_origin_dec = min2dec(latitude_of_origin_min);
+              double central_meridian_dec = min2dec(central_meridian_min);
+              set_transverse_mercator_projection(false_easting, false_northing, latitude_of_origin_dec, central_meridian_dec, scale_factor, 0, source, name);
+              set_geokey(value, source);
+              if (description) sprintf(description, name);
+              return true;
+            }
+            else if (transform == 9802) // CT_LambertConfConic_2SP
+            {
+              double latitude_of_origin_min;
+              double central_meridian_min;
+              double standard_parallel_1_min;
+              double standard_parallel_2_min;
+              double false_easting;
+              double false_northing;
+              if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf", &latitude_of_origin_min, &dummy, &dummy, &central_meridian_min, &dummy, &dummy, &standard_parallel_1_min, &dummy, &dummy, &standard_parallel_2_min, &dummy, &dummy, &false_easting, &dummy, &dummy, &false_northing) != 16)
+              {
+                fprintf(stderr, "failed to scan LCC parameters from '%s'", line);
+                return false;
+              }
+              double latitude_of_origin_dec = min2dec(latitude_of_origin_min);
+              double central_meridian_dec = min2dec(central_meridian_min);
+              double standard_parallel_1_dec = min2dec(standard_parallel_1_min);
+              double standard_parallel_2_dec = min2dec(standard_parallel_2_min);
+              set_lambert_conformal_conic_projection(false_easting, false_northing, latitude_of_origin_dec, central_meridian_dec, standard_parallel_1_dec, standard_parallel_2_dec, 0, source, name);
+              set_geokey(value, source);
+              if (description) sprintf(description, name);
+              return true;
+            }
+            else if (transform == 9822) // CT_AlbersEqualArea
+            {
+              double latitude_of_center_min;
+              double longitude_of_center_min;
+              double standard_parallel_1_min;
+              double standard_parallel_2_min;
+              double false_easting;
+              double false_northing;
+              if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf", &latitude_of_center_min, &dummy, &dummy, &longitude_of_center_min, &dummy, &dummy, &standard_parallel_1_min, &dummy, &dummy, &standard_parallel_2_min, &dummy, &dummy, &false_easting, &dummy, &dummy, &false_northing) != 16)
+              {
+                fprintf(stderr, "failed to scan AEAC parameters from '%s'", line);
+                return false;
+              }
+              double latitude_of_center_dec = min2dec(latitude_of_center_min);
+              double longitude_of_center_dec = min2dec(longitude_of_center_min);
+              double standard_parallel_1_dec = min2dec(standard_parallel_1_min);
+              double standard_parallel_2_dec = min2dec(standard_parallel_2_min);
+              set_albers_equal_area_conic_projection(false_easting, false_northing, latitude_of_center_dec, longitude_of_center_dec, standard_parallel_1_dec, standard_parallel_2_dec, 0, source, name);
+              set_geokey(value, source);
+              if (description) sprintf(description, name);
+              return true;
+            }
+            else 
+            {
+              fprintf(stderr, "transform %d of EPSG code %d not implemented.\n", transform, value);
+              return false;
+            }
+          }
+        }
+      }        
+      fprintf(stderr, "EPSG code %d not found in 'pcs.csv' file\n", value);
+      return false;
     }
   }
 
   if (ellipsoid == -1)
   {
     if (utm_zone != -1) ellipsoid = GEO_ELLIPSOID_WGS84;
-    else if (sp != 0) ellipsoid = (sp_nad27 ? GEO_ELLIPSOID_NAD27 : GEO_ELLIPSOID_NAD83);
+    else if (sp != 0) ellipsoid = (sp_nad27 ? GEO_ELLIPSOID_CLARKE1866 : GEO_ELLIPSOID_GRS1980);
   }
 
-  if (ellipsoid != -1)
+  if (datum != -1)
+  {
+    set_datum(datum);
+  }
+  else if (ellipsoid != -1)
   {
     set_reference_ellipsoid(ellipsoid);
   }
@@ -5041,7 +5944,7 @@ bool GeoProjectionConverter::set_state_plane_nad27_lcc(const char* zone, char* d
   {
     if (strcmp(zone, state_plane_lcc_nad27_list[i].zone) == 0)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD27);
+      set_datum(GEO_DATUM_NAD27);
       set_lambert_conformal_conic_projection(state_plane_lcc_nad27_list[i].falseEastingMeter, state_plane_lcc_nad27_list[i].falseNorthingMeter, state_plane_lcc_nad27_list[i].latOriginDegree, state_plane_lcc_nad27_list[i].longMeridianDegree, state_plane_lcc_nad27_list[i].firstStdParallelDegree, state_plane_lcc_nad27_list[i].secondStdParallelDegree, 0, source);
       set_geokey(state_plane_lcc_nad27_list[i].geokey, source);
       if (description)
@@ -5081,7 +5984,7 @@ bool GeoProjectionConverter::set_state_plane_nad83_lcc(const char* zone, char* d
   {
     if (strcmp(zone, state_plane_lcc_nad83_list[i].zone) == 0)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83);
+      set_datum(GEO_DATUM_NAD83);
       set_lambert_conformal_conic_projection(state_plane_lcc_nad83_list[i].falseEastingMeter, state_plane_lcc_nad83_list[i].falseNorthingMeter, state_plane_lcc_nad83_list[i].latOriginDegree, state_plane_lcc_nad83_list[i].longMeridianDegree, state_plane_lcc_nad83_list[i].firstStdParallelDegree, state_plane_lcc_nad83_list[i].secondStdParallelDegree, 0, source);
       set_geokey(state_plane_lcc_nad83_list[i].geokey, source);
       if (description)
@@ -5121,7 +6024,7 @@ bool GeoProjectionConverter::set_state_plane_nad27_tm(const char* zone, char* de
   {
     if (strcmp(zone, state_plane_tm_nad27_list[i].zone) == 0)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD27);
+      set_datum(GEO_DATUM_NAD27);
       set_transverse_mercator_projection(state_plane_tm_nad27_list[i].falseEastingMeter, state_plane_tm_nad27_list[i].falseNorthingMeter, state_plane_tm_nad27_list[i].latOriginDegree, state_plane_tm_nad27_list[i].longMeridianDegree, state_plane_tm_nad27_list[i].scaleFactor, 0, source);
       set_geokey(state_plane_tm_nad27_list[i].geokey, source);
       if (description)
@@ -5161,7 +6064,7 @@ bool GeoProjectionConverter::set_state_plane_nad83_tm(const char* zone, char* de
   {
     if (strcmp(zone, state_plane_tm_nad83_list[i].zone) == 0)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83);
+      set_datum(GEO_DATUM_NAD83);
       set_transverse_mercator_projection(state_plane_tm_nad83_list[i].falseEastingMeter, state_plane_tm_nad83_list[i].falseNorthingMeter, state_plane_tm_nad83_list[i].latOriginDegree, state_plane_tm_nad83_list[i].longMeridianDegree, state_plane_tm_nad83_list[i].scaleFactor, 0, source);
       set_geokey(state_plane_tm_nad83_list[i].geokey, source);
       if (description)
@@ -6464,6 +7367,8 @@ bool GeoProjectionConverter::LLtoOM(const double LatDegree, const double LongDeg
 
 GeoProjectionConverter::GeoProjectionConverter()
 {
+  argv_zero = 0;
+
   num_geo_keys = 0;
   geo_keys = 0;
   geo_ascii_params = 0;
@@ -6473,8 +7378,7 @@ GeoProjectionConverter::GeoProjectionConverter()
   target_projection = 0;
 
   ellipsoid = new GeoProjectionEllipsoid();
-  set_reference_ellipsoid(GEO_ELLIPSOID_WGS84);
-
+  set_datum(GEO_DATUM_WGS84);
   vertical_geokey = 0;
 
   coordinate_units_set[0] = false;
@@ -6494,6 +7398,7 @@ GeoProjectionConverter::GeoProjectionConverter()
 
 GeoProjectionConverter::~GeoProjectionConverter()
 {
+  if (argv_zero) free(argv_zero);
   delete ellipsoid;
   if (source_projection) delete source_projection;
   if (target_projection) delete target_projection;
@@ -6503,6 +7408,10 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
 {
   int i;
   char tmp[256];
+
+  if (argv_zero) free(argv_zero);
+  argv_zero = strdup(argv[0]);
+
   for (i = 1; i < argc; i++)
   {
     if (argv[i][0] == '\0')
@@ -6539,26 +7448,44 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     }
     else if (strcmp(argv[i],"-wgs72") == 0)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_WGS72, tmp);
+      set_datum(GEO_DATUM_WGS72, tmp);
       fprintf(stderr, "using ellipsoid '%s'\n", tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-wgs84") == 0)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_WGS84, tmp);
+      set_datum(GEO_DATUM_WGS84, tmp);
+      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      *argv[i]='\0';
+    }
+    else if (strcmp(argv[i],"-grs80") == 0)
+    {
+      set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980, tmp);
       fprintf(stderr, "using ellipsoid '%s'\n", tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-nad27") == 0)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD27, tmp);
-      fprintf(stderr, "using ellipsoid '%s'\n", tmp);
+      set_datum(GEO_DATUM_NAD27, tmp);
+      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-nad83") == 0 || strcmp(argv[i],"-grs80") == 0 || strcmp(argv[i],"-etrs89") == 0)
+    else if (strcmp(argv[i],"-nad83") == 0)
     {
-      set_reference_ellipsoid(GEO_ELLIPSOID_NAD83, tmp);
-      fprintf(stderr, "using ellipsoid '%s'\n", tmp);
+      set_datum(GEO_DATUM_NAD83, tmp);
+      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      *argv[i]='\0';
+    }
+    else if (strcmp(argv[i],"-gda94") == 0)
+    {
+      set_datum(GEO_DATUM_GDA94, tmp);
+      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      *argv[i]='\0';
+    }
+    else if (strcmp(argv[i],"-etrs89") == 0)
+    {
+      set_datum(GEO_DATUM_ETRS89, tmp);
+      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strncmp(argv[i],"-vertical_", 10) == 0)
@@ -6779,11 +7706,11 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         fprintf(stderr,"  %s 1500000 0 feet 47.000000 -120.833333 47.5 48.733333\n", argv[i]);
         return false;
       }
-      double latOfOriginDeg = atof(argv[i+4]);
-      double longOfOriginDeg = atof(argv[i+5]);
+      double latOfCenterDeg = atof(argv[i+4]);
+      double longOfCenterDeg = atof(argv[i+5]);
       double firstStdParallelDeg = atof(argv[i+6]);
       double secondStdParallelDeg = atof(argv[i+7]);
-      set_albers_equal_area_conic_projection(falseEasting, falseNorthing, latOfOriginDeg, longOfOriginDeg, firstStdParallelDeg, secondStdParallelDeg, tmp, source);
+      set_albers_equal_area_conic_projection(falseEasting, falseNorthing, latOfCenterDeg, longOfCenterDeg, firstStdParallelDeg, secondStdParallelDeg, tmp, source);
       fprintf(stderr, "using AEAC %s '%s'\n", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0';  *argv[i+3]='\0';  *argv[i+4]='\0';  *argv[i+5]='\0';  *argv[i+6]='\0';  *argv[i+7]='\0'; i+=7;
     }
@@ -7340,7 +8267,7 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD83 does not exist\n", utm->utm_zone_number);
           }
         }
-        else if (ellipsoid->id == GEO_ELLIPSOID_NAD27)
+        else if (ellipsoid->id == GEO_ELLIPSOID_CLARKE1866)
         {
           if (utm->utm_northern_hemisphere)
           {
@@ -7358,7 +8285,7 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD27 does not exist\n", utm->utm_zone_number);
           }
         }
-        else if (ellipsoid->id == GEO_ELLIPSOID_SAD69)
+        else if (ellipsoid->id == GEO_ELLIPSOID_GRS1967)
         {
           if (utm->utm_northern_hemisphere)
           {
@@ -7383,7 +8310,7 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             }
           }
         }
-        else if (ellipsoid->id == GEO_ELLIPSOID_Inter)
+        else if (ellipsoid->id == GEO_ELLIPSOID_INTERNATIONAL)
         {
           if (utm->utm_northern_hemisphere)
           {
@@ -7445,11 +8372,6 @@ bool GeoProjectionConverter::get_img_projection_parameters(char** proName, int* 
       *proNumber = 1;
       *proZone = utm->utm_zone_number;
       *proParams[0] = 0;
-    }
-    else 
-
-
-
     }
     else
     {
@@ -7910,11 +8832,23 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(short* horizontal_uni
     *coordinate_zone = 0;
   }
 
-  if (ellipsoid && ellipsoid->id == GEO_ELLIPSOID_NAD27)
+  if (datum == GEO_DATUM_NAD27)
   {
     *horizontal_datum = 1;
   }
-  else if (ellipsoid && ellipsoid->id == GEO_ELLIPSOID_NAD83)
+  else if (datum == GEO_DATUM_NAD83)
+  {
+    *horizontal_datum = 2;
+  }
+  else if (datum == GEO_DATUM_WGS84)
+  {
+    *horizontal_datum = 3;
+  }
+  else if (ellipsoid && ellipsoid->id == GEO_ELLIPSOID_CLARKE1866)
+  {
+    *horizontal_datum = 1;
+  }
+  else if (ellipsoid && ellipsoid->id == GEO_ELLIPSOID_GRS1980)
   {
     *horizontal_datum = 2;
   }
@@ -7978,15 +8912,15 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
 
   if (horizontal_datum == 1)
   {
-    set_reference_ellipsoid(GEO_ELLIPSOID_NAD27);
+    set_datum(GEO_DATUM_NAD27);
   }
   else if (horizontal_datum == 2)
   {
-    set_reference_ellipsoid(GEO_ELLIPSOID_NAD83);
+    set_datum(GEO_DATUM_NAD83);
   }
   else if (horizontal_datum == 3)
   {
-    set_reference_ellipsoid(GEO_ELLIPSOID_WGS84);
+    set_datum(GEO_DATUM_WGS84);
   }
 
   if (vertical_datum == 2)
