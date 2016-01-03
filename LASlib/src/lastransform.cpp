@@ -818,6 +818,17 @@ private:
   U8 number_of_returns_to;
 };
 
+class LASoperationSetGpsTime : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_gps_time"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), gps_time); };
+  inline void transform(LASpoint* point) const { point->gps_time = gps_time; };
+  LASoperationSetGpsTime(F64 gps_time) { this->gps_time = gps_time; };
+private:
+  F64 gps_time;
+};
+
 class LASoperationTranslateGpsTime : public LASoperation
 {
 public:
@@ -1004,6 +1015,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -bin_Z_into_point_source 200\n");
   fprintf(stderr,"  -bin_abs_scan_angle_into_point_source 2\n");
   fprintf(stderr,"Transform gps_time.\n");
+  fprintf(stderr,"  -set_gps_time 113556962.005715\n");
   fprintf(stderr,"  -translate_gps_time 40.50\n");
   fprintf(stderr,"  -adjusted_to_week\n");
   fprintf(stderr,"  -week_to_adjusted 1671\n");
@@ -1572,6 +1584,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
       }
       add_operation(new LASoperationChangeNumberOfReturnsFromTo((U8)atoi(argv[i+1]), (U8)atoi(argv[i+2])));
       *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+    }
+    else if (strcmp(argv[i],"-set_gps_time") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
+        return FALSE;
+      }
+      add_operation(new LASoperationSetGpsTime(atof(argv[i+1])));
+      *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
     }
     else if (strcmp(argv[i],"-translate_gps_time") == 0)
     {
