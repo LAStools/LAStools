@@ -1,3 +1,5 @@
+ 6 January 2016 -- lasgrid, las2dem: can raster '-attribute [0|1|2...]' stored as "Extra Bytes"
+ 4 January 2016 -- lasground: option '-by_flightline' allows to classify flightlines separately
  2 January 2016 -- LAStools: parse 'pcs.csv' file whenever an unknown EPSG code is encountered
  1 January 2016 -- las2las & txt2las: create OGC WKT string for CRS for full LAS 1.4 compliance 
  1 January 2016 -- all GUIs: can create a directory when browsing for one via pop-up window
