@@ -264,6 +264,20 @@ private:
   F64 above;
 };
 
+class LASoperationCopyAttributeIntoZ : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_attribute_into_z"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline void transform(LASpoint* point) const {
+    F64 z = point->get_attribute_as_float(index);
+    point->set_z(z);
+  };
+  LASoperationCopyAttributeIntoZ(I32 index) { this->index = index; };
+private:
+  I32 index;
+};
+
 class LASoperationTranslateRawX : public LASoperation
 {
 public:
@@ -968,6 +982,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -switch_x_y -switch_x_z -switch_y_z\n");
   fprintf(stderr,"  -clamp_z_below 70.5\n");
   fprintf(stderr,"  -clamp_z 70.5 72.5\n");
+  fprintf(stderr,"  -copy_attribute_into_z 0\n");
   fprintf(stderr,"Transform raw xyz integers.\n");
   fprintf(stderr,"  -translate_raw_z 20\n");
   fprintf(stderr,"  -translate_raw_xyz 1 1 0\n");
@@ -1213,6 +1228,17 @@ BOOL LAStransform::parse(int argc, char* argv[])
       }
       change_coordinates = TRUE;
       add_operation(new LASoperationClampZabove(atof(argv[i+1])));
+      *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+    }
+    else if (strcmp(argv[i],"-copy_attribute_into_z") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
+        return FALSE;
+      }
+      change_coordinates = TRUE;
+      add_operation(new LASoperationCopyAttributeIntoZ(atoi(argv[i+1])));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
     }
     else if (strcmp(argv[i],"-translate_raw_x") == 0)
