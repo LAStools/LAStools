@@ -205,7 +205,11 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
           }
           else
           {
-            fprintf(stderr,"large EVLR with user ID '%s' and record ID %d with payload size %u not moved to VLRs.\n", header->evlrs[i].user_id, header->evlrs[i].record_id, header->evlrs[i].record_length_after_header);
+#ifdef _WIN32
+            fprintf(stderr,"large EVLR with user ID '%s' and record ID %d with payload size %I64d not moved to VLRs.\n", header->evlrs[i].user_id, header->evlrs[i].record_id, header->evlrs[i].record_length_after_header);
+#else
+            fprintf(stderr,"large EVLR with user ID '%s' and record ID %d with payload size %lld not moved to VLRs.\n", header->evlrs[i].user_id, header->evlrs[i].record_id, header->evlrs[i].record_length_after_header);
+#endif
           }
         }
         else if (strcmp(header->evlrs[i].user_id, "LASF_Projection") == 0)
