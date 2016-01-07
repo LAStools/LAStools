@@ -25,6 +25,10 @@
   large cities use '-metro' and the step size is increased
   to 50 meters You can also set it directly with '-step 35'.
 
+  You can classify the points '-by_flightline' assuming that
+  the point source ID of each point properly specifies from
+  which flightline a point is.
+
   It is important to tell the tool whether the horizontal and
   vertical units are meters (which is assumed by default) or
   '-feet' or '-elevation_feet'. Should the LAS file contain
