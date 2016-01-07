@@ -5708,7 +5708,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     }
     else
     {
-      fprintf(stderr, "set_epsg_code: look-up for %d not implemented\n", value);
+//      fprintf(stderr, "set_epsg_code: look-up for %d not implemented\n", value);
       // try to look it up in 'pcs.csv' file
       FILE* file = open_pcs_file(argv_zero);
       if (file == 0)
