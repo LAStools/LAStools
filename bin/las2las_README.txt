@@ -133,7 +133,7 @@ compressed to out.laz.
 drops all points of compressed in.laz whose scan angle is above 15 or
 below -15 and stores surviving points compressed to out.laz.
 
->> las2las -i in.las -o out.las -drop_intensity_below 1000 -remove_extra
+>> las2las -i in.las -o out.las -drop_intensity_below 1000 -remove_padding
 
 drops all points of in.las whose intensity is below 1000 and stores
 surviving points to out.las. in addition any additional user data after
@@ -184,56 +184,57 @@ point.Z).
 
 other commandline arguments are
 
--auto_reoffset          : puts a meaning
--reoffset 10000 40000 0 : puts a new offset into the header and translates the points accordingly
--rescale 0.01 0.01 0.01 : puts a new scale into the header and rescales the points accordingly
--clip_to_bounding_box : removes all points that falls outsize the bouding box specified in the LAS header 
--repair_zero_returns  : sets return counts and number of returns that are zero to one
--start_at_point 100   : skips all points until point number 100
--start_at_point 900   : omits all points after point number 900
--subseq 20 100        : extract a subsequence of 100 points starting from point 20
--point_type 0         : force point type to be 0
--point_size 26        : force point size to be 26
--set_classification 0 : sets all classifications fields to zero
--set_user_data 0      : sets all user_data fields to zero
--remove_all_vlrs      : remove all VLRs
--remove_vlr 2         : remove VLR number 2
--remove_extra         : remove extra bytes before and after the header
--week_to_adjusted     : converts time stamps from GPS week to Adjusted Standard GPS 
--adjusted_to_week     : converts time stamps from Adjusted Standard GPS to GPS week
--scale_rgb_up         : multiplies all RGB values by 256 (to go from 8 bit to 16 bit numbers)
--scale_rgb_down       : divides all RGB values by 256 (to go from 16 bit to 8 bit numbers)
--set_version 1.2      : set LAS version number to 1.2
--wgs84                : use the WGS-84 ellipsoid
--wgs72                : use the WGS-72 ellipsoid
--nad83                : use the NAD83 ellipsoid
--nad27                : use the NAD27 ellipsoid
--utm 12T              : input is UTM zone 12T 
--epsg 2972            : input is EPSG code 2972 (e.g. Reseau Geodesique Francais Guyane 1995)
--sp83 CO_S            : input is state plane NAD83 Colorado South
--sp27 SC_N            : input is state plane NAD27 South Carolina North 
--longlat              : input is geometric coordinates in longitude/latitude 
--latlong              : input is geometric coordinates in latitude/longitude
--ecef                 : input is geocentric (Earth-centered Earth-fixed)
--survey_feet          : input uses survey feet
--feet                 : input uses feet
--meter                : input uses meter
--elevation_surveyfeet : input uses survey feet for elevation
--elevation_feet       : input uses feet for elevation
--elevation_meter      : input uses meter for elevation
--target_utm 12T              : output is UTM zone 12T 
--target_epsg 2193            : output is EPSG code 2193 (e.g. NZGD2000)
--target_sp83 CO_S            : output is state plane NAD83 Colorado South
--target_sp27 SC_N            : output is state plane NAD27 South Carolina North 
--target_longlat              : output is geometric coordinates in longitude/latitude 
--target_latlong              : output is geometric coordinates in latitude/longitude
--target_ecef                 : output is geocentric (Earth-centered Earth-fixed)
--target_survey_feet          : output uses survey feet
--target_feet                 : output uses feet
--target_meter                : output uses meter
--target_elevation_surveyfeet : output uses survey feet for elevation
--target_elevation_feet       : output uses feet for elevation
--target_elevation_meter      : output uses meter for elevation
+-auto_reoffset           : puts a reasonable offset in the header and translates the points accordingly
+-reoffset 10000 40000 0  : puts a new offset into the header and translates the points accordingly
+-rescale 0.01 0.01 0.01  : puts a new scale into the header and rescales the points accordingly
+-clip_to_bounding_box    : removes all points that falls outsize the bouding box specified in the LAS header 
+-repair_zero_returns     : sets return counts and number of returns that are zero to one
+-start_at_point 100      : skips all points until point number 100
+-start_at_point 900      : omits all points after point number 900
+-subseq 20 100           : extract a subsequence of 100 points starting from point 20
+-point_type 0            : force point type to be 0
+-point_size 26           : force point size to be 26
+-set_classification 0    : sets all classifications fields to zero
+-set_user_data 0         : sets all user_data fields to zero
+-remove_all_vlrs         : remove all VLRs
+-remove_vlr 2            : remove VLR number 2 (couting starts at 0)
+-remove_vlrs_from_to 0 2 : remove the first three VLRs
+-remove_padding          : remove user-defined bytes before and after the header
+-week_to_adjusted        : converts time stamps from GPS week to Adjusted Standard GPS 
+-adjusted_to_week        : converts time stamps from Adjusted Standard GPS to GPS week
+-scale_rgb_up            : multiplies all RGB values by 256 (to go from 8 bit to 16 bit numbers)
+-scale_rgb_down          : divides all RGB values by 256 (to go from 16 bit to 8 bit numbers)
+-set_version 1.2         : set LAS version number to 1.2
+-wgs84                   : use datum WGS-84
+-wgs72                   : use datum WGS-72
+-nad83                   : use datum NAD83
+-nad27                   : use datum NAD27
+-utm 12T                 : input is UTM zone 12T 
+-epsg 2972               : input is EPSG code 2972 (e.g. Reseau Geodesique Francais Guyane 1995)
+-sp83 CO_S               : input is state plane NAD83 Colorado South
+-sp27 SC_N               : input is state plane NAD27 South Carolina North 
+-longlat                 : input is geometric coordinates in longitude/latitude 
+-latlong                 : input is geometric coordinates in latitude/longitude
+-ecef                    : input is geocentric (Earth-centered Earth-fixed)
+-survey_feet             : input uses survey feet
+-feet                    : input uses feet
+-meter                   : input uses meter
+-elevation_surveyfeet    : input uses survey feet for elevation
+-elevation_feet          : input uses feet for elevation
+-elevation_meter         : input uses meter for elevation
+-target_utm 12T                  : output is UTM zone 12T 
+-target_epsg 2193                : output is EPSG code 2193 (e.g. NZGD2000)
+-target_sp83 CO_S                : output is state plane NAD83 Colorado South
+-target_sp27 SC_N                : output is state plane NAD27 South Carolina North 
+-target_longlat                  : output is geometric coordinates in longitude/latitude 
+-target_latlong                  : output is geometric coordinates in latitude/longitude
+-target_ecef                     : output is geocentric (Earth-centered Earth-fixed)
+-target_survey_feet              : output uses survey feet
+-target_feet                     : output uses feet
+-target_meter                    : output uses meter
+-target_elevation_surveyfeet     : output uses survey feet for elevation
+-target_elevation_feet           : output uses feet for elevation
+-target_elevation_meter          : output uses meter for elevation
 -target_precision 0.001          : output uses one millimeter resolution for x and y
 -target_elevation_precision 0.02 : output uses two centimeter resolution for z
 
@@ -241,11 +242,11 @@ other commandline arguments are
 -tm 1804461.942257 0.0 feet 0.8203047 -2.1089395 0.99996
 -lcc 609601.22 0.0 meter 33.75 -79 34.33333 36.16666      : specifies a lambertian conic confomal projection
 -lcc 1640416.666667 0.0 surveyfeet 47.000000 -120.833333 47.50 48.733333
--ellipsoid 23                                             : use WGS-84 (specify '-ellipsoid -1' for a list)
+-ellipsoid 23                                             : use ellipsoid WGS-84 (specify '-ellipsoid -1' for a list)
 
 for more info:
 
-C:\lastools\bin>las2las -h
+D:\LAStools\bin>las2las -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -268,6 +269,7 @@ Filter points based on their coordinates.
 Filter points based on their return number.
   -first_only -keep_first -drop_first
   -last_only -keep_last -drop_last
+  -drop_first_of_many -drop_last_of_many
   -keep_middle -drop_middle
   -keep_return 1 2 3
   -drop_return 3 4
@@ -291,6 +293,7 @@ Filter points based on their classification.
   -drop_synthetic -keep_synthetic
   -drop_keypoint -keep_keypoint
   -drop_withheld -keep_withheld
+  -drop_overlap -keep_overlap
 Filter points based on their user data.
   -keep_user_data 1
   -drop_user_data 255
@@ -316,6 +319,11 @@ Filter points based on their gps time.
   -drop_gps_time_below 11.125
   -drop_gps_time_above 130.725
   -drop_gps_time_between 22.0 48.0
+Filter points based on their RGB/NIR channel.
+  -keep_RGB_red 1 1
+  -keep_RGB_green 30 100
+  -keep_RGB_blue 0 0
+  -keep_RGB_nir 64 127
 Filter points based on their wavepacket.
   -keep_wavepacket 0
   -drop_wavepacket 3
@@ -333,11 +341,13 @@ Transform coordinates.
   -switch_x_y -switch_x_z -switch_y_z
   -clamp_z_below 70.5
   -clamp_z 70.5 72.5
+  -copy_attribute_into_z 0
 Transform raw xyz integers.
   -translate_raw_z 20
   -translate_raw_xyz 1 1 0
   -clamp_raw_z 500 800
 Transform intensity.
+  -set_intensity 0
   -scale_intensity 2.5
   -translate_intensity 50
   -translate_then_scale_intensity 0.5 3.1
@@ -375,8 +385,11 @@ Modify the user data.
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
-  -quantize_Z_into_point_source 200
+  -copy_user_data_into_point_source
+  -bin_Z_into_point_source 200
+  -bin_abs_scan_angle_into_point_source 2
 Transform gps_time.
+  -set_gps_time 113556962.005715
   -translate_gps_time 40.50
   -adjusted_to_week
   -week_to_adjusted 1671
@@ -400,6 +413,10 @@ Supported LAS Inputs
   -rescale_xy 0.01 0.01
   -rescale_z 0.01
   -reoffset 600000 4000000 0
+Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
+  -inside min_x min_y max_x max_y
+  -inside_tile ll_x ll_y size
+  -inside_circle center_x center_y radius
 Supported LAS Outputs
   -o lidar.las
   -o lidar.laz
@@ -412,7 +429,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 150131
+LAStools (by martin@rapidlasso.com) version 160108
 usage:
 las2las -i *.las -utm 13N
 las2las -i *.laz -first_only -olaz
@@ -423,7 +440,7 @@ las2las -point_type 0 -lof file_list.txt -merged -o out.las
 las2las -remove_vlr 2 -scale_rgb_up -i in.las -o out.las
 las2las -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las
 las2las -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt
-las2las -i in.las -keep_scan_angle -15 15 -o out.las
+las2las -i in.las -remove_padding -keep_scan_angle -15 15 -o out.las
 las2las -i in.las -rescale 0.01 0.01 0.01 -reoffset 0 300000 0 -o out.las
 las2las -i in.las -set_version 1.2 -keep_gpstime 46.5 47.5 -o out.las
 las2las -i in.las -drop_intensity_below 10 -olaz -stdout > out.laz
