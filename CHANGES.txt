@@ -1,3 +1,5 @@
+10 January 2016 -- all GUIs: edit ".\LAStools\bin\serf\geo\my_epsg.csv" to add your own EPSG codes
+ 9 January 2016 -- LAStools: also parse 'gcs.csv' file whenever an unknown datum is encountered
  6 January 2016 -- lasgrid, las2dem: can raster '-attribute [0|1|2...]' stored as "Extra Bytes"
  4 January 2016 -- lasground: option '-by_flightline' allows to classify flightlines separately
  2 January 2016 -- LAStools: parse 'pcs.csv' file whenever an unknown EPSG code is encountered
