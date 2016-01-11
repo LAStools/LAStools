@@ -97,9 +97,9 @@
 			"onPointCloudLoaded": onPointCloudLoaded
 		});
 		
-		viewer.setEDLEnabled(false);
+		viewer.setEDLEnabled(true);
 		viewer.setPointSize(3);
-		viewer.setMaterial("RGB");
+		viewer.setMaterial("Elevation");
 		viewer.setFOV(60);
 		viewer.setPointSizing("Fixed");
 		viewer.setQuality("Squares");
@@ -108,8 +108,7 @@
 		//viewer.setOpacity(0.03);
 		//viewer.setMinNodeSize(100);
 		
-		viewer.setDescription("Potree 1.4RC. Use this for testing purposes only! Check <a href='https://twitter.com/m_schuetz' target='_blank'>here</a> for new updates.<br>"
-			+ "Report issues on the <a href='https://github.com/potree/potree' target='_blank'>github repository</a> or <a href='mailto:mschuetz@potree.org' target='_blank'>mschuetz@potree.org</a><br>"			
+		viewer.setDescription("Potree 1.4RC. Use this for testing purposes only!"			
 		);
 
 		<!-- INCLUDE POINTCLOUD -->
