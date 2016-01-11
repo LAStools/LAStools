@@ -16,7 +16,11 @@
   It is also possible to add missing projection information to
   the LAS/LAZ file or to reproject (using the same ellipsoid)
   for example from latitude/longitude to UTM or the stateplane
-  of Ohio_North or to Earth-centered Earth-fixed (ECEF).
+  of Ohio_North or to Earth-centered Earth-fixed (ECEF). You can
+  also use common EPSG codes with '-epsg 32754'. For LAS 1.4 it
+  is important to '-set_ogc_wkt' which translates the GeoTIFF
+  keys into an CRS string in the OGC WKT format and adds them as
+  the payload of the corresponding VLR.
 
   Another typical use is extract only first (-first_only) or only
   last (-last_only) returns. Extracting the first return is the
