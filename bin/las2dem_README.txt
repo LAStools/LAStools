@@ -8,7 +8,9 @@
   the '-elevation', the '-slope', the '-intensity', the '-rgb'
   values, or a '-hillshade' or '-gray' or '-false' coloring. The
   output is either in BIL, ASC, IMG, FLT, XYZ, DTM, TIF, PNG or
-  JPG format.
+  JPG format. Additional attributes that some LAS/LAZ files can
+  store as "Extra Bytes" can be rasterized with '-attribute 0'
+  or '-attribute 1' or '-attribute 2' ...
 
   For BIL, ASC, IMG, DTM, and XYZ output one typically stores
   the actual '-elevation' or '-intensity' values whereas the

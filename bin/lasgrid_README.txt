@@ -10,11 +10,13 @@
   or '-intensity' of each point and can compute the '-lowest' or
   the '-highest', the '-average', or the standard deviation
   '-stddev', as well as the '-range'.
-
+ 
   Other gridding options are '-scan_angle_abs', '-scan_angle',
   '-counter', '-counter_16bit', '-counter_32bit', '-user_data',
   '-point_source', '-rgb', '-number_returns' and more. See the
-  end for a complete list.
+  end for a complete list. Additional attributes that some LAS
+  or LAZ files sometimes store as "Extra Bytes" can be gridded
+  with '-attribute 0' or '-attribute 1' or '-attribute 2' ...
 
   This tool can read BILLIONS of points very efficiently. By
   default it uses only 1000MB of main memory. You can increase
