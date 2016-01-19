@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  laswritepoint.hpp
-  
+
   CONTENTS:
-  
+
     Common interface for the classes that write points raw or compressed.
 
   PROGRAMMERS:
@@ -21,9 +21,9 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     6 September 2014 -- removed inheritance of EntropyEncoder and EntropyDecoder
     6 October 2011 -- large file support & reading with missing chunk table
     9 May 2011 -- the chunked compressor now allows variable chunk sizes
@@ -31,9 +31,9 @@
     10 January 2011 -- licensing change for LGPL release and liblas integration
     7 December 2010 -- adapted from LASpointWriter for better code modularity
     3 December 2010 -- updated to (somewhat) support LAS format 1.3
-    7 September 2008 -- updated to support LAS format 1.2 
+    7 September 2008 -- updated to support LAS format 1.2
     22 February 2007 -- created about an hour before henna's birthday
-  
+
 ===============================================================================
 */
 #ifndef LAS_WRITE_POINT_HPP
