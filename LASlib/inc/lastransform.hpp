@@ -35,6 +35,8 @@
 
 #include "lasdefinitions.hpp"
 
+class LASfilter;
+
 class LASoperation
 {
 public:
@@ -56,6 +58,9 @@ public:
   BOOL parse(CHAR* string);
   I32 unparse(CHAR* string) const;
   inline BOOL active() const { return (num_operations != 0); };
+  inline BOOL filtered() const { return is_filtered; };
+
+  void setFilter(LASfilter* filter);
 
   void setPointSource(U16 value);
 
@@ -70,6 +75,8 @@ private:
   U32 num_operations;
   U32 alloc_operations;
   LASoperation** operations;
+  BOOL is_filtered;
+  LASfilter* filter;
 };
 
 #endif
