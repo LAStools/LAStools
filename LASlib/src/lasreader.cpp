@@ -943,7 +943,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name)
         {
           for (I32 i = 0; i < number_attributes; i++)
           {
-            lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i]);
+            lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i]);
           }
         }
         if (!lasreadertxt->open(file_name, parse_string, skip_lines, populate_header))
@@ -994,7 +994,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name)
       {
         for (I32 i = 0; i < number_attributes; i++)
         {
-          lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i]);
+          lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i]);
         }
       }
       if (!lasreadertxt->open(stdin, 0, parse_string, skip_lines, FALSE))
@@ -1541,19 +1541,35 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_scale_scan_angle((F32)atof(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-iadd_extra") == 0)
+    else if (strcmp(argv[i],"-iadd_extra") == 0 || strcmp(argv[i],"-iadd_attribute") == 0)
     {
       if ((i+3) >= argc)
       {
         fprintf(stderr,"ERROR: '%s' needs 3 arguments: data_type name description\n", argv[i]);
         return FALSE;
       }
-      if (((i+4) < argc) && (argv[i+4][0] != '-'))
+      if (((i+4) < argc) && (atof(argv[i+4]) != 0.0))
       {
-        if (((i+5) < argc) && (argv[i+5][0] != '-'))
+        if (((i+5) < argc) && ((atof(argv[i+5]) != 0.0) || (strcmp(argv[i+5], "0") == 0) || (strcmp(argv[i+5], "0.0") == 0)))
         {
-          add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; i+=5;
+          if (((i+6) < argc) && (atof(argv[i+6]) != 0.0))
+          {
+            if (((i+7) < argc) && ((atof(argv[i+7]) != 0.0) || (strcmp(argv[i+7], "0") == 0) || (strcmp(argv[i+7], "0.0") == 0)))
+            {
+              add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]));
+              *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; i+=7;
+            }
+            else
+            {
+              add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]));
+              *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; i+=6;
+            }
+          }
+          else
+          {
+            add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]));
+            *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; i+=5;
+          }
         }
         else
         {
@@ -1736,6 +1752,11 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
   {
     delete transform;
     transform = 0;
+  }
+  else if (transform->filtered())
+  {
+    transform->setFilter(filter);
+    filter = 0;
   }
 
   if (files_are_flightlines || apply_file_source_ID)
@@ -2133,13 +2154,15 @@ void LASreadOpener::set_scale_scan_angle(F32 scale_scan_angle)
   this->scale_scan_angle = scale_scan_angle;
 }
 
-void LASreadOpener::add_attribute(I32 data_type, const CHAR* name, const CHAR* description, F64 scale, F64 offset)
+void LASreadOpener::add_attribute(I32 data_type, const CHAR* name, const CHAR* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset)
 {
   attribute_data_types[number_attributes] = data_type;
   attribute_names[number_attributes] = (name ? strdup(name) : 0);
   attribute_descriptions[number_attributes] = (description ? strdup(description) : 0);
   attribute_scales[number_attributes] = scale;
   attribute_offsets[number_attributes] = offset;
+  attribute_pre_scales[number_attributes] = pre_scale;
+  attribute_pre_offsets[number_attributes] = pre_offset;
   number_attributes++;
 }
 
@@ -2223,6 +2246,8 @@ LASreadOpener::LASreadOpener()
     attribute_descriptions[i] = 0;
     attribute_scales[i] = 1.0;
     attribute_offsets[i] = 0.0;
+    attribute_pre_scales[i] = 1.0;
+    attribute_pre_offsets[i] = 0.0;
   }
   parse_string = 0;
   skip_lines = 0;
