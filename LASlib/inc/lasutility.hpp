@@ -98,13 +98,15 @@ public:
   void report(FILE* file, const CHAR* name=0, const CHAR* name_avg=0) const;
   void reset();
   F32 get_step() const;
-  LASbin(F32 step);
+  LASbin(F32 step, F32 clamp_min=F32_MIN, F32 clamp_max=F32_MAX);
   ~LASbin();
 private:
   void add_to_bin(I32 bin);
   F64 total;
   I64 count;
   F32 step;
+  F32 clamp_min;
+  F32 clamp_max;
   F32 one_over_step;
   BOOL first;
   I32 anker;
