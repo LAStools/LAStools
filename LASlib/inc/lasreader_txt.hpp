@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+   17 January 2016 -- pre-scaling and pre-offsetting of "extra bytes" attributes
     9 July 2014 -- allowing input from stdin after the 7:1 in the World Cup
     8 April 2011 -- created after starting a google group for LAStools users
   
@@ -49,7 +50,7 @@ public:
   void set_scale_scan_angle(F32 scale_scan_angle);
   void set_scale_factor(const F64* scale_factor);
   void set_offset(const F64* offset);
-  void add_attribute(I32 data_type, const CHAR* name, const CHAR* description=0, F64 scale=1.0, F64 offset=0.0);
+  void add_attribute(I32 data_type, const CHAR* name, const CHAR* description=0, F64 scale=1.0, F64 offset=0.0, F64 pre_scale=1.0, F64 pre_offset=0.0);
   virtual BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
   virtual BOOL open(FILE* file, const CHAR* file_name=0, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
 
@@ -88,6 +89,8 @@ private:
   const CHAR* attribute_descriptions[10];
   F64 attribute_scales[10];
   F64 attribute_offsets[10];
+  F64 attribute_pre_scales[10];
+  F64 attribute_pre_offsets[10];
   I32 attribute_starts[10];
   BOOL parse_attribute(const CHAR* l, I32 index);
   BOOL parse(const CHAR* parse_string);
