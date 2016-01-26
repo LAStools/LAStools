@@ -12,6 +12,7 @@
   '-stddev', as well as the '-range'.
  
   Other gridding options are '-scan_angle_abs', '-scan_angle',
+  '-point_density', '-point_density_16bit', '-point_density_32bit', 
   '-counter', '-counter_16bit', '-counter_32bit', '-user_data',
   '-point_source', '-rgb', '-number_returns' and more. See the
   end for a complete list. Additional attributes that some LAS
@@ -195,9 +196,12 @@ other commandline arguments are
 -lowest -low -min      : for each grid cell keep lowest value
 -average -avg -mean    : for each grid cell compute average
 -stddev -std           : for each grid cell compute standard deviation
--counter               : count point densities with an 8 bit counter
--counter_16bit         : count point densities with a 16 bit counter
--counter_32bit         : count point densities with a 32 bit counter
+-counter               : counts points per cell with an 8 bit counter
+-counter_16bit         : counts points per cell with a 16 bit counter
+-counter_32bit         : counts points per cell with a 32 bit counter
+-point_density         : computes area-normalized point densities with an 8 bit counter
+-point_density_16bit   : computes area-normalized point densities with a 16 bit counter
+-point_density_32bit   : computes area-normalized point densities with a 32 bit counter
 -scan_angle_lowest     : for each grid cell keep lowest scan angle value 
 -scan_angle_highest    : for each grid cell keep highest scan angle value 
 -scan_angle_abs_lowest : for each grid cell keep lowest absolute scan angle value 

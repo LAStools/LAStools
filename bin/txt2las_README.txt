@@ -18,6 +18,9 @@
   PTX files with 'las2las' or 'las2txt' by adding the corresponding
   '-opts' or '-optx' option to the command line.
 
+  Also allows adding additional attributes to LAS/LAZ files using
+  the "Extra Bytes" concept with '-add_attribute'.
+
   It is also possible to pipe the ASCII into txt2las. For this you
   will need to add both '-stdin' and '-itxt' to the command-line.
  
@@ -69,9 +72,43 @@ of each line as the x, y, and z coordinate of each point, and the
 LAZ file will have a precision of 0.001 0.001 0.001 and an offset
 of 500000 4000000 0
 
+>> txt2las -i LiDAR.txt -parse xyz0irnt -add_attribute 3 "echo width" "of returning waveform [ns]" 0.1 -o LiDAR.laz
+
+4590235.448 5436373.539 600.528 9.8 35 1 2 215277.271327
+4590235.524 5436373.642 600.257 9.8 35 2 2 215277.271327
+4590238.788 5436378.064 591.820 5.7 89 1 1 215277.271333
+4590238.710 5436377.908 595.356 5.9 18 1 3 215277.271340
+4590239.164 5436378.529 593.746 5.4 30 2 3 215277.271340
+4590239.633 5436379.171 592.083 4.8 15 3 3 215277.271340
+
+Given 'LiDAR.txt' contains ASCII as above then '-parse xyz0irnt' stores
+the first three columns to x y and z and the 4th column as an additional
+attribute in the "Extra Bytes". The first argument of '-add_attribute'
+specifies the data type, the following two strings are the name and the
+description of the "Extra Bytes", and the final 0.1 means that the number
+should be stored with a scale of 0.1. Hence the value 9.8 will be stored
+as an unsigned short 98 and the value 5.3 will be stored as an unsigned
+short 53. 
+
+>> txt2las -i LiDAR2.txt -parse xyz0i1rnt ^
+           -add_attribute 3 "echo width" "of returning waveform [ns]" 0.1 ^
+	   -add_attribute 3 "corrected intensity" "uniform across flightlines" ^
+           -o LiDAR2.laz
+
+4590235.448 5436373.539 600.528 9.8 35 44 1 2 215277.271327
+4590235.524 5436373.642 600.257 9.8 35 39 2 2 215277.271327
+4590238.788 5436378.064 591.820 5.7 89 99 1 1 215277.271333
+4590238.710 5436377.908 595.356 5.9 18 27 1 3 215277.271340
+4590239.164 5436378.529 593.746 5.4 30 38 2 3 215277.271340
+4590239.633 5436379.171 592.083 4.8 15 23 3 3 215277.271340
+
+Same as before but with a second additional attribute marked by '1' in the
+parse string and specified by a second occurance of the '-add_attribute'
+option. These are unsigned integers numbers so no scale value is required.
+
 for more info:
 
-C:\lastools\bin>txt2las -h
+D:\LAStools\bin>txt2las -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -94,6 +131,7 @@ Filter points based on their coordinates.
 Filter points based on their return number.
   -first_only -keep_first -drop_first
   -last_only -keep_last -drop_last
+  -drop_first_of_many -drop_last_of_many
   -keep_middle -drop_middle
   -keep_return 1 2 3
   -drop_return 3 4
@@ -117,6 +155,7 @@ Filter points based on their classification.
   -drop_synthetic -keep_synthetic
   -drop_keypoint -keep_keypoint
   -drop_withheld -keep_withheld
+  -drop_overlap -keep_overlap
 Filter points based on their user data.
   -keep_user_data 1
   -drop_user_data 255
@@ -142,6 +181,11 @@ Filter points based on their gps time.
   -drop_gps_time_below 11.125
   -drop_gps_time_above 130.725
   -drop_gps_time_between 22.0 48.0
+Filter points based on their RGB/NIR channel.
+  -keep_RGB_red 1 1
+  -keep_RGB_green 30 100
+  -keep_RGB_blue 0 0
+  -keep_RGB_nir 64 127
 Filter points based on their wavepacket.
   -keep_wavepacket 0
   -drop_wavepacket 3
@@ -149,6 +193,7 @@ Filter points with simple thinning.
   -keep_every_nth 2
   -keep_random_fraction 0.1
   -thin_with_grid 1.0
+  -thin_with_time 0.001
 Transform coordinates.
   -translate_x -2.5
   -scale_z 0.3048
@@ -158,11 +203,13 @@ Transform coordinates.
   -switch_x_y -switch_x_z -switch_y_z
   -clamp_z_below 70.5
   -clamp_z 70.5 72.5
+  -copy_attribute_into_z 0
 Transform raw xyz integers.
   -translate_raw_z 20
   -translate_raw_xyz 1 1 0
   -clamp_raw_z 500 800
 Transform intensity.
+  -set_intensity 0
   -scale_intensity 2.5
   -translate_intensity 50
   -translate_then_scale_intensity 0.5 3.1
@@ -186,22 +233,30 @@ Modify the classification.
   -classify_z_between_as 2.0 5.0 4
   -classify_intensity_above_as 200 9
   -classify_intensity_below_as 30 11
+  -change_extended_classification_from_to 6 46
 Change the flags.
   -set_withheld_flag 0
   -set_synthetic_flag 1
   -set_keypoint_flag 0
+  -set_extended_overlap_flag 1
+Modify the extended scanner channel.
+  -set_extended_scanner_channel 2
 Modify the user data.
   -set_user_data 0
   -change_user_data_from_to 23 26
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
-  -quantize_Z_into_point_source 200
+  -copy_user_data_into_point_source
+  -bin_Z_into_point_source 200
+  -bin_abs_scan_angle_into_point_source 2
 Transform gps_time.
+  -set_gps_time 113556962.005715
   -translate_gps_time 40.50
   -adjusted_to_week
   -week_to_adjusted 1671
 Transform RGB colors.
+  -scale_rgb 2 4 2
   -scale_rgb_down (by 256)
   -scale_rgb_up (by 256)
 Supported LAS Inputs
@@ -221,6 +276,10 @@ Supported LAS Inputs
   -rescale_xy 0.01 0.01
   -rescale_z 0.01
   -reoffset 600000 4000000 0
+Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
+  -inside min_x min_y max_x max_y
+  -inside_tile ll_x ll_y size
+  -inside_circle center_x center_y radius
 Supported LAS Outputs
   -o lidar.las
   -o lidar.laz
@@ -233,7 +292,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 140709
+LAStools (by martin@rapidlasso.com) version 160119
 Supported ASCII Inputs:
   -i lidar.txt
   -i lidar.txt.gz
@@ -247,7 +306,7 @@ txt2las -parse xyzairn -i lidar.zip -utm 17T -vertical_navd88 -olaz -set_class 2
 unzip -p lidar.zip | txt2las -parse xyz -stdin -o lidar.las -longlat -elevation_survey_feet
 txt2las -i lidar.zip -parse txyzar -scale_scan_angle 57.3 -o lidar.laz
 txt2las -skip 5 -parse xyz -i lidar.rar -set_file_creation 28 2011 -o lidar.las
-txt2las -parse xyzsst -v -set_scale 0.001 0.001 0.001 -i lidar.txt
+txt2las -parse xyzsst -verbose -set_scale 0.001 0.001 0.001 -i lidar.txt
 txt2las -parse xsysz -set_scale 0.1 0.1 0.01 -i lidar.txt.gz -sp83 OH_N -feet
 las2las -parse tsxyzRGB -i lidar.txt -set_version 1.2 -scale_intensity 65535 -o lidar.las
 txt2las -h
