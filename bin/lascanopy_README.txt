@@ -39,8 +39,8 @@
   '-avg', and the standard deviation '-std' of all heights above
   the cutoff that by default is breast height of 1.37. It can be
   changed with the option '-height_cutoff 2.0'. Also the skewness
-  with '-ske', the kurtosis with '-kur', and a quadratic average
-  '-qav' can be computed.
+  with '-ske', the kurtosis with '-kur', and the average square
+  height '-qav' can be computed.
 
   There is also the concept of height "bincentiles" where '-b 90'
   would deliver the percentage or fraction of points between the
