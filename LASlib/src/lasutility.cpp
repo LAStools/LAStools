@@ -331,12 +331,14 @@ F32 LASbin::get_step() const
   return step;
 }
 
-LASbin::LASbin(F32 step)
+LASbin::LASbin(F32 step, F32 clamp_min, F32 clamp_max)
 {
   total = 0;
   count = 0;
   this->step = step;
   this->one_over_step = 1.0f/step;
+  this->clamp_min = clamp_min;
+  this->clamp_max = clamp_max;
   first = TRUE;
   size_pos = 0;
   size_neg = 0;
@@ -356,6 +358,14 @@ LASbin::~LASbin()
 
 void LASbin::add(I32 item)
 {
+  if (item > clamp_max)
+  {
+    item = (I32)clamp_max;
+  }
+  else if (item < clamp_min)
+  {
+    item = (I32)clamp_min;
+  }
   total += item;
   count++;
   I32 bin = I32_FLOOR(one_over_step*item);
@@ -364,6 +374,14 @@ void LASbin::add(I32 item)
 
 void LASbin::add(F64 item)
 {
+  if (item > clamp_max)
+  {
+    item = clamp_max;
+  }
+  else if (item < clamp_min)
+  {
+    item = clamp_min;
+  }
   total += item;
   count++;
   I32 bin = I32_FLOOR(one_over_step*item);
@@ -372,6 +390,14 @@ void LASbin::add(F64 item)
 
 void LASbin::add(I64 item)
 {
+  if (item > clamp_max)
+  {
+    item = (I64)clamp_max;
+  }
+  else if (item < clamp_min)
+  {
+    item = (I64)clamp_min;
+  }
   total += item;
   count++;
   I32 bin = I32_FLOOR(one_over_step*item);
