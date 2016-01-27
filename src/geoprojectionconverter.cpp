@@ -1736,7 +1736,7 @@ static FILE* open_geo_file(const char* program_name, bool pcs=true)
   // create path to 'pcs.csv' file
 
   #define MAX_GEO_PATH_LENGTH 4096
-  int path_len;
+  int path_len = 0;
   char path[MAX_GEO_PATH_LENGTH];
 
 #ifdef _WIN32
@@ -6651,9 +6651,15 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
 int GeoProjectionConverter::unparse(char* string) const
 {
   int n = 0;
+  bool have_epsg = false;
   if (source_projection != 0)
   {
-    if (source_projection->type == GEO_PROJECTION_LAT_LONG)
+    if (source_projection->geokey != 0)
+    {
+      n += sprintf(&string[n], "-epsg %u ", source_projection->geokey);
+      have_epsg = true;
+    }
+    else if (source_projection->type == GEO_PROJECTION_LAT_LONG)
     {
       n += sprintf(&string[n], "-latlong ");
     }
@@ -6664,10 +6670,6 @@ int GeoProjectionConverter::unparse(char* string) const
     else if (source_projection->type == GEO_PROJECTION_ECEF)
     {
       n += sprintf(&string[n], "-ecef ");
-    }
-    else if (source_projection->geokey != 0)
-    {
-      n += sprintf(&string[n], "-epsg %u ", source_projection->geokey);
     }
     else if (source_projection->type == GEO_PROJECTION_UTM)
     {
@@ -6685,19 +6687,22 @@ int GeoProjectionConverter::unparse(char* string) const
       n += sprintf(&string[n], "-tm %.10g %.10g m %.10g %.10g %.10g ", tm->tm_false_easting_meter, tm->tm_false_northing_meter, tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
     }
   }
-  if (ellipsoid)
+  if (!have_epsg)
   {
-    n += sprintf(&string[n], "-ellipsoid %d ", ellipsoid->id);
-  }
-  if (coordinates2meter != 1.0)
-  {
-    if (coordinates2meter == 0.3048)
+    if (ellipsoid)
     {
-      n += sprintf(&string[n], "-feet ");
+      n += sprintf(&string[n], "-ellipsoid %d ", ellipsoid->id);
     }
-    else
+    if (coordinates2meter != 1.0)
     {
-      n += sprintf(&string[n], "-surveyfeet ");
+      if (coordinates2meter == 0.3048)
+      {
+        n += sprintf(&string[n], "-feet ");
+      }
+      else
+      {
+        n += sprintf(&string[n], "-surveyfeet ");
+      }
     }
   }
   if (elevation2meter != 1.0)
@@ -6722,9 +6727,15 @@ int GeoProjectionConverter::unparse(char* string) const
       n += sprintf(&string[n], "-vertical_wgs84 ");
     }
   }
+  have_epsg = false;
   if (target_projection != 0)
   {
-    if (target_projection->type == GEO_PROJECTION_LAT_LONG)
+    if (target_projection->geokey != 0)
+    {
+      n += sprintf(&string[n], "-target_epsg %u ", target_projection->geokey);
+      have_epsg = true;
+    }
+    else if (target_projection->type == GEO_PROJECTION_LAT_LONG)
     {
       n += sprintf(&string[n], "-target_latlong ");
     }
@@ -6735,10 +6746,6 @@ int GeoProjectionConverter::unparse(char* string) const
     else if (target_projection->type == GEO_PROJECTION_ECEF)
     {
       n += sprintf(&string[n], "-target_ecef ");
-    }
-    else if (target_projection->geokey != 0)
-    {
-      n += sprintf(&string[n], "-target_epsg %u ", target_projection->geokey);
     }
     else if (target_projection->type == GEO_PROJECTION_UTM)
     {
@@ -6763,15 +6770,18 @@ int GeoProjectionConverter::unparse(char* string) const
       n += sprintf(&string[n], "-target_tm %g %g m %g %g %g ", tm->tm_false_easting_meter, tm->tm_false_northing_meter, tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
     }
   }
-  if (meter2coordinates != 1.0)
+  if (!have_epsg)
   {
-    if (meter2coordinates == 1.0/0.3048)
+    if (meter2coordinates != 1.0)
     {
-      n += sprintf(&string[n], "-target_feet ");
-    }
-    else
-    {
-      n += sprintf(&string[n], "-target_surveyfeet ");
+      if (meter2coordinates == 1.0/0.3048)
+      {
+        n += sprintf(&string[n], "-target_feet ");
+      }
+      else
+      {
+        n += sprintf(&string[n], "-target_surveyfeet ");
+      }
     }
   }
   if (meter2elevation != 1.0)
