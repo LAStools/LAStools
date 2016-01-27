@@ -279,6 +279,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "laslayers"=.\src_full\laslayers.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "lasmerge"=.\src\lasmerge.dsp - Package Owner=<4>
 
 Package=<5>
@@ -364,6 +376,30 @@ Package=<4>
 ###############################################################################
 
 Project: "lasprofile"=.\src_full\lasprofile.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "laspublish"=.\src_full\laspublish.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "lasreturn"=.\src_full\lasreturn.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

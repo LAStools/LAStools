@@ -101,7 +101,7 @@ PostBuild_Cmds=copy Debug_without_GUI\txt2las-cli.exe ..\bin\txt2las-cli.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /w /W0 /GX /O2 /I "..\laslib\inc" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /w /W0 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /YX /FD /c
 # ADD BASE RSC /l 0x409 /i "../src" /d "NDEBUG"
 # ADD RSC /l 0x409 /i "../src" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -174,44 +174,6 @@ SOURCE=.\geoprojectionconverter.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\txt2las.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\src_full\txt2las_gui.cpp
-
-!IF  "$(CFG)" == "txt2las - Win32 Release without GUI"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "txt2las - Win32 Debug without GUI"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "txt2las - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "txt2las - Win32 Debug"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=..\src_full\txt2las_multi_core.cpp
-
-!IF  "$(CFG)" == "txt2las - Win32 Release without GUI"
-
-!ELSEIF  "$(CFG)" == "txt2las - Win32 Debug without GUI"
-
-!ELSEIF  "$(CFG)" == "txt2las - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "txt2las - Win32 Debug"
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\src_full\laslicense.cpp
 
 !IF  "$(CFG)" == "txt2las - Win32 Release without GUI"
@@ -270,17 +232,6 @@ SOURCE=..\src_full\lastools_gui.cpp
 # Begin Source File
 
 SOURCE=..\src_full\lastools_multi_core.cpp
-
-!IF  "$(CFG)" == "txt2las - Win32 Release without GUI"
-
-!ELSEIF  "$(CFG)" == "txt2las - Win32 Debug without GUI"
-
-!ELSEIF  "$(CFG)" == "txt2las - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "txt2las - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -301,10 +252,45 @@ SOURCE=..\src_full\shpreader.cpp
 !ENDIF 
 
 # End Source File
+# Begin Source File
+
+SOURCE=..\src\txt2las.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\txt2las_gui.cpp
+
+!IF  "$(CFG)" == "txt2las - Win32 Release without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "txt2las - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "txt2las - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "txt2las - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\txt2las_multi_core.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\geoprojectionconverter.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasattributer.hpp
+# End Source File
 # Begin Source File
 
 SOURCE=..\laslib\inc\lasdefinitions.hpp
@@ -312,6 +298,38 @@ SOURCE=..\laslib\inc\lasdefinitions.hpp
 # Begin Source File
 
 SOURCE=..\laslib\inc\lasfilter.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasindex.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasinterval.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\laslicense.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\lasoccupancy.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\laspoint.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasquadtree.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasquantizer.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\lasraster.hpp
 # End Source File
 # Begin Source File
 
@@ -323,7 +341,19 @@ SOURCE=..\laslib\inc\lastransform.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\laslib\inc\lasutility.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\laslib\inc\laswaveform13reader.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\laslib\inc\laswaveform13writer.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\laslib\inc\laswriter.hpp
 # End Source File
 # Begin Source File
 
@@ -331,7 +361,27 @@ SOURCE=..\laslib\inc\laszip.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASzip\src\laszip.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\linereader.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\laslib\inc\mydefs.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\mydefs.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\shpreader.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\txtreader.hpp
 # End Source File
 # End Group
 # Begin Group "Resource Files"
