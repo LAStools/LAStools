@@ -101,7 +101,7 @@ PostBuild_Cmds=copy Debug_without_GUI\las2txt-cli.exe ..\bin\las2txt-cli.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /w /W0 /GX /O2 /I "..\laslib\inc" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /w /W0 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /YX /FD /c
 # ADD BASE RSC /l 0x409 /i "../src" /d "NDEBUG"
 # ADD RSC /l 0x409 /i "../src" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -198,17 +198,6 @@ SOURCE=..\src_full\las2txt_gui.cpp
 # Begin Source File
 
 SOURCE=..\src_full\las2txt_multi_core.cpp
-
-!IF  "$(CFG)" == "las2txt - Win32 Release without GUI"
-
-!ELSEIF  "$(CFG)" == "las2txt - Win32 Debug without GUI"
-
-!ELSEIF  "$(CFG)" == "las2txt - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "las2txt - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -270,17 +259,6 @@ SOURCE=..\src_full\lastools_gui.cpp
 # Begin Source File
 
 SOURCE=..\src_full\lastools_multi_core.cpp
-
-!IF  "$(CFG)" == "las2txt - Win32 Release without GUI"
-
-!ELSEIF  "$(CFG)" == "las2txt - Win32 Debug without GUI"
-
-!ELSEIF  "$(CFG)" == "las2txt - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "las2txt - Win32 Debug"
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
