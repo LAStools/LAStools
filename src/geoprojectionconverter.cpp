@@ -3672,6 +3672,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   bool is_mga = false;
   char* sp = 0;
   bool sp_nad27 = false;
+  bool longlat = false;
   bool ecef = false;
 
   if ((value >= 32601) && (value <= 32660)) // PCS_WGS84_UTM_zone_1N - PCS_WGS84_UTM_zone_60N
@@ -3738,10 +3739,14 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   {
     utm_northern = false; utm_zone = value-29160;
     gcs = GEO_GCS_SAD69;
-  }  
+  }
   else switch (value)
   {
-  case 4978: // WGS 84
+  case 4326: // WGS 84 longlat
+    longlat = true;
+    gcs = GEO_GCS_WGS84;
+    break;
+  case 4978: // WGS 84 ecef
     ecef = true;
     gcs = GEO_GCS_WGS84;
     break;
@@ -4747,6 +4752,15 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       }
     }
     free(epsg_name);
+  }
+
+  if (longlat)
+  {
+    if (set_longlat_projection(description, source))
+    {
+      set_geokey(value, source);
+      return true;
+    }
   }
 
   if (ecef)
