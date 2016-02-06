@@ -491,22 +491,22 @@ private:
   I32 scan_direction;
 };
 
-class LAScriterionScanDirectionChangeOnly : public LAScriterion
+class LAScriterionKeepScanDirectionChange : public LAScriterion
 {
 public:
-  inline const CHAR* name() const { return "scan_direction_change_only"; };
+  inline const CHAR* name() const { return "keep_scan_direction_change"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline BOOL filter(const LASpoint* point) { if (scan_direction_flag == point->scan_direction_flag) return TRUE; I32 s = scan_direction_flag; scan_direction_flag = point->scan_direction_flag; return s == -1; };
   void reset() { scan_direction_flag = -1; };
-  LAScriterionScanDirectionChangeOnly() { reset(); };
+  LAScriterionKeepScanDirectionChange() { reset(); };
 private:
   I32 scan_direction_flag;
 };
 
-class LAScriterionEdgeOfFlightLineOnly : public LAScriterion
+class LAScriterionKeepEdgeOfFlightLine : public LAScriterion
 {
 public:
-  inline const CHAR* name() const { return "edge_of_flight_line_only"; };
+  inline const CHAR* name() const { return "keep_edge_of_flight_line"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline BOOL filter(const LASpoint* point) { return (point->edge_of_flight_line == 0); };
 };
@@ -1226,8 +1226,8 @@ void LASfilter::usage() const
   fprintf(stderr,"  -keep_quintuple -drop_quintuple\n");
   fprintf(stderr,"Filter points based on the scanline flags.\n");
   fprintf(stderr,"  -drop_scan_direction 0\n");
-  fprintf(stderr,"  -scan_direction_change_only\n");
-  fprintf(stderr,"  -edge_of_flight_line_only\n");
+  fprintf(stderr,"  -keep_scan_direction_change\n");
+  fprintf(stderr,"  -keep_edge_of_flight_line\n");
   fprintf(stderr,"Filter points based on their intensity.\n");
   fprintf(stderr,"  -keep_intensity 20 380\n");
   fprintf(stderr,"  -drop_intensity_below 20\n");
@@ -1257,6 +1257,7 @@ void LASfilter::usage() const
   fprintf(stderr,"Filter points based on their scan angle.\n");
   fprintf(stderr,"  -keep_scan_angle -15 15\n");
   fprintf(stderr,"  -drop_abs_scan_angle_above 15\n");
+  fprintf(stderr,"  -drop_abs_scan_angle_below 1\n");
   fprintf(stderr,"  -drop_scan_angle_below -15\n");
   fprintf(stderr,"  -drop_scan_angle_above 15\n");
   fprintf(stderr,"  -drop_scan_angle_between -25 -23\n");
@@ -1348,47 +1349,87 @@ BOOL LASfilter::parse(int argc, char* argv[])
         return FALSE;
       }
     }
-    else if (strncmp(argv[i],"-keep_x", 7) == 0)
+    else if (strncmp(argv[i],"-keep_", 6) == 0)
     {
-      if (strcmp(argv[i],"-keep_xy") == 0)
+      if (strcmp(argv[i],"-keep_first") == 0)
       {
-        if ((i+4) >= argc)
+        add_criterion(new LAScriterionKeepFirstReturn());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_middle") == 0)
+      {
+        add_criterion(new LAScriterionKeepMiddleReturn());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_last") == 0)
+      {
+        add_criterion(new LAScriterionKeepLastReturn());
+        *argv[i]='\0';
+      }
+      else if (strncmp(argv[i],"-keep_class", 11) == 0)
+      {
+        if (strcmp(argv[i],"-keep_classification") == 0 || strcmp(argv[i],"-keep_class") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y\n", argv[i]);
-          return FALSE;
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 at least argument: classification\n", argv[i]);
+            return FALSE;
+          }
+          *argv[i]='\0';
+          i+=1;
+          do
+          {
+            keep_classification_mask |= (1 << atoi(argv[i]));
+            *argv[i]='\0';
+            i+=1;
+          } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+          i-=1;
         }
-        add_criterion(new LAScriterionKeepxy(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
-      }
-      else if (strcmp(argv[i],"-keep_xyz") == 0)
-      {
-        if ((i+6) >= argc)
+        else if (strcmp(argv[i],"-keep_classification_mask") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z\n", argv[i]);
-          return FALSE;
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: classifications_mask\n", argv[i]);
+            return FALSE;
+          }
+          keep_classification_mask = atoi(argv[i+1]);
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
-        add_criterion(new LAScriterionKeepxyz(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; i+=6; 
       }
-      else if (strcmp(argv[i],"-keep_x") == 0)
+      else if (strncmp(argv[i],"-keep_x", 7) == 0)
       {
-        if ((i+2) >= argc)
+        if (strcmp(argv[i],"-keep_xy") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_x max_x\n", argv[i]);
-          return FALSE;
+          if ((i+4) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepxy(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
         }
-        add_criterion(new LAScriterionKeepx(atof(argv[i+1]), atof(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        else if (strcmp(argv[i],"-keep_xyz") == 0)
+        {
+          if ((i+6) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepxyz(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; i+=6; 
+        }
+        else if (strcmp(argv[i],"-keep_x") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_x max_x\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepx(atof(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
       }
-      else
-      {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strncmp(argv[i],"-keep_y", 7) == 0)
-    {
-      if (strcmp(argv[i],"-keep_y") == 0)
+      else if (strcmp(argv[i],"-keep_y") == 0)
       {
         if ((i+2) >= argc)
         {
@@ -1398,15 +1439,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionKeepy(atof(argv[i+1]), atof(argv[i+2])));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
       }
-      else
-      {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strncmp(argv[i],"-keep_z", 7) == 0)
-    {
-      if (strcmp(argv[i],"-keep_z") == 0)
+      else if (strcmp(argv[i],"-keep_z") == 0)
       {
         if ((i+2) >= argc)
         {
@@ -1416,177 +1449,30 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionKeepz(atof(argv[i+1]), atof(argv[i+2])));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
       }
-      else
+      else if (strncmp(argv[i],"-keep_X", 7) == 0)
       {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strncmp(argv[i],"-drop_x", 7) == 0)
-    {
-      if (strcmp(argv[i],"-drop_xy") == 0)
-      {
-        if ((i+4) >= argc)
+        if (strcmp(argv[i],"-keep_XY") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y\n", argv[i]);
-          return FALSE;
+          if ((i+4) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_X min_Y max_X max_Y\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepXY(atoi(argv[i+1]), atoi(argv[i+2]), atoi(argv[i+3]), atoi(argv[i+4])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
         }
-        add_criterion(new LAScriterionDropxy(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
-      }
-      else if (strcmp(argv[i],"-drop_xyz") == 0)
-      {
-        if ((i+6) >= argc)
+        else if (strcmp(argv[i],"-keep_X") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_X max_X\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepX(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
-        add_criterion(new LAScriterionDropxyz(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; i+=6; 
       }
-      else if (strcmp(argv[i],"-drop_x") == 0)
-      {
-        if ((i+2) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_x max_x\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropx(atof(argv[i+1]), atof(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-      }
-      else if (strcmp(argv[i],"-drop_x_below") == 0)
-      {
-        if ((i+1) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: min_x\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropxBelow(atof(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-      }
-      else if (strcmp(argv[i],"-drop_x_above") == 0)
-      {
-        if ((i+1) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: max_x\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropxAbove(atof(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-      }
-      else
-      {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strncmp(argv[i],"-drop_y", 7) == 0)
-    {
-      if (strcmp(argv[i],"-drop_y") == 0)
-      {
-        if ((i+2) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_y max_y\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropy(atof(argv[i+1]), atof(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-      }
-      else if (strcmp(argv[i],"-drop_y_below") == 0)
-      {
-        if ((i+1) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: min_y\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropyBelow(atof(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-      }
-      else if (strcmp(argv[i],"-drop_y_above") == 0)
-      {
-        if ((i+1) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: max_y\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropyAbove(atof(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-      }
-      else
-      {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strncmp(argv[i],"-drop_z", 7) == 0)
-    {
-      if (strcmp(argv[i],"-drop_z") == 0)
-      {
-        if ((i+2) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_z max_z\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropz(atof(argv[i+1]), atof(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-      }
-      else if (strcmp(argv[i],"-drop_z_below") == 0)
-      {
-        if ((i+1) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: min_z\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropzBelow(atof(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-      }
-      else if (strcmp(argv[i],"-drop_z_above") == 0)
-      {
-        if ((i+1) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: max_z\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropzAbove(atof(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-      }
-      else
-      {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strncmp(argv[i],"-keep_X", 7) == 0)
-    {
-      if (strcmp(argv[i],"-keep_XY") == 0)
-      {
-        if ((i+4) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_X min_Y max_X max_Y\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionKeepXY(atoi(argv[i+1]), atoi(argv[i+2]), atoi(argv[i+3]), atoi(argv[i+4])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
-      }
-      else if (strcmp(argv[i],"-keep_X") == 0)
-      {
-        if ((i+2) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_X max_X\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionKeepX(atoi(argv[i+1]), atoi(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
-      }
-      else
-      {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strncmp(argv[i],"-keep_Y", 7) == 0)
-    {
-      if (strcmp(argv[i],"-keep_Y") == 0)
+      else if (strcmp(argv[i],"-keep_Y") == 0)
       {
         if ((i+2) >= argc)
         {
@@ -1596,15 +1482,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionKeepY(atoi(argv[i+1]), atoi(argv[i+2])));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
-      else
-      {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strncmp(argv[i],"-keep_Z", 7) == 0)
-    {
-      if (strcmp(argv[i],"-keep_Z") == 0)
+      else if (strcmp(argv[i],"-keep_Z") == 0)
       {
         if ((i+2) >= argc)
         {
@@ -1614,772 +1492,887 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionKeepZ(atoi(argv[i+1]), atoi(argv[i+2])));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
-      else
+      else if (strcmp(argv[i],"-keep_tile") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: llx lly size\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionKeepTile((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3])));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
-    }
-    else if (strncmp(argv[i],"-drop_X", 7) == 0)
-    {
-      if (strcmp(argv[i],"-drop_X") == 0)
+      else if (strcmp(argv[i],"-keep_circle") == 0)
+      {
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: center_x center_y radius\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionKeepCircle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3])));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+      }
+      else if (strcmp(argv[i],"-keep_return") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs at least 1 argument: return_number\n", argv[i]);
+          return FALSE;
+        }
+        *argv[i]='\0';
+        i+=1;
+        do
+        {
+          keep_return_mask |= (1 << atoi(argv[i]));
+          *argv[i]='\0';
+          i+=1;
+        } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+        i-=1;
+      }
+      else if (strcmp(argv[i],"-keep_return_mask") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: return_mask\n", argv[i]);
+          return FALSE;
+        }
+        keep_return_mask = atoi(argv[i+1]);
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-keep_single") == 0)
+      {
+        add_criterion(new LAScriterionKeepSpecificNumberOfReturns(1));
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_double") == 0)
+      {
+        add_criterion(new LAScriterionKeepSpecificNumberOfReturns(2));
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_triple") == 0)
+      {
+        add_criterion(new LAScriterionKeepSpecificNumberOfReturns(3));
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_quadruple") == 0)
+      {
+        add_criterion(new LAScriterionKeepSpecificNumberOfReturns(4));
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_quintuple") == 0)
+      {
+        add_criterion(new LAScriterionKeepSpecificNumberOfReturns(5));
+        *argv[i]='\0';
+      }
+      else if (strncmp(argv[i],"-keep_intensity", 15) == 0)
+      {
+        if (strcmp(argv[i],"-keep_intensity") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepIntensity(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-keep_intensity_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepIntensityAbove(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-keep_intensity_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepIntensityBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+      }
+      else if (strncmp(argv[i],"-keep_RGB_", 10) == 0)
+      {
+        if (strcmp(argv[i]+10,"red") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 0));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i]+10,"green") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 1));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i]+10,"blue") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 2));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i]+10,"nir") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 3));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
+      else if (strcmp(argv[i],"-keep_scan_angle") == 0)
       {
         if ((i+2) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_X max_X\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionDropX(atoi(argv[i+1]), atoi(argv[i+2])));
+        add_criterion(new LAScriterionKeepScanAngle(atoi(argv[i+1]), atoi(argv[i+2])));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
       }
-      else if (strcmp(argv[i],"-drop_X_below") == 0)
+      else if (strcmp(argv[i],"-keep_synthetic") == 0)
+      {
+        add_criterion(new LAScriterionKeepSynthetic());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_keypoint") == 0)
+      {
+        add_criterion(new LAScriterionKeepKeypoint());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_withheld") == 0)
+      {
+        add_criterion(new LAScriterionKeepWithheld());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_overlap") == 0)
+      {
+        add_criterion(new LAScriterionKeepOverlap());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_wavepacket") == 0)
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: min_X\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionDropXBelow(atoi(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i]='\0';
+        i+=1;
+        add_criterion(new LAScriterionKeepWavepacket(atoi(argv[i])));
+        *argv[i]='\0';
       }
-      else if (strcmp(argv[i],"-drop_X_above") == 0)
+      else if (strncmp(argv[i],"-keep_user_data", 15) == 0)
+      {
+        if (strcmp(argv[i],"-keep_user_data") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepUserData(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-keep_user_data_between") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_value max_value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepUserDataBetween(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
+      else if (strncmp(argv[i],"-keep_point_source", 18) == 0)
+      {
+        if (strcmp(argv[i],"-keep_point_source") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: ID\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepPointSource(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-keep_point_source_between") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepPointSourceBetween(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
+      else if (strncmp(argv[i],"-keep_gps", 9) == 0)
+      {
+        if (strcmp(argv[i],"-keep_gps_time") == 0 || strcmp(argv[i],"-keep_gpstime") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepGpsTime(atof(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
+      else if (strcmp(argv[i],"-keep_every_nth") == 0)
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: max_X\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: nth\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionDropXAbove(atoi(argv[i+1])));
+        add_criterion(new LAScriterionKeepEveryNth((I32)atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
-      else
+      else if (strcmp(argv[i],"-keep_random_fraction") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: fraction\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionKeepRandomFraction((F32)atof(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-keep_scan_direction_change") == 0)
+      {
+        add_criterion(new LAScriterionKeepScanDirectionChange());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-keep_edge_of_flight_line") == 0)
+      {
+        add_criterion(new LAScriterionKeepEdgeOfFlightLine());
+        *argv[i]='\0';
       }
     }
-    else if (strncmp(argv[i],"-drop_Y", 7) == 0)
+    else if (strncmp(argv[i],"-drop_", 6) == 0)
     {
-      if (strcmp(argv[i],"-drop_Y") == 0)
+      if (strcmp(argv[i],"-drop_first") == 0)
       {
-        if ((i+2) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Y max_Y\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionDropY(atoi(argv[i+1]), atoi(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        add_criterion(new LAScriterionDropFirstReturn());
+        *argv[i]='\0';
       }
-      else if (strcmp(argv[i],"-drop_Y_below") == 0)
+      else if (strcmp(argv[i],"-drop_first_of_many") == 0)
+      {
+        add_criterion(new LAScriterionDropFirstOfManyReturn());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_middle") == 0)
+      {
+        add_criterion(new LAScriterionDropMiddleReturn());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_last") == 0)
+      {
+        add_criterion(new LAScriterionDropLastReturn());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_last_of_many") == 0)
+      {
+        add_criterion(new LAScriterionDropLastOfManyReturn());
+        *argv[i]='\0';
+      }
+      else if (strncmp(argv[i],"-drop_class", 11) == 0)
+      {
+        if (strcmp(argv[i],"-drop_classification") == 0 || strcmp(argv[i],"-drop_class") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: classification\n", argv[i]);
+            return FALSE;
+          }
+          *argv[i]='\0';
+          i+=1;
+          do
+          {
+            drop_classification_mask |= (1 << atoi(argv[i]));
+            *argv[i]='\0';
+            i+=1;
+          } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+          i-=1;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_x", 7) == 0)
+      {
+        if (strcmp(argv[i],"-drop_xy") == 0)
+        {
+          if ((i+4) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropxy(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
+        }
+        else if (strcmp(argv[i],"-drop_xyz") == 0)
+        {
+          if ((i+6) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropxyz(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; i+=6; 
+        }
+        else if (strcmp(argv[i],"-drop_x") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_x max_x\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropx(atof(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-drop_x_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_x\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropxBelow(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_x_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_x\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropxAbove(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_y", 7) == 0)
+      {
+        if (strcmp(argv[i],"-drop_y") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_y max_y\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropy(atof(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-drop_y_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_y\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropyBelow(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_y_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_y\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropyAbove(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_z", 7) == 0)
+      {
+        if (strcmp(argv[i],"-drop_z") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_z max_z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropz(atof(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-drop_z_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropzBelow(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_z_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropzAbove(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_X", 7) == 0)
+      {
+        if (strcmp(argv[i],"-drop_X") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_X max_X\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropX(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-drop_X_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_X\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropXBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_X_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_X\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropXAbove(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_Y", 7) == 0)
+      {
+        if (strcmp(argv[i],"-drop_Y") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Y max_Y\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropY(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-drop_Y_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_Y\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropYBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_Y_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_Y\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropYAbove(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_Z", 7) == 0)
+      {
+        if (strcmp(argv[i],"-drop_Z") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Z max_Z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropZ(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-drop_Z_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_Z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropZBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_Z_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_Z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropZAbove(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+      }
+      else if (strcmp(argv[i],"-drop_return") == 0)
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: min_Y\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs at least 1 argument: return_number\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionDropYBelow(atoi(argv[i+1])));
+        *argv[i]='\0';
+        i+=1;
+        do
+        {
+          drop_return_mask |= (1 << atoi(argv[i]));
+          *argv[i]='\0';
+          i+=1;
+        } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+        i-=1;
+      }
+      else if (strcmp(argv[i],"-drop_single") == 0)
+      {
+        add_criterion(new LAScriterionDropSpecificNumberOfReturns(1));
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_double") == 0)
+      {
+        add_criterion(new LAScriterionDropSpecificNumberOfReturns(2));
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_triple") == 0)
+      {
+        add_criterion(new LAScriterionDropSpecificNumberOfReturns(3));
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_quadruple") == 0)
+      {
+        add_criterion(new LAScriterionDropSpecificNumberOfReturns(4));
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_quintuple") == 0)
+      {
+        add_criterion(new LAScriterionDropSpecificNumberOfReturns(5));
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_scan_direction") == 0)
+      {
+        add_criterion(new LAScriterionDropScanDirection(atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
-      else if (strcmp(argv[i],"-drop_Y_above") == 0)
+      else if (strncmp(argv[i],"-drop_intensity_above",15) == 0)
+      {
+        if (strcmp(argv[i],"-drop_intensity_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropIntensityAbove(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_intensity_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropIntensityBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_intensity_between") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropIntensityBetween(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_abs_scan_angle_",21) == 0)
+      {
+        if (strcmp(argv[i],"-drop_abs_scan_angle_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max\n", argv[i]);
+            return FALSE;
+          }
+          I32 angle = atoi(argv[i+1]);
+          add_criterion(new LAScriterionKeepScanAngle(-angle, angle));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_abs_scan_angle_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min\n", argv[i]);
+            return FALSE;
+          }
+          I32 angle = atoi(argv[i+1]);
+          add_criterion(new LAScriterionDropScanAngleBetween(-angle+1, angle-1));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_scan_angle_",17) == 0)
+      {
+        if (strcmp(argv[i],"-drop_scan_angle_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropScanAngleAbove(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_scan_angle_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropScanAngleBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }    
+        else if (strcmp(argv[i],"-drop_scan_angle_between") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropScanAngleBetween(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
+      else if (strcmp(argv[i],"-drop_synthetic") == 0)
+      {
+        add_criterion(new LAScriterionDropSynthetic());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_keypoint") == 0)
+      {
+        add_criterion(new LAScriterionDropKeypoint());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_withheld") == 0)
+      {
+        add_criterion(new LAScriterionDropWithheld());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_overlap") == 0)
+      {
+        add_criterion(new LAScriterionDropOverlap());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-drop_wavepacket") == 0)
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: max_Y\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionDropYAbove(atoi(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i]='\0';
+        i+=1;
+        add_criterion(new LAScriterionDropWavepacket(atoi(argv[i])));
+        *argv[i]='\0';
       }
-      else
+      else if (strncmp(argv[i],"-drop_user_data", 15) == 0)
       {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strncmp(argv[i],"-drop_Z", 7) == 0)
-    {
-      if (strcmp(argv[i],"-drop_Z") == 0)
-      {
-        if ((i+2) >= argc)
+        if (strcmp(argv[i],"-drop_user_data") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Z max_Z\n", argv[i]);
-          return FALSE;
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: ID\n", argv[i]);
+            return FALSE;
+          }
+          *argv[i]='\0';
+          i+=1;
+          do
+          {
+            add_criterion(new LAScriterionDropUserData(atoi(argv[i])));
+            *argv[i]='\0';
+            i+=1;
+          } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+          i-=1;
         }
-        add_criterion(new LAScriterionDropZ(atoi(argv[i+1]), atoi(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-      }
-      else if (strcmp(argv[i],"-drop_Z_below") == 0)
-      {
-        if ((i+1) >= argc)
+        else if (strcmp(argv[i],"-drop_user_data_below") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: min_Z\n", argv[i]);
-          return FALSE;
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropUserDataBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
-        add_criterion(new LAScriterionDropZBelow(atoi(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-      }
-      else if (strcmp(argv[i],"-drop_Z_above") == 0)
-      {
-        if ((i+1) >= argc)
+        else if (strcmp(argv[i],"-drop_user_data_above") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: max_Z\n", argv[i]);
-          return FALSE;
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropUserDataAbove(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
-        add_criterion(new LAScriterionDropZAbove(atoi(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        else if (strcmp(argv[i],"-drop_user_data_between") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_value max_value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropUserDataBetween(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
       }
-      else
+      else if (strncmp(argv[i],"-drop_point_source", 18) == 0)
       {
-        fprintf(stderr,"ERROR: '%s' is not recognized. check documentation with '-h'.\n", argv[i]);
-        return FALSE;
+        if (strcmp(argv[i],"-drop_point_source") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: ID\n", argv[i]);
+            return FALSE;
+          }
+          *argv[i]='\0';
+          i+=1;
+          do
+          {
+            add_criterion(new LAScriterionDropPointSource(atoi(argv[i])));
+            *argv[i]='\0';
+            i+=1;
+          } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+          i-=1;
+        }
+        else if (strcmp(argv[i],"-drop_point_source_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_ID\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropPointSourceBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_point_source_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_ID\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropPointSourceAbove(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_point_source_between") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropPointSourceBetween(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_gps", 9) == 0)
+      {
+        if (strcmp(argv[i],"-drop_gps_time_above") == 0 || strcmp(argv[i],"-drop_gpstime_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_gps_time\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropGpsTimeAbove(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_gps_time_below") == 0 || strcmp(argv[i],"-drop_gpstime_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_gps_time\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropGpsTimeBelow(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-drop_gps_time_between") == 0 || strcmp(argv[i],"-drop_gpstime_between") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropGpsTimeBetween(atof(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
       }
     }
-    else if (strcmp(argv[i],"-keep_tile") == 0)
-    {
-      if ((i+3) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 3 arguments: llx lly size\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepTile((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
-    }
-    else if (strcmp(argv[i],"-keep_circle") == 0)
-    {
-      if ((i+3) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 3 arguments: center_x center_y radius\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepCircle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
-    }
-    else if ((strcmp(argv[i],"-first_only") == 0) || (strcmp(argv[i],"-keep_first") == 0))
+    else if (strcmp(argv[i],"-first_only") == 0)
     {
       add_criterion(new LAScriterionKeepFirstReturn());
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-keep_middle") == 0)
-    {
-      add_criterion(new LAScriterionKeepMiddleReturn());
-      *argv[i]='\0';
-    }
-    else if ((strcmp(argv[i],"-last_only") == 0) || (strcmp(argv[i],"-keep_last") == 0))
+    else if (strcmp(argv[i],"-last_only") == 0)
     {
       add_criterion(new LAScriterionKeepLastReturn());
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-drop_first") == 0)
+    else if (strncmp(argv[i],"-thin_", 6) == 0)
     {
-      add_criterion(new LAScriterionDropFirstReturn());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_first_of_many") == 0)
-    {
-      add_criterion(new LAScriterionDropFirstOfManyReturn());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_middle") == 0)
-    {
-      add_criterion(new LAScriterionDropMiddleReturn());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_last") == 0)
-    {
-      add_criterion(new LAScriterionDropLastReturn());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_last_of_many") == 0)
-    {
-      add_criterion(new LAScriterionDropLastOfManyReturn());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_return") == 0)
-    {
-      if ((i+1) >= argc)
+      if (strcmp(argv[i],"-thin_with_grid") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs at least 1 argument: return_number\n", argv[i]);
-        return FALSE;
-      }
-      *argv[i]='\0';
-      i+=1;
-      do
-      {
-        keep_return_mask |= (1 << atoi(argv[i]));
-        *argv[i]='\0';
-        i+=1;
-      } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-      i-=1;
-    }
-    else if (strcmp(argv[i],"-keep_return_mask") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: return_mask\n", argv[i]);
-        return FALSE;
-      }
-      keep_return_mask = atoi(argv[i+1]);
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_return") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs at least 1 argument: return_number\n", argv[i]);
-        return FALSE;
-      }
-      *argv[i]='\0';
-      i+=1;
-      do
-      {
-        drop_return_mask |= (1 << atoi(argv[i]));
-        *argv[i]='\0';
-        i+=1;
-      } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-      i-=1;
-    }
-    else if (strcmp(argv[i],"-keep_single") == 0 || strcmp(argv[i],"-single_only") == 0)
-    {
-      add_criterion(new LAScriterionKeepSpecificNumberOfReturns(1));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_double") == 0 || strcmp(argv[i],"-double_only") == 0)
-    {
-      add_criterion(new LAScriterionKeepSpecificNumberOfReturns(2));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_triple") == 0 || strcmp(argv[i],"-triple_only") == 0)
-    {
-      add_criterion(new LAScriterionKeepSpecificNumberOfReturns(3));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_quadruple") == 0 || strcmp(argv[i],"-quadruple_only") == 0)
-    {
-      add_criterion(new LAScriterionKeepSpecificNumberOfReturns(4));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_quintuple") == 0 || strcmp(argv[i],"-quintuple_only") == 0)
-    {
-      add_criterion(new LAScriterionKeepSpecificNumberOfReturns(5));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_single") == 0)
-    {
-      add_criterion(new LAScriterionDropSpecificNumberOfReturns(1));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_double") == 0)
-    {
-      add_criterion(new LAScriterionDropSpecificNumberOfReturns(2));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_triple") == 0)
-    {
-      add_criterion(new LAScriterionDropSpecificNumberOfReturns(3));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_quadruple") == 0)
-    {
-      add_criterion(new LAScriterionDropSpecificNumberOfReturns(4));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_quintuple") == 0)
-    {
-      add_criterion(new LAScriterionDropSpecificNumberOfReturns(5));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_scan_direction") == 0)
-    {
-      add_criterion(new LAScriterionDropScanDirection(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-scan_direction_change_only") == 0 || strcmp(argv[i],"-scan_direction_change") == 0)
-    {
-      add_criterion(new LAScriterionScanDirectionChangeOnly());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-edge_of_flight_line_only") == 0 || strcmp(argv[i],"-edge_of_flight_line") == 0)
-    {
-      add_criterion(new LAScriterionEdgeOfFlightLineOnly());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_intensity") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepIntensity(atoi(argv[i+1]), atoi(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-keep_intensity_above") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: max\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepIntensityAbove(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_intensity_above") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: max\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropIntensityAbove(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-keep_intensity_below") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: min\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepIntensityBelow(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_intensity_below") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: min\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropIntensityBelow(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_intensity_between") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropIntensityBetween(atoi(argv[i+1]), atoi(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strncmp(argv[i],"-keep_RGB_", 10) == 0)
-    {
-      if (strcmp(argv[i]+10,"red") == 0)
-      {
-        if ((i+2) >= argc)
+        if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: grid_spacing\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 0));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        add_criterion(new LAScriterionThinWithGrid((F32)atof(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
-      else if (strcmp(argv[i]+10,"green") == 0)
+      else if (strcmp(argv[i],"-thin_with_time") == 0)
       {
-        if ((i+2) >= argc)
+        if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: time_spacing\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 1));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        add_criterion(new LAScriterionThinWithTime((F32)atof(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
-      else if (strcmp(argv[i]+10,"blue") == 0)
-      {
-        if ((i+2) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 2));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-      }
-      else if (strcmp(argv[i]+10,"nir") == 0)
-      {
-        if ((i+2) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
-          return FALSE;
-        }
-        add_criterion(new LAScriterionKeepRGB(atoi(argv[i+1]), atoi(argv[i+2]), 3));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-      }
-      else
-      {
-        fprintf(stderr,"ERROR: '%s' unknown color band\n", argv[i]);
-        return FALSE;
-      }
-    }
-    else if (strcmp(argv[i],"-keep_scan_angle") == 0 || strcmp(argv[i],"-keep_scan") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepScanAngle(atoi(argv[i+1]), atoi(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-drop_abs_scan_angle_above") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: max\n", argv[i]);
-        return FALSE;
-      }
-      I32 angle = atoi(argv[i+1]);
-      add_criterion(new LAScriterionKeepScanAngle(-angle, angle));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_abs_scan_angle_below") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: min\n", argv[i]);
-        return FALSE;
-      }
-      I32 angle = atoi(argv[i+1]);
-      add_criterion(new LAScriterionDropScanAngleBetween(-angle+1, angle-1));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_scan_angle_above") == 0 || strcmp(argv[i],"-drop_scan_above") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: max\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropScanAngleAbove(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_scan_angle_below") == 0 || strcmp(argv[i],"-drop_scan_below") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: min\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropScanAngleBelow(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }    
-    else if (strcmp(argv[i],"-drop_scan_angle_between") == 0 || strcmp(argv[i],"-drop_scan_between") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropScanAngleBetween(atoi(argv[i+1]), atoi(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-keep_classification") == 0 || strcmp(argv[i],"-keep_class") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 at least argument: classification\n", argv[i]);
-        return FALSE;
-      }
-      *argv[i]='\0';
-      i+=1;
-      do
-      {
-        keep_classification_mask |= (1 << atoi(argv[i]));
-        *argv[i]='\0';
-        i+=1;
-      } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-      i-=1;
-    }
-    else if (strcmp(argv[i],"-keep_classification_mask") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: classifications_mask\n", argv[i]);
-        return FALSE;
-      }
-      keep_classification_mask = atoi(argv[i+1]);
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_classification") == 0 || strcmp(argv[i],"-drop_class") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs at least 1 argument: classification\n", argv[i]);
-        return FALSE;
-      }
-      *argv[i]='\0';
-      i+=1;
-      do
-      {
-        drop_classification_mask |= (1 << atoi(argv[i]));
-        *argv[i]='\0';
-        i+=1;
-      } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-      i-=1;
-    }
-    else if (strcmp(argv[i],"-drop_synthetic") == 0)
-    {
-      add_criterion(new LAScriterionDropSynthetic());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_synthetic") == 0)
-    {
-      add_criterion(new LAScriterionKeepSynthetic());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_keypoint") == 0)
-    {
-      add_criterion(new LAScriterionDropKeypoint());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_keypoint") == 0)
-    {
-      add_criterion(new LAScriterionKeepKeypoint());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_withheld") == 0)
-    {
-      add_criterion(new LAScriterionDropWithheld());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_withheld") == 0)
-    {
-      add_criterion(new LAScriterionKeepWithheld());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_overlap") == 0)
-    {
-      add_criterion(new LAScriterionDropOverlap());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_overlap") == 0)
-    {
-      add_criterion(new LAScriterionKeepOverlap());
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_wavepacket") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
-        return FALSE;
-      }
-      *argv[i]='\0';
-      i+=1;
-      add_criterion(new LAScriterionKeepWavepacket(atoi(argv[i])));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-drop_wavepacket") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
-        return FALSE;
-      }
-      *argv[i]='\0';
-      i+=1;
-      add_criterion(new LAScriterionDropWavepacket(atoi(argv[i])));
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-keep_user_data") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepUserData(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-keep_user_data_between") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_value max_value\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepUserDataBetween(atoi(argv[i+1]), atoi(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-drop_user_data") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropUserData(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_user_data_below") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: min_value\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropUserDataBelow(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_user_data_above") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: max_value\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropUserDataAbove(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_user_data_between") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_value max_value\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropUserDataBetween(atoi(argv[i+1]), atoi(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-keep_point_source") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: ID\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepPointSource(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-keep_point_source_between") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepPointSourceBetween(atoi(argv[i+1]), atoi(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-drop_point_source") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: ID\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropPointSource(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_point_source_below") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: min_ID\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropPointSourceBelow(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_point_source_above") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: max_ID\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropPointSourceAbove(atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_point_source_between") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropPointSourceBetween(atoi(argv[i+1]), atoi(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-keep_gps_time") == 0 || strcmp(argv[i],"-keep_gpstime") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepGpsTime(atof(argv[i+1]), atof(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-drop_gps_time_above") == 0 || strcmp(argv[i],"-drop_gpstime_above") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: max_gps_time\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropGpsTimeAbove(atof(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_gps_time_below") == 0 || strcmp(argv[i],"-drop_gpstime_below") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: min_gps_time\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropGpsTimeBelow(atof(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-drop_gps_time_between") == 0 || strcmp(argv[i],"-drop_gpstime_between") == 0)
-    {
-      if ((i+2) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionDropGpsTimeBetween(atof(argv[i+1]), atof(argv[i+2])));
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-keep_every_nth") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: nth\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepEveryNth((I32)atoi(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-keep_random_fraction") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: fraction\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionKeepRandomFraction((F32)atof(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-thin_with_grid") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: grid_spacing\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionThinWithGrid((F32)atof(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-thin_with_time") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: time_spacing\n", argv[i]);
-        return FALSE;
-      }
-      add_criterion(new LAScriterionThinWithTime((F32)atof(argv[i+1])));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
   }
 
@@ -2442,9 +2435,9 @@ void LASfilter::addClipBox(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y
   add_criterion(new LAScriterionKeepxyz(min_x, min_y, min_z, max_x, max_y, max_z));
 }
 
-void LASfilter::addScanDirectionChangeOnly()
+void LASfilter::addKeepScanDirectionChange()
 {
-  add_criterion(new LAScriterionScanDirectionChangeOnly());
+  add_criterion(new LAScriterionKeepScanDirectionChange());
 }
 
 BOOL LASfilter::filter(const LASpoint* point)
