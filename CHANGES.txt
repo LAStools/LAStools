@@ -1,5 +1,10 @@
-24 January 2015 -- txt2las: better support for storing attributes in "Extra Bytes with '-add_attribute'
-24 January 2015 -- NEW: laspublish to visualize and download LiDAR in a Web browser with Potree
+19 February 2016 -- LASlayers: bug fix for delete layers in combination with filters or transform layers
+18 February 2016 -- lasinfo: more useful '-set_number_of_variable_length_records' and friends
+16 February 2016 -- lasclip & lascanopy: avoid crash when SHP file contains completely emtpy records
+7 February 2016 -- las2dem and blast2dem: small bug fix for additional '-scale 2.1' argument
+7 February 2016 -- LAStools: support for EPSG code 4326
+24 January 2016 -- txt2las: better support for storing attributes in "Extra Bytes with '-add_attribute'
+24 January 2016 -- NEW: laspublish to visualize and download LiDAR in a Web browser with Potree
 19 January 2016 -- LASlib: new transform to '-scale_rgb 1.5 2.1 1.8' 
 19 January 2015 -- NEW: lasreturn repairs 'number of returns'. geometrically analyzes multi-returns
 10 January 2016 -- all GUIs: edit ".\LAStools\bin\serf\geo\my_epsg.csv" to add your own EPSG codes
