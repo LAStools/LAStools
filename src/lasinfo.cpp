@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
   bool report_outside = false;
   bool repair_bb = false;
   bool repair_counters = false;
-  bool change_header = false;
+  bool edit_header = false;
   I32 set_file_source_ID = -1;
   I32 set_global_encoding = -1;
   I64 set_project_ID_GUID_data_1 = -1;
@@ -221,12 +221,13 @@ int main(int argc, char *argv[])
 	I8* set_generating_software = 0;
 	I32 set_creation_day = -1;
 	I32 set_creation_year = -1;
+  U16 set_header_size = 0;
+  U32 set_offset_to_point_data = 0;
+  I32 set_number_of_variable_length_records = -1;
   I32 set_point_data_format = -1;
   I32 set_point_data_record_length = -1;
   I32 set_number_of_point_records = -1;
   I32 set_number_of_points_by_return[5] = {-1, -1, -1, -1, -1};
-  U16 set_header_size = 0;
-  U32 set_offset_to_point_data = 0;
   F64* set_bounding_box = 0;
   F64* set_offset = 0;
   F64* set_scale = 0;
@@ -420,7 +421,7 @@ int main(int argc, char *argv[])
       }
 			i++;
 			set_file_source_ID = atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_GUID") == 0)
     {
@@ -442,7 +443,7 @@ int main(int argc, char *argv[])
           byebye(true);
         }
       }
-      change_header = true;
+      edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_system_identifier") == 0)
     {
@@ -455,7 +456,7 @@ int main(int argc, char *argv[])
 			set_system_identifier = new I8[32];
       memset(set_system_identifier, 0, 32);
       strncpy(set_system_identifier, argv[i], 32);
-      change_header = true;
+      edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_generating_software") == 0)
     {
@@ -468,7 +469,7 @@ int main(int argc, char *argv[])
 			set_generating_software = new I8[32];
       memset(set_generating_software, 0, 32);
       strncpy(set_generating_software, argv[i], 32);
-      change_header = true;
+      edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_bb") == 0 || strcmp(argv[i],"-set_bounding_box") == 0)
     {
@@ -490,7 +491,7 @@ int main(int argc, char *argv[])
       set_bounding_box[2] = atof(argv[i]);
 			i++;
       set_bounding_box[4] = atof(argv[i]);
-      change_header = true;
+      edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_offset") == 0)
     {
@@ -506,7 +507,7 @@ int main(int argc, char *argv[])
       set_offset[1] = atof(argv[i]);
 			i++;
       set_offset[2] = atof(argv[i]);
-      change_header = true;
+      edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_scale") == 0)
     {
@@ -522,7 +523,7 @@ int main(int argc, char *argv[])
       set_scale[1] = atof(argv[i]);
 			i++;
       set_scale[2] = atof(argv[i]);
-      change_header = true;
+      edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_global_encoding") == 0)
     {
@@ -533,7 +534,7 @@ int main(int argc, char *argv[])
       }
 			i++;
       set_global_encoding = atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_version") == 0)
     {
@@ -552,7 +553,7 @@ int main(int argc, char *argv[])
       }
       set_version_major = (I8)major;
       set_version_minor = (I8)minor;
-      change_header = true;
+      edit_header = true;
     }
     else if (strcmp(argv[i],"-set_creation_date") == 0 || strcmp(argv[i],"-set_file_creation") == 0)
     {
@@ -565,7 +566,7 @@ int main(int argc, char *argv[])
       set_creation_day = (U16)atoi(argv[i]);
 			i++;
       set_creation_year = (U16)atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_number_of_point_records") == 0 )
     {
@@ -576,7 +577,7 @@ int main(int argc, char *argv[])
       }
 			i++;
       set_number_of_point_records = atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
     }
     else if (strcmp(argv[i],"-set_number_of_points_by_return") == 0 )
     {
@@ -595,7 +596,7 @@ int main(int argc, char *argv[])
       set_number_of_points_by_return[3] = atoi(argv[i]);
 			i++;
       set_number_of_points_by_return[4] = atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
     }
     else if (strcmp(argv[i],"-set_header_size") == 0 )
     {
@@ -606,7 +607,7 @@ int main(int argc, char *argv[])
       }
 			i++;
       set_header_size = atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
     }
     else if (strcmp(argv[i],"-set_offset_to_point_data") == 0)
     {
@@ -617,7 +618,18 @@ int main(int argc, char *argv[])
       }
 			i++;
       set_offset_to_point_data = atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
+    }
+    else if (strcmp(argv[i],"-set_number_of_variable_length_records") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+        byebye(true);
+      }
+			i++;
+      set_number_of_variable_length_records = atoi(argv[i]);
+      edit_header = true;
     }
     else if (strcmp(argv[i],"-set_point_data_format") == 0)
     {
@@ -628,7 +640,7 @@ int main(int argc, char *argv[])
       }
 			i++;
       set_point_data_format = atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
     }
     else if (strcmp(argv[i],"-set_point_data_record_length") == 0)
     {
@@ -639,7 +651,7 @@ int main(int argc, char *argv[])
       }
 			i++;
       set_point_data_record_length = atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
     }
     else if (strcmp(argv[i],"-set_start_of_waveform_data_packet_record") == 0)
     {
@@ -650,7 +662,7 @@ int main(int argc, char *argv[])
       }
 			i++;
       set_start_of_waveform_data_packet_record = atoi(argv[i]);
-      change_header = true;
+      edit_header = true;
     }
     else if (strcmp(argv[i],"-progress") == 0)
     {
@@ -717,15 +729,188 @@ int main(int argc, char *argv[])
     {
       if (lasreadopener.is_merged())
       {
-        fprintf(file_out, "lasinfo report for %u merged files\012", lasreadopener.get_file_name_number());
+        fprintf(file_out, "lasinfo (%u) report for %u merged files\012", LAS_TOOLS_VERSION, lasreadopener.get_file_name_number());
       }
       else if (lasreadopener.is_piped())
       {
-        fprintf(file_out, "lasinfo report for piped input\012");
+        fprintf(file_out, "lasinfo (%u) report for piped input\012", LAS_TOOLS_VERSION);
       }
       else if (lasreadopener.get_file_name())
       {
-        fprintf(file_out, "lasinfo report for %s\012", lasreadopener.get_file_name(lasreadopener.get_file_name_current()));
+        fprintf(file_out, "lasinfo (%u) report for %s\012", LAS_TOOLS_VERSION, lasreadopener.get_file_name(lasreadopener.get_file_name_current()));
+      }
+    }
+
+    if (edit_header)
+    {
+      if (lasreadopener.is_piped())
+      {
+        fprintf(stderr, "ERROR: cannot edit header of piped input\n");
+        edit_header = false;
+      }
+      else if (lasreadopener.is_merged())
+      {
+        fprintf(stderr, "ERROR: cannot edit header of merged input\n");
+        edit_header = false;
+      }
+      else if (lasreadopener.is_buffered())
+      {
+        fprintf(stderr, "ERROR: cannot edit header of buffered input\n");
+        edit_header = false;
+      }
+      const CHAR* file_name = lasreadopener.get_file_name(lasreadopener.get_file_name_current());
+      if ((strstr(file_name, ".laz") == 0) && (strstr(file_name, ".las") == 0) && (strstr(file_name, ".LAZ") == 0) && (strstr(file_name, ".LAS") == 0))
+      {
+        fprintf(stderr, "ERROR: can only edit for LAS or LAZ files, not for '%s'\n", file_name);
+        edit_header = false;
+      }
+      FILE* file = fopen(file_name, "rb+");
+      if (file == 0)
+      {
+        fprintf (stderr, "ERROR: could not open file '%s' for edit of header\n", file_name);
+        edit_header = false;
+      }
+      else
+      {
+        if (set_file_source_ID != -1)
+        {
+          U16 file_source_ID = U16_CLAMP(set_file_source_ID);
+          fseek(file, 4, SEEK_SET);
+          fwrite(&file_source_ID, sizeof(U16), 1, file);
+        }
+        if (set_global_encoding != -1)
+        {
+          U16 global_encoding = U16_CLAMP(set_global_encoding);
+          fseek(file, 6, SEEK_SET);
+          fwrite(&global_encoding, sizeof(U16), 1, file);
+        }
+        if (set_project_ID_GUID_data_1 != -1)
+        {
+          fseek(file, 8, SEEK_SET);
+          U32 GUID_data_1 = U32_CLAMP(set_project_ID_GUID_data_1);
+          U16 GUID_data_2 = U16_CLAMP(set_project_ID_GUID_data_2);
+          U16 GUID_data_3 = U16_CLAMP(set_project_ID_GUID_data_3);
+          U16 GUID_data_4a = U16_CLAMP(set_project_ID_GUID_data_4a);
+          U16 GUID_data_4b_a = U16_CLAMP(set_project_ID_GUID_data_4b >> 32);
+          U32 GUID_data_4b_b = U32_CLAMP(set_project_ID_GUID_data_4b & 0xFFFFFFFF);
+          fwrite(&GUID_data_1, sizeof(U32), 1, file);
+          fwrite(&GUID_data_2, sizeof(U16), 1, file);
+          fwrite(&GUID_data_3, sizeof(U16), 1, file);
+          fwrite(&GUID_data_4a, sizeof(U16), 1, file);
+          fwrite(&GUID_data_4b_a, sizeof(U16), 1, file);
+          fwrite(&GUID_data_4b_b, sizeof(U32), 1, file);
+        }
+        if (set_version_major != -1)
+        {
+          fseek(file, 24, SEEK_SET);
+          fwrite(&set_version_major, sizeof(I8), 1, file);
+        }
+        if (set_version_minor != -1)
+        {
+          fseek(file, 25, SEEK_SET);
+          fwrite(&set_version_minor, sizeof(I8), 1, file);
+        }
+        if (set_system_identifier)
+        {
+          fseek(file, 26, SEEK_SET);
+          fwrite(set_system_identifier, sizeof(I8), 32, file);
+        }
+        if (set_generating_software)
+        {
+          fseek(file, 58, SEEK_SET);
+          fwrite(set_generating_software, sizeof(I8), 32, file);
+        }
+        if (set_creation_day != -1)
+        {
+          U16 creation_day = U16_CLAMP(set_creation_day);
+          fseek(file, 90, SEEK_SET);
+          fwrite(&creation_day, sizeof(U16), 1, file);
+        }
+        if (set_creation_year != -1)
+        {
+          U16 creation_year = U16_CLAMP(set_creation_year);
+          fseek(file, 92, SEEK_SET);
+          fwrite(&creation_year, sizeof(U16), 1, file);
+        }
+        if (set_header_size)
+        {
+          fseek(file, 94, SEEK_SET);
+          fwrite(&set_header_size, sizeof(U16), 1, file);
+        }
+        if (set_offset_to_point_data)
+        {
+          fseek(file, 96, SEEK_SET);
+          fwrite(&set_offset_to_point_data, sizeof(U32), 1, file);
+        }
+        if (set_number_of_variable_length_records != -1)
+        {
+          fseek(file, 100, SEEK_SET);
+          fwrite(&set_number_of_variable_length_records, sizeof(U32), 1, file);
+        }
+        if (set_point_data_format != -1)
+        {
+          U8 point_data_format = U8_CLAMP(set_point_data_format);
+          fseek(file, 104, SEEK_SET);
+          fwrite(&point_data_format, sizeof(U8), 1, file);
+        }
+        if (set_point_data_record_length != -1)
+        {
+          U16 point_data_record_length = U16_CLAMP(set_point_data_record_length);
+          fseek(file, 105, SEEK_SET);
+          fwrite(&point_data_record_length, sizeof(U16), 1, file);
+        }
+        if (set_number_of_point_records != -1)
+        {
+          fseek(file, 107, SEEK_SET);
+          fwrite(&set_number_of_point_records, sizeof(I32), 1, file);
+        }
+        if (set_number_of_points_by_return[0] != -1)
+        {
+          fseek(file, 111, SEEK_SET);
+          fwrite(&(set_number_of_points_by_return[0]), sizeof(I32), 1, file);
+        }
+        if (set_number_of_points_by_return[1] != -1)
+        {
+          fseek(file, 115, SEEK_SET);
+          fwrite(&(set_number_of_points_by_return[1]), sizeof(I32), 1, file);
+        }
+        if (set_number_of_points_by_return[2] != -1)
+        {
+          fseek(file, 119, SEEK_SET);
+          fwrite(&(set_number_of_points_by_return[2]), sizeof(I32), 1, file);
+        }
+        if (set_number_of_points_by_return[3] != -1)
+        {
+          fseek(file, 123, SEEK_SET);
+          fwrite(&(set_number_of_points_by_return[3]), sizeof(I32), 1, file);
+        }
+        if (set_number_of_points_by_return[4] != -1)
+        {
+          fseek(file, 127, SEEK_SET);
+          fwrite(&(set_number_of_points_by_return[4]), sizeof(I32), 1, file);
+        }
+        if (set_scale)
+        {
+          fseek(file, 131, SEEK_SET);
+          fwrite(set_scale, 3*sizeof(F64), 1, file);
+        }
+        if (set_offset)
+        {
+          fseek(file, 155, SEEK_SET);
+          fwrite(set_offset, 3*sizeof(F64), 1, file);
+        }
+        if (set_bounding_box)
+        {
+          fseek(file, 179, SEEK_SET);
+          fwrite(set_bounding_box, 6*sizeof(F64), 1, file);
+        }
+        if (set_start_of_waveform_data_packet_record != -1)
+        {
+          fseek(file, 227, SEEK_SET);
+          fwrite(&set_start_of_waveform_data_packet_record, sizeof(I64), 1, file);
+        }
+        if (verbose) fprintf(stderr, "edited '%s' ...\n", file_name);
+        fclose(file);
       }
     }
 
@@ -758,7 +943,7 @@ int main(int argc, char *argv[])
       set_creation_year = creation.wYear;
       // leap year handling
       if ((((creation.wYear)%4) == 0) && (creation.wMonth > 2)) set_creation_day++;
-      change_header = true;
+      edit_header = true;
 #endif
     }
 
@@ -3246,169 +3431,33 @@ int main(int argc, char *argv[])
 
     FILE* file = 0;
 
-    if (repair_bb || repair_counters || change_header)
+    if (repair_bb || repair_counters)
     {
       if (lasreadopener.is_piped())
       {
-        fprintf(stderr, "ERROR: cannot change or repair header of piped input\n");
-        repair_bb = repair_counters = change_header = false;
+        fprintf(stderr, "ERROR: cannot repair header of piped input\n");
+        repair_bb = repair_counters = false;
       }
       else if (lasreadopener.is_merged())
       {
-        fprintf(stderr, "ERROR: cannot change or repair header of merged input\n");
-        repair_bb = repair_counters = change_header = false;
+        fprintf(stderr, "ERROR: cannot repair header of merged input\n");
+        repair_bb = repair_counters = false;
       }
       else if (lasreadopener.is_buffered())
       {
-        fprintf(stderr, "ERROR: cannot change or repair header of buffered input\n");
-        repair_bb = repair_counters = change_header = false;
+        fprintf(stderr, "ERROR: cannot repair header of buffered input\n");
+        repair_bb = repair_counters = false;
       }
       else if (lasreader->get_format() > LAS_TOOLS_FORMAT_LAZ)
       {
-        fprintf(stderr, "ERROR: can only change or repair header for LAS or LAZ files, not for '%s'\n", lasreadopener.get_file_name());
-        repair_bb = repair_counters = change_header = false;
+        fprintf(stderr, "ERROR: can only repair header for LAS or LAZ files, not for '%s'\n", lasreadopener.get_file_name());
+        repair_bb = repair_counters = false;
       }
       file = fopen(lasreadopener.get_file_name(), "rb+");
       if (file == 0)
       {
-        fprintf (stderr, "ERROR: could not reopen file '%s' for change or repair of header\n", lasreadopener.get_file_name());
-        repair_bb = repair_counters = change_header = false;
-      }
-    }
-
-    if (change_header)
-    {
-      if (set_file_source_ID != -1)
-      {
-        U16 file_source_ID = U16_CLAMP(set_file_source_ID);
-        fseek(file, 4, SEEK_SET);
-        fwrite(&file_source_ID, sizeof(U16), 1, file);
-      }
-      if (set_global_encoding != -1)
-      {
-        U16 global_encoding = U16_CLAMP(set_global_encoding);
-        fseek(file, 6, SEEK_SET);
-        fwrite(&global_encoding, sizeof(U16), 1, file);
-      }
-      if (set_project_ID_GUID_data_1 != -1)
-      {
-        fseek(file, 8, SEEK_SET);
-        U32 GUID_data_1 = U32_CLAMP(set_project_ID_GUID_data_1);
-        U16 GUID_data_2 = U16_CLAMP(set_project_ID_GUID_data_2);
-        U16 GUID_data_3 = U16_CLAMP(set_project_ID_GUID_data_3);
-        U16 GUID_data_4a = U16_CLAMP(set_project_ID_GUID_data_4a);
-        U16 GUID_data_4b_a = U16_CLAMP(set_project_ID_GUID_data_4b >> 32);
-        U32 GUID_data_4b_b = U32_CLAMP(set_project_ID_GUID_data_4b & 0xFFFFFFFF);
-        fwrite(&GUID_data_1, sizeof(U32), 1, file);
-        fwrite(&GUID_data_2, sizeof(U16), 1, file);
-        fwrite(&GUID_data_3, sizeof(U16), 1, file);
-        fwrite(&GUID_data_4a, sizeof(U16), 1, file);
-        fwrite(&GUID_data_4b_a, sizeof(U16), 1, file);
-        fwrite(&GUID_data_4b_b, sizeof(U32), 1, file);
-      }
-      if (set_version_major != -1)
-      {
-        fseek(file, 24, SEEK_SET);
-        fwrite(&set_version_major, sizeof(I8), 1, file);
-      }
-      if (set_version_minor != -1)
-      {
-        fseek(file, 25, SEEK_SET);
-        fwrite(&set_version_minor, sizeof(I8), 1, file);
-      }
-      if (set_system_identifier)
-      {
-        fseek(file, 26, SEEK_SET);
-        fwrite(set_system_identifier, sizeof(I8), 32, file);
-      }
-      if (set_generating_software)
-      {
-        fseek(file, 58, SEEK_SET);
-        fwrite(set_generating_software, sizeof(I8), 32, file);
-      }
-      if (set_creation_day != -1)
-      {
-        U16 creation_day = U16_CLAMP(set_creation_day);
-        fseek(file, 90, SEEK_SET);
-        fwrite(&creation_day, sizeof(U16), 1, file);
-      }
-      if (set_creation_year != -1)
-      {
-        U16 creation_year = U16_CLAMP(set_creation_year);
-        fseek(file, 92, SEEK_SET);
-        fwrite(&creation_year, sizeof(U16), 1, file);
-      }
-      if (set_header_size)
-      {
-        fseek(file, 94, SEEK_SET);
-        fwrite(&set_header_size, sizeof(U16), 1, file);
-      }
-      if (set_offset_to_point_data)
-      {
-        fseek(file, 96, SEEK_SET);
-        fwrite(&set_offset_to_point_data, sizeof(U32), 1, file);
-      }
-      if (set_point_data_format != -1)
-      {
-        U8 point_data_format = U8_CLAMP(set_point_data_format);
-        fseek(file, 104, SEEK_SET);
-        fwrite(&point_data_format, sizeof(U8), 1, file);
-      }
-      if (set_point_data_record_length != -1)
-      {
-        U16 point_data_record_length = U16_CLAMP(set_point_data_record_length);
-        fseek(file, 105, SEEK_SET);
-        fwrite(&point_data_record_length, sizeof(U16), 1, file);
-      }
-      if (set_number_of_point_records != -1)
-      {
-        fseek(file, 107, SEEK_SET);
-        fwrite(&set_number_of_point_records, sizeof(I32), 1, file);
-      }
-      if (set_number_of_points_by_return[0] != -1)
-      {
-        fseek(file, 111, SEEK_SET);
-        fwrite(&(set_number_of_points_by_return[0]), sizeof(I32), 1, file);
-      }
-      if (set_number_of_points_by_return[1] != -1)
-      {
-        fseek(file, 115, SEEK_SET);
-        fwrite(&(set_number_of_points_by_return[1]), sizeof(I32), 1, file);
-      }
-      if (set_number_of_points_by_return[2] != -1)
-      {
-        fseek(file, 119, SEEK_SET);
-        fwrite(&(set_number_of_points_by_return[2]), sizeof(I32), 1, file);
-      }
-      if (set_number_of_points_by_return[3] != -1)
-      {
-        fseek(file, 123, SEEK_SET);
-        fwrite(&(set_number_of_points_by_return[3]), sizeof(I32), 1, file);
-      }
-      if (set_number_of_points_by_return[4] != -1)
-      {
-        fseek(file, 127, SEEK_SET);
-        fwrite(&(set_number_of_points_by_return[4]), sizeof(I32), 1, file);
-      }
-      if (set_scale)
-      {
-        fseek(file, 131, SEEK_SET);
-        fwrite(set_scale, 3*sizeof(F64), 1, file);
-      }
-      if (set_offset)
-      {
-        fseek(file, 155, SEEK_SET);
-        fwrite(set_offset, 3*sizeof(F64), 1, file);
-      }
-      if (set_bounding_box)
-      {
-        fseek(file, 179, SEEK_SET);
-        fwrite(set_bounding_box, 6*sizeof(F64), 1, file);
-      }
-      if (set_start_of_waveform_data_packet_record != -1)
-      {
-        fseek(file, 227, SEEK_SET);
-        fwrite(&set_start_of_waveform_data_packet_record, sizeof(I64), 1, file);
+        fprintf (stderr, "ERROR: could not reopen file '%s' for repair of header\n", lasreadopener.get_file_name());
+        repair_bb = repair_counters = false;
       }
     }
 
