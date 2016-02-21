@@ -46,7 +46,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 160124
+#define LAS_TOOLS_VERSION 160221
 
 #include <stdio.h>
 #include <string.h>
@@ -179,26 +179,26 @@ public:
 class LASheader : public LASquantizer, public LASattributer
 {
 public:
-  CHAR file_signature[4];
-  U16 file_source_ID;
-  U16 global_encoding;
-  U32 project_ID_GUID_data_1;
-  U16 project_ID_GUID_data_2;
-  U16 project_ID_GUID_data_3;
-  U8 project_ID_GUID_data_4[8];
-  U8 version_major;
-  U8 version_minor;
-  CHAR system_identifier[32];
-  CHAR generating_software[32];
-  U16 file_creation_day;
-  U16 file_creation_year;
-  U16 header_size;
-  U32 offset_to_point_data;
-  U32 number_of_variable_length_records;
-  U8 point_data_format;
-  U16 point_data_record_length;
-  U32 number_of_point_records;
-  U32 number_of_points_by_return[5];
+  CHAR file_signature[4];                  // starts at byte   0
+  U16 file_source_ID;                      // starts at byte   4
+  U16 global_encoding;                     // starts at byte   6
+  U32 project_ID_GUID_data_1;              // starts at byte   8
+  U16 project_ID_GUID_data_2;              // starts at byte  12
+  U16 project_ID_GUID_data_3;              // starts at byte  14
+  U8 project_ID_GUID_data_4[8];            // starts at byte  16
+  U8 version_major;                        // starts at byte  24
+  U8 version_minor;                        // starts at byte  25
+  CHAR system_identifier[32];              // starts at byte  26
+  CHAR generating_software[32];            // starts at byte  58
+  U16 file_creation_day;                   // starts at byte  90
+  U16 file_creation_year;                  // starts at byte  92
+  U16 header_size;                         // starts at byte  94
+  U32 offset_to_point_data;                // starts at byte  96
+  U32 number_of_variable_length_records;   // starts at byte 100
+  U8 point_data_format;                    // starts at byte 104
+  U16 point_data_record_length;            // starts at byte 105
+  U32 number_of_point_records;             // starts at byte 107
+  U32 number_of_points_by_return[5];       // starts at byte 111
   F64 max_x;
   F64 min_x;
   F64 max_y;

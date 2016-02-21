@@ -718,6 +718,28 @@ private:
   U8 user_data;
 };
 
+class LAScriterionKeepUserDataBelow : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_user_data_below"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), below_user_data); };
+  inline BOOL filter(const LASpoint* point) { return (point->user_data >= below_user_data); };
+  LAScriterionKeepUserDataBelow(U8 below_user_data) { this->below_user_data = below_user_data; };
+private:
+  U8 below_user_data;
+};
+
+class LAScriterionKeepUserDataAbove : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_user_data_above"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), above_user_data); };
+  inline BOOL filter(const LASpoint* point) { return (point->user_data <= above_user_data); };
+  LAScriterionKeepUserDataAbove(U8 above_user_data) { this->above_user_data = above_user_data; };
+private:
+  U8 above_user_data;
+};
+
 class LAScriterionKeepUserDataBetween : public LAScriterion
 {
 public:
@@ -1243,6 +1265,8 @@ void LASfilter::usage() const
   fprintf(stderr,"Filter points based on their user data.\n");
   fprintf(stderr,"  -keep_user_data 1\n");
   fprintf(stderr,"  -drop_user_data 255\n");
+  fprintf(stderr,"  -keep_user_data_below 50\n");
+  fprintf(stderr,"  -keep_user_data_above 150\n");
   fprintf(stderr,"  -keep_user_data_between 10 20\n");
   fprintf(stderr,"  -drop_user_data_below 1\n");
   fprintf(stderr,"  -drop_user_data_above 100\n");
@@ -1692,6 +1716,26 @@ BOOL LASfilter::parse(int argc, char* argv[])
             return FALSE;
           }
           add_criterion(new LAScriterionKeepUserData(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-keep_user_data_below") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepUserDataBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-keep_user_data_above") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepUserDataAbove(atoi(argv[i+1])));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
         else if (strcmp(argv[i],"-keep_user_data_between") == 0)
