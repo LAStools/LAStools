@@ -8,6 +8,14 @@
   only the TIF format is supported. The world coordinates need
   to be either in GeoTIFF tags or in an accompanying *.tfw file.
 
+  By default the 8 bit RGB colors of the TIF file will be scaled
+  up to 16 bits in order to comform the LAS specification. Use the
+  option '-dont_scale_rgb_up' to avoid this automatic up-scaling.
+
+  By default the LiDAR points falling outside of the image or that
+  fall into a no-data area of the image will not be colored. Use
+  option '-zero_rgb' to set their color to (0/0/0) instead,
+
   Please license from martin@rapidlasso.com before using lascolor
   commercially. Please note that the unlicensed version will set
   intensity, gps_time, user data, and point source ID to zero,
