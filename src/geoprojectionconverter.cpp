@@ -2666,6 +2666,9 @@ int GeoProjectionConverter::set_GeogEllipsoidGeoKey(short value)
   case 7019: // Ellipse_GRS_1980
     ellipsoid_id = GEO_ELLIPSOID_GRS1980;
     break;
+  case 7043: // Ellipse_WGS_72
+    ellipsoid_id = GEO_ELLIPSOID_WGS72;
+    break;
   case 7001: // Ellipse_Airy_1830
     ellipsoid_id = GEO_ELLIPSOID_AIRY;
     break;
