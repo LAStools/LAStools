@@ -62,6 +62,7 @@
     * lasoverage
     * lasduplicate
     * lassplit
+    * lasreturn
     * las2tin
     * las2iso
     * las2dem
