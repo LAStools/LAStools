@@ -60,8 +60,9 @@ static const int GEO_PROJECTION_LONG_LAT = 3;
 static const int GEO_PROJECTION_LAT_LONG = 4;
 static const int GEO_PROJECTION_ECEF     = 5;
 static const int GEO_PROJECTION_AEAC     = 6;
-static const int GEO_PROJECTION_OM       = 7;
-static const int GEO_PROJECTION_NONE     = 8;
+static const int GEO_PROJECTION_HOM      = 7;
+static const int GEO_PROJECTION_OS       = 8;
+static const int GEO_PROJECTION_NONE     = 9;
 
 class ReferenceEllipsoid
 {
@@ -113,7 +114,6 @@ static const ReferenceEllipsoid ellipsoid_list[] =
 
 static const short PCS_NAD27_Alabama_East = 26729;
 static const short PCS_NAD27_Alabama_West = 26730;
-static const short PCS_NAD27_Alaska_zone_1 = 26731; /* Hotine Oblique Mercator Projection not supported*/
 static const short PCS_NAD27_Alaska_zone_2 = 26732;
 static const short PCS_NAD27_Alaska_zone_3 = 26733;
 static const short PCS_NAD27_Alaska_zone_4 = 26734;
@@ -365,7 +365,6 @@ static const short PCS_NAD83_Puerto_Rico = 32161;
 
 static const short GCTP_NAD83_Alabama_East = 101;
 static const short GCTP_NAD83_Alabama_West = 102;
-static const short GCTP_NAD83_Alaska_zone_1 = 5001; /* Hotine Oblique Mercator Projection not supported*/
 static const short GCTP_NAD83_Alaska_zone_2 = 5002;
 static const short GCTP_NAD83_Alaska_zone_3 = 5003;
 static const short GCTP_NAD83_Alaska_zone_4 = 5004;
@@ -1216,7 +1215,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
   if (projection)
   {
     unsigned short vertical_geokey = get_VerticalCSTypeGeoKey();
-    if (projection->type == GEO_PROJECTION_UTM || projection->type == GEO_PROJECTION_LCC || projection->type == GEO_PROJECTION_TM || projection->type == GEO_PROJECTION_AEAC || projection->type == GEO_PROJECTION_OM)
+    if (projection->type == GEO_PROJECTION_UTM || projection->type == GEO_PROJECTION_LCC || projection->type == GEO_PROJECTION_TM || projection->type == GEO_PROJECTION_AEAC || projection->type == GEO_PROJECTION_HOM || projection->type == GEO_PROJECTION_OS)
     {
       unsigned short geokey = get_ProjectedCSTypeGeoKey(source);
       if (geokey && geokey != 32767)
@@ -1502,13 +1501,13 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[6].tiff_tag_location = 34736;
         (*geo_keys)[6].count = 1;
         (*geo_keys)[6].value_offset = 2;
-        (*geo_double_params)[2] = aeac->aeac_longitude_of_center;
+        (*geo_double_params)[2] = aeac->aeac_longitude_of_center_degree;
 
         (*geo_keys)[7].key_id = 3081; // ProjCenterLatGeoKey
         (*geo_keys)[7].tiff_tag_location = 34736;
         (*geo_keys)[7].count = 1;
         (*geo_keys)[7].value_offset = 3;
-        (*geo_double_params)[3] = aeac->aeac_latitude_of_center;
+        (*geo_double_params)[3] = aeac->aeac_latitude_of_center_degree;
 
         (*geo_keys)[8].key_id = 3082; // ProjFalseEastingGeoKey
         (*geo_keys)[8].tiff_tag_location = 34736;
@@ -1550,9 +1549,9 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         }
         return true;
       }
-      else if (projection->type == GEO_PROJECTION_OM)
+      else if (projection->type == GEO_PROJECTION_HOM)
       {
-        GeoProjectionParametersOM* om = (GeoProjectionParametersOM*)projection;
+        GeoProjectionParametersHOM* hom = (GeoProjectionParametersHOM*)projection;
 
         num_geo_keys = 13 + (vertical_geokey ? 1 : 0);
         (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys)*num_geo_keys);
@@ -1584,50 +1583,51 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source); 
 
         // here come the 6 double parameters
-
+/*
         (*geo_keys)[4].key_id = 3078; // ProjStdParallel1GeoKey
         (*geo_keys)[4].tiff_tag_location = 34736;
         (*geo_keys)[4].count = 1;
         (*geo_keys)[4].value_offset = 0;
-        (*geo_double_params)[0] = om->om_first_std_parallel_degree;
+        (*geo_double_params)[0] = hom->hom_first_std_parallel_degree;
 
         (*geo_keys)[5].key_id = 3079; // ProjStdParallel2GeoKey
         (*geo_keys)[5].tiff_tag_location = 34736;
         (*geo_keys)[5].count = 1;
         (*geo_keys)[5].value_offset = 1;
-        (*geo_double_params)[1] = om->om_second_std_parallel_degree;
+        (*geo_double_params)[1] = hom->hom_second_std_parallel_degree;
 
         (*geo_keys)[6].key_id = 3088; // ProjCenterLongGeoKey
         (*geo_keys)[6].tiff_tag_location = 34736;
         (*geo_keys)[6].count = 1;
         (*geo_keys)[6].value_offset = 2;
-        (*geo_double_params)[2] = om->om_long_meridian_degree;
+        (*geo_double_params)[2] = hom->hom_long_meridian_degree;
 
         (*geo_keys)[7].key_id = 3081; // ProjNatOriginLatGeoKey
         (*geo_keys)[7].tiff_tag_location = 34736;
         (*geo_keys)[7].count = 1;
         (*geo_keys)[7].value_offset = 3;
-        (*geo_double_params)[3] = om->om_lat_origin_degree;
+        (*geo_double_params)[3] = hom->hom_lat_origin_degree;
 
         (*geo_keys)[8].key_id = 3082; // ProjFalseEastingGeoKey
         (*geo_keys)[8].tiff_tag_location = 34736;
         (*geo_keys)[8].count = 1;
         (*geo_keys)[8].value_offset = 4;
         if (source)
-          (*geo_double_params)[4] = om->om_false_easting_meter / coordinates2meter;
+          (*geo_double_params)[4] = hom->hom_false_easting_meter / coordinates2meter;
         else
-          (*geo_double_params)[4] = om->om_false_easting_meter * meter2coordinates;
+          (*geo_double_params)[4] = hom->hom_false_easting_meter * meter2coordinates;
 
         (*geo_keys)[9].key_id = 3083; // ProjFalseNorthingGeoKey
         (*geo_keys)[9].tiff_tag_location = 34736;
         (*geo_keys)[9].count = 1;
         (*geo_keys)[9].value_offset = 5;
         if (source)
-          (*geo_double_params)[5] = om->om_false_northing_meter / coordinates2meter;
+          (*geo_double_params)[5] = hom->hom_false_northing_meter / coordinates2meter;
         else
-          (*geo_double_params)[5] = om->om_false_northing_meter * meter2coordinates;
+          (*geo_double_params)[5] = hom->hom_false_northing_meter * meter2coordinates;
 
-        // GCS used with custom OM projection
+*/
+        // GCS used with custom HOM projection
         (*geo_keys)[10].key_id = 2048; // GeographicTypeGeoKey
         (*geo_keys)[10].tiff_tag_location = 0;
         (*geo_keys)[10].count = 1;
@@ -1982,7 +1982,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
         else if (projection->type == GEO_PROJECTION_AEAC)
         {
           GeoProjectionParametersAEAC* aeac = (GeoProjectionParametersAEAC*)projection;
-          n += sprintf(&string[n], "PROJECTION[\"Albers_Conic_Equal_Area\"],PARAMETER[\"standard_parallel_1\",%.15g],PARAMETER[\"standard_parallel_2\",%.15g],PARAMETER[\"latitude_of_center\",%.15g],PARAMETER[\"longitude_of_center\",%.15g],", aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree, aeac->aeac_latitude_of_center, aeac->aeac_longitude_of_center);
+          n += sprintf(&string[n], "PROJECTION[\"Albers_Conic_Equal_Area\"],PARAMETER[\"standard_parallel_1\",%.15g],PARAMETER[\"standard_parallel_2\",%.15g],PARAMETER[\"latitude_of_center\",%.15g],PARAMETER[\"longitude_of_center\",%.15g],", aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree, aeac->aeac_latitude_of_center_degree, aeac->aeac_longitude_of_center_degree);
           if (source)
           {
             n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", aeac->aeac_false_easting_meter/coordinates2meter, aeac->aeac_false_northing_meter/coordinates2meter);
@@ -1992,10 +1992,31 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
             n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", aeac->aeac_false_easting_meter*meter2coordinates, aeac->aeac_false_northing_meter*meter2coordinates);
           }
         }
-        else if (projection->type == GEO_PROJECTION_OM)
+        else if (projection->type == GEO_PROJECTION_HOM)
         {
-          free(string);
-          return false;
+          GeoProjectionParametersHOM* hom = (GeoProjectionParametersHOM*)projection;
+          n += sprintf(&string[n], "PROJECTION[\"Hotine_Oblique_Mercator\"],PARAMETER[\"latitude_of_center\",%.15g],PARAMETER[\"longitude_of_center\",%.15g],PARAMETER[\"azimuth\",%.15g],PARAMETER[\"rectified_grid_angle\",%.15g],PARAMETER[\"scale_factor\",%.15g],", hom->hom_latitude_of_center_degree, hom->hom_longitude_of_center_degree, hom->hom_azimuth_degree, hom->hom_rectified_grid_angle_degree , hom->hom_scale_factor);
+          if (source)
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", hom->hom_false_easting_meter/coordinates2meter, hom->hom_false_northing_meter/coordinates2meter);
+          }
+          else
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", hom->hom_false_easting_meter*meter2coordinates, hom->hom_false_northing_meter*meter2coordinates);
+          }
+        }
+        else if (projection->type == GEO_PROJECTION_OS)
+        {
+          GeoProjectionParametersOS* os = (GeoProjectionParametersOS*)projection;
+          n += sprintf(&string[n], "PROJECTION[\"Oblique_Stereographic\"],PARAMETER[\"latitude_of_origin\",%.15g],PARAMETER[\"central_meridian\",%.15g],PARAMETER[\"scale_factor\",%.15g],", os->os_lat_origin_degree, os->os_long_meridian_degree, os->os_scale_factor);
+          if (source)
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", os->os_false_easting_meter/coordinates2meter, os->os_false_northing_meter/coordinates2meter);
+          }
+          else
+          {
+            n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", os->os_false_easting_meter*meter2coordinates, os->os_false_northing_meter*meter2coordinates);
+          }
         }
         else 
         {
@@ -2070,12 +2091,17 @@ bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** p
     else if (projection->type == GEO_PROJECTION_AEAC)
     {
       GeoProjectionParametersAEAC* aeac = (GeoProjectionParametersAEAC*)projection;
-      n += sprintf(&string[n], "+proj=albers +lat_1=%.15g +lat_2=%.15g +lat_0=%.15g +lon_0=%.15g +x_0=%.15g +y_0=%.15g ", aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree, aeac->aeac_latitude_of_center, aeac->aeac_longitude_of_center, aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter);
+      n += sprintf(&string[n], "+proj=albers +lat_1=%.15g +lat_2=%.15g +lat_0=%.15g +lon_0=%.15g +x_0=%.15g +y_0=%.15g ", aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree, aeac->aeac_latitude_of_center_degree, aeac->aeac_longitude_of_center_degree, aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter);
     }
-    else if (projection->type == GEO_PROJECTION_OM)
+    else if (projection->type == GEO_PROJECTION_HOM)
     {
-      free(string);
-      return false;
+      GeoProjectionParametersHOM* hom = (GeoProjectionParametersHOM*)projection;
+      n += sprintf(&string[n], "+proj=omerc +lat_0=%.15g +lonc=%.15g +alpha=%.15g +gamma=%.15g +k=%.15g +x_0=%.15g +y_0=%.15g ", hom->hom_latitude_of_center_degree, hom->hom_longitude_of_center_degree, hom->hom_azimuth_degree, hom->hom_rectified_grid_angle_degree, hom->hom_scale_factor, hom->hom_false_easting_meter, hom->hom_false_northing_meter);
+    }
+    else if (projection->type == GEO_PROJECTION_OS)
+    {
+      GeoProjectionParametersOS* os = (GeoProjectionParametersOS*)projection;
+      n += sprintf(&string[n], "+proj=sterea +lat_0=%.15g +lon_0=%.15g +k=%.15g +x_0=%.15g +y_0=%.15g ", os->os_lat_origin_degree, os->os_long_meridian_degree, os->os_scale_factor, os->os_false_easting_meter, os->os_false_northing_meter);
     }
     else if (projection->type == GEO_PROJECTION_LONG_LAT)
     {
@@ -2125,6 +2151,10 @@ bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** p
     else if (ellipsoid->id == GEO_ELLIPSOID_CLARKE1866)
     {
       n += sprintf(&string[n], "+datum=NAD27 ");
+    }
+    else if (ellipsoid->id == GEO_ELLIPSOID_BESSEL_1841)
+    {
+      n += sprintf(&string[n], "+datum=bessel ");
     }
     else 
     {
@@ -2639,7 +2669,18 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
         return 32767; // user-defined GCS
       }
     }
-    else if (projection->type == GEO_PROJECTION_OM)
+    else if (projection->type == GEO_PROJECTION_HOM)
+    {
+      if (projection->geokey)
+      {
+        return projection->geokey;
+      }
+      else
+      {
+        return 32767; // user-defined GCS
+      }
+    }
+    else if (projection->type == GEO_PROJECTION_OS)
     {
       if (projection->geokey)
       {
@@ -3550,65 +3591,96 @@ void GeoProjectionConverter::set_albers_equal_area_conic_projection(double false
   }
   aeac->aeac_false_easting_meter = falseEastingMeter;
   aeac->aeac_false_northing_meter = falseNorthingMeter;
-  aeac->aeac_latitude_of_center = latCenterDegree;
-  aeac->aeac_longitude_of_center = longCenterDegree;
+  aeac->aeac_latitude_of_center_degree = latCenterDegree;
+  aeac->aeac_longitude_of_center_degree = longCenterDegree;
   aeac->aeac_first_std_parallel_degree = firstStdParallelDegree;
   aeac->aeac_second_std_parallel_degree = secondStdParallelDegree;
-  aeac->aeac_lat_origin_radian = deg2rad*aeac->aeac_latitude_of_center;
-  aeac->aeac_long_meridian_radian = deg2rad*aeac->aeac_longitude_of_center;
+  aeac->aeac_latitude_of_center_radian = deg2rad*aeac->aeac_latitude_of_center_degree;
+  aeac->aeac_longitude_of_center_radian = deg2rad*aeac->aeac_longitude_of_center_degree;
   aeac->aeac_first_std_parallel_radian = deg2rad*aeac->aeac_first_std_parallel_degree;
   aeac->aeac_second_std_parallel_radian = deg2rad*aeac->aeac_second_std_parallel_degree;
   set_projection(aeac, source);
   compute_aeac_parameters(source);
   if (description)
   {
-    sprintf(description, "false east/north: %g/%g [m], origin lat/ meridian long: %g/%g, parallel 1st/2nd: %g/%g", aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter, aeac->aeac_latitude_of_center, aeac->aeac_longitude_of_center, aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree);
+    sprintf(description, "false east/north: %g/%g [m], center lat/long: %g/%g, parallel 1st/2nd: %g/%g", aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter, aeac->aeac_latitude_of_center_degree, aeac->aeac_longitude_of_center_degree, aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree);
   }
 }
 
 // Configure an Oblique Mercator Projection
 //
-// The function set_oblique_mercator_projection() receives the Oblique  
-// Mercator projection parameters as inputs and sets the corresponding state
-// variables.
+// The function set_hotine_oblique_mercator_projection() receives the Hotine  
+// Oblique Mercator projection parameters as inputs and sets the corresponding
+// state variables.
 //
 // falseEastingMeter & falseNorthingMeter are just an offset in meters added 
 // to the final coordinate calculated.
 //
-// latOriginDegree & longMeridianDegree are the "center" latitiude and
+// latCenterDegree & longCenterDegree are the "center" latitiude and
 // longitude in decimal degrees of the area being projected. All coordinates
 // will be calculated in meters relative to this point on the earth.
 //
-// firstStdParallelDegree & secondStdParallelDegree are the two lines of
-// longitude in decimal degrees (that is they run east-west) that define
-// where the "cone" intersects the earth. They bracket the area being projected.
-void GeoProjectionConverter::set_oblique_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description, bool source, const char* name)
+void GeoProjectionConverter::set_hotine_oblique_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latCenterDegree, double longCenterDegree, double azimuthDegree, double rectifiedGridAngleDegree, double scaleFactor, char* description, bool source, const char* name)
 {
-  GeoProjectionParametersOM* om = new GeoProjectionParametersOM();
-  om->type = GEO_PROJECTION_OM;
+  GeoProjectionParametersHOM* hom = new GeoProjectionParametersHOM();
+  hom->type = GEO_PROJECTION_HOM;
   if (name)
   {
-    sprintf(om->name, "%.255s", name);
+    sprintf(hom->name, "%.255s", name);
   }
   else
   {
-    sprintf(om->name, "Oblique Mercator");
+    sprintf(hom->name, "Hotine Oblique Mercator");
   }
-  om->om_false_easting_meter = falseEastingMeter;
-  om->om_false_northing_meter = falseNorthingMeter;
-  om->om_lat_origin_degree = latOriginDegree;
-  om->om_long_meridian_degree = longMeridianDegree;
-  om->om_first_std_parallel_degree = firstStdParallelDegree;
-  om->om_second_std_parallel_degree = secondStdParallelDegree;
-  om->om_lat_origin_radian = deg2rad*om->om_lat_origin_degree;
-  om->om_long_meridian_radian = deg2rad*om->om_long_meridian_degree;
-  om->om_first_std_parallel_radian = deg2rad*om->om_first_std_parallel_degree;
-  om->om_second_std_parallel_radian = deg2rad*om->om_second_std_parallel_degree;
-  set_projection(om, source);
-  compute_om_parameters(source);
+  hom->hom_false_easting_meter = falseEastingMeter;
+  hom->hom_false_northing_meter = falseNorthingMeter;
+  hom->hom_latitude_of_center_degree = latCenterDegree;
+  hom->hom_longitude_of_center_degree = longCenterDegree;
+  hom->hom_azimuth_degree = azimuthDegree;
+  hom->hom_rectified_grid_angle_degree = rectifiedGridAngleDegree;
+  hom->hom_scale_factor = scaleFactor;
+  set_projection(hom, source);
+//  compute_hom_parameters(source);
   if (description)
   {
-    sprintf(description, "false east/north: %g/%g [m], origin lat/ meridian long: %g/%g, parallel 1st/2nd: %g/%g", om->om_false_easting_meter, om->om_false_northing_meter, om->om_lat_origin_degree, om->om_long_meridian_degree, om->om_first_std_parallel_degree, om->om_second_std_parallel_degree);
+    sprintf(description, "false east/north: %g/%g [m], center lat/long: %g/%g, azimuth: %g angle: %g scale: %g", hom->hom_false_easting_meter, hom->hom_false_northing_meter, hom->hom_latitude_of_center_degree, hom->hom_longitude_of_center_degree, hom->hom_azimuth_degree, hom->hom_rectified_grid_angle_degree, hom->hom_scale_factor);
+  }
+}
+
+/*
+  * The function set_oblique_stereographic_projection() receives the Oblique
+  * Stereographic projection parameters as input and sets the corresponding
+  * state variables. 
+  * falseEastingMeter   : Easting/X in meters at the center of the projection
+  * falseNorthingMeter  : Northing/Y in meters at the center of the projection
+  * latOriginDegree     : Latitude in decimal degree at the origin of the projection
+  * longMeridianDegree  : Longitude n decimal degree at the center of the projection
+  * scaleFactor         : Projection scale factor
+*/
+void GeoProjectionConverter::set_oblique_stereographic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor, char* description, bool source, const char* name)
+{
+  GeoProjectionParametersOS* os = new GeoProjectionParametersOS();
+  os->type = GEO_PROJECTION_OS;
+  if (name)
+  {
+    sprintf(os->name, "%.255s", name);
+  }
+  else
+  {
+    sprintf(os->name, "Oblique Stereographic");
+  }
+  os->os_false_easting_meter = falseEastingMeter;
+  os->os_false_northing_meter = falseNorthingMeter;
+  os->os_lat_origin_degree = latOriginDegree;
+  os->os_long_meridian_degree = longMeridianDegree;
+  os->os_scale_factor = scaleFactor;
+  os->os_lat_origin_radian = deg2rad*os->os_lat_origin_degree;
+  os->os_long_meridian_radian = deg2rad*os->os_long_meridian_degree;
+  set_projection(os, source);
+//  compute_os_parameters(source);
+  if (description)
+  {
+    sprintf(description, "false east/north: %g/%g [m], origin lat/meridian long: %g/%g, scale: %g", os->os_false_easting_meter, os->os_false_northing_meter, os->os_lat_origin_degree, os->os_long_meridian_degree, os->os_scale_factor);
   }
 }
 
@@ -4127,9 +4199,6 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     break;
   case 26730: // PCS_NAD27_Alabama_West
     sp_nad27 = true; sp = "AL_W";
-    break;
-  case 26731: // PCS_NAD27_Alaska_zone_1
-    sp_nad27 = true; sp = "AK_1";
     break;
   case 26732: // PCS_NAD27_Alaska_zone_2
     sp_nad27 = true; sp = "AK_2";
@@ -4685,6 +4754,62 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             if (description) sprintf(description, name);
             return true;
           }
+          else if (transform == 9812) // CT_HotineObliqueMercator
+          {
+            double false_easting;
+            int unit_false_easting;
+            double false_northing;
+            int unit_false_northing;
+            double latitude_of_center;
+            int unit_latitude_of_center;
+            double longitude_of_center;
+            int unit_longitude_of_center;
+            double azimuth;
+            int unit_azimuth;
+            double rectified_grid_angle;
+            int unit_rectified_grid_angle;
+            double scale_factor;
+            if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf", &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing, &dummy, &latitude_of_center, &unit_latitude_of_center, &dummy, &longitude_of_center, &unit_longitude_of_center, &dummy,&azimuth, &unit_azimuth, &dummy, &rectified_grid_angle, &unit_rectified_grid_angle, &dummy, &scale_factor) != 19)
+            {
+              fprintf(stderr, "failed to scan HOM parameters from '%s'", line);
+              return false;
+            }
+            double false_easting_meter = unit2meter(false_easting, unit_false_easting);
+            double false_northing_meter = unit2meter(false_northing, unit_false_northing);
+            double latitude_of_center_decdeg = unit2decdeg(latitude_of_center, unit_latitude_of_center);
+            double longitude_of_center_decdeg = unit2decdeg(longitude_of_center, unit_longitude_of_center);
+            double azimuth_decdeg = unit2decdeg(azimuth, unit_azimuth);
+            double rectified_grid_angle_decdeg = unit2decdeg(rectified_grid_angle, unit_rectified_grid_angle);
+            set_hotine_oblique_mercator_projection(false_easting_meter, false_northing_meter, latitude_of_center_decdeg, longitude_of_center_decdeg, azimuth_decdeg, rectified_grid_angle_decdeg, scale_factor, 0, source, name);
+            set_geokey(value, source);
+            if (description) sprintf(description, name);
+            return true;
+          }
+          else if (transform == 9809) // CT_ObliqueStereographic
+          {
+            double latitude_of_origin;
+            int unit_latitude_of_origin;
+            double central_meridian;
+            int unit_central_meridian;
+            double scale_factor;
+            double false_easting;
+            int unit_false_easting;
+            double false_northing;
+            int unit_false_northing;
+            if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_origin, &unit_latitude_of_origin, &dummy, &central_meridian, &unit_central_meridian, &dummy, &scale_factor, &dummy, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 14)
+            {
+              fprintf(stderr, "failed to scan OS parameters from '%s'", line);
+              return false;
+            }
+            double latitude_of_origin_decdeg = unit2decdeg(latitude_of_origin, unit_latitude_of_origin);
+            double central_meridian_decdeg = unit2decdeg(central_meridian, unit_central_meridian);
+            double false_easting_meter = unit2meter(false_easting, unit_false_easting);
+            double false_northing_meter = unit2meter(false_northing, unit_false_northing);
+            set_oblique_stereographic_projection(false_easting_meter, false_northing_meter, latitude_of_origin_decdeg, central_meridian_decdeg, scale_factor, 0, source, name);
+            set_geokey(value, source);
+            if (description) sprintf(description, name);
+            return true;
+          }
           else 
           {
             fprintf(stderr, "transform %d of EPSG code %d not implemented.\n", transform, value);
@@ -5064,7 +5189,7 @@ void GeoProjectionConverter::compute_aeac_parameters(bool source)
   aeac->aeac_one_MINUS_es2 = 1.0 - ellipsoid->eccentricity_squared;
   aeac->aeac_two_es = 2 * ellipsoid->eccentricity;
 
-  double sin_lat = sin(aeac->aeac_lat_origin_radian);
+  double sin_lat = sin(aeac->aeac_latitude_of_center_radian);
   double es_sin = sin_lat * ellipsoid->eccentricity;
   double one_MINUS_SQRes_sin = 1.0 - (es_sin * es_sin);
   double q0 = aeac->aeac_one_MINUS_es2 * (sin_lat / (one_MINUS_SQRes_sin) - (1.0/aeac->aeac_two_es)*log((1.0 - es_sin) / (1.0 + es_sin)));
@@ -5097,50 +5222,6 @@ void GeoProjectionConverter::compute_aeac_parameters(bool source)
     aeac->aeac_rho0 = 0;
   else
     aeac->aeac_rho0 = aeac->aeac_Albers_a_OVER_n * sqrt(aeac->aeac_C - nq0);
-}
-
-void GeoProjectionConverter::compute_om_parameters(bool source)
-{
-  GeoProjectionParametersOM* om = (GeoProjectionParametersOM*)(source ? source_projection : target_projection);
-
-  if (!om || om->type != GEO_PROJECTION_OM) return;
-
-  om->om_one_MINUS_es2 = 1.0 - ellipsoid->eccentricity_squared;
-  om->om_two_es = 2 * ellipsoid->eccentricity;
-
-  double sin_lat = sin(om->om_lat_origin_radian);
-  double es_sin = sin_lat * ellipsoid->eccentricity;
-  double one_MINUS_SQRes_sin = 1.0 - (es_sin * es_sin);
-  double q0 = om->om_one_MINUS_es2 * (sin_lat / (one_MINUS_SQRes_sin) - (1.0/om->om_two_es)*log((1.0 - es_sin) / (1.0 + es_sin)));
-
-  double sin_lat_1 = sin(om->om_first_std_parallel_radian);
-  double cos_lat = cos(om->om_first_std_parallel_radian);
-  es_sin = sin_lat_1 * ellipsoid->eccentricity;
-  one_MINUS_SQRes_sin = 1.0 - (es_sin * es_sin);
-  double m1 = cos_lat / sqrt(one_MINUS_SQRes_sin);
-  double q1 = om->om_one_MINUS_es2 * (sin_lat_1 / (one_MINUS_SQRes_sin) - (1.0/om->om_two_es)*log((1.0 - es_sin) / (1.0 + es_sin)));
-
-  double SQRm1 = m1 * m1;
-  if (fabs(om->om_first_std_parallel_radian - om->om_second_std_parallel_radian) > 1.0e-10)
-  {
-    sin_lat = sin(om->om_second_std_parallel_radian);
-    cos_lat = cos(om->om_second_std_parallel_radian);
-    es_sin = sin_lat * ellipsoid->eccentricity;
-    one_MINUS_SQRes_sin = 1.0 - (es_sin * es_sin);
-    double m2 = cos_lat / sqrt(one_MINUS_SQRes_sin);
-    double q2 = om->om_one_MINUS_es2 * (sin_lat / (one_MINUS_SQRes_sin) - (1.0/om->om_two_es)*log((1.0 - es_sin) / (1.0 + es_sin)));
-    om->om_n = (SQRm1 - m2 * m2) / (q2 - q1);
-  }
-  else
-    om->om_n = sin_lat_1;
-
-  om->om_C = SQRm1 + om->om_n * q1;
-  om->om_Albers_a_OVER_n = ellipsoid->equatorial_radius / om->om_n;
-  double nq0 = om->om_n * q0;
-  if (om->om_C < nq0)
-    om->om_rho0 = 0;
-  else
-    om->om_rho0 = om->om_Albers_a_OVER_n * sqrt(om->om_C - nq0);
 }
 
 // converts UTM coords to lat/long.  Equations from USGS Bulletin 1532 
@@ -6128,7 +6209,7 @@ bool GeoProjectionConverter::AEACtoLL(const double AEACEastingMeter, const doubl
       LatDegree = -PI_OVER_2;
   }
   
-  LongDegree = aeac->aeac_long_meridian_radian + theta / aeac->aeac_n;
+  LongDegree = aeac->aeac_longitude_of_center_radian + theta / aeac->aeac_n;
 
   if (LongDegree > PI)
     LongDegree -= TWO_PI;
@@ -6181,7 +6262,7 @@ bool GeoProjectionConverter::LLtoAEAC(const double LatDegree, const double LongD
     return false; /* Longitude out of range */
   }
 
-  dlam = LongRadian - aeac->aeac_long_meridian_radian;
+  dlam = LongRadian - aeac->aeac_longitude_of_center_radian;
   if (dlam > PI)
   {
     dlam -= TWO_PI;
@@ -6208,7 +6289,7 @@ bool GeoProjectionConverter::LLtoAEAC(const double LatDegree, const double LongD
 }
 
 /*
-  * The function OMtoLL() converts the Oblique Mercator projection
+  * The function HOMtoLL() converts the Hotine Oblique Mercator projection
   * (easting and northing) coordinates to Geodetic (latitude and longitude)
   * coordinates, according to the current ellipsoid and Oblique Mercator 
   * projection parameters.
@@ -6220,14 +6301,14 @@ bool GeoProjectionConverter::LLtoAEAC(const double LatDegree, const double LongD
   *
   * adapted from OBLIQUE MERCATOR code of U.S. Army Topographic Engineering Center
 */
-bool GeoProjectionConverter::OMtoLL(const double OMEastingMeter, const double OMNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOM* om) const
+bool GeoProjectionConverter::HOMtoLL(const double OMEastingMeter, const double OMNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* om) const
 {
   return true;
 }
 
 /*
-  * The function LLtoOM() converts Geodetic (latitude and longitude)
-  * coordinates to the Oblique Mercator projection (easting and
+  * The function LLtoHOM() converts Geodetic (latitude and longitude)
+  * coordinates to the Hotine Oblique Mercator projection (easting and
   * northing) coordinates, according to the current ellipsoid and
   * Oblique Mercator projection parameters. 
   *
@@ -6238,7 +6319,7 @@ bool GeoProjectionConverter::OMtoLL(const double OMEastingMeter, const double OM
   *
   * adapted from OBLIQUE MERCATOR code of U.S. Army Topographic Engineering Center
 */
-bool GeoProjectionConverter::LLtoOM(const double LatDegree, const double LongDegree, double &OMEastingMeter, double &OMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOM* om) const
+bool GeoProjectionConverter::LLtoHOM(const double LatDegree, const double LongDegree, double &OMEastingMeter, double &OMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* om) const
 {
   return true;
 }
@@ -7335,9 +7416,6 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(short* horizontal_uni
           break;
         case PCS_NAD83_Alabama_West:
           *coordinate_zone = GCTP_NAD83_Alabama_West;
-          break;
-        case PCS_NAD83_Alaska_zone_1:
-          *coordinate_zone = GCTP_NAD83_Alaska_zone_1;
           break;
         case PCS_NAD83_Alaska_zone_2:
           *coordinate_zone = GCTP_NAD83_Alaska_zone_2;
