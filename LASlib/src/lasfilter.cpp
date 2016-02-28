@@ -1421,12 +1421,12 @@ BOOL LASfilter::parse(int argc, char* argv[])
           {
             if (atoi(argv[i]) > 31)
             {
-              fprintf(stderr,"ERROR: cannot keep classification %d because it is larger than 31\n", argv[i]);
+              fprintf(stderr,"ERROR: cannot keep classification %d because it is larger than 31\n", atoi(argv[i]));
               return FALSE;
             }
             else if (atoi(argv[i]) < 0)
             {
-              fprintf(stderr,"ERROR: cannot keep classification %d because it is smaller than 0\n", argv[i]);
+              fprintf(stderr,"ERROR: cannot keep classification %d because it is smaller than 0\n", atoi(argv[i]));
               return FALSE;
             }
             keep_classification_mask |= (1 << atoi(argv[i]));
@@ -1910,12 +1910,12 @@ BOOL LASfilter::parse(int argc, char* argv[])
           {
             if (atoi(argv[i]) > 31)
             {
-              fprintf(stderr,"ERROR: cannot drop classification %d because it is larger than 31\n", argv[i]);
+              fprintf(stderr,"ERROR: cannot drop classification %d because it is larger than 31\n", atoi(argv[i]));
               return FALSE;
             }
             else if (atoi(argv[i]) < 0)
             {
-              fprintf(stderr,"ERROR: cannot drop classification %d because it is smaller than 0\n", argv[i]);
+              fprintf(stderr,"ERROR: cannot drop classification %d because it is smaller than 0\n", atoi(argv[i]));
               return FALSE;
             }
             drop_classification_mask |= (1 << atoi(argv[i]));
@@ -1950,12 +1950,12 @@ BOOL LASfilter::parse(int argc, char* argv[])
           {
             if (atoi(argv[i]) > 255)
             {
-              fprintf(stderr,"ERROR: cannot drop extended classification %d because it is larger than 255\n", argv[i]);
+              fprintf(stderr,"ERROR: cannot drop extended classification %d because it is larger than 255\n", atoi(argv[i]));
               return FALSE;
             }
             else if (atoi(argv[i]) < 0)
             {
-              fprintf(stderr,"ERROR: cannot drop extended classification %d because it is smaller than 0\n", argv[i]);
+              fprintf(stderr,"ERROR: cannot drop extended classification %d because it is smaller than 0\n", atoi(argv[i]));
               return FALSE;
             }
             drop_extended_classification_mask[atoi(argv[i])/32] |= (1 << (atoi(argv[i]) - (32*(atoi(argv[i])/32))));
