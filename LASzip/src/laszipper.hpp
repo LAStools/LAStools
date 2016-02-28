@@ -50,7 +50,7 @@ using namespace std;
 class ByteStreamOut;
 class LASwritePoint;
 
-class LASZIP_DLL LASzipper
+class LASzipper
 {
 public:
   bool open(FILE* outfile, const LASzip* laszip);
