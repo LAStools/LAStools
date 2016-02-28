@@ -183,12 +183,12 @@ class GeoProjectionParametersAEAC : public GeoProjectionParameters
 public:
   double aeac_false_easting_meter;
   double aeac_false_northing_meter;
-  double aeac_latitude_of_center;
-  double aeac_longitude_of_center;
+  double aeac_latitude_of_center_degree;
+  double aeac_longitude_of_center_degree;
   double aeac_first_std_parallel_degree;
   double aeac_second_std_parallel_degree;
-  double aeac_lat_origin_radian;
-  double aeac_long_meridian_radian;
+  double aeac_latitude_of_center_radian;
+  double aeac_longitude_of_center_radian;
   double aeac_first_std_parallel_radian;
   double aeac_second_std_parallel_radian;
   double aeac_n;
@@ -199,25 +199,28 @@ public:
   double aeac_Albers_a_OVER_n;
 };
 
-class GeoProjectionParametersOM : public GeoProjectionParameters
+class GeoProjectionParametersHOM : public GeoProjectionParameters
 {
 public:
-  double om_false_easting_meter;
-  double om_false_northing_meter;
-  double om_lat_origin_degree;
-  double om_long_meridian_degree;
-  double om_first_std_parallel_degree;
-  double om_second_std_parallel_degree;
-  double om_lat_origin_radian;
-  double om_long_meridian_radian;
-  double om_first_std_parallel_radian;
-  double om_second_std_parallel_radian;
-  double om_n;
-  double om_C;
-  double om_two_es;
-  double om_rho0;
-  double om_one_MINUS_es2;
-  double om_Albers_a_OVER_n;
+  double hom_false_easting_meter;
+  double hom_false_northing_meter;
+  double hom_latitude_of_center_degree;
+  double hom_longitude_of_center_degree;
+  double hom_azimuth_degree;
+  double hom_rectified_grid_angle_degree;
+  double hom_scale_factor;
+};
+
+class GeoProjectionParametersOS : public GeoProjectionParameters
+{
+public:
+  double os_false_easting_meter;
+  double os_false_northing_meter;
+  double os_lat_origin_degree;
+  double os_long_meridian_degree;
+  double os_scale_factor;
+  double os_lat_origin_radian;
+  double os_long_meridian_radian;
 };
 
 class GeoProjectionConverter
@@ -286,7 +289,8 @@ public:
   void set_lambert_conformal_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true, const char* name=0);
   void set_transverse_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor, char* description=0, bool source=true, const char* name=0);
   void set_albers_equal_area_conic_projection(double falseEastingMeter, double falseNorthingMeter, double latCenterDegree, double longCenterDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true, const char* name=0);
-  void set_oblique_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree, char* description=0, bool source=true, const char* name=0);
+  void set_hotine_oblique_mercator_projection(double falseEastingMeter, double falseNorthingMeter, double latCenterDegree, double longCenterDegree, double azimuthDegree, double rectifiedGridAngleDegree, double scaleFactor, char* description=0, bool source=true, const char* name=0);
+  void set_oblique_stereographic_projection(double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor, char* description=0, bool source=true, const char* name=0);
 
   const char* get_state_plane_nad27_lcc_zone(int i) const;
   bool set_state_plane_nad27_lcc(const char* zone, char* description=0, bool source=true, const char* name=0);
@@ -344,8 +348,8 @@ public:
   bool AEACtoLL(const double AEACEastingMeter, const double AEACNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersAEAC* aeac) const;
   bool LLtoAEAC(const double LatDegree, const double LongDegree, double &AEACEastingMeter, double &AEACNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersAEAC* aeac) const;
 
-  bool OMtoLL(const double OMEastingMeter, const double OMNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOM* om) const;
-  bool LLtoOM(const double LatDegree, const double LongDegree, double &OMEastingMeter, double &OMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOM* om) const;
+  bool HOMtoLL(const double HOMEastingMeter, const double HOMNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* hom) const;
+  bool LLtoHOM(const double LatDegree, const double LongDegree, double &HOMEastingMeter, double &HOMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* hom) const;
 
   GeoProjectionConverter();
   ~GeoProjectionConverter();
@@ -418,7 +422,8 @@ private:
   void compute_lcc_parameters(bool source);
   void compute_tm_parameters(bool source);
   void compute_aeac_parameters(bool source);
-  void compute_om_parameters(bool source);
+//  void compute_hom_parameters(bool source);
+//  void compute_os_parameters(bool source);
 };
 
 #endif
