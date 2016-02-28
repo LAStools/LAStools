@@ -14,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    25 February 2016 -- depreciating old libLAS laszipper/lasunzipper binding
     29 July 2013 -- reorganized to create an easy-to-use LASzip DLL 
     5 December 2011 -- learns the chunk table if it is missing (e.g. truncated LAZ)
     6 October 2011 -- large file support, ability to read with missing chunk table
@@ -74,10 +75,7 @@ typedef long long SIGNED_INT64;
 
 #define LASZIP_CHUNK_SIZE_DEFAULT           50000
 
-//#include "laszipexport.hpp"
-#define LASZIP_DLL
-
-class LASZIP_DLL LASitem
+class LASitem
 {
 public:
   enum Type { BYTE = 0, SHORT, INT, LONG, FLOAT, DOUBLE, POINT10, GPSTIME11, RGB12, WAVEPACKET13, POINT14, RGBNIR14 } type;
@@ -87,7 +85,7 @@ public:
   const char* get_name() const;
 };
 
-class LASZIP_DLL LASzip
+class LASzip
 {
 public:
 
