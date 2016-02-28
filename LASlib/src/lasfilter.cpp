@@ -632,15 +632,26 @@ private:
   I32 below_intensity, above_intensity;
 };
 
-class LAScriterionKeepClassifications : public LAScriterion
+class LAScriterionDropClassifications : public LAScriterion
 {
 public:
-  inline const CHAR* name() const { return "keep_classification_mask"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), ~drop_classification_mask); };
+  inline const CHAR* name() const { return "drop_classification_mask"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), drop_classification_mask); };
   inline BOOL filter(const LASpoint* point) { return ((1 << point->classification) & drop_classification_mask); };
-  LAScriterionKeepClassifications(U32 keep_classification_mask) { drop_classification_mask = ~keep_classification_mask; };
+  LAScriterionDropClassifications(U32 drop_classification_mask) { this->drop_classification_mask = drop_classification_mask; };
 private:
   U32 drop_classification_mask;
+};
+
+class LAScriterionDropExtendedClassifications : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_extended_classification_mask"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %u %u %u %u %u %u %u ", name(), drop_extended_classification_mask[7], drop_extended_classification_mask[6], drop_extended_classification_mask[5], drop_extended_classification_mask[4], drop_extended_classification_mask[3], drop_extended_classification_mask[2], drop_extended_classification_mask[1], drop_extended_classification_mask[0]); };
+  inline BOOL filter(const LASpoint* point) { return ((1 << (point->extended_classification - (32 * (point->extended_classification / 32)))) & drop_extended_classification_mask[point->extended_classification / 32]); };
+  LAScriterionDropExtendedClassifications(U32 drop_extended_classification_mask[8]) { for (I32 i = 0; i < 8; i++) this->drop_extended_classification_mask[i] = drop_extended_classification_mask[i]; };
+private:
+  U32 drop_extended_classification_mask[8];
 };
 
 class LAScriterionDropSynthetic : public LAScriterion
@@ -1255,9 +1266,11 @@ void LASfilter::usage() const
   fprintf(stderr,"  -drop_intensity_below 20\n");
   fprintf(stderr,"  -drop_intensity_above 380\n");
   fprintf(stderr,"  -drop_intensity_between 4000 5000\n");
-  fprintf(stderr,"Filter points based on their classification.\n");
+  fprintf(stderr,"Filter points based on classifications or flags.\n");
   fprintf(stderr,"  -keep_class 1 3 7\n");
   fprintf(stderr,"  -drop_class 4 2\n");
+  fprintf(stderr,"  -keep_extended_class 43\n");
+  fprintf(stderr,"  -drop_extended_class 129 135\n");
   fprintf(stderr,"  -drop_synthetic -keep_synthetic\n");
   fprintf(stderr,"  -drop_keypoint -keep_keypoint\n");
   fprintf(stderr,"  -drop_withheld -keep_withheld\n");
@@ -1314,6 +1327,9 @@ BOOL LASfilter::parse(int argc, char* argv[])
 
   U32 keep_classification_mask = 0;
   U32 drop_classification_mask = 0;
+
+  U32 keep_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  U32 drop_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
   for (i = 1; i < argc; i++)
   {
@@ -1403,21 +1419,51 @@ BOOL LASfilter::parse(int argc, char* argv[])
           i+=1;
           do
           {
+            if (atoi(argv[i]) > 31)
+            {
+              fprintf(stderr,"ERROR: cannot keep classification %d because it is larger than 31\n", argv[i]);
+              return FALSE;
+            }
+            else if (atoi(argv[i]) < 0)
+            {
+              fprintf(stderr,"ERROR: cannot keep classification %d because it is smaller than 0\n", argv[i]);
+              return FALSE;
+            }
             keep_classification_mask |= (1 << atoi(argv[i]));
             *argv[i]='\0';
             i+=1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
           i-=1;
         }
-        else if (strcmp(argv[i],"-keep_classification_mask") == 0)
+      }
+      else if (strncmp(argv[i],"-keep_extended_", 15) == 0)
+      {
+        if (strcmp(argv[i],"-keep_extended_classification") == 0 || strcmp(argv[i],"-keep_extended_class") == 0)
         {
           if ((i+1) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 1 argument: classifications_mask\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 1 at least argument: classification\n", argv[i]);
             return FALSE;
           }
-          keep_classification_mask = atoi(argv[i+1]);
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i]='\0';
+          i+=1;
+          do
+          {
+            if (atoi(argv[i]) > 255)
+            {
+              fprintf(stderr,"ERROR: cannot keep extended classification %d because it is larger than 255\n", atoi(argv[i]));
+              return FALSE;
+            }
+            else if (atoi(argv[i]) < 0)
+            {
+              fprintf(stderr,"ERROR: cannot keep extended classification %d because it is smaller than 0\n", atoi(argv[i]));
+              return FALSE;
+            }
+            keep_extended_classification_mask[atoi(argv[i])/32] |= (1 << (atoi(argv[i]) - (32*(atoi(argv[i])/32))));
+            *argv[i]='\0';
+            i+=1;
+          } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+          i-=1;
         }
       }
       else if (strncmp(argv[i],"-keep_x", 7) == 0)
@@ -1818,29 +1864,35 @@ BOOL LASfilter::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-drop_", 6) == 0)
     {
-      if (strcmp(argv[i],"-drop_first") == 0)
+      if (strncmp(argv[i],"-drop_first", 11) == 0)
       {
-        add_criterion(new LAScriterionDropFirstReturn());
-        *argv[i]='\0';
+        if (strcmp(argv[i],"-drop_first") == 0)
+        {
+          add_criterion(new LAScriterionDropFirstReturn());
+          *argv[i]='\0';
+        }
+        else if (strcmp(argv[i],"-drop_first_of_many") == 0)
+        {
+          add_criterion(new LAScriterionDropFirstOfManyReturn());
+          *argv[i]='\0';
+        }
       }
-      else if (strcmp(argv[i],"-drop_first_of_many") == 0)
+      else if (strncmp(argv[i],"-drop_last", 10) == 0)
       {
-        add_criterion(new LAScriterionDropFirstOfManyReturn());
-        *argv[i]='\0';
+        if (strcmp(argv[i],"-drop_last") == 0)
+        {
+          add_criterion(new LAScriterionDropLastReturn());
+          *argv[i]='\0';
+        }
+        else if (strcmp(argv[i],"-drop_last_of_many") == 0)
+        {
+          add_criterion(new LAScriterionDropLastOfManyReturn());
+          *argv[i]='\0';
+        }
       }
       else if (strcmp(argv[i],"-drop_middle") == 0)
       {
         add_criterion(new LAScriterionDropMiddleReturn());
-        *argv[i]='\0';
-      }
-      else if (strcmp(argv[i],"-drop_last") == 0)
-      {
-        add_criterion(new LAScriterionDropLastReturn());
-        *argv[i]='\0';
-      }
-      else if (strcmp(argv[i],"-drop_last_of_many") == 0)
-      {
-        add_criterion(new LAScriterionDropLastOfManyReturn());
         *argv[i]='\0';
       }
       else if (strncmp(argv[i],"-drop_class", 11) == 0)
@@ -1856,11 +1908,78 @@ BOOL LASfilter::parse(int argc, char* argv[])
           i+=1;
           do
           {
+            if (atoi(argv[i]) > 31)
+            {
+              fprintf(stderr,"ERROR: cannot drop classification %d because it is larger than 31\n", argv[i]);
+              return FALSE;
+            }
+            else if (atoi(argv[i]) < 0)
+            {
+              fprintf(stderr,"ERROR: cannot drop classification %d because it is smaller than 0\n", argv[i]);
+              return FALSE;
+            }
             drop_classification_mask |= (1 << atoi(argv[i]));
             *argv[i]='\0';
             i+=1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
           i-=1;
+        }
+        else if (strcmp(argv[i],"-drop_classification_mask") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: mask\n", argv[i]);
+            return FALSE;
+          }
+          drop_classification_mask = atoi(argv[i+1]);
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_extended_", 15) == 0)
+      {
+        if (strcmp(argv[i],"-drop_extended_classification") == 0 || strcmp(argv[i],"-drop_extended_class") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: classification\n", argv[i]);
+            return FALSE;
+          }
+          *argv[i]='\0';
+          i+=1;
+          do
+          {
+            if (atoi(argv[i]) > 255)
+            {
+              fprintf(stderr,"ERROR: cannot drop extended classification %d because it is larger than 255\n", argv[i]);
+              return FALSE;
+            }
+            else if (atoi(argv[i]) < 0)
+            {
+              fprintf(stderr,"ERROR: cannot drop extended classification %d because it is smaller than 0\n", argv[i]);
+              return FALSE;
+            }
+            drop_extended_classification_mask[atoi(argv[i])/32] |= (1 << (atoi(argv[i]) - (32*(atoi(argv[i])/32))));
+            *argv[i]='\0';
+            i+=1;
+          } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+          i-=1;
+        }
+        else if (strcmp(argv[i],"-drop_extended_classification_mask") == 0)
+        {
+          if ((i+8) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n", argv[i]);
+            return FALSE;
+          }
+          drop_extended_classification_mask[7] = atoi(argv[i+1]);
+          drop_extended_classification_mask[6] = atoi(argv[i+2]);
+          drop_extended_classification_mask[5] = atoi(argv[i+3]);
+          drop_extended_classification_mask[4] = atoi(argv[i+4]);
+          drop_extended_classification_mask[3] = atoi(argv[i+5]);
+          drop_extended_classification_mask[2] = atoi(argv[i+6]);
+          drop_extended_classification_mask[1] = atoi(argv[i+7]);
+          drop_extended_classification_mask[0] = atoi(argv[i+8]);
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; *argv[i+8]='\0'; i+=8;
         }
       }
       else if (strncmp(argv[i],"-drop_x", 7) == 0)
@@ -2422,15 +2541,61 @@ BOOL LASfilter::parse(int argc, char* argv[])
 
   if (drop_return_mask)
   {
-    if (keep_return_mask == 0) keep_return_mask = 255 & ~drop_return_mask;
+    if (keep_return_mask)
+    {
+      fprintf(stderr,"ERROR: cannot use '-drop_return' and '-keep_return' simultaneously\n");
+      return FALSE;
+    }
+    else
+    {
+      keep_return_mask = 255 & ~drop_return_mask;
+    }
   }
-  if (keep_return_mask) add_criterion(new LAScriterionKeepReturns(keep_return_mask));
+  if (keep_return_mask)
+  {
+    add_criterion(new LAScriterionKeepReturns(keep_return_mask));
+  }
 
+  if (keep_classification_mask)
+  {
+    if (drop_classification_mask)
+    {
+      fprintf(stderr,"ERROR: cannot use '-drop_class' and '-keep_class' simultaneously\n");
+      return FALSE;
+    }
+    else
+    {
+      drop_classification_mask = ~keep_classification_mask;
+    }
+  }
   if (drop_classification_mask)
   {
-    if (keep_classification_mask == 0) keep_classification_mask = ~drop_classification_mask;
+    add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
   }
-  if (keep_classification_mask) add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
+
+  if (keep_extended_classification_mask[0] || keep_extended_classification_mask[1] || keep_extended_classification_mask[2] || keep_extended_classification_mask[3] || keep_extended_classification_mask[4] || keep_extended_classification_mask[5] || keep_extended_classification_mask[6] || keep_extended_classification_mask[7])
+  {
+    if (drop_extended_classification_mask[0] || drop_extended_classification_mask[1] || drop_extended_classification_mask[2] || drop_extended_classification_mask[3] || drop_extended_classification_mask[4] || drop_extended_classification_mask[5] || drop_extended_classification_mask[6] || drop_extended_classification_mask[7])
+    {
+      fprintf(stderr,"ERROR: cannot use '-drop_extended_class' and '-keep_extended_class' simultaneously\n");
+      return FALSE;
+    }
+    else
+    {
+      drop_extended_classification_mask[0] = ~keep_extended_classification_mask[0];
+      drop_extended_classification_mask[1] = ~keep_extended_classification_mask[1];
+      drop_extended_classification_mask[2] = ~keep_extended_classification_mask[2];
+      drop_extended_classification_mask[3] = ~keep_extended_classification_mask[3];
+      drop_extended_classification_mask[4] = ~keep_extended_classification_mask[4];
+      drop_extended_classification_mask[5] = ~keep_extended_classification_mask[5];
+      drop_extended_classification_mask[6] = ~keep_extended_classification_mask[6];
+      drop_extended_classification_mask[7] = ~keep_extended_classification_mask[7];
+    }
+  }
+  if (drop_extended_classification_mask[0] || drop_extended_classification_mask[1] || drop_extended_classification_mask[2] || drop_extended_classification_mask[3] || drop_extended_classification_mask[4] || drop_extended_classification_mask[5] || drop_extended_classification_mask[6] || drop_extended_classification_mask[7])
+  {
+    add_criterion(new LAScriterionDropExtendedClassifications(drop_extended_classification_mask));
+  }
 
   return TRUE;
 }
