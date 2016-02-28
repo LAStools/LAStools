@@ -1,3 +1,6 @@
+28 February 2016 -- LASlayers: support for '-filtered_transform' in a transform layer
+28 February 2016 -- LASlib: new filters '-drop_extended_class 42' and '-drop_extended_class 219'
+28 February 2016 -- laspublish: 2D download maps for 'Hotine Oblique Mercator' and 'Oblique Stereoscopic'
 19 February 2016 -- LASlayers: bug fix for delete layers in combination with filters or transform layers
 18 February 2016 -- lasinfo: more useful '-set_number_of_variable_length_records' and friends
 16 February 2016 -- lasclip & lascanopy: avoid crash when SHP file contains completely emtpy records
