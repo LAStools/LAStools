@@ -2054,8 +2054,21 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
             n += sprintf(&string[n], "UNIT[\"US survey foot\",0.3048006096012192,AUTHORITY[\"EPSG\",\"9003\"]],");
           }
         }
-        // axis and authority
-        n += sprintf(&string[n], "AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"%d\"]]", projection->geokey);
+        // axis
+        n += sprintf(&string[n], "AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],");
+        // authority
+        if (projection->geokey == 0)
+        {
+          projection->geokey = get_ProjectedCSTypeGeoKey(source);
+        }
+        if (projection->geokey)
+        {
+          n += sprintf(&string[n], "AUTHORITY[\"EPSG\",\"%d\"]]", projection->geokey);
+        }
+        else
+        {
+          n += sprintf(&string[n], "]");
+        }
       }
     }
     len = n+1;
@@ -6494,14 +6507,37 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         set_target_utm_projection(tmp);
         fprintf(stderr, "using target projection UTM '%s'\n", tmp);
       }
-      else if (set_utm_projection(argv[i+1], tmp, source))
-      {
-        fprintf(stderr, "using %s UTM '%s'\n", (source ? "projection" : "target projection"), tmp);
-      }
       else
       {
-        fprintf(stderr, "ERROR: utm zone '%s' is unknown. use a format such as '11S' or '10T'\n", argv[i+1]);
-        return false;
+        if (argv[i+1][1] == 'n')
+        {
+          argv[i+1][1] = 'U';
+          argv[i+1][2] = '\0';
+        }
+        else if (argv[i+1][1] == 's')
+        {
+          argv[i+1][1] = 'L';
+          argv[i+1][2] = '\0';
+        }
+        else if (argv[i+1][2] == 'n')
+        {
+          argv[i+1][2] = 'U';
+          argv[i+1][3] = '\0';
+        }
+        else if (argv[i+1][2] == 's')
+        {
+          argv[i+1][2] = 'L';
+          argv[i+1][3] = '\0';
+        }
+        if (set_utm_projection(argv[i+1], tmp, source))
+        {
+          fprintf(stderr, "using %s UTM '%s'\n", (source ? "projection" : "target projection"), tmp);
+        }
+        else
+        {
+          fprintf(stderr, "ERROR: utm zone '%s' is unknown. use '32north', '55south', '10n', '56s', '17U', or '49L'\n", argv[i+1]);
+          return false;
+        }
       }
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
@@ -6772,7 +6808,7 @@ int GeoProjectionConverter::unparse(char* string) const
     else if (source_projection->type == GEO_PROJECTION_UTM)
     {
       GeoProjectionParametersUTM* utm = (GeoProjectionParametersUTM*)source_projection;
-      n += sprintf(&string[n], "-utm %d%c ", utm->utm_zone_number, (utm->utm_northern_hemisphere ? 'T' : 'K'));
+      n += sprintf(&string[n], "-utm %d%c ", utm->utm_zone_number, (utm->utm_northern_hemisphere ? 'U' : 'L'));
     }
     else if (source_projection->type == GEO_PROJECTION_LCC)
     {
