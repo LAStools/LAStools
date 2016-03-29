@@ -269,7 +269,7 @@ SOURCE=..\LASzip\src\bytestreamin.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\inc\bytestreamin_array.hpp
+SOURCE=..\LASzip\src\bytestreamin_array.hpp
 # End Source File
 # Begin Source File
 
@@ -285,7 +285,7 @@ SOURCE=..\LASzip\src\bytestreamout.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\inc\bytestreamout_array.hpp
+SOURCE=..\LASzip\src\bytestreamout_array.hpp
 # End Source File
 # Begin Source File
 
