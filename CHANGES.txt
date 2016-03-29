@@ -1,3 +1,9 @@
+28 March 2016 -- laspublish: fixed bug for download (files were copied / moved to wrong location)
+28 March 2016 -- lasthin: added '-adaptive 0.2' for adaptive thinning (e.g. keypoints)
+20 March 2016 -- lasthin: added '-contours 2.0' to farthest from contour for each cell
+19 March 2016 -- BLAST: new '-temp_files h:\temp' specifies where to temp store 'file_list.12345.txt'
+14 March 2016 -- lasthin: fixed bug in '-subcircle 0.2' that sometimes duplicated points
+13 March 2016 -- LASlayers: fixed bug for '-ignore_class 7' when classifying to same class 7
 28 February 2016 -- LASlayers: support for '-filtered_transform' in a transform layer
 28 February 2016 -- LASlib: new filters '-drop_extended_class 42' and '-drop_extended_class 219'
 28 February 2016 -- laspublish: 2D download maps for 'Hotine Oblique Mercator' and 'Oblique Stereoscopic'

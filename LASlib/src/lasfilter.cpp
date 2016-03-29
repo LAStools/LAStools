@@ -39,6 +39,30 @@ using namespace std;
 
 typedef multimap<I64,F64> my_I64_F64_map;
 
+class LAScriterionAnd : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "filter_and"; };
+  inline I32 get_command(CHAR* string) const { int n = 0; n += one->get_command(&string[n]); n += two->get_command(&string[n]); n += sprintf(&string[n], "-%s ", name()); return n; };
+  inline BOOL filter(const LASpoint* point) { return one->filter(point) && two->filter(point); };
+  LAScriterionAnd(LAScriterion* one, LAScriterion* two) { this->one = one; this->two = two; };
+private:
+  LAScriterion* one;
+  LAScriterion* two;
+};
+
+class LAScriterionOr : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "filter_or"; };
+  inline I32 get_command(CHAR* string) const { int n = 0; n += one->get_command(&string[n]); n += two->get_command(&string[n]); n += sprintf(&string[n], "-%s ", name()); return n; };
+  inline BOOL filter(const LASpoint* point) { return one->filter(point) || two->filter(point); };
+  LAScriterionOr(LAScriterion* one, LAScriterion* two) { this->one = one; this->two = two; };
+private:
+  LAScriterion* one;
+  LAScriterion* two;
+};
+
 class LAScriterionKeepTile : public LAScriterion
 {
 public:
@@ -1316,6 +1340,8 @@ void LASfilter::usage() const
   fprintf(stderr,"  -keep_random_fraction 0.1\n");
   fprintf(stderr,"  -thin_with_grid 1.0\n");
   fprintf(stderr,"  -thin_with_time 0.001\n");
+  fprintf(stderr,"Boolean combination of filters.\n");
+  fprintf(stderr,"  -filter_and\n");
 }
 
 BOOL LASfilter::parse(int argc, char* argv[])
@@ -2535,6 +2561,39 @@ BOOL LASfilter::parse(int argc, char* argv[])
         }
         add_criterion(new LAScriterionThinWithTime((F32)atof(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+    }
+    else if (strncmp(argv[i],"-filter_", 8) == 0)
+    {
+      if (strcmp(argv[i],"-filter_and") == 0)
+      {
+        if (num_criteria < 2)
+        {
+          fprintf(stderr,"ERROR: '%s' needs to be preceeded by at least two filters\n", argv[i]);
+          return FALSE;
+        }
+        LAScriterion* filter_criterion = new LAScriterionAnd(criteria[num_criteria-2], criteria[num_criteria-1]);
+        num_criteria--;
+        criteria[num_criteria] = 0;
+        num_criteria--;
+        criteria[num_criteria] = 0;
+        add_criterion(filter_criterion);
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-filter_or") == 0)
+      {
+        if (num_criteria < 2)
+        {
+          fprintf(stderr,"ERROR: '%s' needs to be preceeded by at least two filters\n", argv[i]);
+          return FALSE;
+        }
+        LAScriterion* filter_criterion = new LAScriterionOr(criteria[num_criteria-2], criteria[num_criteria-1]);
+        num_criteria--;
+        criteria[num_criteria] = 0;
+        num_criteria--;
+        criteria[num_criteria] = 0;
+        add_criterion(filter_criterion);
+        *argv[i]='\0';
       }
     }
   }
