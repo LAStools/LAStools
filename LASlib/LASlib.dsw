@@ -27,6 +27,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "lasexample_add_rgb"=.\example\lasexample_add_rgb.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "lasexample_write_only"=.\example\lasexample_write_only.dsp - Package Owner=<4>
 
 Package=<5>
