@@ -84,12 +84,13 @@ private:
 class LASreaderLASrescale : public virtual LASreaderLAS
 {
 public:
-  LASreaderLASrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor);
+  LASreaderLASrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, BOOL check_for_overflow=TRUE);
 
 protected:
   virtual BOOL open(ByteStreamIn* stream, BOOL peek_only=FALSE);
   virtual BOOL read_point_default();
   BOOL rescale_x, rescale_y, rescale_z;
+  BOOL check_for_overflow;
   F64 scale_factor[3];
   F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
 };
