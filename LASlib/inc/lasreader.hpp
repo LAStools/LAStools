@@ -205,7 +205,7 @@ public:
   void set_transform(LAStransform* transform);
   const LAStransform* get_transform() { return transform; };
   void reset();
-  LASreader* open(const CHAR* other_file_name=0);
+  LASreader* open(const CHAR* other_file_name=0, BOOL reset_after_other=TRUE);
   BOOL reopen(LASreader* lasreader, BOOL remain_buffered=TRUE);
   LASwaveform13reader* open_waveform13(const LASheader* lasheader);
   LASreadOpener();

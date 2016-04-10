@@ -489,7 +489,7 @@ void LASreadOpener::reset()
   file_name = 0;
 }
 
-LASreader* LASreadOpener::open(const CHAR* other_file_name)
+LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_other)
 {
   if (filter) filter->reset();
 
@@ -547,7 +547,10 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name)
       if (other_file_name)
       {
         file_name = other_file_name;
-        file_name_current = 0;
+        if (reset_after_other)
+        {
+          file_name_current = 0;
+        }
       }
       else
       {
@@ -612,7 +615,10 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name)
       if (other_file_name)
       {
         file_name = other_file_name;
-        file_name_current = 0;
+        if (reset_after_other)
+        {
+          file_name_current = 0;
+        }
       }
       else
       {
