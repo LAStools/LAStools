@@ -39,9 +39,9 @@
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
-#include <math.h>
 #endif
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
