@@ -209,6 +209,7 @@ int main(int argc, char *argv[])
   bool repair_counters = false;
   bool edit_header = false;
   I32 set_file_source_ID = -1;
+  bool set_file_source_ID_from_point_source_ID = false;
   I32 set_global_encoding = -1;
   I64 set_project_ID_GUID_data_1 = -1;
   I32 set_project_ID_GUID_data_2 = -1;
@@ -421,6 +422,11 @@ int main(int argc, char *argv[])
       }
 			i++;
 			set_file_source_ID = atoi(argv[i]);
+      edit_header = true;
+		}
+    else if (strcmp(argv[i],"-set_file_source_ID_from_point_source_ID") == 0)
+    {
+			set_file_source_ID_from_point_source_ID = true;
       edit_header = true;
 		}
     else if (strcmp(argv[i],"-set_GUID") == 0)
@@ -764,13 +770,32 @@ int main(int argc, char *argv[])
         fprintf(stderr, "ERROR: can only edit for LAS or LAZ files, not for '%s'\n", file_name);
         edit_header = false;
       }
+      if (set_file_source_ID_from_point_source_ID)
+      {
+        LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+        if (lasreader == 0)
+        {
+          fprintf(stderr, "ERROR: cannot open lasreader for '%s'\n", file_name);
+          byebye(true, argc==1);
+        }
+        if (lasreader->read_point())
+        {
+          set_file_source_ID = lasreader->point.get_point_source_ID();
+        }
+        else
+        {
+          set_file_source_ID = -1;
+        }
+        lasreader->close();
+        delete lasreader;
+      }
       FILE* file = fopen(file_name, "rb+");
       if (file == 0)
       {
         fprintf (stderr, "ERROR: could not open file '%s' for edit of header\n", file_name);
         edit_header = false;
       }
-      else
+      else if (edit_header)
       {
         if (set_file_source_ID != -1)
         {
