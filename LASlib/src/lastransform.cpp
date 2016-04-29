@@ -881,10 +881,21 @@ private:
   I64 delta_secs;
 };
 
+class LASoperationSetRGB : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_RGB"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), RGB[0], RGB[1], RGB[2]); };
+  inline void transform(LASpoint* point) const { point->set_RGB(RGB); };
+  LASoperationSetRGB(U16 R, U16 G, U16 B) { RGB[0] = R; RGB[1] = G; RGB[2] = B; };
+private:
+  U16 RGB[3];
+};
+
 class LASoperationScaleRGB : public LASoperation
 {
 public:
-  inline const CHAR* name() const { return "scale_rgb"; };
+  inline const CHAR* name() const { return "scale_RGB"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), scale[0], scale[1], scale[2]); };
   inline void transform(LASpoint* point) const { point->rgb[0] = U16_CLAMP(scale[0]*point->rgb[0]); point->rgb[1] = U16_CLAMP(scale[1]*point->rgb[1]); point->rgb[2] = U16_CLAMP(scale[2]*point->rgb[2]); };
   LASoperationScaleRGB(F32 scale_R, F32 scale_G, F32 scale_B) { scale[0] = scale_R; scale[1] = scale_G; scale[2] = scale_B; };
@@ -895,7 +906,7 @@ private:
 class LASoperationScaleRGBdown : public LASoperation
 {
 public:
-  inline const CHAR* name() const { return "scale_rgb_down"; };
+  inline const CHAR* name() const { return "scale_RGB_down"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) const { point->rgb[0] = point->rgb[0]/256; point->rgb[1] = point->rgb[1]/256; point->rgb[2] = point->rgb[2]/256; };
 };
@@ -903,7 +914,7 @@ public:
 class LASoperationScaleRGBup : public LASoperation
 {
 public:
-  inline const CHAR* name() const { return "scale_rgb_up"; };
+  inline const CHAR* name() const { return "scale_RGB_up"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) const { point->rgb[0] = point->rgb[0]*256; point->rgb[1] = point->rgb[1]*256; point->rgb[2] = point->rgb[2]*256; };
 };
@@ -930,6 +941,30 @@ public:
   inline const CHAR* name() const { return "switch_y_z"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) const { I32 temp = point->get_Y(); point->set_Y(point->get_Z()); point->set_Z(temp); };
+};
+
+class LASoperationSwitchRG : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "switch_R_G"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) const { I16 temp = point->get_R(); point->set_R(point->get_G()); point->set_G(temp); };
+};
+
+class LASoperationSwitchRB : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "switch_R_B"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) const { I16 temp = point->get_R(); point->set_R(point->get_B()); point->set_B(temp); };
+};
+
+class LASoperationSwitchGB : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "switch_G_B"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) const { I16 temp = point->get_G(); point->set_G(point->get_B()); point->set_B(temp); };
 };
 
 class LASoperationFlipWaveformDirection : public LASoperation
@@ -1053,9 +1088,11 @@ void LAStransform::usage() const
   fprintf(stderr,"  -adjusted_to_week\n");
   fprintf(stderr,"  -week_to_adjusted 1671\n");
   fprintf(stderr,"Transform RGB colors.\n");
-  fprintf(stderr,"  -scale_rgb 2 4 2\n");
-  fprintf(stderr,"  -scale_rgb_down (by 256)\n");
-  fprintf(stderr,"  -scale_rgb_up (by 256)\n");
+  fprintf(stderr,"  -set_RGB 255 0 127\n");
+  fprintf(stderr,"  -scale_RGB 2 4 2\n");
+  fprintf(stderr,"  -scale_RGB_down (by 256)\n");
+  fprintf(stderr,"  -scale_RGB_up (by 256)\n");
+  fprintf(stderr,"  -switch_R_G -switch_R_B -switch_B_G\n");
 }
 
 BOOL LAStransform::parse(int argc, char* argv[])
@@ -1490,6 +1527,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationSetGpsTime(atof(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
+      else if (strcmp(argv[i],"-set_RGB") == 0)
+      {
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: R G B\n", argv[i]);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetRGB((U16)atoi(argv[i+1]), (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3])));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=1; 
+      }
     }
     else if (strncmp(argv[i],"-change_",8) == 0)
     {
@@ -1673,7 +1720,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationScaleScanAngle((F32)atof(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
-      else if (strcmp(argv[i],"-scale_rgb") == 0)
+      else if (strcmp(argv[i],"-scale_RGB") == 0 || strcmp(argv[i],"-scale_rgb") == 0)
       {
         if ((i+3) >= argc)
         {
@@ -1683,12 +1730,12 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationScaleRGB((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3])));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
-      else if (strcmp(argv[i],"-scale_rgb_down") == 0)
+      else if (strcmp(argv[i],"-scale_RGB_down") == 0 || strcmp(argv[i],"-scale_rgb_down") == 0)
       {
         add_operation(new LASoperationScaleRGBdown());
         *argv[i]='\0'; 
       }
-      else if (strcmp(argv[i],"-scale_rgb_up") == 0)
+      else if (strcmp(argv[i],"-scale_RGB_up") == 0 || strcmp(argv[i],"-scale_rgb_up") == 0)
       {
         add_operation(new LASoperationScaleRGBup());
         *argv[i]='\0'; 
@@ -1709,6 +1756,21 @@ BOOL LAStransform::parse(int argc, char* argv[])
       else if (strcmp(argv[i],"-switch_y_z") == 0)
       {
         add_operation(new LASoperationSwitchYZ());
+        *argv[i]='\0'; 
+      }
+      else if (strcmp(argv[i],"-switch_R_G") == 0)
+      {
+        add_operation(new LASoperationSwitchRG());
+        *argv[i]='\0'; 
+      }
+      else if (strcmp(argv[i],"-switch_R_B") == 0)
+      {
+        add_operation(new LASoperationSwitchRB());
+        *argv[i]='\0'; 
+      }
+      else if (strcmp(argv[i],"-switch_G_B") == 0)
+      {
+        add_operation(new LASoperationSwitchGB());
         *argv[i]='\0'; 
       }
     }
