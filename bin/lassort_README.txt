@@ -36,8 +36,11 @@
   does its bucket sort in memory.
 
   Alternatively lassort can sort a LAS/LAZ file in GPS time order
-  or in a point source ID order (or first sort by point source
-  IDs and then by time).
+  ('-gps_time') or in a point source ID order '-point_source' (or
+  first sort by point source IDs and then by time when you specify
+  both). If you sort by GPS time you can - in addition - sort all
+  the returns with the same GPS time stamp by their return (simply
+  also add '-return_number').
 
   Please license from martin.isenburg@rapidlasso.com to use lassort
   commercially.
@@ -56,28 +59,34 @@
 
 example usage:
 
->> lassort *.las 
+>> lassort -i *.las 
 
 z-orders all LAS files with a default bucket size. 
 
->> lassort flight1*.las flight2*.las -gps_time
+>> lassort -i flight1*.las flight2*.las -gps_time
 
 sorts all LAS files by their GPS time
 
->> lassort *.las -olaz -point_source
+>> lassort -i *.las -gps_time -return_number -odix _sorted -olaz
+ 
+sorts all LAS files first by their GPS time and then by their
+return number and store them compressed with appendix '_sorted' 
+added to their current file name
+
+>> lassort -i *.las -olaz -point_source
 
 sorts all LAS files by their point source ID and stores them compressed
 
->> lassort *.laz -olaz -point_source -gps_time
+>> lassort -i *.laz -olaz -point_source -gps_time
 
 sorts all LAZ files first by their point source ID and then by their
 GPS time and stores them compressed
 
->> lassort *.txt -iparse xyzt -otxt -oparse xyzt   
+>> lassort -i *.txt -iparse xyzt -otxt -oparse xyzt   
 
 z-orders all ASCII files with a default bucket size. 
 
->> lassort lidar.las sorted.las -v
+>> lassort -i lidar.las -o sorted.las -v
 
 z-orders the points from lidar.las with a default bucket size. 
 
