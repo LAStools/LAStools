@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    29 April 2016 -- added WARNINGs when rescale / reoffset overflows integers
     13 October 2014 -- changed default IO buffer size with setvbuf() to 262144
     5 November 2011 -- changed default IO buffer size with setvbuf() to 65536
     8 May 2011 -- added an option for variable chunking via chunk()
