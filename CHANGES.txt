@@ -1,3 +1,9 @@
+29 April 2016 -- LASlib: don't EXIT but produce WARNINGs when rescale / reoffset overflows integers
+20 April 2016 -- LASlib: new transforms, '-switch_R_G', '-switch_R_B' and '-set_RGB 32768 16384 0'
+14 April 2016 -- lasclassify: added missing '-ignore_class' selection options to the GUI
+14 April 2016 -- lasground: fixed rare crash when classifying flightlines separately with '-by_flightline'
+10 April 2016 -- LASlib: exit with ERROR when '-rescale 0.001 ...' or '-reoffset ...' overflow integer
+ 8 April 2016 -- lassort: sort first by GPS time then by return number '-gps_time -return_number'
 28 March 2016 -- laspublish: fixed bug for download (files were copied / moved to wrong location)
 28 March 2016 -- lasthin: added '-adaptive 0.2' for adaptive thinning (e.g. keypoints)
 20 March 2016 -- lasthin: added '-contours 2.0' to farthest from contour for each cell
@@ -12,6 +18,7 @@
 16 February 2016 -- lasclip & lascanopy: avoid crash when SHP file contains completely emtpy records
 7 February 2016 -- las2dem and blast2dem: small bug fix for additional '-scale 2.1' argument
 7 February 2016 -- LAStools: support for EPSG code 4326
+25 January 2016 -- LASlib: brand-new opportunity to do a '-filtered_transform' 
 24 January 2016 -- txt2las: better support for storing attributes in "Extra Bytes with '-add_attribute'
 24 January 2016 -- NEW: laspublish to visualize and download LiDAR in a Web browser with Potree
 19 January 2016 -- LASlib: new transform to '-scale_rgb 1.5 2.1 1.8' 
