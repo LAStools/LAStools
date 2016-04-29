@@ -24,6 +24,8 @@
   
   CHANGE HISTORY:
   
+    20 April 2016 -- new '-switch_R_G', '-switch_R_B' and '-set_RGB 32768 16384 0'
+    25 January 2016 -- brand-new opportunity to do a '-filtered_transform' 
     18 December 2011 -- added '-flip_waveform_direction' to deal with Riegl's data 
     20 March 2011 -- added -translate_raw_xyz after the fullest of full moons
     21 January 2011 -- re-created after matt told me about the optech dashmap bug
