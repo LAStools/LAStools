@@ -39,7 +39,6 @@
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
-#include <math.h>
 #endif
 
 #include <stdlib.h>
@@ -1453,65 +1452,60 @@ BOOL LASreaderLASrescale::open(ByteStreamIn* stream, BOOL peek_only)
 
   if (check_for_overflow)
   {
-    F64 temp;
+    F64 temp_f;
+    I64 temp_i;
 
     if (rescale_x)
     {
       // make sure rescale does not cause integer overflow for min_x
-      temp = (orig_x_scale_factor*quantizer.get_X(header.min_x))/header.x_scale_factor;
-      temp = header.get_x(I32_QUANTIZE(temp));
-      if (fabs(temp - header.min_x) > header.x_scale_factor)
+      temp_f = (orig_x_scale_factor*quantizer.get_X(header.min_x))/header.x_scale_factor;
+      temp_i = I64_QUANTIZE(temp_f);
+      if (I32_FITS_IN_RANGE(temp_i) == FALSE)
       {
-        fprintf(stderr,"ERROR: rescaling from %g to %g causes LAS integer overflow for min_x\n", orig_x_scale_factor, header.x_scale_factor);
-        return FALSE;
+        fprintf(stderr,"WARNING: rescaling from %g to %g causes LAS integer overflow for min_x\n", orig_x_scale_factor, header.x_scale_factor);
       }
       // make sure rescale does not cause integer overflow for max_x
-      temp = (orig_x_scale_factor*quantizer.get_X(header.max_x))/header.x_scale_factor;
-      temp = header.get_x(I32_QUANTIZE(temp));
-      if (fabs(temp - header.max_x) > header.x_scale_factor)
+      temp_f = (orig_x_scale_factor*quantizer.get_X(header.max_x))/header.x_scale_factor;
+      temp_i = I64_QUANTIZE(temp_f);
+      if (I32_FITS_IN_RANGE(temp_i) == FALSE)
       {
-        fprintf(stderr,"ERROR: rescaling from %g to %g causes LAS integer overflow for max_x\n", orig_x_scale_factor, header.x_scale_factor);
-        return FALSE;
+        fprintf(stderr,"WARNING: rescaling from %g to %g causes LAS integer overflow for max_x\n", orig_x_scale_factor, header.x_scale_factor);
       }
     }
 
     if (rescale_y)
     {
       // make sure rescale does not cause integer overflow for min_y
-      temp = (orig_y_scale_factor*quantizer.get_Y(header.min_y))/header.y_scale_factor;
-      temp = header.get_y(I32_QUANTIZE(temp));
-      if (fabs(temp - header.min_y) > header.y_scale_factor)
+      temp_f = (orig_y_scale_factor*quantizer.get_Y(header.min_y))/header.y_scale_factor;
+      temp_i = I64_QUANTIZE(temp_f);
+      if (I32_FITS_IN_RANGE(temp_i) == FALSE)
       {
-        fprintf(stderr,"ERROR: rescaling from %g to %g causes LAS integer overflow for min_y\n", orig_y_scale_factor, header.y_scale_factor);
-        return FALSE;
+        fprintf(stderr,"WARNING: rescaling from %g to %g causes LAS integer overflow for min_y\n", orig_y_scale_factor, header.y_scale_factor);
       }
       // make sure rescale does not cause integer overflow for max_y
-      temp = (orig_y_scale_factor*quantizer.get_Y(header.max_y))/header.y_scale_factor;
-      temp = header.get_y(I32_QUANTIZE(temp));
-      if (fabs(temp - header.max_y) > header.y_scale_factor)
+      temp_f = (orig_y_scale_factor*quantizer.get_Y(header.max_y))/header.y_scale_factor;
+      temp_i = I64_QUANTIZE(temp_f);
+      if (I32_FITS_IN_RANGE(temp_i) == FALSE)
       {
-        fprintf(stderr,"ERROR: rescaling from %g to %g causes LAS integer overflow for max_y\n", orig_y_scale_factor, header.y_scale_factor);
-        return FALSE;
+        fprintf(stderr,"WARNING: rescaling from %g to %g causes LAS integer overflow for max_y\n", orig_y_scale_factor, header.y_scale_factor);
       }
     }
 
     if (rescale_z)
     {
       // make sure rescale does not cause integer overflow for min_z
-      temp = (orig_z_scale_factor*quantizer.get_Z(header.min_z))/header.z_scale_factor;
-      temp = header.get_z(I32_QUANTIZE(temp));
-      if (fabs(temp - header.min_z) > header.z_scale_factor)
+      temp_f = (orig_z_scale_factor*quantizer.get_Z(header.min_z))/header.z_scale_factor;
+      temp_i = I64_QUANTIZE(temp_f);
+      if (I32_FITS_IN_RANGE(temp_i) == FALSE)
       {
-        fprintf(stderr,"ERROR: rescaling from %g to %g causes LAS integer overflow for min_z\n", orig_z_scale_factor, header.z_scale_factor);
-        return FALSE;
+        fprintf(stderr,"WARNING: rescaling from %g to %g causes LAS integer overflow for min_z\n", orig_z_scale_factor, header.z_scale_factor);
       }
       // make sure rescale does not cause integer overflow for max_z
-      temp = (orig_z_scale_factor*quantizer.get_Z(header.max_z))/header.z_scale_factor;
-      temp = header.get_z(I32_QUANTIZE(temp));
-      if (fabs(temp - header.max_z) > header.z_scale_factor)
+      temp_f = (orig_z_scale_factor*quantizer.get_Z(header.max_z))/header.z_scale_factor;
+      temp_i = I64_QUANTIZE(temp_f);
+      if (I32_FITS_IN_RANGE(temp_i) == FALSE)
       {
-        fprintf(stderr,"ERROR: rescaling from %g to %g causes LAS integer overflow for max_z\n", orig_z_scale_factor, header.z_scale_factor);
-        return FALSE;
+        fprintf(stderr,"WARNING: rescaling from %g to %g causes LAS integer overflow for max_z\n", orig_z_scale_factor, header.z_scale_factor);
       }
     }
   }
@@ -1598,65 +1592,60 @@ BOOL LASreaderLASreoffset::open(ByteStreamIn* stream, BOOL peek_only)
 
   // make sure reoffset does not cause integer overflow for bounding box
 
-  F64 temp;
+  F64 temp_f;
+  I64 temp_i;
 
   if (reoffset_x)
   {
     // make sure reoffset_x does not cause integer overflow for min_x
-    temp = ((header.x_scale_factor*quantizer.get_X(header.min_x))+orig_x_offset-header.x_offset)/header.x_scale_factor;
-    temp = header.get_x(I32_QUANTIZE(temp));
-    if (fabs(temp - header.min_x) > header.x_scale_factor)
+    temp_f = ((header.x_scale_factor*quantizer.get_X(header.min_x))+orig_x_offset-header.x_offset)/header.x_scale_factor;
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
     {
-      fprintf(stderr,"ERROR: reoffsetting from %g to %g causes LAS integer overflow for min_x\n", orig_x_offset, header.x_offset);
-      return FALSE;
+      fprintf(stderr,"WARNING: reoffsetting from %g to %g causes LAS integer overflow for min_x\n", orig_x_offset, header.x_offset);
     }
     // make sure reoffset_x does not cause integer overflow for max_x
-    temp = ((header.x_scale_factor*quantizer.get_X(header.max_x))+orig_x_offset-header.x_offset)/header.x_scale_factor;
-    temp = header.get_x(I32_QUANTIZE(temp));
-    if (fabs(temp - header.max_x) > header.x_scale_factor)
+    temp_f = ((header.x_scale_factor*quantizer.get_X(header.max_x))+orig_x_offset-header.x_offset)/header.x_scale_factor;
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
     {
-      fprintf(stderr,"ERROR: reoffsetting from %g to %g causes LAS integer overflow for max_x\n", orig_x_offset, header.x_offset);
-      return FALSE;
+      fprintf(stderr,"WARNING: reoffsetting from %g to %g causes LAS integer overflow for max_x\n", orig_x_offset, header.x_offset);
     }
   }
 
   if (reoffset_y)
   {
     // make sure reoffset_y does not cause integer overflow for min_y
-    temp = ((header.y_scale_factor*quantizer.get_Y(header.min_y))+orig_y_offset-header.y_offset)/header.y_scale_factor;
-    temp = header.get_y(I32_QUANTIZE(temp));
-    if (fabs(temp - header.min_y) > header.y_scale_factor)
+    temp_f = ((header.y_scale_factor*quantizer.get_Y(header.min_y))+orig_y_offset-header.y_offset)/header.y_scale_factor;
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
     {
-      fprintf(stderr,"ERROR: reoffsetting from %g to %g causes LAS integer overflow for min_y\n", orig_y_offset, header.y_offset);
-      return FALSE;
+      fprintf(stderr,"WARNING: reoffsetting from %g to %g causes LAS integer overflow for min_y\n", orig_y_offset, header.y_offset);
     }
     // make sure reoffset_y does not cause integer overflow for max_y
-    temp = ((header.y_scale_factor*quantizer.get_Y(header.max_y))+orig_y_offset-header.y_offset)/header.y_scale_factor;
-    temp = header.get_y(I32_QUANTIZE(temp));
-    if (fabs(temp - header.max_y) > header.y_scale_factor)
+    temp_f = ((header.y_scale_factor*quantizer.get_Y(header.max_y))+orig_y_offset-header.y_offset)/header.y_scale_factor;
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
     {
-      fprintf(stderr,"ERROR: reoffsetting from %g to %g causes LAS integer overflow for max_y\n", orig_y_offset, header.y_offset);
-      return FALSE;
+      fprintf(stderr,"WARNING: reoffsetting from %g to %g causes LAS integer overflow for max_y\n", orig_y_offset, header.y_offset);
     }
   }
 
   if (reoffset_z)
   {
      // make sure reoffset does not cause integer overflow for min_z
-    temp = ((header.z_scale_factor*quantizer.get_Z(header.min_z))+orig_z_offset-header.z_offset)/header.z_scale_factor;
-    temp = header.get_z(I32_QUANTIZE(temp));
-    if (fabs(temp - header.min_z) > header.z_scale_factor)
+    temp_f = ((header.z_scale_factor*quantizer.get_Z(header.min_z))+orig_z_offset-header.z_offset)/header.z_scale_factor;
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
     {
-      fprintf(stderr,"ERROR: reoffsetting from %g to %g causes LAS integer overflow for min_z\n", orig_z_offset, header.z_offset);
-      return FALSE;
+      fprintf(stderr,"WARNING: reoffsetting from %g to %g causes LAS integer overflow for min_z\n", orig_z_offset, header.z_offset);
     }
     // make sure rescale does not cause integer overflow for max_z
-    temp = ((header.z_scale_factor*quantizer.get_Z(header.max_z))+orig_z_offset-header.z_offset)/header.z_scale_factor;
-    temp = header.get_z(I32_QUANTIZE(temp));
-    if (fabs(temp - header.max_z) > header.z_scale_factor)
+    temp_f = ((header.z_scale_factor*quantizer.get_Z(header.max_z))+orig_z_offset-header.z_offset)/header.z_scale_factor;
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
     {
-      fprintf(stderr,"ERROR: reoffsetting from %g to %g causes LAS integer overflow for max_z\n", orig_z_offset, header.z_offset);
-      return FALSE;
+      fprintf(stderr,"WARNING: reoffsetting from %g to %g causes LAS integer overflow for max_z\n", orig_z_offset, header.z_offset);
     }
   }
 
@@ -1752,129 +1741,106 @@ BOOL LASreaderLASrescalereoffset::open(ByteStreamIn* stream, BOOL peek_only)
 
   // make sure rescale & reoffset do not cause integer overflow for bounding box
 
-  F64 temp;
+  F64 temp_f;
+  I64 temp_i;
 
-  // make sure rescale & reoffset do not cause integer overflow for min_x
-  if (reoffset_x)
+  if (reoffset_x || rescale_x)
   {
-    temp = ((orig_x_scale_factor*quantizer.get_X(header.min_x))+orig_x_offset-header.x_offset)/header.x_scale_factor;
-    temp = header.get_x(I32_QUANTIZE(temp));
-  }
-  else if (rescale_x)
-  {
-    temp = (orig_x_scale_factor*quantizer.get_X(header.min_x))/header.x_scale_factor;
-    temp = header.get_x(I32_QUANTIZE(temp));
-  }
-  else
-  {
-    temp = header.min_x;
-  }
-  if (fabs(temp - header.min_x) > header.x_scale_factor)
-  {
-    fprintf(stderr,"ERROR: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for min_x\n", orig_x_scale_factor, header.x_scale_factor, orig_x_offset, header.x_offset);
-    return FALSE;
-  }
-  // make sure rescale & reoffset do not cause integer overflow for max_x
-  if (reoffset_x)
-  {
-    temp = ((orig_x_scale_factor*quantizer.get_X(header.max_x))+orig_x_offset-header.x_offset)/header.x_scale_factor;
-    temp = header.get_x(I32_QUANTIZE(temp));
-  }
-  else if (rescale_x)
-  {
-    temp = (orig_x_scale_factor*quantizer.get_X(header.max_x))/header.x_scale_factor;
-    temp = header.get_x(I32_QUANTIZE(temp));
-  }
-  else
-  {
-    temp = header.max_x;
-  }
-  if (fabs(temp - header.max_x) > header.x_scale_factor)
-  {
-    fprintf(stderr,"ERROR: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for max_x\n", orig_x_scale_factor, header.x_scale_factor, orig_x_offset, header.x_offset);
-    return FALSE;
+    // make sure rescale & reoffset do not cause integer overflow for min_x
+    if (reoffset_x)
+    {
+      temp_f = ((orig_x_scale_factor*quantizer.get_X(header.min_x))+orig_x_offset-header.x_offset)/header.x_scale_factor;
+    }
+    else
+    {
+      temp_f = (orig_x_scale_factor*quantizer.get_X(header.min_x))/header.x_scale_factor;
+    }
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
+    {
+      fprintf(stderr,"WARNING: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for min_x\n", orig_x_scale_factor, header.x_scale_factor, orig_x_offset, header.x_offset);
+    }
+
+    // make sure rescale & reoffset do not cause integer overflow for max_x
+    if (reoffset_x)
+    {
+      temp_f = ((orig_x_scale_factor*quantizer.get_X(header.max_x))+orig_x_offset-header.x_offset)/header.x_scale_factor;
+    }
+    else
+    {
+      temp_f = (orig_x_scale_factor*quantizer.get_X(header.max_x))/header.x_scale_factor;
+    }
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
+    {
+      fprintf(stderr,"WARNING: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for max_x\n", orig_x_scale_factor, header.x_scale_factor, orig_x_offset, header.x_offset);
+    }
   }
 
-  // make sure rescale & reoffset do not cause integer overflow for min_y
-  if (reoffset_y)
+  if (reoffset_y || rescale_y)
   {
-    temp = ((orig_y_scale_factor*quantizer.get_Y(header.min_y))+orig_y_offset-header.y_offset)/header.y_scale_factor;
-    temp = header.get_y(I32_QUANTIZE(temp));
-  }
-  else if (rescale_y)
-  {
-    temp = (orig_y_scale_factor*quantizer.get_Y(header.min_y))/header.y_scale_factor;
-    temp = header.get_y(I32_QUANTIZE(temp));
-  }
-  else
-  {
-    temp = header.min_y;
-  }
-  if (fabs(temp - header.min_y) > header.y_scale_factor)
-  {
-    fprintf(stderr,"ERROR: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for min_y\n", orig_y_scale_factor, header.y_scale_factor, orig_y_offset, header.y_offset);
-    return FALSE;
-  }
-  // make sure rescale & reoffset do not cause integer overflow for max_y
-  if (reoffset_y)
-  {
-    temp = ((orig_y_scale_factor*quantizer.get_Y(header.max_y))+orig_y_offset-header.y_offset)/header.y_scale_factor;
-    temp = header.get_y(I32_QUANTIZE(temp));
-  }
-  else if (rescale_y)
-  {
-    temp = (orig_y_scale_factor*quantizer.get_Y(header.max_y))/header.y_scale_factor;
-    temp = header.get_y(I32_QUANTIZE(temp));
-  }
-  else
-  {
-    temp = header.max_y;
-  }
-  if (fabs(temp - header.max_y) > header.y_scale_factor)
-  {
-    fprintf(stderr,"ERROR: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for max_y\n", orig_y_scale_factor, header.y_scale_factor, orig_y_offset, header.y_offset);
-    return FALSE;
+    // make sure rescale & reoffset do not cause integer overflow for min_y
+    if (reoffset_y)
+    {
+      temp_f = ((orig_y_scale_factor*quantizer.get_Y(header.min_y))+orig_y_offset-header.y_offset)/header.y_scale_factor;
+    }
+    else
+    {
+      temp_f = (orig_y_scale_factor*quantizer.get_Y(header.min_y))/header.y_scale_factor;
+    }
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
+    {
+      fprintf(stderr,"WARNING: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for min_y\n", orig_y_scale_factor, header.y_scale_factor, orig_y_offset, header.y_offset);
+    }
+
+    // make sure rescale & reoffset do not cause integer overflow for max_y
+    if (reoffset_y)
+    {
+      temp_f = ((orig_y_scale_factor*quantizer.get_Y(header.max_y))+orig_y_offset-header.y_offset)/header.y_scale_factor;
+    }
+    else
+    {
+      temp_f = (orig_y_scale_factor*quantizer.get_Y(header.max_y))/header.y_scale_factor;
+    }
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
+    {
+      fprintf(stderr,"WARNING: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for max_y\n", orig_y_scale_factor, header.y_scale_factor, orig_y_offset, header.y_offset);
+    }
   }
 
-  // make sure rescale & reoffset do not cause integer overflow for min_z
-  if (reoffset_z)
+  if (reoffset_z || rescale_z)
   {
-    temp = ((orig_z_scale_factor*quantizer.get_Z(header.min_z))+orig_z_offset-header.z_offset)/header.z_scale_factor;
-    temp = header.get_z(I32_QUANTIZE(temp));
-  }
-  else if (rescale_z)
-  {
-    temp = (orig_z_scale_factor*quantizer.get_Z(header.min_z))/header.z_scale_factor;
-    temp = header.get_z(I32_QUANTIZE(temp));
-  }
-  else
-  {
-    temp = header.min_z;
-  }
-  if (fabs(temp - header.min_z) > header.z_scale_factor)
-  {
-    fprintf(stderr,"ERROR: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for min_z\n", orig_z_scale_factor, header.z_scale_factor, orig_z_offset, header.z_offset);
-    return FALSE;
-  }
-  // make sure rescale & reoffset do not cause integer overflow for max_z
-  if (reoffset_z)
-  {
-    temp = ((orig_z_scale_factor*quantizer.get_Z(header.max_z))+orig_z_offset-header.z_offset)/header.z_scale_factor;
-    temp = header.get_z(I32_QUANTIZE(temp));
-  }
-  else if (rescale_z)
-  {
-    temp = (orig_z_scale_factor*quantizer.get_Z(header.max_z))/header.z_scale_factor;
-    temp = header.get_z(I32_QUANTIZE(temp));
-  }
-  else
-  {
-    temp = header.max_z;
-  }
-  if (fabs(temp - header.max_z) > header.z_scale_factor)
-  {
-    fprintf(stderr,"ERROR: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for max_z\n", orig_z_scale_factor, header.z_scale_factor, orig_z_offset, header.z_offset);
-    return FALSE;
+    // make sure rescale & reoffset do not cause integer overflow for min_z
+    if (reoffset_z)
+    {
+      temp_f = ((orig_z_scale_factor*quantizer.get_Z(header.min_z))+orig_z_offset-header.z_offset)/header.z_scale_factor;
+    }
+    else
+    {
+      temp_f = (orig_z_scale_factor*quantizer.get_Z(header.min_z))/header.z_scale_factor;
+    }
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
+    {
+      fprintf(stderr,"WARNING: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for min_z\n", orig_z_scale_factor, header.z_scale_factor, orig_z_offset, header.z_offset);
+    }
+
+    // make sure rescale & reoffset do not cause integer overflow for max_z
+    if (reoffset_z)
+    {
+      temp_f = ((orig_z_scale_factor*quantizer.get_Z(header.max_z))+orig_z_offset-header.z_offset)/header.z_scale_factor;
+    }
+    else
+    {
+      temp_f = (orig_z_scale_factor*quantizer.get_Z(header.max_z))/header.z_scale_factor;
+    }
+    temp_i = I64_QUANTIZE(temp_f);
+    if (I32_FITS_IN_RANGE(temp_i) == FALSE)
+    {
+      fprintf(stderr,"WARNING: rescaling from %g to %g and reoffsetting from %g to %g causes LAS integer overflow for max_z\n", orig_z_scale_factor, header.z_scale_factor, orig_z_offset, header.z_offset);
+    }
   }
 
   return TRUE;
