@@ -3,6 +3,7 @@
 14 April 2016 -- lasclassify: added missing '-ignore_class' selection options to the GUI
 14 April 2016 -- lasground: fixed rare crash when classifying flightlines separately with '-by_flightline'
 10 April 2016 -- LASlib: exit with ERROR when '-rescale 0.001 ...' or '-reoffset ...' overflow integer
+ 9 April 2016 -- lasinfo: new option '-set_file_source_ID_from_point_source_ID'
  8 April 2016 -- lassort: sort first by GPS time then by return number '-gps_time -return_number'
 28 March 2016 -- laspublish: fixed bug for download (files were copied / moved to wrong location)
 28 March 2016 -- lasthin: added '-adaptive 0.2' for adaptive thinning (e.g. keypoints)
