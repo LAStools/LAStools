@@ -1,3 +1,11 @@
+29 April 2016 -- LASlib: don't EXIT but produce WARNINGs when rescale / reoffset overflows integers
+10 April 2016 -- LASlib: exit with ERROR when '-rescale 0.001 ...' or '-reoffset ...' overflow integer
+28 February 2016 -- LASlib: new filters '-drop_extended_class 42' and '-drop_extended_class 219'
+18 February 2016 -- lasinfo: more useful '-set_number_of_variable_length_records' and friends
+25 January 2016 -- LASlib: brand-new opportunity to do a '-filtered_transform' 
+24 January 2016 -- txt2las: better support for storing attributes in "Extra Bytes with '-add_attribute'
+19 January 2016 -- LASlib: new transform to '-scale_rgb 1.5 2.1 1.8' 
+ 1 January 2016 -- las2las & txt2las: create OGC WKT string for CRS for full LAS 1.4 compliance 
 25 September 2015 -- LASlib: disabling auto-upgrade to LAS 1.4 introduced in 150924. now it just warns.
 24 September 2015 -- LASlib: upgrade to LAS 1.4 when '-merged'ing more points than older LAS allows
 24 September 2015 -- LASlib: consistant zeroing of legacy counters for new LAS 1.4 point types
