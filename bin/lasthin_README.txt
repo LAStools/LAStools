@@ -12,9 +12,23 @@
 
   Instead of removing the thinned out points from the output file
   you can also request to classify them with '-classify_as 8' or
-  mark the thinned points by flagging them '-withheld'. Then you can
-  use the  standard '-drop_withheld' or '-keep_withheld' filters
-  to get either the thinned points or their complement.
+  mark thinned out points by flagging them as '-flag_as_withheld'
+  Later use the '-drop_withheld' or '-keep_withheld' filters to
+  get either the thinned points or their complement. You can also
+  use '-flag_as_keypoint' to flag all the points that survive the
+  thinning operation.
+
+  For adaptive thinning use '-adaptive 0.2 5.0' where 0.2 specifies
+  the vertical tolerance that a TIN through the thinned points is
+  allowed to deviate from the complete set of points and 5.0 the
+  maximum distance between points. The default for the latter is
+  10.0 if you only specify '-adaptive 0.15'.
+
+  For 2 meter iso-contour creation you can optimize the thinning
+  with '-contours 2.0'. This is in addition to deciding on a good
+  step size with '-step 0.5'. It will choose the surviving points
+  to be vertically as far away as possible from the contours which
+  tends to result in cleaner, less jaggy countours.
 
   In order to process very large but sparse grids such as, for
   example, a single but very long diagonal flight line, it is

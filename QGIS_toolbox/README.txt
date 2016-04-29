@@ -64,4 +64,4 @@ C:\Program Files\QGIS Wien\apps\qgis\python\plugins\processing\algs\lidar\lastoo
 
 ================================================================
 
-For QGIS 2.10 all is great.
+For QGIS 2.10 and above all is (or should be) great.
