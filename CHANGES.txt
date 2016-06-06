@@ -1,3 +1,8 @@
+6 June 2016 -- lasthin: also GUI shows options for adaptive thinning (e.g. keypoints) and contour thinning
+28 May 2016 -- QGIS 2.14.1: major update to LAStools and LAStools Production toolboxes for QGIS 2.14.1
+20 May 2016 -- las2las: '-move_ancient_to_extended_classification' 5 bits + flags = 8 bit classifications
+15 May 2016 -- LASlib: '-translate_raw_xy_at_random 2 2' perturbes X/Y for faster Delaunay of points on grid
+12 May 2016 -- lasgrid, las2dem, lascanopy: appropiate resolution for X/Y coordinates for XYZ output
 29 April 2016 -- LASlib: don't EXIT but produce WARNINGs when rescale / reoffset overflows integers
 20 April 2016 -- LASlib: new transforms, '-switch_R_G', '-switch_R_B' and '-set_RGB 32768 16384 0'
 14 April 2016 -- lasclassify: added missing '-ignore_class' selection options to the GUI
