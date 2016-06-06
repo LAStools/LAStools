@@ -492,6 +492,7 @@ void LASreadOpener::reset()
 LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_other)
 {
   if (filter) filter->reset();
+  if (transform) transform->reset();
 
   if (file_names || other_file_name)
   {
@@ -1088,6 +1089,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
   lasreader->close();
 
   if (filter) filter->reset();
+  if (transform) transform->reset();
 
   if (pipe_on)
   {
