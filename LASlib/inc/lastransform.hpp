@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     9 May 2016 -- new '-translate_raw_xy_at_random 2 2' for random pertubation
     20 April 2016 -- new '-switch_R_G', '-switch_R_B' and '-set_RGB 32768 16384 0'
     25 January 2016 -- brand-new opportunity to do a '-filtered_transform' 
     18 December 2011 -- added '-flip_waveform_direction' to deal with Riegl's data 
@@ -44,7 +45,8 @@ class LASoperation
 public:
   virtual const CHAR * name() const = 0;
   virtual int get_command(CHAR* string) const = 0;
-  virtual void transform(LASpoint* point) const = 0;
+  virtual void transform(LASpoint* point) = 0;
+  virtual void reset(){};
   virtual ~LASoperation(){};
 };
 
@@ -66,7 +68,8 @@ public:
 
   void setPointSource(U16 value);
 
-  void transform(LASpoint* point) const;
+  void transform(LASpoint* point);
+  void reset();
 
   LAStransform();
   ~LAStransform();
