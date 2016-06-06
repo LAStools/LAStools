@@ -1,3 +1,5 @@
+20 May 2016 -- las2las: '-move_ancient_to_extended_classification' 5 bits + flags = 8 bit classifications
+15 May 2016 -- LASlib: '-translate_raw_xy_at_random 2 2' perturbes X/Y for faster Delaunay of points on grid
 29 April 2016 -- LASlib: don't EXIT but produce WARNINGs when rescale / reoffset overflows integers
 10 April 2016 -- LASlib: exit with ERROR when '-rescale 0.001 ...' or '-reoffset ...' overflow integer
  9 April 2016 -- lasinfo: new option '-set_file_source_ID_from_point_source_ID'
