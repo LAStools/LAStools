@@ -979,9 +979,16 @@ class LAScriterionKeepRandomFraction : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_random_fraction"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), fraction); };
-  inline BOOL filter(const LASpoint* point) { F32 f = (F32)rand()/(F32)RAND_MAX; return f > fraction; };
-  LAScriterionKeepRandomFraction(F32 fraction) { this->fraction = fraction; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    srand(seed);
+    seed = rand();
+    return ((F32)seed/(F32)RAND_MAX) > fraction;
+  };
+  void reset() { seed = 0; };
+  LAScriterionKeepRandomFraction(F32 fraction) { seed = 0; this->fraction = fraction; };
 private:
+  U32 seed;
   F32 fraction;
 };
 
