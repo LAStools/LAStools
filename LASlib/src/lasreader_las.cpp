@@ -439,10 +439,12 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
 
       // check variable length record contents
 
+/*
       if (header.vlrs[i].reserved != 0xAABB)
       {
-//        fprintf(stderr,"WARNING: wrong header.vlrs[%d].reserved: %d != 0xAABB\n", i, header.vlrs[i].reserved);
+        fprintf(stderr,"WARNING: wrong header.vlrs[%d].reserved: %d != 0xAABB\n", i, header.vlrs[i].reserved);
       }
+*/
 
       // make sure there are enough bytes left to read the data of the variable length record before the point block starts
 
@@ -897,10 +899,12 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
 
           // check variable length record contents
 
-          if (header.evlrs[i].reserved != 0xAABB)
+/*
+          if (header.evlrs[i].reserved != 0)
           {
-    //        fprintf(stderr,"WARNING: wrong header.evlrs[%d].reserved: %d != 0xAABB\n", i, header.evlrs[i].reserved);
+            fprintf(stderr,"WARNING: wrong header.evlrs[%d].reserved: %d != 0\n", i, header.evlrs[i].reserved);
           }
+*/
 
           // load data following the header of the variable length record
 
