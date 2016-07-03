@@ -199,6 +199,7 @@ int main(int argc, char *argv[])
   bool verbose = false;
   bool no_header = false;
   bool no_variable_header = false;
+  bool no_returns = false;
   bool no_min_max = false;
   bool check_points = true;
   bool compute_density = false;
@@ -340,6 +341,10 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[i],"-nv") == 0 || strcmp(argv[i],"-no_vlrs") == 0)
     {
       no_variable_header = true;
+    }
+    else if (strcmp(argv[i],"-nr") == 0 || strcmp(argv[i],"-no_returns") == 0)
+    {
+      no_returns = true;
     }
     else if (strcmp(argv[i],"-nmm") == 0 || strcmp(argv[i],"-no_min_max") == 0)
     {
@@ -2770,6 +2775,9 @@ int main(int argc, char *argv[])
                 case 4096: // VerticalCSTypeGeoKey 
                   switch (lasreader->header.vlr_geo_key_entries[j].value_offset)
                   {
+                  case 1127: // VertCS_Canadian_Geodetic_Vertical_Datum_2013
+                    fprintf(file_out, "VerticalCSTypeGeoKey: VertCS_Canadian_Geodetic_Vertical_Datum_2013\012");
+                    break;
                   case 5001: // VertCS_Airy_1830_ellipsoid
                     fprintf(file_out, "VerticalCSTypeGeoKey: VertCS_Airy_1830_ellipsoid\012");
                     break;
@@ -2883,6 +2891,12 @@ int main(int argc, char *argv[])
                     break;
                   case 5106: // VertCS_Caspian_Sea
                     fprintf(file_out, "VerticalCSTypeGeoKey: VertCS_Caspian_Sea\012");
+                    break;
+                  case 5114: // VertCS_Canadian_Geodetic_Vertical_Datum_1928
+                    fprintf(file_out, "VerticalCSTypeGeoKey: VertCS_Canadian_Geodetic_Vertical_Datum_1928\012");
+                    break;
+                  case 5206: // VertCS_Dansk_Vertikal_Reference_1990
+                    fprintf(file_out, "VerticalCSTypeGeoKey: VertCS_Dansk_Vertikal_Reference_1990\012");
                     break;
                   case 5701: // ODN height (Reserved EPSG)
                     fprintf(file_out, "VerticalCSTypeGeoKey: ODN height (Reserved EPSG)\012");
@@ -3031,10 +3045,12 @@ int main(int argc, char *argv[])
           if (lasheader->vlrs[i].record_id == 0) // ClassificationLookup
           {
             LASvlr_classification* vlr_classification = (LASvlr_classification*)lasheader->vlrs[i].data;
-            for (int j = 0; j < 256; j++)
+            int num = lasheader->vlrs[i].record_length_after_header / sizeof(LASvlr_classification);
+            for (int j = 0; j < num; j++)
             {
-              fprintf(file_out, "    %d %s", vlr_classification[j].class_number, vlr_classification[j].description);
+              fprintf(file_out, "    %d %.15s", vlr_classification[j].class_number, vlr_classification[j].description);
             }
+            if (num) fprintf(file_out, "\012");
           }
           else if (lasheader->vlrs[i].record_id == 2) // Histogram
           {
@@ -3403,22 +3419,20 @@ int main(int argc, char *argv[])
           }
         }
       }
-      if (lashistogram.active())
+      if (file_out && !no_returns)
       {
-        lashistogram.report(file_out);
-        lashistogram.reset();
-      }
 #ifdef _WIN32
-      fprintf(file_out, "number of first returns:        %I64d\012", num_first_returns);
-      fprintf(file_out, "number of intermediate returns: %I64d\012", num_intermediate_returns);
-      fprintf(file_out, "number of last returns:         %I64d\012", num_last_returns);
-      fprintf(file_out, "number of single returns:       %I64d\012", num_single_returns);
+        fprintf(file_out, "number of first returns:        %I64d\012", num_first_returns);
+        fprintf(file_out, "number of intermediate returns: %I64d\012", num_intermediate_returns);
+        fprintf(file_out, "number of last returns:         %I64d\012", num_last_returns);
+        fprintf(file_out, "number of single returns:       %I64d\012", num_single_returns);
 #else
-      fprintf(file_out, "number of first returns:        %lld\012", num_first_returns);
-      fprintf(file_out, "number of intermediate returns: %lld\012", num_intermediate_returns);
-      fprintf(file_out, "number of last returns:         %lld\012", num_last_returns);
-      fprintf(file_out, "number of single returns:       %lld\012", num_single_returns);
+        fprintf(file_out, "number of first returns:        %lld\012", num_first_returns);
+        fprintf(file_out, "number of intermediate returns: %lld\012", num_intermediate_returns);
+        fprintf(file_out, "number of last returns:         %lld\012", num_last_returns);
+        fprintf(file_out, "number of single returns:       %lld\012", num_single_returns);
 #endif
+      }
       if (file_out && lasoccupancygrid)
       {
         if (num_last_returns)
@@ -3688,7 +3702,7 @@ int main(int argc, char *argv[])
           wrong_entry = true;
           if (file_out)
           {
-            fprintf(file_out, "WARNING: for return %d point type is %d but (legacy) number of points by return in header is %u instead zero.%s\n", lasheader->point_data_format, i, lasheader->number_of_points_by_return[i-1], (repair_counters ? "it was repaired." : ""));
+            fprintf(file_out, "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s\n", lasheader->point_data_format, i, lasheader->number_of_points_by_return[i-1], (repair_counters ? "it was repaired." : ""));
           }
         }
       }
@@ -3726,17 +3740,17 @@ int main(int argc, char *argv[])
             if (was_set)
             {
 #ifdef _WIN32
-              fprintf(file_out, "WARNING: for return %d real extended number of points by return (%I64d) is different from header entry (%I64d).%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
+              fprintf(file_out, "WARNING: real extended number of points by return [%d] is %I64d - different from header entry %I64d.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
 #else
-              fprintf(file_out, "WARNING: for return %d real extended number of points by return (%lld) is different from header entry (%lld).%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
+              fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
 #endif
             }
             else
             {
 #ifdef _WIN32
-              fprintf(file_out, "WARNING: for return %d real extended number of points by return is %I64d but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
+              fprintf(file_out, "WARNING: real extended number of points by return [%d] is %I64d but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
 #else
-              fprintf(file_out, "WARNING: for return %d real extended number of points by return is %lld but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
+              fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
 #endif
             }
           }
@@ -3756,7 +3770,7 @@ int main(int argc, char *argv[])
         }
       }
 
-      if (file_out && !no_min_max)
+      if (file_out && !no_returns)
       {
 #ifdef _WIN32
         if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there %s %I64d point%s with return number 0\n", (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[0], (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
@@ -3810,7 +3824,10 @@ int main(int argc, char *argv[])
 #else
         if (lassummary.number_of_returns[0]) fprintf(file_out, "WARNING: there are %lld points with a number of returns of given pulse of 0\n", lassummary.number_of_returns[0]); 
 #endif
+      }
 
+      if (file_out && !no_min_max)
+      {
         wrong_entry = false;
         for (i = 0; i < 32; i++) if (lassummary.classification[i]) wrong_entry = true;
         if (lassummary.classification_synthetic || lassummary.classification_keypoint ||  lassummary.classification_withheld) wrong_entry = true;
@@ -3852,6 +3869,12 @@ int main(int argc, char *argv[])
   #endif
           }
         }
+      }
+
+      if (lashistogram.active())
+      {
+        lashistogram.report(file_out);
+        lashistogram.reset();
       }
 
       double value;
