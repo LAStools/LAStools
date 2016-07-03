@@ -415,6 +415,14 @@ public:
   inline BOOL filter(const LASpoint* point) { return (point->return_number > 1); };
 };
 
+class LAScriterionKeepFirstOfManyReturn : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_first_of_many"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns == 1) || (point->return_number > 1)); };
+};
+
 class LAScriterionKeepMiddleReturn : public LAScriterion
 {
 public:
@@ -429,6 +437,14 @@ public:
   inline const CHAR* name() const { return "keep_last"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline BOOL filter(const LASpoint* point) { return (point->return_number < point->number_of_returns); };
+};
+
+class LAScriterionKeepLastOfManyReturn : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_last_of_many"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline BOOL filter(const LASpoint* point) { return ((point->return_number == 1) || (point->return_number < point->number_of_returns)); };
 };
 
 class LAScriterionDropFirstReturn : public LAScriterion
@@ -1277,8 +1293,9 @@ void LASfilter::usage() const
   fprintf(stderr,"  -keep_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)\n");
   fprintf(stderr,"  -drop_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)\n");
   fprintf(stderr,"Filter points based on their return number.\n");
-  fprintf(stderr,"  -first_only -keep_first -drop_first\n");
-  fprintf(stderr,"  -last_only -keep_last -drop_last\n");
+  fprintf(stderr,"  -keep_first -first_only -drop_first\n");
+  fprintf(stderr,"  -keep_last -last_only -drop_last\n");
+  fprintf(stderr,"  -keep_first_of_many -keep_last_of_many\n");
   fprintf(stderr,"  -drop_first_of_many -drop_last_of_many\n");
   fprintf(stderr,"  -keep_middle -drop_middle\n");
   fprintf(stderr,"  -keep_return 1 2 3\n");
@@ -1424,20 +1441,36 @@ BOOL LASfilter::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-keep_", 6) == 0)
     {
-      if (strcmp(argv[i],"-keep_first") == 0)
+      if (strncmp(argv[i],"-keep_first", 11) == 0)
       {
-        add_criterion(new LAScriterionKeepFirstReturn());
-        *argv[i]='\0';
+        if (strcmp(argv[i],"-keep_first") == 0)
+        {
+          add_criterion(new LAScriterionKeepFirstReturn());
+          *argv[i]='\0';
+        }
+        else if (strcmp(argv[i],"-keep_first_of_many") == 0)
+        {
+          add_criterion(new LAScriterionKeepFirstOfManyReturn());
+          *argv[i]='\0';
+        }
       }
       else if (strcmp(argv[i],"-keep_middle") == 0)
       {
         add_criterion(new LAScriterionKeepMiddleReturn());
         *argv[i]='\0';
       }
-      else if (strcmp(argv[i],"-keep_last") == 0)
+      else if (strncmp(argv[i],"-keep_last", 10) == 0)
       {
-        add_criterion(new LAScriterionKeepLastReturn());
-        *argv[i]='\0';
+        if (strcmp(argv[i],"-keep_last") == 0)
+        {
+          add_criterion(new LAScriterionKeepLastReturn());
+          *argv[i]='\0';
+        }
+        else if (strcmp(argv[i],"-keep_last_of_many") == 0)
+        {
+          add_criterion(new LAScriterionKeepLastOfManyReturn());
+          *argv[i]='\0';
+        }
       }
       else if (strncmp(argv[i],"-keep_class", 11) == 0)
       {
