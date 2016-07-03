@@ -24,7 +24,10 @@
   Change the default scale factor of 10.0 with '-scale_u 20.0'
   or disable the storage in the "user data" field with option
   '-do_not_store_in_user_data' or by storing the height above
-  the ground as "extra bytes" with '-store_as_extra_bytes'.
+  the ground as "extra bytes" with '-store_as_extra_bytes' as
+  an 0.01 scaled signed two-byte short [cm resolution] or with
+  '-store_precise_as_extra_bytes' as an 0.001 scaled signed
+  four-byte integer [mm resolution].
 
   Alternatively - to avoid quantizing and clamping - you can
   '-replace_z' the elevation value of each point with the computed
