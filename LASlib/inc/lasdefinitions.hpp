@@ -31,6 +31,7 @@
   
   CHANGE HISTORY:
   
+    22 June 2016 -- set default of VLR header "reserved" to 0 instead of 0xAABB
     1 August 2015 -- moving LASpoint, LASquantizer, and LASattributer to LASzip
     9 December 2013 -- bug fix and improved writing of new LAS 1.4 point types
     21 December 2011 -- (limited) support for LAS 1.4 and attributed extra bytes 
@@ -46,7 +47,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 160606
+#define LAS_TOOLS_VERSION 160703
 
 #include <stdio.h>
 #include <string.h>
@@ -550,7 +551,7 @@ public:
       offset_to_point_data += 54;
       vlrs = (LASvlr*)malloc(sizeof(LASvlr)*number_of_variable_length_records);
     }
-    vlrs[i].reserved = 0xAABB;
+    vlrs[i].reserved = 0; // used to be 0xAABB
     strncpy(vlrs[i].user_id, user_id, 16);
     vlrs[i].record_id = record_id;
     vlrs[i].record_length_after_header = record_length_after_header;
