@@ -838,6 +838,17 @@ private:
   U8 return_number;
 };
 
+class LASoperationSetExtendedReturnNumber : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_extended_return_number"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), extended_return_number); };
+  inline void transform(LASpoint* point) { point->extended_return_number = extended_return_number; };
+  LASoperationSetExtendedReturnNumber(U8 extended_return_number) { this->extended_return_number = extended_return_number; };
+private:
+  U8 extended_return_number;
+};
+
 class LASoperationChangeReturnNumberFromTo : public LASoperation
 {
 public:
@@ -859,6 +870,17 @@ public:
   LASoperationSetNumberOfReturns(U8 number_of_returns) { this->number_of_returns = number_of_returns; };
 private:
   U8 number_of_returns;
+};
+
+class LASoperationSetExtendedNumberOfReturns : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_extended_number_of_returns"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), extended_number_of_returns); };
+  inline void transform(LASpoint* point) { point->extended_number_of_returns = extended_number_of_returns; };
+  LASoperationSetExtendedNumberOfReturns(U8 extended_number_of_returns) { this->extended_number_of_returns = extended_number_of_returns; };
+private:
+  U8 extended_number_of_returns;
 };
 
 class LASoperationChangeNumberOfReturnsFromTo : public LASoperation
@@ -1094,8 +1116,10 @@ void LAStransform::usage() const
   fprintf(stderr,"Change the return number or return count of points.\n");
   fprintf(stderr,"  -repair_zero_returns\n");
   fprintf(stderr,"  -set_return_number 1\n");
+  fprintf(stderr,"  -set_extended_return_number 10\n");
   fprintf(stderr,"  -change_return_number_from_to 2 1\n");
   fprintf(stderr,"  -set_number_of_returns 2\n");
+  fprintf(stderr,"  -set_number_of_returns 15\n");
   fprintf(stderr,"  -change_number_of_returns_from_to 0 2\n");
   fprintf(stderr,"Modify the classification.\n");
   fprintf(stderr,"  -set_classification 2\n");
@@ -1562,6 +1586,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationSetReturnNumber((U8)atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
+      else if (strcmp(argv[i],"-set_extended_return_number") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: extended_return_number\n", argv[i]);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetExtendedReturnNumber((U8)atoi(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
       else if (strcmp(argv[i],"-set_number_of_returns") == 0)
       {
         if ((i+1) >= argc)
@@ -1570,6 +1604,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
           return FALSE;
         }
         add_operation(new LASoperationSetNumberOfReturns((U8)atoi(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i],"-set_extended_number_of_returns") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: extended_number_of_returns\n", argv[i]);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetExtendedNumberOfReturns((U8)atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_gps_time") == 0)
