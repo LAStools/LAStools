@@ -916,7 +916,7 @@ class LAScriterionKeepGpsTime : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_gps_time"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_gpstime, above_gpstime); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %.6f %.6f ", name(), below_gpstime, above_gpstime); };
   inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && ((point->gps_time < below_gpstime) || (point->gps_time > above_gpstime))); };
   LAScriterionKeepGpsTime(F64 below_gpstime, F64 above_gpstime) { this->below_gpstime = below_gpstime; this->above_gpstime = above_gpstime; };
 private:
@@ -927,7 +927,7 @@ class LAScriterionDropGpsTimeBelow : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_gps_time_below"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), below_gpstime); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %.6f ", name(), below_gpstime); };
   inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && (point->gps_time < below_gpstime)); };
   LAScriterionDropGpsTimeBelow(F64 below_gpstime) { this->below_gpstime = below_gpstime; };
 private:
@@ -938,7 +938,7 @@ class LAScriterionDropGpsTimeAbove : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_gps_time_above"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), above_gpstime); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %.6f ", name(), above_gpstime); };
   inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && (point->gps_time > above_gpstime)); };
   LAScriterionDropGpsTimeAbove(F64 above_gpstime) { this->above_gpstime = above_gpstime; };
 private:
@@ -949,7 +949,7 @@ class LAScriterionDropGpsTimeBetween : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_gps_time_between"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_gpstime, above_gpstime); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %.6f %.6f ", name(), below_gpstime, above_gpstime); };
   inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && ((below_gpstime <= point->gps_time) && (point->gps_time <= above_gpstime))); };
   LAScriterionDropGpsTimeBetween(F64 below_gpstime, F64 above_gpstime) { this->below_gpstime = below_gpstime; this->above_gpstime = above_gpstime; };
 private:
