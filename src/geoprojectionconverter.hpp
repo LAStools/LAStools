@@ -108,8 +108,11 @@ struct GeoProjectionGeoKeys
 #define GEO_SPHEROID_WGS72         7043
 
 #define GEO_VERTICAL_WGS84         5030
-#define GEO_VERTICAL_NAVD29        5102
+#define GEO_VERTICAL_NGVD29        5102
 #define GEO_VERTICAL_NAVD88        5103
+#define GEO_VERTICAL_CGVD2013      1127
+#define GEO_VERTICAL_CGVD28        5114
+#define GEO_VERTICAL_DVR90         5206
 
 class GeoProjectionEllipsoid
 {
