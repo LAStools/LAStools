@@ -2071,12 +2071,95 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
         }
       }
     }
+    if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90))
+    {
+      if (vertical_geokey == GEO_VERTICAL_NAVD88)
+      {
+        n += sprintf(&string[n], "VERT_CS[\"NAVD88\",VERT_DATUM[\"North American Vertical Datum 1988\",2005,AUTHORITY[\"EPSG\",\"5103\"]],");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_NGVD29)
+      {
+        n += sprintf(&string[n], "VERT_CS[\"NGVD29\",VERT_DATUM[\"National Geodetic Vertical Datum 1929\",2005,AUTHORITY[\"EPSG\",\"5102\"]],");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_CGVD2013)
+      {
+        n += sprintf(&string[n], "VERT_CS[\"CGVD2013\",VERT_DATUM[\"Canadian Geodetic Vertical Datum of 2013\",2005,AUTHORITY[\"EPSG\",\"1127\"]],");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_CGVD28)
+      {
+        n += sprintf(&string[n], "VERT_CS[\"CGVD28\",VERT_DATUM[\"Canadian Geodetic Vertical Datum of 1928\",2005,AUTHORITY[\"EPSG\",\"5114\"]],");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_DVR90)
+      {
+        n += sprintf(&string[n], "VERT_CS[\"DVR90\",VERT_DATUM[\"Dansk Vertikal Reference 1990\",2005,AUTHORITY[\"EPSG\",\"5206\"]],");
+      }
+      if (source)
+      {
+        if (elevation2meter == 1.0)
+        {
+          n += sprintf(&string[n], "UNIT[\"metre\",1.0,AUTHORITY[\"EPSG\",\"9001\"]]");
+        }
+        else if (elevation2meter == 0.3048)
+        {
+          n += sprintf(&string[n], "UNIT[\"foot\",0.3048,AUTHORITY[\"EPSG\",\"9002\"]]");
+        }
+        else
+        {
+          n += sprintf(&string[n], "UNIT[\"US survey foot\",0.3048006096012192,AUTHORITY[\"EPSG\",\"9003\"]],");
+        }
+      }
+      else
+      {
+        if (meter2elevation == 1.0)
+        {
+          n += sprintf(&string[n], "UNIT[\"metre\",1.0,AUTHORITY[\"EPSG\",\"9001\"]]");
+        }
+        else if (meter2elevation == 0.3048)
+        {
+          n += sprintf(&string[n], "UNIT[\"foot\",0.3048,AUTHORITY[\"EPSG\",\"9002\"]]");
+        }
+        else
+        {
+          n += sprintf(&string[n], "UNIT[\"US survey foot\",0.3048006096012192,AUTHORITY[\"EPSG\",\"9003\"]],");
+        }
+      }
+      if (vertical_geokey == GEO_VERTICAL_NAVD88)
+      {
+        n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"%d\"]]", ((source && (elevation2meter == 1.0)) || (!source && (meter2elevation == 1.0)) ? 5703 : 6360));
+      }
+      else if (vertical_geokey == GEO_VERTICAL_NGVD29)
+      {
+        n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"5702\"]]");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_CGVD2013)
+      {
+        n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"6647\"]]");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_CGVD28)
+      {
+        n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"5713\"]]");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_DVR90)
+      {
+        n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"5799\"]]");
+      }
+    }
     len = n+1;
     *ogc_wkt = string;
     return true;
   }
   return false;
 }
+
+/*
+VERT_CS["Canadian Geodetic Vertical Datum of 1928",VERT_DATUM["Canadian Geodetic Vertical Datum of 1928",2005,AUTHORITY["EPSG","5114"]],UNIT["m",1.0],AXIS["Gravity-related height",UP],AUTHORITY["EPSG","5713"]]
+VERT_CS["North American Vertical Datum of 1988",VERT_DATUM["North American Vertical Datum 1988",2005,AUTHORITY["EPSG","5103"]],UNIT["m",1.0],AXIS["Gravity-related height",UP],AUTHORITY["EPSG","5703"]]
+VERT_CS["North American Vertical Datum of 1988",VERT_DATUM["North American Vertical Datum 1988",2005,AUTHORITY["EPSG","5103"]],UNIT["foot_survey_us",0.3048006096012192],AXIS["Gravity-related height",UP],AUTHORITY["EPSG","5703"]]
+
+  
+VERTCRS["CGVD28 height",VDATUM["Canadian Geodetic Vertical Datum of 1928"],CS[vertical,1],AXIS["gravity-related height (H)",up],LENGTHUNIT["metre",1.0],ID["EPSG",5713]]
+VERTCRS["CGVD2013 height",VDATUM["Canadian Geodetic Vertical Datum of 2013"],CS[vertical,1],AXIS["gravity-related height (H)",up],LENGTHUNIT["metre",1.0], ID["EPSG",6647]] 
+*/
 
 bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** proj4, bool source)
 {
@@ -6472,9 +6555,24 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         vertical_geokey = GEO_VERTICAL_WGS84;
         *argv[i]='\0';
       }
-      else if (strcmp(argv[i],"-vertical_navd29") == 0)
+      else if (strcmp(argv[i],"-vertical_ngvd29") == 0 || strcmp(argv[i],"-vertical_navd29") == 0)
       {
-        vertical_geokey = GEO_VERTICAL_NAVD29;
+        vertical_geokey = GEO_VERTICAL_NGVD29;
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-vertical_cgvd2013") == 0)
+      {
+        vertical_geokey = GEO_VERTICAL_CGVD2013;
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-vertical_cgvd28") == 0)
+      {
+        vertical_geokey = GEO_VERTICAL_CGVD28;
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-vertical_dvr90") == 0)
+      {
+        vertical_geokey = GEO_VERTICAL_DVR90;
         *argv[i]='\0';
       }
     }
@@ -6859,6 +6957,22 @@ int GeoProjectionConverter::unparse(char* string) const
     else if (vertical_geokey == GEO_VERTICAL_WGS84)
     {
       n += sprintf(&string[n], "-vertical_wgs84 ");
+    }
+    else if (vertical_geokey == GEO_VERTICAL_CGVD2013)
+    {
+      n += sprintf(&string[n], "-vertical_cgvd2013 ");
+    }
+    else if (vertical_geokey == GEO_VERTICAL_CGVD28)
+    {
+      n += sprintf(&string[n], "-vertical_cgvd28 ");
+    }
+    else if (vertical_geokey == GEO_VERTICAL_DVR90)
+    {
+      n += sprintf(&string[n], "-vertical_dvr90 ");
+    }
+    else if (vertical_geokey == GEO_VERTICAL_NGVD29)
+    {
+      n += sprintf(&string[n], "-vertical_ngvd29 ");
     }
   }
   have_epsg = false;
@@ -7870,7 +7984,7 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(short* horizontal_uni
   {
     *vertical_datum = 3;
   }
-  else if (vertical_geokey == GEO_VERTICAL_NAVD29)
+  else if (vertical_geokey == GEO_VERTICAL_NGVD29)
   {
     *vertical_datum = 1;
   }
@@ -7934,7 +8048,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   }
   else if (vertical_datum == 1)
   {
-    vertical_geokey = GEO_VERTICAL_NAVD29;
+    vertical_geokey = GEO_VERTICAL_NGVD29;
   }
 
   return true;
