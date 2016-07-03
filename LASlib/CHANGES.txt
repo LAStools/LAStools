@@ -1,3 +1,7 @@
+28 June 2016 -- LASlib: new transforms '-set_extended_return_number 11' and '-set_extended_number_of_returns 13'
+28 June 2016 -- LASlib: new filters '-keep_first_of_many' and '-keep_last_of_many'
+24 June 2016 -- LASlib: the 'reserved' field of newly created VLRs is set to zero instead of 0xAABB
+8 June 2016 -- LASlib: ASCII text input can have ';' as a seperator (e.g. 500936.36;104300.50;711.73)
 20 May 2016 -- las2las: '-move_ancient_to_extended_classification' 5 bits + flags = 8 bit classifications
 15 May 2016 -- LASlib: '-translate_raw_xy_at_random 2 2' perturbes X/Y for faster Delaunay of points on grid
 29 April 2016 -- LASlib: don't EXIT but produce WARNINGs when rescale / reoffset overflows integers
