@@ -10,6 +10,17 @@
   For example, the option '-keep_class 2 3' will triangulate only
   the points of classification 2 or 3.
 
+  Note: to guarantee non-crossing iso-contours the '-simplify'
+  (or '-simplify_length) and the '-simplify_area' parameters
+  should not be used (or set to zero). This is because those
+  two options directly try to simplify individual contours after
+  they were extracted, which can lead to crossing. However, the
+  '-smooth' option operates on the TIN before extracting the
+  contours, and hence is safe. The '-clean' option simply removes
+  entire contours that are too short. You can get less wiggly
+  contours by first thinning the points with the '-contours' 
+  option available in lasthin.
+
   The resulting isocontours are stored either in ESRI's Shapefile
   format (-o contours.shp) or as a text file (-o contours.txt) 
   or in Google Earth's KML format for immediate visualization

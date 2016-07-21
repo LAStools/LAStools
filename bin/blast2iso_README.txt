@@ -11,6 +11,17 @@
   is geo-referencing information in the input file or if it is
   specified explicitely in the command line. 
 
+  Note: to guarantee non-crossing iso-contours the '-simplify'
+  (or '-simplify_length) and the '-simplify_area' parameters
+  should not be used (or set to zero). This is because those
+  two options directly try to simplify individual contours after
+  they were extracted, which can lead to crossing. However, the
+  '-smooth' option operates on the TIN before extracting the
+  contours, and hence is safe. The '-clean' option simply removes
+  entire contours that are too short. You can get less wiggly
+  contours by first thinning the points with the '-contours' 
+  option available in lasthin.
+
   Isolines crossing triangles whose edge length is larger than a
   threshold can be eliminated with the '-kill 250' option. The
   default is a kill of 50 meter. Use '-kill 1000000' to disable
