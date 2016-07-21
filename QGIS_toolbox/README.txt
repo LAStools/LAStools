@@ -1,8 +1,8 @@
 ****************************************************************
 
-  The LAStools LiDAR processing toolbox for QGIS 1.8.0 - 2.6.1
+  The LAStools LiDAR processing toolbox for QGIS 1.8.0 - 2.14.1
 
-  (c) 2013-2014 - martin.isenburg@rapidlasso.com
+  (c) 2013-2016 - martin.isenburg@rapidlasso.com
 
   rapidlasso GmbH - fast tools to catch reality
 
@@ -65,3 +65,20 @@ C:\Program Files\QGIS Wien\apps\qgis\python\plugins\processing\algs\lidar\lastoo
 ================================================================
 
 For QGIS 2.10 and above all is (or should be) great.
+
+================================================================
+
+UPDATE: For the latest LAStools toolbox for QGIS 2.14.1 created at
+the QGIS hackfest in Girona use the QGIS_2_14_1_toolbox.zip file.
+First, rename the current 'lidar' (sub-)folder of your QGIS install
+that is located here:
+
+C:\Program Files\QGIS Essen\apps\qgis\python\plugins\processing\algs\lidar
+
+to something like this:
+
+C:\Program Files\QGIS Essen\apps\qgis\python\plugins\processing\algs\lidar_orig
+
+and then put the contents of the downloaded QGIS_2_14_1_toolbox.zip
+archive - which contains a folder called 'lidar' - in the place of the
+folder that was just renamed.
