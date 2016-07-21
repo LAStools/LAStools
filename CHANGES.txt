@@ -1,3 +1,15 @@
+21 July 2016 -- las2iso, lasboundary, las2shp, las2tin: output *.prj files for SHP file output
+19 July 2016 -- las2las: fixed bug with '-target_survey_feet' not always working with '-cores 8'
+18 July 2016 -- lasgrid, las2dem, lascanopy, lasoverlap: output *.prj files for ASC/BIL/FLT/XYZ
+13 July 2016 -- las2las: added AUTHORITY EPSG code 1116 associated with NAD83 2011 for OGC WKT output
+9 July 2016 -- LAStools: added Norwegian vertical datums -vertical_nn2000 -vertical_nn54 
+9 July 2016 -- lasground, lasground_new, lasheight, lasnoise: fixed bug of version 160703 when using '-buffered 20'
+2 July 2016 -- LAStools: add datums -vertical_navd88 -vertical_cgvd2013 -vertical_cgvd28 -vertical_dvr90 
+2 July 2016 -- lasheight: added the options "store as extra bytes" and "none" to the GUI
+28 June 2016 -- LASlib: new transforms '-set_extended_return_number 11' and '-set_extended_number_of_returns 13'
+28 June 2016 -- LASlib: new filters '-keep_first_of_many' and '-keep_last_of_many'
+24 June 2016 -- LASlib: the 'reserved' field of newly created VLRs is set to zero instead of 0xAABB
+8 June 2016 -- LASlib: ASCII text input can have ';' as a seperator (e.g. 500936.36;104300.50;711.73)
 6 June 2016 -- lasthin: also GUI shows options for adaptive thinning (e.g. keypoints) and contour thinning
 28 May 2016 -- QGIS 2.14.1: major update to LAStools and LAStools Production toolboxes for QGIS 2.14.1
 20 May 2016 -- las2las: '-move_ancient_to_extended_classification' 5 bits + flags = 8 bit classifications
