@@ -1,3 +1,7 @@
+19 July 2016 -- las2las: fixed bug with '-target_survey_feet' not always working with '-cores 8'
+13 July 2016 -- las2las: added AUTHORITY EPSG code 1116 associated with NAD83 2011 for OGC WKT output
+9 July 2016 -- LAStools: added Norwegian vertical datums -vertical_nn2000 -vertical_nn54 
+2 July 2016 -- LAStools: add datums -vertical_navd88 -vertical_cgvd2013 -vertical_cgvd28 -vertical_dvr90 
 28 June 2016 -- LASlib: new transforms '-set_extended_return_number 11' and '-set_extended_number_of_returns 13'
 28 June 2016 -- LASlib: new filters '-keep_first_of_many' and '-keep_last_of_many'
 24 June 2016 -- LASlib: the 'reserved' field of newly created VLRs is set to zero instead of 0xAABB
