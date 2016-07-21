@@ -16,7 +16,7 @@ mkdir temp_tiles
 
 lastile -i %1 ^
         -tile_size 400 ^
-        -o temp_tiles\tiles.laz -olaz
+        -o temp_tiles\split.laz -olaz
 
 :: create another temporary tile directory
 
