@@ -31,14 +31,17 @@
     * lasliberate
     * lasinfo
     * las2las
-    * lasview
-    * laspublish
     * lasdiff
     * lasmerge
     * las2txt & txt2las
     * lasprecision
     * LASzip (with static linking exception)
     * LASlib (with LASzip) - the API used by LAStools.
+
+  These two are also "free" to use but not available in open source.
+
+    * lasview
+    * laspublish
 
 --------------------------------------------------------------------------
 
