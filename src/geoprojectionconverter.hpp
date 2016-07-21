@@ -113,6 +113,8 @@ struct GeoProjectionGeoKeys
 #define GEO_VERTICAL_CGVD2013      1127
 #define GEO_VERTICAL_CGVD28        5114
 #define GEO_VERTICAL_DVR90         5206
+#define GEO_VERTICAL_NN54          5776
+#define GEO_VERTICAL_NN2000        5941
 
 class GeoProjectionEllipsoid
 {
@@ -241,6 +243,7 @@ public:
   bool get_geo_keys_from_projection(int& num_geo_keys, GeoProjectionGeoKeys** geo_keys, int& num_geo_double_params, double** geo_double_params, bool source=true);
   bool set_projection_from_ogc_wkt(int len, char* ogc_wkt);
   bool get_ogc_wkt_from_projection(int& len, char** ogc_wkt, bool source=true);
+  bool get_prj_from_projection(int& len, char** prj, bool source=true);
   bool get_proj4_string_from_projection(int& len, char** proj4, bool source=true);
 
   short get_GTModelTypeGeoKey() const;
