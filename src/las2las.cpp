@@ -440,14 +440,6 @@ int main(int argc, char *argv[])
       usage(true);
     }
   }
-
-  // make sure we do not corrupt the input file
-
-  if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
-  {
-    fprintf(stderr, "ERROR: input and output file name are identical\n");
-    usage(true);
-  }
     
   // possibly loop over multiple input files
 
@@ -951,6 +943,16 @@ int main(int argc, char *argv[])
     {
       // create name from input name
       laswriteopener.make_file_name(lasreadopener.get_file_name());
+    }
+    else
+    {
+      // make sure we do not corrupt the input file
+
+      if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
+      {
+        fprintf(stderr, "ERROR: input and output file name are identical: '%s'\n", lasreadopener.get_file_name());
+        usage(true);
+      }
     }
 
     // prepare the header for the surviving points
