@@ -48,6 +48,7 @@
   
   CHANGE HISTORY:
   
+    30 July 2016 -- no more special handling for stateplanes. just parse for EPSG code 
      9 January 2016 -- use GeographicTypeGeoKey not GeogGeodeticDatumGeoKey for custom
      2 January 2016 -- parse 'pcs.csv' file when unknown EPSG code is encountered
     28 June 2015 -- tried to add the Oblique Mercator projection (very incomplete)
