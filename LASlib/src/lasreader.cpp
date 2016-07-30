@@ -470,6 +470,10 @@ I32 LASreadOpener::unparse(CHAR* string) const
   {
     n += sprintf(string + n, "-io_ibuffer %d ", io_ibuffer_size);
   }
+  if (temp_file_base)
+  {
+    n += sprintf(string + n, "-temp_files \"%s\" ", temp_file_base);
+  }
   return n;
 }
 
@@ -1626,6 +1630,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_buffer_size((F32)atof(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
+    else if (strcmp(argv[i],"-temp_files") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: base name\n", argv[i]);
+        return FALSE;
+      }
+      i++;
+      temp_file_base = argv[i];
+    }
     else if (strcmp(argv[i],"-neighbors") == 0)
     {
       if ((i+1) >= argc)
@@ -2273,6 +2287,7 @@ LASreadOpener::LASreadOpener()
   inside_rectangle = 0;
   filter = 0;
   transform = 0;
+  temp_file_base = 0;
 }
 
 LASreadOpener::~LASreadOpener()
