@@ -1,3 +1,4 @@
+30 July 2016 -- las2las: correct naming of stateplanes when combining '-sp83 CA_I' with 'set_ogc_wkt'
 19 July 2016 -- las2las: fixed bug with '-target_survey_feet' not always working with '-cores 8'
 13 July 2016 -- las2las: added AUTHORITY EPSG code 1116 associated with NAD83 2011 for OGC WKT output
 9 July 2016 -- LAStools: added Norwegian vertical datums -vertical_nn2000 -vertical_nn54 
