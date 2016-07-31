@@ -1,3 +1,8 @@
+30 July 2016 -- las2las: correct naming of stateplanes when combining '-sp83 CA_I' with 'set_ogc_wkt'
+29 July 2016 -- lasgrid, las2dem, lascanopy, lasoverlap: grids can be output as compressed LAZ points
+28 July 2016 -- lasclip: new option '-donuts' to handle islands and lakes (based on winding order)
+27 July 2016 -- lascontrol: new options '-cp_ignore_diff_above 1.5' '-cp_ignore_diff_below -0.5' 
+26 July 2016 -- lascanopy: ability to use '-names' in '-loc' and '-lor' lists of circ/rect plots
 21 July 2016 -- las2iso, lasboundary, las2shp, las2tin: output *.prj files for SHP file output
 19 July 2016 -- las2las: fixed bug with '-target_survey_feet' not always working with '-cores 8'
 18 July 2016 -- lasgrid, las2dem, lascanopy, lasoverlap: output *.prj files for ASC/BIL/FLT/XYZ
