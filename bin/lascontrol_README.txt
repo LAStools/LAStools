@@ -35,6 +35,12 @@
   with the '-adjust_z' command switch and should go hand in hand with
   specifying where the output should go with '-odir ...' or '-odix ...'
 
+  Especially for the '-adjust_z' it is sometimes useful to not let all
+  control points contribute to the error calculation. Via the options
+  '-cp_ignore_diff_above 1.5' and '-cp_ignore_diff_below -0.5' it is
+  possible to ignore control points that are too high or too low above
+  the LiDAR from the calculation that also computes the average error.
+
   Please license from martin.isenburg@rapidlasso.com to use lascontrol
   commercially.
 

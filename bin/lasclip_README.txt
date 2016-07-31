@@ -15,6 +15,12 @@
   overlaps and they must all form closed loops (e.g. last point
   and first point are identical).
 
+  Sometimes polygons describe donut-shaped objects such as lakes
+  with an island. Here the winding order of the lake with be CW
+  and that of the island will be CCW. In order to correcly clip
+  or classify only the lake (but now the island) the command line
+  option '-donuts' needs to be added.
+
   There is an option called '-split' that splits the input LiDAR
   (be it one LAS/LAZ file or several on-the-fly '-merged' LAS/LAZ
   files) into one output file per polygon. 
