@@ -4203,7 +4203,6 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   bool utm_northern = false;
   int utm_zone = -1;
   bool is_mga = false;
-  bool sp_nad27 = false;
   bool longlat = false;
   bool ecef = false;
 
