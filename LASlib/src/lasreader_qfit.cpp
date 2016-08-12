@@ -352,7 +352,10 @@ BOOL LASreaderQFIT::read_point_default()
     point.set_attribute(scan_azimuth_start, (I32)buffer[6]);
     point.set_attribute(pitch_start, (I32)buffer[7]);
     point.set_attribute(roll_start, (I32)buffer[8]);
-    point.set_attribute(pulse_width_start, (U8)buffer[10]);
+    if (version == 48)
+    {
+      point.set_attribute(pulse_width_start, (U8)buffer[10]);
+    }
 
     if (!populated_header)
     {

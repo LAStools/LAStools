@@ -26,6 +26,7 @@
   
   CHANGE HISTORY:
   
+     9 August 2016 -- fixed bug for QFIT version 40 or 56 (without pulse width)
     22 December 2011 -- created after my banker keeps me hostage for 2.5 hours
   
 ===============================================================================
