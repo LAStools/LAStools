@@ -52,7 +52,7 @@ BOOL LASinventory::init(const LASheader* header)
     U32 i;
     extended_number_of_point_records = (header->number_of_point_records ? header->number_of_point_records : header->extended_number_of_point_records);
     for (i = 0; i < 5; i++) extended_number_of_points_by_return[i] = (header->number_of_points_by_return[i] ? header->number_of_points_by_return[i] : header->extended_number_of_points_by_return[i]);
-    for (i = 5; i < 16; i++) extended_number_of_points_by_return[i] = header->extended_number_of_points_by_return[i];
+    for (i = 5; i < 15; i++) extended_number_of_points_by_return[i] = header->extended_number_of_points_by_return[i];
     max_X = header->get_X(header->max_x);
     min_X = header->get_X(header->min_x);
     max_Y = header->get_Y(header->max_y);
