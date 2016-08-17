@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  laswritepoint.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
 
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 
@@ -317,14 +317,14 @@ BOOL LASwritePoint::add_chunk_to_table()
     if (chunk_bytes == 0)
     {
       alloced_chunks = 1024;
-      if (chunk_size == U32_MAX) chunk_sizes = (U32*)malloc(sizeof(U32)*alloced_chunks); 
-      chunk_bytes = (U32*)malloc(sizeof(U32)*alloced_chunks); 
+      if (chunk_size == U32_MAX) chunk_sizes = (U32*)malloc(sizeof(U32)*alloced_chunks);
+      chunk_bytes = (U32*)malloc(sizeof(U32)*alloced_chunks);
     }
     else
     {
       alloced_chunks *= 2;
-      if (chunk_size == U32_MAX) chunk_sizes = (U32*)realloc(chunk_sizes, sizeof(U32)*alloced_chunks); 
-      chunk_bytes = (U32*)realloc(chunk_bytes, sizeof(U32)*alloced_chunks); 
+      if (chunk_size == U32_MAX) chunk_sizes = (U32*)realloc(chunk_sizes, sizeof(U32)*alloced_chunks);
+      chunk_bytes = (U32*)realloc(chunk_bytes, sizeof(U32)*alloced_chunks);
     }
     if (chunk_size == U32_MAX && chunk_sizes == 0) return FALSE;
     if (chunk_bytes == 0) return FALSE;
