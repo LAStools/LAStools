@@ -319,7 +319,7 @@ BOOL LASreadPoint::seek(const U32 current, const U32 target)
   {
     if (current != target)
     {
-      instream->seek(point_start+point_size*target);
+      instream->seek(point_start+(I64)point_size*target);
     }
   }
   return TRUE;
