@@ -36,11 +36,8 @@
 
 #include "lasquadtree.hpp"
 #include "lasinterval.hpp"
-#ifdef LASZIPDLL_EXPORTS
 #include "lasreadpoint.hpp"
-#else
 #include "lasreader.hpp"
-#endif
 #include "bytestreamin_file.hpp"
 #include "bytestreamout_file.hpp"
 
@@ -585,7 +582,6 @@ BOOL LASindex::write(ByteStreamOut* stream) const
 
 // seek to next interval point
 
-#ifdef LASZIPDLL_EXPORTS
 BOOL LASindex::seek_next(LASreadPoint* reader, I64 &p_count)
 {
   if (!have_interval)
@@ -600,7 +596,7 @@ BOOL LASindex::seek_next(LASreadPoint* reader, I64 &p_count)
   }
   return TRUE;
 }
-#else
+
 BOOL LASindex::seek_next(LASreader* lasreader)
 {
   if (!have_interval)
@@ -614,7 +610,6 @@ BOOL LASindex::seek_next(LASreader* lasreader)
   }
   return TRUE;
 }
-#endif
 
 // merge the intervals of non-empty cells
 BOOL LASindex::merge_intervals()
