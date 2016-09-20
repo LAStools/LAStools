@@ -520,6 +520,17 @@ private:
   U8 classification;
 };
 
+class LASoperationSetExtendedClassification : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_extended_classification"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), classification); };
+  inline void transform(LASpoint* point) { point->extended_classification = classification; };
+  LASoperationSetExtendedClassification(U8 classification) { this->classification = classification; };
+private:
+  U8 classification;
+};
+
 class LASoperationChangeClassificationFromTo : public LASoperation
 {
 public:
@@ -1123,6 +1134,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -change_number_of_returns_from_to 0 2\n");
   fprintf(stderr,"Modify the classification.\n");
   fprintf(stderr,"  -set_classification 2\n");
+  fprintf(stderr,"  -set_extended_classification 0\n");
   fprintf(stderr,"  -change_classification_from_to 2 4\n");
   fprintf(stderr,"  -classify_z_below_as -5.0 7\n");
   fprintf(stderr,"  -classify_z_above_as 70.0 7\n");
@@ -1494,6 +1506,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
           return FALSE;
         }
         add_operation(new LASoperationSetClassification(U8_CLAMP(atoi(argv[i+1]))));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strncmp(argv[i],"-set_extended_classification", 28) == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: classification\n", argv[i]);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetExtendedClassification(U8_CLAMP(atoi(argv[i+1]))));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_intensity") == 0)
