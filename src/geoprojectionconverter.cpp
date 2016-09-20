@@ -1828,6 +1828,7 @@ static char* get_epsg_name_from_pcs_file(const char* program_name, short value)
       }
     }
   }
+  fclose(file);
   return epsg_name;
 }
 
