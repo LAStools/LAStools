@@ -143,6 +143,7 @@ private:
   LASbin* intensity_bin;
   LASbin* classification_bin;
   LASbin* scan_angle_bin;
+  LASbin* extended_scan_angle_bin;
   LASbin* user_data_bin;
   LASbin* point_source_id_bin;
   LASbin* gps_time_bin;
