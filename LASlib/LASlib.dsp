@@ -481,10 +481,6 @@ SOURCE=..\LASzip\src\laszip_common_v2.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\LASzip\src\laszip_common_v3.hpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\LASzip\src\mydefs.hpp
 # End Source File
 # End Group
