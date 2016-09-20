@@ -16,6 +16,8 @@
   a concavity of 50 meter. Use '-concavity 0' to disable this. The
   value is always assumed to be meters and will be multipled with
   3.28 for LAS/LAZ files where x and y are known to be in feet.
+  With the '-kill 3' option also triangles in the interior are
+  removed if their edges are 3 meters or longer.
 
   It is also possible to compute histograms over the length of
   edges with '-histo' or '-histo_only'. As arguments this command
@@ -99,7 +101,7 @@ stores the resulting TIN in ESRI's Shapefile format to file tin.shp.
 
 for more info:
 
-D:\LAStools\bin>las2tin -h
+E:\LAStools\bin>las2tin -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -120,8 +122,9 @@ Filter points based on their coordinates.
   -keep_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)
   -drop_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)
 Filter points based on their return number.
-  -first_only -keep_first -drop_first
-  -last_only -keep_last -drop_last
+  -keep_first -first_only -drop_first
+  -keep_last -last_only -drop_last
+  -keep_first_of_many -keep_last_of_many
   -drop_first_of_many -drop_last_of_many
   -keep_middle -drop_middle
   -keep_return 1 2 3
@@ -133,16 +136,18 @@ Filter points based on their return number.
   -keep_quintuple -drop_quintuple
 Filter points based on the scanline flags.
   -drop_scan_direction 0
-  -scan_direction_change_only
-  -edge_of_flight_line_only
+  -keep_scan_direction_change
+  -keep_edge_of_flight_line
 Filter points based on their intensity.
   -keep_intensity 20 380
   -drop_intensity_below 20
   -drop_intensity_above 380
   -drop_intensity_between 4000 5000
-Filter points based on their classification.
+Filter points based on classifications or flags.
   -keep_class 1 3 7
   -drop_class 4 2
+  -keep_extended_class 43
+  -drop_extended_class 129 135
   -drop_synthetic -keep_synthetic
   -drop_keypoint -keep_keypoint
   -drop_withheld -keep_withheld
@@ -150,6 +155,8 @@ Filter points based on their classification.
 Filter points based on their user data.
   -keep_user_data 1
   -drop_user_data 255
+  -keep_user_data_below 50
+  -keep_user_data_above 150
   -keep_user_data_between 10 20
   -drop_user_data_below 1
   -drop_user_data_above 100
@@ -164,6 +171,7 @@ Filter points based on their point source ID.
 Filter points based on their scan angle.
   -keep_scan_angle -15 15
   -drop_abs_scan_angle_above 15
+  -drop_abs_scan_angle_below 1
   -drop_scan_angle_below -15
   -drop_scan_angle_above 15
   -drop_scan_angle_between -25 -23
@@ -185,6 +193,8 @@ Filter points with simple thinning.
   -keep_random_fraction 0.1
   -thin_with_grid 1.0
   -thin_with_time 0.001
+Boolean combination of filters.
+  -filter_and
 Transform coordinates.
   -translate_x -2.5
   -scale_z 0.3048
@@ -194,11 +204,14 @@ Transform coordinates.
   -switch_x_y -switch_x_z -switch_y_z
   -clamp_z_below 70.5
   -clamp_z 70.5 72.5
+  -copy_attribute_into_z 0
 Transform raw xyz integers.
   -translate_raw_z 20
   -translate_raw_xyz 1 1 0
+  -translate_raw_xy_at_random 2 2
   -clamp_raw_z 500 800
 Transform intensity.
+  -set_intensity 0
   -scale_intensity 2.5
   -translate_intensity 50
   -translate_then_scale_intensity 0.5 3.1
@@ -211,8 +224,10 @@ Transform scan_angle.
 Change the return number or return count of points.
   -repair_zero_returns
   -set_return_number 1
+  -set_extended_return_number 10
   -change_return_number_from_to 2 1
   -set_number_of_returns 2
+  -set_number_of_returns 15
   -change_number_of_returns_from_to 0 2
 Modify the classification.
   -set_classification 2
@@ -223,6 +238,7 @@ Modify the classification.
   -classify_intensity_above_as 200 9
   -classify_intensity_below_as 30 11
   -change_extended_classification_from_to 6 46
+  -move_ancient_to_extended_classification
 Change the flags.
   -set_withheld_flag 0
   -set_synthetic_flag 1
@@ -240,12 +256,16 @@ Modify the point source ID.
   -bin_Z_into_point_source 200
   -bin_abs_scan_angle_into_point_source 2
 Transform gps_time.
+  -set_gps_time 113556962.005715
   -translate_gps_time 40.50
   -adjusted_to_week
   -week_to_adjusted 1671
 Transform RGB colors.
-  -scale_rgb_down (by 256)
-  -scale_rgb_up (by 256)
+  -set_RGB 255 0 127
+  -scale_RGB 2 4 2
+  -scale_RGB_down (by 256)
+  -scale_RGB_up (by 256)
+  -switch_R_G -switch_R_B -switch_B_G
 Supported LAS Inputs
   -i lidar.las
   -i lidar.laz
@@ -279,10 +299,11 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 150905 (commercial)
+LAStools (by martin@rapidlasso.com) version 160910 (unlicensed)
 usage:
 las2tin -i *.las
 las2tin -i *.las -concavity 25 -oobj
+las2tin -i *.laz -concavity 1000 -kill 10 -oshp
 las2tin -i lidar.las -o tin.shp
 las2tin -i lidar.laz -first_only -o mesh.obj
 las2tin -i lidar.laz -last_only -o indices_only.txt
