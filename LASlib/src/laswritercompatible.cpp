@@ -57,6 +57,10 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
   {
     return FALSE;
   }
+  if (header->extended_number_of_point_records > U32_MAX) // only less than 2^32-1 points are supported
+  {
+    return FALSE;
+  }
   this->header = header;
 
   // downgrade it to LAS 1.2 or LAS 1.3
@@ -128,17 +132,36 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
   out->put32bitsLE((U8*)&number_of_extended_variable_length_records);
   U64 extended_number_of_point_records;
   if (header->number_of_point_records)
+  {
     extended_number_of_point_records = header->number_of_point_records;
+    fprintf(stderr,"WARNING: legacy number_of_point_records in header of LAS 1.4 file should be zero.\n");
+  }
   else
+  {
     extended_number_of_point_records = header->extended_number_of_point_records;
+    header->number_of_point_records = (U32)header->extended_number_of_point_records;
+  }
   out->put64bitsLE((U8*)&extended_number_of_point_records);
   U64 extended_number_of_points_by_return;
   for (i = 0; i < 15; i++)
   {
-    if ((i < 5) && header->number_of_points_by_return[i])
-      extended_number_of_points_by_return = header->number_of_points_by_return[i];
+    if (i < 5)
+    {
+      if (header->number_of_points_by_return[i])
+      {
+        extended_number_of_points_by_return = header->number_of_points_by_return[i];
+        fprintf(stderr,"WARNING: legacy number_of_points_by_return[%d] in header of LAS 1.4 file should be zero.\n", i);
+      }
+      else
+      {
+        extended_number_of_points_by_return = header->extended_number_of_points_by_return[i];
+        header->number_of_points_by_return[i] = (U32)header->extended_number_of_points_by_return[i];
+      }
+    }
     else
+    {
       extended_number_of_points_by_return = header->extended_number_of_points_by_return[i];
+    }
     out->put64bitsLE((U8*)&extended_number_of_points_by_return);
   }
   // add the compatibility VLR
