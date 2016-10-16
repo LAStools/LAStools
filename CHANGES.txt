@@ -1,3 +1,16 @@
+16 October 2016 -- laslayers: new option '-add' to add filters and transforms as LASlayers to LAY files
+16 October 2016 -- LASlib, las2las: new filters '-keep_attribute_between' and '-drop_attribute_between'
+15 October 2016 -- las2dem, las2iso, las2tin: no more endless loop when '-lakes' or '-creeks' input is emtpy
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_blue_is_NIR -0.1 0.5 (computed from R of RGB and B = NIR)
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_green_is_NIR 0.4 0.8 (computed from R of RGB and G = NIR)
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_intensity_is_NIR -0.2 0.2 (computed from R of RGB and intensity = NIR)
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_from_CIR 0.4 0.8 (computed from RGB = CIR)
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI 0.2 0.7 (computed from R+NIR for point type 8)
+29 September 2016 -- LASlib, las2las: new filters -keep_extended_scanner_channel 1 and -drop_extended_scanner_channel 0
+25 September 2016 -- lasgrid: better '-false' and '-gray' colors when used with option '-classification'  
+21 September 2016 -- LASlib, las2las: new filters '-drop_attribute_above' and '-keep_attribute_below'
+18 September 2016 -- LASlib, lasinfo: improved reporting of (extended & legacy) classification histograms
+16 September 2016 -- laszip: corrected "LAS 1.4 compatibility mode" for case that legacy counters are zero
 10 September 2016 -- tin2dem: new option '-kill 3.0' removes triangles with xy-edge length of 3.0 or more
 8 September 2016 -- blast2dem: correct handling of 16 bit RGB color ranges in '-rgb' mode
 7 September 2016 -- lassort: fixed GPS time, point source ID, and return numbers sort for LAS 1.4
