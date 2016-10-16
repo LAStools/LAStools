@@ -551,6 +551,28 @@ public:
   inline BOOL filter(const LASpoint* point) { return (point->edge_of_flight_line == 0); };
 };
 
+class LAScriterionKeepScannerChannel : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_extended_scanner_channel"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), scanner_channel); };
+  inline BOOL filter(const LASpoint* point) { return (point->get_extended_scanner_channel() != scanner_channel); };
+  LAScriterionKeepScannerChannel(I32 scanner_channel) { this->scanner_channel = scanner_channel; };
+private:
+  I32 scanner_channel;
+};
+
+class LAScriterionDropScannerChannel : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_extended_scanner_channel"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), scanner_channel); };
+  inline BOOL filter(const LASpoint* point) { return (point->get_extended_scanner_channel() == scanner_channel); };
+  LAScriterionDropScannerChannel(I32 scanner_channel) { this->scanner_channel = scanner_channel; };
+private:
+  I32 scanner_channel;
+};
+
 class LAScriterionKeepRGB : public LAScriterion
 {
 public:
@@ -560,6 +582,52 @@ public:
   LAScriterionKeepRGB(I32 below_RGB, I32 above_RGB, I32 channel) { if (above_RGB < below_RGB) { this->below_RGB = above_RGB; this->above_RGB = below_RGB; } else { this->below_RGB = below_RGB; this->above_RGB = above_RGB; }; this->channel = channel; };
 private:
   I32 below_RGB, above_RGB, channel;
+};
+
+class LAScriterionKeepNDVI : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_NDVI"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s%s %g %g ", name(), (NIR == 1 ? "_green_is_NIR" : "_blue_is_NIR"),  below_NDVI, above_NDVI); };
+  inline BOOL filter(const LASpoint* point)
+  { 
+    F32 NDVI = ((F32)(point->rgb[NIR] - point->get_R())) / ((F32)(point->rgb[NIR] + point->get_R()));
+    return (NDVI < below_NDVI) || (above_NDVI < NDVI);
+  };
+  LAScriterionKeepNDVI(F32 below_NDVI, F32 above_NDVI, I32 NIR) { if (above_NDVI < below_NDVI) { this->below_NDVI = above_NDVI; this->above_NDVI = below_NDVI; } else { this->below_NDVI = below_NDVI; this->above_NDVI = above_NDVI; }; this->NIR = NIR; };
+private:
+  F32 below_NDVI, above_NDVI;
+  I32 NIR;
+};
+
+class LAScriterionKeepNDVIfromCIR : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_NDVI_from_CIR"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(),  below_NDVI, above_NDVI); };
+  inline BOOL filter(const LASpoint* point)
+  { 
+    F32 NDVI = ((F32)(point->get_R() - point->get_G())) / ((F32)(point->get_R() + point->get_G()));
+    return (NDVI < below_NDVI) || (above_NDVI < NDVI);
+  };
+  LAScriterionKeepNDVIfromCIR(F32 below_NDVI, F32 above_NDVI) { if (above_NDVI < below_NDVI) { this->below_NDVI = above_NDVI; this->above_NDVI = below_NDVI; } else { this->below_NDVI = below_NDVI; this->above_NDVI = above_NDVI; }; };
+private:
+  F32 below_NDVI, above_NDVI;
+};
+
+class LAScriterionKeepNDVIintensityIsNIR : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_NDVI_intensity_is_NIR"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(),  below_NDVI, above_NDVI); };
+  inline BOOL filter(const LASpoint* point)
+  { 
+    F32 NDVI = ((F32)(point->get_intensity() - point->get_R())) / ((F32)(point->get_intensity() + point->get_R()));
+    return (NDVI < below_NDVI) || (above_NDVI < NDVI);
+  };
+  LAScriterionKeepNDVIintensityIsNIR(F32 below_NDVI, F32 above_NDVI) { if (above_NDVI < below_NDVI) { this->below_NDVI = above_NDVI; this->above_NDVI = below_NDVI; } else { this->below_NDVI = below_NDVI; this->above_NDVI = above_NDVI; }; };
+private:
+  F32 below_NDVI, above_NDVI;
 };
 
 class LAScriterionKeepScanAngle : public LAScriterion
@@ -676,7 +744,21 @@ class LAScriterionDropClassifications : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_classification_mask"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), drop_classification_mask); };
+  inline I32 get_command(CHAR* string) const { 
+    U32 i, n, drop = 0;
+    for (i = 0; i < 32; i++) if ((1 << i) & drop_classification_mask) drop++;
+    if (drop < 16)
+    {
+      n = sprintf(string, "-drop_class ");
+      for (i = 0; i < 32; i++) if ((1 << i) & drop_classification_mask) n += sprintf(string + n, "%u ", i);
+    }
+    else
+    {
+      n = sprintf(string, "-keep_class ");
+      for (i = 0; i < 32; i++) if (!((1 << i) & drop_classification_mask)) n += sprintf(string + n, "%u ", i);
+    }
+    return n;
+  };
   inline BOOL filter(const LASpoint* point) { return ((1 << point->classification) & drop_classification_mask); };
   LAScriterionDropClassifications(U32 drop_classification_mask) { this->drop_classification_mask = drop_classification_mask; };
 private:
@@ -976,6 +1058,80 @@ public:
   LAScriterionDropWavepacket(U32 drop_wavepacket) { this->drop_wavepacket = drop_wavepacket; };
 private:
   U32 drop_wavepacket;
+};
+
+class LAScriterionKeepAttributeBelow : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_attribute_below"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g ", name(), index, below_attribute); };
+  inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) >= below_attribute); };
+  LAScriterionKeepAttributeBelow(I32 index, F64 below_attribute) { this->index = index; this->below_attribute = below_attribute; };
+private:
+  I32 index;
+  F64 below_attribute;
+};
+
+class LAScriterionKeepAttributeAbove : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_attribute_above"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g ", name(), index, above_attribute); };
+  inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) <= above_attribute); };
+  LAScriterionKeepAttributeAbove(I32 index, F64 above_attribute) { this->index = index; this->above_attribute = above_attribute; };
+private:
+  I32 index;
+  F64 above_attribute;
+};
+
+class LAScriterionKeepAttributeBetween : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_attribute_between"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g %g ", name(), index, below_attribute, above_attribute); };
+  inline BOOL filter(const LASpoint* point) { F64 attribute = point->get_attribute_as_float(index); return (attribute < below_attribute) || (above_attribute < attribute); };
+  LAScriterionKeepAttributeBetween(I32 index, F64 below_attribute, F64 above_attribute) { this->index = index; this->below_attribute = below_attribute; this->above_attribute = above_attribute; };
+private:
+  I32 index;
+  F64 below_attribute;
+  F64 above_attribute;
+};
+
+class LAScriterionDropAttributeBelow : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_attribute_below"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g ", name(), index, below_attribute); };
+  inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) < below_attribute); };
+  LAScriterionDropAttributeBelow(I32 index, F64 below_attribute) { this->index = index; this->below_attribute = below_attribute; };
+private:
+  I32 index;
+  F64 below_attribute;
+};
+
+class LAScriterionDropAttributeAbove : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_attribute_above"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g ", name(), index, above_attribute); };
+  inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) > above_attribute); };
+  LAScriterionDropAttributeAbove(I32 index, F64 above_attribute) { this->index = index; this->above_attribute = above_attribute; };
+private:
+  I32 index;
+  F64 above_attribute;
+};
+
+class LAScriterionDropAttributeBetween : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_attribute_between"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g %g ", name(), index, below_attribute, above_attribute); };
+  inline BOOL filter(const LASpoint* point) { F64 attribute = point->get_attribute_as_float(index); return (below_attribute <= attribute) && (attribute <= above_attribute); };
+  LAScriterionDropAttributeBetween(I32 index, F64 below_attribute, F64 above_attribute) { this->index = index; this->below_attribute = below_attribute; this->above_attribute = above_attribute; };
+private:
+  I32 index;
+  F64 below_attribute;
+  F64 above_attribute;
 };
 
 class LAScriterionKeepEveryNth : public LAScriterion
@@ -1351,14 +1507,19 @@ void LASfilter::usage() const
   fprintf(stderr,"  -drop_gps_time_below 11.125\n");
   fprintf(stderr,"  -drop_gps_time_above 130.725\n");
   fprintf(stderr,"  -drop_gps_time_between 22.0 48.0\n");
-  fprintf(stderr,"Filter points based on their RGB/NIR channel.\n");
+  fprintf(stderr,"Filter points based on their RGB/CIR/NIR channels.\n");
   fprintf(stderr,"  -keep_RGB_red 1 1\n");
   fprintf(stderr,"  -keep_RGB_green 30 100\n");
   fprintf(stderr,"  -keep_RGB_blue 0 0\n");
   fprintf(stderr,"  -keep_RGB_nir 64 127\n");
+  fprintf(stderr,"  -keep_NDVI 0.2 0.7 -keep_NDVI_from_CIR -0.1 0.5\n");
+  fprintf(stderr,"  -keep_NDVI_intensity_is_NIR 0.4 0.8 -keep_NDVI_green_is_NIR -0.2 0.2\n");
   fprintf(stderr,"Filter points based on their wavepacket.\n");
   fprintf(stderr,"  -keep_wavepacket 0\n");
   fprintf(stderr,"  -drop_wavepacket 3\n");
+  fprintf(stderr,"Filter points based on extra attributes.\n");
+  fprintf(stderr,"  -keep_attribute_above 0 5.0\n");
+  fprintf(stderr,"  -drop_attribute_below 1 1.5\n");
   fprintf(stderr,"Filter points with simple thinning.\n");
   fprintf(stderr,"  -keep_every_nth 2\n");
   fprintf(stderr,"  -keep_random_fraction 0.1\n");
@@ -1776,6 +1937,34 @@ BOOL LASfilter::parse(int argc, char* argv[])
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
         }
       }
+      else if (strncmp(argv[i],"-keep_NDVI", 10) == 0)
+      {
+        if (strcmp(argv[i]+10,"") == 0)
+        {
+          add_criterion(new LAScriterionKeepNDVI(atof(argv[i+1]), atof(argv[i+2]), 3));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i]+10,"_from_CIR") == 0)
+        {
+          add_criterion(new LAScriterionKeepNDVIfromCIR(atof(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i]+10,"_green_is_NIR") == 0)
+        {
+          add_criterion(new LAScriterionKeepNDVI(atof(argv[i+1]), atof(argv[i+2]), 1));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i]+10,"_blue_is_NIR") == 0)
+        {
+          add_criterion(new LAScriterionKeepNDVI(atof(argv[i+1]), atof(argv[i+2]), 2));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i]+10,"_intensity_is_NIR") == 0)
+        {
+          add_criterion(new LAScriterionKeepNDVIintensityIsNIR(atof(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
       else if (strcmp(argv[i],"-keep_scan_angle") == 0)
       {
         if ((i+2) >= argc)
@@ -1895,6 +2084,39 @@ BOOL LASfilter::parse(int argc, char* argv[])
           }
           add_criterion(new LAScriterionKeepGpsTime(atof(argv[i+1]), atof(argv[i+2])));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
+      else if (strncmp(argv[i],"-keep_attribute", 15) == 0)
+      {
+        if (strcmp(argv[i],"-keep_attribute_below") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: index value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepAttributeBelow(atoi(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-keep_attribute_above") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: index value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepAttributeAbove(atoi(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-keep_attribute_between") == 0)
+        {
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: index below above\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepAttributeBetween(atoi(argv[i+1]), atof(argv[i+2]), atof(argv[i+3])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
         }
       }
       else if (strcmp(argv[i],"-keep_every_nth") == 0)
@@ -2567,6 +2789,39 @@ BOOL LASfilter::parse(int argc, char* argv[])
           }
           add_criterion(new LAScriterionDropGpsTimeBetween(atof(argv[i+1]), atof(argv[i+2])));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+      }
+      else if (strncmp(argv[i],"-drop_attribute", 15) == 0)
+      {
+        if (strcmp(argv[i],"-drop_attribute_below") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: index value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropAttributeBelow(atoi(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-drop_attribute_above") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: index value\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropAttributeAbove(atoi(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-drop_attribute_between") == 0)
+        {
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: index below above\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropAttributeBetween(atoi(argv[i+1]), atof(argv[i+2]), atof(argv[i+3])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
         }
       }
     }
