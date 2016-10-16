@@ -3492,7 +3492,7 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
   else if (code == GEO_GCS_GDA94)
   {
     set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
-    sprintf(gcs_name, "GDA84");
+    sprintf(gcs_name, "GDA94");
     datum_code = gcs_code + 2000;
     sprintf(datum_name, "Geocentric_Datum_of_Australia_1994");
     spheroid_code = GEO_SPHEROID_GRS80;
@@ -6586,8 +6586,6 @@ int GeoProjectionConverter::unparse(char* string) const
   {
     n += sprintf(&string[n], "-target_elevation_precision %g ", target_elevation_precision);
   }
-
-  fprintf(stderr, string);
 
   return n;
 }
