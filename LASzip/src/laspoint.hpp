@@ -519,6 +519,7 @@ public:
   inline U16 get_G() const { return rgb[1]; };
   inline U16 get_B() const { return rgb[2]; };
   inline U16 get_I() const { return rgb[3]; };
+  inline U16 get_NIR() const { return rgb[3]; };
 
   inline void set_X(const I32 X) { this->X = X; };
   inline void set_Y(const I32 Y) { this->Y = Y; };
@@ -543,6 +544,7 @@ public:
   inline void set_G(const U16 G) { this->rgb[1] = G; };
   inline void set_B(const U16 B) { this->rgb[2] = B; };
   inline void set_I(const U16 I) { this->rgb[3] = I; };
+  inline void set_NIR(const U16 NIR) { this->rgb[3] = NIR; };
 
   inline F64 get_x() const { return quantizer->get_x(X); };
   inline F64 get_y() const { return quantizer->get_y(Y); };
