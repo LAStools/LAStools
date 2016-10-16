@@ -964,6 +964,18 @@ private:
   U16 RGB[3];
 };
 
+class LASoperationSetRGBofClass : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_RGB_of_class"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d %d ", name(), c, RGB[0], RGB[1], RGB[2]); };
+  inline void transform(LASpoint* point) { if (point->get_classification() == c) point->set_RGB(RGB); };
+  LASoperationSetRGBofClass(U8 c, U16 R, U16 G, U16 B) { this->c = c; RGB[0] = R; RGB[1] = G; RGB[2] = B; };
+private:
+  U8 c;
+  U16 RGB[3];
+};
+
 class LASoperationScaleRGB : public LASoperation
 {
 public:
@@ -1037,6 +1049,30 @@ public:
   inline const CHAR* name() const { return "switch_G_B"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) { I16 temp = point->get_G(); point->set_G(point->get_B()); point->set_B(temp); };
+};
+
+class LASoperationCopyRintoNIR : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_R_into_NIR"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_NIR(point->get_R()); };
+};
+
+class LASoperationCopyGintoNIR : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_G_into_NIR"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_NIR(point->get_G()); };
+};
+
+class LASoperationCopyBintoNIR : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_B_into_NIR"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_NIR(point->get_B()); };
 };
 
 class LASoperationFlipWaveformDirection : public LASoperation
@@ -1164,12 +1200,14 @@ void LAStransform::usage() const
   fprintf(stderr,"  -translate_gps_time 40.50\n");
   fprintf(stderr,"  -adjusted_to_week\n");
   fprintf(stderr,"  -week_to_adjusted 1671\n");
-  fprintf(stderr,"Transform RGB colors.\n");
+  fprintf(stderr,"Transform RGB/NIR colors.\n");
   fprintf(stderr,"  -set_RGB 255 0 127\n");
+  fprintf(stderr,"  -set_RGB_of_class 9 0 0 255\n");
   fprintf(stderr,"  -scale_RGB 2 4 2\n");
   fprintf(stderr,"  -scale_RGB_down (by 256)\n");
   fprintf(stderr,"  -scale_RGB_up (by 256)\n");
   fprintf(stderr,"  -switch_R_G -switch_R_B -switch_B_G\n");
+  fprintf(stderr,"  -copy_R_into_NIR -copy_G_into_NIR -copy_B_into_NIR\n");
 }
 
 BOOL LAStransform::parse(int argc, char* argv[])
@@ -1495,6 +1533,21 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationCopyUserDataIntoPointSource());
         *argv[i]='\0'; 
       }
+      else if (strcmp(argv[i],"-copy_R_into_NIR") == 0)
+      {
+        add_operation(new LASoperationCopyRintoNIR());
+        *argv[i]='\0'; 
+      }
+      else if (strcmp(argv[i],"-copy_G_into_NIR") == 0)
+      {
+        add_operation(new LASoperationCopyGintoNIR());
+        *argv[i]='\0'; 
+      }
+      else if (strcmp(argv[i],"-copy_B_into_NIR") == 0)
+      {
+        add_operation(new LASoperationCopyBintoNIR());
+        *argv[i]='\0'; 
+      }
     }
     else if (strncmp(argv[i],"-set_", 5) == 0)
     {
@@ -1648,15 +1701,34 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationSetGpsTime(atof(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
-      else if (strcmp(argv[i],"-set_RGB") == 0)
+      else if (strncmp(argv[i],"-set_RGB", 8) == 0)
       {
-        if ((i+3) >= argc)
+        if (strcmp(argv[i],"-set_RGB") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 3 arguments: R G B\n", argv[i]);
-          return FALSE;
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: R G B\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationSetRGB((U16)atoi(argv[i+1]), (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
         }
-        add_operation(new LASoperationSetRGB((U16)atoi(argv[i+1]), (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=1; 
+        else if (strcmp(argv[i],"-set_RGB_of_class") == 0)
+        {
+          if ((i+4) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: class R G B\n", argv[i]);
+            return FALSE;
+          }
+          I32 c = atoi(argv[i+1]);
+          if ((c < 0) || (c > 255))
+          {
+            fprintf(stderr,"ERROR: '%s' needs class between 0 and 255 but got %d\n", argv[i], c);
+            return FALSE;
+          }
+          add_operation(new LASoperationSetRGBofClass((U8)c, (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3]), (U16)atoi(argv[i+4])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
+        }
       }
     }
     else if (strncmp(argv[i],"-change_",8) == 0)
@@ -1984,14 +2056,14 @@ I32 LAStransform::unparse(CHAR* string) const
 {
   U32 i;
   I32 n = 0;
+  if (filter)
+  {
+    n += filter->unparse(&string[n]);
+    n += sprintf(&string[n], "-filtered_transform ");
+  }
   for (i = 0; i < num_operations; i++)
   {
     n += operations[i]->get_command(&string[n]);
-  }
-  if (filter)
-  {
-    n += sprintf(&string[n], "-filtered_transform ");
-    n += filter->unparse(&string[n]);
   }
   return n;
 }
