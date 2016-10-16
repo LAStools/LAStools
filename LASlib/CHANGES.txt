@@ -1,3 +1,13 @@
+16 October 2016 -- LASlib, las2las: new filters '-keep_attribute_between' and '-drop_attribute_between'
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_blue_is_NIR -0.1 0.5 (computed from R of RGB and B = NIR)
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_green_is_NIR 0.4 0.8 (computed from R of RGB and G = NIR)
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_intensity_is_NIR -0.2 0.2 (computed from R of RGB and intensity = NIR)
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_from_CIR 0.4 0.8 (computed from RGB = CIR)
+30 September 2016 -- LASlib, las2las: new filter -keep_NDVI 0.2 0.7 (computed from R+NIR for point type 8)
+29 September 2016 -- LASlib, las2las: new filters -keep_extended_scanner_channel 1 and -drop_extended_scanner_channel 0
+21 September 2016 -- LASlib, las2las: new filters '-drop_attribute_above' and '-keep_attribute_below'
+18 September 2016 -- LASlib, lasinfo: improved reporting of (extended & legacy) classification histograms
+16 September 2016 -- laszip: corrected "LAS 1.4 compatibility mode" for case that legacy counters are zero
 30 July 2016 -- las2las: correct naming of stateplanes when combining '-sp83 CA_I' with 'set_ogc_wkt'
 19 July 2016 -- las2las: fixed bug with '-target_survey_feet' not always working with '-cores 8'
 13 July 2016 -- las2las: added AUTHORITY EPSG code 1116 associated with NAD83 2011 for OGC WKT output
