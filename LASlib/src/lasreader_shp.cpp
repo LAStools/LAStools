@@ -101,7 +101,7 @@ static void from_little_endian(double* value)
   }
 }
 
-BOOL LASreaderSHP::open(const char* file_name)
+bool LASreaderSHP::open(const char* file_name)
 {
   if (file_name == 0)
   {
@@ -282,12 +282,12 @@ void LASreaderSHP::set_offset(const F64* offset)
   }
 }
 
-BOOL LASreaderSHP::seek(const I64 p_index)
+bool LASreaderSHP::seek(const I64 p_index)
 {
   return FALSE;
 }
 
-BOOL LASreaderSHP::read_point_default()
+bool LASreaderSHP::read_point_default()
 {
   if (point_count == number_of_points)
   {
@@ -402,7 +402,7 @@ ByteStreamIn* LASreaderSHP::get_stream() const
   return 0;
 }
 
-void LASreaderSHP::close(BOOL close_stream)
+void LASreaderSHP::close(bool close_stream)
 {
   if (file)
   {
@@ -412,7 +412,7 @@ void LASreaderSHP::close(BOOL close_stream)
   }
 }
 
-BOOL LASreaderSHP::reopen(const char* file_name)
+bool LASreaderSHP::reopen(const char* file_name)
 {
   if (file_name == 0)
   {
@@ -627,7 +627,7 @@ LASreaderSHPrescale::LASreaderSHPrescale(F64 x_scale_factor, F64 y_scale_factor,
   scale_factor[2] = z_scale_factor;
 }
 
-BOOL LASreaderSHPrescale::open(const char* file_name)
+bool LASreaderSHPrescale::open(const char* file_name)
 {
   if (!LASreaderSHP::open(file_name)) return FALSE;
   // do we need to change anything
@@ -653,7 +653,7 @@ LASreaderSHPreoffset::LASreaderSHPreoffset(F64 x_offset, F64 y_offset, F64 z_off
   this->offset[2] = z_offset;
 }
 
-BOOL LASreaderSHPreoffset::open(const char* file_name)
+bool LASreaderSHPreoffset::open(const char* file_name)
 {
   if (!LASreaderSHP::open(file_name)) return FALSE;
   // do we need to change anything
@@ -676,7 +676,7 @@ LASreaderSHPrescalereoffset::LASreaderSHPrescalereoffset(F64 x_scale_factor, F64
 {
 }
 
-BOOL LASreaderSHPrescalereoffset::open(const char* file_name)
+bool LASreaderSHPrescalereoffset::open(const char* file_name)
 {
   if (!LASreaderSHP::open(file_name)) return FALSE;
   // do we need to change anything

@@ -79,7 +79,7 @@ ArithmeticDecoder::ArithmeticDecoder()
   instream = 0;
 }
 
-BOOL ArithmeticDecoder::init(ByteStreamIn* instream)
+bool ArithmeticDecoder::init(ByteStreamIn* instream)
 {
   if (instream == 0) return FALSE;
   this->instream = instream;

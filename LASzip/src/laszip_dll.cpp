@@ -52,7 +52,7 @@
 class laszip_dll_inventory
 {
 public:
-  BOOL active() const { return (first == FALSE); }; 
+  bool active() const { return (first == FALSE); }; 
   U32 number_of_point_records;
   U32 number_of_points_by_return[16];
   I32 max_X;
@@ -100,7 +100,7 @@ public:
     first = TRUE;
   }
 private:
-  BOOL first;
+  bool first;
 };
 
 typedef struct laszip_dll {
@@ -123,12 +123,12 @@ typedef struct laszip_dll {
   F64 lax_r_max_x;
   F64 lax_r_max_y;
   CHAR* lax_file_name;
-  BOOL lax_create;
-  BOOL lax_append;
-  BOOL lax_exploit;
-  BOOL preserve_generating_software;
-  BOOL request_compatibility_mode;
-  BOOL compatibility_mode;
+  bool lax_create;
+  bool lax_append;
+  bool lax_exploit;
+  bool preserve_generating_software;
+  bool request_compatibility_mode;
+  bool compatibility_mode;
   I32 start_scan_angle;
   I32 start_extended_returns;
   I32 start_classification;

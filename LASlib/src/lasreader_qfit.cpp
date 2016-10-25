@@ -40,7 +40,7 @@
 #include <windows.h>
 #endif
 
-BOOL LASreaderQFIT::open(const char* file_name)
+bool LASreaderQFIT::open(const char* file_name)
 {
   if (file_name == 0)
   {
@@ -119,7 +119,7 @@ BOOL LASreaderQFIT::open(const char* file_name)
   return open(in);
 }
 
-BOOL LASreaderQFIT::open(ByteStreamIn* stream)
+bool LASreaderQFIT::open(ByteStreamIn* stream)
 {
   U32 i;
 
@@ -298,7 +298,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
   return seek(0);
 }
 
-BOOL LASreaderQFIT::seek(const I64 p_index)
+bool LASreaderQFIT::seek(const I64 p_index)
 {
   if (p_index < npoints)
   {
@@ -308,7 +308,7 @@ BOOL LASreaderQFIT::seek(const I64 p_index)
   return FALSE;
 }
 
-BOOL LASreaderQFIT::read_point_default()
+bool LASreaderQFIT::read_point_default()
 {
   if (p_count < npoints)
   {
@@ -381,7 +381,7 @@ ByteStreamIn* LASreaderQFIT::get_stream() const
   return stream;
 }
 
-void LASreaderQFIT::close(BOOL close_stream)
+void LASreaderQFIT::close(bool close_stream)
 {
   if (close_stream)
   {
@@ -398,7 +398,7 @@ void LASreaderQFIT::close(BOOL close_stream)
   }
 }
 
-BOOL LASreaderQFIT::reopen(const char* file_name)
+bool LASreaderQFIT::reopen(const char* file_name)
 {
   if (file_name == 0)
   {
@@ -454,7 +454,7 @@ LASreaderQFITrescale::LASreaderQFITrescale(F64 x_scale_factor, F64 y_scale_facto
   scale_factor[2] = z_scale_factor;
 }
 
-BOOL LASreaderQFITrescale::open(ByteStreamIn* stream)
+bool LASreaderQFITrescale::open(ByteStreamIn* stream)
 {
   if (!LASreaderQFIT::open(stream)) return FALSE;
   // do we need to change anything
@@ -480,7 +480,7 @@ LASreaderQFITreoffset::LASreaderQFITreoffset(F64 x_offset, F64 y_offset, F64 z_o
   this->offset[2] = z_offset;
 }
 
-BOOL LASreaderQFITreoffset::open(ByteStreamIn* stream)
+bool LASreaderQFITreoffset::open(ByteStreamIn* stream)
 {
   if (!LASreaderQFIT::open(stream)) return FALSE;
   // do we need to change anything
@@ -503,7 +503,7 @@ LASreaderQFITrescalereoffset::LASreaderQFITrescalereoffset(F64 x_scale_factor, F
 {
 }
 
-BOOL LASreaderQFITrescalereoffset::open(ByteStreamIn* stream)
+bool LASreaderQFITrescalereoffset::open(ByteStreamIn* stream)
 {
   if (!LASreaderQFIT::open(stream)) return FALSE;
   // do we need to change anything

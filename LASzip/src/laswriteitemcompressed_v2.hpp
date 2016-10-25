@@ -44,8 +44,8 @@ public:
 
   LASwriteItemCompressed_POINT10_v2(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  bool init(const U8* item);
+  bool write(const U8* item);
 
   ~LASwriteItemCompressed_POINT10_v2();
 
@@ -75,8 +75,8 @@ public:
 
   LASwriteItemCompressed_GPSTIME11_v2(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  bool init(const U8* item);
+  bool write(const U8* item);
 
   ~LASwriteItemCompressed_GPSTIME11_v2();
 
@@ -98,8 +98,8 @@ public:
 
   LASwriteItemCompressed_RGB12_v2(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  bool init(const U8* item);
+  bool write(const U8* item);
 
   ~LASwriteItemCompressed_RGB12_v2();
 
@@ -122,8 +122,8 @@ public:
 
   LASwriteItemCompressed_BYTE_v2(ArithmeticEncoder* enc, U32 number);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  bool init(const U8* item);
+  bool write(const U8* item);
 
   ~LASwriteItemCompressed_BYTE_v2();
 

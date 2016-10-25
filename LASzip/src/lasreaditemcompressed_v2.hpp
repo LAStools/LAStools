@@ -44,7 +44,7 @@ public:
 
   LASreadItemCompressed_POINT10_v2(ArithmeticDecoder* dec);
 
-  BOOL init(const U8* item);
+  bool init(const U8* item);
   void read(U8* item);
 
   ~LASreadItemCompressed_POINT10_v2();
@@ -75,7 +75,7 @@ public:
 
   LASreadItemCompressed_GPSTIME11_v2(ArithmeticDecoder* dec);
 
-  BOOL init(const U8* item);
+  bool init(const U8* item);
   void read(U8* item);
 
   ~LASreadItemCompressed_GPSTIME11_v2();
@@ -98,7 +98,7 @@ public:
 
   LASreadItemCompressed_RGB12_v2(ArithmeticDecoder* dec);
 
-  BOOL init(const U8* item);
+  bool init(const U8* item);
   void read(U8* item);
 
   ~LASreadItemCompressed_RGB12_v2();
@@ -122,7 +122,7 @@ public:
 
   LASreadItemCompressed_BYTE_v2(ArithmeticDecoder* dec, U32 number);
 
-  BOOL init(const U8* item);
+  bool init(const U8* item);
   void read(U8* item);
 
   ~LASreadItemCompressed_BYTE_v2();

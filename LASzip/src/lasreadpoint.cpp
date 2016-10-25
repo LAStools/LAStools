@@ -65,7 +65,7 @@ LASreadPoint::LASreadPoint()
   last_warning = 0;
 }
 
-BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* laszip)
+bool LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* laszip)
 {
   U32 i;
 
@@ -222,7 +222,7 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
   return TRUE;
 }
 
-BOOL LASreadPoint::init(ByteStreamIn* instream)
+bool LASreadPoint::init(ByteStreamIn* instream)
 {
   if (!instream) return FALSE;
   this->instream = instream;
@@ -248,7 +248,7 @@ BOOL LASreadPoint::init(ByteStreamIn* instream)
   return TRUE;
 }
 
-BOOL LASreadPoint::seek(const U32 current, const U32 target)
+bool LASreadPoint::seek(const U32 current, const U32 target)
 {
   if (!instream->isSeekable()) return FALSE;
   U32 delta = 0;
@@ -325,7 +325,7 @@ BOOL LASreadPoint::seek(const U32 current, const U32 target)
   return TRUE;
 }
 
-BOOL LASreadPoint::read(U8* const * point)
+bool LASreadPoint::read(U8* const * point)
 {
   U32 i;
 
@@ -431,7 +431,7 @@ BOOL LASreadPoint::read(U8* const * point)
   return TRUE;
 }
 
-BOOL LASreadPoint::check_end()
+bool LASreadPoint::check_end()
 {
   if (readers == readers_compressed)
   {
@@ -457,13 +457,13 @@ BOOL LASreadPoint::check_end()
   return TRUE;
 }
 
-BOOL LASreadPoint::done()
+bool LASreadPoint::done()
 {
   instream = 0;
   return TRUE;
 }
 
-BOOL LASreadPoint::init_dec()
+bool LASreadPoint::init_dec()
 {
   // maybe read chunk table (only if chunking enabled)
 
@@ -483,7 +483,7 @@ BOOL LASreadPoint::init_dec()
   return TRUE;
 }
 
-BOOL LASreadPoint::read_chunk_table()
+bool LASreadPoint::read_chunk_table()
 {
   // read the 8 bytes that store the location of the chunk table
   I64 chunk_table_start_position;

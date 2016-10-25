@@ -43,17 +43,17 @@ class LASwriterBIN : public LASwriter
 {
 public:
 
-  BOOL refile(FILE* file);
+  bool refile(FILE* file);
 
-  BOOL open(const char* file_name, const LASheader* header, const char* version, U32 io_buffer_size=LAS_TOOLS_IO_OBUFFER_SIZE );
-  BOOL open(FILE* file, const LASheader* header, const char* version);
-  BOOL open(ByteStreamOut* stream, const LASheader* header, const char* version);
+  bool open(const char* file_name, const LASheader* header, const char* version, U32 io_buffer_size=LAS_TOOLS_IO_OBUFFER_SIZE );
+  bool open(FILE* file, const LASheader* header, const char* version);
+  bool open(ByteStreamOut* stream, const LASheader* header, const char* version);
 
-  BOOL write_point(const LASpoint* point);
-  BOOL chunk() { return FALSE; };
+  bool write_point(const LASpoint* point);
+  bool chunk() { return FALSE; };
 
-  BOOL update_header(const LASheader* header, BOOL use_inventory=FALSE, BOOL update_extra_bytes=FALSE);
-  I64 close(BOOL update_npoints=TRUE);
+  bool update_header(const LASheader* header, bool use_inventory=FALSE, bool update_extra_bytes=FALSE);
+  I64 close(bool update_npoints=TRUE);
 
   LASwriterBIN();
   ~LASwriterBIN();

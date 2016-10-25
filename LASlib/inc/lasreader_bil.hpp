@@ -41,21 +41,21 @@ public:
 
   void set_scale_factor(const F64* scale_factor);
   void set_offset(const F64* offset);
-  virtual BOOL open(const CHAR* file_name);
+  virtual bool open(const CHAR* file_name);
 
   I32 get_format() const { return LAS_TOOLS_FORMAT_BIL; };
 
-  BOOL seek(const I64 p_index);
+  bool seek(const I64 p_index);
 
   ByteStreamIn* get_stream() const;
-  void close(BOOL close_stream=TRUE);
-  BOOL reopen(const CHAR* file_name);
+  void close(bool close_stream=TRUE);
+  bool reopen(const CHAR* file_name);
 
   LASreaderBIL();
   virtual ~LASreaderBIL();
 
 protected:
-  BOOL read_point_default();
+  bool read_point_default();
 
 private:
   F64* scale_factor;
@@ -65,11 +65,11 @@ private:
   F64 ulxcenter, ulycenter;
   F32 xdim, ydim;
   F32 nodata;
-  BOOL floatpixels;
+  bool floatpixels;
 
   void clean();
-  BOOL read_hdr_file(const CHAR* file_name);
-  BOOL read_blw_file(const CHAR* file_name);
+  bool read_hdr_file(const CHAR* file_name);
+  bool read_blw_file(const CHAR* file_name);
   void populate_scale_and_offset();
   void populate_bounding_box();
 };
@@ -77,7 +77,7 @@ private:
 class LASreaderBILrescale : public virtual LASreaderBIL
 {
 public:
-  virtual BOOL open(const CHAR* file_name);
+  virtual bool open(const CHAR* file_name);
   LASreaderBILrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor);
 
 protected:
@@ -87,7 +87,7 @@ protected:
 class LASreaderBILreoffset : public virtual LASreaderBIL
 {
 public:
-  virtual BOOL open(const CHAR* file_name);
+  virtual bool open(const CHAR* file_name);
   LASreaderBILreoffset(F64 x_offset, F64 y_offset, F64 z_offset);
 protected:
   F64 offset[3];
@@ -96,7 +96,7 @@ protected:
 class LASreaderBILrescalereoffset : public LASreaderBILrescale, LASreaderBILreoffset
 {
 public:
-  BOOL open(const CHAR* file_name);
+  bool open(const CHAR* file_name);
   LASreaderBILrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset);
 };
 

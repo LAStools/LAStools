@@ -42,29 +42,29 @@ class ByteStreamOutNil : public ByteStreamOut
 public:
   ByteStreamOutNil();
 /* write a single byte                                       */
-  BOOL putByte(U8 byte);
+  bool putByte(U8 byte);
 /* write an array of bytes                                   */
-  BOOL putBytes(const U8* bytes, U32 num_bytes);
+  bool putBytes(const U8* bytes, U32 num_bytes);
 /* write 16 bit low-endian field                             */
-  BOOL put16bitsLE(const U8* bytes);
+  bool put16bitsLE(const U8* bytes);
 /* write 32 bit low-endian field                             */
-  BOOL put32bitsLE(const U8* bytes);
+  bool put32bitsLE(const U8* bytes);
 /* write 64 bit low-endian field                             */
-  BOOL put64bitsLE(const U8* bytes);
+  bool put64bitsLE(const U8* bytes);
 /* write 16 bit big-endian field                             */
-  BOOL put16bitsBE(const U8* bytes);
+  bool put16bitsBE(const U8* bytes);
 /* write 32 bit big-endian field                             */
-  BOOL put32bitsBE(const U8* bytes);
+  bool put32bitsBE(const U8* bytes);
 /* write 64 bit big-endian field                             */
-  BOOL put64bitsBE(const U8* bytes);
+  bool put64bitsBE(const U8* bytes);
 /* is the stream seekable (e.g. standard out is not)         */
-  BOOL isSeekable() const;
+  bool isSeekable() const;
 /* get current position of stream                            */
   I64 tell() const;
 /* seek to this position in the stream                       */
-  BOOL seek(const I64 position);
+  bool seek(const I64 position);
 /* seek to the end of the file                               */
-  BOOL seekEnd();
+  bool seekEnd();
 /* destructor                                                */
   ~ByteStreamOutNil(){};
 private:
@@ -76,49 +76,49 @@ inline ByteStreamOutNil::ByteStreamOutNil()
   num_bytes = 0;
 }
 
-inline BOOL ByteStreamOutNil::putByte(U8 byte)
+inline bool ByteStreamOutNil::putByte(U8 byte)
 {
   num_bytes++;
   return TRUE;
 }
 
-inline BOOL ByteStreamOutNil::putBytes(const U8* bytes, U32 num_bytes)
+inline bool ByteStreamOutNil::putBytes(const U8* bytes, U32 num_bytes)
 {
   this->num_bytes += num_bytes;
   return TRUE;
 }
 
-inline BOOL ByteStreamOutNil::put16bitsLE(const U8* bytes)
+inline bool ByteStreamOutNil::put16bitsLE(const U8* bytes)
 {
   return putBytes(bytes, 2);
 }
 
-inline BOOL ByteStreamOutNil::put32bitsLE(const U8* bytes)
+inline bool ByteStreamOutNil::put32bitsLE(const U8* bytes)
 {
   return putBytes(bytes, 4);
 }
 
-inline BOOL ByteStreamOutNil::put64bitsLE(const U8* bytes)
+inline bool ByteStreamOutNil::put64bitsLE(const U8* bytes)
 {
   return putBytes(bytes, 8);
 }
 
-inline BOOL ByteStreamOutNil::put16bitsBE(const U8* bytes)
+inline bool ByteStreamOutNil::put16bitsBE(const U8* bytes)
 {
   return putBytes(bytes, 2);
 }
 
-inline BOOL ByteStreamOutNil::put32bitsBE(const U8* bytes)
+inline bool ByteStreamOutNil::put32bitsBE(const U8* bytes)
 {
   return putBytes(bytes, 4);
 }
 
-inline BOOL ByteStreamOutNil::put64bitsBE(const U8* bytes)
+inline bool ByteStreamOutNil::put64bitsBE(const U8* bytes)
 {
   return putBytes(bytes, 8);
 }
 
-inline BOOL ByteStreamOutNil::isSeekable() const
+inline bool ByteStreamOutNil::isSeekable() const
 {
   return TRUE;
 }
@@ -128,12 +128,12 @@ inline I64 ByteStreamOutNil::tell() const
   return num_bytes;
 }
 
-inline BOOL ByteStreamOutNil::seek(I64 position)
+inline bool ByteStreamOutNil::seek(I64 position)
 {
   return TRUE;
 }
 
-inline BOOL ByteStreamOutNil::seekEnd()
+inline bool ByteStreamOutNil::seekEnd()
 {
   return TRUE;
 }

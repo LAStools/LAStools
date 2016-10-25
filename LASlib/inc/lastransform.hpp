@@ -54,15 +54,15 @@ class LAStransform
 {
 public:
 
-  BOOL change_coordinates;
+  bool change_coordinates;
 
   void usage() const;
   void clean();
-  BOOL parse(int argc, char* argv[]);
-  BOOL parse(CHAR* string);
+  bool parse(int argc, char* argv[]);
+  bool parse(CHAR* string);
   I32 unparse(CHAR* string) const;
-  inline BOOL active() const { return (num_operations != 0); };
-  inline BOOL filtered() const { return is_filtered; };
+  inline bool active() const { return (num_operations != 0); };
+  inline bool filtered() const { return is_filtered; };
 
   void setFilter(LASfilter* filter);
 
@@ -80,7 +80,7 @@ private:
   U32 num_operations;
   U32 alloc_operations;
   LASoperation** operations;
-  BOOL is_filtered;
+  bool is_filtered;
   LASfilter* filter;
 };
 

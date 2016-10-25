@@ -42,7 +42,7 @@ void LASreaderMerged::set_io_ibuffer_size(I32 io_ibuffer_size)
   this->io_ibuffer_size = io_ibuffer_size;
 }
 
-BOOL LASreaderMerged::add_file_name(const char* file_name)
+bool LASreaderMerged::add_file_name(const char* file_name)
 {
   // do we have a file name
   if (file_name == 0)
@@ -450,7 +450,7 @@ void LASreaderMerged::set_offset(const F64* offset)
   }
 }
 
-void LASreaderMerged::set_files_are_flightlines(BOOL files_are_flightlines)
+void LASreaderMerged::set_files_are_flightlines(bool files_are_flightlines)
 {
   this->files_are_flightlines = files_are_flightlines;
   // when merging multiple flightlines the merged header must have a file source ID of 0
@@ -460,7 +460,7 @@ void LASreaderMerged::set_files_are_flightlines(BOOL files_are_flightlines)
   }
 }
 
-void LASreaderMerged::set_apply_file_source_ID(BOOL apply_file_source_ID)
+void LASreaderMerged::set_apply_file_source_ID(bool apply_file_source_ID)
 {
   this->apply_file_source_ID = apply_file_source_ID;
   // when merging multiple flightlines the merged header must have a file source ID of 0
@@ -508,17 +508,17 @@ void LASreaderMerged::set_skip_lines(I32 skip_lines)
   this->skip_lines = skip_lines;
 }
 
-void LASreaderMerged::set_populate_header(BOOL populate_header)
+void LASreaderMerged::set_populate_header(bool populate_header)
 {
   this->populate_header = populate_header;
 }
 
-void LASreaderMerged::set_keep_lastiling(BOOL keep_lastiling)
+void LASreaderMerged::set_keep_lastiling(bool keep_lastiling)
 {
   this->keep_lastiling = keep_lastiling;
 }
 
-BOOL LASreaderMerged::open()
+bool LASreaderMerged::open()
 {
   if (file_name_number == 0)
   {
@@ -536,7 +536,7 @@ BOOL LASreaderMerged::open()
   // combine all headers
 
   U32 i,j;
-  BOOL first = TRUE;
+  bool first = TRUE;
 
   for (i = 0; i < file_name_number; i++)
   {
@@ -1060,7 +1060,7 @@ void LASreaderMerged::set_transform(LAStransform* transform)
   this->transform = transform;
 }
 
-BOOL LASreaderMerged::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
+bool LASreaderMerged::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
 {
   inside = 1;
   t_ll_x = ll_x;
@@ -1079,7 +1079,7 @@ BOOL LASreaderMerged::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size
   return TRUE;
 }
 
-BOOL LASreaderMerged::inside_circle(const F64 center_x, const F64 center_y, const F64 radius)
+bool LASreaderMerged::inside_circle(const F64 center_x, const F64 center_y, const F64 radius)
 {
   inside = 2;
   c_center_x = center_x;
@@ -1097,7 +1097,7 @@ BOOL LASreaderMerged::inside_circle(const F64 center_x, const F64 center_y, cons
   return TRUE;
 }
 
-BOOL LASreaderMerged::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y)
+bool LASreaderMerged::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y)
 {
   inside = 3;
   r_min_x = min_x;
@@ -1120,7 +1120,7 @@ I32 LASreaderMerged::get_format() const
   return lasreader->get_format();
 }
 
-BOOL LASreaderMerged::read_point_default()
+bool LASreaderMerged::read_point_default()
 {
   if (file_name_current == 0)
   {
@@ -1174,7 +1174,7 @@ BOOL LASreaderMerged::read_point_default()
   return FALSE;
 }
 
-void LASreaderMerged::close(BOOL close_stream)
+void LASreaderMerged::close(bool close_stream)
 {
   if (lasreader) 
   {
@@ -1182,7 +1182,7 @@ void LASreaderMerged::close(BOOL close_stream)
   }
 }
 
-BOOL LASreaderMerged::reopen()
+bool LASreaderMerged::reopen()
 {
   p_count = 0;
   file_name_current = 0;
@@ -1282,7 +1282,7 @@ LASreaderMerged::~LASreaderMerged()
   clean();
 }
 
-BOOL LASreaderMerged::open_next_file()
+bool LASreaderMerged::open_next_file()
 {
   while (file_name_current < file_name_number)
   {

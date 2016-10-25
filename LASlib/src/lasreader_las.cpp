@@ -44,7 +44,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_only)
+bool LASreaderLAS::open(const char* file_name, I32 io_buffer_size, bool peek_only)
 {
   if (file_name == 0)
   {
@@ -74,7 +74,7 @@ BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_onl
   return open(in, peek_only);
 }
 
-BOOL LASreaderLAS::open(FILE* file, BOOL peek_only)
+bool LASreaderLAS::open(FILE* file, bool peek_only)
 {
   if (file == 0)
   {
@@ -103,7 +103,7 @@ BOOL LASreaderLAS::open(FILE* file, BOOL peek_only)
   return open(in);
 }
 
-BOOL LASreaderLAS::open(istream& stream, BOOL peek_only)
+bool LASreaderLAS::open(istream& stream, bool peek_only)
 {
   // create input
   ByteStreamIn* in;
@@ -115,7 +115,7 @@ BOOL LASreaderLAS::open(istream& stream, BOOL peek_only)
   return open(in, peek_only);
 }
 
-BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
+bool LASreaderLAS::open(ByteStreamIn* stream, bool peek_only)
 {
   U32 i,j;
 
@@ -1281,7 +1281,7 @@ I32 LASreaderLAS::get_format() const
   return LAS_TOOLS_FORMAT_LAS;
 }
 
-BOOL LASreaderLAS::seek(const I64 p_index)
+bool LASreaderLAS::seek(const I64 p_index)
 {
   if (reader)
   {
@@ -1297,7 +1297,7 @@ BOOL LASreaderLAS::seek(const I64 p_index)
   return FALSE;
 }
 
-BOOL LASreaderLAS::read_point_default()
+bool LASreaderLAS::read_point_default()
 {
   if (p_count < npoints)
   {
@@ -1363,7 +1363,7 @@ ByteStreamIn* LASreaderLAS::get_stream() const
   return stream;
 }
 
-void LASreaderLAS::close(BOOL close_stream)
+void LASreaderLAS::close(bool close_stream)
 {
   if (reader) 
   {
@@ -1398,7 +1398,7 @@ LASreaderLAS::~LASreaderLAS()
   if (reader || stream) close(TRUE);
 }
 
-LASreaderLASrescale::LASreaderLASrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, BOOL check_for_overflow) : LASreaderLAS()
+LASreaderLASrescale::LASreaderLASrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, bool check_for_overflow) : LASreaderLAS()
 {
   scale_factor[0] = x_scale_factor;
   scale_factor[1] = y_scale_factor;
@@ -1406,7 +1406,7 @@ LASreaderLASrescale::LASreaderLASrescale(F64 x_scale_factor, F64 y_scale_factor,
   this->check_for_overflow = check_for_overflow;
 }
 
-BOOL LASreaderLASrescale::read_point_default()
+bool LASreaderLASrescale::read_point_default()
 {
   if (!LASreaderLAS::read_point_default()) return FALSE;
   if (rescale_x)
@@ -1427,7 +1427,7 @@ BOOL LASreaderLASrescale::read_point_default()
   return TRUE;
 }
 
-BOOL LASreaderLASrescale::open(ByteStreamIn* stream, BOOL peek_only)
+bool LASreaderLASrescale::open(ByteStreamIn* stream, bool peek_only)
 {
   LASquantizer quantizer = header;
   if (!LASreaderLAS::open(stream, peek_only)) return FALSE;
@@ -1530,7 +1530,7 @@ LASreaderLASreoffset::LASreaderLASreoffset() : LASreaderLAS()
   auto_reoffset = TRUE;
 }
 
-BOOL LASreaderLASreoffset::read_point_default()
+bool LASreaderLASreoffset::read_point_default()
 {
   if (!LASreaderLAS::read_point_default()) return FALSE;
   if (reoffset_x)
@@ -1551,7 +1551,7 @@ BOOL LASreaderLASreoffset::read_point_default()
   return TRUE;
 }
 
-BOOL LASreaderLASreoffset::open(ByteStreamIn* stream, BOOL peek_only)
+bool LASreaderLASreoffset::open(ByteStreamIn* stream, bool peek_only)
 {
   LASquantizer quantizer = header;
   if (!LASreaderLAS::open(stream, peek_only)) return FALSE;
@@ -1664,7 +1664,7 @@ LASreaderLASrescalereoffset::LASreaderLASrescalereoffset(F64 x_scale_factor, F64
 {
 }
 
-BOOL LASreaderLASrescalereoffset::read_point_default()
+bool LASreaderLASrescalereoffset::read_point_default()
 {
   if (!LASreaderLAS::read_point_default()) return FALSE;
   if (reoffset_x)
@@ -1700,7 +1700,7 @@ BOOL LASreaderLASrescalereoffset::read_point_default()
   return TRUE;
 }
 
-BOOL LASreaderLASrescalereoffset::open(ByteStreamIn* stream, BOOL peek_only)
+bool LASreaderLASrescalereoffset::open(ByteStreamIn* stream, bool peek_only)
 {
   LASquantizer quantizer = header;
   if (!LASreaderLASrescale::open(stream, peek_only)) return FALSE;

@@ -1210,7 +1210,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -copy_R_into_NIR -copy_G_into_NIR -copy_B_into_NIR\n");
 }
 
-BOOL LAStransform::parse(int argc, char* argv[])
+bool LAStransform::parse(int argc, char* argv[])
 {
   int i;
 
@@ -2029,7 +2029,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
   return TRUE;
 }
 
-BOOL LAStransform::parse(CHAR* string)
+bool LAStransform::parse(CHAR* string)
 {
   int p = 0;
   int argc = 1;

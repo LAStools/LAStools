@@ -40,7 +40,7 @@ class ByteStreamOut
 {
 public:
 /* write single bits                                         */
-  inline BOOL putBits(U32 bits, U32 num_bits)
+  inline bool putBits(U32 bits, U32 num_bits)
   {
     U64 new_bits = bits;
     bit_buffer |= (new_bits << num_buffer);
@@ -55,7 +55,7 @@ public:
     return TRUE;
   };
 /* called after writing bits before closing or writing bytes */
-  inline BOOL flushBits()
+  inline bool flushBits()
   {
     if (num_buffer)
     {
@@ -68,29 +68,29 @@ public:
     return TRUE;
   };
 /* write a single byte                                       */
-  virtual BOOL putByte(U8 byte) = 0;
+  virtual bool putByte(U8 byte) = 0;
 /* write an array of bytes                                   */
-  virtual BOOL putBytes(const U8* bytes, U32 num_bytes) = 0;
+  virtual bool putBytes(const U8* bytes, U32 num_bytes) = 0;
 /* write 16 bit low-endian field                             */
-  virtual BOOL put16bitsLE(const U8* bytes) = 0;
+  virtual bool put16bitsLE(const U8* bytes) = 0;
 /* write 32 bit low-endian field                             */
-  virtual BOOL put32bitsLE(const U8* bytes) = 0;
+  virtual bool put32bitsLE(const U8* bytes) = 0;
 /* write 64 bit low-endian field                             */
-  virtual BOOL put64bitsLE(const U8* bytes) = 0;
+  virtual bool put64bitsLE(const U8* bytes) = 0;
 /* write 16 bit big-endian field                             */
-  virtual BOOL put16bitsBE(const U8* bytes) = 0;
+  virtual bool put16bitsBE(const U8* bytes) = 0;
 /* write 32 bit big-endian field                             */
-  virtual BOOL put32bitsBE(const U8* bytes) = 0;
+  virtual bool put32bitsBE(const U8* bytes) = 0;
 /* write 64 bit big-endian field                             */
-  virtual BOOL put64bitsBE(const U8* bytes) = 0;
+  virtual bool put64bitsBE(const U8* bytes) = 0;
 /* is the stream seekable (e.g. standard out is not)         */
-  virtual BOOL isSeekable() const = 0;
+  virtual bool isSeekable() const = 0;
 /* get current position of stream                            */
   virtual I64 tell() const = 0;
 /* seek to this position in the stream                       */
-  virtual BOOL seek(const I64 position) = 0;
+  virtual bool seek(const I64 position) = 0;
 /* seek to the end of the file                               */
-  virtual BOOL seekEnd() = 0;
+  virtual bool seekEnd() = 0;
 /* constructor                                               */
   inline ByteStreamOut() { bit_buffer = 0; num_buffer = 0; };
 /* destructor                                                */
