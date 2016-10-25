@@ -51,7 +51,7 @@ public:
   {
     instream = 0;
   };
-  BOOL init(ByteStreamIn* instream)
+  bool init(ByteStreamIn* instream)
   {
     if (!instream) return FALSE;
     this->instream = instream;
@@ -65,7 +65,7 @@ protected:
 class LASreadItemCompressed : public LASreadItem
 {
 public:
-  virtual BOOL init(const U8* item)=0;
+  virtual bool init(const U8* item)=0;
 
   virtual ~LASreadItemCompressed(){};
 };

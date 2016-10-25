@@ -45,7 +45,7 @@
 #define DIRECTORY_SLASH '/'
 #endif
 
-BOOL LASwriteOpener::is_piped() const
+bool LASwriteOpener::is_piped() const
 {
   return ((file_name == 0) && use_stdout);
 }
@@ -233,7 +233,7 @@ void LASwriteOpener::usage() const
   fprintf(stderr,"  -nil    (pipe to NULL)\n");
 }
 
-BOOL LASwriteOpener::parse(int argc, char* argv[])
+bool LASwriteOpener::parse(int argc, char* argv[])
 {
   int i;
   for (i = 1; i < argc; i++)
@@ -501,7 +501,7 @@ void LASwriteOpener::set_cut(U32 cut)
   if (cut && file_name) cut_characters();
 }
 
-BOOL LASwriteOpener::set_format(I32 format)
+bool LASwriteOpener::set_format(I32 format)
 {
   if ((format < LAS_TOOLS_FORMAT_DEFAULT) || (format > LAS_TOOLS_FORMAT_TXT))
   {
@@ -566,7 +566,7 @@ BOOL LASwriteOpener::set_format(I32 format)
   return TRUE;
 }
 
-BOOL LASwriteOpener::set_format(const CHAR* format)
+bool LASwriteOpener::set_format(const CHAR* format)
 {
   if (format)
   {
@@ -603,7 +603,7 @@ BOOL LASwriteOpener::set_format(const CHAR* format)
   return TRUE;
 }
 
-void LASwriteOpener::set_force(BOOL force)
+void LASwriteOpener::set_force(bool force)
 {
   this->force = force;
 }
@@ -863,7 +863,7 @@ U32 LASwriteOpener::get_cut() const
   return cut;
 }
 
-BOOL LASwriteOpener::format_was_specified() const
+bool LASwriteOpener::format_was_specified() const
 {
   return specified;
 }
@@ -941,7 +941,7 @@ void LASwriteOpener::set_scale_rgb(F32 scale_rgb)
   this->scale_rgb = scale_rgb;
 }
 
-BOOL LASwriteOpener::active() const
+bool LASwriteOpener::active() const
 {
   return (file_name != 0 || use_stdout || use_nil);
 }

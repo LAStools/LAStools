@@ -49,18 +49,18 @@ public:
   ~LASquadtree();
 
   // read from file or write to file
-  BOOL read(ByteStreamIn* stream);
-  BOOL write(ByteStreamOut* stream) const;
+  bool read(ByteStreamIn* stream);
+  bool write(ByteStreamOut* stream) const;
 
   // create or finalize the cell (in the spatial hierarchy) 
-  BOOL manage_cell(const U32 cell_index, const BOOL finalize=FALSE);
+  bool manage_cell(const U32 cell_index, const bool finalize=FALSE);
 
   // map points to cells
-  BOOL inside(const F64 x, const F64 y) const;
+  bool inside(const F64 x, const F64 y) const;
   U32 get_cell_index(const F64 x, const F64 y) const;
 
   // map cells to coarser cells
-  BOOL coarsen(const I32 cell_index, I32* coarser_cell_index, U32* num_cell_indices, I32** cell_indices) const;
+  bool coarsen(const I32 cell_index, I32* coarser_cell_index, U32* num_cell_indices, I32** cell_indices) const;
 
   // describe cells
   void get_cell_bounding_box(const I32 cell_index, F32* min, F32* max) const;
@@ -78,15 +78,15 @@ public:
   U32 intersect_circle(const F64 center_x, const F64 center_y, const F64 radius);
 
   // iterate over cells
-  BOOL get_all_cells();
-  BOOL get_intersected_cells();
-  BOOL has_more_cells();
+  bool get_all_cells();
+  bool get_intersected_cells();
+  bool has_more_cells();
 
   // for LASquadtree
-  BOOL setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, F32 cell_size = 1000.0f);
-  BOOL setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, F32 cell_size, F32 offset_x, F32 offset_y);
-  BOOL tiling_setup(F32 min_x, F32 max_x, F32 min_y, F32 max_y, U32 levels);
-  BOOL subtiling_setup(F32 min_x, F32 max_x, F32 min_y, F32 max_y, U32 sub_level, U32 sub_level_index, U32 levels);
+  bool setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, F32 cell_size = 1000.0f);
+  bool setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, F32 cell_size, F32 offset_x, F32 offset_y);
+  bool tiling_setup(F32 min_x, F32 max_x, F32 min_y, F32 max_y, U32 levels);
+  bool subtiling_setup(F32 min_x, F32 max_x, F32 min_y, F32 max_y, U32 sub_level, U32 sub_level_index, U32 levels);
 
   // additional index queries
   U32 get_level_index(const F64 x, const F64 y, U32 level) const;
@@ -118,8 +118,8 @@ public:
   U32 get_max_cell_index(U32 level) const;
   U32 get_max_cell_index() const;
 
-  U32* raster_occupancy(BOOL(*does_cell_exist)(I32), U32 level) const;
-  U32* raster_occupancy(BOOL(*does_cell_exist)(I32)) const;
+  U32* raster_occupancy(bool(*does_cell_exist)(I32), U32 level) const;
+  U32* raster_occupancy(bool(*does_cell_exist)(I32)) const;
 
   U32 levels;
   F32 cell_size;
@@ -151,8 +151,8 @@ private:
   void intersect_tile_with_cells_adaptive(const F32 ll_x, const F32 ll_y, const F32 ur_x, const F32 ur_y, const F32 cell_min_x, const F32 cell_max_x, const F32 cell_min_y, const F32 cell_max_y, U32 level, U32 level_index);
   void intersect_circle_with_cells(const F64 center_x, const F64 center_y, const F64 radius, const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y, const F32 cell_min_x, const F32 cell_max_x, const F32 cell_min_y, const F32 cell_max_y, U32 level, U32 level_index);
   void intersect_circle_with_cells_adaptive(const F64 center_x, const F64 center_y, const F64 radius, const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y, const F32 cell_min_x, const F32 cell_max_x, const F32 cell_min_y, const F32 cell_max_y, U32 level, U32 level_index);
-  BOOL intersect_circle_with_rectangle(const F64 center_x, const F64 center_y, const F64 radius, const F32 r_min_x, const F32 r_max_x, const F32 r_min_y, const F32 r_max_y);
-  void raster_occupancy(BOOL(*does_cell_exist)(I32), U32* data, U32 min_x, U32 min_y, U32 level_index, U32 level, U32 stop_level) const;
+  bool intersect_circle_with_rectangle(const F64 center_x, const F64 center_y, const F64 radius, const F32 r_min_x, const F32 r_max_x, const F32 r_min_y, const F32 r_max_y);
+  void raster_occupancy(bool(*does_cell_exist)(I32), U32* data, U32 min_x, U32 min_y, U32 level_index, U32 level, U32 stop_level) const;
   void* current_cells;
   U32 next_cell_index;
 };

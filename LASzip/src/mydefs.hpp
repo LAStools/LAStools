@@ -66,12 +66,6 @@ typedef long long          I64;
 typedef float              F32;
 typedef double             F64;
 
-#if defined(_MSC_VER) && (_MSC_VER < 1300) || defined (__MINGW32__)
-typedef int                BOOL;
-#else
-typedef bool               BOOL;
-#endif
-
 typedef union U32I32F32 { U32 u32; I32 i32; F32 f32; } U32I32F32;
 typedef union U64I64F64 { U64 u64; I64 i64; F64 f64; } U64I64F64;
 
@@ -167,7 +161,7 @@ typedef union U64I64F64 { U64 u64; I64 i64; F64 f64; } U64I64F64;
 #define NULL    0
 #endif
 
-inline BOOL IS_LITTLE_ENDIAN()
+inline bool IS_LITTLE_ENDIAN()
 {
   const U32 i = 1;
   return (*((U8*)&i) == 1);

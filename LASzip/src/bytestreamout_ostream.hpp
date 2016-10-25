@@ -46,17 +46,17 @@ class ByteStreamOutOstream : public ByteStreamOut
 public:
   ByteStreamOutOstream(ostream& stream);
 /* write a single byte                                       */
-  BOOL putByte(U8 byte);
+  bool putByte(U8 byte);
 /* write an array of bytes                                   */
-  BOOL putBytes(const U8* bytes, U32 num_bytes);
+  bool putBytes(const U8* bytes, U32 num_bytes);
 /* is the stream seekable (e.g. standard out is not)         */
-  BOOL isSeekable() const;
+  bool isSeekable() const;
 /* get current position of stream                            */
   I64 tell() const;
 /* seek to this position in the stream                       */
-  BOOL seek(const I64 position);
+  bool seek(const I64 position);
 /* seek to the end of the file                               */
-  BOOL seekEnd();
+  bool seekEnd();
 /* destructor                                                */
   ~ByteStreamOutOstream(){};
 protected:
@@ -68,17 +68,17 @@ class ByteStreamOutOstreamLE : public ByteStreamOutOstream
 public:
   ByteStreamOutOstreamLE(ostream& stream);
 /* write 16 bit low-endian field                             */
-  BOOL put16bitsLE(const U8* bytes);
+  bool put16bitsLE(const U8* bytes);
 /* write 32 bit low-endian field                             */
-  BOOL put32bitsLE(const U8* bytes);
+  bool put32bitsLE(const U8* bytes);
 /* write 64 bit low-endian field                             */
-  BOOL put64bitsLE(const U8* bytes);
+  bool put64bitsLE(const U8* bytes);
 /* write 16 bit big-endian field                             */
-  BOOL put16bitsBE(const U8* bytes);
+  bool put16bitsBE(const U8* bytes);
 /* write 32 bit big-endian field                             */
-  BOOL put32bitsBE(const U8* bytes);
+  bool put32bitsBE(const U8* bytes);
 /* write 64 bit big-endian field                             */
-  BOOL put64bitsBE(const U8* bytes);
+  bool put64bitsBE(const U8* bytes);
 private:
   U8 swapped[8];
 };
@@ -88,17 +88,17 @@ class ByteStreamOutOstreamBE : public ByteStreamOutOstream
 public:
   ByteStreamOutOstreamBE(ostream& stream);
 /* write 16 bit low-endian field                             */
-  BOOL put16bitsLE(const U8* bytes);
+  bool put16bitsLE(const U8* bytes);
 /* write 32 bit low-endian field                             */
-  BOOL put32bitsLE(const U8* bytes);
+  bool put32bitsLE(const U8* bytes);
 /* write 64 bit low-endian field                             */
-  BOOL put64bitsLE(const U8* bytes);
+  bool put64bitsLE(const U8* bytes);
 /* write 16 bit big-endian field                             */
-  BOOL put16bitsBE(const U8* bytes);
+  bool put16bitsBE(const U8* bytes);
 /* write 32 bit big-endian field                             */
-  BOOL put32bitsBE(const U8* bytes);
+  bool put32bitsBE(const U8* bytes);
 /* write 64 bit big-endian field                             */
-  BOOL put64bitsBE(const U8* bytes);
+  bool put64bitsBE(const U8* bytes);
 private:
   U8 swapped[8];
 };
@@ -108,19 +108,19 @@ inline ByteStreamOutOstream::ByteStreamOutOstream(ostream& stream_param) :
 {
 }
 
-inline BOOL ByteStreamOutOstream::putByte(U8 byte)
+inline bool ByteStreamOutOstream::putByte(U8 byte)
 {
   stream.put(byte);
   return stream.good();
 }
 
-inline BOOL ByteStreamOutOstream::putBytes(const U8* bytes, U32 num_bytes)
+inline bool ByteStreamOutOstream::putBytes(const U8* bytes, U32 num_bytes)
 {
   stream.write((const char*)bytes, num_bytes);
   return stream.good();
 }
 
-inline BOOL ByteStreamOutOstream::isSeekable() const
+inline bool ByteStreamOutOstream::isSeekable() const
 {
   return !!(static_cast<ofstream&>(stream));
 }
@@ -130,13 +130,13 @@ inline I64 ByteStreamOutOstream::tell() const
   return (I64)stream.tellp();
 }
 
-inline BOOL ByteStreamOutOstream::seek(I64 position)
+inline bool ByteStreamOutOstream::seek(I64 position)
 {
   stream.seekp(static_cast<streamoff>(position));
   return stream.good();
 }
 
-inline BOOL ByteStreamOutOstream::seekEnd()
+inline bool ByteStreamOutOstream::seekEnd()
 {
   stream.seekp(0, ios::end);
   return stream.good();
@@ -146,29 +146,29 @@ inline ByteStreamOutOstreamLE::ByteStreamOutOstreamLE(ostream& stream) : ByteStr
 {
 }
 
-inline BOOL ByteStreamOutOstreamLE::put16bitsLE(const U8* bytes)
+inline bool ByteStreamOutOstreamLE::put16bitsLE(const U8* bytes)
 {
   return putBytes(bytes, 2);
 }
 
-inline BOOL ByteStreamOutOstreamLE::put32bitsLE(const U8* bytes)
+inline bool ByteStreamOutOstreamLE::put32bitsLE(const U8* bytes)
 {
   return putBytes(bytes, 4);
 }
 
-inline BOOL ByteStreamOutOstreamLE::put64bitsLE(const U8* bytes)
+inline bool ByteStreamOutOstreamLE::put64bitsLE(const U8* bytes)
 {
   return putBytes(bytes, 8);
 }
 
-inline BOOL ByteStreamOutOstreamLE::put16bitsBE(const U8* bytes)
+inline bool ByteStreamOutOstreamLE::put16bitsBE(const U8* bytes)
 {
   swapped[0] = bytes[1];
   swapped[1] = bytes[0];
   return putBytes(swapped, 2);
 }
 
-inline BOOL ByteStreamOutOstreamLE::put32bitsBE(const U8* bytes)
+inline bool ByteStreamOutOstreamLE::put32bitsBE(const U8* bytes)
 {
   swapped[0] = bytes[3];
   swapped[1] = bytes[2];
@@ -177,7 +177,7 @@ inline BOOL ByteStreamOutOstreamLE::put32bitsBE(const U8* bytes)
   return putBytes(swapped, 4);
 }
 
-inline BOOL ByteStreamOutOstreamLE::put64bitsBE(const U8* bytes)
+inline bool ByteStreamOutOstreamLE::put64bitsBE(const U8* bytes)
 {
   swapped[0] = bytes[7];
   swapped[1] = bytes[6];
@@ -194,14 +194,14 @@ inline ByteStreamOutOstreamBE::ByteStreamOutOstreamBE(ostream& stream) : ByteStr
 {
 }
 
-inline BOOL ByteStreamOutOstreamBE::put16bitsLE(const U8* bytes)
+inline bool ByteStreamOutOstreamBE::put16bitsLE(const U8* bytes)
 {
   swapped[0] = bytes[1];
   swapped[1] = bytes[0];
   return putBytes(swapped, 2);
 }
 
-inline BOOL ByteStreamOutOstreamBE::put32bitsLE(const U8* bytes)
+inline bool ByteStreamOutOstreamBE::put32bitsLE(const U8* bytes)
 {
   swapped[0] = bytes[3];
   swapped[1] = bytes[2];
@@ -210,7 +210,7 @@ inline BOOL ByteStreamOutOstreamBE::put32bitsLE(const U8* bytes)
   return putBytes(swapped, 4);
 }
 
-inline BOOL ByteStreamOutOstreamBE::put64bitsLE(const U8* bytes)
+inline bool ByteStreamOutOstreamBE::put64bitsLE(const U8* bytes)
 {
   swapped[0] = bytes[7];
   swapped[1] = bytes[6];
@@ -223,17 +223,17 @@ inline BOOL ByteStreamOutOstreamBE::put64bitsLE(const U8* bytes)
   return putBytes(swapped, 8);
 }
 
-inline BOOL ByteStreamOutOstreamBE::put16bitsBE(const U8* bytes)
+inline bool ByteStreamOutOstreamBE::put16bitsBE(const U8* bytes)
 {
   return putBytes(bytes, 2);
 }
 
-inline BOOL ByteStreamOutOstreamBE::put32bitsBE(const U8* bytes)
+inline bool ByteStreamOutOstreamBE::put32bitsBE(const U8* bytes)
 {
   return putBytes(bytes, 4);
 }
 
-inline BOOL ByteStreamOutOstreamBE::put64bitsBE(const U8* bytes)
+inline bool ByteStreamOutOstreamBE::put64bitsBE(const U8* bytes)
 {
   return putBytes(bytes, 8);
 }

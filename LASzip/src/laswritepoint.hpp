@@ -53,12 +53,12 @@ public:
   ~LASwritePoint();
 
   // should only be called *once*
-  BOOL setup(const U32 num_items, const LASitem* items, const LASzip* laszip=0);
+  bool setup(const U32 num_items, const LASitem* items, const LASzip* laszip=0);
 
-  BOOL init(ByteStreamOut* outstream);
-  BOOL write(const U8 * const * point);
-  BOOL chunk();
-  BOOL done();
+  bool init(ByteStreamOut* outstream);
+  bool write(const U8 * const * point);
+  bool chunk();
+  bool done();
 
 private:
   ByteStreamOut* outstream;
@@ -76,8 +76,8 @@ private:
   U32* chunk_bytes;
   I64 chunk_start_position;
   I64 chunk_table_start_position;
-  BOOL add_chunk_to_table();
-  BOOL write_chunk_table();
+  bool add_chunk_to_table();
+  bool write_chunk_table();
 };
 
 #endif

@@ -41,8 +41,8 @@ class LASreaderTXT : public LASreader
 {
 public:
 
-  void set_pts(BOOL pts);
-  void set_ptx(BOOL ptx);
+  void set_pts(bool pts);
+  void set_ptx(bool ptx);
 
   void set_translate_intensity(F32 translate_intensity);
   void set_scale_intensity(F32 scale_intensity);
@@ -51,22 +51,22 @@ public:
   void set_scale_factor(const F64* scale_factor);
   void set_offset(const F64* offset);
   void add_attribute(I32 data_type, const CHAR* name, const CHAR* description=0, F64 scale=1.0, F64 offset=0.0, F64 pre_scale=1.0, F64 pre_offset=0.0);
-  virtual BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
-  virtual BOOL open(FILE* file, const CHAR* file_name=0, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
+  virtual bool open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, bool populate_header=FALSE);
+  virtual bool open(FILE* file, const CHAR* file_name=0, const CHAR* parse_string=0, I32 skip_lines=0, bool populate_header=FALSE);
 
   I32 get_format() const { return LAS_TOOLS_FORMAT_TXT; };
 
-  BOOL seek(const I64 p_index);
+  bool seek(const I64 p_index);
 
   ByteStreamIn* get_stream() const;
-  void close(BOOL close_stream=TRUE);
-  BOOL reopen(const CHAR* file_name);
+  void close(bool close_stream=TRUE);
+  bool reopen(const CHAR* file_name);
 
   LASreaderTXT();
   virtual ~LASreaderTXT();
 
 protected:
-  BOOL read_point_default();
+  bool read_point_default();
 
 private:
   CHAR* parse_string;
@@ -77,9 +77,9 @@ private:
   F64* scale_factor;
   F64* offset;
   I32 skip_lines;
-  BOOL populated_header;
-  BOOL ipts;
-  BOOL iptx;
+  bool populated_header;
+  bool ipts;
+  bool iptx;
   FILE* file;
   bool piped;
   CHAR line[512];
@@ -92,9 +92,9 @@ private:
   F64 attribute_pre_scales[10];
   F64 attribute_pre_offsets[10];
   I32 attribute_starts[10];
-  BOOL parse_attribute(const CHAR* l, I32 index);
-  BOOL parse(const CHAR* parse_string);
-  BOOL check_parse_string(const CHAR* parse_string);
+  bool parse_attribute(const CHAR* l, I32 index);
+  bool parse(const CHAR* parse_string);
+  bool check_parse_string(const CHAR* parse_string);
   void populate_scale_and_offset();
   void populate_bounding_box();
   void clean();
@@ -103,7 +103,7 @@ private:
 class LASreaderTXTrescale : public virtual LASreaderTXT
 {
 public:
-  virtual BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
+  virtual bool open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, bool populate_header=FALSE);
   LASreaderTXTrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor);
 
 protected:
@@ -113,7 +113,7 @@ protected:
 class LASreaderTXTreoffset : public virtual LASreaderTXT
 {
 public:
-  virtual BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
+  virtual bool open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, bool populate_header=FALSE);
   LASreaderTXTreoffset(F64 x_offset, F64 y_offset, F64 z_offset);
 protected:
   F64 offset[3];
@@ -122,7 +122,7 @@ protected:
 class LASreaderTXTrescalereoffset : public LASreaderTXTrescale, LASreaderTXTreoffset
 {
 public:
-  BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
+  bool open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, bool populate_header=FALSE);
   LASreaderTXTrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset);
 };
 

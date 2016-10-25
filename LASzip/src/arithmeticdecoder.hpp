@@ -51,7 +51,7 @@ public:
   ~ArithmeticDecoder();
 
 /* Manage decoding                                           */
-  BOOL init(ByteStreamIn* instream);
+  bool init(ByteStreamIn* instream);
   void done();
 
 /* Manage an entropy model for a single bit                  */

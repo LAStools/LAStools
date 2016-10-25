@@ -78,7 +78,7 @@ struct TSheader
   I32 rgb;
 };
 
-BOOL LASreaderBIN::open(const char* file_name)
+bool LASreaderBIN::open(const char* file_name)
 {
   if (file_name == 0)
   {
@@ -132,7 +132,7 @@ BOOL LASreaderBIN::open(const char* file_name)
   return open(in);
 }
 
-BOOL LASreaderBIN::open(ByteStreamIn* stream)
+bool LASreaderBIN::open(ByteStreamIn* stream)
 {
   int i;
 
@@ -250,7 +250,7 @@ BOOL LASreaderBIN::open(ByteStreamIn* stream)
   return seek(0);
 }
 
-BOOL LASreaderBIN::seek(const I64 p_index)
+bool LASreaderBIN::seek(const I64 p_index)
 {
   if (p_index < npoints)
   {
@@ -269,7 +269,7 @@ BOOL LASreaderBIN::seek(const I64 p_index)
   return FALSE;
 }
 
-BOOL LASreaderBIN::read_point_default()
+bool LASreaderBIN::read_point_default()
 {
   if (p_count < npoints)
   {
@@ -373,7 +373,7 @@ ByteStreamIn* LASreaderBIN::get_stream() const
   return stream;
 }
 
-void LASreaderBIN::close(BOOL close_stream)
+void LASreaderBIN::close(bool close_stream)
 {
   if (close_stream)
   {
@@ -408,7 +408,7 @@ LASreaderBINrescale::LASreaderBINrescale(F64 x_scale_factor, F64 y_scale_factor,
   scale_factor[2] = z_scale_factor;
 }
 
-BOOL LASreaderBINrescale::open(ByteStreamIn* stream)
+bool LASreaderBINrescale::open(ByteStreamIn* stream)
 {
   if (!LASreaderBIN::open(stream)) return FALSE;
   // do we need to change anything
@@ -434,7 +434,7 @@ LASreaderBINreoffset::LASreaderBINreoffset(F64 x_offset, F64 y_offset, F64 z_off
   this->offset[2] = z_offset;
 }
 
-BOOL LASreaderBINreoffset::open(ByteStreamIn* stream)
+bool LASreaderBINreoffset::open(ByteStreamIn* stream)
 {
   if (!LASreaderBIN::open(stream)) return FALSE;
   // do we need to change anything
@@ -457,7 +457,7 @@ LASreaderBINrescalereoffset::LASreaderBINrescalereoffset(F64 x_scale_factor, F64
 {
 }
 
-BOOL LASreaderBINrescalereoffset::open(ByteStreamIn* stream)
+bool LASreaderBINrescalereoffset::open(ByteStreamIn* stream)
 {
   if (!LASreaderBIN::open(stream)) return FALSE;
   // do we need to change anything

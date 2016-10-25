@@ -33,7 +33,7 @@
 #include "bytestreamout_array.hpp"
 #include "bytestreamin_array.hpp"
 
-BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteopener, BOOL moveCRSfromEVLRtoVLR, BOOL moveEVLRtoVLR)
+bool LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteopener, bool moveCRSfromEVLRtoVLR, bool moveEVLRtoVLR)
 {
   U32 i;
 
@@ -288,7 +288,7 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
   return TRUE;
 }
 
-BOOL LASwriterCompatibleDown::write_point(const LASpoint* point)
+bool LASwriterCompatibleDown::write_point(const LASpoint* point)
 {
   I32 scan_angle_remainder;
   I32 number_of_returns_increment;
@@ -369,12 +369,12 @@ BOOL LASwriterCompatibleDown::write_point(const LASpoint* point)
   return TRUE;
 }
 
-BOOL LASwriterCompatibleDown::update_header(const LASheader* header, BOOL use_inventory, BOOL update_extra_bytes)
+bool LASwriterCompatibleDown::update_header(const LASheader* header, bool use_inventory, bool update_extra_bytes)
 {
   return writer->update_header(header, use_inventory, update_extra_bytes);
 }
 
-I64 LASwriterCompatibleDown::close(BOOL update_header)
+I64 LASwriterCompatibleDown::close(bool update_header)
 {
   I64 bytes = writer->close(update_header);
 
@@ -399,7 +399,7 @@ LASwriterCompatibleDown::~LASwriterCompatibleDown()
 {
 }
 
-BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopener)
+bool LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopener)
 {
   U32 i;
 
@@ -592,7 +592,7 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
   return TRUE;
 }
 
-BOOL LASwriterCompatibleUp::write_point(const LASpoint* point)
+bool LASwriterCompatibleUp::write_point(const LASpoint* point)
 {
   I16 scan_angle;
   U8 extended_returns;
@@ -631,12 +631,12 @@ BOOL LASwriterCompatibleUp::write_point(const LASpoint* point)
   return TRUE;
 }
 
-BOOL LASwriterCompatibleUp::update_header(const LASheader* header, BOOL use_inventory, BOOL update_extra_bytes)
+bool LASwriterCompatibleUp::update_header(const LASheader* header, bool use_inventory, bool update_extra_bytes)
 {
   return writer->update_header(header, use_inventory, update_extra_bytes);
 }
 
-I64 LASwriterCompatibleUp::close(BOOL update_header)
+I64 LASwriterCompatibleUp::close(bool update_header)
 {
   I64 bytes = writer->close(update_header);
 

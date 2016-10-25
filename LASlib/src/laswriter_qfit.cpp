@@ -40,14 +40,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-BOOL LASwriterQFIT::refile(FILE* file)
+bool LASwriterQFIT::refile(FILE* file)
 {
   if (stream == 0) return FALSE;
   if (this->file) this->file = file;
   return ((ByteStreamOutFile*)stream)->refile(file);
 }
 
-BOOL LASwriterQFIT::open(const char* file_name, const LASheader* header, I32 version, U32 io_buffer_size)
+bool LASwriterQFIT::open(const char* file_name, const LASheader* header, I32 version, U32 io_buffer_size)
 {
   if (file_name == 0)
   {
@@ -71,7 +71,7 @@ BOOL LASwriterQFIT::open(const char* file_name, const LASheader* header, I32 ver
   return open(file, header, version);
 }
 
-BOOL LASwriterQFIT::open(FILE* file, const LASheader* header, I32 version)
+bool LASwriterQFIT::open(FILE* file, const LASheader* header, I32 version)
 {
   if (file == 0)
   {
@@ -104,7 +104,7 @@ BOOL LASwriterQFIT::open(FILE* file, const LASheader* header, I32 version)
   return open(out, header, version);
 }
 
-BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 version)
+bool LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 version)
 {
   if (stream == 0)
   {
@@ -220,7 +220,7 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
   return TRUE;
 }
 
-BOOL LASwriterQFIT::write_point(const LASpoint* point)
+bool LASwriterQFIT::write_point(const LASpoint* point)
 {
   buffer[0] = I32_QUANTIZE(point->gps_time / 0.001);
   if (buffer[0] < 0) buffer[0] *= -1;
@@ -264,12 +264,12 @@ BOOL LASwriterQFIT::write_point(const LASpoint* point)
   return TRUE;
 }
 
-BOOL LASwriterQFIT::update_header(const LASheader* header, BOOL use_inventory, BOOL update_extra_bytes)
+bool LASwriterQFIT::update_header(const LASheader* header, bool use_inventory, bool update_extra_bytes)
 {
   return TRUE;
 }
 
-I64 LASwriterQFIT::close(BOOL update_header)
+I64 LASwriterQFIT::close(bool update_header)
 {
   I64 bytes = 0;
   

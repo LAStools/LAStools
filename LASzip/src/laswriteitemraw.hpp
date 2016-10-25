@@ -41,7 +41,7 @@ class LASwriteItemRaw_POINT10_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_POINT10_LE(){};
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     return outstream->putBytes(item, 20);
   };
@@ -51,7 +51,7 @@ class LASwriteItemRaw_POINT10_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_POINT10_BE(){};
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     ENDIAN_SWAP_32(&item[ 0], &swapped[ 0]);    // x
     ENDIAN_SWAP_32(&item[ 4], &swapped[ 4]);    // y
@@ -69,7 +69,7 @@ class LASwriteItemRaw_GPSTIME11_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_GPSTIME11_LE() {};
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     return outstream->putBytes(item, 8);
   };
@@ -79,7 +79,7 @@ class LASwriteItemRaw_GPSTIME11_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_GPSTIME11_BE() {};
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     ENDIAN_SWAP_64(item, swapped);
     return outstream->putBytes(swapped, 8);
@@ -92,7 +92,7 @@ class LASwriteItemRaw_RGB12_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_RGB12_LE(){}
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     return outstream->putBytes(item, 6);
   };
@@ -102,7 +102,7 @@ class LASwriteItemRaw_RGB12_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_RGB12_BE(){}
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     ENDIAN_SWAP_32(&item[ 0], &swapped[ 0]); // R
     ENDIAN_SWAP_32(&item[ 2], &swapped[ 2]); // G
@@ -117,7 +117,7 @@ class LASwriteItemRaw_WAVEPACKET13_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_WAVEPACKET13_LE(){}
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     return outstream->putBytes(item, 29);
   };
@@ -127,7 +127,7 @@ class LASwriteItemRaw_WAVEPACKET13_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_WAVEPACKET13_BE(){}
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     swapped[0] = item[0];                    // wavepacket descriptor index
     ENDIAN_SWAP_64(&item[ 1], &swapped[ 1]); // byte offset to waveform data
@@ -149,7 +149,7 @@ public:
   {
     this->number = number;
   }
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     return outstream->putBytes(item, number);
   };
@@ -214,7 +214,7 @@ class LASwriteItemRaw_POINT14_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_POINT14_LE(){};
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     ((LAStempWritePoint14*)buffer)->X = ((LAStempWritePoint10*)item)->X;
     ((LAStempWritePoint14*)buffer)->Y = ((LAStempWritePoint10*)item)->Y;
@@ -255,7 +255,7 @@ class LASwriteItemRaw_RGBNIR14_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_RGBNIR14_LE(){}
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     return outstream->putBytes(item, 8);
   };
@@ -265,7 +265,7 @@ class LASwriteItemRaw_RGBNIR14_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_RGBNIR14_BE(){}
-  inline BOOL write(const U8* item)
+  inline bool write(const U8* item)
   {
     ENDIAN_SWAP_32(&item[ 0], &swapped[ 0]); // R
     ENDIAN_SWAP_32(&item[ 2], &swapped[ 2]); // G
