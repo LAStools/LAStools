@@ -19,6 +19,14 @@
   or LAZ files sometimes store as "Extra Bytes" can be gridded
   with '-attribute 0' or '-attribute 1' or '-attribute 2' ...
 
+  Sometimes vendors will cut off clouds or haze in the data in
+  airborne surveys before delivering the data. Often the return
+  below the clouds will usually be of lower quality. Areas with
+  missing first returns can be found by gridding '-return_type'
+  with option '-highest'. Areas with missing last returns can be
+  found by gridding '-return_type' with option '-lowest'. Using
+  a '-false' coloring makes it easy to spot afected areas. 
+
   This tool can read BILLIONS of points very efficiently. By
   default it uses only 1000MB of main memory. You can increase
   this with the '-mem 2000' option to up to 2 GB. The tool
@@ -239,7 +247,7 @@ other commandline arguments are
 
 for more info:
 
-D:\lastools\bin>lasgrid -h
+E:\LAStools\bin>lasgrid -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -260,8 +268,10 @@ Filter points based on their coordinates.
   -keep_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)
   -drop_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)
 Filter points based on their return number.
-  -first_only -keep_first -drop_first
-  -last_only -keep_last -drop_last
+  -keep_first -first_only -drop_first
+  -keep_last -last_only -drop_last
+  -keep_first_of_many -keep_last_of_many
+  -drop_first_of_many -drop_last_of_many
   -keep_middle -drop_middle
   -keep_return 1 2 3
   -drop_return 3 4
@@ -272,22 +282,27 @@ Filter points based on their return number.
   -keep_quintuple -drop_quintuple
 Filter points based on the scanline flags.
   -drop_scan_direction 0
-  -scan_direction_change_only
-  -edge_of_flight_line_only
+  -keep_scan_direction_change
+  -keep_edge_of_flight_line
 Filter points based on their intensity.
   -keep_intensity 20 380
   -drop_intensity_below 20
   -drop_intensity_above 380
   -drop_intensity_between 4000 5000
-Filter points based on their classification.
+Filter points based on classifications or flags.
   -keep_class 1 3 7
   -drop_class 4 2
+  -keep_extended_class 43
+  -drop_extended_class 129 135
   -drop_synthetic -keep_synthetic
   -drop_keypoint -keep_keypoint
   -drop_withheld -keep_withheld
+  -drop_overlap -keep_overlap
 Filter points based on their user data.
   -keep_user_data 1
   -drop_user_data 255
+  -keep_user_data_below 50
+  -keep_user_data_above 150
   -keep_user_data_between 10 20
   -drop_user_data_below 1
   -drop_user_data_above 100
@@ -302,6 +317,7 @@ Filter points based on their point source ID.
 Filter points based on their scan angle.
   -keep_scan_angle -15 15
   -drop_abs_scan_angle_above 15
+  -drop_abs_scan_angle_below 1
   -drop_scan_angle_below -15
   -drop_scan_angle_above 15
   -drop_scan_angle_between -25 -23
@@ -310,13 +326,26 @@ Filter points based on their gps time.
   -drop_gps_time_below 11.125
   -drop_gps_time_above 130.725
   -drop_gps_time_between 22.0 48.0
+Filter points based on their RGB/CIR/NIR channels.
+  -keep_RGB_red 1 1
+  -keep_RGB_green 30 100
+  -keep_RGB_blue 0 0
+  -keep_RGB_nir 64 127
+  -keep_NDVI 0.2 0.7 -keep_NDVI_from_CIR -0.1 0.5
+  -keep_NDVI_intensity_is_NIR 0.4 0.8 -keep_NDVI_green_is_NIR -0.2 0.2
 Filter points based on their wavepacket.
   -keep_wavepacket 0
   -drop_wavepacket 3
+Filter points based on extra attributes.
+  -keep_attribute_above 0 5.0
+  -drop_attribute_below 1 1.5
 Filter points with simple thinning.
   -keep_every_nth 2
   -keep_random_fraction 0.1
   -thin_with_grid 1.0
+  -thin_with_time 0.001
+Boolean combination of filters.
+  -filter_and
 Transform coordinates.
   -translate_x -2.5
   -scale_z 0.3048
@@ -326,11 +355,14 @@ Transform coordinates.
   -switch_x_y -switch_x_z -switch_y_z
   -clamp_z_below 70.5
   -clamp_z 70.5 72.5
+  -copy_attribute_into_z 0
 Transform raw xyz integers.
   -translate_raw_z 20
   -translate_raw_xyz 1 1 0
+  -translate_raw_xy_at_random 2 2
   -clamp_raw_z 500 800
 Transform intensity.
+  -set_intensity 0
   -scale_intensity 2.5
   -translate_intensity 50
   -translate_then_scale_intensity 0.5 3.1
@@ -343,35 +375,51 @@ Transform scan_angle.
 Change the return number or return count of points.
   -repair_zero_returns
   -set_return_number 1
+  -set_extended_return_number 10
   -change_return_number_from_to 2 1
   -set_number_of_returns 2
+  -set_number_of_returns 15
   -change_number_of_returns_from_to 0 2
 Modify the classification.
   -set_classification 2
+  -set_extended_classification 0
   -change_classification_from_to 2 4
   -classify_z_below_as -5.0 7
   -classify_z_above_as 70.0 7
   -classify_z_between_as 2.0 5.0 4
   -classify_intensity_above_as 200 9
   -classify_intensity_below_as 30 11
+  -change_extended_classification_from_to 6 46
+  -move_ancient_to_extended_classification
 Change the flags.
   -set_withheld_flag 0
   -set_synthetic_flag 1
   -set_keypoint_flag 0
+  -set_extended_overlap_flag 1
+Modify the extended scanner channel.
+  -set_extended_scanner_channel 2
 Modify the user data.
   -set_user_data 0
   -change_user_data_from_to 23 26
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
-  -quantize_Z_into_point_source 200
+  -copy_user_data_into_point_source
+  -bin_Z_into_point_source 200
+  -bin_abs_scan_angle_into_point_source 2
 Transform gps_time.
+  -set_gps_time 113556962.005715
   -translate_gps_time 40.50
   -adjusted_to_week
   -week_to_adjusted 1671
-Transform RGB colors.
-  -scale_rgb_down (by 256)
-  -scale_rgb_up (by 256)
+Transform RGB/NIR colors.
+  -set_RGB 255 0 127
+  -set_RGB_of_class 9 0 0 255
+  -scale_RGB 2 4 2
+  -scale_RGB_down (by 256)
+  -scale_RGB_up (by 256)
+  -switch_R_G -switch_R_B -switch_B_G
+  -copy_R_into_NIR -copy_G_into_NIR -copy_B_into_NIR
 Supported LAS Inputs
   -i lidar.las
   -i lidar.laz
@@ -389,9 +437,14 @@ Supported LAS Inputs
   -rescale_xy 0.01 0.01
   -rescale_z 0.01
   -reoffset 600000 4000000 0
+Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
+  -inside min_x min_y max_x max_y
+  -inside_tile ll_x ll_y size
+  -inside_circle center_x center_y radius
 Supported Raster Outputs
   -o dtm.asc
   -o dsm.bil
+  -o dem.laz
   -o canopy.flt
   -o dtm.dtm
   -o density.xyz
@@ -404,7 +457,7 @@ Supported Raster Outputs
   -odir C:\data\hillshade (specify output directory)
   -odix _small (specify file name appendix)
   -ocut 2 (cut the last two characters from name)
-LAStools (by martin@rapidlasso.com) version 140709 (licensed)
+LAStools (by martin@rapidlasso.com) version 161023 (commercial)
 Supported raster operations
   -elevation_lowest (default)
   -elevation_highest
@@ -420,10 +473,13 @@ Supported raster operations
   -number_returns_highest
   -number_returns_average
   -number_returns_stddev
+  -return_type_lowest
+  -return_type_highest
   -occupancy
   -counter
   -counter_16bit
   -counter_32bit
+  -classification_variety
   -scan_angle_lowest
   -scan_angle_highest
   -scan_angle_range
@@ -436,11 +492,12 @@ Supported raster operations
   -point_source_lowest
   -point_source_highest
   -point_source_range
+  -rgb
 usage:
 lasgrid -i *.las -opng -step 5 -false
 lasgrid -i in.las -o dtm.asc -mem 1000
 lasgrid -i in.las -o chm.png -false -subcircle 0.5 -set_min_max 0 30
-lasgrid -i in.laz -o dsm.img -elevation_highest -mem 2000 -temp_files E:\tmp
+lasgrid -i in.laz -o dsm.img -elevation_highest -mem 1900 -temp_files E:\tmp
 lasgrid -i in.laz -o out.png -elevation_stddev -false -step 5
 lasgrid -i in.las -o intensity.asc -intensity_lowest -step 2 -temp_files E:\tmp
 lasgrid -i in.laz -o out.png -scan_angle_abs_lowest -gray -step 2

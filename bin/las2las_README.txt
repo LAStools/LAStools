@@ -20,7 +20,9 @@
   also use common EPSG codes with '-epsg 32754'. For LAS 1.4 it
   is important to '-set_ogc_wkt' which translates the GeoTIFF
   keys into an CRS string in the OGC WKT format and adds them as
-  the payload of the corresponding VLR.
+  the payload of the corresponding VLR. For LAS 1.4 files you
+  can use '-set_ogc_wkt_in_evlr' to put that string into the
+  EVLR instead of the VLR (but we don't recommend that).
 
   Another typical use is extract only first (-first_only) or only
   last (-last_only) returns. Extracting the first return is the
