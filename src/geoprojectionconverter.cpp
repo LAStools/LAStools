@@ -1711,24 +1711,6 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
   return false;
 }
 
-bool GeoProjectionConverter::set_projection_from_ogc_wkt(int len, char* ogc_wkt)
-{
-  bool user_defined_ellipsoid = false;
-  int user_defined_projection = 0;
-  int offsetProjStdParallel1GeoKey = -1;
-  int offsetProjStdParallel2GeoKey = -1;
-  int offsetProjNatOriginLatGeoKey = -1;
-  int offsetProjFalseEastingGeoKey = -1;
-  int offsetProjFalseNorthingGeoKey = -1;
-  int offsetProjCenterLongGeoKey = -1;
-  int offsetProjScaleAtNatOriginGeoKey = -1;
-  bool has_projection = false;
-  int ellipsoid = -1;
-  int datum = -1;
-
-  return false;
-}
-
 static FILE* open_geo_file(const char* program_name, bool pcs=true)
 {
   FILE* file = 0;
@@ -1777,6 +1759,56 @@ static FILE* open_geo_file(const char* program_name, bool pcs=true)
   file = fopen(path, "r");
 
   return file;
+}
+
+bool GeoProjectionConverter::set_projection_from_ogc_wkt(int len, char* ogc_wkt)
+{
+/*
+  bool user_defined_ellipsoid = false;
+  int user_defined_projection = 0;
+  int offsetProjStdParallel1GeoKey = -1;
+  int offsetProjStdParallel2GeoKey = -1;
+  int offsetProjNatOriginLatGeoKey = -1;
+  int offsetProjFalseEastingGeoKey = -1;
+  int offsetProjFalseNorthingGeoKey = -1;
+  int offsetProjCenterLongGeoKey = -1;
+  int offsetProjScaleAtNatOriginGeoKey = -1;
+  bool has_projection = false;
+  int ellipsoid = -1;
+  int datum = -1;
+
+  // check if we have a projection (e.g. string contains a PROJCS)
+
+  int projcs = strstr(ogc_wkt, "PROJCS[");
+
+  if (projcs == -1)
+  {
+    // check if the string contains a GEOCCS
+    int geoccs = strstr(ogc_wkt, "GEOCCS[");
+  }
+  else
+  {
+    // if we can find an AUTHORITY containing the EPSG code we are done
+    int open_bracket = 1;
+    int curr = projcs + 7;
+    while ((curr < len) && open_bracket)
+    {
+      if (ogc_wkt[curr] == '[')
+      {
+        if (open_bracket == 1)
+        {
+        }
+        open_bracket++;
+      }
+      else if (ogc_wkt[curr] == ']')
+      {
+        open_bracket--;
+      }
+    }
+  }
+
+*/
+  return false;
 }
 
 static char* get_epsg_name_from_pcs_file(const char* program_name, short value)
@@ -1911,14 +1943,80 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
       // if not geographic we have a projection
       if ((projection->type != GEO_PROJECTION_LAT_LONG) && (projection->type != GEO_PROJECTION_LONG_LAT))
       {
+        char* epsg_name = 0;
         if (strlen(projection->name) == 0)
         {
-          char* epsg_name = get_epsg_name_from_pcs_file(argv_zero, projection->geokey);
-          if (epsg_name)
+          epsg_name = get_epsg_name_from_pcs_file(argv_zero, projection->geokey);
+        }
+        // maybe output a compound CRS
+        if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) )
+        {
+          n += sprintf(&string[n], "COMPD_CS[\"%s + ", (epsg_name ? epsg_name : projection->name));
+
+          if (vertical_geokey == GEO_VERTICAL_NAVD88)
           {
-            n += sprintf(&string[n], "PROJCS[\"%s\",", epsg_name);
-            free(epsg_name);
+            n += sprintf(&string[n], "NAVD88");
           }
+          else if (vertical_geokey == GEO_VERTICAL_NGVD29)
+          {
+            n += sprintf(&string[n], "NGVD29");
+          }
+          else if (vertical_geokey == GEO_VERTICAL_CGVD2013)
+          {
+            n += sprintf(&string[n], "CGVD2013");
+          }
+          else if (vertical_geokey == GEO_VERTICAL_CGVD28)
+          {
+            n += sprintf(&string[n], "CGVD28");
+          }
+          else if (vertical_geokey == GEO_VERTICAL_DVR90)
+          {
+            n += sprintf(&string[n], "DVR90");
+          }
+          else if (vertical_geokey == GEO_VERTICAL_NN2000)
+          {
+            n += sprintf(&string[n], "NN2000");
+          }
+          else if (vertical_geokey == GEO_VERTICAL_NN54)
+          {
+            n += sprintf(&string[n], "NN54");
+          }
+
+          if (source)
+          {
+            if (elevation2meter == 1.0)
+            {
+              n += sprintf(&string[n], "\",");
+            }
+            else if (elevation2meter == 0.3048)
+            {
+              n += sprintf(&string[n], " (ft)\",");
+            }
+            else
+            {
+              n += sprintf(&string[n], " (ftUS)\",");
+            }
+          }
+          else
+          {
+            if (meter2elevation == 1.0)
+            {
+              n += sprintf(&string[n], "\",");
+            }
+            else if (meter2elevation == 0.3048)
+            {
+              n += sprintf(&string[n], " (ft)\",");
+            }
+            else
+            {
+              n += sprintf(&string[n], " (ftUS)\",");
+            }
+          }
+        }
+        if (epsg_name)
+        {
+          n += sprintf(&string[n], "PROJCS[\"%s\",", epsg_name);
+          free(epsg_name);
         }
         else
         {
@@ -2160,6 +2258,8 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
       {
         n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"5776\"]]");
       }
+      // close bracket for compound CRS
+      n += sprintf(&string[n], "]");
     }
     len = n+1;
     *ogc_wkt = string;
