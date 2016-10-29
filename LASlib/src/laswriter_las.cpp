@@ -432,33 +432,19 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     {
       writing_new_point_type = FALSE;
     }
-
-    U64 start_of_first_extended_variable_length_record = header->start_of_first_extended_variable_length_record;
-    if (start_of_first_extended_variable_length_record != 0)
-    {
-#ifdef _WIN32
-      fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %I64d. writing 0 instead.\n", start_of_first_extended_variable_length_record);
-#else
-      fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %lld. writing 0 instead.\n", start_of_first_extended_variable_length_record);
-#endif
-      start_of_first_extended_variable_length_record = 0;
-    }
+    start_of_first_extended_variable_length_record = header->start_of_first_extended_variable_length_record;
     if (!stream->put64bitsLE((U8*)&(start_of_first_extended_variable_length_record)))
     {
       fprintf(stderr,"ERROR: writing header->start_of_first_extended_variable_length_record\n");
       return FALSE;
     }
-    U32 number_of_extended_variable_length_records = header->number_of_extended_variable_length_records;
-    if (number_of_extended_variable_length_records != 0)
-    {
-      fprintf(stderr,"WARNING: EVLRs not supported. header->number_of_extended_variable_length_records is %u. writing 0 instead.\n", number_of_extended_variable_length_records);
-      number_of_extended_variable_length_records = 0;
-    }
+    number_of_extended_variable_length_records = header->number_of_extended_variable_length_records;
     if (!stream->put32bitsLE((U8*)&(number_of_extended_variable_length_records)))
     {
       fprintf(stderr,"ERROR: writing header->number_of_extended_variable_length_records\n");
       return FALSE;
     }
+    evlrs = header->evlrs;
     U64 extended_number_of_point_records;
     if (header->number_of_point_records)
       extended_number_of_point_records = header->number_of_point_records;
@@ -1226,6 +1212,77 @@ I64 LASwriterLAS::close(BOOL update_header)
     writer = 0;
   }
 
+  if (writing_las_1_4 && number_of_extended_variable_length_records)
+  {
+    I64 real_start_of_first_extended_variable_length_record = stream->tell();
+
+    // write extended variable length records variable after variable (to avoid alignment issues)
+
+    for (U32 i = 0; i < number_of_extended_variable_length_records; i++)
+    {
+      // check variable length records contents
+
+      if (evlrs[i].reserved != 0xAABB)
+      {
+  //      fprintf(stderr,"WARNING: wrong evlrs[%d].reserved: %d != 0xAABB\n", i, evlrs[i].reserved);
+      }
+
+      // write variable length records variable after variable (to avoid alignment issues)
+
+      if (!stream->put16bitsLE((U8*)&(evlrs[i].reserved)))
+      {
+        fprintf(stderr,"ERROR: writing evlrs[%d].reserved\n", i);
+        return FALSE;
+      }
+      if (!stream->putBytes((U8*)evlrs[i].user_id, 16))
+      {
+        fprintf(stderr,"ERROR: writing evlrs[%d].user_id\n", i);
+        return FALSE;
+      }
+      if (!stream->put16bitsLE((U8*)&(evlrs[i].record_id)))
+      {
+        fprintf(stderr,"ERROR: writing evlrs[%d].record_id\n", i);
+        return FALSE;
+      }
+      if (!stream->put64bitsLE((U8*)&(evlrs[i].record_length_after_header)))
+      {
+        fprintf(stderr,"ERROR: writing evlrs[%d].record_length_after_header\n", i);
+        return FALSE;
+      }
+      if (!stream->putBytes((U8*)evlrs[i].description, 32))
+      {
+        fprintf(stderr,"ERROR: writing evlrs[%d].description\n", i);
+        return FALSE;
+      }
+
+      // write the data following the header of the variable length record
+
+      if (evlrs[i].record_length_after_header)
+      {
+        if (evlrs[i].data)
+        {
+          if (!stream->putBytes((U8*)evlrs[i].data, (U32)evlrs[i].record_length_after_header))
+          {
+            fprintf(stderr,"ERROR: writing %d bytes of data from evlrs[%d].data\n", (U32)evlrs[i].record_length_after_header, i);
+            return FALSE;
+          }
+        }
+        else
+        {
+          fprintf(stderr,"ERROR: there should be %d bytes of data in evlrs[%d].data\n", evlrs[i].record_length_after_header, i);
+          return FALSE;
+        }
+      }
+    }
+
+    if (real_start_of_first_extended_variable_length_record != start_of_first_extended_variable_length_record)
+    {
+  	  stream->seek(header_start_position+235);
+  	  stream->put64bitsLE((U8*)&real_start_of_first_extended_variable_length_record);
+      stream->seekEnd();
+    }
+  }
+
   if (stream)
   {
     if (update_header && p_count != npoints)
@@ -1294,6 +1351,10 @@ LASwriterLAS::LASwriterLAS()
   writer = 0;
   writing_las_1_4 = FALSE;
   writing_new_point_type = FALSE;
+  // for delayed write of EVLRs
+  start_of_first_extended_variable_length_record = 0;
+  number_of_extended_variable_length_records = 0;
+  evlrs = 0;
 }
 
 LASwriterLAS::~LASwriterLAS()
