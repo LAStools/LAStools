@@ -5,7 +5,7 @@
   
   CONTENTS:
   
-    Writes LIDAR points to the LAS format (Version 1.x , April 29, 2008).
+    Writes LiDAR points to the LAS format (Version 1.x , April 29, 2008).
 
   PROGRAMMERS:
 
@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    23 October 2016 -- support writing Extended Variable Length Records (ELVRs)
     29 April 2016 -- added WARNINGs when rescale / reoffset overflows integers
     13 October 2014 -- changed default IO buffer size with setvbuf() to 262144
     5 November 2011 -- changed default IO buffer size with setvbuf() to 65536
@@ -82,6 +83,10 @@ private:
   I64 header_start_position;
   BOOL writing_las_1_4;
   BOOL writing_new_point_type;
+  // for delayed write of EVLRs
+  I64 start_of_first_extended_variable_length_record;
+  U32 number_of_extended_variable_length_records;
+  const LASevlr* evlrs;
 };
 
 #endif
