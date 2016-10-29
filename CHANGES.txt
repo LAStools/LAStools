@@ -1,3 +1,8 @@
+28 October 2016 -- lasreturn: '-classify_as 12' or '-flag_as_synthetic' marks returns from incomplete pulses
+27 October 2016 -- lasreturn: new option '-check_return_numbering' prints missing return histograms
+26 October 2016 -- lasgrid: new option '-return_type -highest -false' to visualize missing (cloud) returns
+23 October 2016 -- las2las: OGC WKT string stores COMPD_CS for projection + vertical
+22 October 2016 -- las2las: new '-set_ogc_wkt_in_elvr' store to EVLR instead of VLR
 16 October 2016 -- laslayers: new option '-add' to add filters and transforms as LASlayers to LAY files
 16 October 2016 -- LASlib, las2las: new filters '-keep_attribute_between' and '-drop_attribute_between'
 15 October 2016 -- las2dem, las2iso, las2tin: no more endless loop when '-lakes' or '-creeks' input is emtpy
