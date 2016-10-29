@@ -47,7 +47,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 161016
+#define LAS_TOOLS_VERSION 161029
 
 #include <stdio.h>
 #include <string.h>
@@ -632,6 +632,71 @@ public:
     return FALSE;
   };
 
+  // note that data needs to be allocated with new [] and not malloc and that LASheader
+  // will become the owner over this and manage its deallocation 
+  void add_evlr(const CHAR* user_id, const U16 record_id, const I64 record_length_after_header, U8* data, const BOOL keep_description=FALSE, const CHAR* description=0, const BOOL keep_existing=FALSE)
+  {
+    U32 i = 0;
+    BOOL found_description = FALSE;
+    if (evlrs)
+    {
+      if (keep_existing)
+      {
+        i = number_of_variable_length_records;
+      }
+      else
+      {
+        for (i = 0; i < number_of_variable_length_records; i++)
+        {
+          if ((strcmp(evlrs[i].user_id, user_id) == 0) && (evlrs[i].record_id == record_id))
+          {
+            if (evlrs[i].record_length_after_header)
+            {
+              delete [] evlrs[i].data;
+              evlrs[i].data = 0;
+            }
+            found_description = TRUE;
+            break;
+          }
+        }
+      }
+      if (i == number_of_extended_variable_length_records)
+      {
+        number_of_extended_variable_length_records++;
+        evlrs = (LASevlr*)realloc(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
+      }
+    }
+    else
+    {
+      number_of_extended_variable_length_records = 1;
+      evlrs = (LASevlr*)malloc(sizeof(LASevlr)*number_of_extended_variable_length_records);
+    }
+    evlrs[i].reserved = 0; // used to be 0xAABB
+    strncpy(evlrs[i].user_id, user_id, 16);
+    evlrs[i].record_id = record_id;
+    evlrs[i].record_length_after_header = record_length_after_header;
+    if (keep_description && found_description)
+    {
+      // do nothing
+    }
+    else if (description)
+    {
+      sprintf(evlrs[i].description, "%.31s", description);
+    }
+    else
+    {
+      sprintf(evlrs[i].description, "by LAStools of rapidlasso GmbH");
+    }
+    if (record_length_after_header)
+    {
+      evlrs[i].data = data;
+    }
+    else
+    {
+      evlrs[i].data = 0;
+    }
+  };
+
   void set_lastiling(U32 level, U32 level_index, U32 implicit_levels, BOOL buffer, BOOL reversible, F32 min_x, F32 max_x, F32 min_y, F32 max_y)
   {
     clean_lastiling();
@@ -792,11 +857,18 @@ public:
     }
   }
 
-  void set_geo_wkt_ogc_cs(const I32 num_geo_wkt_ogc_cs, const CHAR* geo_wkt_ogc_cs)
+  void set_geo_wkt_ogc_cs(const I32 num_geo_wkt_ogc_cs, const CHAR* geo_wkt_ogc_cs, BOOL in_evlr=FALSE)
   {
     vlr_geo_wkt_ogc_cs = new CHAR[num_geo_wkt_ogc_cs];
     memcpy(vlr_geo_wkt_ogc_cs, geo_wkt_ogc_cs, sizeof(CHAR)*num_geo_wkt_ogc_cs);
-    add_vlr("LASF_Projection", 2112, sizeof(CHAR)*num_geo_wkt_ogc_cs, (U8*)vlr_geo_wkt_ogc_cs);
+    if (in_evlr)
+    {
+      add_evlr("LASF_Projection", 2112, sizeof(CHAR)*num_geo_wkt_ogc_cs, (U8*)vlr_geo_wkt_ogc_cs);
+    }
+    else
+    {
+      add_vlr("LASF_Projection", 2112, sizeof(CHAR)*num_geo_wkt_ogc_cs, (U8*)vlr_geo_wkt_ogc_cs);
+    }
   }
 
   void del_geo_wkt_ogc_cs()
