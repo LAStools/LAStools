@@ -33,6 +33,8 @@
   
   CHANGE HISTORY:
   
+    23 October 2016 -- OGC WKT string stores COMPD_CS for projection + vertical
+    22 October 2016 -- new '-set_ogc_wkt_in_elvr' store to EVLR instead of VLR
      1 January 2016 -- option '-set_ogc_wkt' to store CRS as OGC WKT string
      3 May 2015 -- improved up-conversion via '-set_version 1.4 -point_type 6'
      5 July 2012 -- added option to '-remove_original_vlr' 
@@ -148,6 +150,7 @@ int main(int argc, char *argv[])
   int set_gps_time_endcoding = -1;
   // variable header changes
   bool set_ogc_wkt = false;
+  bool set_ogc_wkt_in_evlr = false;
   bool remove_header_padding = false;
   bool remove_all_variable_length_records = false;
   int remove_variable_length_record = -1;
@@ -313,13 +316,19 @@ int main(int argc, char *argv[])
       set_version_minor = atoi(argv[i+1]);
       i+=1;
     }
-    else if (strcmp(argv[i],"-remove_padding") == 0 || strcmp(argv[i],"-remove_extra") == 0)
+    else if (strcmp(argv[i],"-remove_padding") == 0)
     {
       remove_header_padding = true;
     }
     else if (strcmp(argv[i],"-set_ogc_wkt") == 0)
     {
       set_ogc_wkt = true;
+      set_ogc_wkt_in_evlr = false;
+    }
+    else if (strcmp(argv[i],"-set_ogc_wkt_in_evlr") == 0)
+    {
+      set_ogc_wkt = true;
+      set_ogc_wkt_in_evlr = true;
     }
     else if (strcmp(argv[i],"-remove_all_vlrs") == 0)
     {
@@ -733,45 +742,6 @@ int main(int argc, char *argv[])
       point->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
     }
 
-    // maybe we should remove some stuff
-
-    if (remove_header_padding)
-    {
-      lasreader->header.clean_user_data_in_header();
-      lasreader->header.clean_user_data_after_header();
-    }
-
-    if (remove_all_variable_length_records)
-    {
-      lasreader->header.clean_vlrs();
-      lasreader->header.clean_evlrs();
-    }
-    else
-    {
-      if (remove_variable_length_record != -1)
-      {
-        lasreader->header.remove_vlr(remove_variable_length_record);
-      }
-    
-      if (remove_variable_length_record_from != -1)
-      {
-        for (i = remove_variable_length_record_to; i >= remove_variable_length_record_from; i--)
-        {
-          lasreader->header.remove_vlr(i);
-        }
-      }
-    }
-
-    if (remove_tiling_vlr)
-    {
-      lasreader->header.clean_lastiling();
-    }
-
-    if (remove_original_vlr)
-    {
-      lasreader->header.clean_lasoriginal();
-    }
-
     // maybe we should add / change the projection information
     LASquantizer* reproject_quantizer = 0;
     LASquantizer* saved_quantizer = 0;
@@ -825,7 +795,22 @@ int main(int argc, char *argv[])
         CHAR* ogc_wkt = 0;
         if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false)))
         {
-          lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt);
+          if (set_ogc_wkt_in_evlr)
+          {
+            if (lasreader->header.version_minor >= 4)
+            {
+              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt, TRUE);
+            }
+            else
+            {
+              fprintf(stderr, "WARNING: input file is LAS 1.%d. setting OGC WKT to VLR instead of EVLR ...\n", lasreader->header.version_minor);
+              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt, FALSE);
+            }
+          }
+          else
+          {
+            lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt);
+          }
           free(ogc_wkt);
           if ((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6))
           {
@@ -847,7 +832,22 @@ int main(int argc, char *argv[])
         CHAR* ogc_wkt = 0;
         if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
         {
-          lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt);
+          if (set_ogc_wkt_in_evlr)
+          {
+            if (lasreader->header.version_minor >= 4)
+            {
+              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt, TRUE);
+            }
+            else
+            {
+              fprintf(stderr, "WARNING: input file is LAS 1.%d. setting OGC WKT to VLR instead of EVLR ...\n", lasreader->header.version_minor);
+              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt, FALSE);
+            }
+          }
+          else
+          {
+              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt);
+          }
           free(ogc_wkt);
           if ((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6))
           {
@@ -863,6 +863,44 @@ int main(int argc, char *argv[])
       {
         fprintf(stderr, "WARNING: no projection information. ignoring '-set_ogc_wkt' for '%s'\n", lasreadopener.get_file_name());
       }
+    }
+
+    // maybe we should remove some stuff
+
+    if (remove_header_padding)
+    {
+      lasreader->header.clean_user_data_in_header();
+      lasreader->header.clean_user_data_after_header();
+    }
+
+    if (remove_all_variable_length_records)
+    {
+      lasreader->header.clean_vlrs();
+    }
+    else
+    {
+      if (remove_variable_length_record != -1)
+      {
+        lasreader->header.remove_vlr(remove_variable_length_record);
+      }
+    
+      if (remove_variable_length_record_from != -1)
+      {
+        for (i = remove_variable_length_record_to; i >= remove_variable_length_record_from; i--)
+        {
+          lasreader->header.remove_vlr(i);
+        }
+      }
+    }
+
+    if (remove_tiling_vlr)
+    {
+      lasreader->header.clean_lastiling();
+    }
+
+    if (remove_original_vlr)
+    {
+      lasreader->header.clean_lasoriginal();
     }
 
     // do we need an extra pass
