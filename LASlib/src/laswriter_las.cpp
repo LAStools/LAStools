@@ -1263,13 +1263,13 @@ I64 LASwriterLAS::close(BOOL update_header)
         {
           if (!stream->putBytes((U8*)evlrs[i].data, (U32)evlrs[i].record_length_after_header))
           {
-            fprintf(stderr,"ERROR: writing %d bytes of data from evlrs[%d].data\n", (U32)evlrs[i].record_length_after_header, i);
+            fprintf(stderr,"ERROR: writing %u bytes of data from evlrs[%d].data\n", (U32)evlrs[i].record_length_after_header, i);
             return FALSE;
           }
         }
         else
         {
-          fprintf(stderr,"ERROR: there should be %d bytes of data in evlrs[%d].data\n", evlrs[i].record_length_after_header, i);
+          fprintf(stderr,"ERROR: there should be %u bytes of data in evlrs[%d].data\n", (U32)evlrs[i].record_length_after_header, i);
           return FALSE;
         }
       }
