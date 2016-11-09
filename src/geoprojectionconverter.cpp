@@ -1925,6 +1925,7 @@ static int print_ogc_wkt_geogcs(char* string, const char* gcs_name, short gcs_co
   return n;
 }
 
+/* non-zero *ogc_wkt returns char[] that becomes property of caller. dealloc with free() */
 bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wkt, bool source)
 {
   GeoProjectionParameters* projection = (source ? source_projection : target_projection);
@@ -2120,6 +2121,8 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
         else 
         {
           free(string);
+          len = 0;
+          *ogc_wkt = 0;
           return false;
         }
         // units
@@ -2265,6 +2268,8 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
     *ogc_wkt = string;
     return true;
   }
+  len = 0;
+  *ogc_wkt = 0;
   return false;
 }
 
@@ -2336,6 +2341,7 @@ static int print_prj_geogcs(char* string, const char* gcs_name, short gcs_code, 
   return n;
 }
 
+/* non-zero *prj returns char[] that becomes property of caller. dealloc with free() */
 bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool source)
 {
   GeoProjectionParameters* projection = (source ? source_projection : target_projection);
@@ -2481,6 +2487,8 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
         else 
         {
           free(string);
+          len = 0;
+          *prj = 0;
           return false;
         }
         // units
@@ -2610,6 +2618,8 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
     *prj = string;
     return true;
   }
+  len = 0;
+  *prj = 0;
   return false;
 }
 
@@ -2624,6 +2634,7 @@ VERTCRS["CGVD28 height",VDATUM["Canadian Geodetic Vertical Datum of 1928"],CS[ve
 VERTCRS["CGVD2013 height",VDATUM["Canadian Geodetic Vertical Datum of 2013"],CS[vertical,1],AXIS["gravity-related height (H)",up],LENGTHUNIT["metre",1.0], ID["EPSG",6647]] 
 */
 
+/* non-zero *proj4 returns char[] that becomes property of caller. dealloc with free() */
 bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** proj4, bool source)
 {
   GeoProjectionParameters* projection = (source ? source_projection : target_projection);
@@ -2677,6 +2688,8 @@ bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** p
     else
     {
       free(string);
+      len = 0;
+      *proj4 = 0;
       return false;
     }
     if (gcs_code == GEO_GCS_WGS84)
@@ -2718,6 +2731,8 @@ bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** p
     else 
     {
       free(string);
+      len = 0;
+      *proj4 = 0;
       return false;
     }
     if (has_coordinate_units(source))
@@ -2750,6 +2765,8 @@ bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** p
     *proj4 = string;
     return true;
   }
+  len = 0;
+  *proj4 = 0;
   return false;
 }
 
