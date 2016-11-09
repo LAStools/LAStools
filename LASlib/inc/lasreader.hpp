@@ -224,7 +224,7 @@ private:
   U32 file_name_allocated;
   U32 file_name_current;
   F32 buffer_size;
-  const CHAR* temp_file_base;
+  CHAR* temp_file_base;
   CHAR** neighbor_file_names;
   U32 neighbor_file_name_number;
   U32 neighbor_file_name_allocated;
