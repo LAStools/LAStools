@@ -47,7 +47,8 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   
   CHANGE HISTORY:
-  
+
+     9 November 2016 -- support "user defined" AlbersEqualArea projection in GeoTIFF
     30 July 2016 -- no more special handling for stateplanes. just parse for EPSG code 
      9 January 2016 -- use GeographicTypeGeoKey not GeogGeodeticDatumGeoKey for custom
      2 January 2016 -- parse 'pcs.csv' file when unknown EPSG code is encountered

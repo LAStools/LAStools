@@ -1202,6 +1202,29 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         has_projection = true;
       }
     }
+    else if (user_defined_projection == 11)
+    {
+      if ((offsetProjFalseEastingGeoKey >= 0) &&
+          (offsetProjFalseNorthingGeoKey >= 0) &&
+          (offsetProjNatOriginLatGeoKey >= 0) &&
+          (offsetProjCenterLongGeoKey >= 0) &&
+          (offsetProjStdParallel1GeoKey >= 0) &&
+          (offsetProjStdParallel2GeoKey >= 0))
+      {
+        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
+        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
+        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
+        double longOriginDeg = geo_double_params[offsetProjCenterLongGeoKey];
+        double firstStdParallelDeg = geo_double_params[offsetProjStdParallel1GeoKey];
+        double secondStdParallelDeg = geo_double_params[offsetProjStdParallel2GeoKey];
+        set_albers_equal_area_conic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg);
+        if (description)
+        {
+          sprintf(description, "generic lambert conformal conic");
+        }
+        has_projection = true;
+      }
+    }
   }
 
   return has_projection;
