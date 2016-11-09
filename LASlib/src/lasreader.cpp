@@ -1637,8 +1637,8 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
         fprintf(stderr,"ERROR: '%s' needs 1 argument: base name\n", argv[i]);
         return FALSE;
       }
-      i++;
-      temp_file_base = argv[i];
+      temp_file_base = strdup(argv[i+1]);
+      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
     else if (strcmp(argv[i],"-neighbors") == 0)
     {
@@ -2312,4 +2312,5 @@ LASreadOpener::~LASreadOpener()
   if (inside_rectangle) delete [] inside_rectangle;
   if (filter) delete filter;
   if (transform) delete transform;
+  if (temp_file_base) free(temp_file_base);
 }
