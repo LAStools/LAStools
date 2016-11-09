@@ -2140,7 +2140,7 @@ void LAStransform::setPointSource(U16 value)
     U32 i;
     for (i = 0; i < num_operations; i++)
     {
-      if (strcmp(operations[i]->name(), "set_point_source"))
+      if (strcmp(operations[i]->name(), "set_point_source") == 0)
       {
         delete operations[i];
         operations[i] = new LASoperationSetPointSource(value);
