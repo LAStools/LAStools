@@ -1,5 +1,8 @@
+13 November 2016 -- all LAStools: early FALSE when setting output directory via '-odir __' will not succeed  
+9 November 2016 -- all LAStools: support CRS via "user defined" AlbersEqualArea projection in GeoTIFF tags
 23 October 2016 -- las2las: OGC WKT string stores COMPD_CS for projection + vertical
 22 October 2016 -- las2las: new '-set_ogc_wkt_in_elvr' store to EVLR instead of VLR
+22 October 2016 -- LASlib: ability to not only read but also write EVLR
 16 October 2016 -- LASlib, las2las: new filters '-keep_attribute_between' and '-drop_attribute_between'
 30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_blue_is_NIR -0.1 0.5 (computed from R of RGB and B = NIR)
 30 September 2016 -- LASlib, las2las: new filter -keep_NDVI_green_is_NIR 0.4 0.8 (computed from R of RGB and G = NIR)
