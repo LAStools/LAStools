@@ -38,6 +38,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #ifdef _WIN32
 #define DIRECTORY_SLASH '\\'
@@ -264,7 +266,11 @@ BOOL LASwriteOpener::parse(int argc, char* argv[])
         fprintf(stderr,"ERROR: '%s' needs 1 argument: directory\n", argv[i]);
         return FALSE;
       }
-      set_directory(argv[i+1]);
+      if (!set_directory(argv[i+1]))
+      {
+        fprintf(stderr,"ERROR: '%s' is not a valid directory\n", argv[i]);
+        return FALSE;
+      }
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
     else if (strcmp(argv[i],"-odix") == 0)
@@ -409,7 +415,7 @@ void LASwriteOpener::set_io_obuffer_size(I32 io_obuffer_size)
   this->io_obuffer_size = io_obuffer_size;
 }
 
-void LASwriteOpener::set_directory(const CHAR* directory)
+BOOL LASwriteOpener::set_directory(const CHAR* directory)
 {
   if (this->directory) free(this->directory);
   if (directory)
@@ -428,11 +434,25 @@ void LASwriteOpener::set_directory(const CHAR* directory)
       this->directory[len-1] = '\0';
     }
     if (file_name) add_directory();
+
+    // return FALSE if it does not exist or is no directory
+
+    struct stat info;
+
+    if (stat(this->directory, &info) != 0)
+    {
+      return FALSE;
+    }
+    else if (!(info.st_mode & S_IFDIR))
+    {
+      return FALSE;
+    }
   }
   else
   {
     this->directory = 0;
   }
+  return TRUE;
 }
 
 void LASwriteOpener::set_file_name(const CHAR* file_name)
