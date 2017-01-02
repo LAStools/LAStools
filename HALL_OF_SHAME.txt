@@ -1,13 +1,7 @@
 HALL OF SHAME
 =============
 
-1) Slovenian Environment Agency or ARSO (Agencija Republike Slovenije za okolje)
-
-   for providing "pseudo-open" access to their national LiDAR data by only
-   offering downloads in the proprietary "Optimized LAS" or "zLAS" format
-   also known as the "LAZ clone"
-
-   use the "LASliberator" [1,2,3] to set the enslaved Slovenian LiDAR free 
+1) [nominee was removed because issue was resolved]
    
 2) ...
 
