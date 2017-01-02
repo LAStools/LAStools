@@ -6,9 +6,12 @@
   source to a target LAS/LAZ file using the GPS-time stamp and
   the return number as a reference.
 
-  By default the classification field of the source points is
+  By default the selected attributes of the source points are
   copied to all target points if the two share the exact same
-  combination of GPS-time stamp and return number.
+  combination of GPS-time stamp and return number. Selecting 
+  attributes to be copied is done by adding '-classification',
+  '-intensity', and/or '-elevation' to the command line. If no
+  selection is made the classifications are copied.
 
   By default the points from the target file that have no match
   in the source file remain unchanged unless the option '-zero'
