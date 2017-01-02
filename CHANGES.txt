@@ -1,3 +1,10 @@
+2 January 2017 -- all LAStools: more support for CRS with "user defined" AlbersEqualArea projection in GeoTIFF tags
+2 January 2017 -- lasview: better handling of intensity distributions containing only a few bright points
+2 January 2017 -- lasview: draw measurement line between points picked with 'i' when <SHIFT> or <CAPS LOCK> is on
+10 December 2016 -- blast2dem: also support rasterization of extra bytes via '-attribute 0' or '-attribute 1'
+28 November 2016 -- all LAStools: new filters '-keep_second_last' and '-drop_second_last' return 
+26 November 2016 -- lascopy: added ability to also copy z, intensity, and RGB  from source to target 
+23 November 2016 -- lascopy: fixed bug in copying classifications for returns part of a multi-return
 14 November 2016 -- blast2dem: output *.prj files for ASC/BIL/FLT/XYZ
 14 November 2016 -- NEW: lascopy copies classifications from source to target based on GPS time + return number
 14 November 2016 -- blast2dem: grids can be output as compressed LAZ points

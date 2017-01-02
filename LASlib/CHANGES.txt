@@ -1,3 +1,4 @@
+28 November 2016 -- all LAStools: new filters '-keep_second_last' and '-drop_second_last' return 
 13 November 2016 -- all LAStools: early FALSE when setting output directory via '-odir __' will not succeed  
 9 November 2016 -- all LAStools: support CRS via "user defined" AlbersEqualArea projection in GeoTIFF tags
 23 October 2016 -- las2las: OGC WKT string stores COMPD_CS for projection + vertical
