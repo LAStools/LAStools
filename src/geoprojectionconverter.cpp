@@ -813,6 +813,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
   int offsetProjStdParallel1GeoKey = -1;
   int offsetProjStdParallel2GeoKey = -1;
   int offsetProjNatOriginLatGeoKey = -1;
+  int offsetProjNatOriginLongGeoKey = -1;
   int offsetProjFalseEastingGeoKey = -1;
   int offsetProjFalseNorthingGeoKey = -1;
   int offsetProjCenterLongGeoKey = -1;
@@ -1129,6 +1130,9 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
     case 3079: // ProjStdParallel2GeoKey
       offsetProjStdParallel2GeoKey = geo_keys[i].value_offset;
       break;        
+    case 3080 : // ProjNatOriginLongGeoKey
+      offsetProjNatOriginLongGeoKey = geo_keys[i].value_offset;
+      break;
     case 3081: // ProjNatOriginLatGeoKey
       offsetProjNatOriginLatGeoKey = geo_keys[i].value_offset;
       break;
@@ -1207,20 +1211,20 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
       if ((offsetProjFalseEastingGeoKey >= 0) &&
           (offsetProjFalseNorthingGeoKey >= 0) &&
           (offsetProjNatOriginLatGeoKey >= 0) &&
-          (offsetProjCenterLongGeoKey >= 0) &&
+          ((offsetProjCenterLongGeoKey >= 0) || (offsetProjNatOriginLongGeoKey >= 0)) &&
           (offsetProjStdParallel1GeoKey >= 0) &&
           (offsetProjStdParallel2GeoKey >= 0))
       {
         double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
         double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
         double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
-        double longOriginDeg = geo_double_params[offsetProjCenterLongGeoKey];
+        double longOriginDeg = ((offsetProjCenterLongGeoKey >= 0) ? geo_double_params[offsetProjCenterLongGeoKey] : geo_double_params[offsetProjNatOriginLongGeoKey]);
         double firstStdParallelDeg = geo_double_params[offsetProjStdParallel1GeoKey];
         double secondStdParallelDeg = geo_double_params[offsetProjStdParallel2GeoKey];
         set_albers_equal_area_conic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg);
         if (description)
         {
-          sprintf(description, "generic lambert conformal conic");
+          sprintf(description, "generic albers equal area");
         }
         has_projection = true;
       }
@@ -6600,6 +6604,9 @@ int GeoProjectionConverter::unparse(char* string) const
     {
       n += sprintf(&string[n], "-ellipsoid %d ", ellipsoid->id);
     }
+  }
+  if (has_coordinate_units(true))
+  {
     if (coordinates2meter != 1.0)
     {
       if (coordinates2meter == 0.3048)
