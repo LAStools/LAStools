@@ -2931,6 +2931,9 @@ int main(int argc, char *argv[])
                   case 5776: // Norway Normal Null 1954
                     fprintf(file_out, "VerticalCSTypeGeoKey: Norway Normal Null 1954\012");
                     break;
+                  case 5783: // Deutches Haupthohennetz 1992
+                    fprintf(file_out, "VerticalCSTypeGeoKey: Deutsches Haupthoehennetz 1992\012");
+                    break;
                   case 5941: // Norway Normal Null 2000
                     fprintf(file_out, "VerticalCSTypeGeoKey: Norway Normal Null 2000\012");
                     break;
