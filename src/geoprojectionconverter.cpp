@@ -1977,7 +1977,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
           epsg_name = get_epsg_name_from_pcs_file(argv_zero, projection->geokey);
         }
         // maybe output a compound CRS
-        if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) )
+        if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) )
         {
           n += sprintf(&string[n], "COMPD_CS[\"%s + ", (epsg_name ? epsg_name : projection->name));
 
@@ -2008,6 +2008,10 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
           else if (vertical_geokey == GEO_VERTICAL_NN54)
           {
             n += sprintf(&string[n], "NN54");
+          }
+          else if (vertical_geokey == GEO_VERTICAL_DHHN92)
+          {
+            n += sprintf(&string[n], "DHHN92");
           }
 
           if (source)
@@ -2200,7 +2204,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
         }
       }
     }
-    if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) )
+    if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) )
     {
       if (vertical_geokey == GEO_VERTICAL_NAVD88)
       {
@@ -2229,6 +2233,10 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
       else if (vertical_geokey == GEO_VERTICAL_NN54)
       {
         n += sprintf(&string[n], "VERT_CS[\"NN54\",VERT_DATUM[\"Norway Normal Null 1954\",2005,AUTHORITY[\"EPSG\",\"5174\"]],");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_DHHN92)
+      {
+        n += sprintf(&string[n], "VERT_CS[\"DHHN92\",VERT_DATUM[\"Deutsches Haupthoehennetz 1992\",2005,AUTHORITY[\"EPSG\",\"5783\"]],");
       }
       if (source)
       {
@@ -2287,6 +2295,10 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
       else if (vertical_geokey == GEO_VERTICAL_NN54)
       {
         n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"5776\"]]");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_DHHN92)
+      {
+        n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"5783\"]]");
       }
       // close bracket for compound CRS
       n += sprintf(&string[n], "]");
@@ -2552,7 +2564,7 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
         n += sprintf(&string[n], "]");
       }
     }
-    if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) )
+    if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) )
     {
       if (vertical_geokey == GEO_VERTICAL_NAVD88)
       {
@@ -2581,6 +2593,10 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
       else if (vertical_geokey == GEO_VERTICAL_NN54)
       {
         n += sprintf(&string[n], "VERT_CS[\"NN54\",VERT_DATUM[\"Norway Normal Null 1954\",2005,AUTHORITY[\"EPSG\",\"5174\"]],");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_DHHN92)
+      {
+        n += sprintf(&string[n], "VERT_CS[\"DHHN92\",VERT_DATUM[\"Deutsches Haupthoehennetz 1992\",2005,AUTHORITY[\"EPSG\",\"5783\"]],");
       }
       if (source)
       {
@@ -2639,6 +2655,10 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
       else if (vertical_geokey == GEO_VERTICAL_NN54)
       {
         n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"5776\"]]");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_DHHN92)
+      {
+        n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"5783\"]]");
       }
     }
     len = n+1;
@@ -4533,7 +4553,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             int unit_false_northing;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_origin, &unit_latitude_of_origin, &dummy, &central_meridian, &unit_central_meridian, &dummy, &scale_factor, &dummy, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 14)
             {
-              fprintf(stderr, "failed to scan TM parameters from '%s'", line);
+              fprintf(stderr, "failed to scan TM parameters from '%s'\n", line);
               return false;
             }
             double latitude_of_origin_decdeg = unit2decdeg(latitude_of_origin, unit_latitude_of_origin);
@@ -4561,7 +4581,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             int unit_false_northing;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_origin, &unit_latitude_of_origin, &dummy, &central_meridian, &unit_central_meridian, &dummy, &standard_parallel_1, &unit_standard_parallel_1, &dummy, &standard_parallel_2, &unit_standard_parallel_2, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 17)
             {
-              fprintf(stderr, "failed to scan LCC parameters from '%s'", line);
+              fprintf(stderr, "failed to scan LCC(2SP) parameters from '%s'\n", line);
               return false;
             }
             double latitude_of_origin_decdeg = unit2decdeg(latitude_of_origin, unit_latitude_of_origin);
@@ -4571,6 +4591,41 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             double false_easting_meter = unit2meter(false_easting, unit_false_easting);
             double false_northing_meter = unit2meter(false_northing, unit_false_northing);
             set_lambert_conformal_conic_projection(false_easting_meter, false_northing_meter, latitude_of_origin_decdeg, central_meridian_decdeg, standard_parallel_1_decdeg, standard_parallel_2_decdeg, 0, source, name);
+            set_geokey(value, source);
+            if (description) sprintf(description, name);
+            return true;
+          }
+          else if (transform == 9801) // CT_LambertConfConic_1SP
+          {
+            double latitude_of_natural_origin;
+            int unit_latitude_of_natural_origin;
+            double longitude_of_natural_origin;
+            int unit_longitude_of_natural_origin;
+            double scale_factor_at_natural_origin;
+            double false_easting;
+            int unit_false_easting;
+            double false_northing;
+            int unit_false_northing;
+
+            if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_natural_origin, &unit_latitude_of_natural_origin, &dummy, &longitude_of_natural_origin, &unit_longitude_of_natural_origin, &dummy, &scale_factor_at_natural_origin, &dummy, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 14)
+            {
+              fprintf(stderr, "failed to scan LCC(1SP) parameters from '%s'\n", line);
+              return false;
+            }
+            double latitude_of_natural_origin_decdeg = unit2decdeg(latitude_of_natural_origin, unit_latitude_of_natural_origin);
+            double longitude_of_natural_origin_decdeg = unit2decdeg(longitude_of_natural_origin, unit_longitude_of_natural_origin);
+            double false_easting_meter = unit2meter(false_easting, unit_false_easting);
+            double false_northing_meter = unit2meter(false_northing, unit_false_northing);
+/*
+            fprintf(stderr, "Lambert Conic Conformal (1SP)\n");
+            fprintf(stderr, "Latitude of natural origin:  %.10g\n", latitude_of_natural_origin_decdeg);
+            fprintf(stderr, "Longitude of natural origin: %.10g\n", longitude_of_natural_origin_decdeg);
+            fprintf(stderr, "Scale factor at natural origin: %.10g\n", scale_factor_at_natural_origin);
+            fprintf(stderr, "False easting:  %.10g\n", false_easting_meter);
+            fprintf(stderr, "False northing: %.10g\n", false_northing_meter);
+*/
+            if (scale_factor_at_natural_origin != 1.0) fprintf(stderr, "WARNING: current implementation for Lambert Conic Conformal (1SP) ignores scale factor\n");
+            set_lambert_conformal_conic_projection(false_easting_meter, false_northing_meter, latitude_of_natural_origin_decdeg, longitude_of_natural_origin_decdeg, latitude_of_natural_origin, latitude_of_natural_origin, 0, source, name);
             set_geokey(value, source);
             if (description) sprintf(description, name);
             return true;
@@ -4591,7 +4646,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             int unit_false_northing;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_center, &unit_latitude_of_center, &dummy, &longitude_of_center, &unit_longitude_of_center, &dummy, &standard_parallel_1, &unit_standard_parallel_1, &dummy, &standard_parallel_2, &unit_standard_parallel_2, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 17)
             {
-              fprintf(stderr, "failed to scan AEAC parameters from '%s'", line);
+              fprintf(stderr, "failed to scan AEAC parameters from '%s'\n", line);
               return false;
             }
             double latitude_of_center_decdeg = unit2decdeg(latitude_of_center, unit_latitude_of_center);
@@ -4622,7 +4677,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             double scale_factor;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf", &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing, &dummy, &latitude_of_center, &unit_latitude_of_center, &dummy, &longitude_of_center, &unit_longitude_of_center, &dummy,&azimuth, &unit_azimuth, &dummy, &rectified_grid_angle, &unit_rectified_grid_angle, &dummy, &scale_factor) != 19)
             {
-              fprintf(stderr, "failed to scan HOM parameters from '%s'", line);
+              fprintf(stderr, "failed to scan HOM parameters from '%s'\n", line);
               return false;
             }
             double false_easting_meter = unit2meter(false_easting, unit_false_easting);
@@ -4649,7 +4704,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             int unit_false_northing;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_origin, &unit_latitude_of_origin, &dummy, &central_meridian, &unit_central_meridian, &dummy, &scale_factor, &dummy, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 14)
             {
-              fprintf(stderr, "failed to scan OS parameters from '%s'", line);
+              fprintf(stderr, "failed to scan OS parameters from '%s'\n", line);
               return false;
             }
             double latitude_of_origin_decdeg = unit2decdeg(latitude_of_origin, unit_latitude_of_origin);
@@ -6249,6 +6304,11 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         vertical_geokey = GEO_VERTICAL_NN54;
         *argv[i]='\0';
       }
+      else if (strcmp(argv[i],"-vertical_dhhn92") == 0)
+      {
+        vertical_geokey = GEO_VERTICAL_DHHN92;
+        *argv[i]='\0';
+      }
     }
     else if (strcmp(argv[i],"-latlong") == 0 || strcmp(argv[i],"-target_latlong") == 0)
     {
@@ -6663,6 +6723,10 @@ int GeoProjectionConverter::unparse(char* string) const
     else if (vertical_geokey == GEO_VERTICAL_NN54)
     {
       n += sprintf(&string[n], "-vertical_nn54 ");
+    }
+    else if (vertical_geokey == GEO_VERTICAL_DHHN92)
+    {
+      n += sprintf(&string[n], "-vertical_dhhn92 ");
     }
   }
   have_epsg = false;
