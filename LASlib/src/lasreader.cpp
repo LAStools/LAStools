@@ -1809,6 +1809,28 @@ const CHAR* LASreadOpener::get_file_name() const
   return 0;
 }
 
+const CHAR* LASreadOpener::get_file_name_only() const
+{
+  const CHAR* file_name_only = 0;
+  const CHAR* file_name_curr = get_file_name();
+
+  if (file_name_curr)
+  {
+    int len = strlen(file_name_curr);
+    while ((len > 0) && (file_name_curr[len] != '\\') && (file_name_curr[len] != '/') && (file_name_curr[len] != ':')) len--;
+    if (len)
+    {
+      file_name_only = file_name_curr + len + 1;
+    }
+    else
+    {
+      file_name_only = file_name_curr;
+    }
+  }
+
+  return file_name_only;
+}
+
 const CHAR* LASreadOpener::get_file_name(U32 number) const
 {
   return file_names[number];
