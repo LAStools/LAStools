@@ -13,7 +13,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,10 @@
   
   CHANGE HISTORY:
   
+    7 January 2017 -- new laszip_create_reader() laszip_create_writer() for Trimble
+    7 January 2017 -- set reserved field in LASzip VLR from 0xAABB to 0x0
+    7 January 2017 -- make scan angle quantization in compatibility mode consistent with LIB
+    7 January 2017 -- compatibility mode *decompression* fix for points with waveforms  
     23 September 2015 -- correct update of bounding box and counters from inventory on closing
     22 September 2015 -- bug fix for not overwriting description of pre-existing "extra bytes"
     5 September 2015 -- "LAS 1.4 compatibility mode" now allows pre-existing "extra bytes"
@@ -59,6 +63,8 @@
 extern "C"
 {
 #endif
+
+#include <stdio.h>
 
 /*---------------------------------------------------------------------------*/
 /*--------------- DLL variables to pass data to/from LASzip -----------------*/
@@ -390,6 +396,15 @@ laszip_open_writer(
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
+laszip_create_writer(
+    laszip_POINTER                     pointer
+    , FILE*                            file
+    , FILE*                            lax_file
+    , laszip_BOOL                      compress
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
 laszip_write_point(
     laszip_POINTER                     pointer
 );
@@ -424,6 +439,15 @@ LASZIP_API laszip_I32
 laszip_open_reader(
     laszip_POINTER                     pointer
     , const laszip_CHAR*               file_name
+    , laszip_BOOL*                     is_compressed
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_create_reader(
+    laszip_POINTER                     pointer
+    , FILE*                            file
+    , FILE*                            lax_file
     , laszip_BOOL*                     is_compressed
 );
 
