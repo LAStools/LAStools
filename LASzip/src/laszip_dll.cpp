@@ -137,6 +137,26 @@ typedef struct laszip_dll {
   laszip_dll_inventory* inventory;
 } laszip_dll_struct;
 
+/*--------------------------------------------------------------------------*/
+static laszip_I32
+laszip_create_writer_internal(
+    laszip_POINTER                     pointer
+    , FILE*                            file
+    , FILE*                            lax_file
+    , laszip_BOOL                      compress
+    , laszip_BOOL                      close_file
+) {return 1;};
+
+/*---------------------------------------------------------------------------*/
+static laszip_I32
+laszip_create_reader_internal(
+    laszip_POINTER                     pointer
+    , FILE*                            file
+    , FILE*                            lax_file
+    , laszip_BOOL                      close_file
+    , laszip_BOOL*                     is_compressed
+) {return 1;};
+
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
 laszip_get_version(
@@ -1318,7 +1338,7 @@ laszip_add_vlr(
 
     // copy the VLR
 
-    laszip_dll->header.vlrs[i].reserved = 0xAABB;
+    laszip_dll->header.vlrs[i].reserved = 0x0;
     strncpy(laszip_dll->header.vlrs[i].user_id, user_id, 16);
     laszip_dll->header.vlrs[i].record_id = record_id;
     laszip_dll->header.vlrs[i].record_length_after_header = record_length_after_header;
@@ -2356,7 +2376,7 @@ laszip_open_writer(
     {
       // write the LASzip VLR header
 
-      U16 reserved = 0xAABB;
+      U16 reserved = 0x0;
       try { laszip_dll->streamout->put16bitsLE((U8*)&reserved); } catch(...)
       {
         sprintf(laszip_dll->error, "writing header.vlrs[%d].reserved", i);
@@ -2545,6 +2565,18 @@ laszip_open_writer(
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
+laszip_create_writer(
+    laszip_POINTER                     pointer
+    , FILE*                            file
+    , FILE*                            lax_file
+    , laszip_BOOL                      compress
+)
+{
+  return laszip_create_writer_internal(pointer, file, lax_file, compress, FALSE);
+}
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
 laszip_write_point(
     laszip_POINTER                     pointer
 )
@@ -2568,7 +2600,7 @@ laszip_write_point(
       // distill extended attributes
       struct laszip_point* point = &laszip_dll->point;
 
-      point->scan_angle_rank = I8_CLAMP(0.006f*point->extended_scan_angle);
+      point->scan_angle_rank = I8_CLAMP(I16_QUANTIZE(0.006f*point->extended_scan_angle));
       scan_angle_remainder = point->extended_scan_angle - I16_QUANTIZE(((F32)point->scan_angle_rank)/0.006f);
       if (point->extended_number_of_returns <= 7)
       {
@@ -3277,9 +3309,9 @@ laszip_open_reader(
 
         // check variable length record contents
 
-        if (laszip_dll->header.vlrs[i].reserved != 0xAABB)
+        if ((laszip_dll->header.vlrs[i].reserved != 0xAABB) && (laszip_dll->header.vlrs[i].reserved != 0x0))
         {
-          sprintf(laszip_dll->warning,"wrong header.vlrs[%d].reserved: %d != 0xAABB", i, laszip_dll->header.vlrs[i].reserved);
+          sprintf(laszip_dll->warning,"wrong header.vlrs[%d].reserved: %d != 0xAABB and %d != 0x0", i, laszip_dll->header.vlrs[i].reserved, laszip_dll->header.vlrs[i].reserved);
         }
 
         // make sure there are enough bytes left to read the data of the variable length record before the point block starts
@@ -3551,7 +3583,7 @@ laszip_open_reader(
 
       struct laszip_vlr* compatibility_VLR = 0;
 
-      if (laszip_dll->header.point_data_format == 1 || laszip_dll->header.point_data_format == 3 || laszip_dll->header.point_data_format == 5)
+      if (laszip_dll->header.point_data_format == 1 || laszip_dll->header.point_data_format == 3 || laszip_dll->header.point_data_format == 4 || laszip_dll->header.point_data_format == 5)
       {
         // if we find the compatibility VLR
 
@@ -3706,7 +3738,7 @@ laszip_open_reader(
             else
             {
               // LAS 1.3 header is 140 bytes less than LAS 1.4+ header
-              laszip_dll->header.header_size += 148;
+              laszip_dll->header.header_size += 140;
               laszip_dll->header.offset_to_point_data += 140;
             }
             laszip_dll->header.version_minor = 4;
@@ -3814,6 +3846,18 @@ laszip_open_reader(
 
   laszip_dll->error[0] = '\0';
   return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_create_reader(
+    laszip_POINTER                     pointer
+    , FILE*                            file
+    , FILE*                            lax_file
+    , laszip_BOOL*                     is_compressed
+)
+{
+  return laszip_create_reader_internal(pointer, file, lax_file, FALSE, is_compressed);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -4037,7 +4081,7 @@ laszip_read_point(
       flags_and_channel = point->extra_bytes[laszip_dll->start_flags_and_channel];
       if (laszip_dll->start_NIR_band != -1)
       {
-        point->rgb[3] = *((U16*)(point->extra_bytes + laszip_dll->start_NIR_band));
+        ((U16)point->rgb[3]) = *((U16*)(point->extra_bytes + laszip_dll->start_NIR_band));
       }
 
       // decompose into individual attributes
