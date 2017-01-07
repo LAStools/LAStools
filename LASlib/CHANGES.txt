@@ -1,3 +1,7 @@
+6 January 2017 -- all LAStools: rudimentary support for Lambert Conic Conformal (1SP) by ignoring scale factor
+6 January 2017 -- all LAStools: more EPSG codes due to updates 'pcs.csv' and 'gcs.csv' files 
+4 January 2017 -- all LAStools: added DHHN92 "Deutsches Haupthoehennetz 1992" for OpenNRW LiDAR (-vertical_dhhn92)
+2 January 2017 -- all LAStools: more support for CRS with "user defined" AlbersEqualArea projection in GeoTIFF tags
 28 November 2016 -- all LAStools: new filters '-keep_second_last' and '-drop_second_last' return 
 13 November 2016 -- all LAStools: early FALSE when setting output directory via '-odir __' will not succeed  
 9 November 2016 -- all LAStools: support CRS via "user defined" AlbersEqualArea projection in GeoTIFF tags

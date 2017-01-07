@@ -1,3 +1,8 @@
+6 January 2017 -- all LAStools: rudimentary support for Lambert Conic Conformal (1SP) by ignoring scale factor
+6 January 2017 -- all LAStools: more EPSG codes due to updates 'pcs.csv' and 'gcs.csv' files 
+6 January 2017 -- lasboundary: new option to add '-labels' to KML output 
+5 January 2017 -- lasplanes: fixed tiny bug that occured when output to PEF file with '-o planes.pef' was requested
+4 January 2017 -- all LAStools: added DHHN92 "Deutsches Haupthoehennetz 1992" for OpenNRW LiDAR (-vertical_dhhn92)
 2 January 2017 -- all LAStools: more support for CRS with "user defined" AlbersEqualArea projection in GeoTIFF tags
 2 January 2017 -- lasview: better handling of intensity distributions containing only a few bright points
 2 January 2017 -- lasview: draw measurement line between points picked with 'i' when <SHIFT> or <CAPS LOCK> is on
