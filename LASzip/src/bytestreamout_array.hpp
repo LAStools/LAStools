@@ -11,7 +11,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -22,6 +22,7 @@
   
   CHANGE HISTORY:
   
+    22 June 2016 -- access to current size for "native LAS 1.4 compressor"
     19 July 2015 -- moved from LASlib to LASzip for "compatibility mode" in DLL
      9 April 2012 -- created after cooking Zuccini/Onion/Potatoe dinner for Mara
   
@@ -55,6 +56,7 @@ public:
   ~ByteStreamOutArray(){};
 /* get access to data                                        */
   inline I64 getSize() const { return size; };
+  inline I64 getCurr() const { return curr; };
   inline const U8* getData() const { return data; };
   inline U8* takeData() { U8* d = data; data = 0; alloc = 0; size = 0; curr = 0; return d; };
 protected:
