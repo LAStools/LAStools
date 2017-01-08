@@ -785,7 +785,41 @@ int main(int argc, char *argv[])
           {
             if (memcmp((const void*)lasreader1->point.extra_bytes, (const void*)lasreader2->point.extra_bytes, lasreader1->point.extra_bytes_number))
             {
-              if (different_points < shutup) fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d != %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3]);
+              if (different_points < shutup)
+              {
+                if (lasreader1->point.extra_bytes_number == 1)
+                {
+                  fprintf(stderr, "%d extra_byte of point %u of %u are different: %d != %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader2->point.extra_bytes[0]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 2)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d != %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 3)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d != %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 4)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d != %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 5)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d %d != %d %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader1->point.extra_bytes[4], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3], lasreader2->point.extra_bytes[4]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 6)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d %d %d != %d %d %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader1->point.extra_bytes[4], lasreader1->point.extra_bytes[5], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3], lasreader2->point.extra_bytes[4], lasreader2->point.extra_bytes[5]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 7)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d %d %d %d != %d %d %d %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader1->point.extra_bytes[4], lasreader1->point.extra_bytes[5], lasreader1->point.extra_bytes[6], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3], lasreader2->point.extra_bytes[4], lasreader2->point.extra_bytes[5], lasreader2->point.extra_bytes[6]);
+                }
+                else
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d %d %d %d %d != %d %d %d %d %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader1->point.extra_bytes[4], lasreader1->point.extra_bytes[5], lasreader1->point.extra_bytes[6], lasreader1->point.extra_bytes[7], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3], lasreader2->point.extra_bytes[4], lasreader2->point.extra_bytes[5], lasreader2->point.extra_bytes[6], lasreader2->point.extra_bytes[7]);
+                }
+              }
               difference = true;
             }
           }
@@ -793,7 +827,41 @@ int main(int argc, char *argv[])
           {
             if (memcmp((const void*)lasreader1->point.extra_bytes, (const void*)lasreader2->point.extra_bytes, lasreader2->point.extra_bytes_number))
             {
-              if (different_points < shutup) fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d != %d %d %d %d\n", lasreader2->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3]);
+              if (different_points < shutup)
+              {
+                if (lasreader1->point.extra_bytes_number == 1)
+                {
+                  fprintf(stderr, "%d extra_byte of point %u of %u are different: %d != %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader2->point.extra_bytes[0]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 2)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d != %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 3)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d != %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 4)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d != %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 5)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d %d != %d %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader1->point.extra_bytes[4], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3], lasreader2->point.extra_bytes[4]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 6)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d %d %d != %d %d %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader1->point.extra_bytes[4], lasreader1->point.extra_bytes[5], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3], lasreader2->point.extra_bytes[4], lasreader2->point.extra_bytes[5]);
+                }
+                else if (lasreader1->point.extra_bytes_number == 7)
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d %d %d %d != %d %d %d %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader1->point.extra_bytes[4], lasreader1->point.extra_bytes[5], lasreader1->point.extra_bytes[6], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3], lasreader2->point.extra_bytes[4], lasreader2->point.extra_bytes[5], lasreader2->point.extra_bytes[6]);
+                }
+                else
+                {
+                  fprintf(stderr, "%d extra_bytes of point %u of %u are different: %d %d %d %d %d %d %d %d != %d %d %d %d %d %d %d %d\n", lasreader1->point.extra_bytes_number,  (U32)lasreader1->p_count, (U32)lasreader1->npoints, lasreader1->point.extra_bytes[0], lasreader1->point.extra_bytes[1], lasreader1->point.extra_bytes[2], lasreader1->point.extra_bytes[3], lasreader1->point.extra_bytes[4], lasreader1->point.extra_bytes[5], lasreader1->point.extra_bytes[6], lasreader1->point.extra_bytes[7], lasreader2->point.extra_bytes[0], lasreader2->point.extra_bytes[1], lasreader2->point.extra_bytes[2], lasreader2->point.extra_bytes[3], lasreader2->point.extra_bytes[4], lasreader2->point.extra_bytes[5], lasreader2->point.extra_bytes[6], lasreader2->point.extra_bytes[7]);
+                }
+              }
               difference = true;
             }
           }
