@@ -1212,6 +1212,9 @@ int main(int argc, char *argv[])
                   case 4034: // GCSE_Clarke1880
                     fprintf(file_out, "GeographicTypeGeoKey: GCSE_Clarke1880\012");
                     break;
+                  case 4140: // GCSE_NAD83_CSRS
+                    fprintf(file_out, "GeographicTypeGeoKey: GCSE_NAD83_CSRS\012");
+                    break;
                   case 4267: // GCS_NAD27
                     fprintf(file_out, "GeographicTypeGeoKey: GCS_NAD27\012");
                     break;
@@ -1269,6 +1272,9 @@ int main(int argc, char *argv[])
                     break;
                   case 6326: // Datum_WGS84
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_WGS84\012");
+                    break;
+                  case 6140: // Datum_WGS84
+                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_NAD83_CSRS\012");
                     break;
                   case 6001: // DatumE_Airy1830
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: DatumE_Airy1830\012");
@@ -1614,907 +1620,918 @@ int main(int argc, char *argv[])
                   }
                   break;
                 case 3074: // ProjectionGeoKey
-                  switch (lasreader->header.vlr_geo_key_entries[j].value_offset)
+                  if ((16001 <= lasreader->header.vlr_geo_key_entries[j].value_offset) && (lasreader->header.vlr_geo_key_entries[j].value_offset <= 16060))
                   {
-                  case 32767: // user-defined
-                    fprintf(file_out, "ProjectionGeoKey: user-defined\012");
-                    break;
-                  case 10101: // Proj_Alabama_CS27_East
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alabama_CS27_East\012");
-                    break;
-                  case 10102: // Proj_Alabama_CS27_West
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alabama_CS27_West\012");
-                    break;
-                  case 10131: // Proj_Alabama_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alabama_CS83_East\012");
-                    break;
-                  case 10132: // Proj_Alabama_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alabama_CS83_West\012");
-                    break;
-                  case 10201: // Proj_Arizona_Coordinate_System_east			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_Coordinate_System_east\012");
-                    break;
-                  case 10202: // Proj_Arizona_Coordinate_System_Central		
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_Coordinate_System_Central\012");
-                    break;
-                  case 10203: // Proj_Arizona_Coordinate_System_west			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_Coordinate_System_west\012");
-                    break;
-                  case 10231: // Proj_Arizona_CS83_east				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_CS83_east\012");
-                    break;
-                  case 10232: // Proj_Arizona_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_CS83_Central\012");
-                    break;
-                  case 10233: // Proj_Arizona_CS83_west				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_CS83_west\012");
-                    break;
-                  case 10301: // Proj_Arkansas_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arkansas_CS27_North\012");
-                    break;
-                  case 10302: // Proj_Arkansas_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arkansas_CS27_South\012");
-                    break;
-                  case 10331: // Proj_Arkansas_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arkansas_CS83_North\012");
-                    break;
-                  case 10332: // Proj_Arkansas_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Arkansas_CS83_South\012");
-                    break;
-                  case 10401: // Proj_California_CS27_I				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_I\012");
-                    break;
-                  case 10402: // Proj_California_CS27_II				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_II\012");
-                    break;
-                  case 10403: // Proj_California_CS27_III				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_III\012");
-                    break;
-                  case 10404: // Proj_California_CS27_IV				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_IV\012");
-                    break;
-                  case 10405: // Proj_California_CS27_V				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_V\012");
-                    break;
-                  case 10406: // Proj_California_CS27_VI				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_VI\012");
-                    break;
-                  case 10407: // Proj_California_CS27_VII				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_VII\012");
-                    break;
-                  case 10431: // Proj_California_CS83_1				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_1\012");
-                    break;
-                  case 10432: // Proj_California_CS83_2				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_2\012");
-                    break;
-                  case 10433: // Proj_California_CS83_3				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_3\012");
-                    break;
-                  case 10434: // Proj_California_CS83_4				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_4\012");
-                    break;
-                  case 10435: // Proj_California_CS83_5				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_5\012");
-                    break;
-                  case 10436: // Proj_California_CS83_6				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_6\012");
-                    break;
-                  case 10501: // Proj_Colorado_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS27_North\012");
-                    break;
-                  case 10502: // Proj_Colorado_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS27_Central\012");
-                    break;
-                  case 10503: // Proj_Colorado_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS27_South\012");
-                    break;
-                  case 10531: // Proj_Colorado_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS83_North\012");
-                    break;
-                  case 10532: // Proj_Colorado_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS83_Central\012");
-                    break;
-                  case 10533: // Proj_Colorado_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS83_South\012");
-                    break;
-                  case 10600: // Proj_Connecticut_CS27				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Connecticut_CS27\012");
-                    break;
-                  case 10630: // Proj_Connecticut_CS83				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Connecticut_CS83\012");
-                    break;
-                  case 10700: // Proj_Delaware_CS27					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Delaware_CS27\012");
-                    break;
-                  case 10730: // Proj_Delaware_CS83					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Delaware_CS83\012");
-                    break;
-                  case 10901: // Proj_Florida_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS27_East\012");
-                    break;
-                  case 10902: // Proj_Florida_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS27_West\012");
-                    break;
-                  case 10903: // Proj_Florida_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS27_North\012");
-                    break;
-                  case 10931: // Proj_Florida_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS83_East\012");
-                    break;
-                  case 10932: // Proj_Florida_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS83_West\012");
-                    break;
-                  case 10933: // Proj_Florida_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS83_North\012");
-                    break;
-                  case 11001: // Proj_Georgia_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Georgia_CS27_East\012");
-                    break;
-                  case 11002: // Proj_Georgia_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Georgia_CS27_West\012");
-                    break;
-                  case 11031: // Proj_Georgia_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Georgia_CS83_East\012");
-                    break;
-                  case 11032: // Proj_Georgia_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Georgia_CS83_West\012");
-                    break;
-                  case 11101: // Proj_Idaho_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS27_East\012");
-                    break;
-                  case 11102: // Proj_Idaho_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS27_Central\012");
-                    break;
-                  case 11103: // Proj_Idaho_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS27_West\012");
-                    break;
-                  case 11131: // Proj_Idaho_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS83_East\012");
-                    break;
-                  case 11132: // Proj_Idaho_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS83_Central\012");
-                    break;
-                  case 11133: // Proj_Idaho_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS83_West\012");
-                    break;
-                  case 11201: // Proj_Illinois_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Illinois_CS27_East\012");
-                    break;
-                  case 11202: // Proj_Illinois_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Illinois_CS27_West\012");
-                    break;
-                  case 11231: // Proj_Illinois_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Illinois_CS83_East\012");
-                    break;
-                  case 11232: // Proj_Illinois_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Illinois_CS83_West\012");
-                    break;
-                  case 11301: // Proj_Indiana_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Indiana_CS27_East\012");
-                    break;
-                  case 11302: // Proj_Indiana_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Indiana_CS27_West\012");
-                    break;
-                  case 11331: // Proj_Indiana_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Indiana_CS83_East\012");
-                    break;
-                  case 11332: // Proj_Indiana_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Indiana_CS83_West\012");
-                    break;
-                  case 11401: // Proj_Iowa_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Iowa_CS27_North\012");
-                    break;
-                  case 11402: // Proj_Iowa_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Iowa_CS27_South\012");
-                    break;
-                  case 11431: // Proj_Iowa_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Iowa_CS83_North\012");
-                    break;
-                  case 11432: // Proj_Iowa_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Iowa_CS83_South\012");
-                    break;
-                  case 11501: // Proj_Kansas_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Kansas_CS27_North\012");
-                    break;
-                  case 11502: // Proj_Kansas_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Kansas_CS27_South\012");
-                    break;
-                  case 11531: // Proj_Kansas_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Kansas_CS83_North\012");
-                    break;
-                  case 11532: // Proj_Kansas_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Kansas_CS83_South\012");
-                    break;
-                  case 11601: // Proj_Kentucky_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Kentucky_CS27_North\012");
-                    break;
-                  case 11602: // Proj_Kentucky_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Kentucky_CS27_South\012");
-                    break;
-                  case 11631: // Proj_Kentucky_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Kentucky_CS83_North\012");
-                    break;
-                  case 11632: // Proj_Kentucky_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Kentucky_CS83_South\012");
-                    break;
-                  case 11701: // Proj_Louisiana_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Louisiana_CS27_North\012");
-                    break;
-                  case 11702: // Proj_Louisiana_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Louisiana_CS27_South\012");
-                    break;
-                  case 11731: // Proj_Louisiana_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Louisiana_CS83_North\012");
-                    break;
-                  case 11732: // Proj_Louisiana_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Louisiana_CS83_South\012");
-                    break;
-                  case 11801: // Proj_Maine_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Maine_CS27_East\012");
-                    break;
-                  case 11802: // Proj_Maine_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Maine_CS27_West\012");
-                    break;
-                  case 11831: // Proj_Maine_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Maine_CS83_East\012");
-                    break;
-                  case 11832: // Proj_Maine_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Maine_CS83_West\012");
-                    break;
-                  case 11900: // Proj_Maryland_CS27					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Maryland_CS27\012");
-                    break;
-                  case 11930: // Proj_Maryland_CS83					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Maryland_CS83\012");
-                    break;
-                  case 12001: // Proj_Massachusetts_CS27_Mainland			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Massachusetts_CS27_Mainland\012");
-                    break;
-                  case 12002: // Proj_Massachusetts_CS27_Island			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Massachusetts_CS27_Island\012");
-                    break;
-                  case 12031: // Proj_Massachusetts_CS83_Mainland			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Massachusetts_CS83_Mainland\012");
-                    break;
-                  case 12032: // Proj_Massachusetts_CS83_Island			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Massachusetts_CS83_Island\012");
-                    break;
-                  case 12101: // Proj_Michigan_State_Plane_East			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_State_Plane_East\012");
-                    break;
-                  case 12102: // Proj_Michigan_State_Plane_Old_Central		
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_State_Plane_Old_Central\012");
-                    break;
-                  case 12103: // Proj_Michigan_State_Plane_West			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_State_Plane_West\012");
-                    break;
-                  case 12111: // Proj_Michigan_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS27_North\012");
-                    break;
-                  case 12112: // Proj_Michigan_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS27_Central\012");
-                    break;
-                  case 12113: // Proj_Michigan_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS27_South\012");
-                    break;
-                  case 12141: // Proj_Michigan_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS83_North\012");
-                    break;
-                  case 12142: // Proj_Michigan_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS83_Central\012");
-                    break;
-                  case 12143: // Proj_Michigan_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS83_South\012");
-                    break;
-                  case 12201: // Proj_Minnesota_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS27_North\012");
-                    break;
-                  case 12202: // Proj_Minnesota_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS27_Central\012");
-                    break;
-                  case 12203: // Proj_Minnesota_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS27_South\012");
-                    break;
-                  case 12231: // Proj_Minnesota_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS83_North\012");
-                    break;
-                  case 12232: // Proj_Minnesota_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS83_Central\012");
-                    break;
-                  case 12233: // Proj_Minnesota_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS83_South\012");
-                    break;
-                  case 12301: // Proj_Mississippi_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Mississippi_CS27_East\012");
-                    break;
-                  case 12302: // Proj_Mississippi_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Mississippi_CS27_West\012");
-                    break;
-                  case 12331: // Proj_Mississippi_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Mississippi_CS83_East\012");
-                    break;
-                  case 12332: // Proj_Mississippi_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Mississippi_CS83_West\012");
-                    break;
-                  case 12401: // Proj_Missouri_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS27_East\012");
-                    break;
-                  case 12402: // Proj_Missouri_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS27_Central\012");
-                    break;
-                  case 12403: // Proj_Missouri_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS27_West\012");
-                    break;
-                  case 12431: // Proj_Missouri_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS83_East\012");
-                    break;
-                  case 12432: // Proj_Missouri_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS83_Central\012");
-                    break;
-                  case 12433: // Proj_Missouri_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS83_West\012");
-                    break;
-                  case 12501: // Proj_Montana_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Montana_CS27_North\012");
-                    break;
-                  case 12502: // Proj_Montana_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Montana_CS27_Central\012");
-                    break;
-                  case 12503: // Proj_Montana_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Montana_CS27_South\012");
-                    break;
-                  case 12530: // Proj_Montana_CS83					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Montana_CS83\012");
-                    break;
-                  case 12601: // Proj_Nebraska_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Nebraska_CS27_North\012");
-                    break;
-                  case 12602: // Proj_Nebraska_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Nebraska_CS27_South\012");
-                    break;
-                  case 12630: // Proj_Nebraska_CS83					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Nebraska_CS83\012");
-                    break;
-                  case 12701: // Proj_Nevada_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS27_East\012");
-                    break;
-                  case 12702: // Proj_Nevada_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS27_Central\012");
-                    break;
-                  case 12703: // Proj_Nevada_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS27_West\012");
-                    break;
-                  case 12731: // Proj_Nevada_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS83_East\012");
-                    break;
-                  case 12732: // Proj_Nevada_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS83_Central\012");
-                    break;
-                  case 12733: // Proj_Nevada_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS83_West\012");
-                    break;
-                  case 12800: // Proj_New_Hampshire_CS27				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Hampshire_CS27\012");
-                    break;
-                  case 12830: // Proj_New_Hampshire_CS83				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Hampshire_CS83\012");
-                    break;
-                  case 12900: // Proj_New_Jersey_CS27				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Jersey_CS27\012");
-                    break;
-                  case 12930: // Proj_New_Jersey_CS83				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Jersey_CS83\012");
-                    break;
-                  case 13001: // Proj_New_Mexico_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS27_East\012");
-                    break;
-                  case 13002: // Proj_New_Mexico_CS27_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS27_Central\012");
-                    break;
-                  case 13003: // Proj_New_Mexico_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS27_West\012");
-                    break;
-                  case 13031: // Proj_New_Mexico_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS83_East\012");
-                    break;
-                  case 13032: // Proj_New_Mexico_CS83_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS83_Central\012");
-                    break;
-                  case 13033: // Proj_New_Mexico_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS83_West\012");
-                    break;
-                  case 13101: // Proj_New_York_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS27_East\012");
-                    break;
-                  case 13102: // Proj_New_York_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS27_Central\012");
-                    break;
-                  case 13103: // Proj_New_York_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS27_West\012");
-                    break;
-                  case 13104: // Proj_New_York_CS27_Long_Island			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS27_Long_Island\012");
-                    break;
-                  case 13131: // Proj_New_York_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS83_East\012");
-                    break;
-                  case 13132: // Proj_New_York_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS83_Central\012");
-                    break;
-                  case 13133: // Proj_New_York_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS83_West\012");
-                    break;
-                  case 13134: // Proj_New_York_CS83_Long_Island			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS83_Long_Island\012");
-                    break;
-                  case 13200: // Proj_North_Carolina_CS27				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_North_Carolina_CS27\012");
-                    break;
-                  case 13230: // Proj_North_Carolina_CS83				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_North_Carolina_CS83\012");
-                    break;
-                  case 13301: // Proj_North_Dakota_CS27_North			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_North_Dakota_CS27_North\012");
-                    break;
-                  case 13302: // Proj_North_Dakota_CS27_South			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_North_Dakota_CS27_South\012");
-                    break;
-                  case 13331: // Proj_North_Dakota_CS83_North			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_North_Dakota_CS83_North\012");
-                    break;
-                  case 13332: // Proj_North_Dakota_CS83_South			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_North_Dakota_CS83_South\012");
-                    break;
-                  case 13401: // Proj_Ohio_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Ohio_CS27_North\012");
-                    break;
-                  case 13402: // Proj_Ohio_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Ohio_CS27_South\012");
-                    break;
-                  case 13431: // Proj_Ohio_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Ohio_CS83_North\012");
-                    break;
-                  case 13432: // Proj_Ohio_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Ohio_CS83_South\012");
-                    break;
-                  case 13501: // Proj_Oklahoma_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Oklahoma_CS27_North\012");
-                    break;
-                  case 13502: // Proj_Oklahoma_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Oklahoma_CS27_South\012");
-                    break;
-                  case 13531: // Proj_Oklahoma_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Oklahoma_CS83_North\012");
-                    break;
-                  case 13532: // Proj_Oklahoma_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Oklahoma_CS83_South\012");
-                    break;
-                  case 13601: // Proj_Oregon_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Oregon_CS27_North\012");
-                    break;
-                  case 13602: // Proj_Oregon_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Oregon_CS27_South\012");
-                    break;
-                  case 13631: // Proj_Oregon_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Oregon_CS83_North\012");
-                    break;
-                  case 13632: // Proj_Oregon_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Oregon_CS83_South\012");
-                    break;
-                  case 13701: // Proj_Pennsylvania_CS27_North			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Pennsylvania_CS27_North\012");
-                    break;
-                  case 13702: // Proj_Pennsylvania_CS27_South			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Pennsylvania_CS27_South\012");
-                    break;
-                  case 13731: // Proj_Pennsylvania_CS83_North			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Pennsylvania_CS83_North\012");
-                    break;
-                  case 13732: // Proj_Pennsylvania_CS83_South			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Pennsylvania_CS83_South\012");
-                    break;
-                  case 13800: // Proj_Rhode_Island_CS27				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Rhode_Island_CS27\012");
-                    break;
-                  case 13830: // Proj_Rhode_Island_CS83				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Rhode_Island_CS83\012");
-                    break;
-                  case 13901: // Proj_South_Carolina_CS27_North			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_South_Carolina_CS27_North\012");
-                    break;
-                  case 13902: // Proj_South_Carolina_CS27_South			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_South_Carolina_CS27_South\012");
-                    break;
-                  case 13930: // Proj_South_Carolina_CS83				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_South_Carolina_CS83\012");
-                    break;
-                  case 14001: // Proj_South_Dakota_CS27_North			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_South_Dakota_CS27_North\012");
-                    break;
-                  case 14002: // Proj_South_Dakota_CS27_South			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_South_Dakota_CS27_South\012");
-                    break;
-                  case 14031: // Proj_South_Dakota_CS83_North			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_South_Dakota_CS83_North\012");
-                    break;
-                  case 14032: // Proj_South_Dakota_CS83_South			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_South_Dakota_CS83_South\012");
-                    break;
-                  case 14100: // Proj_Tennessee_CS27					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Tennessee_CS27\012");
-                    break;
-                  case 14130: // Proj_Tennessee_CS83					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Tennessee_CS83\012");
-                    break;
-                  case 14201: // Proj_Texas_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_North\012");
-                    break;
-                  case 14202: // Proj_Texas_CS27_North_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_North_Central\012");
-                    break;
-                  case 14203: // Proj_Texas_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_Central\012");
-                    break;
-                  case 14204: // Proj_Texas_CS27_South_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_South_Central\012");
-                    break;
-                  case 14205: // Proj_Texas_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_South\012");
-                    break;
-                  case 14231: // Proj_Texas_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_North\012");
-                    break;
-                  case 14232: // Proj_Texas_CS83_North_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_North_Central\012");
-                    break;
-                  case 14233: // Proj_Texas_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_Central\012");
-                    break;
-                  case 14234: // Proj_Texas_CS83_South_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_South_Central\012");
-                    break;
-                  case 14235: // Proj_Texas_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_South\012");
-                    break;
-                  case 14301: // Proj_Utah_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS27_North\012");
-                    break;
-                  case 14302: // Proj_Utah_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS27_Central\012");
-                    break;
-                  case 14303: // Proj_Utah_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS27_South\012");
-                    break;
-                  case 14331: // Proj_Utah_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS83_North\012");
-                    break;
-                  case 14332: // Proj_Utah_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS83_Central\012");
-                    break;
-                  case 14333: // Proj_Utah_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS83_South\012");
-                    break;
-                  case 14400: // Proj_Vermont_CS27					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Vermont_CS27\012");
-                    break;
-                  case 14430: // Proj_Vermont_CS83					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Vermont_CS83\012");
-                    break;
-                  case 14501: // Proj_Virginia_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Virginia_CS27_North\012");
-                    break;
-                  case 14502: // Proj_Virginia_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Virginia_CS27_South\012");
-                    break;
-                  case 14531: // Proj_Virginia_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Virginia_CS83_North\012");
-                    break;
-                  case 14532: // Proj_Virginia_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Virginia_CS83_South\012");
-                    break;
-                  case 14601: // Proj_Washington_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Washington_CS27_North\012");
-                    break;
-                  case 14602: // Proj_Washington_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Washington_CS27_South\012");
-                    break;
-                  case 14631: // Proj_Washington_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Washington_CS83_North\012");
-                    break;
-                  case 14632: // Proj_Washington_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Washington_CS83_South\012");
-                    break;
-                  case 14701: // Proj_West_Virginia_CS27_North			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_West_Virginia_CS27_North\012");
-                    break;
-                  case 14702: // Proj_West_Virginia_CS27_South			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_West_Virginia_CS27_South\012");
-                    break;
-                  case 14731: // Proj_West_Virginia_CS83_North			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_West_Virginia_CS83_North\012");
-                    break;
-                  case 14732: // Proj_West_Virginia_CS83_South			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_West_Virginia_CS83_South\012");
-                    break;
-                  case 14801: // Proj_Wisconsin_CS27_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS27_North\012");
-                    break;
-                  case 14802: // Proj_Wisconsin_CS27_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS27_Central\012");
-                    break;
-                  case 14803: // Proj_Wisconsin_CS27_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS27_South\012");
-                    break;
-                  case 14831: // Proj_Wisconsin_CS83_North				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS83_North\012");
-                    break;
-                  case 14832: // Proj_Wisconsin_CS83_Central				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS83_Central\012");
-                    break;
-                  case 14833: // Proj_Wisconsin_CS83_South				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS83_South\012");
-                    break;
-                  case 14901: // Proj_Wyoming_CS27_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS27_East\012");
-                    break;
-                  case 14902: // Proj_Wyoming_CS27_East_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS27_East_Central\012");
-                    break;
-                  case 14903: // Proj_Wyoming_CS27_West_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS27_West_Central\012");
-                    break;
-                  case 14904: // Proj_Wyoming_CS27_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS27_West\012");
-                    break;
-                  case 14931: // Proj_Wyoming_CS83_East				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS83_East\012");
-                    break;
-                  case 14932: // Proj_Wyoming_CS83_East_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS83_East_Central\012");
-                    break;
-                  case 14933: // Proj_Wyoming_CS83_West_Central			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS83_West_Central\012");
-                    break;
-                  case 14934: // Proj_Wyoming_CS83_West				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS83_West\012");
-                    break;
-                  case 15001: // Proj_Alaska_CS27_1					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_1\012");
-                    break;
-                  case 15002: // Proj_Alaska_CS27_2					
-                    fprintf(file_out, "ProjectionGeoKey: ProjectionGeoKey\012");
-                    break;
-                  case 15003: // Proj_Alaska_CS27_3					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_3\012");
-                    break;
-                  case 15004: // Proj_Alaska_CS27_4					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_4\012");
-                    break;
-                  case 15005: // Proj_Alaska_CS27_5					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_5\012");
-                    break;
-                  case 15006: // Proj_Alaska_CS27_6					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_6\012");
-                    break;
-                  case 15007: // Proj_Alaska_CS27_7					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_7\012");
-                    break;
-                  case 15008: // Proj_Alaska_CS27_8					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_8\012");
-                    break;
-                  case 15009: // Proj_Alaska_CS27_9					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_9\012");
-                    break;
-                  case 15010: // Proj_Alaska_CS27_10					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_10\012");
-                    break;
-                  case 15031: // Proj_Alaska_CS83_1					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_1\012");
-                    break;
-                  case 15032: // Proj_Alaska_CS83_2					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_2\012");
-                    break;
-                  case 15033: // Proj_Alaska_CS83_3					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_3\012");
-                    break;
-                  case 15034: // Proj_Alaska_CS83_4					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_4\012");
-                    break;
-                  case 15035: // Proj_Alaska_CS83_5					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_5\012");
-                    break;
-                  case 15036: // Proj_Alaska_CS83_6					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_6\012");
-                    break;
-                  case 15037: // Proj_Alaska_CS83_7					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_7\012");
-                    break;
-                  case 15038: // Proj_Alaska_CS83_8					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_8\012");
-                    break;
-                  case 15039: // Proj_Alaska_CS83_9					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_9\012");
-                    break;
-                  case 15040: // Proj_Alaska_CS83_10					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_10\012");
-                    break;
-                  case 15101: // Proj_Hawaii_CS27_1					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_1\012");
-                    break;
-                  case 15102: // Proj_Hawaii_CS27_2					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_2\012");
-                    break;
-                  case 15103: // Proj_Hawaii_CS27_3					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_3\012");
-                    break;
-                  case 15104: // Proj_Hawaii_CS27_4					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_4\012");
-                    break;
-                  case 15105: // Proj_Hawaii_CS27_5					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_5\012");
-                    break;
-                  case 15131: // Proj_Hawaii_CS83_1					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_1\012");
-                    break;
-                  case 15132: // Proj_Hawaii_CS83_2					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_2\012");
-                    break;
-                  case 15133: // Proj_Hawaii_CS83_3					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_3\012");
-                    break;
-                  case 15134: // Proj_Hawaii_CS83_4					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_4\012");
-                    break;
-                  case 15135: // Proj_Hawaii_CS83_5					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_5\012");
-                    break;
-                  case 15201: // Proj_Puerto_Rico_CS27				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Puerto_Rico_CS27\012");
-                    break;
-                  case 15202: // Proj_St_Croix					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_St_Croix\012");
-                    break;
-                  case 15230: // Proj_Puerto_Rico_Virgin_Is				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Puerto_Rico_Virgin_Is\012");
-                    break;
-                  case 15914: // Proj_BLM_14N_feet					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_BLM_14N_feet\012");
-                    break;
-                  case 15915: // Proj_BLM_15N_feet					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_BLM_15N_feet\012");
-                    break;
-                  case 15916: // Proj_BLM_16N_feet					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_BLM_16N_feet\012");
-                    break;
-                  case 15917: // Proj_BLM_17N_feet					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_BLM_17N_feet\012");
-                    break;
-                  case 17348: // Proj_Map_Grid_of_Australia_48			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_48\012");
-                    break;
-                  case 17349: // Proj_Map_Grid_of_Australia_49			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_49\012");
-                    break;
-                  case 17350: // Proj_Map_Grid_of_Australia_50			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_50\012");
-                    break;
-                  case 17351: // Proj_Map_Grid_of_Australia_51			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_51\012");
-                    break;
-                  case 17352: // Proj_Map_Grid_of_Australia_52			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_52\012");
-                    break;
-                  case 17353: // Proj_Map_Grid_of_Australia_53			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_53\012");
-                    break;
-                  case 17354: // Proj_Map_Grid_of_Australia_54			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_54\012");
-                    break;
-                  case 17355: // Proj_Map_Grid_of_Australia_55			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_55\012");
-                    break;
-                  case 17356: // Proj_Map_Grid_of_Australia_56			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_56\012");
-                    break;
-                  case 17357: // Proj_Map_Grid_of_Australia_57			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_57\012");
-                    break;
-                  case 17358: // Proj_Map_Grid_of_Australia_58			
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_58\012");
-                    break;
-                  case 17448: // Proj_Australian_Map_Grid_48				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_48\012");
-                    break;
-                  case 17449: // Proj_Australian_Map_Grid_49				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_49\012");
-                    break;
-                  case 17450: // Proj_Australian_Map_Grid_50				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_50\012");
-                    break;
-                  case 17451: // Proj_Australian_Map_Grid_51				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_51\012");
-                    break;
-                  case 17452: // Proj_Australian_Map_Grid_52				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_52\012");
-                    break;
-                  case 17453: // Proj_Australian_Map_Grid_53				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_53\012");
-                    break;
-                  case 17454: // Proj_Australian_Map_Grid_54				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_54\012");
-                    break;
-                  case 17455: // Proj_Australian_Map_Grid_55				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_55\012");
-                    break;
-                  case 17456: // Proj_Australian_Map_Grid_56				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_56\012");
-                    break;
-                  case 17457: // Proj_Australian_Map_Grid_57				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_57\012");
-                    break;
-                  case 17458: // Proj_Australian_Map_Grid_58				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_58\012");
-                    break;
-                  case 18031: // Proj_Argentina_1					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_1\012");
-                    break;
-                  case 18032: // Proj_Argentina_2					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_2\012");
-                    break;
-                  case 18033: // Proj_Argentina_3					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_3\012");
-                    break;
-                  case 18034: // Proj_Argentina_4					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_4\012");
-                    break;
-                  case 18035: // Proj_Argentina_5					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_5\012");
-                    break;
-                  case 18036: // Proj_Argentina_6					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_6\012");
-                    break;
-                  case 18037: // Proj_Argentina_7					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_7\012");
-                    break;
-                  case 18051: // Proj_Colombia_3W					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colombia_3W\012");
-                    break;
-                  case 18052: // Proj_Colombia_Bogota				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colombia_Bogota\012");
-                    break;
-                  case 18053: // Proj_Colombia_3E					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colombia_3E\012");
-                    break;
-                  case 18054: // Proj_Colombia_6E					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Colombia_6E\012");
-                    break;
-                  case 18072: // Proj_Egypt_Red_Belt					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Egypt_Red_Belt\012");
-                    break;
-                  case 18073: // Proj_Egypt_Purple_Belt				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Egypt_Purple_Belt\012");
-                    break;
-                  case 18074: // Proj_Extended_Purple_Belt				
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Extended_Purple_Belt\012");
-                    break;
-                  case 18141: // Proj_New_Zealand_North_Island_Nat_Grid		
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Zealand_North_Island_Nat_Grid\012");
-                    break;
-                  case 18142: // Proj_New_Zealand_South_Island_Nat_Grid		
-                    fprintf(file_out, "ProjectionGeoKey: Proj_New_Zealand_South_Island_Nat_Grid\012");
-                    break;
-                  case 19900: // Proj_Bahrain_Grid					
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Bahrain_Grid\012");
-                    break;
-                  case 19905: // Proj_Netherlands_E_Indies_Equatorial		
-                    fprintf(file_out, "ProjectionGeoKey: Proj_Netherlands_E_Indies_Equatorial\012");
-                    break;
-                  case 19912: // Proj_RSO_Borneo
-                    fprintf(file_out, "ProjectionGeoKey: Proj_RSO_Borneo\012");
-                    break;
-                  default:
-                    fprintf(file_out, "ProjectionGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                    fprintf(file_out, "ProjectionGeoKey: Proj_UTM_zone_%dN\012", lasreader->header.vlr_geo_key_entries[j].value_offset - 16000);
+                  }
+                  else if ((16101 <= lasreader->header.vlr_geo_key_entries[j].value_offset) && (lasreader->header.vlr_geo_key_entries[j].value_offset <= 16160))
+                  {
+                    fprintf(file_out, "ProjectionGeoKey: Proj_UTM_zone_%dS\012", lasreader->header.vlr_geo_key_entries[j].value_offset - 16100);
+                  }
+                  else
+                  {
+                    switch (lasreader->header.vlr_geo_key_entries[j].value_offset)
+                    {
+                    case 32767: // user-defined
+                      fprintf(file_out, "ProjectionGeoKey: user-defined\012");
+                      break;
+                    case 10101: // Proj_Alabama_CS27_East
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alabama_CS27_East\012");
+                      break;
+                    case 10102: // Proj_Alabama_CS27_West
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alabama_CS27_West\012");
+                      break;
+                    case 10131: // Proj_Alabama_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alabama_CS83_East\012");
+                      break;
+                    case 10132: // Proj_Alabama_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alabama_CS83_West\012");
+                      break;
+                    case 10201: // Proj_Arizona_Coordinate_System_east			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_Coordinate_System_east\012");
+                      break;
+                    case 10202: // Proj_Arizona_Coordinate_System_Central		
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_Coordinate_System_Central\012");
+                      break;
+                    case 10203: // Proj_Arizona_Coordinate_System_west			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_Coordinate_System_west\012");
+                      break;
+                    case 10231: // Proj_Arizona_CS83_east				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_CS83_east\012");
+                      break;
+                    case 10232: // Proj_Arizona_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_CS83_Central\012");
+                      break;
+                    case 10233: // Proj_Arizona_CS83_west				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arizona_CS83_west\012");
+                      break;
+                    case 10301: // Proj_Arkansas_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arkansas_CS27_North\012");
+                      break;
+                    case 10302: // Proj_Arkansas_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arkansas_CS27_South\012");
+                      break;
+                    case 10331: // Proj_Arkansas_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arkansas_CS83_North\012");
+                      break;
+                    case 10332: // Proj_Arkansas_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Arkansas_CS83_South\012");
+                      break;
+                    case 10401: // Proj_California_CS27_I				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_I\012");
+                      break;
+                    case 10402: // Proj_California_CS27_II				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_II\012");
+                      break;
+                    case 10403: // Proj_California_CS27_III				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_III\012");
+                      break;
+                    case 10404: // Proj_California_CS27_IV				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_IV\012");
+                      break;
+                    case 10405: // Proj_California_CS27_V				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_V\012");
+                      break;
+                    case 10406: // Proj_California_CS27_VI				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_VI\012");
+                      break;
+                    case 10407: // Proj_California_CS27_VII				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS27_VII\012");
+                      break;
+                    case 10431: // Proj_California_CS83_1				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_1\012");
+                      break;
+                    case 10432: // Proj_California_CS83_2				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_2\012");
+                      break;
+                    case 10433: // Proj_California_CS83_3				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_3\012");
+                      break;
+                    case 10434: // Proj_California_CS83_4				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_4\012");
+                      break;
+                    case 10435: // Proj_California_CS83_5				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_5\012");
+                      break;
+                    case 10436: // Proj_California_CS83_6				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_California_CS83_6\012");
+                      break;
+                    case 10501: // Proj_Colorado_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS27_North\012");
+                      break;
+                    case 10502: // Proj_Colorado_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS27_Central\012");
+                      break;
+                    case 10503: // Proj_Colorado_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS27_South\012");
+                      break;
+                    case 10531: // Proj_Colorado_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS83_North\012");
+                      break;
+                    case 10532: // Proj_Colorado_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS83_Central\012");
+                      break;
+                    case 10533: // Proj_Colorado_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colorado_CS83_South\012");
+                      break;
+                    case 10600: // Proj_Connecticut_CS27				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Connecticut_CS27\012");
+                      break;
+                    case 10630: // Proj_Connecticut_CS83				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Connecticut_CS83\012");
+                      break;
+                    case 10700: // Proj_Delaware_CS27					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Delaware_CS27\012");
+                      break;
+                    case 10730: // Proj_Delaware_CS83					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Delaware_CS83\012");
+                      break;
+                    case 10901: // Proj_Florida_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS27_East\012");
+                      break;
+                    case 10902: // Proj_Florida_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS27_West\012");
+                      break;
+                    case 10903: // Proj_Florida_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS27_North\012");
+                      break;
+                    case 10931: // Proj_Florida_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS83_East\012");
+                      break;
+                    case 10932: // Proj_Florida_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS83_West\012");
+                      break;
+                    case 10933: // Proj_Florida_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Florida_CS83_North\012");
+                      break;
+                    case 11001: // Proj_Georgia_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Georgia_CS27_East\012");
+                      break;
+                    case 11002: // Proj_Georgia_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Georgia_CS27_West\012");
+                      break;
+                    case 11031: // Proj_Georgia_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Georgia_CS83_East\012");
+                      break;
+                    case 11032: // Proj_Georgia_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Georgia_CS83_West\012");
+                      break;
+                    case 11101: // Proj_Idaho_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS27_East\012");
+                      break;
+                    case 11102: // Proj_Idaho_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS27_Central\012");
+                      break;
+                    case 11103: // Proj_Idaho_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS27_West\012");
+                      break;
+                    case 11131: // Proj_Idaho_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS83_East\012");
+                      break;
+                    case 11132: // Proj_Idaho_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS83_Central\012");
+                      break;
+                    case 11133: // Proj_Idaho_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Idaho_CS83_West\012");
+                      break;
+                    case 11201: // Proj_Illinois_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Illinois_CS27_East\012");
+                      break;
+                    case 11202: // Proj_Illinois_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Illinois_CS27_West\012");
+                      break;
+                    case 11231: // Proj_Illinois_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Illinois_CS83_East\012");
+                      break;
+                    case 11232: // Proj_Illinois_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Illinois_CS83_West\012");
+                      break;
+                    case 11301: // Proj_Indiana_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Indiana_CS27_East\012");
+                      break;
+                    case 11302: // Proj_Indiana_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Indiana_CS27_West\012");
+                      break;
+                    case 11331: // Proj_Indiana_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Indiana_CS83_East\012");
+                      break;
+                    case 11332: // Proj_Indiana_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Indiana_CS83_West\012");
+                      break;
+                    case 11401: // Proj_Iowa_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Iowa_CS27_North\012");
+                      break;
+                    case 11402: // Proj_Iowa_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Iowa_CS27_South\012");
+                      break;
+                    case 11431: // Proj_Iowa_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Iowa_CS83_North\012");
+                      break;
+                    case 11432: // Proj_Iowa_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Iowa_CS83_South\012");
+                      break;
+                    case 11501: // Proj_Kansas_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Kansas_CS27_North\012");
+                      break;
+                    case 11502: // Proj_Kansas_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Kansas_CS27_South\012");
+                      break;
+                    case 11531: // Proj_Kansas_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Kansas_CS83_North\012");
+                      break;
+                    case 11532: // Proj_Kansas_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Kansas_CS83_South\012");
+                      break;
+                    case 11601: // Proj_Kentucky_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Kentucky_CS27_North\012");
+                      break;
+                    case 11602: // Proj_Kentucky_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Kentucky_CS27_South\012");
+                      break;
+                    case 11631: // Proj_Kentucky_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Kentucky_CS83_North\012");
+                      break;
+                    case 11632: // Proj_Kentucky_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Kentucky_CS83_South\012");
+                      break;
+                    case 11701: // Proj_Louisiana_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Louisiana_CS27_North\012");
+                      break;
+                    case 11702: // Proj_Louisiana_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Louisiana_CS27_South\012");
+                      break;
+                    case 11731: // Proj_Louisiana_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Louisiana_CS83_North\012");
+                      break;
+                    case 11732: // Proj_Louisiana_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Louisiana_CS83_South\012");
+                      break;
+                    case 11801: // Proj_Maine_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Maine_CS27_East\012");
+                      break;
+                    case 11802: // Proj_Maine_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Maine_CS27_West\012");
+                      break;
+                    case 11831: // Proj_Maine_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Maine_CS83_East\012");
+                      break;
+                    case 11832: // Proj_Maine_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Maine_CS83_West\012");
+                      break;
+                    case 11900: // Proj_Maryland_CS27					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Maryland_CS27\012");
+                      break;
+                    case 11930: // Proj_Maryland_CS83					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Maryland_CS83\012");
+                      break;
+                    case 12001: // Proj_Massachusetts_CS27_Mainland			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Massachusetts_CS27_Mainland\012");
+                      break;
+                    case 12002: // Proj_Massachusetts_CS27_Island			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Massachusetts_CS27_Island\012");
+                      break;
+                    case 12031: // Proj_Massachusetts_CS83_Mainland			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Massachusetts_CS83_Mainland\012");
+                      break;
+                    case 12032: // Proj_Massachusetts_CS83_Island			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Massachusetts_CS83_Island\012");
+                      break;
+                    case 12101: // Proj_Michigan_State_Plane_East			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_State_Plane_East\012");
+                      break;
+                    case 12102: // Proj_Michigan_State_Plane_Old_Central		
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_State_Plane_Old_Central\012");
+                      break;
+                    case 12103: // Proj_Michigan_State_Plane_West			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_State_Plane_West\012");
+                      break;
+                    case 12111: // Proj_Michigan_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS27_North\012");
+                      break;
+                    case 12112: // Proj_Michigan_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS27_Central\012");
+                      break;
+                    case 12113: // Proj_Michigan_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS27_South\012");
+                      break;
+                    case 12141: // Proj_Michigan_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS83_North\012");
+                      break;
+                    case 12142: // Proj_Michigan_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS83_Central\012");
+                      break;
+                    case 12143: // Proj_Michigan_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Michigan_CS83_South\012");
+                      break;
+                    case 12201: // Proj_Minnesota_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS27_North\012");
+                      break;
+                    case 12202: // Proj_Minnesota_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS27_Central\012");
+                      break;
+                    case 12203: // Proj_Minnesota_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS27_South\012");
+                      break;
+                    case 12231: // Proj_Minnesota_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS83_North\012");
+                      break;
+                    case 12232: // Proj_Minnesota_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS83_Central\012");
+                      break;
+                    case 12233: // Proj_Minnesota_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Minnesota_CS83_South\012");
+                      break;
+                    case 12301: // Proj_Mississippi_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Mississippi_CS27_East\012");
+                      break;
+                    case 12302: // Proj_Mississippi_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Mississippi_CS27_West\012");
+                      break;
+                    case 12331: // Proj_Mississippi_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Mississippi_CS83_East\012");
+                      break;
+                    case 12332: // Proj_Mississippi_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Mississippi_CS83_West\012");
+                      break;
+                    case 12401: // Proj_Missouri_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS27_East\012");
+                      break;
+                    case 12402: // Proj_Missouri_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS27_Central\012");
+                      break;
+                    case 12403: // Proj_Missouri_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS27_West\012");
+                      break;
+                    case 12431: // Proj_Missouri_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS83_East\012");
+                      break;
+                    case 12432: // Proj_Missouri_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS83_Central\012");
+                      break;
+                    case 12433: // Proj_Missouri_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Missouri_CS83_West\012");
+                      break;
+                    case 12501: // Proj_Montana_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Montana_CS27_North\012");
+                      break;
+                    case 12502: // Proj_Montana_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Montana_CS27_Central\012");
+                      break;
+                    case 12503: // Proj_Montana_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Montana_CS27_South\012");
+                      break;
+                    case 12530: // Proj_Montana_CS83					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Montana_CS83\012");
+                      break;
+                    case 12601: // Proj_Nebraska_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Nebraska_CS27_North\012");
+                      break;
+                    case 12602: // Proj_Nebraska_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Nebraska_CS27_South\012");
+                      break;
+                    case 12630: // Proj_Nebraska_CS83					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Nebraska_CS83\012");
+                      break;
+                    case 12701: // Proj_Nevada_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS27_East\012");
+                      break;
+                    case 12702: // Proj_Nevada_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS27_Central\012");
+                      break;
+                    case 12703: // Proj_Nevada_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS27_West\012");
+                      break;
+                    case 12731: // Proj_Nevada_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS83_East\012");
+                      break;
+                    case 12732: // Proj_Nevada_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS83_Central\012");
+                      break;
+                    case 12733: // Proj_Nevada_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Nevada_CS83_West\012");
+                      break;
+                    case 12800: // Proj_New_Hampshire_CS27				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Hampshire_CS27\012");
+                      break;
+                    case 12830: // Proj_New_Hampshire_CS83				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Hampshire_CS83\012");
+                      break;
+                    case 12900: // Proj_New_Jersey_CS27				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Jersey_CS27\012");
+                      break;
+                    case 12930: // Proj_New_Jersey_CS83				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Jersey_CS83\012");
+                      break;
+                    case 13001: // Proj_New_Mexico_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS27_East\012");
+                      break;
+                    case 13002: // Proj_New_Mexico_CS27_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS27_Central\012");
+                      break;
+                    case 13003: // Proj_New_Mexico_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS27_West\012");
+                      break;
+                    case 13031: // Proj_New_Mexico_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS83_East\012");
+                      break;
+                    case 13032: // Proj_New_Mexico_CS83_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS83_Central\012");
+                      break;
+                    case 13033: // Proj_New_Mexico_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Mexico_CS83_West\012");
+                      break;
+                    case 13101: // Proj_New_York_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS27_East\012");
+                      break;
+                    case 13102: // Proj_New_York_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS27_Central\012");
+                      break;
+                    case 13103: // Proj_New_York_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS27_West\012");
+                      break;
+                    case 13104: // Proj_New_York_CS27_Long_Island			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS27_Long_Island\012");
+                      break;
+                    case 13131: // Proj_New_York_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS83_East\012");
+                      break;
+                    case 13132: // Proj_New_York_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS83_Central\012");
+                      break;
+                    case 13133: // Proj_New_York_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS83_West\012");
+                      break;
+                    case 13134: // Proj_New_York_CS83_Long_Island			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_York_CS83_Long_Island\012");
+                      break;
+                    case 13200: // Proj_North_Carolina_CS27				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_North_Carolina_CS27\012");
+                      break;
+                    case 13230: // Proj_North_Carolina_CS83				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_North_Carolina_CS83\012");
+                      break;
+                    case 13301: // Proj_North_Dakota_CS27_North			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_North_Dakota_CS27_North\012");
+                      break;
+                    case 13302: // Proj_North_Dakota_CS27_South			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_North_Dakota_CS27_South\012");
+                      break;
+                    case 13331: // Proj_North_Dakota_CS83_North			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_North_Dakota_CS83_North\012");
+                      break;
+                    case 13332: // Proj_North_Dakota_CS83_South			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_North_Dakota_CS83_South\012");
+                      break;
+                    case 13401: // Proj_Ohio_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Ohio_CS27_North\012");
+                      break;
+                    case 13402: // Proj_Ohio_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Ohio_CS27_South\012");
+                      break;
+                    case 13431: // Proj_Ohio_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Ohio_CS83_North\012");
+                      break;
+                    case 13432: // Proj_Ohio_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Ohio_CS83_South\012");
+                      break;
+                    case 13501: // Proj_Oklahoma_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Oklahoma_CS27_North\012");
+                      break;
+                    case 13502: // Proj_Oklahoma_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Oklahoma_CS27_South\012");
+                      break;
+                    case 13531: // Proj_Oklahoma_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Oklahoma_CS83_North\012");
+                      break;
+                    case 13532: // Proj_Oklahoma_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Oklahoma_CS83_South\012");
+                      break;
+                    case 13601: // Proj_Oregon_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Oregon_CS27_North\012");
+                      break;
+                    case 13602: // Proj_Oregon_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Oregon_CS27_South\012");
+                      break;
+                    case 13631: // Proj_Oregon_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Oregon_CS83_North\012");
+                      break;
+                    case 13632: // Proj_Oregon_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Oregon_CS83_South\012");
+                      break;
+                    case 13701: // Proj_Pennsylvania_CS27_North			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Pennsylvania_CS27_North\012");
+                      break;
+                    case 13702: // Proj_Pennsylvania_CS27_South			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Pennsylvania_CS27_South\012");
+                      break;
+                    case 13731: // Proj_Pennsylvania_CS83_North			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Pennsylvania_CS83_North\012");
+                      break;
+                    case 13732: // Proj_Pennsylvania_CS83_South			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Pennsylvania_CS83_South\012");
+                      break;
+                    case 13800: // Proj_Rhode_Island_CS27				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Rhode_Island_CS27\012");
+                      break;
+                    case 13830: // Proj_Rhode_Island_CS83				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Rhode_Island_CS83\012");
+                      break;
+                    case 13901: // Proj_South_Carolina_CS27_North			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_South_Carolina_CS27_North\012");
+                      break;
+                    case 13902: // Proj_South_Carolina_CS27_South			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_South_Carolina_CS27_South\012");
+                      break;
+                    case 13930: // Proj_South_Carolina_CS83				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_South_Carolina_CS83\012");
+                      break;
+                    case 14001: // Proj_South_Dakota_CS27_North			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_South_Dakota_CS27_North\012");
+                      break;
+                    case 14002: // Proj_South_Dakota_CS27_South			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_South_Dakota_CS27_South\012");
+                      break;
+                    case 14031: // Proj_South_Dakota_CS83_North			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_South_Dakota_CS83_North\012");
+                      break;
+                    case 14032: // Proj_South_Dakota_CS83_South			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_South_Dakota_CS83_South\012");
+                      break;
+                    case 14100: // Proj_Tennessee_CS27					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Tennessee_CS27\012");
+                      break;
+                    case 14130: // Proj_Tennessee_CS83					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Tennessee_CS83\012");
+                      break;
+                    case 14201: // Proj_Texas_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_North\012");
+                      break;
+                    case 14202: // Proj_Texas_CS27_North_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_North_Central\012");
+                      break;
+                    case 14203: // Proj_Texas_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_Central\012");
+                      break;
+                    case 14204: // Proj_Texas_CS27_South_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_South_Central\012");
+                      break;
+                    case 14205: // Proj_Texas_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS27_South\012");
+                      break;
+                    case 14231: // Proj_Texas_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_North\012");
+                      break;
+                    case 14232: // Proj_Texas_CS83_North_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_North_Central\012");
+                      break;
+                    case 14233: // Proj_Texas_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_Central\012");
+                      break;
+                    case 14234: // Proj_Texas_CS83_South_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_South_Central\012");
+                      break;
+                    case 14235: // Proj_Texas_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Texas_CS83_South\012");
+                      break;
+                    case 14301: // Proj_Utah_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS27_North\012");
+                      break;
+                    case 14302: // Proj_Utah_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS27_Central\012");
+                      break;
+                    case 14303: // Proj_Utah_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS27_South\012");
+                      break;
+                    case 14331: // Proj_Utah_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS83_North\012");
+                      break;
+                    case 14332: // Proj_Utah_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS83_Central\012");
+                      break;
+                    case 14333: // Proj_Utah_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Utah_CS83_South\012");
+                      break;
+                    case 14400: // Proj_Vermont_CS27					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Vermont_CS27\012");
+                      break;
+                    case 14430: // Proj_Vermont_CS83					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Vermont_CS83\012");
+                      break;
+                    case 14501: // Proj_Virginia_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Virginia_CS27_North\012");
+                      break;
+                    case 14502: // Proj_Virginia_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Virginia_CS27_South\012");
+                      break;
+                    case 14531: // Proj_Virginia_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Virginia_CS83_North\012");
+                      break;
+                    case 14532: // Proj_Virginia_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Virginia_CS83_South\012");
+                      break;
+                    case 14601: // Proj_Washington_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Washington_CS27_North\012");
+                      break;
+                    case 14602: // Proj_Washington_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Washington_CS27_South\012");
+                      break;
+                    case 14631: // Proj_Washington_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Washington_CS83_North\012");
+                      break;
+                    case 14632: // Proj_Washington_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Washington_CS83_South\012");
+                      break;
+                    case 14701: // Proj_West_Virginia_CS27_North			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_West_Virginia_CS27_North\012");
+                      break;
+                    case 14702: // Proj_West_Virginia_CS27_South			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_West_Virginia_CS27_South\012");
+                      break;
+                    case 14731: // Proj_West_Virginia_CS83_North			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_West_Virginia_CS83_North\012");
+                      break;
+                    case 14732: // Proj_West_Virginia_CS83_South			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_West_Virginia_CS83_South\012");
+                      break;
+                    case 14801: // Proj_Wisconsin_CS27_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS27_North\012");
+                      break;
+                    case 14802: // Proj_Wisconsin_CS27_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS27_Central\012");
+                      break;
+                    case 14803: // Proj_Wisconsin_CS27_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS27_South\012");
+                      break;
+                    case 14831: // Proj_Wisconsin_CS83_North				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS83_North\012");
+                      break;
+                    case 14832: // Proj_Wisconsin_CS83_Central				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS83_Central\012");
+                      break;
+                    case 14833: // Proj_Wisconsin_CS83_South				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wisconsin_CS83_South\012");
+                      break;
+                    case 14901: // Proj_Wyoming_CS27_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS27_East\012");
+                      break;
+                    case 14902: // Proj_Wyoming_CS27_East_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS27_East_Central\012");
+                      break;
+                    case 14903: // Proj_Wyoming_CS27_West_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS27_West_Central\012");
+                      break;
+                    case 14904: // Proj_Wyoming_CS27_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS27_West\012");
+                      break;
+                    case 14931: // Proj_Wyoming_CS83_East				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS83_East\012");
+                      break;
+                    case 14932: // Proj_Wyoming_CS83_East_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS83_East_Central\012");
+                      break;
+                    case 14933: // Proj_Wyoming_CS83_West_Central			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS83_West_Central\012");
+                      break;
+                    case 14934: // Proj_Wyoming_CS83_West				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Wyoming_CS83_West\012");
+                      break;
+                    case 15001: // Proj_Alaska_CS27_1					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_1\012");
+                      break;
+                    case 15002: // Proj_Alaska_CS27_2					
+                      fprintf(file_out, "ProjectionGeoKey: ProjectionGeoKey\012");
+                      break;
+                    case 15003: // Proj_Alaska_CS27_3					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_3\012");
+                      break;
+                    case 15004: // Proj_Alaska_CS27_4					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_4\012");
+                      break;
+                    case 15005: // Proj_Alaska_CS27_5					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_5\012");
+                      break;
+                    case 15006: // Proj_Alaska_CS27_6					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_6\012");
+                      break;
+                    case 15007: // Proj_Alaska_CS27_7					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_7\012");
+                      break;
+                    case 15008: // Proj_Alaska_CS27_8					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_8\012");
+                      break;
+                    case 15009: // Proj_Alaska_CS27_9					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_9\012");
+                      break;
+                    case 15010: // Proj_Alaska_CS27_10					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS27_10\012");
+                      break;
+                    case 15031: // Proj_Alaska_CS83_1					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_1\012");
+                      break;
+                    case 15032: // Proj_Alaska_CS83_2					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_2\012");
+                      break;
+                    case 15033: // Proj_Alaska_CS83_3					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_3\012");
+                      break;
+                    case 15034: // Proj_Alaska_CS83_4					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_4\012");
+                      break;
+                    case 15035: // Proj_Alaska_CS83_5					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_5\012");
+                      break;
+                    case 15036: // Proj_Alaska_CS83_6					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_6\012");
+                      break;
+                    case 15037: // Proj_Alaska_CS83_7					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_7\012");
+                      break;
+                    case 15038: // Proj_Alaska_CS83_8					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_8\012");
+                      break;
+                    case 15039: // Proj_Alaska_CS83_9					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_9\012");
+                      break;
+                    case 15040: // Proj_Alaska_CS83_10					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Alaska_CS83_10\012");
+                      break;
+                    case 15101: // Proj_Hawaii_CS27_1					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_1\012");
+                      break;
+                    case 15102: // Proj_Hawaii_CS27_2					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_2\012");
+                      break;
+                    case 15103: // Proj_Hawaii_CS27_3					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_3\012");
+                      break;
+                    case 15104: // Proj_Hawaii_CS27_4					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_4\012");
+                      break;
+                    case 15105: // Proj_Hawaii_CS27_5					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS27_5\012");
+                      break;
+                    case 15131: // Proj_Hawaii_CS83_1					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_1\012");
+                      break;
+                    case 15132: // Proj_Hawaii_CS83_2					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_2\012");
+                      break;
+                    case 15133: // Proj_Hawaii_CS83_3					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_3\012");
+                      break;
+                    case 15134: // Proj_Hawaii_CS83_4					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_4\012");
+                      break;
+                    case 15135: // Proj_Hawaii_CS83_5					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Hawaii_CS83_5\012");
+                      break;
+                    case 15201: // Proj_Puerto_Rico_CS27				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Puerto_Rico_CS27\012");
+                      break;
+                    case 15202: // Proj_St_Croix					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_St_Croix\012");
+                      break;
+                    case 15230: // Proj_Puerto_Rico_Virgin_Is				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Puerto_Rico_Virgin_Is\012");
+                      break;
+                    case 15914: // Proj_BLM_14N_feet					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_BLM_14N_feet\012");
+                      break;
+                    case 15915: // Proj_BLM_15N_feet					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_BLM_15N_feet\012");
+                      break;
+                    case 15916: // Proj_BLM_16N_feet					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_BLM_16N_feet\012");
+                      break;
+                    case 15917: // Proj_BLM_17N_feet					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_BLM_17N_feet\012");
+                      break;
+                    case 17348: // Proj_Map_Grid_of_Australia_48			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_48\012");
+                      break;
+                    case 17349: // Proj_Map_Grid_of_Australia_49			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_49\012");
+                      break;
+                    case 17350: // Proj_Map_Grid_of_Australia_50			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_50\012");
+                      break;
+                    case 17351: // Proj_Map_Grid_of_Australia_51			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_51\012");
+                      break;
+                    case 17352: // Proj_Map_Grid_of_Australia_52			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_52\012");
+                      break;
+                    case 17353: // Proj_Map_Grid_of_Australia_53			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_53\012");
+                      break;
+                    case 17354: // Proj_Map_Grid_of_Australia_54			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_54\012");
+                      break;
+                    case 17355: // Proj_Map_Grid_of_Australia_55			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_55\012");
+                      break;
+                    case 17356: // Proj_Map_Grid_of_Australia_56			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_56\012");
+                      break;
+                    case 17357: // Proj_Map_Grid_of_Australia_57			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_57\012");
+                      break;
+                    case 17358: // Proj_Map_Grid_of_Australia_58			
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_58\012");
+                      break;
+                    case 17448: // Proj_Australian_Map_Grid_48				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_48\012");
+                      break;
+                    case 17449: // Proj_Australian_Map_Grid_49				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_49\012");
+                      break;
+                    case 17450: // Proj_Australian_Map_Grid_50				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_50\012");
+                      break;
+                    case 17451: // Proj_Australian_Map_Grid_51				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_51\012");
+                      break;
+                    case 17452: // Proj_Australian_Map_Grid_52				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_52\012");
+                      break;
+                    case 17453: // Proj_Australian_Map_Grid_53				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_53\012");
+                      break;
+                    case 17454: // Proj_Australian_Map_Grid_54				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_54\012");
+                      break;
+                    case 17455: // Proj_Australian_Map_Grid_55				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_55\012");
+                      break;
+                    case 17456: // Proj_Australian_Map_Grid_56				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_56\012");
+                      break;
+                    case 17457: // Proj_Australian_Map_Grid_57				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_57\012");
+                      break;
+                    case 17458: // Proj_Australian_Map_Grid_58				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Australian_Map_Grid_58\012");
+                      break;
+                    case 18031: // Proj_Argentina_1					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_1\012");
+                      break;
+                    case 18032: // Proj_Argentina_2					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_2\012");
+                      break;
+                    case 18033: // Proj_Argentina_3					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_3\012");
+                      break;
+                    case 18034: // Proj_Argentina_4					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_4\012");
+                      break;
+                    case 18035: // Proj_Argentina_5					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_5\012");
+                      break;
+                    case 18036: // Proj_Argentina_6					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_6\012");
+                      break;
+                    case 18037: // Proj_Argentina_7					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Argentina_7\012");
+                      break;
+                    case 18051: // Proj_Colombia_3W					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colombia_3W\012");
+                      break;
+                    case 18052: // Proj_Colombia_Bogota				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colombia_Bogota\012");
+                      break;
+                    case 18053: // Proj_Colombia_3E					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colombia_3E\012");
+                      break;
+                    case 18054: // Proj_Colombia_6E					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Colombia_6E\012");
+                      break;
+                    case 18072: // Proj_Egypt_Red_Belt					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Egypt_Red_Belt\012");
+                      break;
+                    case 18073: // Proj_Egypt_Purple_Belt				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Egypt_Purple_Belt\012");
+                      break;
+                    case 18074: // Proj_Extended_Purple_Belt				
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Extended_Purple_Belt\012");
+                      break;
+                    case 18141: // Proj_New_Zealand_North_Island_Nat_Grid		
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Zealand_North_Island_Nat_Grid\012");
+                      break;
+                    case 18142: // Proj_New_Zealand_South_Island_Nat_Grid		
+                      fprintf(file_out, "ProjectionGeoKey: Proj_New_Zealand_South_Island_Nat_Grid\012");
+                      break;
+                    case 19900: // Proj_Bahrain_Grid					
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Bahrain_Grid\012");
+                      break;
+                    case 19905: // Proj_Netherlands_E_Indies_Equatorial		
+                      fprintf(file_out, "ProjectionGeoKey: Proj_Netherlands_E_Indies_Equatorial\012");
+                      break;
+                    case 19912: // Proj_RSO_Borneo
+                      fprintf(file_out, "ProjectionGeoKey: Proj_RSO_Borneo\012");
+                      break;
+                    default:
+                      fprintf(file_out, "ProjectionGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                  }
                   }
                   break;
                 case 3075: // ProjCoordTransGeoKey
