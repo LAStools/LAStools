@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  lasindex.hpp
-  
+
   CONTENTS:
-  
+
     This class can create a spatial indexing, store a spatial indexing, write
     a spatial indexing to file, read a spatial indexing from file, and - most
     importantly - it can be used together with a lasreader for efficient access
@@ -24,15 +24,15 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
      7 January 2017 -- add read(FILE* file) for Trimble LASzip DLL improvement
      2 April 2015 -- add seek_next(LASreadPoint* reader, I64 &p_count) for DLL
      2 April 2015 -- delete read_next(LASreader* lasreader) that was not used
     31 March 2015 -- remove unused LASquadtree inheritance of abstract LASspatial 
     29 April 2011 -- created after cable outage during the royal wedding (-:
-  
+
 ===============================================================================
 */
 #ifndef LAS_INDEX_HPP
