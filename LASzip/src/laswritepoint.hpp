@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    23 August 2016 -- layering of items for selective decompression in LAS 1.4 
     6 September 2014 -- removed inheritance of EntropyEncoder and EntropyDecoder
     6 October 2011 -- large file support & reading with missing chunk table
     9 May 2011 -- the chunked compressor now allows variable chunk sizes
@@ -67,6 +68,7 @@ private:
   LASwriteItem** writers_raw;
   LASwriteItem** writers_compressed;
   ArithmeticEncoder* enc;
+  BOOL layered_las14_compression;
   // used for chunking
   U32 chunk_size;
   U32 chunk_count;
