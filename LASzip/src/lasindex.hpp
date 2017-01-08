@@ -16,7 +16,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -27,6 +27,7 @@
   
   CHANGE HISTORY:
   
+     7 January 2017 -- add read(FILE* file) for Trimble LASzip DLL improvement
      2 April 2015 -- add seek_next(LASreadPoint* reader, I64 &p_count) for DLL
      2 April 2015 -- delete read_next(LASreader* lasreader) that was not used
     31 March 2015 -- remove unused LASquadtree inheritance of abstract LASspatial 
@@ -36,6 +37,8 @@
 */
 #ifndef LAS_INDEX_HPP
 #define LAS_INDEX_HPP
+
+#include <stdio.h>
 
 #include "mydefs.hpp"
 
@@ -61,6 +64,8 @@ public:
   void complete(U32 minimum_points=100000, I32 maximum_intervals=-1, const BOOL verbose=TRUE);
 
   // read from file or write to file
+  BOOL read(FILE* file);
+  BOOL write(FILE* file) const;
   BOOL read(const char* file_name);
   BOOL append(const char* file_name) const;
   BOOL write(const char* file_name) const;

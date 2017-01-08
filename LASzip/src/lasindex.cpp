@@ -279,6 +279,40 @@ BOOL LASindex::has_intervals()
   return FALSE;
 }
 
+BOOL LASindex::read(FILE* file)
+{
+  if (file == 0) return FALSE;
+  ByteStreamIn* stream;
+  if (IS_LITTLE_ENDIAN())
+    stream = new ByteStreamInFileLE(file);
+  else
+    stream = new ByteStreamInFileBE(file);
+  if (!read(stream))
+  {
+    delete stream;
+    return FALSE;
+  }
+  delete stream;
+  return TRUE;
+}
+
+BOOL LASindex::write(FILE* file) const
+{
+  if (file == 0) return FALSE;
+  ByteStreamOut* stream;
+  if (IS_LITTLE_ENDIAN())
+    stream = new ByteStreamOutFileLE(file);
+  else
+    stream = new ByteStreamOutFileBE(file);
+  if (!write(stream))
+  {
+    delete stream;
+    return FALSE;
+  }
+  delete stream;
+  return TRUE;
+}
+
 BOOL LASindex::read(const char* file_name)
 {
   if (file_name == 0) return FALSE;
@@ -298,25 +332,21 @@ BOOL LASindex::read(const char* file_name)
     name[strlen(name)-1] = 'x';
   }
   FILE* file = fopen(name, "rb");
-  free(name);
   if (file == 0)
   {
+    fprintf(stderr,"ERROR (LASindex): cannot open '%s' for read\n", name);
+    free(name);
     return FALSE;
   }
-  ByteStreamIn* stream;
-  if (IS_LITTLE_ENDIAN())
-    stream = new ByteStreamInFileLE(file);
-  else
-    stream = new ByteStreamInFileBE(file);
-  if (!read(stream))
+  if (!read(file))
   {
     fprintf(stderr,"ERROR (LASindex): cannot read '%s'\n", name);
-    delete stream;
     fclose(file);
+    free(name);
     return FALSE;
   }
-  delete stream;
   fclose(file);
+  free(name);
   return TRUE;
 }
 
@@ -484,20 +514,13 @@ BOOL LASindex::write(const char* file_name) const
     free(name);
     return FALSE;
   }
-  ByteStreamOut* stream;
-  if (IS_LITTLE_ENDIAN())
-    stream = new ByteStreamOutFileLE(file);
-  else
-    stream = new ByteStreamOutFileBE(file);
-  if (!write(stream))
+  if (!write(file))
   {
     fprintf(stderr,"ERROR (LASindex): cannot write '%s'\n", name);
-    delete stream;
     fclose(file);
     free(name);
     return FALSE;
   }
-  delete stream;
   fclose(file);
   free(name);
   return TRUE;
