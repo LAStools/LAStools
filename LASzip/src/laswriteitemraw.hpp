@@ -53,9 +53,9 @@ public:
   LASwriteItemRaw_POINT10_BE(){};
   inline BOOL write(const U8* item)
   {
-    ENDIAN_SWAP_32(&item[ 0], &swapped[ 0]);    // x
-    ENDIAN_SWAP_32(&item[ 4], &swapped[ 4]);    // y
-    ENDIAN_SWAP_32(&item[ 8], &swapped[ 8]);    // z
+    ENDIAN_SWAP_32(&item[ 0], &swapped[ 0]);    // X
+    ENDIAN_SWAP_32(&item[ 4], &swapped[ 4]);    // Y
+    ENDIAN_SWAP_32(&item[ 8], &swapped[ 8]);    // Z
     ENDIAN_SWAP_16(&item[12], &swapped[12]);    // intensity
     *((U32*)&swapped[14]) = *((U32*)&item[14]); // bitfield, classification, scan_angle_rank, user_data
     ENDIAN_SWAP_16(&item[18], &swapped[18]);    // point_source_ID

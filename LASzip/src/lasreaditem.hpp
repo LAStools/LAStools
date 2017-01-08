@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -29,8 +29,8 @@
   
 ===============================================================================
 */
-#ifndef LAS_READ_ITEM_H
-#define LAS_READ_ITEM_H
+#ifndef LAS_READ_ITEM_HPP
+#define LAS_READ_ITEM_HPP
 
 #include "mydefs.hpp"
 
