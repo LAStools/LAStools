@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  laszip.hpp
-  
+
   CONTENTS:
-  
+
     Contains LASitem and LASchunk structs as well as the IDs of the currently
     supported entropy coding scheme
 
@@ -38,7 +38,7 @@
     20 March 2011 -- incrementing LASZIP_VERSION to 1.2 for improved compression
     10 January 2011 -- licensing change for LGPL release and liblas integration
     12 December 2010 -- refactored from lasdefinitions after movies with silke
-  
+
 ===============================================================================
 */
 #ifndef LASZIP_HPP

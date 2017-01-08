@@ -285,15 +285,15 @@ SOURCE=.\src\laszip.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\dll\laszip_api.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\laszip_common_v1.hpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\src\laszip_common_v2.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\dll\laszip_dll.h
 # End Source File
 # Begin Source File
 

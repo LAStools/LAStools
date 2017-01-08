@@ -29,6 +29,6 @@
 
   COPYRIGHT:
   
-  (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+  (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
 --------------------------------------------------------------------------

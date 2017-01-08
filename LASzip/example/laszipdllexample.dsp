@@ -97,7 +97,7 @@ PostBuild_Cmds=copy Debug\laszipdllexample.exe ..\dll\laszipdllexample.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\dll\laszip_dll.c
+SOURCE=..\dll\laszip_api.c
 # End Source File
 # Begin Source File
 
