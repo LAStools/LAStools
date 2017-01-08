@@ -53,9 +53,9 @@ public:
   inline void read(U8* item)
   {
     instream->getBytes(swapped, 20);
-    ENDIAN_SWAP_32(&swapped[ 0], &item[ 0]);    // x
-    ENDIAN_SWAP_32(&swapped[ 4], &item[ 4]);    // y
-    ENDIAN_SWAP_32(&swapped[ 8], &item[ 8]);    // z
+    ENDIAN_SWAP_32(&swapped[ 0], &item[ 0]);    // X
+    ENDIAN_SWAP_32(&swapped[ 4], &item[ 4]);    // Y
+    ENDIAN_SWAP_32(&swapped[ 8], &item[ 8]);    // Z
     ENDIAN_SWAP_16(&swapped[12], &item[12]);    // intensity
     *((U32*)&item[14]) = *((U32*)&swapped[14]); // bitfield, classification, scan_angle_rank, user_data
     ENDIAN_SWAP_16(&swapped[18], &item[18]);    // point_source_ID
@@ -159,9 +159,9 @@ private:
 class LAStempReadPoint10
 {
 public:
-  I32 x;
-  I32 y;
-  I32 z;
+  I32 X;
+  I32 Y;
+  I32 Z;
   U16 intensity;
   U8 return_number : 3;
   U8 number_of_returns : 3;
@@ -189,9 +189,9 @@ public:
 class LAStempReadPoint14
 {
 public:
-  I32 x;
-  I32 y;
-  I32 z;
+  I32 X;
+  I32 Y;
+  I32 Z;
   U16 intensity;
   U8 return_number : 4;
   U8 number_of_returns : 4;
@@ -212,9 +212,9 @@ public:
   inline void read(U8* item)
   {
     instream->getBytes(buffer, 30);
-    ((LAStempReadPoint10*)item)->x = ((LAStempReadPoint14*)buffer)->x;
-    ((LAStempReadPoint10*)item)->y = ((LAStempReadPoint14*)buffer)->y;
-    ((LAStempReadPoint10*)item)->z = ((LAStempReadPoint14*)buffer)->z;
+    ((LAStempReadPoint10*)item)->X = ((LAStempReadPoint14*)buffer)->X;
+    ((LAStempReadPoint10*)item)->Y = ((LAStempReadPoint14*)buffer)->Y;
+    ((LAStempReadPoint10*)item)->Z = ((LAStempReadPoint14*)buffer)->Z;
     ((LAStempReadPoint10*)item)->intensity = ((LAStempReadPoint14*)buffer)->intensity;
     if (((LAStempReadPoint14*)buffer)->number_of_returns > 7)
     {
