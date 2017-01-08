@@ -879,6 +879,10 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
       case 4283: // GCS_GDA94
         gcs_code = GEO_GCS_GDA94;
         break;
+      case 4140: // Datum_NAD83_CSRS
+      case 4617: // Datum_NAD83_CSRS
+        datum_code = GEO_GCS_NAD83_CSRS;
+        break;
       case 4030: // GCSE_WGS84 (unknown datum based on WGS 84 ellipsoid)
         ellipsoid = GEO_ELLIPSOID_WGS84;
         break;
@@ -955,6 +959,9 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         break;
       case 6283: // Datum_Geocentric_Datum_of_Australia_1994
         datum_code = GEO_GCS_GDA94;
+        break;
+      case 6140: // Datum_NAD83_CSRS
+        datum_code = GEO_GCS_NAD83_CSRS;
         break;
       case 6030: // DatumE_WGS84
         ellipsoid = GEO_ELLIPSOID_WGS84;
