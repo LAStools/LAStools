@@ -25,7 +25,6 @@
   
   CHANGE HISTORY:
   
-    7 January 2017 -- new laszip_create_reader() laszip_create_writer() in DLL
     7 January 2017 -- set reserved VLR field from 0xAABB to 0x0 in DLL
     7 January 2017 -- consistent compatibility mode scan angle quantization in DLL
     7 January 2017 -- compatibility mode *decompression* fix for waveforms in DLL
