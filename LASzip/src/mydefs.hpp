@@ -154,6 +154,7 @@ typedef union U64I64F64 { U64 u64; I64 i64; F64 f64; } U64I64F64;
 #define F64_IS_FINITE(n) ((F64_MIN < (n)) && ((n) < F64_MAX))
 
 #define U32_ZERO_BIT_0(n) (((n)&(U32)0xFFFFFFFE))
+#define U32_ZERO_BIT_0_1(n) (((n)&(U32)0xFFFFFFFC))
 
 #ifndef FALSE
 #define FALSE   0
