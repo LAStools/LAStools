@@ -594,31 +594,6 @@ laszip_open_writer
 };
 
 /*---------------------------------------------------------------------------*/
-typedef laszip_I32 (*laszip_create_writer_def)
-(
-    laszip_POINTER                     pointer
-    , FILE*                            file
-    , FILE*                            lax_file
-    , laszip_BOOL                      compress
-);
-laszip_create_writer_def laszip_create_writer_ptr = 0;
-LASZIP_API laszip_I32
-laszip_create_writer
-(
-    laszip_POINTER                     pointer
-    , FILE*                            file
-    , FILE*                            lax_file
-    , laszip_BOOL                      compress
-)
-{
-  if (laszip_create_writer_ptr)
-  {
-    return (*laszip_create_writer_ptr)(pointer, file, lax_file, compress);
-  }
-  return 1;
-};
-
-/*---------------------------------------------------------------------------*/
 typedef laszip_I32 (*laszip_write_point_def)
 (
     laszip_POINTER                     pointer
@@ -736,31 +711,6 @@ laszip_open_reader
     return (*laszip_open_reader_ptr)(pointer, file_name, is_compressed);
   }
   return 1;
-};
-
-/*---------------------------------------------------------------------------*/
-typedef laszip_I32 (*laszip_create_reader_def)
-(
-    laszip_POINTER                     pointer
-    , FILE*                            file
-    , FILE*                            lax_file
-    , laszip_BOOL*                     is_compressed
-);
-laszip_create_reader_def laszip_create_reader_ptr = 0;
-LASZIP_API laszip_I32
-laszip_create_reader
-(
-    laszip_POINTER                     pointer
-    , FILE*                            file
-    , FILE*                            lax_file
-    , laszip_BOOL*                     is_compressed
-)
-{
-    if (laszip_create_reader_ptr)
-    {
-        return (*laszip_create_reader_ptr)(pointer, file, lax_file, is_compressed);
-    }
-    return 1;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -1036,11 +986,6 @@ laszip_I32 laszip_load_dll()
      FreeLibrary(laszip_HINSTANCE);
      return 1;
   }
-  laszip_create_writer_ptr = (laszip_create_writer_def)GetProcAddress(laszip_HINSTANCE, "laszip_create_writer");
-  if ( laszip_create_writer_ptr == NULL) {
-     FreeLibrary(laszip_HINSTANCE);
-     return 1;
-  }
   laszip_write_point_ptr = (laszip_write_point_def)GetProcAddress(laszip_HINSTANCE, "laszip_write_point");
   if (laszip_write_point_ptr == NULL) {
      FreeLibrary(laszip_HINSTANCE);
@@ -1070,11 +1015,6 @@ laszip_I32 laszip_load_dll()
   if (laszip_open_reader_ptr == NULL) {
      FreeLibrary(laszip_HINSTANCE);
      return 1;
-  }
-  laszip_create_reader_ptr = (laszip_create_reader_def)GetProcAddress(laszip_HINSTANCE, "laszip_create_reader");
-  if(laszip_create_reader_ptr == NULL) {
-    FreeLibrary(laszip_HINSTANCE);
-    return 1;
   }
   laszip_has_spatial_index_ptr = (laszip_has_spatial_index_def)GetProcAddress(laszip_HINSTANCE, "laszip_has_spatial_index");
   if (laszip_has_spatial_index_ptr == NULL) {

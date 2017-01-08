@@ -137,26 +137,6 @@ typedef struct laszip_dll {
   laszip_dll_inventory* inventory;
 } laszip_dll_struct;
 
-/*--------------------------------------------------------------------------*/
-static laszip_I32
-laszip_create_writer_internal(
-    laszip_POINTER                     pointer
-    , FILE*                            file
-    , FILE*                            lax_file
-    , laszip_BOOL                      compress
-    , laszip_BOOL                      close_file
-) {return 1;};
-
-/*---------------------------------------------------------------------------*/
-static laszip_I32
-laszip_create_reader_internal(
-    laszip_POINTER                     pointer
-    , FILE*                            file
-    , FILE*                            lax_file
-    , laszip_BOOL                      close_file
-    , laszip_BOOL*                     is_compressed
-) {return 1;};
-
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
 laszip_get_version(
@@ -2565,18 +2545,6 @@ laszip_open_writer(
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
-laszip_create_writer(
-    laszip_POINTER                     pointer
-    , FILE*                            file
-    , FILE*                            lax_file
-    , laszip_BOOL                      compress
-)
-{
-  return laszip_create_writer_internal(pointer, file, lax_file, compress, FALSE);
-}
-
-/*---------------------------------------------------------------------------*/
-LASZIP_API laszip_I32
 laszip_write_point(
     laszip_POINTER                     pointer
 )
@@ -3846,18 +3814,6 @@ laszip_open_reader(
 
   laszip_dll->error[0] = '\0';
   return 0;
-}
-
-/*---------------------------------------------------------------------------*/
-LASZIP_API laszip_I32
-laszip_create_reader(
-    laszip_POINTER                     pointer
-    , FILE*                            file
-    , FILE*                            lax_file
-    , laszip_BOOL*                     is_compressed
-)
-{
-  return laszip_create_reader_internal(pointer, file, lax_file, FALSE, is_compressed);
 }
 
 /*---------------------------------------------------------------------------*/
