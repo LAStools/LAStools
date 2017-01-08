@@ -94,8 +94,8 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
   else
     out = new ByteStreamOutArrayBE();
   // write control info
-  U16 lastools_version = (U16)LAS_TOOLS_VERSION;
-  out->put16bitsLE((U8*)&lastools_version);
+  U16 laszip_version = (U16)LASZIP_VERSION_BUILD_DATE;
+  out->put16bitsLE((U8*)&laszip_version);
   U16 compatible_version = 3;
   out->put16bitsLE((U8*)&compatible_version);
   U32 unused = 0;
