@@ -563,7 +563,7 @@ public:
   inline U8 get_extended_scanner_channel() const { return extended_scanner_channel; };
 
   inline void set_extended_classification(U8 extended_classification) { this->extended_classification = extended_classification; };
-  inline void set_extended_scan_angle(U16 extended_scan_angle) { this->extended_scan_angle = extended_scan_angle; };
+  inline void set_extended_scan_angle(I16 extended_scan_angle) { this->extended_scan_angle = extended_scan_angle; };
   inline void set_extended_overlap_flag(U8 extended_overlap_flag) { this->extended_classification_flags = (extended_overlap_flag << 3) | (this->extended_classification_flags & 7); };
   inline void set_extended_scanner_channel(U8 extended_scanner_channel) { this->extended_scanner_channel = extended_scanner_channel; };
 
