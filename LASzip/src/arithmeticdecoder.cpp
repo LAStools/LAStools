@@ -14,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2005-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -79,15 +79,18 @@ ArithmeticDecoder::ArithmeticDecoder()
   instream = 0;
 }
 
-BOOL ArithmeticDecoder::init(ByteStreamIn* instream)
+BOOL ArithmeticDecoder::init(ByteStreamIn* instream, BOOL really_init)
 {
   if (instream == 0) return FALSE;
   this->instream = instream;
   length = AC__MaxLength;
-  value = (instream->getByte() << 24);
-  value |= (instream->getByte() << 16);
-  value |= (instream->getByte() << 8);
-  value |= (instream->getByte());
+  if (really_init)
+  {
+    value = (instream->getByte() << 24);
+    value |= (instream->getByte() << 16);
+    value |= (instream->getByte() << 8);
+    value |= (instream->getByte());
+  }
   return TRUE;
 }
 
