@@ -27,7 +27,7 @@
   
   CHANGE HISTORY:
   
-     7 January 2017 -- 12th example is identical to example 8 for the time being 
+     8 January 2017 -- changed from "laszip_dll.h" to "laszip_api.h" because of hobu
     23 September 2015 -- 11th example writes without a-priori bounding box or counters
     22 September 2015 -- 10th upconverts to LAS 1.4 with pre-existing "extra bytes"
      5 September 2015 -- eighth and nineth example show pre-existing "extra bytes"
@@ -44,7 +44,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "laszip_dll.h"
+#include "laszip_api.h"
 
 void usage(bool wait=false)
 {
