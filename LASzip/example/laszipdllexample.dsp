@@ -109,7 +109,7 @@ SOURCE=.\laszipdllexample.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\dll\laszip_dll.h
+SOURCE=..\dll\laszip_api.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

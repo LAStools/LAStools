@@ -60,8 +60,8 @@ typedef long long SIGNED_INT64;
 
 #define LASZIP_VERSION_MAJOR                2
 #define LASZIP_VERSION_MINOR                5
-#define LASZIP_VERSION_REVISION             1
-#define LASZIP_VERSION_BUILD_DATE      170107
+#define LASZIP_VERSION_REVISION             2
+#define LASZIP_VERSION_BUILD_DATE      170111
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1

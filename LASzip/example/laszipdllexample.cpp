@@ -27,6 +27,7 @@
   
   CHANGE HISTORY:
   
+    11 January 2017 -- 12th example changes the default chunk size from 50000 to 5000
      8 January 2017 -- changed from "laszip_dll.h" to "laszip_api.h" because of hobu
     23 September 2015 -- 11th example writes without a-priori bounding box or counters
     22 September 2015 -- 10th upconverts to LAS 1.4 with pre-existing "extra bytes"
@@ -108,7 +109,7 @@ static double taketime()
 #define EXAMPLE_ELEVEN 11
 #define EXAMPLE_TWELVE 12
 
-#define EXAMPLE EXAMPLE_TWELVE
+#define EXAMPLE EXAMPLE_EIGHT
 
 int main(int argc, char *argv[])
 {
@@ -3117,7 +3118,7 @@ int main(int argc, char *argv[])
 
   if (EXAMPLE == EXAMPLE_TWELVE)
   {
-    fprintf(stderr,"running EXAMPLE_TWELVE (always *with* compatibility mode when reading but when writing *only* for compressed output)\n");
+    fprintf(stderr,"running EXAMPLE_TWELVE (changing chunk size to 5000 *with* compatibility when writing *only* for compressed output)\n");
 
     // create the reader
 
@@ -3206,6 +3207,14 @@ int main(int argc, char *argv[])
     if (laszip_set_header(laszip_writer, header))
     {
       fprintf(stderr,"DLL ERROR: setting header for laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // change the chunk size from the default value to 50000 
+
+    if (laszip_set_chunk_size(laszip_writer, 5000))
+    {
+      fprintf(stderr,"DLL ERROR: setting chunk size 5000 for laszip writer\n");
       byebye(true, argc==1, laszip_writer);
     }
 

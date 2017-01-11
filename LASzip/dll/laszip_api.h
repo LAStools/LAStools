@@ -405,6 +405,13 @@ laszip_request_compatibility_mode(
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
+laszip_set_chunk_size(
+    laszip_POINTER                     pointer
+    , const laszip_U32                 chunk_size
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
 laszip_open_writer(
     laszip_POINTER                     pointer
     , const laszip_CHAR*               file_name
