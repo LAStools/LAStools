@@ -129,6 +129,7 @@ typedef struct laszip_dll {
   BOOL preserve_generating_software;
   BOOL request_compatibility_mode;
   BOOL compatibility_mode;
+  U32 set_chunk_size;
   I32 start_scan_angle;
   I32 start_extended_returns;
   I32 start_classification;
@@ -324,6 +325,7 @@ laszip_clean(
     laszip_dll->header.x_scale_factor = 0.01;
     laszip_dll->header.y_scale_factor = 0.01;
     laszip_dll->header.z_scale_factor = 0.01;
+    laszip_dll->set_chunk_size = LASZIP_CHUNK_SIZE_DEFAULT;
   }
   catch (...)
   {
@@ -1511,6 +1513,42 @@ laszip_request_compatibility_mode(
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
+laszip_set_chunk_size(
+    laszip_POINTER                     pointer
+    , const laszip_U32                 chunk_size
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+
+  try
+  {
+    if (laszip_dll->reader)
+    {
+      sprintf(laszip_dll->error, "reader is already open");
+      return 1;
+    }
+
+    if (laszip_dll->writer)
+    {
+      sprintf(laszip_dll->error, "writer is already open");
+      return 1;
+    }
+
+    laszip_dll->set_chunk_size = chunk_size;
+  }
+  catch (...)
+  {
+    sprintf(laszip_dll->error, "internal error in laszip_set_chunk_size");
+    return 1;
+  }
+
+  laszip_dll->error[0] = '\0';
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
 laszip_create_spatial_index(
     laszip_POINTER                     pointer
     , const laszip_BOOL                create
@@ -2029,6 +2067,17 @@ laszip_open_writer(
       laszip->request_version(0);
     }
 
+    // maybe we should change the chunk size
+
+    if (laszip_dll->set_chunk_size != LASZIP_CHUNK_SIZE_DEFAULT)
+    {
+      if (!laszip->set_chunk_size(laszip_dll->set_chunk_size))
+      {
+        sprintf(laszip_dll->error, "setting chunk size %d has failed", laszip_dll->set_chunk_size);
+        return 1;
+      }
+    }
+    
     // open the file
 
     laszip_dll->file = fopen(file_name, "wb");
