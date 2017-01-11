@@ -2059,23 +2059,26 @@ laszip_open_writer(
         sprintf(laszip_dll->error, "cannot compress point_data_format %d with point_data_record_length %d", (I32)laszip_dll->header.point_data_format, (I32)laszip_dll->header.point_data_record_length);
         return 1;
       }
+
+      // request version 2 for all item compressors
+
       laszip->request_version(2);
       laszip_vrl_payload_size = 34 + 6*laszip->num_items;
+
+      // maybe we should change the chunk size
+
+      if (laszip_dll->set_chunk_size != LASZIP_CHUNK_SIZE_DEFAULT)
+      {
+        if (!laszip->set_chunk_size(laszip_dll->set_chunk_size))
+        {
+          sprintf(laszip_dll->error, "setting chunk size %d has failed", laszip_dll->set_chunk_size);
+          return 1;
+        }
+      }
     }
     else
     {
       laszip->request_version(0);
-    }
-
-    // maybe we should change the chunk size
-
-    if (laszip_dll->set_chunk_size != LASZIP_CHUNK_SIZE_DEFAULT)
-    {
-      if (!laszip->set_chunk_size(laszip_dll->set_chunk_size))
-      {
-        sprintf(laszip_dll->error, "setting chunk size %d has failed", laszip_dll->set_chunk_size);
-        return 1;
-      }
     }
     
     // open the file
