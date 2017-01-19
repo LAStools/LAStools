@@ -42,6 +42,7 @@
 #else
 #include <unistd.h>
 #endif
+#include <cstddef>
 
 static const double PI = 3.141592653589793238462643383279502884197169;
 static const double TWO_PI = PI * 2;
@@ -1752,7 +1753,7 @@ static FILE* open_geo_file(const char* program_name, bool pcs=true)
   // create path to 'pcs.csv' file
 
   #define MAX_GEO_PATH_LENGTH 4096
-  int path_len = 0;
+  std::size_t path_len = 0;
   char path[MAX_GEO_PATH_LENGTH];
 
 #ifdef _WIN32
