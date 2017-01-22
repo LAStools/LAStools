@@ -1,3 +1,10 @@
+20 January 2017 -- las2shp: ability to output other LAS attributes to corresponding DBF file 
+16 January 2017 -- LASlib: support for NAVD88 Geoids when generating OGC WKT string via '-vertical_navd88_geoid12b' 
+11 January 2017 -- txt2las: 'k'/'h'/'o' for <k>eypoint/with<h>eld/<o>verlap flag and 'l' for scanner channe<l>
+10 January 2017 -- las2txt: parse option 'h'/'o' for with<h>eld/<o>verlap flag and 'l' for scanner channe<l>
+10 January 2017 -- LASlib: new '-merge_scanner_channel_into_point_source' '-split_scanner_channel_from_point_source'
+10 January 2017 -- LASlib: new transform '-copy_scanner_channel_into_point_source'
+10 January 2017 -- LASlib: new filters '-keep_scanner_channel 2' and '-drop_scanner_channel 1'
 8 January 2017 -- lasdiff: better difference reporting when checking "extra bytes"
 8 January 2017 -- lasinfo: more complete output for GeoTIFF tags 2048, 2050, and
 6 January 2017 -- all LAStools: rudimentary support for Lambert Conic Conformal (1SP) by ignoring scale factor

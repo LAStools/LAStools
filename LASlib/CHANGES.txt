@@ -1,3 +1,4 @@
+16 January 2017 -- LASlib: support for NAVD88 Geoids when generating OGC WKT string via '-vertical_navd88_geoid12b'
 6 January 2017 -- all LAStools: rudimentary support for Lambert Conic Conformal (1SP) by ignoring scale factor
 6 January 2017 -- all LAStools: more EPSG codes due to updates 'pcs.csv' and 'gcs.csv' files 
 4 January 2017 -- all LAStools: added DHHN92 "Deutsches Haupthoehennetz 1992" for OpenNRW LiDAR (-vertical_dhhn92)
