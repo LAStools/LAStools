@@ -1991,6 +1991,41 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
           if (vertical_geokey == GEO_VERTICAL_NAVD88)
           {
             n += sprintf(&string[n], "NAVD88");
+            if (vertical_geoid)
+            {
+              if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B) 
+              {
+                n += sprintf(&string[n], " height - Geoid12B");
+              }
+              else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID12A)
+              {
+                n += sprintf(&string[n], " height - Geoid12A");
+              }
+              else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID12)
+              {
+                n += sprintf(&string[n], " height - Geoid12");
+              }
+              else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID09)
+              {
+                n += sprintf(&string[n], " height - Geoid09");
+              }
+              else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID06)
+              {
+                n += sprintf(&string[n], " height - Geoid06");
+              }
+              else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID03)
+              {
+                n += sprintf(&string[n], " height - Geoid03");
+              }
+              else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID99)
+              {
+                n += sprintf(&string[n], " height - Geoid99");
+              }
+              else if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID96)
+              {
+                n += sprintf(&string[n], " height - Geoid96");
+              }
+            }
           }
           else if (vertical_geokey == GEO_VERTICAL_NGVD29)
           {
@@ -2215,7 +2250,43 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
     {
       if (vertical_geokey == GEO_VERTICAL_NAVD88)
       {
-        n += sprintf(&string[n], "VERT_CS[\"NAVD88\",VERT_DATUM[\"North American Vertical Datum 1988\",2005,AUTHORITY[\"EPSG\",\"5103\"]],");
+        n += sprintf(&string[n], "VERT_CS[\"NAVD88");
+        if (vertical_geoid)
+        {
+          if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B) 
+          {
+            n += sprintf(&string[n], " height - Geoid12B");
+          }
+          else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID12A)
+          {
+            n += sprintf(&string[n], " height - Geoid12A");
+          }
+          else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID12)
+          {
+            n += sprintf(&string[n], " height - Geoid12");
+          }
+          else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID09)
+          {
+            n += sprintf(&string[n], " height - Geoid09");
+          }
+          else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID06)
+          {
+            n += sprintf(&string[n], " height - Geoid06");
+          }
+          else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID03)
+          {
+            n += sprintf(&string[n], " height - Geoid03");
+          }
+          else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID99)
+          {
+            n += sprintf(&string[n], " height - Geoid99");
+          }
+          else if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID96)
+          {
+            n += sprintf(&string[n], " height - Geoid96");
+          }
+        }
+        n += sprintf(&string[n], "\",VERT_DATUM[\"North American Vertical Datum 1988\",2005,AUTHORITY[\"EPSG\",\"5103\"]],");
       }
       else if (vertical_geokey == GEO_VERTICAL_NGVD29)
       {
@@ -3118,6 +3189,90 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
       else
       {
         GeoProjectionParametersUTM* utm = (GeoProjectionParametersUTM*)projection;
+        if (gcs_code == GEO_GCS_NAD83)
+        {
+          if (utm->utm_northern_hemisphere)
+          {
+            if ((1 <= utm->utm_zone_number) && (utm->utm_zone_number <= 23))
+            {
+              return 26900 + utm->utm_zone_number; 
+            }
+            else if ((59 <= utm->utm_zone_number) && (utm->utm_zone_number <= 60))
+            {
+              return 3313 + utm->utm_zone_number;
+            }
+          }
+        }
+        else if (gcs_code == GEO_GCS_NAD83_CSRS)
+        {
+          if (utm->utm_northern_hemisphere)
+          {
+            if ((7 <= utm->utm_zone_number) && (utm->utm_zone_number <= 22))
+            {
+              unsigned short epsg_codes_NAD83_CSRS[] = { 3154, 3155, 3156, 3157, 2955, 2956, 2957, 3158, 3159, 3160, 2958, 2959, 2960, 2961, 2962, 3761 };
+              return epsg_codes_NAD83_CSRS[utm->utm_zone_number - 7];
+            }
+          }
+        }
+        else if (gcs_code == GEO_GCS_NAD83_2011)
+        {
+          if (utm->utm_northern_hemisphere)
+          {
+            if ((1 <= utm->utm_zone_number) && (utm->utm_zone_number <= 19))
+            {
+              return 6329 + utm->utm_zone_number; 
+            }
+            else if ((59 <= utm->utm_zone_number) && (utm->utm_zone_number <= 60))
+            {
+              return 6269 + utm->utm_zone_number;
+            }
+          }
+        }
+        else if (gcs_code == GEO_GCS_NAD83_NSRS2007)
+        {
+          if (utm->utm_northern_hemisphere)
+          {
+            if ((1 <= utm->utm_zone_number) && (utm->utm_zone_number <= 19))
+            {
+              return 3707 + utm->utm_zone_number; 
+            }
+            else if ((59 <= utm->utm_zone_number) && (utm->utm_zone_number <= 60))
+            {
+              return 3647 + utm->utm_zone_number;
+            }
+          }
+        }
+        else if (gcs_code == GEO_GCS_NAD83_HARN)
+        {
+          if (utm->utm_northern_hemisphere)
+          {
+            if ((10 <= utm->utm_zone_number) && (utm->utm_zone_number <= 19))
+            {
+              return 3730 + utm->utm_zone_number; 
+            }
+            else if ((4 <= utm->utm_zone_number) && (utm->utm_zone_number <= 5))
+            {
+              return 3746 + utm->utm_zone_number; 
+            }
+          }
+          else
+          {
+            if (utm->utm_zone_number == 2)
+            {
+              return 2195;
+            }
+          }
+        }
+        else if (gcs_code == GEO_GCS_NAD83_CSRS)
+        {
+          if (utm->utm_northern_hemisphere)
+          {
+            if ((7 <= utm->utm_zone_number) && (utm->utm_zone_number <= 22))
+            {
+              return 6643 + utm->utm_zone_number; 
+            }
+          }
+        }
         if (ellipsoid->id == GEO_ELLIPSOID_WGS84)
         {
           if (utm->utm_northern_hemisphere)
@@ -6161,6 +6316,7 @@ GeoProjectionConverter::GeoProjectionConverter()
   ellipsoid = new GeoProjectionEllipsoid();
   set_gcs(GEO_GCS_WGS84);
   vertical_geokey = 0;
+  vertical_geoid = 0;
 
   coordinate_units_set[0] = false;
   coordinate_units_set[1] = false;
@@ -6251,11 +6407,37 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-nad83") == 0)
+    else if (strncmp(argv[i],"-nad83", 6) == 0)
     {
-      set_gcs(GEO_GCS_NAD83, tmp);
-      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
-      *argv[i]='\0';
+      if (strcmp(argv[i],"-nad83") == 0)
+      {
+        set_gcs(GEO_GCS_NAD83, tmp);
+        fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-nad83_2011") == 0)
+      {
+        set_gcs(GEO_GCS_NAD83_2011, tmp);
+        fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-nad83_harn") == 0)
+      {
+        set_gcs(GEO_GCS_NAD83_HARN, tmp);
+        fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-nad83_csrs") == 0)
+      {
+        set_gcs(GEO_GCS_NAD83_CSRS, tmp);
+        fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        *argv[i]='\0';
+      }
+      else
+      {
+        fprintf(stderr,"ERROR: unknown datum '%d'.\n", argv[i]);
+        return false;
+      }
     }
     else if (strcmp(argv[i],"-gda94") == 0)
     {
@@ -6271,9 +6453,49 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-vertical_", 10) == 0)
     {
-      if (strcmp(argv[i],"-vertical_navd88") == 0)
+      if (strncmp(argv[i],"-vertical_navd88", 16) == 0)
       {
         vertical_geokey = GEO_VERTICAL_NAVD88;
+        if (strcmp(argv[i] + 16,"") == 0)
+        {
+          vertical_geoid = 0; // none 
+        }
+        else if (strcmp(argv[i] + 16,"_geoid12b") == 0)
+        {
+          vertical_geoid = GEO_VERTICAL_NAVD88_GEOID12B;
+        }
+        else if (strcmp(argv[i] + 16,"_geoid12a") == 0)
+        {
+          vertical_geoid = GEO_VERTICAL_NAVD88_GEOID12A;
+        }
+        else if (strcmp(argv[i] + 16,"_geoid12") == 0)
+        {
+          vertical_geoid = GEO_VERTICAL_NAVD88_GEOID12;
+        }
+        else if (strcmp(argv[i] + 16,"_geoid09") == 0)
+        {
+          vertical_geoid = GEO_VERTICAL_NAVD88_GEOID09;
+        }
+        else if (strcmp(argv[i] + 16,"_geoid06") == 0)
+        {
+          vertical_geoid = GEO_VERTICAL_NAVD88_GEOID06;
+        }
+        else if (strcmp(argv[i] + 16,"_geoid03") == 0)
+        {
+          vertical_geoid = GEO_VERTICAL_NAVD88_GEOID03;
+        }
+        else if (strcmp(argv[i] + 16,"_geoid99") == 0)
+        {
+          vertical_geoid = GEO_VERTICAL_NAVD88_GEOID99;
+        }
+        else if (strcmp(argv[i] + 16,"_geoid96") == 0)
+        {
+          vertical_geoid = GEO_VERTICAL_NAVD88_GEOID96;
+        }
+        else
+        {
+          fprintf(stderr, "WARNING: unknown specialization of NAVD88 '%s'\n", argv[i] + 16);
+        }
         *argv[i]='\0';
       }
       else if (strcmp(argv[i],"-vertical_wgs84") == 0)
@@ -6647,7 +6869,7 @@ int GeoProjectionConverter::unparse(char* string) const
     else if (source_projection->type == GEO_PROJECTION_UTM)
     {
       GeoProjectionParametersUTM* utm = (GeoProjectionParametersUTM*)source_projection;
-      n += sprintf(&string[n], "-utm %d%c ", utm->utm_zone_number, (utm->utm_northern_hemisphere ? 'U' : 'L'));
+      n += sprintf(&string[n], "-utm %d%c ", utm->utm_zone_number, (utm->utm_northern_hemisphere ? 'n' : 's'));
     }
     else if (source_projection->type == GEO_PROJECTION_LCC)
     {
