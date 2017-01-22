@@ -34,7 +34,7 @@
   CHANGE HISTORY:
   
     23 October 2016 -- OGC WKT string stores COMPD_CS for projection + vertical
-    22 October 2016 -- new '-set_ogc_wkt_in_elvr' store to EVLR instead of VLR
+    22 October 2016 -- new '-set_ogc_wkt_in_evlr' store to EVLR instead of VLR
      1 January 2016 -- option '-set_ogc_wkt' to store CRS as OGC WKT string
      3 May 2015 -- improved up-conversion via '-set_version 1.4 -point_type 6'
      5 July 2012 -- added option to '-remove_original_vlr' 

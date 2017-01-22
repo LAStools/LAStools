@@ -157,6 +157,10 @@ PostBuild_Cmds=copy Debug\txt2las.exe ..\bin\txt2las.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\src_full\dbfreader.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\geoprojectionconverter.cpp
 
 !IF  "$(CFG)" == "txt2las - Win32 Release without GUI"
@@ -285,6 +289,10 @@ SOURCE=..\src_full\txt2las_multi_core.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=..\src_full\dbfreader.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\geoprojectionconverter.hpp
 # End Source File
 # Begin Source File
@@ -357,19 +365,11 @@ SOURCE=..\laslib\inc\laswriter.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\laszip.hpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\LASzip\src\laszip.hpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\src_full\linereader.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\laslib\inc\mydefs.hpp
 # End Source File
 # Begin Source File
 
