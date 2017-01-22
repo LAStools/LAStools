@@ -157,6 +157,25 @@ PostBuild_Cmds=copy Debug\las2las.exe ..\bin\las2las.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\src_full\dbfreader.cpp
+
+!IF  "$(CFG)" == "las2las - Win32 Release without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "las2las - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "las2las - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "las2las - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\geoprojectionconverter.cpp
 # End Source File
 # Begin Source File
@@ -270,6 +289,10 @@ SOURCE=..\src_full\shpreader.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=..\src_full\dbfreader.hpp
+# End Source File
 # Begin Source File
 
 SOURCE=.\geoprojectionconverter.hpp

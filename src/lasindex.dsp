@@ -157,6 +157,10 @@ PostBuild_Cmds=copy Debug\lasindex.exe ..\bin\lasindex.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=..\src_full\dbfreader.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\geoprojectionconverter.cpp
 # End Source File
 # Begin Source File
@@ -272,7 +276,15 @@ SOURCE=..\src_full\shpreader.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=..\src_full\dbfreader.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\geoprojectionconverter.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasattributer.hpp
 # End Source File
 # Begin Source File
 
@@ -284,11 +296,15 @@ SOURCE=..\laslib\inc\lasfilter.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\lasindex.hpp
+SOURCE=..\LASzip\src\lasindex.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\lasinterval.hpp
+SOURCE=..\LASzip\src\lasinterval.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\laslicense.hpp
 # End Source File
 # Begin Source File
 
@@ -296,7 +312,15 @@ SOURCE=..\src_full\lasoccupancy.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\laslib\inc\lasquadtree.hpp
+SOURCE=..\LASzip\src\laspoint.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasquadtree.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\lasquantizer.hpp
 # End Source File
 # Begin Source File
 
@@ -305,10 +329,6 @@ SOURCE=..\src_full\lasraster.hpp
 # Begin Source File
 
 SOURCE=..\laslib\inc\lasreader.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\laslib\inc\lasspatial.hpp
 # End Source File
 # Begin Source File
 
@@ -329,10 +349,6 @@ SOURCE=..\laslib\inc\laswaveform13writer.hpp
 # Begin Source File
 
 SOURCE=..\laslib\inc\laswriter.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\laslib\inc\laszip.hpp
 # End Source File
 # Begin Source File
 
