@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -1282,6 +1282,42 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       point.return_number = temp_i & 7;
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
     }
+    else if (p[0] == 'k') // we expect the <k>eypoint flag
+    {
+      while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+      if (l[0] == 0) return FALSE;
+      if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+      if (temp_i < 0 || temp_i > 1) fprintf(stderr, "WARNING: keypoint flag %d is out of range of single bit\n", temp_i);
+      point.set_keypoint_flag(temp_i ? 1 : 0);
+      while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+    }
+    else if (p[0] == 'h') // we expect the with<h>eld flag
+    {
+      while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+      if (l[0] == 0) return FALSE;
+      if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+      if (temp_i < 0 || temp_i > 1) fprintf(stderr, "WARNING: withheld flag %d is out of range of single bit\n", temp_i);
+      point.set_withheld_flag(temp_i ? 1 : 0);
+      while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+    }
+    else if (p[0] == 'o') // we expect the <o>verlap flag
+    {
+      while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+      if (l[0] == 0) return FALSE;
+      if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+      if (temp_i < 0 || temp_i > 1) fprintf(stderr, "WARNING: overlap flag %d is out of range of single bit\n", temp_i);
+      point.set_extended_overlap_flag(temp_i ? 1 : 0);
+      while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+    }
+    else if (p[0] == 'l') // we expect the scanner channe<l>
+    {
+      while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+      if (l[0] == 0) return FALSE;
+      if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+      if (temp_i < 0 || temp_i > 3) fprintf(stderr, "WARNING: scanner channel %d is out of range of two bits\n", temp_i);
+      point.extended_scanner_channel = temp_i & 3;
+      while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+    }
     else if (p[0] == 'E') // we expect a terrasolid echo encoding)
     {
       while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
@@ -1417,7 +1453,11 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
         (p[0] != 'a') && // we expect the scan angle
         (p[0] != 'n') && // we expect the number of returns of given pulse
         (p[0] != 'r') && // we expect the number of the return
-        (p[0] != 'E') && // we expect a terrasolid echo encoding
+        (p[0] != 'k') && // we expect the <k>eypoint flag
+        (p[0] != 'h') && // we expect the with<h>eld flag
+        (p[0] != 'o') && // we expect the <o>verlap flag
+        (p[0] != 'l') && // we expect the scanner channe<l>
+        (p[0] != 'E') && // we expect terrasolid echo encoding
         (p[0] != 'c') && // we expect the classification
         (p[0] != 'u') && // we expect the user data
         (p[0] != 'p') && // we expect the point source ID
@@ -1439,24 +1479,28 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
       else
       {
         fprintf(stderr, "ERROR: unknown symbol '%c' in parse string. valid are\n", p[0]);
-        fprintf(stderr, "       'x' : the x coordinate\n");
-        fprintf(stderr, "       'y' : the y coordinate\n");
-        fprintf(stderr, "       'z' : the z coordinate\n");
-        fprintf(stderr, "       't' : the gps time\n");
-        fprintf(stderr, "       'R' : the red channel of the RGB field\n");
-        fprintf(stderr, "       'G' : the green channel of the RGB field\n");
-        fprintf(stderr, "       'B' : the blue channel of the RGB field\n");
-        fprintf(stderr, "       's' : a string or a number that we don't care about\n");
-        fprintf(stderr, "       'i' : the intensity\n");
-        fprintf(stderr, "       'a' : the scan angle\n");
-        fprintf(stderr, "       'n' : the number of returns of that given pulse\n");
-        fprintf(stderr, "       'r' : the number of the return\n");
-        fprintf(stderr, "       'E' : a terrasolid echo encoding\n");
-        fprintf(stderr, "       'c' : the classification\n");
-        fprintf(stderr, "       'u' : the user data\n");
-        fprintf(stderr, "       'p' : the point source ID\n");
-        fprintf(stderr, "       'e' : the edge of flight line flag\n");
-        fprintf(stderr, "       'd' : the direction of scan flag\n");
+        fprintf(stderr, "       'x' : the <x> coordinate\n");
+        fprintf(stderr, "       'y' : the <y> coordinate\n");
+        fprintf(stderr, "       'z' : the <z> coordinate\n");
+        fprintf(stderr, "       't' : the gps <t>ime\n");
+        fprintf(stderr, "       'R' : the <R>ed channel of the RGB field\n");
+        fprintf(stderr, "       'G' : the <G>reen channel of the RGB field\n");
+        fprintf(stderr, "       'B' : the <B>lue channel of the RGB field\n");
+        fprintf(stderr, "       's' : <s>kip a string or a number that we don't care about\n");
+        fprintf(stderr, "       'i' : the <i>ntensity\n");
+        fprintf(stderr, "       'a' : the scan <a>ngle\n");
+        fprintf(stderr, "       'n' : the <n>umber of returns of that given pulse\n");
+        fprintf(stderr, "       'r' : the number of the <r>eturn\n");
+        fprintf(stderr, "       'k' : the <k>eypoint flag\n");
+        fprintf(stderr, "       'h' : the with<h>eld flag\n");
+        fprintf(stderr, "       'o' : the <o>verlap flag\n");
+        fprintf(stderr, "       'l' : the scanner channe<l>\n");
+        fprintf(stderr, "       'E' : terrasolid <E>hco Encoding\n");
+        fprintf(stderr, "       'c' : the <c>lassification\n");
+        fprintf(stderr, "       'u' : the <u>ser data\n");
+        fprintf(stderr, "       'p' : the <p>oint source ID\n");
+        fprintf(stderr, "       'e' : the <e>dge of flight line flag\n");
+        fprintf(stderr, "       'd' : the <d>irection of scan flag\n");
         fprintf(stderr, "   '0'-'9' : additional point attributes described as extra bytes\n");
         fprintf(stderr, "       'H' : a hexadecimal string encoding the RGB color\n");
         fprintf(stderr, "       'I' : a hexadecimal string encoding the intensity\n");

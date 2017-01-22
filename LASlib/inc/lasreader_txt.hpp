@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,8 @@
   
   CHANGE HISTORY:
   
+   11 January 2017 -- added with<h>eld and scanner channe<l> for the parse string
+   11 January 2017 -- added 'k'eypoint and 'o'verlap flags for the parse string
    17 January 2016 -- pre-scaling and pre-offsetting of "extra bytes" attributes
     9 July 2014 -- allowing input from stdin after the 7:1 in the World Cup
     8 April 2011 -- created after starting a google group for LAStools users
