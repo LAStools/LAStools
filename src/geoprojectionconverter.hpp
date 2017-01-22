@@ -119,6 +119,15 @@ struct GeoProjectionGeoKeys
 #define GEO_VERTICAL_DHHN92        5783
 #define GEO_VERTICAL_NN2000        5941
 
+#define GEO_VERTICAL_NAVD88_GEOID96   965103
+#define GEO_VERTICAL_NAVD88_GEOID99   995103
+#define GEO_VERTICAL_NAVD88_GEOID03  1035103
+#define GEO_VERTICAL_NAVD88_GEOID06  1065103
+#define GEO_VERTICAL_NAVD88_GEOID09  1095103
+#define GEO_VERTICAL_NAVD88_GEOID12  1125103
+#define GEO_VERTICAL_NAVD88_GEOID12A 1135103
+#define GEO_VERTICAL_NAVD88_GEOID12B 1145103
+
 class GeoProjectionEllipsoid
 {
 public:
@@ -412,6 +421,7 @@ private:
 
   // vertical coordinate system
   short vertical_geokey;
+  int vertical_geoid;
 
   // parameters for coordinate scaling
   bool coordinate_units_set[2];
