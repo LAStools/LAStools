@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -570,7 +570,7 @@ public:
 class LAScriterionKeepScannerChannel : public LAScriterion
 {
 public:
-  inline const CHAR* name() const { return "keep_extended_scanner_channel"; };
+  inline const CHAR* name() const { return "keep_scanner_channel"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), scanner_channel); };
   inline BOOL filter(const LASpoint* point) { return (point->get_extended_scanner_channel() != scanner_channel); };
   LAScriterionKeepScannerChannel(I32 scanner_channel) { this->scanner_channel = scanner_channel; };
@@ -581,7 +581,7 @@ private:
 class LAScriterionDropScannerChannel : public LAScriterion
 {
 public:
-  inline const CHAR* name() const { return "drop_extended_scanner_channel"; };
+  inline const CHAR* name() const { return "drop_scanner_channel"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), scanner_channel); };
   inline BOOL filter(const LASpoint* point) { return (point->get_extended_scanner_channel() == scanner_channel); };
   LAScriterionDropScannerChannel(I32 scanner_channel) { this->scanner_channel = scanner_channel; };
@@ -2171,6 +2171,16 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionKeepEdgeOfFlightLine());
         *argv[i]='\0';
       }
+      else if (strcmp(argv[i],"-keep_scanner_channel") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionKeepScannerChannel((I32)atof(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
     }
     else if (strncmp(argv[i],"-drop_", 6) == 0)
     {
@@ -2850,6 +2860,16 @@ BOOL LASfilter::parse(int argc, char* argv[])
           add_criterion(new LAScriterionDropAttributeBetween(atoi(argv[i+1]), atof(argv[i+2]), atof(argv[i+3])));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
         }
+      }
+      else if (strcmp(argv[i],"-drop_scanner_channel") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionDropScannerChannel((I32)atof(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
     }
     else if (strcmp(argv[i],"-first_only") == 0)
