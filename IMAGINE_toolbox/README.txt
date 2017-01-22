@@ -1,8 +1,8 @@
 **************************************************************
 
-  The LAStools LiDAR toolbox for ERDAS IMAGINE 2014 and 2015
+  The LAStools LiDAR toolbox for ERDAS IMAGINE 2014 - 2016.1
 
-  (c) 2014-2015 - martin.isenburg@rapidlasso.com
+  (c) 2014-2017 - martin.isenburg@rapidlasso.com
 
   rapidlasso GmbH - fast tools to catch reality
 
