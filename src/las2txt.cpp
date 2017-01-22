@@ -28,6 +28,7 @@
   
   CHANGE HISTORY:
   
+    11 January 2017 -- added with<h>eld and scanner channe<l> for the parse string
     24 April 2015 -- added 'k'eypoint and 'o'verlap flags for the parse string
     30 March 2015 -- support LAS 1.4 extended return counts and number of returns 
     25 October 2011 -- changed LAS 1.3 parsing to use new LASwaveform13reader
@@ -189,7 +190,7 @@ static void output_waveform(FILE* file_out, CHAR separator_sign, LASwaveform13re
   }
 }
 
-I32 attribute_starts[10];
+static I32 attribute_starts[10];
 
 static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint* point, I32 index, CHAR* printstring)
 {
@@ -357,7 +358,7 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
   }
   else
   {
-    fprintf(stderr, "WARNING: attribute %d not (yet) implemented.\n", index);
+    fprintf(stderr, "WARNING: data type %d of attribute %d not implemented.\n", header->attributes[index].data_type, index);
     return FALSE;
   }
   return TRUE;
@@ -866,8 +867,10 @@ int main(int argc, char *argv[])
       case 'p': // the point source ID
       case 'e': // the edge of flight line flag
       case 'd': // the direction of scan flag
-      case 'k': // the keypoint flag
-      case 'o': // // the (extended) overlap flag
+      case 'k': // the <k>eypoint flag
+      case 'h': // the with<h>eld flag
+      case 'o': // the (extended) <o>verlap flag
+      case 'l': // the (extended) scanner channe<l>
       case 'm': // the index of the point (count starts at 0)
       case 'M': // the index of the point (count starts at 0)
         break;
@@ -1063,8 +1066,14 @@ int main(int argc, char *argv[])
         case 'k': // the keypoint flag
           fprintf(file_out, "%d", lasreader->point.get_keypoint_flag());
           break;
+        case 'h': // the withheld flag
+          fprintf(file_out, "%d", lasreader->point.get_withheld_flag());
+          break;
         case 'o': // the (extended) overlap flag
           fprintf(file_out, "%d", lasreader->point.get_extended_overlap_flag());
+          break;
+        case 'l': // the (extended) scanner channel
+          fprintf(file_out, "%d", lasreader->point.get_extended_scanner_channel());
           break;
         case 'R': // the red channel of the RGB field
           fprintf(file_out, "%d", lasreader->point.rgb[0]);
