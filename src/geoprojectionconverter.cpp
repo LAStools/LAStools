@@ -6435,7 +6435,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       }
       else
       {
-        fprintf(stderr,"ERROR: unknown datum '%d'.\n", argv[i]);
+        fprintf(stderr,"ERROR: unknown datum '%s'.\n", argv[i]);
         return false;
       }
     }
