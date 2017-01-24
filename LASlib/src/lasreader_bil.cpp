@@ -41,7 +41,7 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    fprintf(stderr,"ERROR: fine name pointer is zero\n");
+    fprintf(stderr,"ERROR: file name pointer is zero\n");
     return FALSE;
   }
 
@@ -285,7 +285,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    fprintf(stderr,"ERROR: fine name pointer is zero\n");
+    fprintf(stderr,"ERROR: file name pointer is zero\n");
     return FALSE;
   }
 
@@ -454,7 +454,7 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    fprintf(stderr,"ERROR: fine name pointer is zero\n");
+    fprintf(stderr,"ERROR: file name pointer is zero\n");
     return FALSE;
   }
 
@@ -685,7 +685,7 @@ BOOL LASreaderBIL::reopen(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    fprintf(stderr,"ERROR: fine name pointer is zero\n");
+    fprintf(stderr,"ERROR: file name pointer is zero\n");
     return FALSE;
   }
 
