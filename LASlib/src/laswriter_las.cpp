@@ -255,7 +255,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     fprintf(stderr,"WARNING: header->version_major is %d. writing 1 instead.\n", header->version_major);
     version_major = 1;
   }
-  if (!stream->putByte(header->version_major))
+  if (!stream->putByte(version_major))
   {
     fprintf(stderr,"ERROR: writing header->version_major\n");
     return FALSE;
