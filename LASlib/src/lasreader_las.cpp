@@ -48,7 +48,7 @@ BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_onl
 {
   if (file_name == 0)
   {
-    fprintf(stderr,"ERROR: fine name pointer is zero\n");
+    fprintf(stderr,"ERROR: file name pointer is zero\n");
     return FALSE;
   }
 
