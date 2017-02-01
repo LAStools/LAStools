@@ -37,7 +37,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -48,6 +48,7 @@
   
   CHANGE HISTORY:
 
+     1 February 2017 -- set_projection_from_ogc_wkt() from EPSG code of OGC WKT string
      9 November 2016 -- support "user defined" AlbersEqualArea projection in GeoTIFF
     30 July 2016 -- no more special handling for stateplanes. just parse for EPSG code 
      9 January 2016 -- use GeographicTypeGeoKey not GeogGeodeticDatumGeoKey for custom
@@ -253,7 +254,7 @@ public:
 
   bool set_projection_from_geo_keys(int num_geo_keys, GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description=0);
   bool get_geo_keys_from_projection(int& num_geo_keys, GeoProjectionGeoKeys** geo_keys, int& num_geo_double_params, double** geo_double_params, bool source=true);
-  bool set_projection_from_ogc_wkt(int len, char* ogc_wkt);
+  bool set_projection_from_ogc_wkt(const char* ogc_wkt, char* description=0);
   bool get_ogc_wkt_from_projection(int& len, char** ogc_wkt, bool source=true);
   bool get_prj_from_projection(int& len, char** prj, bool source=true);
   bool get_proj4_string_from_projection(int& len, char** proj4, bool source=true);

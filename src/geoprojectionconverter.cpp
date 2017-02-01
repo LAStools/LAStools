@@ -1795,7 +1795,7 @@ static FILE* open_geo_file(const char* program_name, bool pcs=true)
   return file;
 }
 
-bool GeoProjectionConverter::set_projection_from_ogc_wkt(int len, char* ogc_wkt)
+bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, char* description)
 {
 /*
   bool user_defined_ellipsoid = false;
@@ -1810,38 +1810,68 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(int len, char* ogc_wkt)
   bool has_projection = false;
   int ellipsoid = -1;
   int datum = -1;
+*/
+
+  // this very first version only checks for the EPSG code of projection
 
   // check if we have a projection (e.g. string contains a PROJCS)
 
-  int projcs = strstr(ogc_wkt, "PROJCS[");
+  int len = strlen(ogc_wkt);
+  const char* projcs = strstr(ogc_wkt, "PROJCS[");
 
-  if (projcs == -1)
+  if (projcs == 0)
   {
     // check if the string contains a GEOCCS
-    int geoccs = strstr(ogc_wkt, "GEOCCS[");
+    const char* geoccs = strstr(ogc_wkt, "GEOCCS[");
   }
   else
   {
     // if we can find an AUTHORITY containing the EPSG code we are done
     int open_bracket = 1;
-    int curr = projcs + 7;
+    int curr = (projcs - ogc_wkt) + 7;
     while ((curr < len) && open_bracket)
     {
       if (ogc_wkt[curr] == '[')
       {
-        if (open_bracket == 1)
-        {
-        }
         open_bracket++;
       }
       else if (ogc_wkt[curr] == ']')
       {
         open_bracket--;
       }
+      else if (open_bracket == 1)
+      {
+        if (ogc_wkt[curr] == 'A')
+        {
+          if (strncmp(&ogc_wkt[curr], "AUTHORITY", 9) == 0)
+          {
+            curr += 9;
+            const char* epsg = strstr(&ogc_wkt[curr], "\"EPSG\"");
+            if (epsg)
+            {
+              curr = (epsg - ogc_wkt) + 6;
+              while ((curr < len) && ogc_wkt[curr] != ',')
+              {
+                curr++;
+              }
+              curr++;
+              while ((curr < len) && ogc_wkt[curr] != '\"')
+              {
+                curr++;
+              }
+              curr++;
+              int code = -1;
+              if (sscanf(&ogc_wkt[curr], "%d", &code) == 1)
+              {
+                return set_epsg_code(code, description);
+              }
+            }
+          }
+        }
+      }
+      curr++;
     }
   }
-
-*/
   return false;
 }
 
