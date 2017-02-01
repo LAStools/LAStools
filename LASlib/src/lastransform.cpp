@@ -280,6 +280,14 @@ private:
   I32 index;
 };
 
+class LASoperationCopyIntensityIntoZ : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_intensity_into_z"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_z((F64)point->get_intensity()); };
+};
+
 class LASoperationTranslateRawX : public LASoperation
 {
 public:
@@ -1168,6 +1176,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -clamp_z_below 70.5\n");
   fprintf(stderr,"  -clamp_z 70.5 72.5\n");
   fprintf(stderr,"  -copy_attribute_into_z 0\n");
+  fprintf(stderr,"  -copy_intensity_into_z\n");
   fprintf(stderr,"Transform raw xyz integers.\n");
   fprintf(stderr,"  -translate_raw_z 20\n");
   fprintf(stderr,"  -translate_raw_xyz 1 1 0\n");
@@ -1580,6 +1589,12 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationCopyBintoNIR());
         *argv[i]='\0'; 
       }
+      else if (strcmp(argv[i],"-copy_intensity_into_z") == 0)
+      {
+        change_coordinates = TRUE;
+        add_operation(new LASoperationCopyIntensityIntoZ());
+        *argv[i]='\0'; 
+      } 
     }
     else if (strncmp(argv[i],"-set_", 5) == 0)
     {
