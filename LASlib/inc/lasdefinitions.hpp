@@ -31,6 +31,7 @@
   
   CHANGE HISTORY:
   
+    1 February 2017 -- better support for OGC WKT strings in VLRs or EVLRs
     22 June 2016 -- set default of VLR header "reserved" to 0 instead of 0xAABB
     1 August 2015 -- moving LASpoint, LASquantizer, and LASattributer to LASzip
     9 December 2013 -- bug fix and improved writing of new LAS 1.4 point types
@@ -47,7 +48,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 170122
+#define LAS_TOOLS_VERSION 170201
 
 #include <stdio.h>
 #include <string.h>
@@ -225,8 +226,8 @@ public:
   LASvlr_key_entry* vlr_geo_key_entries;
   F64* vlr_geo_double_params;
   CHAR* vlr_geo_ascii_params;
-  CHAR* vlr_geo_wkt_ogc_math;
-  CHAR* vlr_geo_wkt_ogc_cs;
+  CHAR* vlr_geo_ogc_wkt_math;
+  CHAR* vlr_geo_ogc_wkt;
   LASvlr_classification* vlr_classification;
   LASvlr_wave_packet_descr** vlr_wave_packet_descr;
 
@@ -340,8 +341,8 @@ public:
       vlr_geo_key_entries = 0;
       vlr_geo_double_params = 0;
       vlr_geo_ascii_params = 0;
-      vlr_geo_wkt_ogc_math = 0;
-      vlr_geo_wkt_ogc_cs = 0;
+      vlr_geo_ogc_wkt_math = 0;
+      vlr_geo_ogc_wkt = 0;
       vlr_classification = 0;
       if (vlr_wave_packet_descr) delete [] vlr_wave_packet_descr;
       vlr_wave_packet_descr = 0;
@@ -843,40 +844,60 @@ public:
 
   void set_geo_wkt_ogc_math(const I32 num_geo_wkt_ogc_math, const CHAR* geo_wkt_ogc_math)
   {
-    vlr_geo_wkt_ogc_math = new CHAR[num_geo_wkt_ogc_math];
-    memcpy(vlr_geo_wkt_ogc_math, geo_wkt_ogc_math, sizeof(CHAR)*num_geo_wkt_ogc_math);
-    add_vlr("LASF_Projection", 2111, sizeof(CHAR)*num_geo_wkt_ogc_math, (U8*)vlr_geo_wkt_ogc_math);
+    I32 null_terminator = 0;
+    if (geo_wkt_ogc_math[num_geo_wkt_ogc_math-1] == '\0')
+    {
+      vlr_geo_ogc_wkt_math = new CHAR[num_geo_wkt_ogc_math];
+    }
+    else
+    {
+      null_terminator = 1;
+      vlr_geo_ogc_wkt_math = new CHAR[num_geo_wkt_ogc_math+1];
+      vlr_geo_ogc_wkt_math[num_geo_wkt_ogc_math] = '\0';
+    }
+    memcpy(vlr_geo_ogc_wkt_math, geo_wkt_ogc_math, sizeof(CHAR)*num_geo_wkt_ogc_math);
+    add_vlr("LASF_Projection", 2111, sizeof(CHAR)*(num_geo_wkt_ogc_math+null_terminator), (U8*)vlr_geo_ogc_wkt_math);
   }
 
   void del_geo_wkt_ogc_math()
   {
-    if (vlr_geo_wkt_ogc_math)
+    if (vlr_geo_ogc_wkt_math)
     {
       remove_vlr("LASF_Projection", 2111);
-      vlr_geo_wkt_ogc_math = 0;
+      vlr_geo_ogc_wkt_math = 0;
     }
   }
 
-  void set_geo_wkt_ogc_cs(const I32 num_geo_wkt_ogc_cs, const CHAR* geo_wkt_ogc_cs, BOOL in_evlr=FALSE)
+  void set_geo_ogc_wkt(const I32 num_geo_ogc_wkt, const CHAR* geo_ogc_wkt, BOOL in_evlr=FALSE)
   {
-    vlr_geo_wkt_ogc_cs = new CHAR[num_geo_wkt_ogc_cs];
-    memcpy(vlr_geo_wkt_ogc_cs, geo_wkt_ogc_cs, sizeof(CHAR)*num_geo_wkt_ogc_cs);
-    if (in_evlr)
+    I32 null_terminator = 0;
+    if (geo_ogc_wkt[num_geo_ogc_wkt-1] == '\0')
     {
-      add_evlr("LASF_Projection", 2112, sizeof(CHAR)*num_geo_wkt_ogc_cs, (U8*)vlr_geo_wkt_ogc_cs);
+      vlr_geo_ogc_wkt = new CHAR[num_geo_ogc_wkt];
     }
     else
     {
-      add_vlr("LASF_Projection", 2112, sizeof(CHAR)*num_geo_wkt_ogc_cs, (U8*)vlr_geo_wkt_ogc_cs);
+      null_terminator = 1;
+      vlr_geo_ogc_wkt = new CHAR[num_geo_ogc_wkt+1];
+      vlr_geo_ogc_wkt[num_geo_ogc_wkt] = '\0';
+    }
+    memcpy(vlr_geo_ogc_wkt, geo_ogc_wkt, sizeof(CHAR)*num_geo_ogc_wkt);
+    if (in_evlr)
+    {
+      add_evlr("LASF_Projection", 2112, sizeof(CHAR)*(num_geo_ogc_wkt+null_terminator), (U8*)vlr_geo_ogc_wkt);
+    }
+    else
+    {
+      add_vlr("LASF_Projection", 2112, sizeof(CHAR)*(num_geo_ogc_wkt+null_terminator), (U8*)vlr_geo_ogc_wkt);
     }
   }
 
-  void del_geo_wkt_ogc_cs()
+  void del_geo_ogc_wkt()
   {
-    if (vlr_geo_wkt_ogc_cs)
+    if (vlr_geo_ogc_wkt)
     {
       remove_vlr("LASF_Projection", 2112);
-      vlr_geo_wkt_ogc_cs = 0;
+      vlr_geo_ogc_wkt = 0;
     }
   }
 
