@@ -723,7 +723,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
           {
             if (header.vlr_geo_double_params)
             {
-              fprintf(stderr,"WARNING: variable length records contain more than one GeoF64ParamsTag\n");
+              fprintf(stderr,"WARNING: variable length records contain more than one GeoDoubleParamsTag\n");
             }
             header.vlr_geo_double_params = (F64*)header.vlrs[i].data;
           }
@@ -735,12 +735,28 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
             }
             header.vlr_geo_ascii_params = (CHAR*)header.vlrs[i].data;
           }
-          else if ((header.vlrs[i].record_id != 2111) && (header.vlrs[i].record_id != 2112)) // WKT OGC MATH TRANSFORM or WKT OGC COORDINATE SYSTEM
+          else if (header.vlrs[i].record_id == 2111) // WKT OGC MATH TRANSFORM
+          {
+            if (header.vlr_geo_ogc_wkt_math)
+            {
+              fprintf(stderr,"WARNING: variable length records contain more than one WKT OGC MATH TRANSFORM\n");
+            }
+            header.vlr_geo_ogc_wkt_math = (CHAR*)header.vlrs[i].data;
+          }
+          else if (header.vlrs[i].record_id == 2112) // WKT OGC COORDINATE SYSTEM
+          {
+            if (header.vlr_geo_ogc_wkt)
+            {
+              fprintf(stderr,"WARNING: variable length records contain more than one WKT OGC COORDINATE SYSTEM\n");
+            }
+            header.vlr_geo_ogc_wkt = (CHAR*)header.vlrs[i].data;
+          }
+          else
           {
             fprintf(stderr,"WARNING: unknown LASF_Projection VLR with record_id %d.\n", header.vlrs[i].record_id);
           } 
         }
-        else if (header.vlrs[i].record_id != 2112) // GeoAsciiParamsTag
+        else
         {
           fprintf(stderr,"WARNING: no payload for LASF_Projection VLR with record_id %d.\n", header.vlrs[i].record_id);
         }
@@ -1090,7 +1106,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
             {
               if (header.vlr_geo_keys)
               {
-                fprintf(stderr,"WARNING: variable length records contain more than one GeoKeyDirectoryTag\n");
+                fprintf(stderr,"WARNING: extended variable length records contain more than one GeoKeyDirectoryTag\n");
               }
               header.vlr_geo_keys = (LASvlr_geo_keys*)header.evlrs[i].data;
 
@@ -1098,15 +1114,15 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
 
               if (header.vlr_geo_keys->key_directory_version != 1)
               {
-                fprintf(stderr,"WARNING: wrong vlr_geo_keys->key_directory_version: %d != 1\n",header.vlr_geo_keys->key_directory_version);
+                fprintf(stderr,"WARNING: wrong evlr_geo_keys->key_directory_version: %d != 1\n",header.vlr_geo_keys->key_directory_version);
               }
               if (header.vlr_geo_keys->key_revision != 1)
               {
-                fprintf(stderr,"WARNING: wrong vlr_geo_keys->key_revision: %d != 1\n",header.vlr_geo_keys->key_revision);
+                fprintf(stderr,"WARNING: wrong evlr_geo_keys->key_revision: %d != 1\n",header.vlr_geo_keys->key_revision);
               }
               if (header.vlr_geo_keys->minor_revision != 0)
               {
-                fprintf(stderr,"WARNING: wrong vlr_geo_keys->minor_revision: %d != 0\n",header.vlr_geo_keys->minor_revision);
+                fprintf(stderr,"WARNING: wrong evlr_geo_keys->minor_revision: %d != 0\n",header.vlr_geo_keys->minor_revision);
               }
               header.vlr_geo_key_entries = (LASvlr_key_entry*)&header.vlr_geo_keys[1];
             }
@@ -1114,7 +1130,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
             {
               if (header.vlr_geo_double_params)
               {
-                fprintf(stderr,"WARNING: variable length records contain more than one GeoF64ParamsTag\n");
+                fprintf(stderr,"WARNING: extended variable length records contain more than one GeoF64ParamsTag\n");
               }
               header.vlr_geo_double_params = (F64*)header.evlrs[i].data;
             }
@@ -1122,9 +1138,29 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
             {
               if (header.vlr_geo_ascii_params)
               {
-                fprintf(stderr,"WARNING: variable length records contain more than one GeoAsciiParamsTag\n");
+                fprintf(stderr,"WARNING: extended variable length records contain more than one GeoAsciiParamsTag\n");
               }
               header.vlr_geo_ascii_params = (CHAR*)header.evlrs[i].data;
+            }
+            else if (header.evlrs[i].record_id == 2111) // WKT OGC MATH TRANSFORM
+            {
+              if (header.vlr_geo_ogc_wkt_math)
+              {
+                fprintf(stderr,"WARNING: extended variable length records contain more than one WKT OGC MATH TRANSFORM\n");
+              }
+              header.vlr_geo_ogc_wkt_math = (CHAR*)header.evlrs[i].data;
+            }
+            else if (header.evlrs[i].record_id == 2112) // WKT OGC COORDINATE SYSTEM
+            {
+              if (header.vlr_geo_ogc_wkt)
+              {
+                fprintf(stderr,"WARNING: extended variable length records contain more than one WKT OGC COORDINATE SYSTEM\n");
+              }
+              header.vlr_geo_ogc_wkt = (CHAR*)header.evlrs[i].data;
+            }
+            else
+            {
+              fprintf(stderr,"WARNING: unknown LASF_Projection EVLR with record_id %d.\n", header.evlrs[i].record_id);
             }
           }
           else if (strcmp(header.evlrs[i].user_id, "LASF_Spec") == 0)
@@ -1133,7 +1169,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
             {
               if (header.vlr_classification)
               {
-                fprintf(stderr,"WARNING: variable length records contain more than one ClassificationLookup\n");
+                fprintf(stderr,"WARNING: extended variable length records contain more than one ClassificationLookup\n");
               }
               header.vlr_classification = (LASvlr_classification*)header.evlrs[i].data;
             }
