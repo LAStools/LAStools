@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    1 February 2017 -- better support for OGC WKT strings in VLRs or EVLRs
     13 October 2014 -- changed default IO buffer size with setvbuf() to 262144
     27 August 2014 -- peek bounding box to open many file with lasreadermerged
      9 July 2012 -- fixed crash that occured when input had a corrupt VLRs
