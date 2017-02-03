@@ -652,7 +652,7 @@ int main(int argc, char *argv[])
         CHAR* ogc_wkt = 0;
         if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false)))
         {
-          lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt);
+          lasreader->header.set_geo_ogc_wkt(len, ogc_wkt);
           free(ogc_wkt);
           if ((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6))
           {
