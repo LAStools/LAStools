@@ -13,7 +13,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     1 February 2017 -- new '-copy_intensity_into_z' for use in lasgrid or lascanopy
      9 May 2016 -- new '-translate_raw_xy_at_random 2 2' for random pertubation
     20 April 2016 -- new '-switch_R_G', '-switch_R_B' and '-set_RGB 32768 16384 0'
     25 January 2016 -- brand-new opportunity to do a '-filtered_transform' 
