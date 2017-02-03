@@ -1,3 +1,9 @@
+2 February 2017 -- lascolor: support TIFF with more than 3 bands (for now simply ignore the additional bands)
+2 February 2017 -- lasground, lasground_new: small bug fix for '-replace_z' with non-zero 'z_offset' in LAS header
+2 February 2017 -- LAStools: read (subset of) projections from OGC WKT strings if coded via AUTHORITY EPSG code
+1 February 2017 -- LASlib: better support for OGC WKT strings in VLRs or EVLRs when reading
+1 February 2017 -- LASlib: new transform '-copy_intensity_into_z' for use in lasgrid or lascanopy
+30 January 2017 -- las2shp: ability to output also 'x' and 'y' to corresponding DBF file 
 20 January 2017 -- las2shp: ability to output other LAS attributes to corresponding DBF file 
 16 January 2017 -- LASlib: support for NAVD88 Geoids when generating OGC WKT string via '-vertical_navd88_geoid12b' 
 11 January 2017 -- txt2las: 'k'/'h'/'o' for <k>eypoint/with<h>eld/<o>verlap flag and 'l' for scanner channe<l>
