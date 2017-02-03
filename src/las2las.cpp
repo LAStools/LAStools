@@ -799,17 +799,17 @@ int main(int argc, char *argv[])
           {
             if (lasreader->header.version_minor >= 4)
             {
-              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt, TRUE);
+              lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, TRUE);
             }
             else
             {
               fprintf(stderr, "WARNING: input file is LAS 1.%d. setting OGC WKT to VLR instead of EVLR ...\n", lasreader->header.version_minor);
-              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt, FALSE);
+              lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, FALSE);
             }
           }
           else
           {
-            lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt);
+            lasreader->header.set_geo_ogc_wkt(len, ogc_wkt);
           }
           free(ogc_wkt);
           if ((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6))
@@ -836,17 +836,17 @@ int main(int argc, char *argv[])
           {
             if (lasreader->header.version_minor >= 4)
             {
-              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt, TRUE);
+              lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, TRUE);
             }
             else
             {
               fprintf(stderr, "WARNING: input file is LAS 1.%d. setting OGC WKT to VLR instead of EVLR ...\n", lasreader->header.version_minor);
-              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt, FALSE);
+              lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, FALSE);
             }
           }
           else
           {
-              lasreader->header.set_geo_wkt_ogc_cs(len, ogc_wkt);
+              lasreader->header.set_geo_ogc_wkt(len, ogc_wkt);
           }
           free(ogc_wkt);
           if ((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6))
