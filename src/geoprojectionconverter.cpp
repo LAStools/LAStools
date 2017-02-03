@@ -16,7 +16,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -889,6 +889,9 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
       case 4019: // GCSE_GRS1980 (unknown datum based on GRS1980 ellipsoid)
         ellipsoid = GEO_ELLIPSOID_GRS1980;
         break;
+      case 4619: // GCS_SWEREF99
+        gcs_code = GEO_GCS_SWEREF99;
+        break;
       case 4001: // GCSE_Airy1830
         ellipsoid = GEO_ELLIPSOID_AIRY;
         break;
@@ -968,6 +971,9 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         break;
       case 6019: // DatumE_GRS1980
         ellipsoid = GEO_ELLIPSOID_GRS1980;
+        break;
+      case 6619: // Datum_SWEREF99
+        datum_code = GEO_GCS_SWEREF99;
         break;
       case 6202: // Datum_Australian_Geodetic_Datum_1966
       case 6203: // Datum_Australian_Geodetic_Datum_1984

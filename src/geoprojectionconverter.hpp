@@ -98,6 +98,7 @@ struct GeoProjectionGeoKeys
 #define GEO_GCS_WGS72BE            4324
 #define GEO_GCS_WGS84              4326
 #define GEO_GCS_NAD83_CSRS         4617
+#define GEO_GCS_SWEREF99           4619
 #define GEO_GCS_NAD83_NSRS2007     4759
 #define GEO_GCS_NAD83_2011         6318
 
