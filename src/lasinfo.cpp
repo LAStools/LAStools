@@ -1233,6 +1233,9 @@ int main(int argc, char *argv[])
                   case 4289: // GCS_Amersfoort
                     fprintf(file_out, "GeographicTypeGeoKey: GCS_Amersfoort\012");
                     break;
+                  case 4619: // GCS_SWEREF99
+                    fprintf(file_out, "GeographicTypeGeoKey: GCS_SWEREF99\012");
+                    break;
                   default:
                     fprintf(file_out, "GeographicTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
                   }
@@ -1350,6 +1353,9 @@ int main(int argc, char *argv[])
                     break;
                   case 6289: // Datum_Amersfoort
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_Amersfoort\012");
+                    break;
+                  case 6619: // Datum_SWEREF99
+                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_SWEREF99\012");
                     break;
                   default:
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
@@ -2405,6 +2411,9 @@ int main(int argc, char *argv[])
                       break;
                     case 15917: // Proj_BLM_17N_feet					
                       fprintf(file_out, "ProjectionGeoKey: Proj_BLM_17N_feet\012");
+                      break;
+                    case 17333: // Proj_SWEREF99_TM		
+                      fprintf(file_out, "ProjectionGeoKey: Proj_SWEREF99_TM\012");
                       break;
                     case 17348: // Proj_Map_Grid_of_Australia_48			
                       fprintf(file_out, "ProjectionGeoKey: Proj_Map_Grid_of_Australia_48\012");
