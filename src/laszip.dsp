@@ -158,6 +158,21 @@ PostBuild_Cmds=copy Debug\laszip.exe ..\bin\laszip.exe
 # Begin Source File
 
 SOURCE=..\src_full\dbfreader.cpp
+
+!IF  "$(CFG)" == "laszip - Win32 Release without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug without GUI"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "laszip - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
