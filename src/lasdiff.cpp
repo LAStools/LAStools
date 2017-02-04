@@ -468,7 +468,7 @@ int main(int argc, char *argv[])
       }
       if (lasheader1->extended_number_of_point_records != lasheader2->extended_number_of_point_records)
       {
-        fprintf(stderr, "  different start_of_waveform_data_packet_record: %u %u\n", (U32)lasheader1->start_of_waveform_data_packet_record, (U32)lasheader2->start_of_waveform_data_packet_record);
+        fprintf(stderr, "  different extended_number_of_point_records: %u %u\n", (U32)lasheader1->extended_number_of_point_records, (U32)lasheader2->extended_number_of_point_records);
         different_header++;
       }
       for (i = 0; i < 15; i++)
