@@ -259,6 +259,60 @@ private:
   U8 buffer[30];
 };
 
+class LASreadItemRaw_POINT14_BE : public LASreadItemRaw
+{
+public:
+  LASreadItemRaw_POINT14_BE(){};
+  inline void read(U8* item)
+  {
+    instream->getBytes(swapped, 30);
+    ENDIAN_SWAP_32(&swapped[ 0], &item[ 0]);    // X
+    ENDIAN_SWAP_32(&swapped[ 4], &item[ 4]);    // Y
+    ENDIAN_SWAP_32(&swapped[ 8], &item[ 8]);    // Z
+    ENDIAN_SWAP_16(&swapped[12], &item[12]);    // intensity
+    if (((LAStempReadPoint14*)swapped)->number_of_returns > 7)
+    {
+      if (((LAStempReadPoint14*)swapped)->return_number > 6)
+      {
+        if (((LAStempReadPoint14*)swapped)->return_number >= ((LAStempReadPoint14*)swapped)->number_of_returns)
+        {
+          ((LAStempReadPoint10*)item)->return_number = 7;
+        }
+        else
+        {
+          ((LAStempReadPoint10*)item)->return_number = 6;
+        }
+      }
+      else
+      {
+        ((LAStempReadPoint10*)item)->return_number = ((LAStempReadPoint14*)swapped)->return_number;
+      }
+      ((LAStempReadPoint10*)item)->number_of_returns = 7;
+    }
+    else
+    {
+      ((LAStempReadPoint10*)item)->return_number = ((LAStempReadPoint14*)swapped)->return_number;
+      ((LAStempReadPoint10*)item)->number_of_returns = ((LAStempReadPoint14*)swapped)->number_of_returns;
+    }
+    ((LAStempReadPoint10*)item)->scan_direction_flag = ((LAStempReadPoint14*)swapped)->scan_direction_flag;
+    ((LAStempReadPoint10*)item)->edge_of_flight_line = ((LAStempReadPoint14*)swapped)->edge_of_flight_line;
+    ((LAStempReadPoint10*)item)->classification = (((LAStempReadPoint14*)swapped)->classification_flags << 5);
+    if (((LAStempReadPoint14*)swapped)->classification < 32) ((LAStempReadPoint10*)item)->classification |= ((LAStempReadPoint14*)swapped)->classification;
+    ((LAStempReadPoint10*)item)->user_data = ((LAStempReadPoint14*)swapped)->user_data;
+    ENDIAN_SWAP_16(&swapped[20], &item[18]); // point_source_ID
+    ((LAStempReadPoint10*)item)->extended_scanner_channel = ((LAStempReadPoint14*)swapped)->scanner_channel;
+    ((LAStempReadPoint10*)item)->extended_classification_flags = ((LAStempReadPoint14*)swapped)->classification_flags;
+    ((LAStempReadPoint10*)item)->extended_classification = ((LAStempReadPoint14*)swapped)->classification;
+    ((LAStempReadPoint10*)item)->extended_return_number = ((LAStempReadPoint14*)swapped)->return_number;
+    ((LAStempReadPoint10*)item)->extended_number_of_returns = ((LAStempReadPoint14*)swapped)->number_of_returns;
+    ENDIAN_SWAP_16(&swapped[18], (U8*)&(((LAStempReadPoint10*)item)->extended_scan_angle));
+    ((LAStempReadPoint10*)item)->scan_angle_rank = I8_CLAMP(I16_QUANTIZE(0.006f*((LAStempReadPoint10*)item)->extended_scan_angle));
+    ENDIAN_SWAP_64(&swapped[22], (U8*)&(((LAStempReadPoint10*)item)->gps_time));
+  }
+private:
+  U8 swapped[30];
+};
+
 class LASreadItemRaw_RGBNIR14_LE : public LASreadItemRaw
 {
 public:
