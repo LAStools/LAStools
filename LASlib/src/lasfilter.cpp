@@ -1162,6 +1162,18 @@ private:
   I32 every;
 };
 
+class LAScriterionDropEveryNth : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_every_nth"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), every); };
+  inline BOOL filter(const LASpoint* point) { if (counter == every) { counter = 1; return TRUE; } else { counter++; return FALSE; } };
+  LAScriterionDropEveryNth(I32 every) { this->every = every; counter = 1; };
+private:
+  I32 counter;
+  I32 every;
+};
+
 class LAScriterionKeepRandomFraction : public LAScriterion
 {
 public:
@@ -1464,7 +1476,7 @@ void LASfilter::usage() const
   fprintf(stderr,"  -drop_z_above 130.725 (max_z)\n");
   fprintf(stderr,"  -keep_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)\n");
   fprintf(stderr,"  -drop_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)\n");
-  fprintf(stderr,"Filter points based on their return number.\n");
+  fprintf(stderr,"Filter points based on their return numbering.\n");
   fprintf(stderr,"  -keep_first -first_only -drop_first\n");
   fprintf(stderr,"  -keep_last -last_only -drop_last\n");
   fprintf(stderr,"  -keep_second_last -drop_second_last\n");
@@ -1477,7 +1489,8 @@ void LASfilter::usage() const
   fprintf(stderr,"  -keep_double -drop_double\n");
   fprintf(stderr,"  -keep_triple -drop_triple\n");
   fprintf(stderr,"  -keep_quadruple -drop_quadruple\n");
-  fprintf(stderr,"  -keep_quintuple -drop_quintuple\n");
+  fprintf(stderr,"  -keep_number_of_returns 5\n");
+  fprintf(stderr,"  -drop_number_of_returns 0\n");
   fprintf(stderr,"Filter points based on the scanline flags.\n");
   fprintf(stderr,"  -drop_scan_direction 0\n");
   fprintf(stderr,"  -keep_scan_direction_change\n");
@@ -1538,7 +1551,7 @@ void LASfilter::usage() const
   fprintf(stderr,"  -keep_attribute_above 0 5.0\n");
   fprintf(stderr,"  -drop_attribute_below 1 1.5\n");
   fprintf(stderr,"Filter points with simple thinning.\n");
-  fprintf(stderr,"  -keep_every_nth 2\n");
+  fprintf(stderr,"  -keep_every_nth 2 -drop_every_nth 3\n");
   fprintf(stderr,"  -keep_random_fraction 0.1\n");
   fprintf(stderr,"  -thin_with_grid 1.0\n");
   fprintf(stderr,"  -thin_with_time 0.001\n");
@@ -1856,6 +1869,16 @@ BOOL LASfilter::parse(int argc, char* argv[])
           return FALSE;
         }
         keep_return_mask = atoi(argv[i+1]);
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-keep_number_of_returns") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: number of returns\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionKeepSpecificNumberOfReturns(atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
       else if (strcmp(argv[i],"-keep_single") == 0)
@@ -2542,6 +2565,16 @@ BOOL LASfilter::parse(int argc, char* argv[])
         } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
         i-=1;
       }
+      else if (strcmp(argv[i],"-drop_number_of_returns") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: number of returns\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionDropSpecificNumberOfReturns(atoi(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
       else if (strcmp(argv[i],"-drop_single") == 0)
       {
         add_criterion(new LAScriterionDropSpecificNumberOfReturns(1));
@@ -2861,6 +2894,17 @@ BOOL LASfilter::parse(int argc, char* argv[])
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
         }
       }
+      else if (strcmp(argv[i],"-drop_every_nth") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: nth\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionDropEveryNth((I32)atoi(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+
       else if (strcmp(argv[i],"-drop_scanner_channel") == 0)
       {
         if ((i+1) >= argc)
