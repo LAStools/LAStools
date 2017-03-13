@@ -773,7 +773,7 @@ private:
 class LASoperationSetExtendedOverlapFlag : public LASoperation
 {
 public:
-  inline const CHAR* name() const { return "set_extended_overlap_flag"; };
+  inline const CHAR* name() const { return "set_overlap_flag"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
   inline void transform(LASpoint* point) { point->set_extended_overlap_flag(flag); };
   LASoperationSetExtendedOverlapFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
@@ -784,7 +784,7 @@ private:
 class LASoperationSetExtendedScannerChannel : public LASoperation
 {
 public:
-  inline const CHAR* name() const { return "set_extended_scanner_channel"; };
+  inline const CHAR* name() const { return "set_scanner_channel"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), channel); };
   inline void transform(LASpoint* point) { point->set_extended_scanner_channel(channel); };
   LASoperationSetExtendedScannerChannel(U8 channel) { this->channel = (channel >= 3 ? 3 : channel); };
@@ -1083,6 +1083,14 @@ public:
   inline void transform(LASpoint* point) { point->set_NIR(point->get_B()); };
 };
 
+class LASoperationCopyNIRintoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_NIR_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_intensity(point->get_NIR()); };
+};
+
 class LASoperationFlipWaveformDirection : public LASoperation
 {
 public:
@@ -1097,6 +1105,14 @@ public:
   inline const CHAR* name() const { return "copy_user_data_into_point_source"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) { point->point_source_ID = point->get_user_data(); };
+};
+
+class LASoperationCopyUserDataIntoScannerChannel : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_user_data_into_scanner_channel"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->extended_scanner_channel = (point->get_user_data() & 0x0003); };
 };
 
 class LASoperationCopyScannerChannelIntoPointSource : public LASoperation
@@ -1189,6 +1205,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -translate_then_scale_intensity 0.5 3.1\n");
   fprintf(stderr,"  -clamp_intensity 0 255\n");
   fprintf(stderr,"  -clamp_intensity_above 255\n");
+  fprintf(stderr,"  -copy_NIR_into_intensity\n");
   fprintf(stderr,"Transform scan_angle.\n");
   fprintf(stderr,"  -scale_scan_angle 1.944445\n");
   fprintf(stderr,"  -translate_scan_angle -5\n");
@@ -1216,9 +1233,10 @@ void LAStransform::usage() const
   fprintf(stderr,"  -set_withheld_flag 0\n");
   fprintf(stderr,"  -set_synthetic_flag 1\n");
   fprintf(stderr,"  -set_keypoint_flag 0\n");
-  fprintf(stderr,"  -set_extended_overlap_flag 1\n");
+  fprintf(stderr,"  -set_overlap_flag 1\n");
   fprintf(stderr,"Modify the extended scanner channel.\n");
-  fprintf(stderr,"  -set_extended_scanner_channel 2\n");
+  fprintf(stderr,"  -set_scanner_channel 2\n");
+  fprintf(stderr,"  -copy_user_data_into_scanner_channel\n");
   fprintf(stderr,"Modify the user data.\n");
   fprintf(stderr,"  -set_user_data 0\n");
   fprintf(stderr,"  -change_user_data_from_to 23 26\n");
@@ -1564,10 +1582,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationCopyAttributeIntoZ(atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
-      else if (strcmp(argv[i],"-copy_user_data_into_point_source") == 0)
+      else if (strncmp(argv[i],"-copy_user_data_", 16) == 0)
       {
-        add_operation(new LASoperationCopyUserDataIntoPointSource());
-        *argv[i]='\0'; 
+        if (strcmp(argv[i],"-copy_user_data_into_point_source") == 0)
+        {
+          add_operation(new LASoperationCopyUserDataIntoPointSource());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_user_data_into_scanner_channel") == 0)
+        {
+          add_operation(new LASoperationCopyUserDataIntoScannerChannel());
+          *argv[i]='\0'; 
+        }
       }
       else if (strcmp(argv[i],"-copy_scanner_channel_into_point_source") == 0)
       {
@@ -1587,6 +1613,11 @@ BOOL LAStransform::parse(int argc, char* argv[])
       else if (strcmp(argv[i],"-copy_B_into_NIR") == 0)
       {
         add_operation(new LASoperationCopyBintoNIR());
+        *argv[i]='\0'; 
+      }
+      else if (strcmp(argv[i],"-copy_NIR_into_intensity") == 0)
+      {
+        add_operation(new LASoperationCopyNIRintoIntensity());
         *argv[i]='\0'; 
       }
       else if (strcmp(argv[i],"-copy_intensity_into_z") == 0)
@@ -1658,7 +1689,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationSetKeypointFlag((U8)atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
-      else if (strcmp(argv[i],"-set_extended_overlap_flag") == 0)
+      else if ((strcmp(argv[i],"-set_extended_overlap_flag") == 0) || (strcmp(argv[i],"-set_overlap_flag") == 0))
       {
         if ((i+1) >= argc)
         {
@@ -1668,7 +1699,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationSetExtendedOverlapFlag((U8)atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
-      else if (strcmp(argv[i],"-set_extended_scanner_channel") == 0)
+      else if ((strcmp(argv[i],"-set_extended_scanner_channel") == 0) || (strcmp(argv[i],"-set_scanner_channel") == 0))
       {
         if ((i+1) >= argc)
         {
