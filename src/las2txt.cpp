@@ -872,7 +872,7 @@ int main(int argc, char *argv[])
       case 'o': // the (extended) <o>verlap flag
       case 'l': // the (extended) scanner channe<l>
       case 'm': // the index of the point (count starts at 0)
-      case 'M': // the index of the point (count starts at 0)
+      case 'M': // the index of the point (count starts at 1)
         break;
       case 't': // the gps-time
         if (lasreader->point.have_gps_time == false)
