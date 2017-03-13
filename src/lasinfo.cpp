@@ -1364,6 +1364,9 @@ int main(int argc, char *argv[])
                 case 2051: // GeogPrimeMeridianGeoKey
                   switch (lasreader->header.vlr_geo_key_entries[j].value_offset)
                   {
+                  case 32767: // user-defined
+                    fprintf(file_out, "GeogPrimeMeridianGeoKey: user-defined\012");
+                    break;
                   case 8901: // PM_Greenwich
                     fprintf(file_out, "GeogPrimeMeridianGeoKey: PM_Greenwich\012");
                     break;
@@ -1473,6 +1476,9 @@ int main(int argc, char *argv[])
                 case 2056: // GeogEllipsoidGeoKey
                   switch (lasreader->header.vlr_geo_key_entries[j].value_offset)
                   {
+                  case 32767: // user-defined
+                    fprintf(file_out, "GeogEllipsoidGeoKey: user-defined\012");
+                    break;
                   case 7001: // Ellipse_Airy_1830
                     fprintf(file_out, "GeogEllipsoidGeoKey: Ellipse_Airy_1830\012");
                     break;
