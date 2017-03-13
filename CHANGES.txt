@@ -5,6 +5,7 @@
 10 March 2017 -- lasboundary: add download links via '-base_url http://lidar.com/data' to KML output
 9 March 2017 -- lassort: fixed serious bug only happening for new LAS 1.4 point types 6 through 10
 8 March 2017 -- LASlib: new transform '-copy_user_data_into_scanner_channel' fixes bad LAS 1.4 files
+6 March 2017 -- LASlib: new transform '-copy_NIR_into_intensity' for point types 8 and 10
 2 February 2017 -- lascolor: support TIFF with more than 3 bands (for now simply ignore the additional bands)
 2 February 2017 -- lasground, lasground_new: small bug fix for '-replace_z' with non-zero 'z_offset' in LAS header
 2 February 2017 -- LAStools: read (subset of) projections from OGC WKT strings if coded via AUTHORITY EPSG code
