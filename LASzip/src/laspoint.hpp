@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    10 March 2017 -- fix in copy_to() and copy_from() new LAS 1.4 point types
     10 October 2016 -- small fixes for NIR and extended scanner channel
     19 July 2015 -- created after FOSS4GE in the train back from Lake Como
   
@@ -202,27 +203,60 @@ public:
 
   void copy_to(U8* buffer) const
   {
-    U32 i;
-    U32 b = 0;
-    for (i = 0; i < num_items; i++)
+    if (extended_point_type)
     {
-      memcpy(&buffer[b], point[i], items[i].size);
+      memcpy(buffer, &X, 14);
+      *((U8*)&(buffer[14])) = ((U8*)&X)[24];
+      *((U8*)&(buffer[15])) = (extended_classification_flags << 4) | (extended_scanner_channel << 2) | (((U8*)&X)[14] & 0x03);
+      *((U8*)&(buffer[16])) = extended_classification;
+      *((U8*)&(buffer[17])) = ((U8*)&X)[17];
+      *((I16*)&(buffer[18])) = *((I16*)&(((U8*)&X)[20]));
+      *((U16*)&(buffer[20])) = *((U16*)&(((U8*)&X)[18]));
+      memcpy(buffer+22, &gps_time, 8);
+    }
+    else
+    {
+      memcpy(buffer, &X, 20);
+    }
+    U32 i;
+    U32 b = items[0].size;
+    for (i = 1; i < num_items; i++)
+    {
       b += items[i].size;
     }
   };
 
   void copy_from(const U8* buffer)
   {
+    if (extended_point_type)
+    {
+      memcpy(&X, buffer, 14);
+      ((U8*)&X)[24] = *((U8*)&(buffer[14]));
+      extended_classification_flags = (*((U8*)&(buffer[15])) >> 4);
+      extended_scanner_channel = ((*((U8*)&(buffer[15])) >> 2) & 0x03);
+      scan_direction_flag = ((*((U8*)&(buffer[15])) >> 1) & 0x01);
+      edge_of_flight_line = (*((U8*)&(buffer[15])) & 0x01);
+      extended_classification = *((U8*)&(buffer[16]));
+      if (extended_classification < 32) classification = extended_classification;
+      ((U8*)&X)[17] = *((U8*)&(buffer[17]));
+      *((I16*)&(((U8*)&X)[20])) = *((I16*)&(buffer[18])); ;
+      *((U16*)&(((U8*)&X)[18])) = *((U16*)&(buffer[20]));
+      memcpy(&gps_time, buffer+22, 8);
+    }
+    else
+    {
+      memcpy(&X, buffer, 20);
+    }
     U32 i;
-    U32 b = 0;
-    for (i = 0; i < num_items; i++)
+    U32 b = items[0].size;
+    for (i = 1; i < num_items; i++)
     {
       memcpy(point[i], &buffer[b], items[i].size);
       b += items[i].size;
     }
   };
 
-// these functions set the desired point format (and maybe add on attributes in extra bytes)
+  // these functions set the desired point format (and maybe add on attributes in extra bytes)
 
   BOOL init(const LASquantizer* quantizer, const U8 point_type, const U16 point_size, const LASattributer* attributer=0)
   {
