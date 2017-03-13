@@ -1803,7 +1803,7 @@ static FILE* open_geo_file(const char* program_name, bool pcs=true)
 
 bool get_unit_from_ogc_wkt(const char* ogc_wkt, double* value)
 {
-  char* unit = strstr(ogc_wkt, "UNIT[");
+  const char* unit = strstr(ogc_wkt, "UNIT[");
   if (unit)
   {
     int len = strlen(ogc_wkt);
@@ -1835,7 +1835,7 @@ bool get_unit_from_ogc_wkt(const char* ogc_wkt, double* value)
 
 bool get_parameter_from_ogc_wkt(const char* ogc_wkt, const char* name, double* value)
 {
-  char* para = strstr(ogc_wkt, name);
+  const char* para = strstr(ogc_wkt, name);
   if (para)
   {
     int len = strlen(ogc_wkt);
@@ -4196,9 +4196,9 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
             {
 //              fprintf(stderr, "set ellipsoid %d for EPSG code %d for '%s'\n", ellipsoid_id, value, gname);
               set_reference_ellipsoid(ellipsoid_id);
-              sprintf(gcs_name, gname);
+              sprintf(gcs_name, "%s", gname);
               datum_code = dcode;
-              sprintf(datum_name, dname);
+              sprintf(datum_name, "%s", dname);
               spheroid_code = value;
               done = true;
               break;
@@ -4219,7 +4219,7 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
       return false;
     }
   }
-  if (description) sprintf(description, gcs_name);
+  if (description) sprintf(description, "%s", gcs_name);
   return true;
 }
 
@@ -4803,14 +4803,14 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     set_transverse_mercator_projection(650000.0, 200000.0, 47.14439372222222, 19.04857177777778, 0.99993, 0, source, "EOV / HD72 / Hungarian National Grid");
     set_geokey(value, source);
     set_coordinates_in_meter(source);
-    if (description) sprintf(description, gcs_name);
+    if (description) sprintf(description, "%s", gcs_name);
     return true;
   case EPSG_CH1903_LV03:  // should really be Hotine_Oblique_Mercator (but is special case with 90 degree angle that reduces to TM)
     set_gcs(GEO_GCS_CH1903);
     set_transverse_mercator_projection(600000.0, 200000.0, 46.95240555555556, 7.439583333333333, 1.0, 0, source, "CH1903 / LV03");
     set_geokey(value, source);
     set_coordinates_in_meter(source);
-    if (description) sprintf(description, gcs_name);
+    if (description) sprintf(description, "%s", gcs_name);
     return true;
   default:
     // try to look it up in 'pcs.csv' file
@@ -4914,7 +4914,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             double false_northing_meter = unit2meter(false_northing, unit_false_northing);
             set_transverse_mercator_projection(false_easting_meter, false_northing_meter, latitude_of_origin_decdeg, central_meridian_decdeg, scale_factor, 0, source, name);
             set_geokey(value, source);
-            if (description) sprintf(description, name);
+            if (description) sprintf(description, "%s", name);
             return true;
           }
           else if (transform == 9802) // CT_LambertConfConic_2SP
@@ -4944,7 +4944,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             double false_northing_meter = unit2meter(false_northing, unit_false_northing);
             set_lambert_conformal_conic_projection(false_easting_meter, false_northing_meter, latitude_of_origin_decdeg, central_meridian_decdeg, standard_parallel_1_decdeg, standard_parallel_2_decdeg, 0, source, name);
             set_geokey(value, source);
-            if (description) sprintf(description, name);
+            if (description) sprintf(description, "%s", name);
             return true;
           }
           else if (transform == 9801) // CT_LambertConfConic_1SP
@@ -4979,7 +4979,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             if (scale_factor_at_natural_origin != 1.0) fprintf(stderr, "WARNING: current implementation for Lambert Conic Conformal (1SP) ignores scale factor\n");
             set_lambert_conformal_conic_projection(false_easting_meter, false_northing_meter, latitude_of_natural_origin_decdeg, longitude_of_natural_origin_decdeg, latitude_of_natural_origin, latitude_of_natural_origin, 0, source, name);
             set_geokey(value, source);
-            if (description) sprintf(description, name);
+            if (description) sprintf(description, "%s", name);
             return true;
           }
           else if (transform == 9822) // CT_AlbersEqualArea
@@ -5009,7 +5009,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             double false_northing_meter = unit2meter(false_northing, unit_false_northing);
             set_albers_equal_area_conic_projection(false_easting_meter, false_northing_meter, latitude_of_center_decdeg, longitude_of_center_decdeg, standard_parallel_1_decdeg, standard_parallel_2_decdeg, 0, source, name);
             set_geokey(value, source);
-            if (description) sprintf(description, name);
+            if (description) sprintf(description, "%s", name);
             return true;
           }
           else if (transform == 9812) // CT_HotineObliqueMercator
@@ -5040,7 +5040,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             double rectified_grid_angle_decdeg = unit2decdeg(rectified_grid_angle, unit_rectified_grid_angle);
             set_hotine_oblique_mercator_projection(false_easting_meter, false_northing_meter, latitude_of_center_decdeg, longitude_of_center_decdeg, azimuth_decdeg, rectified_grid_angle_decdeg, scale_factor, 0, source, name);
             set_geokey(value, source);
-            if (description) sprintf(description, name);
+            if (description) sprintf(description, "%s", name);
             return true;
           }
           else if (transform == 9809) // CT_ObliqueStereographic
@@ -5065,7 +5065,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             double false_northing_meter = unit2meter(false_northing, unit_false_northing);
             set_oblique_stereographic_projection(false_easting_meter, false_northing_meter, latitude_of_origin_decdeg, central_meridian_decdeg, scale_factor, 0, source, name);
             set_geokey(value, source);
-            if (description) sprintf(description, name);
+            if (description) sprintf(description, "%s", name);
             return true;
           }
           else 
@@ -5906,7 +5906,6 @@ bool GeoProjectionConverter::TMtoLL(const double TMEastingMeter, const double TM
   double eta4;
   double ftphi;   /* Footpoint latitude                              */
   int    i;       /* Loop iterator                                   */
-  double s;       /* Sine of latitude                                */
   double sn;      /* Radius of curvature in the prime vertical       */
   double sr;      /* Radius of curvature in the meridian             */
   double t;       /* Tangent of latitude                             */
@@ -5947,7 +5946,7 @@ bool GeoProjectionConverter::TMtoLL(const double TMEastingMeter, const double TM
   sn = SPHSN(ftphi);
 
   /* Sine Cosine terms */
-  s = sin(ftphi);
+//  s = sin(ftphi);
   c = cos(ftphi);
 
   /* Tangent Value  */
