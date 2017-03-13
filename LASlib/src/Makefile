@@ -1,7 +1,7 @@
 # makefile for liblas.a
 #
 #COPTS    = -g -Wall
-COPTS     = -O3 -Wall -Wno-deprecated -DNDEBUG -DUNORDERED
+COPTS     = -O3 -Wall -Wno-deprecated -Wno-strict-aliasing -Wno-write-strings -DNDEBUG -DUNORDERED
 COMPILER  = g++
 AR  = ar rc
 #BITS     = -64
