@@ -1,3 +1,4 @@
+12 March 2017 -- LASlib: new filters '-drop_every_nth' '-drop_number_of_returns' '-keep_number_of_returns'
 8 March 2017 -- LASlib: new transform '-copy_user_data_into_scanner_channel' fixes bad LAS 1.4 files
 1 February 2017 -- LASlib: better support for OGC WKT strings in VLRs or EVLRs when reading
 1 February 2017 -- LASlib: new transform '-copy_intensity_into_z' for use in lasgrid or lascanopy

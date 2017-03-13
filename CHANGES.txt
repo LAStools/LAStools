@@ -1,3 +1,4 @@
+12 March 2017 -- LASlib: new filters '-drop_every_nth' '-drop_number_of_returns' '-keep_number_of_returns'
 11 March 2017 -- lassort: option to first sort by '-scanner_channel' and then by '-return_number' 
 11 March 2017 -- lassort: option to first sort by '-point_source' and then by '-scanner_channel'
 10 March 2017 -- LAStools: also read more generic LCC, TM, and AEAC projections from OGC WKT strings 
