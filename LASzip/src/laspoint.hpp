@@ -222,6 +222,7 @@ public:
     U32 b = items[0].size;
     for (i = 1; i < num_items; i++)
     {
+      memcpy(&buffer[b], point[i], items[i].size);
       b += items[i].size;
     }
   };
