@@ -1,3 +1,6 @@
+22 March 2017 -- las2shp: fixed bug accidentally introduced in version 170203
+22 March 2017 -- lassort: fixed *serious* bug accidentally introduced in version 170313
+22 March 2017 -- LASlib: new filter '-thin_points_with_time 0.000001' vs '-thin_pulses_with_time 0.001'
 12 March 2017 -- LASlib: new filters '-drop_every_nth' '-drop_number_of_returns' '-keep_number_of_returns'
 11 March 2017 -- lassort: option to first sort by '-scanner_channel' and then by '-return_number' 
 11 March 2017 -- lassort: option to first sort by '-point_source' and then by '-scanner_channel'
