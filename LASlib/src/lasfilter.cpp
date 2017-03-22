@@ -35,9 +35,11 @@
 #include <string.h>
 
 #include <map>
+#include <set>
 using namespace std;
 
 typedef multimap<I64,F64> my_I64_F64_map;
+typedef set<I64> my_I64_set;
 
 class LAScriterionAnd : public LAScriterion
 {
@@ -1403,10 +1405,10 @@ private:
   U16* plus_plus_sizes;
 };
 
-class LAScriterionThinWithTime : public LAScriterion
+class LAScriterionThinPulsesWithTime : public LAScriterion
 {
 public:
-  inline const CHAR* name() const { return "thin_with_time"; };
+  inline const CHAR* name() const { return "thin_pulses_with_time"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
   inline BOOL filter(const LASpoint* point)
   { 
@@ -1430,14 +1432,47 @@ public:
   {
     times.clear();
   };
-  LAScriterionThinWithTime(F64 time_spacing)
+  LAScriterionThinPulsesWithTime(F64 time_spacing)
   {
     this->time_spacing = time_spacing;
   };
-  ~LAScriterionThinWithTime() { reset(); };
+  ~LAScriterionThinPulsesWithTime() { reset(); };
 private:
   F64 time_spacing;
   my_I64_F64_map times;
+};
+
+class LAScriterionThinPointsWithTime : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "thin_points_with_time"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
+  inline BOOL filter(const LASpoint* point)
+  { 
+    I64 pos_t = I64_FLOOR(point->get_gps_time() / time_spacing);
+    my_I64_set::iterator map_element = times.find(pos_t);
+    if (map_element == times.end())
+    {
+      times.insert(my_I64_set::value_type(pos_t));
+      return FALSE;
+    }
+    else
+    {
+      return TRUE;
+    }
+  }
+  void reset()
+  {
+    times.clear();
+  };
+  LAScriterionThinPointsWithTime(F64 time_spacing)
+  {
+    this->time_spacing = time_spacing;
+  };
+  ~LAScriterionThinPointsWithTime() { reset(); };
+private:
+  F64 time_spacing;
+  my_I64_set times;
 };
 
 void LASfilter::clean()
@@ -1554,7 +1589,8 @@ void LASfilter::usage() const
   fprintf(stderr,"  -keep_every_nth 2 -drop_every_nth 3\n");
   fprintf(stderr,"  -keep_random_fraction 0.1\n");
   fprintf(stderr,"  -thin_with_grid 1.0\n");
-  fprintf(stderr,"  -thin_with_time 0.001\n");
+  fprintf(stderr,"  -thin_pulses_with_time 0.0001\n");
+  fprintf(stderr,"  -thin_points_with_time 0.000001\n");
   fprintf(stderr,"Boolean combination of filters.\n");
   fprintf(stderr,"  -filter_and\n");
 }
@@ -2938,14 +2974,24 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionThinWithGrid((F32)atof(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
-      else if (strcmp(argv[i],"-thin_with_time") == 0)
+      else if (strcmp(argv[i],"-thin_pulses_with_time") == 0 || strcmp(argv[i],"-thin_with_time") == 0)
       {
         if ((i+1) >= argc)
         {
           fprintf(stderr,"ERROR: '%s' needs 1 argument: time_spacing\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionThinWithTime((F32)atof(argv[i+1])));
+        add_criterion(new LAScriterionThinPulsesWithTime(atof(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-thin_points_with_time") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: time_spacing\n", argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionThinPointsWithTime(atof(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
     }
