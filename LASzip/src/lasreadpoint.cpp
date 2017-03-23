@@ -524,7 +524,7 @@ BOOL LASreadPoint::read_chunk_table()
       return FALSE;
     }
     // then we cannot seek to the chunk table but won't need it anyways
-    number_chunks = U32_MAX-1;
+    number_chunks = 0;
     tabled_chunks = 0;
     return TRUE;
   }
