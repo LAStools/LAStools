@@ -1,7 +1,7 @@
 # makefile for all example of how to use LASlib (when linking statically)
 #
 #COPTS    = -g -Wall
-COPTS     = -O3 -Wall -Wno-strict-aliasing
+COPTS     = -O3 -Wall -Wno-strict-aliasing -Wno-unused-result
 COMPILER  = g++
 LINKER  = g++
 #BITS     = -64
