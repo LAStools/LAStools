@@ -183,7 +183,7 @@ public:
   void set_scale_intensity(F32 scale_intensity);
   void set_translate_scan_angle(F32 translate_scan_angle);
   void set_scale_scan_angle(F32 scale_scan_angle);
-  void add_attribute(I32 data_type, const CHAR* name, const CHAR* description=0, F64 scale=1.0, F64 offset=0.0, F64 pre_scale=1.0, F64 pre_offset=0.0);
+  void add_attribute(I32 data_type, const CHAR* name, const CHAR* description=0, F64 scale=1.0, F64 offset=0.0, F64 pre_scale=1.0, F64 pre_offset=0.0, F64 no_data=F64_MAX);
   void set_parse_string(const CHAR* parse_string);
   void set_skip_lines(I32 skip_lines);
   void set_populate_header(BOOL populate_header);
@@ -250,6 +250,7 @@ private:
   F64 attribute_offsets[10];
   F64 attribute_pre_scales[10];
   F64 attribute_pre_offsets[10];
+  F64 attribute_no_datas[10];
   CHAR* parse_string;
   I32 skip_lines;
   BOOL populate_header;
