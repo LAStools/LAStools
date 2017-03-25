@@ -52,7 +52,7 @@ public:
   void set_scale_scan_angle(F32 scale_scan_angle);
   void set_scale_factor(const F64* scale_factor);
   void set_offset(const F64* offset);
-  void add_attribute(I32 data_type, const CHAR* name, const CHAR* description=0, F64 scale=1.0, F64 offset=0.0, F64 pre_scale=1.0, F64 pre_offset=0.0);
+  void add_attribute(I32 data_type, const CHAR* name, const CHAR* description=0, F64 scale=1.0, F64 offset=0.0, F64 pre_scale=1.0, F64 pre_offset=0.0, F64 no_data=F64_MAX);
   virtual BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
   virtual BOOL open(FILE* file, const CHAR* file_name=0, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
 
@@ -93,6 +93,7 @@ private:
   F64 attribute_offsets[10];
   F64 attribute_pre_scales[10];
   F64 attribute_pre_offsets[10];
+  F64 attribute_no_datas[10];
   I32 attribute_starts[10];
   BOOL parse_attribute(const CHAR* l, I32 index);
   BOOL parse(const CHAR* parse_string);
