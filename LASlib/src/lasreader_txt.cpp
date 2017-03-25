@@ -104,6 +104,11 @@ BOOL LASreaderTXT::open(FILE* file, const char* file_name, const char* parse_str
           for (I32 d = 0; d < dim; d++)
             attribute.set_offset(attribute_offsets[i], d);
         }
+        if (attribute_no_datas[i] != F64_MAX)
+        {
+          for (I32 d = 0; d < dim; d++)
+            attribute.set_no_data(attribute_no_datas[i], d);
+        }
         header.add_attribute(attribute);
       }
       catch(...) {
@@ -726,7 +731,7 @@ void LASreaderTXT::set_offset(const F64* offset)
   }
 }
 
-void LASreaderTXT::add_attribute(I32 data_type, const char* name, const char* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset)
+void LASreaderTXT::add_attribute(I32 data_type, const char* name, const char* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset, F64 no_data)
 {
   attributes_data_types[number_attributes] = data_type;
   if (name)
@@ -751,6 +756,7 @@ void LASreaderTXT::add_attribute(I32 data_type, const char* name, const char* de
   attribute_offsets[number_attributes] = offset;
   attribute_pre_scales[number_attributes] = pre_scale;
   attribute_pre_offsets[number_attributes] = pre_offset;
+  attribute_no_datas[number_attributes] = no_data;
   number_attributes++;
 }
 
