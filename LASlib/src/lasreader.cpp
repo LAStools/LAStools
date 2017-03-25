@@ -954,7 +954,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         {
           for (I32 i = 0; i < number_attributes; i++)
           {
-            lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i]);
+            lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i], attribute_no_datas[i]);
           }
         }
         if (!lasreadertxt->open(file_name, parse_string, skip_lines, populate_header))
@@ -1005,7 +1005,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       {
         for (I32 i = 0; i < number_attributes; i++)
         {
-          lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i]);
+          lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i], attribute_no_datas[i]);
         }
       }
       if (!lasreadertxt->open(stdin, 0, parse_string, skip_lines, FALSE))
@@ -1568,8 +1568,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
           {
             if (((i+7) < argc) && ((atof(argv[i+7]) != 0.0) || (strcmp(argv[i+7], "0") == 0) || (strcmp(argv[i+7], "0.0") == 0)))
             {
-              add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]));
-              *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; i+=7;
+              if (((i+8) < argc) && ((atof(argv[i+8]) != 0.0) || (strcmp(argv[i+8], "0") == 0) || (strcmp(argv[i+8], "0.0") == 0)))
+              {
+                add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]), atof(argv[i+8]));
+                *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; *argv[i+8]='\0'; i+=8;
+              }
+              else
+              {
+                add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]));
+                *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; i+=7;
+              }
             }
             else
             {
@@ -2198,7 +2206,7 @@ void LASreadOpener::set_scale_scan_angle(F32 scale_scan_angle)
   this->scale_scan_angle = scale_scan_angle;
 }
 
-void LASreadOpener::add_attribute(I32 data_type, const CHAR* name, const CHAR* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset)
+void LASreadOpener::add_attribute(I32 data_type, const CHAR* name, const CHAR* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset, F64 no_data)
 {
   attribute_data_types[number_attributes] = data_type;
   attribute_names[number_attributes] = (name ? strdup(name) : 0);
@@ -2207,6 +2215,7 @@ void LASreadOpener::add_attribute(I32 data_type, const CHAR* name, const CHAR* d
   attribute_offsets[number_attributes] = offset;
   attribute_pre_scales[number_attributes] = pre_scale;
   attribute_pre_offsets[number_attributes] = pre_offset;
+  attribute_no_datas[number_attributes] = no_data;
   number_attributes++;
 }
 
@@ -2292,6 +2301,7 @@ LASreadOpener::LASreadOpener()
     attribute_offsets[i] = 0.0;
     attribute_pre_scales[i] = 1.0;
     attribute_pre_offsets[i] = 0.0;
+    attribute_no_datas[i] = F64_MAX;
   }
   parse_string = 0;
   skip_lines = 0;
