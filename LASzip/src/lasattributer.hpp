@@ -89,7 +89,29 @@ public:
   inline BOOL set_no_data(U64 no_data, I32 dim=0) { if ((6 == get_type()) && (dim < get_dim())) { this->no_data[dim].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
   inline BOOL set_no_data(I64 no_data, I32 dim=0) { if ((7 == get_type()) && (dim < get_dim())) { this->no_data[dim].i64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
   inline BOOL set_no_data(F32 no_data, I32 dim=0) { if ((8 == get_type()) && (dim < get_dim())) { this->no_data[dim].f64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
-  inline BOOL set_no_data(F64 no_data, I32 dim=0) { if ((9 == get_type()) && (dim < get_dim())) { this->no_data[dim].f64 = no_data; options |= 0x01; return TRUE; } return FALSE; };
+  inline BOOL set_no_data(F64 no_data, I32 dim=0)
+  {
+    if (dim < get_dim())
+    {
+      switch (get_type())
+      {
+      case 0:
+      case 2:
+      case 4:
+      case 6:
+        this->no_data[dim].u64 = (U64)no_data; options |= 0x01; return TRUE;
+      case 1:
+      case 3:
+      case 5:
+      case 7:
+        this->no_data[dim].i64 = (I64)no_data; options |= 0x01; return TRUE;
+      case 8:
+      case 9:
+        this->no_data[dim].f64 = no_data; options |= 0x01; return TRUE;
+      }
+    }
+    return FALSE;
+  };
 
   inline void set_min(U8* min, I32 dim=0) { this->min[dim] = cast(min); options |= 0x02; };
   inline void update_min(U8* min, I32 dim=0) { this->min[dim] = smallest(cast(min), this->min[dim]); };
