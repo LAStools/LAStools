@@ -14,7 +14,26 @@
 
   By default the LiDAR points falling outside of the image or that
   fall into a no-data area of the image will not be colored. Use
-  option '-zero_rgb' to set their color to (0/0/0) instead,
+  option '-zero_rgb' to set their color to (0/0/0) instead.
+
+  It is also possible to only copy a '-grey' band into all three
+  RGB channels or a single color '-red', '-green' or '-blue' into
+  the corresponding channel. If the input image has more than one
+  band use '-band 2' to specify which one to copy from. By default
+  this will be band 0.
+
+  It is also possible to copy '-nir' either from a single band
+  image or from a multi-band image and then '-band 3' or else is
+  needed. Instead of copying into the NIR band of point types 8
+  or 10 the NIR value can also be stored as '-intensity'.
+
+  With '-rgbnir' and a 4-band RGBNIR input image it is possible
+  to copy all 4 bands at once into either RGB and the NIR channel
+  or into the RGB and the intensity fields by adding '-intensity'  
+
+  For storing to the NIR channel the input LAS file already needs
+  to be LAS 1.4. If needed use las2las to upgraded to a LAS 1.4
+  file prior to running lascolor.
 
   Please license from martin@rapidlasso.com before using lascolor
   commercially. Please note that the unlicensed version will set
