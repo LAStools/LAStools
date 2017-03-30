@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -169,6 +169,14 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     if (!point.init(&quantizer, header->point_data_format, header->point_data_record_length, header)) return FALSE;
     point_data_format = header->point_data_format;
     point_data_record_length = header->point_data_record_length;
+  }
+
+  // fail if we have the old compressor enabled the new LAS 1.4 point types
+  
+  if (compressor && (point_data_format > 5) && (compressor != LASZIP_COMPRESSOR_LAYERED_CHUNKED))
+  {
+    fprintf(stderr,"ERROR: point type %d requires using \"native LAS 1.4 extension\" of LASzip\n", point_data_format);
+    return FALSE;
   }
 
   // do we need a LASzip VLR (because we compress or use non-standard points?) 
