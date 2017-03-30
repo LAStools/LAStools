@@ -1,3 +1,4 @@
+30 March 2017 -- LASlib: alpha-release of "native LAS 1.4 extension" for LASzip compression of new LAS 1.4 points
 27 March 2017 -- lascolor: support NIR, 4 band RGBNIR images as well as three band grey and single band copying
 26 March 2017 -- lascanopy: fixed bug in raster mode when attempting to use '-use_tile_bb' or '-use_orig_bb'
 22 March 2017 -- las2shp: fixed bug accidentally introduced in version 170203

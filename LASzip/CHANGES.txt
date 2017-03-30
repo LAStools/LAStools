@@ -1,7 +1,10 @@
+30 March 2017 -- alpha-release of "native LAS 1.4 extension" for LASzip compression
 11 January 2017 --  new DLL/API function 'laszip_set_chunk_size()' to change chunk size
 8 January 2017 -- changed file names from "laszip_dll.h" to "laszip_api.h" for hobu
 7 January 2017 -- set reserved field in LASzip VLR from 0xAABB to 0x0
+
 7 January 2017 -- make scan angle quantization in compatibility mode consistent with LASlib
+
 7 January 2017 -- compatibility mode *decompression* fix for points with waveforms
 23 September 2015 -- correct update of bounding box and counters from inventory on closing
 23 September 2015 -- correct update of bounding box and counters from inventory on closing
