@@ -2289,7 +2289,7 @@ inline BOOL LASwriteItemCompressed_BYTE14_v3::chunk_bytes()
     }
     else
     {
-      num_bytes;
+      num_bytes = 0;
     }
   }
 
