@@ -544,7 +544,7 @@ int main(int argc, char *argv[])
 
       LASwriter* laswriter = 0;
       
-      if (lasreader->header.point_data_format > 5)
+      if ((lasreader->header.point_data_format > 5) && !laswriteopener.get_native() && (laswriteopener.get_format() == LAS_TOOLS_FORMAT_LAZ))
       {
         LASwriterCompatibleDown* laswritercompatibledown = new LASwriterCompatibleDown();
         if (laswritercompatibledown->open(&lasreader->header, &laswriteopener, move_CRS, move_all))
