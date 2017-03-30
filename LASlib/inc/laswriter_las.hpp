@@ -5,7 +5,7 @@
   
   CONTENTS:
   
-    Writes LiDAR points to the LAS format (Version 1.x , April 29, 2008).
+    Writes LiDAR points to the LAS format (Version 1.x).
 
   PROGRAMMERS:
 
@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2016, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    29 March 2017 -- read and write support "native LAS 1.4 extension" for LASzip
     23 October 2016 -- support writing Extended Variable Length Records (ELVRs)
     29 April 2016 -- added WARNINGs when rescale / reoffset overflows integers
     13 October 2014 -- changed default IO buffer size with setvbuf() to 262144
