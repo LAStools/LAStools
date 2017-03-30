@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -57,7 +57,7 @@ LASwriter* LASwriteOpener::open(const LASheader* header)
   if (use_nil)
   {
     LASwriterLAS* laswriterlas = new LASwriterLAS();
-    if (!laswriterlas->open(header, (format == LAS_TOOLS_FORMAT_LAZ ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
+    if (!laswriterlas->open(header, (format == LAS_TOOLS_FORMAT_LAZ ? (native ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
     {
       fprintf(stderr,"ERROR: cannot open laswriterlas to NULL\n");
       delete laswriterlas;
@@ -70,7 +70,7 @@ LASwriter* LASwriteOpener::open(const LASheader* header)
     if (format <= LAS_TOOLS_FORMAT_LAZ)
     {
       LASwriterLAS* laswriterlas = new LASwriterLAS();
-      if (!laswriterlas->open(file_name, header, (format == LAS_TOOLS_FORMAT_LAZ ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NONE), 2, chunk_size, io_obuffer_size))
+      if (!laswriterlas->open(file_name, header, (format == LAS_TOOLS_FORMAT_LAZ ? (native ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size, io_obuffer_size))
       {
         fprintf(stderr,"ERROR: cannot open laswriterlas with file name '%s'\n", file_name);
         delete laswriterlas;
@@ -136,7 +136,7 @@ LASwriter* LASwriteOpener::open(const LASheader* header)
     if (format <= LAS_TOOLS_FORMAT_LAZ)
     {
       LASwriterLAS* laswriterlas = new LASwriterLAS();
-      if (!laswriterlas->open(stdout, header, (format == LAS_TOOLS_FORMAT_LAZ ? LASZIP_COMPRESSOR_CHUNKED : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
+      if (!laswriterlas->open(stdout, header, (format == LAS_TOOLS_FORMAT_LAZ ? (native ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
       {
         fprintf(stderr,"ERROR: cannot open laswriterlas to stdout\n");
         delete laswriterlas;
@@ -296,6 +296,11 @@ BOOL LASwriteOpener::parse(int argc, char* argv[])
     else if (strcmp(argv[i],"-oforce") == 0)
     {
       set_force(TRUE);
+      *argv[i]='\0';
+    }
+    else if (strcmp(argv[i],"-native") == 0)
+    {
+      set_native(TRUE);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-olas") == 0)
@@ -519,6 +524,11 @@ void LASwriteOpener::set_cut(U32 cut)
 {
   this->cut = cut;
   if (cut && file_name) cut_characters();
+}
+
+void LASwriteOpener::set_native(BOOL native)
+{
+  this->native = native;
 }
 
 BOOL LASwriteOpener::set_format(I32 format)
@@ -883,6 +893,11 @@ U32 LASwriteOpener::get_cut() const
   return cut;
 }
 
+BOOL LASwriteOpener::get_native() const
+{
+  return native;
+}
+
 BOOL LASwriteOpener::format_was_specified() const
 {
   return specified;
@@ -1043,6 +1058,7 @@ LASwriteOpener::LASwriteOpener()
   parse_string = 0;
   separator = 0;
   scale_rgb = 1.0f;
+  native = FALSE;
   format = LAS_TOOLS_FORMAT_DEFAULT;
   specified = FALSE;
   force = FALSE;
