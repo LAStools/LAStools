@@ -1,7 +1,7 @@
 # makefile for laszippertest
 #
 #COPTS		= -g -Wall
-COPTS		= -O3 -Wall
+COPTS		= -O3 -Wall -Wno-strict-aliasing
 COMPILER	= g++
 LINKER		= g++
 #BITS		= -64
@@ -13,7 +13,7 @@ INCLUDE		= -I/usr/include
 LAZLIBS		=
 LAZINCLUDE	= -I../src
 
-LAZOBJS		= ../src/laszip.o ../src/laszipper.o ../src/lasunzipper.o ../src/lasreadpoint.o ../src/lasreaditemcompressed_v1.o ../src/lasreaditemcompressed_v2.o ../src/laswritepoint.o  ../src/laswriteitemcompressed_v1.o ../src/laswriteitemcompressed_v2.o ../src/integercompressor.o ../src/arithmeticdecoder.o ../src/arithmeticencoder.o ../src/arithmeticmodel.o
+LAZOBJS		= ../src/laszip.o ../src/laszipper.o ../src/lasunzipper.o ../src/lasreadpoint.o ../src/lasreaditemcompressed_v1.o ../src/lasreaditemcompressed_v2.o ../src/lasreaditemcompressed_v3.o ../src/laswritepoint.o  ../src/laswriteitemcompressed_v1.o ../src/laswriteitemcompressed_v2.o ../src/laswriteitemcompressed_v3.o ../src/integercompressor.o ../src/arithmeticdecoder.o ../src/arithmeticencoder.o ../src/arithmeticmodel.o
 
 all: laszippertest
 
