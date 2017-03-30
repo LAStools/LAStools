@@ -3242,7 +3242,7 @@ int main(int argc, char *argv[])
       if (lasheader->laszip)
       {
         fprintf(file_out, "LASzip compression (version %d.%dr%d c%d", lasheader->laszip->version_major, lasheader->laszip->version_minor, lasheader->laszip->version_revision, lasheader->laszip->compressor);
-        if (lasheader->laszip->compressor == LASZIP_COMPRESSOR_CHUNKED) fprintf(file_out, " %d):", lasheader->laszip->chunk_size);
+        if ((lasheader->laszip->compressor == LASZIP_COMPRESSOR_CHUNKED) || (lasheader->laszip->compressor == LASZIP_COMPRESSOR_LAYERED_CHUNKED)) fprintf(file_out, " %d):", lasheader->laszip->chunk_size);
         else fprintf(file_out, "):");
         for (i = 0; i < (int)lasheader->laszip->num_items; i++) fprintf(file_out, " %s %d", lasheader->laszip->items[i].get_name(), lasheader->laszip->items[i].version);
         fprintf(file_out, "\012");
