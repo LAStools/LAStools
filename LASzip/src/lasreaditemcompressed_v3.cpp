@@ -1673,7 +1673,6 @@ inline void LASreadItemCompressed_RGBNIR14_v3::read(U8* item)
   if (changed_NIR)
   {
     U8 corr;
-    I32 diff = 0;
     U32 sym = dec_NIR->decodeSymbol(contexts[current_context].m_nir_bytes_used);
     if (sym & (1 << 0))
     {
