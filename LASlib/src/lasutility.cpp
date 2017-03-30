@@ -1363,7 +1363,6 @@ BOOL LASoccupancyGrid::occupied(I32 pos_x, I32 pos_y) const
   if (pos_y < 0)
   {
     pos_y = -pos_y - 1;
-    ankers = minus_ankers;
     if ((U32)pos_y < minus_plus_size && minus_plus_sizes[pos_y])
     {
       pos_x -= minus_ankers[pos_y];
@@ -1388,7 +1387,6 @@ BOOL LASoccupancyGrid::occupied(I32 pos_x, I32 pos_y) const
   }
   else
   {
-    ankers = plus_ankers;
     if ((U32)pos_y < plus_plus_size && plus_plus_sizes[pos_y])
     {
       pos_x -= plus_ankers[pos_y];
