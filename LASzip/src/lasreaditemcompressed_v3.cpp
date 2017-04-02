@@ -1713,6 +1713,12 @@ LASreadItemCompressed_WAVEPACKET14_v3::LASreadItemCompressed_WAVEPACKET14_v3(Ari
   assert(dec);
   this->dec = dec;
 
+  /* zero instreams and decoders */
+
+  instream_wavepacket = 0;
+
+  dec_wavepacket = 0;
+
   /* zero num_bytes and init booleans */
 
   num_bytes_wavepacket = 0;
