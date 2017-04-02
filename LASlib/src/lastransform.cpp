@@ -1059,6 +1059,14 @@ public:
   inline void transform(LASpoint* point) { I16 temp = point->get_G(); point->set_G(point->get_B()); point->set_B(temp); };
 };
 
+class LASoperationCopyRintoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_R_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_intensity(point->get_R()); };
+};
+
 class LASoperationCopyRintoNIR : public LASoperation
 {
 public:
@@ -1067,12 +1075,28 @@ public:
   inline void transform(LASpoint* point) { point->set_NIR(point->get_R()); };
 };
 
+class LASoperationCopyGintoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_G_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_intensity(point->get_G()); };
+};
+
 class LASoperationCopyGintoNIR : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_G_into_NIR"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) { point->set_NIR(point->get_G()); };
+};
+
+class LASoperationCopyBintoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_B_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_intensity(point->get_B()); };
 };
 
 class LASoperationCopyBintoNIR : public LASoperation
@@ -1261,7 +1285,9 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_RGB_down (by 256)\n");
   fprintf(stderr,"  -scale_RGB_up (by 256)\n");
   fprintf(stderr,"  -switch_R_G -switch_R_B -switch_B_G\n");
-  fprintf(stderr,"  -copy_R_into_NIR -copy_G_into_NIR -copy_B_into_NIR\n");
+  fprintf(stderr,"  -copy_R_into_NIR -copy_R_into_intensity\n");
+  fprintf(stderr,"  -copy_G_into_NIR -copy_G_into_intensity\n");
+  fprintf(stderr,"  -copy_B_into_NIR -copy_B_into_intensity\n");
 }
 
 BOOL LAStransform::parse(int argc, char* argv[])
@@ -1600,20 +1626,44 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationCopyScannerChannelIntoPointSource());
         *argv[i]='\0'; 
       }
-      else if (strcmp(argv[i],"-copy_R_into_NIR") == 0)
+      else if (strncmp(argv[i],"-copy_R_", 8) == 0)
       {
-        add_operation(new LASoperationCopyRintoNIR());
-        *argv[i]='\0'; 
+        if (strcmp(argv[i],"-copy_R_into_intensity") == 0)
+        {
+          add_operation(new LASoperationCopyRintoIntensity());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_R_into_NIR") == 0)
+        {
+          add_operation(new LASoperationCopyRintoNIR());
+          *argv[i]='\0';
+        }
       }
-      else if (strcmp(argv[i],"-copy_G_into_NIR") == 0)
+      else if (strncmp(argv[i],"-copy_G_", 8) == 0)
       {
-        add_operation(new LASoperationCopyGintoNIR());
-        *argv[i]='\0'; 
+        if (strcmp(argv[i],"-copy_G_into_intensity") == 0)
+        {
+          add_operation(new LASoperationCopyGintoIntensity());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_G_into_NIR") == 0)
+        {
+          add_operation(new LASoperationCopyGintoNIR());
+          *argv[i]='\0'; 
+        }
       }
-      else if (strcmp(argv[i],"-copy_B_into_NIR") == 0)
+      else if (strncmp(argv[i],"-copy_B_", 8) == 0)
       {
-        add_operation(new LASoperationCopyBintoNIR());
-        *argv[i]='\0'; 
+        if (strcmp(argv[i],"-copy_B_into_intensity") == 0)
+        {
+          add_operation(new LASoperationCopyBintoIntensity());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_B_into_NIR") == 0)
+        {
+          add_operation(new LASoperationCopyBintoNIR());
+          *argv[i]='\0'; 
+        }
       }
       else if (strcmp(argv[i],"-copy_NIR_into_intensity") == 0)
       {
