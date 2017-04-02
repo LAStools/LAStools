@@ -301,6 +301,7 @@ public:
         this->point[i] = (U8*)(this->rgb);
         break;
       case LASitem::WAVEPACKET13:
+      case LASitem::WAVEPACKET14:
         have_wavepacket = TRUE;
         this->point[i] = (U8*)&(this->wavepacket);
         break;
@@ -359,6 +360,7 @@ public:
         this->point[i] = (U8*)(this->rgb);
         break;
       case LASitem::WAVEPACKET13:
+      case LASitem::WAVEPACKET14:
         have_wavepacket = TRUE;
         this->point[i] = (U8*)&(this->wavepacket);
         break;

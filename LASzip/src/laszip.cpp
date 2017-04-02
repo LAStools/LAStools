@@ -560,9 +560,18 @@ bool LASzip::setup(U16* num_items, LASitem** items, const U8 point_type, const U
   }
   if (have_wavepacket)
   {
-    (*items)[i].type = LASitem::WAVEPACKET13;
-    (*items)[i].size = 29;
-    (*items)[i].version = 0;
+    if (have_point14)
+	  {
+      (*items)[i].type = LASitem::WAVEPACKET14;
+      (*items)[i].size = 29;
+      (*items)[i].version = 0;
+    }
+    else
+	  {
+      (*items)[i].type = LASitem::WAVEPACKET13;
+      (*items)[i].size = 29;
+      (*items)[i].version = 0;
+    }
     i++;
   }
   if (extra_bytes_number)
