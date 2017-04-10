@@ -271,23 +271,31 @@ bool LASzip::check_item(const LASitem* item)
   return true;
 }
 
-bool LASzip::check_items(const U16 num_items, const LASitem* items)
+bool LASzip::check_items(const U16 num_items, const LASitem* items, const U16 point_size)
 {
   if (num_items == 0) return return_error("number of items cannot be zero");
   if (items == 0) return return_error("items pointer cannot be NULL");
   U16 i;
+  U16 size = 0;
   for (i = 0; i < num_items; i++)
   {
     if (!check_item(&items[i])) return false;
+    size += items[i].size;
+  }
+  if (point_size && (point_size != size))
+  {
+    CHAR temp[64];
+    sprintf(temp, "point has size of %d but items only add up to %d bytes", point_size, size);
+    return return_error(temp);
   }
   return true;
 }
 
-bool LASzip::check()
+bool LASzip::check(const U16 point_size)
 {
   if (!check_compressor(compressor)) return false;
   if (!check_coder(coder)) return false;
-  if (!check_items(num_items, items)) return false;
+  if (!check_items(num_items, items, point_size)) return false;
   return true;
 }
 
