@@ -53,8 +53,8 @@ public:
   void set_scale_factor(const F64* scale_factor);
   void set_offset(const F64* offset);
   void add_attribute(I32 data_type, const CHAR* name, const CHAR* description=0, F64 scale=1.0, F64 offset=0.0, F64 pre_scale=1.0, F64 pre_offset=0.0, F64 no_data=F64_MAX);
-  virtual BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
-  virtual BOOL open(FILE* file, const CHAR* file_name=0, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
+  virtual BOOL open(const CHAR* file_name, U8 point_type=0, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
+  virtual BOOL open(FILE* file, const CHAR* file_name=0, U8 point_type=0, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
 
   I32 get_format() const { return LAS_TOOLS_FORMAT_TXT; };
 
@@ -71,6 +71,7 @@ protected:
   BOOL read_point_default();
 
 private:
+  U8 point_type;
   CHAR* parse_string;
   F32 translate_intensity;
   F32 scale_intensity;
@@ -106,7 +107,7 @@ private:
 class LASreaderTXTrescale : public virtual LASreaderTXT
 {
 public:
-  virtual BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
+  virtual BOOL open(const CHAR* file_name, U8 point_type=0, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
   LASreaderTXTrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor);
 
 protected:
@@ -116,7 +117,7 @@ protected:
 class LASreaderTXTreoffset : public virtual LASreaderTXT
 {
 public:
-  virtual BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
+  virtual BOOL open(const CHAR* file_name, U8 point_type=0, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
   LASreaderTXTreoffset(F64 x_offset, F64 y_offset, F64 z_offset);
 protected:
   F64 offset[3];
@@ -125,7 +126,7 @@ protected:
 class LASreaderTXTrescalereoffset : public LASreaderTXTrescale, LASreaderTXTreoffset
 {
 public:
-  BOOL open(const CHAR* file_name, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
+  BOOL open(const CHAR* file_name, U8 point_type=0, const CHAR* parse_string=0, I32 skip_lines=0, BOOL populate_header=FALSE);
   LASreaderTXTrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset);
 };
 
