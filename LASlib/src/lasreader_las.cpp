@@ -1216,7 +1216,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
 
   if (header.laszip)
   {
-    if (!header.laszip->check())
+    if (!header.laszip->check(header.point_data_record_length))
     {
       fprintf(stderr,"ERROR: %s\n", header.laszip->get_error());
       fprintf(stderr,"       please upgrade to the latest release of LAStools (with LASzip)\n");
