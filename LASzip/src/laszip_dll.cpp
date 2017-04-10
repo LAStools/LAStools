@@ -3551,7 +3551,7 @@ laszip_open_reader(
     {
       // yes. check the compressor state
       *is_compressed = 1;
-      if (!laszip->check())
+      if (!laszip->check(laszip_dll->header.point_data_record_length))
       {
         sprintf(laszip_dll->error, "%s upgrade to the latest release of LASzip or contact 'martin.isenburg@rapidlasso.com' for assistance", laszip->get_error());
         return 1;
