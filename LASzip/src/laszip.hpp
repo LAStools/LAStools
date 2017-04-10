@@ -25,6 +25,8 @@
   
   CHANGE HISTORY:
   
+    8 April 2017 -- new check for whether point size and total size of items match
+    30 March 2017 -- support for "native LAS 1.4 extension" added into main branch
     7 January 2017 -- set reserved VLR field from 0xAABB to 0x0 in DLL
     7 January 2017 -- consistent compatibility mode scan angle quantization in DLL
     7 January 2017 -- compatibility mode *decompression* fix for waveforms in DLL
@@ -97,8 +99,8 @@ public:
   bool check_compressor(const unsigned short compressor);
   bool check_coder(const unsigned short coder);
   bool check_item(const LASitem* item);
-  bool check_items(const unsigned short num_items, const LASitem* items);
-  bool check();
+  bool check_items(const unsigned short num_items, const LASitem* items, const unsigned short point_size=0);
+  bool check(const unsigned short point_size=0);
 
   // go back and forth between item array and point type & size
   bool setup(unsigned short* num_items, LASitem** items, const unsigned char point_type, const unsigned short point_size, const unsigned short compressor=LASZIP_COMPRESSOR_NONE);
