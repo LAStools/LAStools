@@ -605,7 +605,7 @@ BOOL LASreaderMerged::open()
       lasreadertxt->set_scale_scan_angle(scale_scan_angle);
       lasreadertxt->set_scale_factor(scale_factor);
       lasreadertxt->set_offset(offset);
-      if (!lasreadertxt->open(file_names[i], parse_string, skip_lines, populate_header))
+      if (!lasreadertxt->open(file_names[i], 0, parse_string, skip_lines, populate_header))
       {
         fprintf(stderr, "ERROR: could not open lasreadertxt for file '%s'\n", file_names[i]);
         return FALSE;
@@ -1410,7 +1410,7 @@ BOOL LASreaderMerged::open_next_file()
     }
     else
     {
-      if (!lasreadertxt->open(file_names[file_name_current], parse_string, skip_lines, populate_header))
+      if (!lasreadertxt->open(file_names[file_name_current], 0, parse_string, skip_lines, populate_header))
       {
         fprintf(stderr, "ERROR: could not open lasreadertxt for file '%s'\n", file_names[file_name_current]);
         return FALSE;
