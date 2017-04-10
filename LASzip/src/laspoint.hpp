@@ -603,6 +603,8 @@ public:
   inline U8 get_extended_scanner_channel() const { return extended_scanner_channel; };
 
   inline void set_extended_classification(U8 extended_classification) { this->extended_classification = extended_classification; };
+  inline void set_extended_return_number(U8 extended_return_number) { this->extended_return_number = extended_return_number; };
+  inline void set_extended_number_of_returns(U8 extended_number_of_returns) { this->extended_number_of_returns = extended_number_of_returns; };
   inline void set_extended_scan_angle(I16 extended_scan_angle) { this->extended_scan_angle = extended_scan_angle; };
   inline void set_extended_overlap_flag(U8 extended_overlap_flag) { this->extended_classification_flags = (extended_overlap_flag << 3) | (this->extended_classification_flags & 7); };
   inline void set_extended_scanner_channel(U8 extended_scanner_channel) { this->extended_scanner_channel = extended_scanner_channel; };
