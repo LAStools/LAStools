@@ -957,7 +957,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i], attribute_no_datas[i]);
           }
         }
-        if (!lasreadertxt->open(file_name, parse_string, skip_lines, populate_header))
+        if (!lasreadertxt->open(file_name, point_type, parse_string, skip_lines, populate_header))
         {
           fprintf(stderr,"ERROR: cannot open lasreadertxt with file name '%s'\n", file_name);
           delete lasreadertxt;
@@ -1008,7 +1008,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           lasreadertxt->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i], attribute_no_datas[i]);
         }
       }
-      if (!lasreadertxt->open(stdin, 0, parse_string, skip_lines, FALSE))
+      if (!lasreadertxt->open(stdin, 0, point_type, parse_string, skip_lines, FALSE))
       {
         fprintf(stderr,"ERROR: cannot open lasreadertxt with file name '%s'\n", file_name);
         delete lasreadertxt;
@@ -2136,6 +2136,16 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
   return TRUE;
 }
 
+BOOL LASreadOpener::set_point_type(U8 point_type)
+{
+  if (point_type > 10)
+  {
+    return FALSE;
+  }
+  this->point_type = point_type;
+  return TRUE;
+}
+
 void LASreadOpener::set_parse_string(const CHAR* parse_string)
 {
   if (this->parse_string) free(this->parse_string);
@@ -2303,6 +2313,7 @@ LASreadOpener::LASreadOpener()
     attribute_pre_offsets[i] = 0.0;
     attribute_no_datas[i] = F64_MAX;
   }
+  point_type = 0;
   parse_string = 0;
   skip_lines = 0;
   populate_header = FALSE;
