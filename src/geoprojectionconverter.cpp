@@ -3783,18 +3783,18 @@ short GeoProjectionConverter::get_GeogEllipsoidGeoKey() const
   return 0;
 }
 
-bool GeoProjectionConverter::set_ProjLinearUnitsGeoKey(short value)
+bool GeoProjectionConverter::set_ProjLinearUnitsGeoKey(short value, bool source)
 {
   switch (value)
   {
   case 9001: // Linear_Meter
-    set_coordinates_in_meter();
+    set_coordinates_in_meter(source);
     break;
   case 9002: // Linear_Foot
-    set_coordinates_in_feet();
+    set_coordinates_in_feet(source);
     break;
   case 9003: // Linear_Foot_US_Survey
-    set_coordinates_in_survey_feet();
+    set_coordinates_in_survey_feet(source);
     break;
   default:
     fprintf(stderr, "set_ProjLinearUnitsGeoKey: look-up for %d not implemented\n", value);
@@ -4865,7 +4865,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             fprintf(stderr, "failed to scan units, gcs, and transform from '%s'", line);
             return false;
           }
-          if (!set_ProjLinearUnitsGeoKey(units))
+          if (!set_ProjLinearUnitsGeoKey(units, source))
           {
             fprintf(stderr, "units %d of EPSG code %d not implemented.\n", units, value);
             return false;
@@ -8175,11 +8175,11 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
 {
   if (horizontal_units == 1)
   {
-    set_ProjLinearUnitsGeoKey(9001);
+    set_ProjLinearUnitsGeoKey(9001, source);
   }
   else if (horizontal_units == 0)
   {
-    set_ProjLinearUnitsGeoKey(9002);
+    set_ProjLinearUnitsGeoKey(9002, source);
   }
 
   if (vertical_units == 1)

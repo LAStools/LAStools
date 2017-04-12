@@ -281,7 +281,7 @@ public:
   int set_GeogEllipsoidGeoKey(short value);
   short get_GeogEllipsoidGeoKey() const;
 
-  bool set_ProjLinearUnitsGeoKey(short value);
+  bool set_ProjLinearUnitsGeoKey(short value, bool source=true);
   short get_ProjLinearUnitsGeoKey(bool source=true) const;
 
   bool set_VerticalUnitsGeoKey(short value);
