@@ -7683,15 +7683,15 @@ bool GeoProjectionConverter::get_img_projection_parameters(char** proName, int* 
 
 bool GeoProjectionConverter::get_dtm_projection_parameters(short* horizontal_units, short* vertical_units, short* coordinate_system, short* coordinate_zone, short* horizontal_datum, short* vertical_datum, bool source)
 {
-  if (get_ProjLinearUnitsGeoKey() == 9001)
+  if (get_ProjLinearUnitsGeoKey(source) == 9001)
   {
     *horizontal_units = 1;
   }
-  else if (get_ProjLinearUnitsGeoKey() == 9002)
+  else if (get_ProjLinearUnitsGeoKey(source) == 9002)
   {
     *horizontal_units = 0;
   }
-  else if (get_ProjLinearUnitsGeoKey() == 9003)
+  else if (get_ProjLinearUnitsGeoKey(source) == 9003)
   {
     *horizontal_units = 0;
   }
@@ -7700,15 +7700,15 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(short* horizontal_uni
     *horizontal_units = 2;
   }
 
-  if (get_VerticalUnitsGeoKey() == 9001)
+  if (get_VerticalUnitsGeoKey(source) == 9001)
   {
     *vertical_units = 1;
   }
-  else if (get_VerticalUnitsGeoKey() == 9002)
+  else if (get_VerticalUnitsGeoKey(source) == 9002)
   {
     *vertical_units = 0;
   }
-  else if (get_VerticalUnitsGeoKey() == 9003)
+  else if (get_VerticalUnitsGeoKey(source) == 9003)
   {
     *vertical_units = 0;
   }
