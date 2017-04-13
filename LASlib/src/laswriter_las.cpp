@@ -171,7 +171,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     point_data_record_length = header->point_data_record_length;
   }
 
-  // fail if we have the old compressor enabled the new LAS 1.4 point types
+  // fail if we don't use the layered compressor for the new LAS 1.4 point types
   
   if (compressor && (point_data_format > 5) && (compressor != LASZIP_COMPRESSOR_LAYERED_CHUNKED))
   {
@@ -189,7 +189,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     laszip->setup(point.num_items, point.items, compressor);
     if (chunk_size > -1) laszip->set_chunk_size((U32)chunk_size);
     if (compressor == LASZIP_COMPRESSOR_NONE) laszip->request_version(0);
-    else if (chunk_size == 0) { fprintf(stderr,"ERROR: adaptive chunking is depricated\n"); return FALSE; }
+    else if (chunk_size == 0 && (point_data_format <= 5)) { fprintf(stderr,"ERROR: adaptive chunking is depricated for point type %d.\n       only available for new LAS 1.4 point types 6 or higher.\n", point_data_format); return FALSE; }
     else if (requested_version) laszip->request_version(requested_version);
     else laszip->request_version(2);
     laszip_vlr_data_size = 34 + 6*laszip->num_items;
