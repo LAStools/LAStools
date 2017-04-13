@@ -338,7 +338,25 @@ BOOL LASwritePoint::chunk()
   {
     return FALSE;
   }
-  enc->done();
+  if (layered_las14_compression)
+  {
+    U32 i;
+    // write how many points are in the chunk
+    outstream->put32bitsLE((U8*)&chunk_count);
+    // write all layers 
+    for (i = 0; i < num_writers; i++)
+    {
+      ((LASwriteItemCompressed*)writers[i])->chunk_sizes();
+    }
+    for (i = 0; i < num_writers; i++)
+    {
+      ((LASwriteItemCompressed*)writers[i])->chunk_bytes();
+    }
+  }
+  else
+  {
+    enc->done();
+  }
   add_chunk_to_table();
   init(outstream);
   chunk_count = 0;
