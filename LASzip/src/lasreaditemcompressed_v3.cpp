@@ -734,6 +734,33 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item)
     ((LASpoint14*)last_item)->return_number = r;
   }
 
+  // set legacy return counts and number of returns
+
+  if (n > 7)
+  {
+    if (r > 6)
+    {
+      if (r >= n)
+      {
+        ((LASpoint14*)last_item)->legacy_return_number = 7;
+      }
+      else
+      {
+        ((LASpoint14*)last_item)->legacy_return_number = 6;
+      }
+    }
+    else
+    {
+      ((LASpoint14*)last_item)->legacy_return_number = r;
+    }
+    ((LASpoint14*)last_item)->legacy_number_of_returns = 7;
+  }
+  else
+  {
+    ((LASpoint14*)last_item)->legacy_return_number = r;
+    ((LASpoint14*)last_item)->legacy_number_of_returns = n;
+  }
+
   // get return map m and return level l context for current point
 
   U32 m = number_return_map_6ctx[n][r];
@@ -833,6 +860,7 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item)
     if (scan_angle_change) // if the scan angle has actually changed
     {
       ((LASpoint14*)last_item)->scan_angle = contexts[current_context].ic_scan_angle->decompress(((LASpoint14*)last_item)->scan_angle, gps_time_change); // if the GPS time has changed
+      ((LASpoint14*)last_item)->legacy_scan_angle_rank = I8_CLAMP(I16_QUANTIZE(0.006f*((LASpoint14*)last_item)->scan_angle));
     }
   }
 
