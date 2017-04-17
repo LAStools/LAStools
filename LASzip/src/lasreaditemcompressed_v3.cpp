@@ -75,7 +75,7 @@ typedef struct LASpoint14
 
 #define LASZIP_GPSTIME_MULTI_TOTAL (LASZIP_GPSTIME_MULTI - LASZIP_GPSTIME_MULTI_MINUS + 5) 
 
-LASreadItemCompressed_POINT14_v3::LASreadItemCompressed_POINT14_v3(ArithmeticDecoder* dec)
+LASreadItemCompressed_POINT14_v3::LASreadItemCompressed_POINT14_v3(ArithmeticDecoder* dec, const U32 decompress_layers)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -125,6 +125,7 @@ LASreadItemCompressed_POINT14_v3::LASreadItemCompressed_POINT14_v3(ArithmeticDec
   num_bytes_point_source = 0;
   num_bytes_gps_time = 0;
 
+  changed_Z = FALSE;
   changed_classification = FALSE;
   changed_flags = FALSE;
   changed_intensity = FALSE;
@@ -133,14 +134,14 @@ LASreadItemCompressed_POINT14_v3::LASreadItemCompressed_POINT14_v3(ArithmeticDec
   changed_point_source = FALSE;
   changed_gps_time = FALSE;
 
-  requested_Z = TRUE;
-  requested_classification = TRUE;
-  requested_flags = TRUE;
-  requested_intensity = TRUE;
-  requested_scan_angle = TRUE;
-  requested_user_data = TRUE;
-  requested_point_source = TRUE;
-  requested_gps_time = TRUE;
+  requested_Z = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_CLASSIFICATIONS ? TRUE : FALSE);
+  requested_classification = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_CLASSIFICATIONS ? TRUE : FALSE);
+  requested_flags = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_FLAGS ? TRUE : FALSE);
+  requested_intensity = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_INTENSITY ? TRUE : FALSE);
+  requested_scan_angle = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_SCAN_ANGLE ? TRUE : FALSE);
+  requested_user_data = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_USER_DATA ? TRUE : FALSE);
+  requested_point_source = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_POINT_SOURCE ? TRUE : FALSE);
+  requested_gps_time = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_GPS_TIME ? TRUE : FALSE);
 
   /* init the bytes buffer to zero */
 
@@ -395,16 +396,6 @@ BOOL LASreadItemCompressed_POINT14_v3::chunk_sizes()
   instream->get32bitsLE(((U8*)&num_bytes_point_source));
   instream->get32bitsLE(((U8*)&num_bytes_gps_time));
 
-  /* some layers may not change */
-
-  changed_classification = !!num_bytes_classification;
-  changed_flags = !!num_bytes_flags;
-  changed_intensity = !!num_bytes_intensity;
-  changed_scan_angle = !!num_bytes_scan_angle;
-  changed_user_data = !!num_bytes_user_data;
-  changed_point_source = !!num_bytes_point_source;
-  changed_gps_time = !!num_bytes_gps_time;
-
   return TRUE;
 }
 
@@ -482,7 +473,7 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item)
     num_bytes_allocated = num_bytes;
   }
 
-  /* load the requested bytes and init the corresponding instreams an decoders */
+  /* load the requested bytes and init the corresponding instreams and decoders */
 
   num_bytes = 0;
   instream->getBytes(bytes, num_bytes_channel_returns_XY);
@@ -492,10 +483,27 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item)
 
   if (requested_Z)
   {
-    instream->getBytes(&(bytes[num_bytes]), num_bytes_Z);
-    instream_Z->init(&(bytes[num_bytes]), num_bytes_Z);
-    dec_Z->init(instream_Z);
-    num_bytes += num_bytes_Z;
+    if (num_bytes_Z)
+    {
+      instream->getBytes(&(bytes[num_bytes]), num_bytes_Z);
+      instream_Z->init(&(bytes[num_bytes]), num_bytes_Z);
+      dec_Z->init(instream_Z);
+      num_bytes += num_bytes_Z;
+      changed_Z = TRUE;
+    }
+    else
+    {
+      instream_Z->init(0, 0);
+      changed_Z = FALSE;
+    }
+  }
+  else 
+  {
+    if (num_bytes_Z)
+    {
+      instream->skipBytes(num_bytes_Z);
+    }
+    changed_Z = FALSE;
   }
 
   if (requested_classification)
@@ -506,11 +514,21 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item)
       instream_classification->init(&(bytes[num_bytes]), num_bytes_classification);
       dec_classification->init(instream_classification);
       num_bytes += num_bytes_classification;
+      changed_classification = TRUE;
     }
     else
     {
       instream_classification->init(0, 0);
+      changed_classification = FALSE;
     }
+  }
+  else 
+  {
+    if (num_bytes_classification)
+    {
+      instream->skipBytes(num_bytes_classification);
+    }
+    changed_classification = FALSE;
   }
 
   if (requested_flags)
@@ -521,11 +539,21 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item)
       instream_flags->init(&(bytes[num_bytes]), num_bytes_flags);
       dec_flags->init(instream_flags);
       num_bytes += num_bytes_flags;
+      changed_flags = TRUE;
     }
     else
     {
       instream_flags->init(0, 0);
+      changed_flags = FALSE;
     }
+  }
+  else 
+  {
+    if (num_bytes_flags)
+    {
+      instream->skipBytes(num_bytes_flags);
+    }
+    changed_flags = FALSE;
   }
 
   if (requested_intensity)
@@ -536,11 +564,21 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item)
       instream_intensity->init(&(bytes[num_bytes]), num_bytes_intensity);
       dec_intensity->init(instream_intensity);
       num_bytes += num_bytes_intensity;
+      changed_intensity = TRUE;
     }
     else
     {
       instream_intensity->init(0, 0);
+      changed_intensity = FALSE;
     }
+  }
+  else 
+  {
+    if (num_bytes_intensity)
+    {
+      instream->skipBytes(num_bytes_intensity);
+    }
+    changed_intensity = FALSE;
   }
 
   if (requested_scan_angle)
@@ -551,11 +589,21 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item)
       instream_scan_angle->init(&(bytes[num_bytes]), num_bytes_scan_angle);
       dec_scan_angle->init(instream_scan_angle);
       num_bytes += num_bytes_scan_angle;
+      changed_scan_angle = TRUE;
     }
     else
     {
       instream_scan_angle->init(0, 0);
+      changed_scan_angle = FALSE;
     }
+  }
+  else 
+  {
+    if (num_bytes_scan_angle)
+    {
+      instream->skipBytes(num_bytes_scan_angle);
+    }
+    changed_scan_angle = FALSE;
   }
 
   if (requested_user_data)
@@ -566,11 +614,21 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item)
       instream_user_data->init(&(bytes[num_bytes]), num_bytes_user_data);
       dec_user_data->init(instream_user_data);
       num_bytes += num_bytes_user_data;
+      changed_user_data = TRUE;
     }
     else
     {
       instream_user_data->init(0, 0);
+      changed_user_data = FALSE;
     }
+  }
+  else 
+  {
+    if (num_bytes_user_data)
+    {
+      instream->skipBytes(num_bytes_user_data);
+    }
+    changed_user_data = FALSE;
   }
 
   if (requested_point_source)
@@ -581,11 +639,21 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item)
       instream_point_source->init(&(bytes[num_bytes]), num_bytes_point_source);
       dec_point_source->init(instream_point_source);
       num_bytes += num_bytes_point_source;
+      changed_point_source = TRUE;
     }
     else
     {
       instream_point_source->init(0, 0);
+      changed_point_source = FALSE;
     }
+  }
+  else
+  {
+    if (num_bytes_point_source)
+    {
+      instream->skipBytes(num_bytes_point_source);
+    }
+    changed_point_source = FALSE;
   }
 
   if (requested_gps_time)
@@ -596,11 +664,21 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item)
       instream_gps_time->init(&(bytes[num_bytes]), num_bytes_gps_time);
       dec_gps_time->init(instream_gps_time);
       num_bytes += num_bytes_gps_time;
+      changed_gps_time = TRUE;
     }
     else
     {
       instream_gps_time->init(0, 0);
+      changed_gps_time = FALSE;
     }
+  }
+  else
+  {
+    if (num_bytes_gps_time)
+    {
+      instream->skipBytes(num_bytes_gps_time);
+    }
+    changed_gps_time = FALSE;
   }
 
   /* mark the four scanner channel contexts as unused */
@@ -788,18 +866,21 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item)
   contexts[current_context].last_Y_diff_median5[(m<<1) | gps_time_change].add(diff);
 
   ////////////////////////////////////////
-  // decompress Z layer 
+  // decompress Z layer (if changed and requested)
   ////////////////////////////////////////
 
-  k_bits = (contexts[current_context].ic_dX->getK() + contexts[current_context].ic_dY->getK()) / 2;
-  ((LASpoint14*)last_item)->Z = contexts[current_context].ic_Z->decompress(contexts[current_context].last_Z[l], (n==1) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
-  contexts[current_context].last_Z[l] = ((LASpoint14*)last_item)->Z;
+  if (changed_Z) // if the Z coordinate should be decompressed and changes within this chunk
+  {
+    k_bits = (contexts[current_context].ic_dX->getK() + contexts[current_context].ic_dY->getK()) / 2;
+    ((LASpoint14*)last_item)->Z = contexts[current_context].ic_Z->decompress(contexts[current_context].last_Z[l], (n==1) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
+    contexts[current_context].last_Z[l] = ((LASpoint14*)last_item)->Z;
+  }
 
   ////////////////////////////////////////
-  // decompress classifications layer 
+  // decompress classifications layer (if changed and requested)
   ////////////////////////////////////////
 
-  if (changed_classification)
+  if (changed_classification) // if the classification should be decompressed and changes within this chunk
   {
     U32 last_classification = ((LASpoint14*)last_item)->classification;
     I32 ccc = ((last_classification & 0x1F) << 1) + (cpr == 3 ? 1 : 0);
@@ -818,10 +899,10 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item)
   }
 
   ////////////////////////////////////////
-  // decompress flags layer 
+  // decompress flags layer (if changed and requested)
   ////////////////////////////////////////
 
-  if (changed_flags)
+  if (changed_flags) // if the flags should be decompressed and change within this chunk
   {
     U32 last_flags = (((LASpoint14*)last_item)->edge_of_flight_line << 5) | (((LASpoint14*)last_item)->scan_direction_flag << 4) | ((LASpoint14*)last_item)->classification_flags;
     if (contexts[current_context].m_flags[last_flags] == 0)
@@ -841,10 +922,10 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item)
   }
 
   ////////////////////////////////////////
-  // decompress intensity layer 
+  // decompress intensity layer (if changed and requested)
   ////////////////////////////////////////
 
-  if (changed_intensity)
+  if (changed_intensity) // if the intensity should be decompressed and changes within this chunk
   {
     U16 intensity = contexts[current_context].ic_intensity->decompress(contexts[current_context].last_intensity[(cpr<<1) | gps_time_change], cpr);
     contexts[current_context].last_intensity[(cpr<<1) | gps_time_change] = intensity;
@@ -852,7 +933,7 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item)
   }
 
   ////////////////////////////////////////
-  // decompress scan_angle layer 
+  // decompress scan_angle layer (if changed and requested)
   ////////////////////////////////////////
 
   if (changed_scan_angle) // if the scan angle should be decompressed and changes within this chunk
@@ -865,10 +946,10 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item)
   }
 
   ////////////////////////////////////////
-  // decompress user_data layer 
+  // decompress user_data layer (if changed and requested)
   ////////////////////////////////////////
 
-  if (changed_user_data)
+  if (changed_user_data) // if the user data should be decompressed and changes within this chunk
   {
     if (contexts[current_context].m_user_data[((LASpoint14*)last_item)->user_data/4] == 0)
     {
@@ -879,7 +960,7 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item)
   }
 
   ////////////////////////////////////////
-  // decompress point_source layer 
+  // decompress point_source layer (if changed and requested)
   ////////////////////////////////////////
 
   if (changed_point_source) // if the point source ID should be decompressed and changes within this chunk
@@ -891,7 +972,7 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item)
   }
 
   ////////////////////////////////////////
-  // decompress gps_time layer 
+  // decompress gps_time layer (if changed and requested)
   ////////////////////////////////////////
 
   if (changed_gps_time) // if the GPS time should be decompressed and changes within this chunk
@@ -1019,7 +1100,7 @@ void LASreadItemCompressed_POINT14_v3::read_gps_time()
 ===============================================================================
 */
 
-LASreadItemCompressed_RGB14_v3::LASreadItemCompressed_RGB14_v3(ArithmeticDecoder* dec)
+LASreadItemCompressed_RGB14_v3::LASreadItemCompressed_RGB14_v3(ArithmeticDecoder* dec, const U32 decompress_layers)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -1038,7 +1119,7 @@ LASreadItemCompressed_RGB14_v3::LASreadItemCompressed_RGB14_v3(ArithmeticDecoder
 
   changed_RGB = FALSE;
 
-  requested_RGB = TRUE;
+  requested_RGB = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_RGB ? TRUE : FALSE);
 
   /* init the bytes buffer to zero */
 
@@ -1317,7 +1398,7 @@ inline void LASreadItemCompressed_RGB14_v3::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_RGBNIR14_v3::LASreadItemCompressed_RGBNIR14_v3(ArithmeticDecoder* dec)
+LASreadItemCompressed_RGBNIR14_v3::LASreadItemCompressed_RGBNIR14_v3(ArithmeticDecoder* dec, const U32 decompress_layers)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -1340,8 +1421,8 @@ LASreadItemCompressed_RGBNIR14_v3::LASreadItemCompressed_RGBNIR14_v3(ArithmeticD
   changed_RGB = FALSE;
   changed_NIR = FALSE;
 
-  requested_RGB = TRUE;
-  requested_NIR = TRUE;
+  requested_RGB = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_RGB ? TRUE : FALSE);
+  requested_NIR = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_NIR ? TRUE : FALSE);
 
   /* init the bytes buffer to zero */
 
@@ -1734,7 +1815,7 @@ inline void LASreadItemCompressed_RGBNIR14_v3::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_WAVEPACKET14_v3::LASreadItemCompressed_WAVEPACKET14_v3(ArithmeticDecoder* dec)
+LASreadItemCompressed_WAVEPACKET14_v3::LASreadItemCompressed_WAVEPACKET14_v3(ArithmeticDecoder* dec, const U32 decompress_layers)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -1753,7 +1834,7 @@ LASreadItemCompressed_WAVEPACKET14_v3::LASreadItemCompressed_WAVEPACKET14_v3(Ari
 
   changed_wavepacket = FALSE;
 
-  requested_wavepacket = TRUE;
+  requested_wavepacket = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_WAVEPACKET ? TRUE : FALSE);
 
   /* init the bytes buffer to zero */
 
@@ -2003,7 +2084,7 @@ inline void LASreadItemCompressed_WAVEPACKET14_v3::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_BYTE14_v3::LASreadItemCompressed_BYTE14_v3(ArithmeticDecoder* dec, U32 number)
+LASreadItemCompressed_BYTE14_v3::LASreadItemCompressed_BYTE14_v3(ArithmeticDecoder* dec, U32 number, const U32 decompress_layers)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -2036,7 +2117,7 @@ LASreadItemCompressed_BYTE14_v3::LASreadItemCompressed_BYTE14_v3(ArithmeticDecod
 
     changed_Bytes[i] = FALSE;
 
-    requested_Bytes[i] = TRUE;
+    requested_Bytes[i] = (decompress_layers & (LASZIP_SELECTIVE_DECOMPRESSION_BYTE0 << i) ? TRUE : FALSE);
   }
 
   /* init the bytes buffer to zero */

@@ -31,6 +31,7 @@
 #ifndef LAS_READ_ITEM_COMPRESSED_V3_HPP
 #define LAS_READ_ITEM_COMPRESSED_V3_HPP
 
+#include "laszip_selective_decompression_v3.hpp"
 #include "lasreaditem.hpp"
 #include "arithmeticdecoder.hpp"
 #include "integercompressor.hpp"
@@ -42,7 +43,7 @@ class LASreadItemCompressed_POINT14_v3 : public LASreadItemCompressed
 {
 public:
 
-  LASreadItemCompressed_POINT14_v3(ArithmeticDecoder* dec);
+  LASreadItemCompressed_POINT14_v3(ArithmeticDecoder* dec, const U32 decompress_layers=LASZIP_SELECTIVE_DECOMPRESSION_ALL);
 
   BOOL chunk_sizes();
   BOOL init(const U8* item);
@@ -76,6 +77,7 @@ private:
   ArithmeticDecoder* dec_point_source;
   ArithmeticDecoder* dec_gps_time;
 
+  BOOL changed_Z;
   BOOL changed_classification;
   BOOL changed_flags;
   BOOL changed_intensity;
@@ -117,7 +119,7 @@ class LASreadItemCompressed_RGB14_v3 : public LASreadItemCompressed
 {
 public:
 
-  LASreadItemCompressed_RGB14_v3(ArithmeticDecoder* dec);
+  LASreadItemCompressed_RGB14_v3(ArithmeticDecoder* dec, const U32 decompress_layers=LASZIP_SELECTIVE_DECOMPRESSION_ALL);
 
   BOOL chunk_sizes();
   BOOL init(const U8* item);
@@ -154,7 +156,7 @@ class LASreadItemCompressed_RGBNIR14_v3 : public LASreadItemCompressed
 {
 public:
 
-  LASreadItemCompressed_RGBNIR14_v3(ArithmeticDecoder* dec);
+  LASreadItemCompressed_RGBNIR14_v3(ArithmeticDecoder* dec, const U32 decompress_layers=LASZIP_SELECTIVE_DECOMPRESSION_ALL);
 
   BOOL chunk_sizes();
   BOOL init(const U8* item);
@@ -196,7 +198,7 @@ class LASreadItemCompressed_WAVEPACKET14_v3 : public LASreadItemCompressed
 {
 public:
 
-  LASreadItemCompressed_WAVEPACKET14_v3(ArithmeticDecoder* dec);
+  LASreadItemCompressed_WAVEPACKET14_v3(ArithmeticDecoder* dec, const U32 decompress_layers=LASZIP_SELECTIVE_DECOMPRESSION_ALL);
 
   BOOL chunk_sizes();
   BOOL init(const U8* item);
@@ -233,7 +235,7 @@ class LASreadItemCompressed_BYTE14_v3 : public LASreadItemCompressed
 {
 public:
 
-  LASreadItemCompressed_BYTE14_v3(ArithmeticDecoder* dec, U32 number);
+  LASreadItemCompressed_BYTE14_v3(ArithmeticDecoder* dec, U32 number, const U32 decompress_layers=LASZIP_SELECTIVE_DECOMPRESSION_ALL);
 
   BOOL chunk_sizes();
   BOOL init(const U8* item);
