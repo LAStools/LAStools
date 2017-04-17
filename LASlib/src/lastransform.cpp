@@ -737,6 +737,31 @@ private:
   U8 class_to;
 };
 
+class LASoperationClassifyIntensityBetweenAs : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "classify_intensity_between_as"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), (I32)intensity_below, (I32)intensity_above, (I32)class_to); };
+  inline void transform(LASpoint* point) {
+    if ((intensity_above <= point->intensity) && (point->intensity <= intensity_above))
+    {
+      if (class_to >= 32)
+      {
+        point->classification = class_to;
+      }
+      else
+      {
+        point->classification = (point->classification & 224) | class_to;
+      }
+    }
+  };
+  LASoperationClassifyIntensityBetweenAs(U16 intensity_below, U16 intensity_above, U8 class_to) { this->intensity_below = intensity_below; this->intensity_above = intensity_above; this->class_to = class_to; };
+private:
+  U16 intensity_below;
+  U16 intensity_above;
+  U8 class_to;
+};
+
 class LASoperationSetWithheldFlag : public LASoperation
 {
 public:
@@ -1251,6 +1276,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -classify_z_between_as 2.0 5.0 4\n");
   fprintf(stderr,"  -classify_intensity_above_as 200 9\n");
   fprintf(stderr,"  -classify_intensity_below_as 30 11 \n");
+  fprintf(stderr,"  -classify_intensity_between_as 500 900 15\n");
   fprintf(stderr,"  -change_extended_classification_from_to 6 46\n");
   fprintf(stderr,"  -move_ancient_to_extended_classification\n");
   fprintf(stderr,"Change the flags.\n");
@@ -1924,55 +1950,71 @@ BOOL LAStransform::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-classify_", 10) == 0)
     {
-      if (strcmp(argv[i],"-classify_z_below_as") == 0)
+      if (strncmp(argv[i],"-classify_z_", 12) == 0)
       {
-        if ((i+2) >= argc)
+        if (strcmp(argv[i],"-classify_z_below_as") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyZbelowAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
-        add_operation(new LASoperationClassifyZbelowAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+        else if (strcmp(argv[i],"-classify_z_above_as") == 0)
+        {
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyZaboveAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+        }
+        else if (strcmp(argv[i],"-classify_z_between_as") == 0)
+        {
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: z_min z_max classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyZbetweenAs(atof(argv[i+1]), atof(argv[i+2]), U8_CLAMP(atoi(argv[i+3]))));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+        }
       }
-      else if (strcmp(argv[i],"-classify_z_above_as") == 0)
+      if (strncmp(argv[i],"-classify_intensity_", 20) == 0)
       {
-        if ((i+2) >= argc)
+        if (strcmp(argv[i],"-classify_intensity_below_as") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyIntensityBelowAs(U16_CLAMP(atoi(argv[i+1])), U8_CLAMP(atoi(argv[i+2]))));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
-        add_operation(new LASoperationClassifyZaboveAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
-      }
-      else if (strcmp(argv[i],"-classify_z_between_as") == 0)
-      {
-        if ((i+3) >= argc)
+        else if (strcmp(argv[i],"-classify_intensity_above_as") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 3 arguments: z_min z_max classification_code\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyIntensityAboveAs(U16_CLAMP(atoi(argv[i+1])), (U8)atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
-        add_operation(new LASoperationClassifyZbetweenAs(atof(argv[i+1]), atof(argv[i+2]), U8_CLAMP(atoi(argv[i+3]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
-      }
-      else if (strcmp(argv[i],"-classify_intensity_below_as") == 0)
-      {
-        if ((i+2) >= argc)
+        else if (strcmp(argv[i],"-classify_intensity_between_as") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
-          return FALSE;
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: min_intensity_value max_intensity_value classification_code\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyIntensityBetweenAs(U16_CLAMP(atoi(argv[i+1])), U16_CLAMP(atoi(argv[i+2])), (U8)atoi(argv[i+3])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
         }
-        add_operation(new LASoperationClassifyIntensityBelowAs(U16_CLAMP(atoi(argv[i+1])), U8_CLAMP(atoi(argv[i+2]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
-      }
-      else if (strcmp(argv[i],"-classify_intensity_above_as") == 0)
-      {
-        if ((i+2) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
-          return FALSE;
-        }
-        add_operation(new LASoperationClassifyIntensityAboveAs(U16_CLAMP(atoi(argv[i+1])), (U8)atoi(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
     }
     else if (strncmp(argv[i],"-scale_", 7) == 0)
