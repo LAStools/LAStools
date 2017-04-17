@@ -1215,10 +1215,6 @@ BOOL LASreadItemCompressed_RGB14_v3::chunk_sizes()
 
   instream->get32bitsLE(((U8*)&num_bytes_RGB));
 
-  /* some layers may not change */
-
-  changed_RGB = !!num_bytes_RGB;
-
   return TRUE;
 }
 
@@ -1267,11 +1263,21 @@ BOOL LASreadItemCompressed_RGB14_v3::init(const U8* item)
       instream->getBytes(bytes, num_bytes_RGB);
       instream_RGB->init(bytes, num_bytes_RGB);
       dec_RGB->init(instream_RGB);
+      changed_RGB = TRUE;
     }
     else
     {
       instream_RGB->init(0, 0);
+      changed_RGB = FALSE;
     }
+  }
+  else
+  {
+    if (num_bytes_RGB)
+    {
+      instream->skipBytes(num_bytes_RGB);
+    }
+    changed_RGB = FALSE;
   }
 
   /* mark the four scanner channel contexts as unused */
@@ -1553,11 +1559,6 @@ BOOL LASreadItemCompressed_RGBNIR14_v3::chunk_sizes()
   instream->get32bitsLE(((U8*)&num_bytes_RGB));
   instream->get32bitsLE(((U8*)&num_bytes_NIR));
 
-  /* some layers may not change */
-
-  changed_RGB = !!num_bytes_RGB;
-  changed_NIR = !!num_bytes_NIR;
-
   return TRUE;
 }
 
@@ -1618,19 +1619,21 @@ BOOL LASreadItemCompressed_RGBNIR14_v3::init(const U8* item)
       num_bytes += num_bytes_RGB;
       instream_RGB->init(bytes, num_bytes_RGB);
       dec_RGB->init(instream_RGB);
+      changed_RGB = TRUE;
     }
     else
     {
       instream_RGB->init(0, 0);
+      changed_RGB = FALSE;
     }
   }
   else
   {
     if (num_bytes_RGB)
     {
-//      instream->skipBytes(num_bytes_RGB);
-      num_bytes += num_bytes_RGB;
+      instream->skipBytes(num_bytes_RGB);
     }
+    changed_RGB = FALSE;
   }
 
   if (requested_NIR)
@@ -1640,18 +1643,21 @@ BOOL LASreadItemCompressed_RGBNIR14_v3::init(const U8* item)
       instream->getBytes(&bytes[num_bytes], num_bytes_NIR);
       instream_NIR->init(&bytes[num_bytes], num_bytes_NIR);
       dec_NIR->init(instream_NIR);
+      changed_NIR = TRUE;
     }
     else
     {
       instream_NIR->init(0, 0);
+      changed_NIR = FALSE;
     }
   }
   else
   {
     if (num_bytes_NIR)
     {
-//      instream->skipBytes(num_bytes_NIR);
+      instream->skipBytes(num_bytes_NIR);
     }
+    changed_NIR = FALSE;
   }
 
   /* mark the four scanner channel contexts as unused */
@@ -1941,10 +1947,6 @@ BOOL LASreadItemCompressed_WAVEPACKET14_v3::chunk_sizes()
 
   instream->get32bitsLE(((U8*)&num_bytes_wavepacket));
 
-  /* some layers may not change */
-
-  changed_wavepacket = !!num_bytes_wavepacket;
-
   return TRUE;
 }
 
@@ -1993,11 +1995,21 @@ BOOL LASreadItemCompressed_WAVEPACKET14_v3::init(const U8* item)
       instream->getBytes(bytes, num_bytes_wavepacket);
       instream_wavepacket->init(bytes, num_bytes_wavepacket);
       dec_wavepacket->init(instream_wavepacket);
+      changed_wavepacket = TRUE;
     }
     else
     {
       instream_wavepacket->init(0, 0);
+      changed_wavepacket = FALSE;
     }
+  }
+  else
+  {
+    if (num_bytes_wavepacket)
+    {
+      instream->skipBytes(num_bytes_wavepacket);
+    }
+    changed_wavepacket = FALSE;
   }
 
   /* mark the four scanner channel contexts as unused */
@@ -2233,10 +2245,6 @@ BOOL LASreadItemCompressed_BYTE14_v3::chunk_sizes()
     /* read bytes per layer */
 
     instream->get32bitsLE(((U8*)&(num_bytes_Bytes[i])));
-
-    /* some layers may not change */
-
-    changed_Bytes[i] = !!(num_bytes_Bytes[i]);
   }
 
   return TRUE;
@@ -2319,11 +2327,21 @@ BOOL LASreadItemCompressed_BYTE14_v3::init(const U8* item)
         instream_Bytes[i]->init(&(bytes[num_bytes]), num_bytes_Bytes[i]);
         dec_Bytes[i]->init(instream_Bytes[i]);
         num_bytes += num_bytes_Bytes[i];
+        changed_Bytes[i] = TRUE;
       }
       else
       {
         dec_Bytes[i]->init(0, 0);
+        changed_Bytes[i] = FALSE;
       }
+    }
+    else
+    {
+      if (num_bytes_Bytes[i])
+      {
+        instream->skipBytes(num_bytes_Bytes[i]);
+      }
+      changed_Bytes[i] = FALSE;
     }
   }
 
