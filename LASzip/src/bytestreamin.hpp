@@ -78,6 +78,8 @@ public:
   virtual BOOL seek(const I64 position) = 0;
 /* seek to the end of the file                               */
   virtual BOOL seekEnd(const I64 distance=0) = 0;
+/* seek to the end of the file                               */
+  virtual BOOL skipBytes(const U32 num_bytes) { I64 curr = tell(); return seek(curr + num_bytes); };
 /* constructor                                               */
   inline ByteStreamIn() { bit_buffer = 0; num_buffer = 0; };
 /* destructor                                                */
