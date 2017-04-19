@@ -75,7 +75,7 @@ typedef struct LASpoint14
 
 #define LASZIP_GPSTIME_MULTI_TOTAL (LASZIP_GPSTIME_MULTI - LASZIP_GPSTIME_MULTI_MINUS + 5) 
 
-LASreadItemCompressed_POINT14_v3::LASreadItemCompressed_POINT14_v3(ArithmeticDecoder* dec, const U32 decompress_layers)
+LASreadItemCompressed_POINT14_v3::LASreadItemCompressed_POINT14_v3(ArithmeticDecoder* dec, const U32 decompress_selective)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -134,14 +134,14 @@ LASreadItemCompressed_POINT14_v3::LASreadItemCompressed_POINT14_v3(ArithmeticDec
   changed_point_source = FALSE;
   changed_gps_time = FALSE;
 
-  requested_Z = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_CLASSIFICATIONS ? TRUE : FALSE);
-  requested_classification = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_CLASSIFICATIONS ? TRUE : FALSE);
-  requested_flags = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_FLAGS ? TRUE : FALSE);
-  requested_intensity = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_INTENSITY ? TRUE : FALSE);
-  requested_scan_angle = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_SCAN_ANGLE ? TRUE : FALSE);
-  requested_user_data = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_USER_DATA ? TRUE : FALSE);
-  requested_point_source = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_POINT_SOURCE ? TRUE : FALSE);
-  requested_gps_time = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_GPS_TIME ? TRUE : FALSE);
+  requested_Z = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_Z ? TRUE : FALSE);
+  requested_classification = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATIONS ? TRUE : FALSE);
+  requested_flags = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_FLAGS ? TRUE : FALSE);
+  requested_intensity = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_INTENSITY ? TRUE : FALSE);
+  requested_scan_angle = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE ? TRUE : FALSE);
+  requested_user_data = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_USER_DATA ? TRUE : FALSE);
+  requested_point_source = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE ? TRUE : FALSE);
+  requested_gps_time = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME ? TRUE : FALSE);
 
   /* init the bytes buffer to zero */
 
@@ -1100,7 +1100,7 @@ void LASreadItemCompressed_POINT14_v3::read_gps_time()
 ===============================================================================
 */
 
-LASreadItemCompressed_RGB14_v3::LASreadItemCompressed_RGB14_v3(ArithmeticDecoder* dec, const U32 decompress_layers)
+LASreadItemCompressed_RGB14_v3::LASreadItemCompressed_RGB14_v3(ArithmeticDecoder* dec, const U32 decompress_selective)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -1119,7 +1119,7 @@ LASreadItemCompressed_RGB14_v3::LASreadItemCompressed_RGB14_v3(ArithmeticDecoder
 
   changed_RGB = FALSE;
 
-  requested_RGB = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_RGB ? TRUE : FALSE);
+  requested_RGB = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_RGB ? TRUE : FALSE);
 
   /* init the bytes buffer to zero */
 
@@ -1404,7 +1404,7 @@ inline void LASreadItemCompressed_RGB14_v3::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_RGBNIR14_v3::LASreadItemCompressed_RGBNIR14_v3(ArithmeticDecoder* dec, const U32 decompress_layers)
+LASreadItemCompressed_RGBNIR14_v3::LASreadItemCompressed_RGBNIR14_v3(ArithmeticDecoder* dec, const U32 decompress_selective)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -1427,8 +1427,8 @@ LASreadItemCompressed_RGBNIR14_v3::LASreadItemCompressed_RGBNIR14_v3(ArithmeticD
   changed_RGB = FALSE;
   changed_NIR = FALSE;
 
-  requested_RGB = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_RGB ? TRUE : FALSE);
-  requested_NIR = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_NIR ? TRUE : FALSE);
+  requested_RGB = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_RGB ? TRUE : FALSE);
+  requested_NIR = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_NIR ? TRUE : FALSE);
 
   /* init the bytes buffer to zero */
 
@@ -1821,7 +1821,7 @@ inline void LASreadItemCompressed_RGBNIR14_v3::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_WAVEPACKET14_v3::LASreadItemCompressed_WAVEPACKET14_v3(ArithmeticDecoder* dec, const U32 decompress_layers)
+LASreadItemCompressed_WAVEPACKET14_v3::LASreadItemCompressed_WAVEPACKET14_v3(ArithmeticDecoder* dec, const U32 decompress_selective)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -1840,7 +1840,7 @@ LASreadItemCompressed_WAVEPACKET14_v3::LASreadItemCompressed_WAVEPACKET14_v3(Ari
 
   changed_wavepacket = FALSE;
 
-  requested_wavepacket = (decompress_layers & LASZIP_SELECTIVE_DECOMPRESSION_WAVEPACKET ? TRUE : FALSE);
+  requested_wavepacket = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET ? TRUE : FALSE);
 
   /* init the bytes buffer to zero */
 
@@ -2096,7 +2096,7 @@ inline void LASreadItemCompressed_WAVEPACKET14_v3::read(U8* item)
 ===============================================================================
 */
 
-LASreadItemCompressed_BYTE14_v3::LASreadItemCompressed_BYTE14_v3(ArithmeticDecoder* dec, U32 number, const U32 decompress_layers)
+LASreadItemCompressed_BYTE14_v3::LASreadItemCompressed_BYTE14_v3(ArithmeticDecoder* dec, U32 number, const U32 decompress_selective)
 {
   /* not used as a decoder. just gives access to instream */
 
@@ -2129,7 +2129,7 @@ LASreadItemCompressed_BYTE14_v3::LASreadItemCompressed_BYTE14_v3(ArithmeticDecod
 
     changed_Bytes[i] = FALSE;
 
-    requested_Bytes[i] = (decompress_layers & (LASZIP_SELECTIVE_DECOMPRESSION_BYTE0 << i) ? TRUE : FALSE);
+    requested_Bytes[i] = (decompress_selective & (LASZIP_DECOMPRESS_SELECTIVE_BYTE0 << i) ? TRUE : FALSE);
   }
 
   /* init the bytes buffer to zero */
