@@ -31,6 +31,7 @@
   
   CHANGE HISTORY:
   
+    19 April 2017 -- support for selective decompression for new LAS 1.4 points 
     1 February 2017 -- better support for OGC WKT strings in VLRs or EVLRs
     22 June 2016 -- set default of VLR header "reserved" to 0 instead of 0xAABB
     1 August 2015 -- moving LASpoint, LASquantizer, and LASattributer to LASzip
@@ -48,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 170414
+#define LAS_TOOLS_VERSION 170419
 
 #include <stdio.h>
 #include <string.h>
