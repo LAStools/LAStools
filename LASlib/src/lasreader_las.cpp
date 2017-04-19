@@ -44,7 +44,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_only)
+BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_only, U32 decompress_selective)
 {
   if (file_name == 0)
   {
@@ -71,10 +71,10 @@ BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_onl
   else
     in = new ByteStreamInFileBE(file);
 
-  return open(in, peek_only);
+  return open(in, peek_only, decompress_selective);
 }
 
-BOOL LASreaderLAS::open(FILE* file, BOOL peek_only)
+BOOL LASreaderLAS::open(FILE* file, BOOL peek_only, U32 decompress_selective)
 {
   if (file == 0)
   {
@@ -100,10 +100,10 @@ BOOL LASreaderLAS::open(FILE* file, BOOL peek_only)
   else
     in = new ByteStreamInFileBE(file);
 
-  return open(in);
+  return open(in, peek_only, decompress_selective);
 }
 
-BOOL LASreaderLAS::open(istream& stream, BOOL peek_only)
+BOOL LASreaderLAS::open(istream& stream, BOOL peek_only, U32 decompress_selective)
 {
   // create input
   ByteStreamIn* in;
@@ -112,10 +112,10 @@ BOOL LASreaderLAS::open(istream& stream, BOOL peek_only)
   else
     in = new ByteStreamInIstreamBE(stream);
 
-  return open(in, peek_only);
+  return open(in, peek_only, decompress_selective);
 }
 
-BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
+BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_selective)
 {
   U32 i,j;
 
@@ -1240,7 +1240,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only)
 
   // create the point reader
 
-  reader = new LASreadPoint();
+  reader = new LASreadPoint(decompress_selective);
 
   // initialize point and the reader
 
@@ -1463,10 +1463,10 @@ BOOL LASreaderLASrescale::read_point_default()
   return TRUE;
 }
 
-BOOL LASreaderLASrescale::open(ByteStreamIn* stream, BOOL peek_only)
+BOOL LASreaderLASrescale::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_selective)
 {
   LASquantizer quantizer = header;
-  if (!LASreaderLAS::open(stream, peek_only)) return FALSE;
+  if (!LASreaderLAS::open(stream, peek_only, decompress_selective)) return FALSE;
   // do we need to change anything
   rescale_x = rescale_y = rescale_z = FALSE;
   orig_x_scale_factor = header.x_scale_factor;
@@ -1587,10 +1587,10 @@ BOOL LASreaderLASreoffset::read_point_default()
   return TRUE;
 }
 
-BOOL LASreaderLASreoffset::open(ByteStreamIn* stream, BOOL peek_only)
+BOOL LASreaderLASreoffset::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_selective)
 {
   LASquantizer quantizer = header;
-  if (!LASreaderLAS::open(stream, peek_only)) return FALSE;
+  if (!LASreaderLAS::open(stream, peek_only, decompress_selective)) return FALSE;
   // maybe auto reoffset
   if (auto_reoffset)
   {
@@ -1736,10 +1736,10 @@ BOOL LASreaderLASrescalereoffset::read_point_default()
   return TRUE;
 }
 
-BOOL LASreaderLASrescalereoffset::open(ByteStreamIn* stream, BOOL peek_only)
+BOOL LASreaderLASrescalereoffset::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_selective)
 {
   LASquantizer quantizer = header;
-  if (!LASreaderLASrescale::open(stream, peek_only)) return FALSE;
+  if (!LASreaderLASrescale::open(stream, peek_only, decompress_selective)) return FALSE;
   // maybe auto reoffset
   if (auto_reoffset)
   {
