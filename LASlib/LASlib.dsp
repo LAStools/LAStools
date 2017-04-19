@@ -501,6 +501,10 @@ SOURCE=..\LASzip\src\laszip_common_v3.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASzip\src\laszip_decompress_selective_v3.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\mydefs.hpp
 # End Source File
 # End Group
