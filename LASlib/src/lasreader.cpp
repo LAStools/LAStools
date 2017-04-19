@@ -655,7 +655,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           lasreaderlas = new LASreaderLASreoffset(offset[0], offset[1], offset[2]);
         else
           lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
-        if (!lasreaderlas->open(file_name, io_ibuffer_size))
+        if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
         {
           fprintf(stderr,"ERROR: cannot open lasreaderlas with file name '%s'\n", file_name);
           delete lasreaderlas;
@@ -1145,7 +1145,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
       if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
       {
         LASreaderLAS* lasreaderlas = (LASreaderLAS*)lasreader;
-        if (!lasreaderlas->open(file_name, io_ibuffer_size))
+        if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
         {
           fprintf(stderr,"ERROR: cannot reopen lasreaderlas with file name '%s'\n", file_name);
           return FALSE;
@@ -2249,6 +2249,11 @@ void LASreadOpener::set_pipe_on(BOOL pipe_on)
   this->pipe_on = pipe_on;
 }
 
+void LASreadOpener::set_decompress_selective(U32 decompress_selective)
+{
+  this->decompress_selective = decompress_selective;
+}
+
 void LASreadOpener::set_inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
 {
   if (inside_tile == 0) inside_tile = new F32[3];
@@ -2325,6 +2330,7 @@ LASreadOpener::LASreadOpener()
   file_name_current = 0;
   neighbor_file_name_number = 0;
   neighbor_file_name_allocated = 0;
+  decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL;
   inside_tile = 0;
   inside_circle = 0;
   inside_rectangle = 0;
