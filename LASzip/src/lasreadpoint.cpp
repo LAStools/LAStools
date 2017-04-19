@@ -41,7 +41,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-LASreadPoint::LASreadPoint()
+LASreadPoint::LASreadPoint(U32 decompress_delective)
 {
   point_size = 0;
   instream = 0;
@@ -59,6 +59,8 @@ LASreadPoint::LASreadPoint()
   tabled_chunks = 0;
   chunk_totals = 0;
   chunk_starts = 0;
+  // used for selective decompression (new LAS 1.4 point types only)
+  this->decompress_delective = decompress_delective;
   // used for seeking
   point_start = 0;
   seek_point = 0;
@@ -217,25 +219,25 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
         break;
       case LASitem::POINT14:
         if ((items[i].version == 3) || (items[i].version == 2)) // version == 2 from lasproto
-          readers_compressed[i] = new LASreadItemCompressed_POINT14_v3(dec);
+          readers_compressed[i] = new LASreadItemCompressed_POINT14_v3(dec, decompress_delective);
         else
           return FALSE;
         break;
       case LASitem::RGB14:
         if ((items[i].version == 3) || (items[i].version == 2)) // version == 2 from lasproto
-          readers_compressed[i] = new LASreadItemCompressed_RGB14_v3(dec);
+          readers_compressed[i] = new LASreadItemCompressed_RGB14_v3(dec, decompress_delective);
         else
           return FALSE;
         break;
       case LASitem::RGBNIR14:
         if ((items[i].version == 3) || (items[i].version == 2)) // version == 2 from lasproto
-          readers_compressed[i] = new LASreadItemCompressed_RGBNIR14_v3(dec);
+          readers_compressed[i] = new LASreadItemCompressed_RGBNIR14_v3(dec, decompress_delective);
         else
           return FALSE;
         break;
       case LASitem::BYTE14:
         if ((items[i].version == 3) || (items[i].version == 2)) // version == 2 from lasproto
-          readers_compressed[i] = new LASreadItemCompressed_BYTE14_v3(dec, items[i].size);
+          readers_compressed[i] = new LASreadItemCompressed_BYTE14_v3(dec, items[i].size, decompress_delective);
         else
           return FALSE;
         break;
@@ -247,7 +249,7 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
         break;
       case LASitem::WAVEPACKET14:
         if (items[i].version == 3)
-          readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET14_v3(dec);
+          readers_compressed[i] = new LASreadItemCompressed_WAVEPACKET14_v3(dec, decompress_delective);
         else
           return FALSE;
         break;
