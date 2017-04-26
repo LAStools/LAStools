@@ -167,6 +167,7 @@ public:
   BOOL is_merged() const { return merged; };
   void set_buffer_size(const F32 buffer_size);
   F32 get_buffer_size() const;
+  void set_unbuffered(const BOOL unbuffered);
   void set_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique=FALSE);
   BOOL add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique=FALSE);
   void set_auto_reoffset(const BOOL auto_reoffset);
@@ -227,6 +228,7 @@ private:
   U32 file_name_allocated;
   U32 file_name_current;
   F32 buffer_size;
+  BOOL unbuffered;
   CHAR* temp_file_base;
   CHAR** neighbor_file_names;
   U32 neighbor_file_name_number;
