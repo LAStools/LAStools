@@ -24,7 +24,8 @@
 
   CHANGE HISTORY:
 
-	8 January 2017 -- name change from 'laszip_dll.h' and integration Hobu's changes for Unix
+   25 April 2017 -- adding initial support for new "native LAS 1.4 extension" 
+    8 January 2017 -- name change from 'laszip_dll.h' and integration Hobu's changes for Unix
     7 January 2017 -- set reserved field in LASzip VLR from 0xAABB to 0x0
     7 January 2017 -- make scan angle quantization in compatibility mode consistent with LIB
     7 January 2017 -- compatibility mode *decompression* fix for points with waveforms
@@ -394,6 +395,13 @@ LASZIP_API laszip_I32
 laszip_preserve_generating_software(
     laszip_POINTER                     pointer
     , const laszip_BOOL                preserve
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_request_native_extension(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                request
 );
 
 /*---------------------------------------------------------------------------*/
