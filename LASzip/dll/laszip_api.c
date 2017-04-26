@@ -550,6 +550,27 @@ laszip_preserve_generating_software
 };
 
 /*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_request_native_extension_def)
+(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                request
+);
+laszip_request_native_extension_def laszip_request_native_extension_ptr = 0;
+LASZIP_API laszip_I32
+laszip_request_native_extension
+(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                request
+)
+{
+  if (laszip_request_native_extension_ptr)
+  {
+    return (*laszip_request_native_extension_ptr)(pointer, request);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
 typedef laszip_I32 (*laszip_request_compatibility_mode_def)
 (
     laszip_POINTER                     pointer
@@ -1008,6 +1029,11 @@ laszip_I32 laszip_load_dll()
   }
   laszip_preserve_generating_software_ptr = (laszip_preserve_generating_software_def)GetProcAddress(laszip_HINSTANCE, "laszip_preserve_generating_software");
   if (laszip_preserve_generating_software_ptr == NULL) {
+     FreeLibrary(laszip_HINSTANCE);
+     return 1;
+  }
+  laszip_request_native_extension_ptr = (laszip_request_native_extension_def)GetProcAddress(laszip_HINSTANCE, "laszip_request_native_extension");
+  if (laszip_request_native_extension_ptr == NULL) {
      FreeLibrary(laszip_HINSTANCE);
      return 1;
   }
