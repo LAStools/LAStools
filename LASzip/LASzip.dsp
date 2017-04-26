@@ -57,7 +57,7 @@ LINK32=link.exe
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Release\LASzip.dll dll\LASzip.dll	copy  Release\LASzip.dll example\Release\LASzip.dll
+PostBuild_Cmds=copy Release\LASzip.dll dll\LASzip.dll	copy  Release\LASzip.dll example\LASzip.dll
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "LASzip - Win32 Debug"
@@ -87,7 +87,7 @@ LINK32=link.exe
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy Debug\LASzip.dll dll\LASzip.dll	copy Debug\LASzip.dll example\Debug\LASzip.dll
+PostBuild_Cmds=copy Debug\LASzip.dll dll\LASzip.dll	copy Debug\LASzip.dll example\LASzip.dll
 # End Special Build Tool
 
 !ENDIF 
@@ -137,6 +137,10 @@ SOURCE=.\src\lasreaditemcompressed_v2.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\lasreaditemcompressed_v3.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\lasreadpoint.cpp
 # End Source File
 # Begin Source File
@@ -146,6 +150,10 @@ SOURCE=.\src\laswriteitemcompressed_v1.cpp
 # Begin Source File
 
 SOURCE=.\src\laswriteitemcompressed_v2.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\laswriteitemcompressed_v3.cpp
 # End Source File
 # Begin Source File
 
@@ -253,6 +261,10 @@ SOURCE=.\src\lasreaditemcompressed_v2.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\lasreaditemcompressed_v3.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\lasreaditemraw.hpp
 # End Source File
 # Begin Source File
@@ -270,6 +282,10 @@ SOURCE=.\src\laswriteitemcompressed_v1.hpp
 # Begin Source File
 
 SOURCE=.\src\laswriteitemcompressed_v2.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\laswriteitemcompressed_v3.hpp
 # End Source File
 # Begin Source File
 
@@ -294,6 +310,14 @@ SOURCE=.\src\laszip_common_v1.hpp
 # Begin Source File
 
 SOURCE=.\src\laszip_common_v2.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\laszip_common_v3.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\laszip_decompress_selective_v3.hpp
 # End Source File
 # Begin Source File
 
