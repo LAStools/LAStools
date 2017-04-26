@@ -1,3 +1,4 @@
+25 April 2017 -- enable "native LAS 1.4 extension" in LASzip DLL via 'request_native_extension'
 30 March 2017 -- alpha-release of "native LAS 1.4 extension" for LASzip compression
 11 January 2017 --  new DLL/API function 'laszip_set_chunk_size()' to change chunk size
 8 January 2017 -- changed file names from "laszip_dll.h" to "laszip_api.h" for hobu
