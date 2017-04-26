@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+   25 April 2017 -- adding initial support for new "native LAS 1.4 extension" 
     8 January 2017 -- changed from "laszip_dll.h" to "laszip_api.h" for hobu
 
 ===============================================================================
@@ -127,6 +128,7 @@ typedef struct laszip_dll {
   BOOL lax_append;
   BOOL lax_exploit;
   BOOL preserve_generating_software;
+  BOOL request_native_extension;
   BOOL request_compatibility_mode;
   BOOL compatibility_mode;
   U32 set_chunk_size;
@@ -1475,6 +1477,43 @@ laszip_preserve_generating_software(
   return 0;
 }
 
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_request_native_extension(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                request
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+
+  try
+  {
+    if (laszip_dll->reader)
+    {
+      sprintf(laszip_dll->error, "reader is already open");
+      return 1;
+    }
+
+    if (laszip_dll->writer)
+    {
+      sprintf(laszip_dll->error, "writer is already open");
+      return 1;
+    }
+
+    laszip_dll->request_native_extension = request;
+  }
+  catch (...)
+  {
+    sprintf(laszip_dll->error, "internal error in laszip_request_native_extension");
+    return 1;
+  }
+
+  laszip_dll->error[0] = '\0';
+  return 0;
+}
+
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
 laszip_request_compatibility_mode(
@@ -1690,7 +1729,12 @@ laszip_open_writer(
 
     if (laszip_dll->header.point_data_format > 5)
     {
-      if (laszip_dll->request_compatibility_mode)
+      if (laszip_dll->request_native_extension)
+      {
+        // we are *not* operating in compatibility mode
+        laszip_dll->compatibility_mode = FALSE;
+      }
+      else if (laszip_dll->request_compatibility_mode)
       {
         // make sure there are no more than U32_MAX points
 
@@ -2024,25 +2068,28 @@ laszip_open_writer(
     {
       switch (laszip->items[i].type)
       {
-      case LASitem::POINT14:
       case LASitem::POINT10:
+      case LASitem::POINT14:
         laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.X);
         break;
       case LASitem::GPSTIME11:
         laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.gps_time);
         break;
-      case LASitem::RGBNIR14:
       case LASitem::RGB12:
+      case LASitem::RGB14:
+      case LASitem::RGBNIR14:
         laszip_dll->point_items[i] = (U8*)laszip_dll->point.rgb;
         break;
-      case LASitem::WAVEPACKET13:
-        laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.wave_packet);
-        break;
       case LASitem::BYTE:
+      case LASitem::BYTE14:
         laszip_dll->point.num_extra_bytes = laszip->items[i].size;
         if (laszip_dll->point.extra_bytes) delete [] laszip_dll->point.extra_bytes;
         laszip_dll->point.extra_bytes = new U8[laszip_dll->point.num_extra_bytes];
         laszip_dll->point_items[i] = laszip_dll->point.extra_bytes;
+        break;
+      case LASitem::WAVEPACKET13:
+      case LASitem::WAVEPACKET14:
+        laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.wave_packet);
         break;
       default:
         sprintf(laszip_dll->error, "unknown LASitem type %d", (I32)laszip->items[i].type);
@@ -2054,15 +2101,29 @@ laszip_open_writer(
 
     if (compress)
     {
-      if (!laszip->setup(laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length, LASZIP_COMPRESSOR_DEFAULT))
+      if ((laszip_dll->header.point_data_format > 5) && laszip_dll->request_native_extension)
       {
-        sprintf(laszip_dll->error, "cannot compress point_data_format %d with point_data_record_length %d", (I32)laszip_dll->header.point_data_format, (I32)laszip_dll->header.point_data_record_length);
-        return 1;
+        if (!laszip->setup(laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length, LASZIP_COMPRESSOR_LAYERED_CHUNKED))
+        {
+          sprintf(laszip_dll->error, "cannot compress point_data_format %d with point_data_record_length %d using native", (I32)laszip_dll->header.point_data_format, (I32)laszip_dll->header.point_data_record_length);
+          return 1;
+        }
+      }
+      else
+      {
+        if (!laszip->setup(laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length, LASZIP_COMPRESSOR_DEFAULT))
+        {
+          sprintf(laszip_dll->error, "cannot compress point_data_format %d with point_data_record_length %d", (I32)laszip_dll->header.point_data_format, (I32)laszip_dll->header.point_data_record_length);
+          return 1;
+        }
       }
 
-      // request version 2 for all item compressors
+      // request version (for old point types only, new point types automatically use version 3)
 
       laszip->request_version(2);
+
+      // calculate payload size
+
       laszip_vrl_payload_size = 34 + 6*laszip->num_items;
 
       // maybe we should change the chunk size
@@ -3588,25 +3649,28 @@ laszip_open_reader(
     {
       switch (laszip->items[i].type)
       {
-      case LASitem::POINT14:
       case LASitem::POINT10:
+      case LASitem::POINT14:
         laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.X);
         break;
       case LASitem::GPSTIME11:
         laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.gps_time);
         break;
-      case LASitem::RGBNIR14:
       case LASitem::RGB12:
+      case LASitem::RGB14:
+      case LASitem::RGBNIR14:
         laszip_dll->point_items[i] = (U8*)laszip_dll->point.rgb;
         break;
-      case LASitem::WAVEPACKET13:
-        laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.wave_packet);
-        break;
       case LASitem::BYTE:
+      case LASitem::BYTE14:
         laszip_dll->point.num_extra_bytes = laszip->items[i].size;
         if (laszip_dll->point.extra_bytes) delete [] laszip_dll->point.extra_bytes;
         laszip_dll->point.extra_bytes = new U8[laszip_dll->point.num_extra_bytes];
         laszip_dll->point_items[i] = laszip_dll->point.extra_bytes;
+        break;
+      case LASitem::WAVEPACKET13:
+      case LASitem::WAVEPACKET14:
+        laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.wave_packet);
         break;
       default:
         sprintf(laszip_dll->error, "unknown LASitem type %d", (I32)laszip->items[i].type);
@@ -3836,6 +3900,10 @@ laszip_open_reader(
           }
         }
       }
+    }
+    else if (laszip_dll->header.point_data_format > 5)
+    {
+      laszip_dll->point.extended_point_type = 1;
     }
 
     // create the point reader
