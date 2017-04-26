@@ -332,6 +332,7 @@ bool LASzip::setup(const U8 point_type, const U16 point_size, const U16 compress
       {
         return false;
       }
+      this->compressor = LASZIP_COMPRESSOR_LAYERED_CHUNKED;
     }
     else
     {
