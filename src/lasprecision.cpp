@@ -33,7 +33,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-12, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-17, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -44,6 +44,7 @@
   
   CHANGE HISTORY:
   
+     1 May 2017 -- 3rd example for selective decompression for new LAS 1.4 points 
     30 November 2010 -- created spotting few paper cups at Starbuck's Offenbach
   
 ===============================================================================
@@ -55,6 +56,7 @@
 #include <string.h>
 
 #include "lasreader.hpp"
+#include "laszip_decompress_selective_v3.hpp"
 #include "laswriter.hpp"
 #include "geoprojectionconverter.hpp"
 
@@ -374,6 +376,19 @@ int main(int argc, char *argv[])
   {
     fprintf(stderr, "ERROR: no input specified\n");
     byebye(true, argc==1);
+  }
+
+  // maybe we do not need to read all layers (for compressed new LAS 1.4 point types only)
+
+  if (!output)
+  {
+    U32 decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;
+
+    if (report_z) decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_Z;
+    if (report_gps) decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+    if (report_rgb) decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_RGB;
+
+    lasreadopener.set_decompress_selective(decompress_selective);
   }
 
   // make sure we do not corrupt the input file
