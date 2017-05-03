@@ -38,6 +38,7 @@ class LAScriterion
 public:
   virtual const CHAR * name() const = 0;
   virtual I32 get_command(CHAR* string) const = 0;
+  virtual U32 get_decompress_selective() const = 0;
   virtual BOOL filter(const LASpoint* point) = 0;
   virtual void reset(){};
   virtual ~LAScriterion(){};
@@ -53,6 +54,7 @@ public:
   BOOL parse(CHAR* string);
   I32 unparse(CHAR* string) const;
   inline BOOL active() const { return (num_criteria != 0); };
+  U32 get_decompress_selective() const;
 
   void addClipCircle(F64 x, F64 y, F64 radius);
   void addClipBox(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y, F64 max_z);
