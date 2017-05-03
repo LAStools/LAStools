@@ -32,7 +32,7 @@
   
   COPYRIGHT:
   
-    (c) 2011-14, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2011-17, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -43,6 +43,7 @@
   
   CHANGE HISTORY:
   
+     1 May 2017 -- 2nd example for selective decompression for new LAS 1.4 points 
     17 May 2011 -- enabling batch processing with wildcards or multiple file names
     29 April 2011 -- created after cable outage during the royal wedding (-:
   
@@ -55,6 +56,7 @@
 #include <string.h>
 
 #include "lasreader.hpp"
+#include "laszip_decompress_selective_v3.hpp"
 #include "lasindex.hpp"
 #include "lasquadtree.hpp"
 
@@ -266,6 +268,10 @@ int main(int argc, char *argv[])
     fprintf(stderr,"ERROR: no input specified\n");
     byebye(true, argc==1);
   }
+
+  // only decompress the one layer we need (for new LAS 1.4 point types only)
+
+  lasreadopener.set_decompress_selective(LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY);
 
 /*
   // lasquadtree test
