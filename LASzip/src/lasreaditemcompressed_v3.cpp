@@ -135,7 +135,7 @@ LASreadItemCompressed_POINT14_v3::LASreadItemCompressed_POINT14_v3(ArithmeticDec
   changed_gps_time = FALSE;
 
   requested_Z = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_Z ? TRUE : FALSE);
-  requested_classification = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATIONS ? TRUE : FALSE);
+  requested_classification = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION ? TRUE : FALSE);
   requested_flags = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_FLAGS ? TRUE : FALSE);
   requested_intensity = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_INTENSITY ? TRUE : FALSE);
   requested_scan_angle = (decompress_selective & LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE ? TRUE : FALSE);
