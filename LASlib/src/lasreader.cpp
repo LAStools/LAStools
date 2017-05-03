@@ -2267,6 +2267,10 @@ void LASreadOpener::set_pipe_on(BOOL pipe_on)
 void LASreadOpener::set_decompress_selective(U32 decompress_selective)
 {
   this->decompress_selective = decompress_selective;
+  if (filter)
+  {
+    this->decompress_selective |= filter->get_decompress_selective();
+  }
 }
 
 void LASreadOpener::set_inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
