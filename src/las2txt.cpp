@@ -637,6 +637,124 @@ int main(int argc, char *argv[])
     byebye(true, argc == 1);
   }
 
+  // what layers do we need (for selective LAS 1.4 decompression)
+
+  if (opts || optx)
+  {
+    decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_Z;
+    decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
+    decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_RGB;
+  }
+  else if (parse_string == 0)
+  {
+    decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_Z;
+  }
+  else
+  {
+    // check requested fields and print warnings of necessary
+    i = 0;
+    while (parse_string[i])
+    {
+      switch (parse_string[i])
+      {
+      case ')': // diff of unscaled raw integer X to prev point
+      case '!': // diff of unscaled raw integer Y to prev point
+        diff = true;
+      case 'x': // the x coordinate
+      case 'y': // the y coordinate
+      case 'X': // the unscaled raw integer X coordinate
+      case 'Y': // the unscaled raw integer Y coordinate
+      case 'r': // the number of the return
+      case 'n': // the number of returns of given pulse
+      case 'l': // the (extended) scanner channe<l>
+        break;
+      case '@': // diff of unscaled raw integer Z to prev point
+        diff = true;
+      case 'z': // the z coordinate
+      case 'Z': // the unscaled raw integer Z coordinate
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_Z;
+        break;
+      case 'i': // the intensity
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
+        break;
+      case 'a': // the scan angle
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE;
+        break;
+      case 'c': // the classification
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
+        break;
+      case 'u': // the user data
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
+        break;
+      case 'p': // the point source ID
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE;
+        break;
+      case 'e': // the edge of flight line flag
+      case 'd': // the direction of scan flag
+      case 'k': // the <k>eypoint flag
+      case 'h': // the with<h>eld flag
+      case 'o': // the (extended) <o>verlap flag
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_FLAGS;
+        break;
+      case 'm': // the index of the point (count starts at 0)
+      case 'M': // the index of the point (count starts at 1)
+        break;
+      case '#': // diff of gps-time to prev point
+        diff = true;
+      case 't': // the gps-time
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+        break;
+      case '$': // the R difference to the last point
+      case '&': // the byte-wise R difference to the last point
+      case '%': // the G difference to the last point
+      case '*': // the byte-wise G difference to the last point
+      case '^': // the B difference to the last point
+      case '(': // the byte-wise B difference to the last point
+        diff = true;
+      case 'R': // the red channel of the RGB field
+      case 'B': // the blue channel of the RGB field
+      case 'G': // the green channel of the RGB field
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_RGB;
+        break;
+      case 'I': // the near infrared channel of the RGBI field
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_NIR;
+        break;
+      case 'w': // the wavepacket index
+      case 'W': // all wavepacket attributes
+      case 'V': // the waveform data
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET;
+        break;
+      case 'E':
+        if (extra_string == 0)
+        {
+          fprintf (stderr, "WARNING: requested 'E' but no '-extra' specified. skipping ...\n");
+          parse_string[i] = 's';
+        }
+        break;
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
+        break;
+      default:
+        fprintf (stderr, "WARNING: requested unknown parse item '%c'. skipping ...\n", parse_string[i]);
+        parse_string[i] = 's';
+      }
+      i++;
+    }
+  }
+
+  // only decompress the layers we need (for new LAS 1.4 point types only)
+
+  lasreadopener.set_decompress_selective(decompress_selective);
+
   // possibly loop over multiple input files
 
   while (lasreadopener.active())
@@ -849,7 +967,8 @@ int main(int argc, char *argv[])
 
     if (parse_string == 0) parse_string = strdup("xyz");
 
-    // check requested fields and print warnings of necessary
+    // check requested fields and print warnings if attributes do not exist
+
     i = 0;
     while (parse_string[i])
     {
@@ -857,91 +976,69 @@ int main(int argc, char *argv[])
       {
       case ')': // diff of unscaled raw integer X to prev point
       case '!': // diff of unscaled raw integer Y to prev point
-        diff = true;
       case 'x': // the x coordinate
       case 'y': // the y coordinate
       case 'X': // the unscaled raw integer X coordinate
       case 'Y': // the unscaled raw integer Y coordinate
       case 'r': // the number of the return
       case 'n': // the number of returns of given pulse
-      case 'l': // the (extended) scanner channe<l>
-        break;
       case '@': // diff of unscaled raw integer Z to prev point
-        diff = true;
       case 'z': // the z coordinate
       case 'Z': // the unscaled raw integer Z coordinate
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_Z;
-        break;
       case 'i': // the intensity
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
-        break;
       case 'a': // the scan angle
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE;
-        break;
       case 'c': // the classification
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATIONS;
-        break;
       case 'u': // the user data
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
-        break;
       case 'p': // the point source ID
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE;
-        break;
       case 'e': // the edge of flight line flag
       case 'd': // the direction of scan flag
       case 'k': // the <k>eypoint flag
       case 'h': // the with<h>eld flag
-      case 'o': // the (extended) <o>verlap flag
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_FLAGS;
-        break;
       case 'm': // the index of the point (count starts at 0)
       case 'M': // the index of the point (count starts at 1)
         break;
+      case 'l': // the (extended) scanner channe<l>
+        if (lasreader->point.extended_point_type == 0)
+          fprintf (stderr, "WARNING: requested 'l' but points are not of extended type\n");
+        break;
+      case 'o': // the (extended) <o>verlap flag
+        if (lasreader->point.extended_point_type == 0)
+          fprintf (stderr, "WARNING: requested 'o' but points are not of extended type\n");
+        break;
       case '#': // diff of gps-time to prev point
-        diff = true;
       case 't': // the gps-time
         if (lasreader->point.have_gps_time == false)
           fprintf (stderr, "WARNING: requested 't' but points do not have gps time\n");
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
         break;
       case '$': // the R difference to the last point
       case '&': // the byte-wise R difference to the last point
-        diff = true;
       case 'R': // the red channel of the RGB field
         if (lasreader->point.have_rgb == false)
           fprintf (stderr, "WARNING: requested 'R' but points do not have RGB\n");
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_RGB;
         break;
       case '%': // the G difference to the last point
       case '*': // the byte-wise G difference to the last point
-        diff = true;
       case 'G': // the green channel of the RGB field
         if (lasreader->point.have_rgb == false)
           fprintf (stderr, "WARNING: requested 'G' but points do not have RGB\n");
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_RGB;
         break;
       case '^': // the B difference to the last point
       case '(': // the byte-wise B difference to the last point
-        diff = true;
       case 'B': // the blue channel of the RGB field
         if (lasreader->point.have_rgb == false)
           fprintf (stderr, "WARNING: requested 'B' but points do not have RGB\n");
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_RGB;
         break;
       case 'I': // the near infrared channel of the RGBI field
         if (lasreader->point.have_nir == false)
-          fprintf (stderr, "WARNING: requested 'I' but points do not have RGBI\n");
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_NIR;
+          fprintf (stderr, "WARNING: requested 'I' but points do not have NIR\n");
         break;
       case 'w': // the wavepacket index
         if (lasreader->point.have_wavepacket == false)
           fprintf (stderr, "WARNING: requested 'w' but points do not have wavepacket\n");
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET;
         break;
       case 'W': // all wavepacket attributes
         if (lasreader->point.have_wavepacket == false)
           fprintf (stderr, "WARNING: requested 'W' but points do not have wavepacket\n");
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET;
         break;
       case 'V': // the waveform data
         if (laswaveform13reader == 0)
@@ -949,12 +1046,11 @@ int main(int argc, char *argv[])
           fprintf (stderr, "WARNING: requested 'V' but no waveform data available\n");
           fprintf (stderr, "         omitting ...\n");
         }
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET;
         break;
       case 'E':
         if (extra_string == 0)
         {
-          fprintf (stderr, "WARNING: requested 'E' but no '-extra' specified\n");
+          fprintf (stderr, "WARNING: requested 'E' but no '-extra' specified. skipping ...\n");
           parse_string[i] = 's';
         }
         break;
@@ -970,14 +1066,15 @@ int main(int argc, char *argv[])
       case '9':
         if ((parse_string[i] - '0') >= lasreader->header.number_attributes)
         {
-          fprintf(stderr, "WARNING: attribute '%d' does not exist.\n", (parse_string[i] - '0'));
+          fprintf(stderr, "WARNING: attribute '%d' does not exist. skipping ...\n", (parse_string[i] - '0'));
           parse_string[i] = 's';
         }
         else
         {
           attribute_starts[(parse_string[i] - '0')] = lasreader->header.get_attribute_start((parse_string[i] - '0'));
         }
-        decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
+        break;
+      case 's':
         break;
       default:
         fprintf (stderr, "WARNING: requested unknown parse item '%c'\n", parse_string[i]);
