@@ -520,6 +520,14 @@ int main(int argc, char *argv[])
       }
     }
 
+    if (set_point_data_format > 5)
+    {
+      if (set_version_minor == -1)
+      {
+        set_version_minor = 4;
+      }
+    }
+
     if (set_version_major != -1)
     {
       if (set_version_major != 1)
