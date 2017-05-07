@@ -43,13 +43,19 @@
 using namespace std;
 
 #ifdef UNORDERED
-  // Check if on OS X and using cland (unordered map isn't part of tr1 namespace)
-  #if defined(__APPLE__) && defined(__clang__)
-    #include <unordered_map>
-  #else
-    #include <tr1/unordered_map>
+   // Figure out whether <unordered_map> is in tr1
+#  ifdef __has_include
+#    if __has_include(<unordered_map>)
+#     include <unordered_map>
+      using namespace std;
+#     define UNORDERED_FOUND
+#    endif
+#  endif
+#  ifndef UNORDERED_FOUND
+#    include <tr1/unordered_map>
+    using namespace std;
     using namespace tr1;
-  #endif
+#   endif
 typedef unordered_map<I32, LASintervalStartCell*> my_cell_hash;
 #else
 #include <hash_map>
