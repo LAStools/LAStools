@@ -891,6 +891,7 @@ laszip_close_reader
 /*---------------------------------------------------------------------------*/
 #ifdef _WIN32
   #include <windows.h>
+#define FreeLibraryZeroMeansFail true
 #else
   #include <dlfcn.h>
   typedef void* HINSTANCE;
@@ -898,6 +899,7 @@ laszip_close_reader
 #define LoadLibrary dlopen
 #define GetProcAddress dlsym
 #define FreeLibrary dlclose
+#define FreeLibraryZeroMeansFail false
 #define TEXT
 #endif
 static HINSTANCE laszip_HINSTANCE = NULL;
@@ -1121,8 +1123,17 @@ laszip_I32 laszip_unload_dll()
   if (laszip_HINSTANCE == NULL) {
     return 1;
   }
-  if (!FreeLibrary(laszip_HINSTANCE)) {
-    return 1;
+  if (FreeLibraryZeroMeansFail)
+  {
+    if (!FreeLibrary(laszip_HINSTANCE)) {
+      return 1;
+    }
+  }
+  else
+  {
+    if (FreeLibrary(laszip_HINSTANCE)) {
+      return 1;
+    }
   }
   laszip_HINSTANCE = NULL;
   return 0;
