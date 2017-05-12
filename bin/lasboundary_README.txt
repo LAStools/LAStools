@@ -29,6 +29,11 @@
   '-sp83 OH_N' or similar. If you request '-labels' then there will
   be one label per file (!!!) in the center of the bounding box.
 
+  For both KML and SHP output you can put many outputs into one
+  file with the '-overview' option. To have additional into about
+  bounding box and number of points in each file add '-labels' in
+  addition to the command line.
+
   Finally, the tool can also compute a standard *convex hull* with
   the '-convex' flag.
 
