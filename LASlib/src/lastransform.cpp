@@ -840,6 +840,28 @@ private:
   U8 user_data_to;
 };
 
+class LASoperationCopyClassificationIntoUserData : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_classification_into_user_data"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_user_data(point->get_classification() ? point->get_classification() : point->get_extended_classification()); };
+};
+
+class LASoperationCopyAttributeIntoUserData : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_attribute_into_user_data"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline void transform(LASpoint* point) {
+    F64 user_data = point->get_attribute_as_float(index);
+    point->set_user_data(U8_CLAMP(user_data));
+  };
+  LASoperationCopyAttributeIntoUserData(I32 index) { this->index = index; };
+private:
+  I32 index;
+};
+
 class LASoperationSetPointSource : public LASoperation
 {
 public:
@@ -1290,6 +1312,8 @@ void LAStransform::usage() const
   fprintf(stderr,"Modify the user data.\n");
   fprintf(stderr,"  -set_user_data 0\n");
   fprintf(stderr,"  -change_user_data_from_to 23 26\n");
+  fprintf(stderr,"  -change_user_data_from_to 23 26\n");
+  fprintf(stderr,"  -copy_attribute_into_user_data 1\n");
   fprintf(stderr,"Modify the point source ID.\n");
   fprintf(stderr,"  -set_point_source 500\n");
   fprintf(stderr,"  -change_point_source_from_to 1023 1024\n");
@@ -1623,16 +1647,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-copy_", 6) == 0)
     {
-      if (strcmp(argv[i],"-copy_attribute_into_z") == 0)
+      if (strncmp(argv[i],"-copy_attribute_", 16) == 0)
       {
-        if ((i+1) >= argc)
+        if (strcmp(argv[i],"-copy_attribute_into_z") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
-          return FALSE;
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
+            return FALSE;
+          }
+          change_coordinates = TRUE;
+          add_operation(new LASoperationCopyAttributeIntoZ(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
-        change_coordinates = TRUE;
-        add_operation(new LASoperationCopyAttributeIntoZ(atoi(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        else if (strcmp(argv[i],"-copy_attribute_into_user_data") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationCopyAttributeIntoUserData(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        }
       }
       else if (strncmp(argv[i],"-copy_user_data_", 16) == 0)
       {
@@ -1700,6 +1737,11 @@ BOOL LAStransform::parse(int argc, char* argv[])
       {
         change_coordinates = TRUE;
         add_operation(new LASoperationCopyIntensityIntoZ());
+        *argv[i]='\0'; 
+      } 
+      else if (strcmp(argv[i],"-copy_classification_into_user_data") == 0)
+      {
+        add_operation(new LASoperationCopyClassificationIntoUserData());
         *argv[i]='\0'; 
       } 
     }
