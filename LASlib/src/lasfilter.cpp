@@ -2212,7 +2212,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
         }
         else if (strcmp(argv[i],"-keep_user_data_below") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i+1) >= argc)
           {
             fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
             return FALSE;
@@ -2222,7 +2222,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
         }
         else if (strcmp(argv[i],"-keep_user_data_above") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i+1) >= argc)
           {
             fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
             return FALSE;
