@@ -733,6 +733,27 @@ laszip_exploit_spatial_index
 };
 
 /*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_decompress_selective_def)
+(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                exploit
+);
+laszip_decompress_selective_def laszip_decompress_selective_ptr = 0;
+LASZIP_API laszip_I32
+laszip_decompress_selective
+(
+    laszip_POINTER                     pointer
+    , const laszip_BOOL                exploit
+)
+{
+  if (laszip_decompress_selective_ptr)
+  {
+    return (*laszip_decompress_selective_ptr)(pointer, exploit);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
 typedef laszip_I32 (*laszip_open_reader_def)
 (
     laszip_POINTER                     pointer
@@ -891,7 +912,7 @@ laszip_close_reader
 /*---------------------------------------------------------------------------*/
 #ifdef _WIN32
   #include <windows.h>
-#define FreeLibraryZeroMeansFail true
+#define FreeLibraryZeroMeansFail 1
 #else
   #include <dlfcn.h>
   typedef void* HINSTANCE;
@@ -899,7 +920,7 @@ laszip_close_reader
 #define LoadLibrary dlopen
 #define GetProcAddress dlsym
 #define FreeLibrary dlclose
-#define FreeLibraryZeroMeansFail false
+#define FreeLibraryZeroMeansFail 0
 #define TEXT
 #endif
 static HINSTANCE laszip_HINSTANCE = NULL;
@@ -1076,6 +1097,11 @@ laszip_I32 laszip_load_dll()
   }
   laszip_exploit_spatial_index_ptr = (laszip_exploit_spatial_index_def)GetProcAddress(laszip_HINSTANCE, "laszip_exploit_spatial_index");
   if (laszip_exploit_spatial_index_ptr == NULL) {
+     FreeLibrary(laszip_HINSTANCE);
+     return 1;
+  }
+  laszip_decompress_selective_ptr = (laszip_decompress_selective_def)GetProcAddress(laszip_HINSTANCE, "laszip_decompress_selective");
+  if (laszip_decompress_selective_ptr == NULL) {
      FreeLibrary(laszip_HINSTANCE);
      return 1;
   }

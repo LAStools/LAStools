@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+   28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
    25 April 2017 -- adding initial support for new "native LAS 1.4 extension" 
     8 January 2017 -- changed from "laszip_dll.h" to "laszip_api.h" for hobu
 
@@ -127,6 +128,7 @@ typedef struct laszip_dll {
   BOOL lax_create;
   BOOL lax_append;
   BOOL lax_exploit;
+  U32 las14_decompress_selective;
   BOOL preserve_generating_software;
   BOOL request_native_extension;
   BOOL request_compatibility_mode;
@@ -328,6 +330,7 @@ laszip_clean(
     laszip_dll->header.y_scale_factor = 0.01;
     laszip_dll->header.z_scale_factor = 0.01;
     laszip_dll->set_chunk_size = LASZIP_CHUNK_SIZE_DEFAULT;
+    laszip_dll->las14_decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL;
   }
   catch (...)
   {
@@ -3037,6 +3040,42 @@ laszip_exploit_spatial_index(
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
+laszip_decompress_selective(
+    laszip_POINTER                     pointer
+    , const laszip_U32                 decompress_selective
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+
+  try
+  {
+    if (laszip_dll->reader)
+    {
+      sprintf(laszip_dll->error, "reader is already open");
+      return 1;
+    }
+
+    if (laszip_dll->writer)
+    {
+      sprintf(laszip_dll->error, "writer is already open");
+      return 1;
+    }
+
+    laszip_dll->las14_decompress_selective = decompress_selective;
+  }
+  catch (...)
+  {
+    sprintf(laszip_dll->error, "internal error in laszip_decompress_selective");
+    return 1;
+  }
+
+  laszip_dll->error[0] = '\0';
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
 laszip_open_reader(
     laszip_POINTER                     pointer
     , const laszip_CHAR*               file_name
@@ -3908,7 +3947,7 @@ laszip_open_reader(
 
     // create the point reader
 
-    laszip_dll->reader = new LASreadPoint();
+    laszip_dll->reader = new LASreadPoint(laszip_dll->las14_decompress_selective);
     if (laszip_dll->reader == 0)
     {
       sprintf(laszip_dll->error, "could not alloc LASreadPoint");

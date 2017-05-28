@@ -27,6 +27,8 @@
   
   CHANGE HISTORY:
   
+    28 May 2017 -- 14th example reads compressed LAS 1.4 with "selective decompression"
+    25 April 2017 -- 13th example writes LAS 1.4 using new "native LAS 1.4 extension" 
     11 January 2017 -- 12th example changes the default chunk size from 50000 to 5000
      8 January 2017 -- changed from "laszip_dll.h" to "laszip_api.h" because of hobu
     23 September 2015 -- 11th example writes without a-priori bounding box or counters
@@ -109,8 +111,9 @@ static double taketime()
 #define EXAMPLE_ELEVEN 11
 #define EXAMPLE_TWELVE 12
 #define EXAMPLE_THIRTEEN 13
+#define EXAMPLE_FOURTEEN 14
 
-#define EXAMPLE EXAMPLE_THIRTEEN
+#define EXAMPLE EXAMPLE_FOURTEEN
 
 int main(int argc, char *argv[])
 {
@@ -3471,6 +3474,187 @@ int main(int argc, char *argv[])
     fprintf(stderr,"total time: %g sec for reading %scompressed and writing %scompressed\n", taketime()-start_time, (is_compressed ? "" : "un"), (compress ? "" : "un"));
 
   } // end of EXAMPLE_THIRTEEN
+
+  if (EXAMPLE == EXAMPLE_FOURTEEN)
+  {
+    fprintf(stderr,"running EXAMPLE_FOURTEEN (selective decompression of XYZ when reading native compressed LAS 1.4\n");
+
+    // create the reader
+
+    laszip_POINTER laszip_reader;
+    if (laszip_create(&laszip_reader))
+    {
+      fprintf(stderr,"DLL ERROR: creating laszip reader\n");
+      byebye(true, argc==1);
+    }
+
+    // request compatibility mode for the reader
+
+    laszip_BOOL request_compatibility = 1;
+    if (laszip_request_compatibility_mode(laszip_reader, request_compatibility))
+    {
+      fprintf(stderr,"DLL ERROR: requesting LAS 1.4 compatibility mode for the reader\n");
+      byebye(true, argc==1, laszip_reader);
+    }
+
+    // request compatibility mode for the reader
+
+    laszip_U32 decompress_selective = laszip_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | laszip_DECOMPRESS_SELECTIVE_Z;
+    if (laszip_decompress_selective(laszip_reader, decompress_selective))
+    {
+      fprintf(stderr,"DLL ERROR: decompressing XYZ selectively for the reader\n");
+      byebye(true, argc==1, laszip_reader);
+    }
+
+    // open the reader
+
+    laszip_BOOL is_compressed = 0;
+    if (laszip_open_reader(laszip_reader, file_name_in, &is_compressed))
+    {
+      fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
+      byebye(true, argc==1, laszip_reader);
+    }
+  
+    fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
+
+    // get a pointer to the header of the reader that was just populated
+
+    laszip_header* header;
+
+    if (laszip_get_header_pointer(laszip_reader, &header))
+    {
+      fprintf(stderr,"DLL ERROR: getting header pointer from laszip reader\n");
+      byebye(true, argc==1, laszip_reader);
+    }
+
+    // how many points does the file have
+
+    laszip_I64 npoints = (header->number_of_point_records ? header->number_of_point_records : header->extended_number_of_point_records);
+
+    // report how many points the file has
+
+    fprintf(stderr,"file '%s' contains %I64d points\n", file_name_in, npoints);
+
+    // get a pointer to the points that will be read
+
+    laszip_point* point;
+
+    if (laszip_get_point_pointer(laszip_reader, &point))
+    {
+      fprintf(stderr,"DLL ERROR: getting point pointer from laszip reader\n");
+      byebye(true, argc==1, laszip_reader);
+    }
+
+    // create the writer
+
+    laszip_POINTER laszip_writer;
+    if (laszip_create(&laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: creating laszip writer\n");
+      byebye(true, argc==1);
+    }
+
+    // request native extension for the writer
+
+    laszip_BOOL request_native = 1;
+    if (laszip_request_native_extension(laszip_writer, request_native))
+    {
+      fprintf(stderr,"DLL ERROR: requesting native LAS 1.4 extension for the writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // initialize the header for the writer using the header of the reader 
+
+    if (laszip_set_header(laszip_writer, header))
+    {
+      fprintf(stderr,"DLL ERROR: setting header for laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // check if the output is compressed
+
+    laszip_BOOL compress = (strstr(file_name_out, ".laz") != 0);
+
+    // open the writer
+
+    if (laszip_open_writer(laszip_writer, file_name_out, compress))
+    {
+      fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
+      byebye(true, argc==1, laszip_writer);
+    }
+  
+    fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
+
+    // read the points
+
+    laszip_I64 p_count = 0;
+
+    while (p_count < npoints)
+    {
+      // read a point
+
+      if (laszip_read_point(laszip_reader))
+      {
+        fprintf(stderr,"DLL ERROR: reading point %I64\n", p_count);
+        byebye(true, argc==1, laszip_reader);
+      }
+
+      // copy the point
+
+      if (laszip_set_point(laszip_writer, point))
+      {
+        fprintf(stderr,"DLL ERROR: setting point %I64\n", p_count);
+        byebye(true, argc==1, laszip_writer);
+      }
+
+      // write the point
+
+      if (laszip_write_point(laszip_writer))
+      {
+        fprintf(stderr,"DLL ERROR: writing point %I64\n", p_count);
+        byebye(true, argc==1, laszip_writer);
+      }
+
+      p_count++;
+    }
+
+    fprintf(stderr,"successfully read and written %I64d points\n", p_count);
+
+    // close the writer
+
+    if (laszip_close_writer(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: closing laszip writer\n");
+      byebye(true, argc==1, laszip_writer);
+    }
+
+    // destroy the writer
+
+    if (laszip_destroy(laszip_writer))
+    {
+      fprintf(stderr,"DLL ERROR: destroying laszip writer\n");
+      byebye(true, argc==1);
+    }
+
+    // close the reader
+
+    if (laszip_close_reader(laszip_reader))
+    {
+      fprintf(stderr,"DLL ERROR: closing laszip reader\n");
+      byebye(true, argc==1, laszip_reader);
+    }
+
+    // destroy the reader
+
+    if (laszip_destroy(laszip_reader))
+    {
+      fprintf(stderr,"DLL ERROR: destroying laszip reader\n");
+      byebye(true, argc==1);
+    }
+
+    fprintf(stderr,"total time: %g sec for reading %scompressed and writing %scompressed\n", taketime()-start_time, (is_compressed ? "" : "un"), (compress ? "" : "un"));
+
+  } // end of EXAMPLE_FOURTEEN
 
   // unload LASzip DLL
 
