@@ -24,7 +24,8 @@
 
   CHANGE HISTORY:
 
-   25 April 2017 -- adding initial support for new "native LAS 1.4 extension" 
+    28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
+    25 April 2017 -- adding initial support for new "native LAS 1.4 extension" 
     8 January 2017 -- name change from 'laszip_dll.h' and integration Hobu's changes for Unix
     7 January 2017 -- set reserved field in LASzip VLR from 0xAABB to 0x0
     7 January 2017 -- make scan angle quantization in compatibility mode consistent with LIB
@@ -214,6 +215,34 @@ typedef struct laszip_point
   laszip_U8* extra_bytes;
 
 } laszip_point_struct;
+
+/*---------------------------------------------------------------------------*/
+/*------ DLL constants for selective decompression via LASzip DLL -----------*/
+/*---------------------------------------------------------------------------*/
+
+#define laszip_DECOMPRESS_SELECTIVE_ALL                0xFFFFFFFF
+
+#define laszip_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY 0x00000000
+#define laszip_DECOMPRESS_SELECTIVE_Z                  0x00000001
+#define laszip_DECOMPRESS_SELECTIVE_CLASSIFICATION     0x00000002
+#define laszip_DECOMPRESS_SELECTIVE_FLAGS              0x00000004
+#define laszip_DECOMPRESS_SELECTIVE_INTENSITY          0x00000008
+#define laszip_DECOMPRESS_SELECTIVE_SCAN_ANGLE         0x00000010
+#define laszip_DECOMPRESS_SELECTIVE_USER_DATA          0x00000020
+#define laszip_DECOMPRESS_SELECTIVE_POINT_SOURCE       0x00000040
+#define laszip_DECOMPRESS_SELECTIVE_GPS_TIME           0x00000080
+#define laszip_DECOMPRESS_SELECTIVE_RGB                0x00000100
+#define laszip_DECOMPRESS_SELECTIVE_NIR                0x00000200
+#define laszip_DECOMPRESS_SELECTIVE_WAVEPACKET         0x00000400
+#define laszip_DECOMPRESS_SELECTIVE_BYTE0              0x00010000
+#define laszip_DECOMPRESS_SELECTIVE_BYTE1              0x00020000
+#define laszip_DECOMPRESS_SELECTIVE_BYTE2              0x00040000
+#define laszip_DECOMPRESS_SELECTIVE_BYTE3              0x00080000
+#define laszip_DECOMPRESS_SELECTIVE_BYTE4              0x00100000
+#define laszip_DECOMPRESS_SELECTIVE_BYTE5              0x00200000
+#define laszip_DECOMPRESS_SELECTIVE_BYTE6              0x00400000
+#define laszip_DECOMPRESS_SELECTIVE_BYTE7              0x00800000
+#define laszip_DECOMPRESS_SELECTIVE_EXTRA_BYTES        0xFFF00000
 
 /*---------------------------------------------------------------------------*/
 /*---------------- DLL functions to manage the LASzip DLL -------------------*/
@@ -455,6 +484,13 @@ LASZIP_API laszip_I32
 laszip_exploit_spatial_index(
     laszip_POINTER                     pointer
     , const laszip_BOOL                exploit
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_decompress_selective(
+    laszip_POINTER                     pointer
+    , const laszip_U32                 decompress_selective
 );
 
 /*---------------------------------------------------------------------------*/
