@@ -1,3 +1,7 @@
+28 May 2017 -- LASzip DLL: support for "selective decompression" of compressed LAS 1.4 points added into DLL API
+27 May 2017 -- lascontrol: let '-odir quality' specify where error report '-cp_out cp_check.csv' will be stored 
+21 May 2017 -- lasgrid: fixed BIL output for the '-point_density' option. now '-density' means '-point_density'.
+13 May 2017 -- all (license-restricted) LAStools: option '-fail' prevents running when license is missing/expired
 11 May 2017 -- LASlib: new transforms '-copy_classification_into_user_data' and '-copy_attribute_into_user_data 1'
 10 May 2017 -- las2dem, blast2dem, lasgrid: fix rounding error for ususual or very small step sizes (0.2 or less)
 5 May 2017 -- lasground + lasground_new: user data change due to '-compute_height' makes it into LASlayers output
