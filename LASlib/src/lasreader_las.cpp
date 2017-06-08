@@ -41,6 +41,7 @@
 #include <io.h>
 #endif
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
