@@ -1917,15 +1917,38 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionKeepy(atof(argv[i+1]), atof(argv[i+2])));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
       }
-      else if (strcmp(argv[i],"-keep_z") == 0)
+      else if (strncmp(argv[i],"-keep_z", 7) == 0)
       {
-        if ((i+2) >= argc)
+        if (strcmp(argv[i],"-keep_z") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_z max_z\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_z max_z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepz(atof(argv[i+1]), atof(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
         }
-        add_criterion(new LAScriterionKeepz(atof(argv[i+1]), atof(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        else if (strcmp(argv[i],"-keep_z_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropzBelow(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-keep_z_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropzAbove(atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
       }
       else if (strncmp(argv[i],"-keep_X", 7) == 0)
       {
@@ -1960,15 +1983,38 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionKeepY(atoi(argv[i+1]), atoi(argv[i+2])));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
-      else if (strcmp(argv[i],"-keep_Z") == 0)
+      else if (strncmp(argv[i],"-keep_Z", 7) == 0)
       {
-        if ((i+2) >= argc)
+        if (strcmp(argv[i],"-keep_Z") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Z max_Z\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_Z max_Z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepZ(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
-        add_criterion(new LAScriterionKeepZ(atoi(argv[i+1]), atoi(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+        else if (strcmp(argv[i],"-keep_Z_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_Z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropZBelow(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
+        else if (strcmp(argv[i],"-keep_Z_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_Z\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropZAbove(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
       }
       else if (strcmp(argv[i],"-keep_tile") == 0)
       {
