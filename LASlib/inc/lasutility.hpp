@@ -13,7 +13,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     1 June 2017 -- improved "fluff" detection
      3 May 2015 -- updated LASinventory to handle LAS 1.4 content 
     25 December 2010 -- created after swinging in Mara's hammock for hours
   
@@ -69,6 +70,10 @@ public:
   I64 classification_extended_overlap;
   LASpoint min;
   LASpoint max;
+  U16 xyz_low_digits_10[3];
+  U16 xyz_low_digits_100[3];
+  U16 xyz_low_digits_1000[3];
+  U16 xyz_low_digits_10000[3];
   I64 xyz_fluff_10[3];
   I64 xyz_fluff_100[3];
   I64 xyz_fluff_1000[3];
@@ -144,6 +149,8 @@ private:
   LASbin* classification_bin;
   LASbin* scan_angle_bin;
   LASbin* extended_scan_angle_bin;
+  LASbin* return_number_bin;
+  LASbin* number_of_returns_bin;
   LASbin* user_data_bin;
   LASbin* point_source_id_bin;
   LASbin* gps_time_bin;
