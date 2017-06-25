@@ -24,7 +24,8 @@
   
   CHANGE HISTORY:
   
-    3 April 2012 -- created after joining the Spar Europe 2012 Advisory Board
+    20 June 2017 -- fixed reading of signed versus unsigned 16 and 8 bit intergers
+     3 April 2012 -- created after joining the Spar Europe 2012 Advisory Board
   
 ===============================================================================
 */
@@ -66,6 +67,7 @@ private:
   F32 xdim, ydim;
   F32 nodata;
   BOOL floatpixels;
+  BOOL signedpixels;
 
   void clean();
   BOOL read_hdr_file(const CHAR* file_name);
