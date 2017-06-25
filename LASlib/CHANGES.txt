@@ -1,3 +1,4 @@
+24 June 2017 -- LASlib: corrected on-the-fly conversion from BIL rasters to point clouds for unsigned integers
 11 May 2017 -- LASlib: new transforms '-copy_classification_into_user_data' and '-copy_attribute_into_user_data 1'
 20 April 2017 -- LASlib: new option '-unbuffered' for lasreadopener removes buffers from on-the-fly buffering
 16 April 2017 -- txt2las: allow requesting a particular point type with new option '-set_point_type 6'
