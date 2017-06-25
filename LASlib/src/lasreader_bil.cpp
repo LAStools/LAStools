@@ -202,50 +202,106 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
   }
   else if (nbits == 16)
   {
-    I16 elev;
-    for (col = 0; col < ncols; col++)
+    if (signedpixels)
     {
-      for (row = 0; row < nrows; row++)
+      I16 elev;
+      for (col = 0; col < ncols; col++)
       {
-        if (fread((void*)&elev, 2, 1, file) == 1)
+        for (row = 0; row < nrows; row++)
         {
-          elevation = (F32)elev;
-          if (elevation != nodata)
+          if (fread((void*)&elev, 2, 1, file) == 1)
           {
-            if (header.max_z < elevation) header.max_z = elevation;
-            if (header.min_z > elevation) header.min_z = elevation;
-            npoints++;
+            elevation = (F32)elev;
+            if (elevation != nodata)
+            {
+              if (header.max_z < elevation) header.max_z = elevation;
+              if (header.min_z > elevation) header.min_z = elevation;
+              npoints++;
+            }
+          }
+          else
+          {
+            col = ncols;
+            row = nrows;
           }
         }
-        else
+      }
+    }
+    else
+    {
+      U16 elev;
+      for (col = 0; col < ncols; col++)
+      {
+        for (row = 0; row < nrows; row++)
         {
-          col = ncols;
-          row = nrows;
+          if (fread((void*)&elev, 2, 1, file) == 1)
+          {
+            elevation = (F32)elev;
+            if (elevation != nodata)
+            {
+              if (header.max_z < elevation) header.max_z = elevation;
+              if (header.min_z > elevation) header.min_z = elevation;
+              npoints++;
+            }
+          }
+          else
+          {
+            col = ncols;
+            row = nrows;
+          }
         }
       }
     }
   }
   else
   {
-    I8 rgb[3];
-    for (col = 0; col < ncols; col++)
+    if (signedpixels)
     {
-      for (row = 0; row < nrows; row++)
+      I8 rgb[4];
+      for (col = 0; col < ncols; col++)
       {
-        if (fread((void*)&rgb, 1, nbands, file) == (U32)nbands)
+        for (row = 0; row < nrows; row++)
         {
-          elevation = (F32)(rgb[0]);
-          if (elevation != nodata)
+          if (fread((void*)&rgb, 1, nbands, file) == (U32)nbands)
           {
-            if (header.max_z < elevation) header.max_z = elevation;
-            if (header.min_z > elevation) header.min_z = elevation;
-            npoints++;
+            elevation = (F32)(rgb[0]);
+            if (elevation != nodata)
+            {
+              if (header.max_z < elevation) header.max_z = elevation;
+              if (header.min_z > elevation) header.min_z = elevation;
+              npoints++;
+            }
+          }
+          else
+          {
+            col = ncols;
+            row = nrows;
           }
         }
-        else
+      }
+    }
+    else
+    {
+      U8 rgb[4];
+      for (col = 0; col < ncols; col++)
+      {
+        for (row = 0; row < nrows; row++)
         {
-          col = ncols;
-          row = nrows;
+          if (fread((void*)&rgb, 1, nbands, file) == (U32)nbands)
+          {
+            elevation = (F32)(rgb[0]);
+            if (elevation != nodata)
+            {
+              if (header.max_z < elevation) header.max_z = elevation;
+              if (header.min_z > elevation) header.min_z = elevation;
+              npoints++;
+            }
+          }
+          else
+          {
+            col = ncols;
+            row = nrows;
+          }
         }
       }
     }
@@ -385,13 +441,17 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     {
       CHAR pixeltype[32];
       sscanf(line, "%s %s", dummy, pixeltype);
-      if (strcmp(pixeltype, "float") && strcmp(pixeltype, "FLOAT"))
+      if ((strcmp(pixeltype, "float") == 0) || (strcmp(pixeltype, "FLOAT") == 0))
       {
-        fprintf(stderr, "WARNING: pixeltype '%s' not recognized by LASreader_bil\n", pixeltype);
+        floatpixels = TRUE;
+      }
+      else if ((strcmp(pixeltype, "signedint") == 0) || (strcmp(pixeltype, "SIGNEDINT") == 0)) 
+      {
+        signedpixels = TRUE;
       }
       else
       {
-        floatpixels = TRUE;
+        fprintf(stderr, "WARNING: pixeltype '%s' not recognized by LASreader_bil\n", pixeltype);
       }
     }
     else if (strstr(line, "nodata") || strstr(line, "NODATA"))
@@ -621,33 +681,69 @@ BOOL LASreaderBIL::read_point_default()
     }
     else if (nbits == 16)
     {
-      I16 elev;
-      if (fread((void*)&elev, 2, 1, file) != 1)
+      if (signedpixels)
       {
+        I16 elev;
+        if (fread((void*)&elev, 2, 1, file) != 1)
+        {
 #ifdef _WIN32
-        fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %I64d points\n", row, nrows, col, ncols, p_count);
+          fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %I64d points\n", row, nrows, col, ncols, p_count);
 #else
-        fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %lld points\n", row, nrows, col, ncols, p_count);
+          fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %lld points\n", row, nrows, col, ncols, p_count);
 #endif
-        npoints = p_count;
-        return FALSE;
+          npoints = p_count;
+          return FALSE;
+        }
+        elevation = (F32)elev;
       }
-      elevation = (F32)elev;
+      else
+      {
+        U16 elev;
+        if (fread((void*)&elev, 2, 1, file) != 1)
+        {
+#ifdef _WIN32
+          fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %I64d points\n", row, nrows, col, ncols, p_count);
+#else
+          fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %lld points\n", row, nrows, col, ncols, p_count);
+#endif
+          npoints = p_count;
+          return FALSE;
+        }
+        elevation = (F32)elev;
+      }
     }
     else
     {
-      U8 rgb[3];
-      if (fread((void*)rgb, 1, nbands, file) != (U32)nbands)
+      if (signedpixels)
       {
+        I8 rgb[4];
+        if (fread((void*)rgb, 1, nbands, file) != (U32)nbands)
+        {
 #ifdef _WIN32
-        fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %I64d points\n", row, nrows, col, ncols, p_count);
+          fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %I64d points\n", row, nrows, col, ncols, p_count);
 #else
-        fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %lld points\n", row, nrows, col, ncols, p_count);
+          fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %lld points\n", row, nrows, col, ncols, p_count);
 #endif
-        npoints = p_count;
-        return FALSE;
+          npoints = p_count;
+          return FALSE;
+        }
+        elevation = rgb[0];
       }
-      elevation = rgb[0];
+      else
+      {
+        U8 rgb[4];
+        if (fread((void*)rgb, 1, nbands, file) != (U32)nbands)
+        {
+#ifdef _WIN32
+          fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %I64d points\n", row, nrows, col, ncols, p_count);
+#else
+          fprintf(stderr,"WARNING: end-of-file after %d of %d rows and %d of %d cols. read %lld points\n", row, nrows, col, ncols, p_count);
+#endif
+          npoints = p_count;
+          return FALSE;
+        }
+        elevation = rgb[0];
+      }
     }
 
     if (elevation != nodata)
@@ -727,6 +823,7 @@ void LASreaderBIL::clean()
   ydim = 0;
   nodata = -9999;
   floatpixels = FALSE;
+  signedpixels = FALSE;
 }
 
 LASreaderBIL::LASreaderBIL()
