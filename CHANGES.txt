@@ -1,3 +1,5 @@
+28 June 2017 -- lasgrid, las2dem, blast2dem, lascanopy: fixed quantization bug in X/Y coords for LAZ grid output
+28 June 2017 -- lasgrid, las2dem, blast2dem, lascanopy: no more bug for unlicensed writing (black-diagonal) 
 25 June 2017 -- lascolor: fix inability to read a certain type of tiled 4-band TIF images
 24 June 2017 -- lasgrid, las2dem, lascanopy: correct *unsigned* output for 16 bit '-intensity' for '-no_data 0'
 24 June 2017 -- LASlib: corrected on-the-fly conversion from BIL rasters to point clouds for unsigned integers
