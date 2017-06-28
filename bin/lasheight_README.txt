@@ -64,6 +64,13 @@
   the difference between the ellipsoid and the geoid. Simply run:
 
   lasheight -i lidar.las -ground_points geoid.txt -replace_z -odix _geoid
+
+  When using external ground points with '-ground_points geoid.laz'
+  lasheight will *not* use all points in the file but cut out a
+  "generous portion" surrounding the bounding box of the points
+  whose height is to be computed. That "generous cutting" may fail
+  when the 'geoid.laz' file has sparsely spaced points. Using the
+  '-all_ground_points' option forces lasheight to use all points. 
  
   Please license from martin.isenburg@rapidlasso.com before using
   lasheight commercially.
