@@ -15,7 +15,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-14, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-17, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -26,6 +26,7 @@
 
   CHANGE HISTORY:
 
+    13 July 2017 -- added missing checks for LAS 1.4 EVLR size and payloads
     18 August 2015 -- fixed report for truncated files (fewer or more points) 
     11 September 2014 -- added missing checks for LAS 1.4 files and points
     27 July 2011 -- added capability to create a difference output file
@@ -574,6 +575,71 @@ int main(int argc, char *argv[])
     {
       different_header++;
       fprintf(stderr, "skipping check of user-defined data in header due to length difference (%d != %d)\n", lasreader1->header.user_data_after_header_size, lasreader2->header.user_data_after_header_size);
+    }
+
+    // check extended variable length headers
+
+    if (lasreader1->header.number_of_extended_variable_length_records == lasreader2->header.number_of_extended_variable_length_records)
+    {
+      for (i = 0; i < (int)lasreader1->header.number_of_extended_variable_length_records; i++)
+      {
+        if (lasreader1->header.evlrs[i].reserved != lasreader2->header.evlrs[i].reserved)
+        {
+          different_header++;
+          fprintf(stderr, "extended variable length record %d reserved field is different: %d %d\n", i, lasreader1->header.evlrs[i].reserved, lasreader2->header.evlrs[i].reserved);
+        }
+        if (memcmp(lasreader1->header.evlrs[i].user_id, lasreader2->header.evlrs[i].user_id, 16) != 0)
+        {
+          different_header++;
+          fprintf(stderr, "extended variable length record %d user_id field is different: '%s' '%s'\n", i, lasreader1->header.evlrs[i].user_id, lasreader2->header.evlrs[i].user_id);
+        }
+        if (lasreader1->header.evlrs[i].record_id != lasreader2->header.evlrs[i].record_id)
+        {
+          different_header++;
+          fprintf(stderr, "extended variable length record %d record_id field is different: %d %d\n", i, lasreader1->header.evlrs[i].record_id, lasreader2->header.evlrs[i].record_id);
+        }
+        if (lasreader1->header.evlrs[i].record_length_after_header != lasreader2->header.evlrs[i].record_length_after_header)
+        {
+          different_header++;
+#ifdef _WIN32
+          fprintf(stderr, "extended variable length record %d record_length_after_header field is different: %I64d %I64d\n", i, lasreader1->header.evlrs[i].record_length_after_header, lasreader2->header.evlrs[i].record_length_after_header);
+#else
+          fprintf(stderr, "extended variable length record %d record_length_after_header field is different: %lld %lld\n", i, lasreader1->header.evlrs[i].record_length_after_header, lasreader2->header.evlrs[i].record_length_after_header);
+#endif
+        }
+        if (memcmp(lasreader1->header.evlrs[i].description, lasreader2->header.evlrs[i].description, 32) != 0)
+        {
+          different_header++;
+          fprintf(stderr, "extended variable length record %d description field is different: '%s' '%s'\n", i, lasreader1->header.evlrs[i].description, lasreader2->header.evlrs[i].description);
+        }
+        if (lasreader1->header.evlrs[i].record_length_after_header == lasreader2->header.evlrs[i].record_length_after_header)
+        {
+          if (memcmp(lasreader1->header.vlrs[i].data, lasreader2->header.vlrs[i].data, lasreader1->header.vlrs[i].record_length_after_header))
+          {
+            for (j = 0; j < lasreader1->header.vlrs[i].record_length_after_header; j++)
+            {
+              if (lasreader1->header.vlrs[i].data[j] != lasreader2->header.vlrs[i].data[j])
+              {
+                different_header++;
+                fprintf(stderr, "extended variable length record %d data field is different at byte %d: %d %d\n", i, j, lasreader1->header.vlrs[i].data[j], lasreader2->header.vlrs[i].data[j]);
+                break;
+              }
+            }
+          }
+        }
+        else
+        {
+#ifdef _WIN32
+          fprintf(stderr, "skipping check of extended variable length record %d due to different size (%I64d != %I64d)\n", i, lasreader1->header.evlrs[i].record_length_after_header, lasreader2->header.evlrs[i].record_length_after_header);
+#else
+          fprintf(stderr, "skipping check of extended variable length record %d due to different size (%lld != %lld)\n", i, lasreader1->header.evlrs[i].record_length_after_header, lasreader2->header.evlrs[i].record_length_after_header);
+#endif
+        }
+      }
+    }
+    else
+    {
+      fprintf(stderr, "skipping check of extended variable length records due to different number (%d != %d)\n", lasreader1->header.number_of_variable_length_records, lasreader2->header.number_of_variable_length_records);
     }
 
     if (different_header)
