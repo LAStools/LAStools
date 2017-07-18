@@ -1,3 +1,4 @@
+18 July 2017 -- bug fix for spatially-indexed reading from native compressed LAS 1.4 files
 28 May 2017 -- support for "selective decompression" of compressed LAS 1.4 points added into DLL API
 25 April 2017 -- enable "native LAS 1.4 extension" in LASzip DLL via 'request_native_extension'
 30 March 2017 -- alpha-release of "native LAS 1.4 extension" for LASzip compression
