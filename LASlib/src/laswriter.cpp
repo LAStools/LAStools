@@ -268,7 +268,7 @@ BOOL LASwriteOpener::parse(int argc, char* argv[])
       }
       if (!set_directory(argv[i+1]))
       {
-        fprintf(stderr,"ERROR: '%s' is not a valid directory\n", argv[i]);
+        fprintf(stderr,"ERROR: '%s' is not a valid directory\n", argv[i+1]);
         return FALSE;
       }
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
