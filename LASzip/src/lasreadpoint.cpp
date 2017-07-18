@@ -179,7 +179,17 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
     }
     seek_point = new U8*[num_items];
     if (!seek_point) return FALSE;
-    seek_point[0] = new U8[point_size];
+    if (layered_las14_compression)
+    {
+      // because combo LAS 1.0 - 1.4 point struct has padding
+      seek_point[0] = new U8[(point_size*2)];
+      // because extended_point_type must be set
+      seek_point[0][22] = 1;
+    }
+    else
+    {
+      seek_point[0] = new U8[point_size];
+    }
     if (!seek_point[0]) return FALSE;
     for (i = 0; i < num_readers; i++)
     {
@@ -256,7 +266,18 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
       default:
         return FALSE;
       }
-      if (i) seek_point[i] = seek_point[i-1]+items[i-1].size;
+      if (i)
+      {
+        if (layered_las14_compression)
+        {
+          // because combo LAS 1.0 - 1.4 point struct has padding
+          seek_point[i] = seek_point[i-1]+(2*items[i-1].size);
+        }
+        else
+        {
+          seek_point[i] = seek_point[i-1]+items[i-1].size;
+        }
+      }
     }
     if (laszip->compressor != LASZIP_COMPRESSOR_POINTWISE)
     {

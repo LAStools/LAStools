@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    18 July 2017 -- bug fix for spatial-indexed reading of native compressed LAS 1.4 
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 
     23 August 2016 -- layering of items for selective decompression in LAS 1.4 
     6 September 2014 -- removed inheritance of EntropyEncoder and EntropyDecoder
