@@ -245,7 +245,7 @@ void LASinterval::merge_intervals(U32 maximum_intervals, const BOOL verbose)
       }
       else
       {
-        fprintf(stderr,"maximum_intervals: %u number of interval gaps: %d next largest interval gap %u\n", maximum_intervals, map.size(), diff);
+        fprintf(stderr,"maximum_intervals: %u number of interval gaps: %u next largest interval gap %u\n", maximum_intervals, (U32)map.size(), diff);
       }
     }
     return;
