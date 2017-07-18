@@ -33,7 +33,7 @@
   
   CHANGE HISTORY:
   
-    14 July 2017 -- fixed missing 'comma' in compound (COMPD_CS) OGC WKT string 
+    14 July 2017 -- fixed missing 'comma' in compound (COMPD_CS) OGC WKT string
     23 October 2016 -- OGC WKT string stores COMPD_CS for projection + vertical
     22 October 2016 -- new '-set_ogc_wkt_in_evlr' store to EVLR instead of VLR
      1 January 2016 -- option '-set_ogc_wkt' to store CRS as OGC WKT string
