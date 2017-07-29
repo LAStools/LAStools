@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  arithmeticdecoder.hpp
-  
+
   CONTENTS:
-      
+
     A modular C++ wrapper for an adapted version of Amir Said's FastAC Code.
     see: http://www.cipr.rpi.edu/~said/FastAC.html
 
@@ -22,16 +22,16 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     22 August 2016 -- can be used as init dummy by "native LAS 1.4 compressor"
     13 November 2014 -- integrity check in readBits(), readByte(), readShort()
      6 September 2014 -- removed the (unused) inheritance from EntropyDecoder
     10 January 2011 -- licensing change for LGPL release and liblas integration
      8 December 2010 -- unified framework for all entropy coders
     30 October 2009 -- refactoring Amir Said's FastAC code
-  
+
 ===============================================================================
 */
 #ifndef ARITHMETIC_DECODER_HPP
@@ -103,7 +103,7 @@ private:
   ByteStreamIn* instream;
 
   void renorm_dec_interval();
-  U32 base, value, length;
+  U32 value, length;
 };
 
 #endif
