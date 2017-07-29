@@ -916,7 +916,9 @@ laszip_close_reader
 #else
   #include <dlfcn.h>
   typedef void* HINSTANCE;
+#ifndef NULL
 #define NULL 0
+#endif
 #define LoadLibrary dlopen
 #define GetProcAddress dlsym
 #define FreeLibrary dlclose
