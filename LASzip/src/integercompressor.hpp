@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  integercompressor.hpp
-  
+
   CONTENTS:
- 
+
     This compressor provides three different contexts for encoding integer
     numbers whose range may lie anywhere between 1 and 31 bits, which is
     specified with the SetPrecision function.
@@ -42,7 +42,7 @@
     31 October 2009 -- switched from the Rangecoder to the Entropycoder
     30 September 2005 -- now splitting the corrector into raw and compressed bits
     13 July 2005 -- created after returning with many mosquito bites from OBX
-  
+
 ===============================================================================
 */
 #ifndef INTEGER_COMPRESSOR_HPP
@@ -95,7 +95,9 @@ private:
 
   ArithmeticModel** mCorrector;
 
+#ifdef CREATE_HISTOGRAMS
   int** corr_histogram;
+#endif
 };
 
 #endif
