@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  arithmeticencoder.hpp
-  
+
   CONTENTS:
-      
+
     A modular C++ wrapper for an adapted version of Amir Said's FastAC Code.
     see: http://www.cipr.rpi.edu/~said/FastAC.html
 
@@ -30,7 +30,7 @@
     10 January 2011 -- licensing change for LGPL release and liblas integration
      8 December 2010 -- unified framework for all entropy coders
     30 October 2009 -- refactoring Amir Said's FastAC code
-  
+
 ===============================================================================
 */
 #ifndef ARITHMETIC_ENCODER_HPP
@@ -108,7 +108,7 @@ private:
   U8* endbuffer;
   U8* outbyte;
   U8* endbyte;
-  U32 base, value, length;
+  U32 base, length;
 };
 
 #endif
