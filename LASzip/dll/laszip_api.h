@@ -24,8 +24,10 @@
 
   CHANGE HISTORY:
 
+    29 July 2017 -- integrating minimal stream-based reading/writing into branch
+    20 July 2017 -- Andrew Bell adds support for stream-based reading/writing.
     28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
-    25 April 2017 -- adding initial support for new "native LAS 1.4 extension" 
+    25 April 2017 -- adding initial support for new "native LAS 1.4 extension"
     8 January 2017 -- name change from 'laszip_dll.h' and integration Hobu's changes for Unix
     7 January 2017 -- set reserved field in LASzip VLR from 0xAABB to 0x0
     7 January 2017 -- make scan angle quantization in compatibility mode consistent with LIB
@@ -563,7 +565,34 @@ laszip_unload_dll
 );
 
 #ifdef __cplusplus
-}
+} // extern "C"
+
+#if defined(_MSC_VER) && (_MSC_VER < 1300)
+#include <fstream.h>
+#else
+#include <istream>
+#include <fstream>
+using namespace std;
 #endif
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_open_reader_stream(
+    laszip_POINTER                     pointer
+    , istream&                         stream
+    , laszip_BOOL*                     is_compressed
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_open_writer_stream(
+    laszip_POINTER                     pointer
+    , ostream&                         stream
+    , laszip_BOOL                      compress
+    , laszip_U8                        point_format
+    , laszip_U16                       point_size
+);
+
+#endif  // __cplusplus
 
 #endif /* LASZIP_API_H */
