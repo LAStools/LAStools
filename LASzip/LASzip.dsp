@@ -166,6 +166,7 @@ SOURCE=.\src\laszip.cpp
 # Begin Source File
 
 SOURCE=.\src\laszip_dll.cpp
+# SUBTRACT CPP /I "stl"
 # End Source File
 # End Group
 # Begin Group "Header Files"
