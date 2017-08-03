@@ -1799,11 +1799,12 @@ static laszip_I32 write_laszip_vlr_payload(
 static laszip_I32 setup_laszip_items(
     laszip_dll_struct*                 laszip_dll
     , LASzip*                          laszip
-    , laszip_U8                        point_format
-    , laszip_U16                       point_size
     , laszip_BOOL                      compress
 )
 {
+  laszip_U8 point_format = laszip_dll->header.point_data_format;
+  laszip_U16 point_size = laszip_dll->header.point_data_record_length;
+
   // create point items in the LASzip structure from point format and size
 
   if (!laszip->setup(point_format, point_size, LASZIP_COMPRESSOR_NONE))
@@ -2307,7 +2308,7 @@ laszip_open_writer(
       }
     }
 
-    if (setup_laszip_items(laszip_dll, &laszip, laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length, compress))
+    if (setup_laszip_items(laszip_dll, &laszip, compress))
     {
       return 1;
     }
@@ -4525,19 +4526,16 @@ laszip_I32 create_point_writer
 }
 
 /*---------------------------------------------------------------------------*/
-// Unlike the file writer, the stream writer does no output, it just sets
-// things up so that points can be written.  There is no support for
-// 1.4 compatibility mode.  This needs to be called just prior to writing
-// points as it uses the current stream position in order to identify the
-// position where points should be written.
-//
+// The stream writer also supports software that writes the LAS header on its 
+// own simply by setting the BOOL 'do_not_write_header' to TRUE. This function
+// should then be called just prior to writing points as data is then written
+// to the current stream position
 LASZIP_API laszip_I32
 laszip_open_writer_stream(
     laszip_POINTER                     pointer
     , ostream&                         stream
     , laszip_BOOL                      compress
-    , laszip_U8                        point_format
-    , laszip_U16                       point_size
+    , laszip_BOOL                      do_not_write_header
 )
 {
   if (pointer == 0) return 1;
@@ -4562,8 +4560,14 @@ laszip_open_writer_stream(
       laszip_dll->request_native_extension = TRUE;
     }
 
+    if (do_not_write_header == FALSE)
+    {
+      sprintf(laszip_dll->error, "writing header via laszip_open_writer_stream not yet implemented.");
+      return 1;
+    }
+
     LASzip laszip;
-    if (setup_laszip_items(laszip_dll, &laszip, point_format, point_size, compress))
+    if (setup_laszip_items(laszip_dll, &laszip, compress))
     {
       return 1;
     }
@@ -4589,8 +4593,6 @@ laszip_open_writer_stream(
 LASZIP_API laszip_I32
 laszip_create_laszip_vlr(
     laszip_POINTER                     pointer
-    , laszip_U8                        point_format
-    , laszip_U16                       point_size
     , std::vector<laszip_U8>&          vlr
 )
 {
@@ -4600,7 +4602,7 @@ laszip_create_laszip_vlr(
   laszip_dll->request_native_extension = TRUE;
 
   LASzip laszip;
-  if (setup_laszip_items(laszip_dll, &laszip, point_format, point_size, TRUE))
+  if (setup_laszip_items(laszip_dll, &laszip, TRUE))
   {
     return 1;
   }
