@@ -654,6 +654,54 @@ laszip_set_header(
 
 /*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
+laszip_set_point_type_and_size(
+    laszip_POINTER                     pointer
+    , laszip_U8                        point_type
+    , laszip_U16                       point_size
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+
+  try
+  {
+    if (laszip_dll->reader)
+    {
+      sprintf(laszip_dll->error, "cannot set point format and point size after reader was opened");
+      return 1;
+    }
+
+    if (laszip_dll->writer)
+    {
+      sprintf(laszip_dll->error, "cannot set point format and point size after writer was opened");
+      return 1;
+    }
+
+    // check if point type and type are supported
+    
+    if (!LASzip().setup(point_type, point_size, LASZIP_COMPRESSOR_NONE))
+    {
+      sprintf(laszip_dll->error, "invalid combination of point_type %d and point_size %d", (I32)point_type, (I32)point_size);
+      return 1;
+    }
+
+    // set point type and point size
+
+    laszip_dll->header.point_data_format = point_type;
+    laszip_dll->header.point_data_record_length = point_size;
+  }
+  catch (...)
+  {
+    sprintf(laszip_dll->error, "internal error in laszip_set_point_type_and_size");
+    return 1;
+  }
+
+  laszip_dll->error[0] = '\0';
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
 laszip_check_for_integer_overflow(
     laszip_POINTER                     pointer
 )
@@ -1802,14 +1850,14 @@ static laszip_I32 setup_laszip_items(
     , laszip_BOOL                      compress
 )
 {
-  laszip_U8 point_format = laszip_dll->header.point_data_format;
+  laszip_U8 point_type = laszip_dll->header.point_data_format;
   laszip_U16 point_size = laszip_dll->header.point_data_record_length;
 
   // create point items in the LASzip structure from point format and size
 
-  if (!laszip->setup(point_format, point_size, LASZIP_COMPRESSOR_NONE))
+  if (!laszip->setup(point_type, point_size, LASZIP_COMPRESSOR_NONE))
   {
-    sprintf(laszip_dll->error, "invalid combination of point_format %d and point_size %d", (I32)point_format, (I32)point_size);
+    sprintf(laszip_dll->error, "invalid combination of point_type %d and point_size %d", (I32)point_type, (I32)point_size);
     return 1;
   }
 
@@ -1857,19 +1905,19 @@ static laszip_I32 setup_laszip_items(
 
   if (compress)
   {
-    if ((point_format > 5) && laszip_dll->request_native_extension)
+    if ((point_type > 5) && laszip_dll->request_native_extension)
     {
-      if (!laszip->setup(point_format, point_size, LASZIP_COMPRESSOR_LAYERED_CHUNKED))
+      if (!laszip->setup(point_type, point_size, LASZIP_COMPRESSOR_LAYERED_CHUNKED))
       {
-        sprintf(laszip_dll->error, "cannot compress point_format %d with point_size %d using native", (I32)point_format, (I32)point_size);
+        sprintf(laszip_dll->error, "cannot compress point_type %d with point_size %d using native", (I32)point_type, (I32)point_size);
         return 1;
       }
     }
     else
     {
-      if (!laszip->setup(point_format, point_size, LASZIP_COMPRESSOR_DEFAULT))
+      if (!laszip->setup(point_type, point_size, LASZIP_COMPRESSOR_DEFAULT))
       {
-        sprintf(laszip_dll->error, "cannot compress point_format %d with point_size %d", (I32)point_format, (I32)point_size);
+        sprintf(laszip_dll->error, "cannot compress point_type %d with point_size %d", (I32)point_type, (I32)point_size);
         return 1;
       }
     }

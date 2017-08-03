@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    4 August 2017 -- 'laszip_set_point_type_and_size()' as minimal setup for ostream writer
     3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
     29 July 2017 -- integrating minimal stream-based reading/writing into branch
     20 July 2017 -- Andrew Bell adds support for stream-based reading/writing.
@@ -325,6 +326,14 @@ LASZIP_API laszip_I32
 laszip_set_header(
     laszip_POINTER                     pointer
     , const laszip_header_struct*      header
+);
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_set_point_type_and_size(
+    laszip_POINTER                     pointer
+    , laszip_U8                        point_type
+    , laszip_U16                       point_size
 );
 
 /*---------------------------------------------------------------------------*/

@@ -255,6 +255,29 @@ laszip_set_header
 };
 
 /*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_set_point_type_and_size_def)
+(
+    laszip_POINTER                     pointer
+    , laszip_U8                        point_type
+    , laszip_U16                       point_size
+);
+laszip_set_point_type_and_size_def laszip_set_point_type_and_size_ptr = 0;
+LASZIP_API laszip_I32
+laszip_set_point_type_and_size
+(
+    laszip_POINTER                     pointer
+    , laszip_U8                        point_type
+    , laszip_U16                       point_size
+)
+{
+  if (laszip_set_point_type_and_size_ptr)
+  {
+    return (*laszip_set_point_type_and_size_ptr)(pointer, point_type, point_size);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
 typedef laszip_I32 (*laszip_check_for_integer_overflow_def)
 (
     laszip_POINTER                     pointer
@@ -989,6 +1012,11 @@ laszip_I32 laszip_load_dll()
   }
   laszip_set_header_ptr = (laszip_set_header_def)GetProcAddress(laszip_HINSTANCE, "laszip_set_header");
   if (laszip_set_header_ptr == NULL) {
+     FreeLibrary(laszip_HINSTANCE);
+     return 1;
+  }
+  laszip_set_point_type_and_size_ptr = (laszip_set_point_type_and_size_def)GetProcAddress(laszip_HINSTANCE, "laszip_set_point_type_and_size");
+  if (laszip_set_point_type_and_size_ptr == NULL) {
      FreeLibrary(laszip_HINSTANCE);
      return 1;
   }
