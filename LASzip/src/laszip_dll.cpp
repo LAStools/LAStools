@@ -2135,10 +2135,6 @@ laszip_open_writer(
 
       laszip->request_version(2);
 
-      // calculate payload size
-
-      laszip_vrl_payload_size = 34 + 6*laszip->num_items;
-
       // maybe we should change the chunk size
 
       if (laszip_dll->set_chunk_size != LASZIP_CHUNK_SIZE_DEFAULT)
@@ -2260,7 +2256,7 @@ laszip_open_writer(
     }
     if (compress)
     {
-      laszip_dll->header.offset_to_point_data += (54 + laszip_vrl_payload_size);
+      laszip_dll->header.offset_to_point_data += (54 + laszip_vrl_payload_size(laszip));
     }
     try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.offset_to_point_data)); } catch(...)
     {
@@ -2269,7 +2265,7 @@ laszip_open_writer(
     }
     if (compress)
     {
-      laszip_dll->header.offset_to_point_data -= (54 + laszip_vrl_payload_size);
+      laszip_dll->header.offset_to_point_data -= (54 + laszip_vrl_payload_size(laszip));
       laszip_dll->header.number_of_variable_length_records += 1;
     }
     try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_variable_length_records)); } catch(...)
@@ -2521,7 +2517,7 @@ laszip_open_writer(
         sprintf(laszip_dll->error, "writing header.vlrs[%d].record_id", i);
         return 1;
       }
-      U16 record_length_after_header = laszip_vrl_payload_size;
+      U16 record_length_after_header = laszip_vrl_payload_size(laszip);
       try { laszip_dll->streamout->put16bitsLE((U8*)&record_length_after_header); } catch(...)
       {
         sprintf(laszip_dll->error, "writing header.vlrs[%d].record_length_after_header", i);
