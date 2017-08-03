@@ -590,8 +590,7 @@ laszip_open_writer_stream(
     laszip_POINTER                     pointer
     , ostream&                         stream
     , laszip_BOOL                      compress
-    , laszip_U8                        point_format
-    , laszip_U16                       point_size
+    , laszip_BOOL                      do_not_write_header
 );
 
 #include <vector>
@@ -601,8 +600,6 @@ laszip_open_writer_stream(
 LASZIP_API laszip_I32
 laszip_create_laszip_vlr(
     laszip_POINTER                     pointer
-    , laszip_U8                        point_format
-    , laszip_U16                       point_size
     , std::vector<laszip_U8>&          vlr
 );
 
