@@ -1640,7 +1640,7 @@ laszip_create_spatial_index(
 
 /*---------------------------------------------------------------------------*/
 static U32 laszip_vrl_payload_size(
-    LASzip                             *laszip
+    LASzip*                             laszip
 )
 {
   return 34 + (6 * laszip->num_items);
@@ -1649,8 +1649,8 @@ static U32 laszip_vrl_payload_size(
 /*---------------------------------------------------------------------------*/
 static laszip_I32 write_laszip_vlr_header(
     laszip_POINTER                     pointer
-    , LASzip                           *laszip
-    , ByteStreamOut                    *out
+    , LASzip*                          laszip
+    , ByteStreamOut*                   out
 )
 {
   if (pointer == 0) return 1;
@@ -1697,8 +1697,8 @@ static laszip_I32 write_laszip_vlr_header(
 /*---------------------------------------------------------------------------*/
 static laszip_I32 write_laszip_vlr_payload(
     laszip_POINTER                     pointer
-    , LASzip                           *laszip
-    , ByteStreamOut                    *out
+    , LASzip*                          laszip
+    , ByteStreamOut*                   out
 )
 {
   if (pointer == 0) return 1;
@@ -1791,6 +1791,106 @@ static laszip_I32 write_laszip_vlr_payload(
       sprintf(laszip_dll->error, "writing version %d of item %d", (I32)laszip->items[j].version, j);
       return 1;
     }
+  }
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+static laszip_I32 setup_laszip_items(
+    laszip_dll_struct*                 laszip_dll
+    , LASzip*                          laszip
+    , laszip_U8                        point_format
+    , laszip_U16                       point_size
+    , laszip_BOOL                      compress
+)
+{
+  // create point items in the LASzip structure from point format and size
+
+  if (!laszip->setup(point_format, point_size, LASZIP_COMPRESSOR_NONE))
+  {
+    sprintf(laszip_dll->error, "invalid combination of point_format %d and point_size %d", (I32)point_format, (I32)point_size);
+    return 1;
+  }
+
+  // compute offsets (or points item pointers) for data transfer from the point items
+
+  laszip_dll->point_items = new U8*[laszip->num_items];
+  if (laszip_dll->point_items == 0)
+  {
+    sprintf(laszip_dll->error, "could not alloc point_items");
+    return 1;
+  }
+
+  for (size_t i = 0; i < laszip->num_items; i++)
+  {
+    switch (laszip->items[i].type)
+    {
+    case LASitem::POINT10:
+    case LASitem::POINT14:
+      laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.X);
+      break;
+    case LASitem::GPSTIME11:
+      laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.gps_time);
+      break;
+    case LASitem::RGB12:
+    case LASitem::RGB14:
+    case LASitem::RGBNIR14:
+      laszip_dll->point_items[i] = (U8*)laszip_dll->point.rgb;
+      break;
+    case LASitem::BYTE:
+    case LASitem::BYTE14:
+      laszip_dll->point.num_extra_bytes = laszip->items[i].size;
+      if (laszip_dll->point.extra_bytes) delete [] laszip_dll->point.extra_bytes;
+      laszip_dll->point.extra_bytes = new U8[laszip_dll->point.num_extra_bytes];
+      laszip_dll->point_items[i] = laszip_dll->point.extra_bytes;
+      break;
+    case LASitem::WAVEPACKET13:
+    case LASitem::WAVEPACKET14:
+      laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.wave_packet);
+      break;
+    default:
+      sprintf(laszip_dll->error, "unknown LASitem type %d", (I32)laszip->items[i].type);
+      return 1;
+    }
+  }
+
+  if (compress)
+  {
+    if ((point_format > 5) && laszip_dll->request_native_extension)
+    {
+      if (!laszip->setup(point_format, point_size, LASZIP_COMPRESSOR_LAYERED_CHUNKED))
+      {
+        sprintf(laszip_dll->error, "cannot compress point_format %d with point_size %d using native", (I32)point_format, (I32)point_size);
+        return 1;
+      }
+    }
+    else
+    {
+      if (!laszip->setup(point_format, point_size, LASZIP_COMPRESSOR_DEFAULT))
+      {
+        sprintf(laszip_dll->error, "cannot compress point_format %d with point_size %d", (I32)point_format, (I32)point_size);
+        return 1;
+      }
+    }
+
+    // request version (old point types only, new point types always use version 3)
+
+    laszip->request_version(2);
+
+    // maybe we should change the chunk size
+
+    if (laszip_dll->set_chunk_size != LASZIP_CHUNK_SIZE_DEFAULT)
+    {
+      if (!laszip->set_chunk_size(laszip_dll->set_chunk_size))
+      {
+        sprintf(laszip_dll->error, "setting chunk size %d has failed", laszip_dll->set_chunk_size);
+        return 1;
+      }
+    }
+  }
+  else
+  {
+    laszip->request_version(0);
   }
   return 0;
 }
@@ -2196,109 +2296,20 @@ laszip_open_writer(
       return 1;
     }
 
-    LASzip* laszip = new LASzip;
-
-    if (laszip == 0)
-    {
-      sprintf(laszip_dll->error, "could not alloc LASzip");
-      return 1;
-    }
+    LASzip laszip;
 
     if (compress && laszip_dll->request_compatibility_mode && (laszip_dll->header.point_data_format > 5))
     {
-      if (!laszip->request_compatibility_mode(1))
+      if (!laszip.request_compatibility_mode(1))
       {
         sprintf(laszip_dll->error, "requesting 'compatibility mode' has failed");
         return 1;
       }
     }
 
-    if (!laszip->setup(laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length, LASZIP_COMPRESSOR_NONE))
+    if (setup_laszip_items(laszip_dll, &laszip, laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length, compress))
     {
-      sprintf(laszip_dll->error, "invalid combination of point_data_format %d and point_data_record_length %d", (I32)laszip_dll->header.point_data_format, (I32)laszip_dll->header.point_data_record_length);
       return 1;
-    }
-
-    // create point's item pointers
-
-    laszip_dll->point_items = new U8*[laszip->num_items];
-
-    if (laszip_dll->point_items == 0)
-    {
-      sprintf(laszip_dll->error, "could not alloc point_items");
-      return 1;
-    }
-
-    for (i = 0; i < laszip->num_items; i++)
-    {
-      switch (laszip->items[i].type)
-      {
-      case LASitem::POINT10:
-      case LASitem::POINT14:
-        laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.X);
-        break;
-      case LASitem::GPSTIME11:
-        laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.gps_time);
-        break;
-      case LASitem::RGB12:
-      case LASitem::RGB14:
-      case LASitem::RGBNIR14:
-        laszip_dll->point_items[i] = (U8*)laszip_dll->point.rgb;
-        break;
-      case LASitem::BYTE:
-      case LASitem::BYTE14:
-        laszip_dll->point.num_extra_bytes = laszip->items[i].size;
-        if (laszip_dll->point.extra_bytes) delete [] laszip_dll->point.extra_bytes;
-        laszip_dll->point.extra_bytes = new U8[laszip_dll->point.num_extra_bytes];
-        laszip_dll->point_items[i] = laszip_dll->point.extra_bytes;
-        break;
-      case LASitem::WAVEPACKET13:
-      case LASitem::WAVEPACKET14:
-        laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.wave_packet);
-        break;
-      default:
-        sprintf(laszip_dll->error, "unknown LASitem type %d", (I32)laszip->items[i].type);
-        return 1;
-      }
-    }
-
-    if (compress)
-    {
-      if ((laszip_dll->header.point_data_format > 5) && laszip_dll->request_native_extension)
-      {
-        if (!laszip->setup(laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length, LASZIP_COMPRESSOR_LAYERED_CHUNKED))
-        {
-          sprintf(laszip_dll->error, "cannot compress point_data_format %d with point_data_record_length %d using native", (I32)laszip_dll->header.point_data_format, (I32)laszip_dll->header.point_data_record_length);
-          return 1;
-        }
-      }
-      else
-      {
-        if (!laszip->setup(laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length, LASZIP_COMPRESSOR_DEFAULT))
-        {
-          sprintf(laszip_dll->error, "cannot compress point_data_format %d with point_data_record_length %d", (I32)laszip_dll->header.point_data_format, (I32)laszip_dll->header.point_data_record_length);
-          return 1;
-        }
-      }
-
-      // request version (for old point types only, new point types automatically use version 3)
-
-      laszip->request_version(2);
-
-      // maybe we should change the chunk size
-
-      if (laszip_dll->set_chunk_size != LASZIP_CHUNK_SIZE_DEFAULT)
-      {
-        if (!laszip->set_chunk_size(laszip_dll->set_chunk_size))
-        {
-          sprintf(laszip_dll->error, "setting chunk size %d has failed", laszip_dll->set_chunk_size);
-          return 1;
-        }
-      }
-    }
-    else
-    {
-      laszip->request_version(0);
     }
     
     // open the file
@@ -2406,7 +2417,7 @@ laszip_open_writer(
     }
     if (compress)
     {
-      laszip_dll->header.offset_to_point_data += (54 + laszip_vrl_payload_size(laszip));
+      laszip_dll->header.offset_to_point_data += (54 + laszip_vrl_payload_size(&laszip));
     }
     try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.offset_to_point_data)); } catch(...)
     {
@@ -2415,7 +2426,7 @@ laszip_open_writer(
     }
     if (compress)
     {
-      laszip_dll->header.offset_to_point_data -= (54 + laszip_vrl_payload_size(laszip));
+      laszip_dll->header.offset_to_point_data -= (54 + laszip_vrl_payload_size(&laszip));
       laszip_dll->header.number_of_variable_length_records += 1;
     }
     try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_variable_length_records)); } catch(...)
@@ -2649,14 +2660,14 @@ laszip_open_writer(
     {
       // write the LASzip VLR header
 
-      if (write_laszip_vlr_header(laszip_dll, laszip, laszip_dll->streamout))
+      if (write_laszip_vlr_header(laszip_dll, &laszip, laszip_dll->streamout))
       {
         return 1;
       }
 
       // write the LASzip VLR payload
 
-      if (write_laszip_vlr_payload(laszip_dll, laszip, laszip_dll->streamout))
+      if (write_laszip_vlr_payload(laszip_dll, &laszip, laszip_dll->streamout))
       {
         return 1;
       }
@@ -2682,7 +2693,7 @@ laszip_open_writer(
       return 1;
     }
 
-    if (!laszip_dll->writer->setup(laszip->num_items, laszip->items, laszip))
+    if (!laszip_dll->writer->setup(laszip.num_items, laszip.items, &laszip))
     {
       sprintf(laszip_dll->error, "setup of LASwritePoint failed");
       return 1;
@@ -2693,8 +2704,6 @@ laszip_open_writer(
       sprintf(laszip_dll->error, "init of LASwritePoint failed");
       return 1;
     }
-
-    delete laszip;
 
     if (laszip_dll->lax_create)
     {
@@ -4485,118 +4494,6 @@ laszip_open_reader_stream(
   }
 }
 
-/*---------------------------------------------------------------------------*/
-laszip_I32 setup_laszip_items(
-    laszip_dll_struct *laszip_dll
-    , LASzip *laszip
-    , laszip_U8 point_format
-    , laszip_U16 point_size
-    , laszip_BOOL compress
-)
-{
-  // This creates the point items in the LASzip structure.
-  if (!laszip->setup(point_format, point_size, LASZIP_COMPRESSOR_NONE))
-  {
-    sprintf(laszip_dll->error, "invalid combination of point_data_format "
-      "%d and point_data_record_length %d",
-      (I32)laszip_dll->header.point_data_format,
-      (I32)laszip_dll->header.point_data_record_length);
-    return 1;
-  }
-
-  // Use the created items to create offsets for data transfer.
-  laszip_dll->point_items = new U8*[laszip->num_items];
-  if (laszip_dll->point_items == 0)
-  {
-    sprintf(laszip_dll->error, "could not alloc point_items");
-    return 1;
-  }
-
-  for (size_t i = 0; i < laszip->num_items; i++)
-  {
-    switch (laszip->items[i].type)
-    {
-    case LASitem::POINT10:
-    case LASitem::POINT14:
-      laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.X);
-      break;
-    case LASitem::GPSTIME11:
-      laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.gps_time);
-      break;
-    case LASitem::RGB12:
-    case LASitem::RGB14:
-    case LASitem::RGBNIR14:
-      laszip_dll->point_items[i] = (U8*)laszip_dll->point.rgb;
-      break;
-    case LASitem::BYTE:
-    case LASitem::BYTE14:
-      laszip_dll->point.num_extra_bytes = laszip->items[i].size;
-      if (laszip_dll->point.extra_bytes)
-        delete [] laszip_dll->point.extra_bytes;
-      laszip_dll->point.extra_bytes =
-        new U8[laszip_dll->point.num_extra_bytes];
-      laszip_dll->point_items[i] = laszip_dll->point.extra_bytes;
-      break;
-    case LASitem::WAVEPACKET13:
-    case LASitem::WAVEPACKET14:
-      laszip_dll->point_items[i] = (U8*)&(laszip_dll->point.wave_packet);
-      break;
-    default:
-      sprintf(laszip_dll->error, "unknown LASitem type %d",
-        (I32)laszip->items[i].type);
-      return 1;
-    }
-  }
-
-  if (compress)
-  {
-    if ((point_format > 5) && laszip_dll->request_native_extension)
-    {
-      if (!laszip->setup(point_format, point_size,
-          LASZIP_COMPRESSOR_LAYERED_CHUNKED))
-      {
-        sprintf(laszip_dll->error, "cannot compress point_data_format %d "
-          "with point_data_record_length %d using native",
-          (I32)point_format, (I32)point_size);
-        return 1;
-      }
-    }
-    else
-    {
-      if (!laszip->setup(point_format, point_size,
-        LASZIP_COMPRESSOR_DEFAULT))
-      {
-        sprintf(laszip_dll->error, "cannot compress point_data_format %d "
-          "with point_data_record_length %d",
-          (I32)point_format, (I32)point_size);
-        return 1;
-      }
-    }
-
-    // request version (for old point types only, new point types
-    //automatically use version 3)
-
-    laszip->request_version(2);
-
-    // maybe we should change the chunk size
-
-    if (laszip_dll->set_chunk_size != LASZIP_CHUNK_SIZE_DEFAULT)
-    {
-      if (!laszip->set_chunk_size(laszip_dll->set_chunk_size))
-      {
-        sprintf(laszip_dll->error, "setting chunk size %d has failed",
-          laszip_dll->set_chunk_size);
-        return 1;
-      }
-    }
-  }
-  else
-  {
-    laszip->request_version(0);
-  }
-  return 0;
-}
-
 /*----------------------------------------------------------------------------*/
 laszip_I32 create_point_writer
 (
@@ -4666,7 +4563,10 @@ laszip_open_writer_stream(
     }
 
     LASzip laszip;
-    setup_laszip_items(laszip_dll, &laszip, point_format, point_size, compress);
+    if (setup_laszip_items(laszip_dll, &laszip, point_format, point_size, compress))
+    {
+      return 1;
+    }
 
     if (IS_LITTLE_ENDIAN())
       laszip_dll->streamout = new ByteStreamOutOstreamLE(stream);
@@ -4700,7 +4600,10 @@ laszip_create_laszip_vlr(
   laszip_dll->request_native_extension = TRUE;
 
   LASzip laszip;
-  setup_laszip_items(laszip_dll, &laszip, point_format, point_size, TRUE);
+  if (setup_laszip_items(laszip_dll, &laszip, point_format, point_size, TRUE))
+  {
+    return 1;
+  }
 
   ByteStreamOutArray* out = 0;
   
