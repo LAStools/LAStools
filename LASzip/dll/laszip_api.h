@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
     29 July 2017 -- integrating minimal stream-based reading/writing into branch
     20 July 2017 -- Andrew Bell adds support for stream-based reading/writing.
     28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
