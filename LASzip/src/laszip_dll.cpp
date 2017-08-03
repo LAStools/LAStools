@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
    29 July 2017 -- integrating minimal stream-based reading/writing into branch
    20 July 2017 -- Andrew Bell adds support for stream-based reading/writing
    28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
@@ -1646,6 +1647,155 @@ static U32 laszip_vrl_payload_size(
 }
 
 /*---------------------------------------------------------------------------*/
+static laszip_I32 write_laszip_vlr_header(
+    laszip_POINTER                     pointer
+    , LASzip                           *laszip
+    , ByteStreamOut                    *out
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+
+  // write the LASzip VLR header
+
+  U16 reserved = 0x0;
+  try { out->put16bitsLE((U8*)&reserved); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing LASzip VLR header.reserved");
+    return 1;
+  }
+  U8 user_id[16] = "laszip encoded\0";
+  try { out->putBytes((U8*)user_id, 16); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing LASzip VLR header.user_id");
+    return 1;
+  }
+  U16 record_id = 22204;
+  try { out->put16bitsLE((U8*)&record_id); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing LASzip VLR header.record_id");
+    return 1;
+  }
+  U16 record_length_after_header = (U16)laszip_vrl_payload_size(laszip);
+  try { laszip_dll->streamout->put16bitsLE((U8*)&record_length_after_header); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing LASzip VLR header.record_length_after_header");
+    return 1;
+  }
+  CHAR description[32];
+  memset(description, 0, 32);
+  sprintf(description, "LASzip DLL %d.%d r%d (%d)", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE);
+  try { laszip_dll->streamout->putBytes((U8*)description, 32); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing LASzip VLR header.description");
+    return 1;
+  }
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+static laszip_I32 write_laszip_vlr_payload(
+    laszip_POINTER                     pointer
+    , LASzip                           *laszip
+    , ByteStreamOut                    *out
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+
+  // write the LASzip VLR payload
+
+  //     U16  compressor                2 bytes
+  //     U32  coder                     2 bytes
+  //     U8   version_major             1 byte
+  //     U8   version_minor             1 byte
+  //     U16  version_revision          2 bytes
+  //     U32  options                   4 bytes
+  //     I32  chunk_size                4 bytes
+  //     I64  number_of_special_evlrs   8 bytes
+  //     I64  offset_to_special_evlrs   8 bytes
+  //     U16  num_items                 2 bytes
+  //        U16 type                2 bytes * num_items
+  //        U16 size                2 bytes * num_items
+  //        U16 version             2 bytes * num_items
+  // which totals 34+6*num_items
+
+  try { out->put16bitsLE((U8*)&(laszip->compressor)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing compressor %d", (I32)laszip->compressor);
+    return 1;
+  }
+  try { out->put16bitsLE((U8*)&(laszip->coder)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing coder %d", (I32)laszip->coder);
+    return 1;
+  }
+  try { out->putBytes((U8*)&(laszip->version_major), 1); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing version_major %d", (I32)laszip->version_major);
+    return 1;
+  }
+  try { out->putBytes((U8*)&(laszip->version_minor), 1); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing version_minor %d", (I32)laszip->version_minor);
+    return 1;
+  }
+  try { out->put16bitsLE((U8*)&(laszip->version_revision)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing version_revision %d", (I32)laszip->version_revision);
+    return 1;
+  }
+  try { out->put32bitsLE((U8*)&(laszip->options)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing options %u", laszip->options);
+    return 1;
+  }
+  try { out->put32bitsLE((U8*)&(laszip->chunk_size)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing chunk_size %u", laszip->chunk_size);
+    return 1;
+  }
+  try { out->put64bitsLE((U8*)&(laszip->number_of_special_evlrs)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing number_of_special_evlrs %d", (I32)laszip->number_of_special_evlrs);
+    return 1;
+  }
+  try { out->put64bitsLE((U8*)&(laszip->offset_to_special_evlrs)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing offset_to_special_evlrs %d", (I32)laszip->offset_to_special_evlrs);
+    return 1;
+  }
+  try { out->put16bitsLE((U8*)&(laszip->num_items)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing num_items %d", (I32)laszip->num_items);
+    return 1;
+  }
+
+  U32 j;
+  for (j = 0; j < laszip->num_items; j++)
+  {
+    U16 type = (U16)(laszip->items[j].type);
+    try { out->put16bitsLE((U8*)&type); } catch(...)
+    {
+      sprintf(laszip_dll->error, "writing type %d of item %d", (I32)laszip->items[j].type, j);
+      return 1;
+    }
+    try { out->put16bitsLE((U8*)&(laszip->items[j].size)); } catch(...)
+    {
+      sprintf(laszip_dll->error, "writing size %d of item %d", (I32)laszip->items[j].size, j);
+      return 1;
+    }
+    try { out->put16bitsLE((U8*)&(laszip->items[j].version)); } catch(...)
+    {
+      sprintf(laszip_dll->error, "writing version %d of item %d", (I32)laszip->items[j].version, j);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
 LASZIP_API laszip_I32
 laszip_open_writer(
     laszip_POINTER                     pointer
@@ -2499,126 +2649,16 @@ laszip_open_writer(
     {
       // write the LASzip VLR header
 
-      U16 reserved = 0x0;
-      try { laszip_dll->streamout->put16bitsLE((U8*)&reserved); } catch(...)
+      if (write_laszip_vlr_header(laszip_dll, laszip, laszip_dll->streamout))
       {
-        sprintf(laszip_dll->error, "writing header.vlrs[%d].reserved", i);
-        return 1;
-      }
-      U8 user_id[16] = "laszip encoded\0";
-      try { laszip_dll->streamout->putBytes((U8*)user_id, 16); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing header.vlrs[%d].user_id", i);
-        return 1;
-      }
-      U16 record_id = 22204;
-      try { laszip_dll->streamout->put16bitsLE((U8*)&record_id); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing header.vlrs[%d].record_id", i);
-        return 1;
-      }
-      U16 record_length_after_header = laszip_vrl_payload_size(laszip);
-      try { laszip_dll->streamout->put16bitsLE((U8*)&record_length_after_header); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing header.vlrs[%d].record_length_after_header", i);
-        return 1;
-      }
-      CHAR description[32];
-      memset(description, 0, 32);
-      sprintf(description, "LASzip DLL %d.%d r%d (%d)", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE);
-      try { laszip_dll->streamout->putBytes((U8*)description, 32); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing header.vlrs[%d].description", i);
         return 1;
       }
 
       // write the LASzip VLR payload
 
-      //     U16  compressor                2 bytes
-      //     U32  coder                     2 bytes
-      //     U8   version_major             1 byte
-      //     U8   version_minor             1 byte
-      //     U16  version_revision          2 bytes
-      //     U32  options                   4 bytes
-      //     I32  chunk_size                4 bytes
-      //     I64  number_of_special_evlrs   8 bytes
-      //     I64  offset_to_special_evlrs   8 bytes
-      //     U16  num_items                 2 bytes
-      //        U16 type                2 bytes * num_items
-      //        U16 size                2 bytes * num_items
-      //        U16 version             2 bytes * num_items
-      // which totals 34+6*num_items
-
-      try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip->compressor)); } catch(...)
+      if (write_laszip_vlr_payload(laszip_dll, laszip, laszip_dll->streamout))
       {
-        sprintf(laszip_dll->error, "writing compressor %d", (I32)laszip->compressor);
         return 1;
-      }
-      try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip->coder)); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing coder %d", (I32)laszip->coder);
-        return 1;
-      }
-      try { laszip_dll->streamout->putBytes((U8*)&(laszip->version_major), 1); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing version_major %d", (I32)laszip->version_major);
-        return 1;
-      }
-      try { laszip_dll->streamout->putBytes((U8*)&(laszip->version_minor), 1); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing version_minor %d", (I32)laszip->version_minor);
-        return 1;
-      }
-      try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip->version_revision)); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing version_revision %d", (I32)laszip->version_revision);
-        return 1;
-      }
-      try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip->options)); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing options %u", laszip->options);
-        return 1;
-      }
-      try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip->chunk_size)); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing chunk_size %u", laszip->chunk_size);
-        return 1;
-      }
-      try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip->number_of_special_evlrs)); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing number_of_special_evlrs %d", (I32)laszip->number_of_special_evlrs);
-        return 1;
-      }
-      try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip->offset_to_special_evlrs)); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing offset_to_special_evlrs %d", (I32)laszip->offset_to_special_evlrs);
-        return 1;
-      }
-      try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip->num_items)); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing num_items %d", (I32)laszip->num_items);
-        return 1;
-      }
-
-      U32 j;
-      for (j = 0; j < laszip->num_items; j++)
-      {
-        U16 type = (U16)(laszip->items[j].type);
-        try { laszip_dll->streamout->put16bitsLE((U8*)&type); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing type %d of item %d", (I32)laszip->items[j].type, j);
-          return 1;
-        }
-        try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip->items[j].size)); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing size %d of item %d", (I32)laszip->items[j].size, j);
-          return 1;
-        }
-        try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip->items[j].version)); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing version %d of item %d", (I32)laszip->items[j].version, j);
-          return 1;
-        }
       }
     }
 
@@ -4642,158 +4682,7 @@ laszip_open_writer_stream(
   }
   laszip_dll->error[0] = '\0';
   return 0;
-}
- 
-/*---------------------------------------------------------------------------*/
-static laszip_I32 write_laszip_vlr_header(
-    laszip_POINTER                     pointer
-    , LASzip                           *laszip
-    , ByteStreamOut                    *out
-)
-{
-  if (pointer == 0) return 1;
-  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
-
-  // write the LASzip VLR header
-
-  U16 reserved = 0x0;
-  try { out->put16bitsLE((U8*)&reserved); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing LASzip VLR header.reserved");
-    return 1;
-  }
-  U8 user_id[16] = "laszip encoded\0";
-  try { out->putBytes((U8*)user_id, 16); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing LASzip VLR header.user_id");
-    return 1;
-  }
-  U16 record_id = 22204;
-  try { out->put16bitsLE((U8*)&record_id); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing LASzip VLR header.record_id");
-    return 1;
-  }
-  U16 record_length_after_header = (U16)laszip_vrl_payload_size(laszip);
-  try { laszip_dll->streamout->put16bitsLE((U8*)&record_length_after_header); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing LASzip VLR header.record_length_after_header");
-    return 1;
-  }
-  CHAR description[32];
-  memset(description, 0, 32);
-  sprintf(description, "LASzip DLL %d.%d r%d (%d)", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE);
-  try { laszip_dll->streamout->putBytes((U8*)description, 32); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing LASzip VLR header.description");
-    return 1;
-  }
-
-  laszip_dll->error[0] = '\0';
-  return 0;
-}
-
-/*---------------------------------------------------------------------------*/
-static laszip_I32 write_laszip_vlr_payload(
-    laszip_POINTER                     pointer
-    , LASzip                           *laszip
-    , ByteStreamOut                    *out
-)
-{
-  if (pointer == 0) return 1;
-  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
-
-  // write the LASzip VLR payload
-
-  //     U16  compressor                2 bytes
-  //     U32  coder                     2 bytes
-  //     U8   version_major             1 byte
-  //     U8   version_minor             1 byte
-  //     U16  version_revision          2 bytes
-  //     U32  options                   4 bytes
-  //     I32  chunk_size                4 bytes
-  //     I64  number_of_special_evlrs   8 bytes
-  //     I64  offset_to_special_evlrs   8 bytes
-  //     U16  num_items                 2 bytes
-  //        U16 type                2 bytes * num_items
-  //        U16 size                2 bytes * num_items
-  //        U16 version             2 bytes * num_items
-  // which totals 34+6*num_items
-
-  try { out->put16bitsLE((U8*)&(laszip->compressor)); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing compressor %d", (I32)laszip->compressor);
-    return 1;
-  }
-  try { out->put16bitsLE((U8*)&(laszip->coder)); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing coder %d", (I32)laszip->coder);
-    return 1;
-  }
-  try { out->putBytes((U8*)&(laszip->version_major), 1); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing version_major %d", (I32)laszip->version_major);
-    return 1;
-  }
-  try { out->putBytes((U8*)&(laszip->version_minor), 1); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing version_minor %d", (I32)laszip->version_minor);
-    return 1;
-  }
-  try { out->put16bitsLE((U8*)&(laszip->version_revision)); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing version_revision %d", (I32)laszip->version_revision);
-    return 1;
-  }
-  try { out->put32bitsLE((U8*)&(laszip->options)); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing options %u", laszip->options);
-    return 1;
-  }
-  try { out->put32bitsLE((U8*)&(laszip->chunk_size)); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing chunk_size %u", laszip->chunk_size);
-    return 1;
-  }
-  try { out->put64bitsLE((U8*)&(laszip->number_of_special_evlrs)); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing number_of_special_evlrs %d", (I32)laszip->number_of_special_evlrs);
-    return 1;
-  }
-  try { out->put64bitsLE((U8*)&(laszip->offset_to_special_evlrs)); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing offset_to_special_evlrs %d", (I32)laszip->offset_to_special_evlrs);
-    return 1;
-  }
-  try { out->put16bitsLE((U8*)&(laszip->num_items)); } catch(...)
-  {
-    sprintf(laszip_dll->error, "writing num_items %d", (I32)laszip->num_items);
-    return 1;
-  }
-
-  U32 j;
-  for (j = 0; j < laszip->num_items; j++)
-  {
-    U16 type = (U16)(laszip->items[j].type);
-    try { out->put16bitsLE((U8*)&type); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing type %d of item %d", (I32)laszip->items[j].type, j);
-      return 1;
-    }
-    try { out->put16bitsLE((U8*)&(laszip->items[j].size)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing size %d of item %d", (I32)laszip->items[j].size, j);
-      return 1;
-    }
-    try { out->put16bitsLE((U8*)&(laszip->items[j].version)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing version %d of item %d", (I32)laszip->items[j].version, j);
-      return 1;
-    }
-  }
-  laszip_dll->error[0] = '\0';
-  return 0;
-}
+} 
 
 /*---------------------------------------------------------------------------*/
 // make LASzip VLR for given point type and size (always request native LAS 1.4 extension)
@@ -4834,6 +4723,7 @@ laszip_create_laszip_vlr(
 
   delete out;
 
+  laszip_dll->error[0] = '\0';
   return 0;
 }
 
