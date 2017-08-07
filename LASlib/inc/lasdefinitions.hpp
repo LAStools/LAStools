@@ -593,7 +593,7 @@ public:
     return 0;
   };
 
-  BOOL remove_vlr(U32 i)
+  BOOL remove_vlr(U32 i, BOOL delete_data=TRUE)
   {
     if (vlrs)
     {
@@ -602,7 +602,10 @@ public:
         offset_to_point_data -= (54 + vlrs[i].record_length_after_header);
         if (vlrs[i].record_length_after_header)
         {
-          delete [] vlrs[i].data;
+          if (delete_data)
+          {
+            delete [] vlrs[i].data;
+          }
         }
         number_of_variable_length_records--;
         if (number_of_variable_length_records)
@@ -615,8 +618,9 @@ public:
           free(vlrs);
           vlrs = 0;
         }
+        return TRUE;
       }
-      return TRUE;
+      return FALSE;
     }
     return FALSE;
   };
@@ -697,6 +701,50 @@ public:
     {
       evlrs[i].data = 0;
     }
+  };
+
+  BOOL remove_evlr(U32 i, BOOL delete_data=TRUE)
+  {
+    if (evlrs)
+    {
+      if (i < number_of_extended_variable_length_records)
+      {
+        if (evlrs[i].record_length_after_header)
+        {
+          if (delete_data)
+          {
+            delete [] evlrs[i].data;
+          }
+        }
+        number_of_extended_variable_length_records--;
+        if (number_of_extended_variable_length_records)
+        {
+          evlrs[i] = evlrs[number_of_extended_variable_length_records];
+          evlrs = (LASevlr*)realloc(evlrs, sizeof(LASvlr)*number_of_extended_variable_length_records);
+        }
+        else
+        {
+          free(evlrs);
+          evlrs = 0;
+        }
+        return TRUE;
+      }
+      return FALSE;
+    }
+    return FALSE;
+  };
+
+  BOOL remove_evlr(const CHAR* user_id, U16 record_id)
+  {
+    U32 i;
+    for (i = 0; i < number_of_extended_variable_length_records; i++)
+    {
+      if ((strcmp(evlrs[i].user_id, user_id) == 0) && (evlrs[i].record_id == record_id))
+      {
+        return remove_evlr(i);
+      }
+    }
+    return FALSE;
   };
 
   void set_lastiling(U32 level, U32 level_index, U32 implicit_levels, BOOL buffer, BOOL reversible, F32 min_x, F32 max_x, F32 min_y, F32 max_y)
