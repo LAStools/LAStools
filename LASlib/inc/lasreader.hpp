@@ -14,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -25,6 +25,8 @@
   
   CHANGE HISTORY:
   
+     5 August 2017 -- unless '-buffered 25' just created buffers always '-remain_buffered'
+     5 August 2017 -- removed option '-unbuffered' because it makes too many assumptions
      7 February 2014 -- added option '-apply_file_source_ID' when reading LAS/LAZ
     22 August 2012 -- added the '-pipe_on' option for a multi-stage LAStools pipeline
     11 August 2012 -- added on-the-fly buffered reading of LiDAR files (efficient with LAX)
@@ -167,7 +169,6 @@ public:
   BOOL is_merged() const { return merged; };
   void set_buffer_size(const F32 buffer_size);
   F32 get_buffer_size() const;
-  void set_unbuffered(const BOOL unbuffered);
   void set_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique=FALSE);
   BOOL add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique=FALSE);
   void set_auto_reoffset(const BOOL auto_reoffset);
@@ -228,7 +229,6 @@ private:
   U32 file_name_allocated;
   U32 file_name_current;
   F32 buffer_size;
-  BOOL unbuffered;
   CHAR* temp_file_base;
   CHAR** neighbor_file_names;
   U32 neighbor_file_name_number;
