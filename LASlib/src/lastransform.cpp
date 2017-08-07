@@ -1119,6 +1119,14 @@ public:
   inline void transform(LASpoint* point) { I16 temp = point->get_G(); point->set_G(point->get_B()); point->set_B(temp); };
 };
 
+class LASoperationCopyRGBintoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_RGB_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_intensity(U16_QUANTIZE((0.2989*point->get_R())+(0.5870*point->get_G())+(0.1140*point->get_B()))); };
+};
+
 class LASoperationCopyRintoIntensity : public LASoperation
 {
 public:
@@ -1349,6 +1357,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_RGB_down (by 256)\n");
   fprintf(stderr,"  -scale_RGB_up (by 256)\n");
   fprintf(stderr,"  -switch_R_G -switch_R_B -switch_B_G\n");
+  fprintf(stderr,"  -copy_RGB_into_intensity\n");
   fprintf(stderr,"  -copy_R_into_NIR -copy_R_into_intensity\n");
   fprintf(stderr,"  -copy_G_into_NIR -copy_G_into_intensity\n");
   fprintf(stderr,"  -copy_B_into_NIR -copy_B_into_intensity\n");
@@ -1703,9 +1712,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationCopyScannerChannelIntoPointSource());
         *argv[i]='\0'; 
       }
-      else if (strncmp(argv[i],"-copy_R_", 8) == 0)
+      else if (strncmp(argv[i],"-copy_R", 7) == 0)
       {
-        if (strcmp(argv[i],"-copy_R_into_intensity") == 0)
+        if (strcmp(argv[i],"-copy_RGB_into_intensity") == 0)
+        {
+          add_operation(new LASoperationCopyRGBintoIntensity());
+          *argv[i]='\0';
+        }
+        else if (strcmp(argv[i],"-copy_R_into_intensity") == 0)
         {
           add_operation(new LASoperationCopyRintoIntensity());
           *argv[i]='\0'; 
