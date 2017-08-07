@@ -676,11 +676,6 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         }
         if (filter) lasreaderlas->set_filter(filter);
         if (transform) lasreaderlas->set_transform(transform);
-        if (unbuffered && lasreaderlas->header.vlr_lasoriginal)
-        {
-          lasreaderlas->npoints = lasreaderlas->header.vlr_lasoriginal->number_of_point_records;
-          lasreaderlas->header.restore_lasoriginal();
-        }
         if (inside_rectangle) lasreaderlas->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
         else if (inside_tile) lasreaderlas->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
         else if (inside_circle) lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
@@ -1154,11 +1149,6 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
         {
           fprintf(stderr,"ERROR: cannot reopen lasreaderlas with file name '%s'\n", file_name);
           return FALSE;
-        }
-        if (!remain_buffered && lasreaderlas->header.vlr_lasoriginal)
-        {
-          lasreaderlas->npoints = lasreaderlas->header.vlr_lasoriginal->number_of_point_records;
-          lasreaderlas->header.restore_lasoriginal();
         }
         if (inside_rectangle || inside_tile || inside_circle)
         {
@@ -1643,11 +1633,6 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       set_buffer_size((F32)atof(argv[i+1]));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-unbuffered") == 0)
-    {
-      set_unbuffered(TRUE);
-      *argv[i]='\0';
-    }
     else if (strcmp(argv[i],"-temp_files") == 0)
     {
       if ((i+1) >= argc)
@@ -1907,11 +1892,6 @@ void LASreadOpener::set_buffer_size(const F32 buffer_size)
 F32 LASreadOpener::get_buffer_size() const
 {
   return buffer_size;
-}
-
-void LASreadOpener::set_unbuffered(const BOOL unbuffered)
-{
-  this->unbuffered = unbuffered;
 }
 
 void LASreadOpener::set_filter(LASfilter* filter)
@@ -2315,7 +2295,6 @@ LASreadOpener::LASreadOpener()
   scale_factor = 0;
   offset = 0;
   buffer_size = 0.0f;
-  unbuffered = FALSE;
   auto_reoffset = FALSE;
   files_are_flightlines = FALSE;
   apply_file_source_ID = FALSE;
