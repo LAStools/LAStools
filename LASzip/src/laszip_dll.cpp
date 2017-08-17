@@ -2868,7 +2868,7 @@ laszip_write_point(
       point->extra_bytes[laszip_dll->start_flags_and_channel] = (U8)((scanner_channel << 1) | overlap_bit);
       if (laszip_dll->start_NIR_band != -1)
       {
-        *((U16*)(point->extra_bytes + laszip_dll->start_NIR_band)) = ((U16)(point->rgb[3]));
+        *((U16*)(point->extra_bytes + laszip_dll->start_NIR_band)) = point->rgb[3];
       }
     }
 
@@ -4338,7 +4338,7 @@ laszip_read_point(
       flags_and_channel = point->extra_bytes[laszip_dll->start_flags_and_channel];
       if (laszip_dll->start_NIR_band != -1)
       {
-        ((U16)(point->rgb[3])) = *((U16*)(point->extra_bytes + laszip_dll->start_NIR_band));
+        point->rgb[3] = *((U16*)(point->extra_bytes + laszip_dll->start_NIR_band));
       }
 
       // decompose into individual attributes
