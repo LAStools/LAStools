@@ -28,6 +28,9 @@
     Converting between Oblique Mercator and latitude / longitude
     adapted from code written by U.S. Army Topographic Engineering Center
 
+    Converting between Oblique Stereographic and latitude / longitude
+    formulas from "Oblique Stereographic Alternative" by Gerald Evenden and Rueben Schulz
+
   PROGRAMMERS:
   
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
@@ -240,6 +243,14 @@ public:
   double os_scale_factor;
   double os_lat_origin_radian;
   double os_long_meridian_radian;
+  double os_R2;
+  double os_C;
+  double os_phic0;
+  double os_sinc0;
+  double os_cosc0;
+  double os_ratexp;
+  double os_K;
+  double os_gf;
 };
 
 class GeoProjectionConverter
@@ -371,6 +382,9 @@ public:
   bool HOMtoLL(const double HOMEastingMeter, const double HOMNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* hom) const;
   bool LLtoHOM(const double LatDegree, const double LongDegree, double &HOMEastingMeter, double &HOMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* hom) const;
 
+  bool OStoLL(const double OSEastingMeter, const double OSNorthingMeter, double& LatDegree,  double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOS* os) const;
+  bool LLtoOS(const double LatDegree, const double LongDegree, double& OSEastingMeter,  double& OSNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOS* os) const;
+
   GeoProjectionConverter();
   ~GeoProjectionConverter();
 
@@ -444,7 +458,7 @@ private:
   void compute_tm_parameters(bool source);
   void compute_aeac_parameters(bool source);
 //  void compute_hom_parameters(bool source);
-//  void compute_os_parameters(bool source);
+  void compute_os_parameters(bool source);
 };
 
 #endif
