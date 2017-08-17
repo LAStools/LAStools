@@ -1061,6 +1061,9 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
       case 11: // CT_AlbersEqualArea
         user_defined_projection = 11;
         break;
+      case 16: // CT_ObliqueStereographic
+        user_defined_projection = 16;
+        break;
       case 2: // CT_TransvMercator_Modified_Alaska
         fprintf(stderr, "ProjCoordTransGeoKey: CT_TransvMercator_Modified_Alaska not implemented\n");
         break;
@@ -1096,9 +1099,6 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         break;
       case 15: // CT_PolarStereographic
         fprintf(stderr, "ProjCoordTransGeoKey: CT_PolarStereographic not implemented\n");
-        break;
-      case 16: // CT_ObliqueStereographic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueStereographic not implemented\n");
         break;
       case 17: // CT_Equirectangular
         fprintf(stderr, "ProjCoordTransGeoKey: CT_Equirectangular not implemented\n");
@@ -1238,6 +1238,27 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         if (description)
         {
           sprintf(description, "generic albers equal area");
+        }
+        has_projection = true;
+      }
+    }
+    else if (user_defined_projection == 16)
+    {
+      if ((offsetProjFalseEastingGeoKey >= 0) &&
+          (offsetProjFalseNorthingGeoKey >= 0) &&
+          (offsetProjNatOriginLatGeoKey >= 0) &&
+          ((offsetProjCenterLongGeoKey >= 0) || (offsetProjNatOriginLongGeoKey >= 0)) &&
+          (offsetProjScaleAtNatOriginGeoKey >= 0))
+      {
+        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
+        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
+        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
+        double longMeridianDeg = ((offsetProjCenterLongGeoKey >= 0) ? geo_double_params[offsetProjCenterLongGeoKey] : geo_double_params[offsetProjNatOriginLongGeoKey]);
+        double scaleFactor = geo_double_params[offsetProjScaleAtNatOriginGeoKey];
+        set_oblique_stereographic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longMeridianDeg, scaleFactor);
+        if (description)
+        {
+          sprintf(description, "generic oblique stereographic");
         }
         has_projection = true;
       }
@@ -4655,7 +4676,7 @@ void GeoProjectionConverter::set_oblique_stereographic_projection(double falseEa
   os->os_lat_origin_radian = deg2rad*os->os_lat_origin_degree;
   os->os_long_meridian_radian = deg2rad*os->os_long_meridian_degree;
   set_projection(os, source);
-//  compute_os_parameters(source);
+  compute_os_parameters(source);
   if (description)
   {
     sprintf(description, "false east/north: %g/%g [m], origin lat/meridian long: %g/%g, scale: %g", os->os_false_easting_meter, os->os_false_northing_meter, os->os_lat_origin_degree, os->os_long_meridian_degree, os->os_scale_factor);
@@ -5392,6 +5413,31 @@ void GeoProjectionConverter::compute_aeac_parameters(bool source)
     aeac->aeac_rho0 = 0;
   else
     aeac->aeac_rho0 = aeac->aeac_Albers_a_OVER_n * sqrt(aeac->aeac_C - nq0);
+}
+
+static double srat(double esinp, double exp)
+{
+  return pow((1.0 - esinp) / (1.0 + esinp), exp);
+}
+
+void GeoProjectionConverter::compute_os_parameters(bool source)
+{
+  GeoProjectionParametersOS* os = (GeoProjectionParametersOS*)(source ? source_projection : target_projection);
+
+  if (!os || os->type != GEO_PROJECTION_OS) return;
+
+  double sphi = sin(os->os_lat_origin_radian);
+  double cphi = cos(os->os_lat_origin_radian);
+  cphi *= cphi;
+  
+  os->os_R2 = 2.0 * sqrt(1.0 - ellipsoid->eccentricity_squared) / (1.0 - ellipsoid->eccentricity_squared * sphi * sphi);
+  os->os_C = sqrt(1.0 + ellipsoid->eccentricity_squared * cphi * cphi / (1.0 - ellipsoid->eccentricity_squared));
+  os->os_phic0 = asin(sphi / os->os_C);
+  os->os_sinc0 = sin(os->os_phic0);
+  os->os_cosc0 = cos(os->os_phic0);
+  os->os_ratexp = 0.5 * os->os_C * ellipsoid->eccentricity;
+  os->os_K = tan(0.5 * os->os_phic0 + PI/4) / (pow(tan(0.5 * os->os_lat_origin_radian + PI/4), os->os_C) * srat(ellipsoid->eccentricity * sphi, os->os_ratexp));
+  os->os_gf = os->os_scale_factor * ellipsoid->equatorial_radius;
 }
 
 // converts UTM coords to lat/long.  Equations from USGS Bulletin 1532 
@@ -6463,16 +6509,15 @@ bool GeoProjectionConverter::LLtoAEAC(const double LatDegree, const double LongD
   * coordinates, according to the current ellipsoid and Oblique Mercator 
   * projection parameters.
   *
-  *   OMEastingMeter    : input Easting/X in meters 
-  *   OMNorthingMeter   : input Northing/Y in meters
+  *   HOMEastingMeter    : input Easting/X in meters 
+  *   HOMNorthingMeter   : input Northing/Y in meters
   *   LatDegree         : output Latitude in decimal degrees
   *   LongDegree        : output Longitude in decimal degrees
   *
-  * adapted from OBLIQUE MERCATOR code of U.S. Army Topographic Engineering Center
 */
 bool GeoProjectionConverter::HOMtoLL(const double OMEastingMeter, const double OMNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* om) const
 {
-  return true;
+  return false;
 }
 
 /*
@@ -6483,13 +6528,105 @@ bool GeoProjectionConverter::HOMtoLL(const double OMEastingMeter, const double O
   *
   *   LatDegree         : input Latitude in decimal degrees
   *   LongDegree        : input Longitude in decimal degrees
-  *   OMEastingMeter    : output Easting/X in meters 
-  *   OMNorthingMeter   : output Northing/Y in meters
+  *   HOMEastingMeter    : output Easting/X in meters 
+  *   HOMNorthingMeter   : output Northing/Y in meters
   *
-  * adapted from OBLIQUE MERCATOR code of U.S. Army Topographic Engineering Center
 */
 bool GeoProjectionConverter::LLtoHOM(const double LatDegree, const double LongDegree, double &OMEastingMeter, double &OMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* om) const
 {
+  return false;
+}
+
+/*
+  * The function OStoLL() converts the Oblique Stereographic projection
+  * (easting and northing) coordinates to Geodetic (latitude and longitude)
+  * coordinates, according to the current ellipsoid and Oblique Stereographic
+  * projection parameters.
+  *
+  *   OSEastingMeter    : input Easting/X in meters 
+  *   OSNorthingMeter   : input Northing/Y in meters
+  *   LatDegree         : output Latitude in decimal degrees
+  *   LongDegree        : output Longitude in decimal degrees
+  *
+  * formulas from "Oblique Stereographic Alternative" by Gerald Evenden and Rueben Schulz
+*/
+bool GeoProjectionConverter::OStoLL(const double OSEastingMeter, const double OSNorthingMeter, double& LatDegree,  double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOS* os) const
+{
+  double x = (OSEastingMeter - os->os_false_easting_meter) / os->os_gf;
+  double y = (OSNorthingMeter - os->os_false_northing_meter) / os->os_gf;
+
+  double rho = hypot(x, y);
+  if (fabs(rho) < 1.0e-6)
+  {
+    x = 0.0;
+    y = os->os_phic0;
+  }
+  else
+  {
+    double ce = 2.0 * atan2(rho, os->os_R2);
+    double sinc = sin(ce);
+    double cosc = cos(ce);
+    x = atan2(x * sinc, rho * (os->os_cosc0 * cosc) - (y * os->os_sinc0 * sinc));
+    y = (cosc * os->os_sinc0) + (y * sinc * os->os_cosc0 / rho);
+    if (fabs(y) >= 1.0)
+    {
+      y = (y < 0.0) ? -PI/2.0 : PI/2.0;
+    }
+    else
+    {
+      y = asin(y);
+    }
+  }
+  x /= os->os_C;
+  double num = pow(tan(0.5 * y + PI/4)/os->os_K, 1.0/os->os_C);
+  for (int i=15;;)
+  {
+    double phi = 2.0 * atan(num * srat(ellipsoid->eccentricity * sin(y), -0.5 * ellipsoid->eccentricity)) - PI/2;
+    if (fabs(phi - y) < 1.0e-14)
+    {
+      break;
+    }
+    y = phi;
+    if (--i < 0)
+    {
+      return false;
+    }
+  }
+
+  LatDegree = rad2deg*y;
+  LongDegree = rad2deg*(x + os->os_long_meridian_radian);
+  return true;
+}
+
+/*
+  * The function LLtoOS() converts Geodetic (latitude and longitude)
+  * coordinates to the Oblique Stereographic projection (easting and
+  * northing) coordinates, according to the current ellipsoid and
+  * Oblique Stereographic projection parameters. 
+  *
+  *   LatDegree         : input Latitude in decimal degrees
+  *   LongDegree        : input Longitude in decimal degrees
+  *   OSEastingMeter    : output Easting/X in meters 
+  *   OSNorthingMeter   : output Northing/Y in meters
+  *
+  * formulas from "Oblique Stereographic Alternative" by Gerald Evenden and Rueben Schulz
+*/
+bool GeoProjectionConverter::LLtoOS(const double LatDegree, const double LongDegree, double& OSEastingMeter,  double& OSNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersOS* os) const
+{
+  double y = LatDegree*deg2rad;
+  double x = (LongDegree - os->os_long_meridian_degree)*deg2rad;
+
+  y = 2.0 * atan(os->os_K * pow(tan(0.5 * y + PI/4), os->os_C) * srat(ellipsoid->eccentricity * sin(y), os->os_ratexp)) - PI/2;
+  x *= os->os_C;
+  double sinc = sin(y);
+  double cosc = cos(y);
+  double cosl = cos(x);
+  double k = os->os_R2 / (1.0 + os->os_sinc0 * sinc + os->os_cosc0 * cosc * cosl);
+  x = k * cosc * sin(x);
+  y = k * (os->os_cosc0 * sinc - os->os_sinc0 * cosc * cosl);
+
+  OSEastingMeter = x * os->os_gf + os->os_false_easting_meter;
+  OSNorthingMeter = y * os->os_gf + os->os_false_northing_meter;
   return true;
 }
 
@@ -7391,6 +7528,9 @@ bool GeoProjectionConverter::to_lon_lat_ele(const double* point, double& longitu
     case GEO_PROJECTION_AEAC:
       AEACtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersAEAC*)source_projection);
       break;
+    case GEO_PROJECTION_OS:
+      OStoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersOS*)source_projection);
+      break;
     }
     elevation_in_meter = elevation2meter*point[2] + elevation_offset_in_meter;
     return true;
@@ -7438,6 +7578,9 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
     case GEO_PROJECTION_AEAC:
       AEACtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersAEAC*)source_projection);
       break;
+    case GEO_PROJECTION_OS:
+      OStoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersOS*)source_projection);
+      break;
     }
 
     switch (target_projection->type)
@@ -7474,6 +7617,11 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
       break;
     case GEO_PROJECTION_AEAC:
       LLtoAEAC(latitude, longitude, x, y, ellipsoid, (const GeoProjectionParametersAEAC*)target_projection);
+      x = meter2coordinates * x;
+      y = meter2coordinates * y;
+      break;
+    case GEO_PROJECTION_OS:
+      LLtoOS(latitude, longitude, x, y, ellipsoid, (const GeoProjectionParametersOS*)target_projection);
       x = meter2coordinates * x;
       y = meter2coordinates * y;
       break;
