@@ -303,6 +303,11 @@ BOOL LASwriteOpener::parse(int argc, char* argv[])
       set_native(TRUE);
       *argv[i]='\0';
     }
+    else if (strcmp(argv[i],"-no_native") == 0)
+    {
+      set_native(FALSE);
+      *argv[i]='\0';
+    }
     else if (strcmp(argv[i],"-olas") == 0)
     {
       specified = TRUE;
@@ -1058,7 +1063,7 @@ LASwriteOpener::LASwriteOpener()
   parse_string = 0;
   separator = 0;
   scale_rgb = 1.0f;
-  native = FALSE;
+  native = TRUE;
   format = LAS_TOOLS_FORMAT_DEFAULT;
   specified = FALSE;
   force = FALSE;

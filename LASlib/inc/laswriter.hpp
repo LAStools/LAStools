@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    17 August 2017 -- switch on "native LAS 1.4 extension". turns off with '-no_native'.
     29 March 2017 -- enable "native LAS 1.4 extension" for LASzip via '-native'
     13 November 2016 -- return early FALSE when set_directory() will not succeed  
     5 September 2011 -- support for writing Terrasolid's BIN format
