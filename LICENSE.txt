@@ -42,6 +42,7 @@
 
     * lasview
     * laspublish
+    * lasoptimize
 
 --------------------------------------------------------------------------
 
@@ -91,6 +92,6 @@
 
   COPYRIGHT:
   
-  (c) 2007-2015, rapidlasso GmbH, GERMANY - fast tools to catch reality
+  (c) 2007-2017, rapidlasso GmbH, GERMANY - fast tools to catch reality
 
 --------------------------------------------------------------------------
