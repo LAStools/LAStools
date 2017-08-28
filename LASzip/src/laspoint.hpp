@@ -571,7 +571,7 @@ public:
   inline void set_number_of_returns(const U8 number_of_returns) { this->number_of_returns = (number_of_returns > 7 ? 7 : number_of_returns); };
   inline void set_scan_direction_flag(const U8 scan_direction_flag) { this->scan_direction_flag = scan_direction_flag; };
   inline void set_edge_of_flight_line(const U8 edge_of_flight_line) { this->edge_of_flight_line = edge_of_flight_line; };
-  inline void set_classification(U8 classification) { this->classification = (classification & 31); };
+  inline void set_classification(U8 classification) { if (classification < 32) { this->classification = classification; this->extended_classification = classification; } };
   inline void set_synthetic_flag(U8 synthetic_flag) { if (synthetic_flag) { this->synthetic_flag = 1; this->extended_classification_flags |= 0x01; } else { this->synthetic_flag = 0; this->extended_classification_flags &= 0x0E; } };
   inline void set_keypoint_flag(U8 keypoint_flag) { if (keypoint_flag) { this->keypoint_flag = 1; this->extended_classification_flags |= 0x02; } else { this->keypoint_flag = 0; this->extended_classification_flags &= 0x0D; } };
   inline void set_withheld_flag(U8 withheld_flag) { if (withheld_flag) { this->withheld_flag = 1; this->extended_classification_flags |= 0x04; } else { this->withheld_flag = 0; this->extended_classification_flags &= 0x0B; } };
