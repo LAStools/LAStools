@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    23 August 2017 -- minor version increment for C++ stream-based read/write API
     28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
     8 April 2017 -- new check for whether point size and total size of items match
     30 March 2017 -- support for "native LAS 1.4 extension" added into main branch
@@ -62,9 +63,9 @@ typedef long long SIGNED_INT64;
 #endif
 
 #define LASZIP_VERSION_MAJOR                3
-#define LASZIP_VERSION_MINOR                0
-#define LASZIP_VERSION_REVISION             4
-#define LASZIP_VERSION_BUILD_DATE      170804
+#define LASZIP_VERSION_MINOR                1
+#define LASZIP_VERSION_REVISION             0
+#define LASZIP_VERSION_BUILD_DATE      170823
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1
