@@ -484,6 +484,21 @@ BOOL LASwriterTXT::write_point(const LASpoint* point)
     case 'd': // the direction of scan flag
       fprintf(file, "%d", point->get_scan_direction_flag());
       break;
+    case 'h': // the withheld flag
+      fprintf(file, "%d", point->get_withheld_flag());
+      break;
+    case 'k': // the keypoint flag
+      fprintf(file, "%d", point->get_keypoint_flag());
+      break;
+    case 'g': // the synthetic flag
+      fprintf(file, "%d", point->get_synthetic_flag());
+      break;
+    case 'o': // the overlap flag
+      fprintf(file, "%d", point->get_extended_overlap_flag());
+      break;
+    case 'l': // the scanner channel
+      fprintf(file, "%d", point->get_extended_scanner_channel());
+      break;
     case 'R': // the red channel of the RGB field
       if (scale_rgb != 1.0f)
         fprintf(file, "%.2f", scale_rgb*point->get_rgb()[0]);
@@ -616,6 +631,11 @@ BOOL LASwriterTXT::check_parse_string(const CHAR* parse_string)
         (p[0] != 'p') && // the point source ID
         (p[0] != 'e') && // the edge of flight line flag
         (p[0] != 'd') && // the direction of scan flag
+        (p[0] != 'h') && // the withheld flag
+        (p[0] != 'k') && // the keypoint flag
+        (p[0] != 'g') && // the synthetic flag
+        (p[0] != 'o') && // the overlap flag
+        (p[0] != 'l') && // the scanner channel
         (p[0] != 'm') && // the index of the point (count starts at 0)
         (p[0] != 'M') && // the index of the point (count starts at 1)
         (p[0] != 'w') && // the wavepacket descriptor index
@@ -654,6 +674,11 @@ BOOL LASwriterTXT::check_parse_string(const CHAR* parse_string)
         fprintf(stderr, "       'p' : the point source ID\n");
         fprintf(stderr, "       'e' : the edge of flight line flag\n");
         fprintf(stderr, "       'd' : the direction of scan flag\n");
+        fprintf(stderr, "       'h' : the withheld flag\n");
+        fprintf(stderr, "       'k' : the keypoint flag\n");
+        fprintf(stderr, "       'g' : the synthetic flag\n");
+        fprintf(stderr, "       'o' : the overlap flag\n");
+        fprintf(stderr, "       'l' : the scanner channel\n");
         fprintf(stderr, "       'M' : the index of the point\n");
         fprintf(stderr, "       'w' : the wavepacket descriptor index\n");
         fprintf(stderr, "       'W' : all wavepacket attributes\n");
