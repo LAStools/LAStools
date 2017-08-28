@@ -29,7 +29,7 @@
 ===============================================================================
 */
 
-#include "laszip_api.h"
+#include <laszip/laszip_api.h>
 
 // DLL function definitions
 
@@ -759,19 +759,19 @@ laszip_exploit_spatial_index
 typedef laszip_I32 (*laszip_decompress_selective_def)
 (
     laszip_POINTER                     pointer
-    , const laszip_BOOL                exploit
+    , const laszip_U32                 decompress_selective
 );
 laszip_decompress_selective_def laszip_decompress_selective_ptr = 0;
 LASZIP_API laszip_I32
 laszip_decompress_selective
 (
     laszip_POINTER                     pointer
-    , const laszip_BOOL                exploit
+    , const laszip_U32                 decompress_selective
 )
 {
   if (laszip_decompress_selective_ptr)
   {
-    return (*laszip_decompress_selective_ptr)(pointer, exploit);
+    return (*laszip_decompress_selective_ptr)(pointer, decompress_selective);
   }
   return 1;
 };
