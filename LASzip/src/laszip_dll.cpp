@@ -24,11 +24,12 @@
 
   CHANGE HISTORY:
 
+   23 August 2017 -- turn on "native" by default
     3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
    29 July 2017 -- integrating minimal stream-based reading/writing into branch
    20 July 2017 -- Andrew Bell adds support for stream-based reading/writing
    28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
-   25 April 2017 -- adding initial support for new "native LAS 1.4 extension" 
+   25 April 2017 -- adding initial support for new "native LAS 1.4 extension"
     8 January 2017 -- changed from "laszip_dll.h" to "laszip_api.h" for hobu
 
 ===============================================================================
@@ -335,6 +336,7 @@ laszip_clean(
     laszip_dll->header.y_scale_factor = 0.01;
     laszip_dll->header.z_scale_factor = 0.01;
     laszip_dll->set_chunk_size = LASZIP_CHUNK_SIZE_DEFAULT;
+    laszip_dll->request_native_extension = TRUE;
     laszip_dll->las14_decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL;
   }
   catch (...)
@@ -678,7 +680,7 @@ laszip_set_point_type_and_size(
     }
 
     // check if point type and type are supported
-    
+
     if (!LASzip().setup(point_type, point_size, LASZIP_COMPRESSOR_NONE))
     {
       sprintf(laszip_dll->error, "invalid combination of point_type %d and point_size %d", (I32)point_type, (I32)point_size);
@@ -1725,7 +1727,7 @@ static laszip_I32 write_laszip_vlr_header(
     return 1;
   }
   U16 record_length_after_header = (U16)laszip_vrl_payload_size(laszip);
-  try { laszip_dll->streamout->put16bitsLE((U8*)&record_length_after_header); } catch(...)
+  try { out->put16bitsLE((U8*)&record_length_after_header); } catch(...)
   {
     sprintf(laszip_dll->error, "writing LASzip VLR header.record_length_after_header");
     return 1;
@@ -1733,7 +1735,7 @@ static laszip_I32 write_laszip_vlr_header(
   CHAR description[32];
   memset(description, 0, 32);
   sprintf(description, "LASzip DLL %d.%d r%d (%d)", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE);
-  try { laszip_dll->streamout->putBytes((U8*)description, 32); } catch(...)
+  try { out->putBytes((U8*)description, 32); } catch(...)
   {
     sprintf(laszip_dll->error, "writing LASzip VLR header.description");
     return 1;
@@ -2007,7 +2009,7 @@ laszip_open_writer(
 #ifdef _WIN32
           sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %I64d", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
 #else
-          sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %%llu", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
+          sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %llu", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
 #endif
 	return 1;
         }
@@ -2360,7 +2362,7 @@ laszip_open_writer(
     {
       return 1;
     }
-    
+
     // open the file
 
     laszip_dll->file = fopen(file_name, "wb");
@@ -2594,7 +2596,7 @@ laszip_open_writer(
           sprintf(laszip_dll->warning, "header.start_of_waveform_data_packet_record is %llu. writing 0 instead.", laszip_dll->header.start_of_waveform_data_packet_record);
 #endif
           laszip_dll->header.start_of_waveform_data_packet_record = 0;
-        }                  
+        }
         try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.start_of_waveform_data_packet_record)); } catch(...)
         {
           sprintf(laszip_dll->error, "writing header.start_of_waveform_data_packet_record");
@@ -3862,9 +3864,9 @@ static laszip_I32 laszip_read_header(
           if (((U64)(laszip_dll->header.number_of_point_records)) != extended_number_of_point_records)
           {
 #ifdef _WIN32
-            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %I64d.\n", laszip_dll->header.number_of_point_records, number_of_extended_variable_length_records);
+            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %I64d.\n", laszip_dll->header.number_of_point_records, extended_number_of_point_records);
 #else
-            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %llu.\n", laszip_dll->header.number_of_point_records, number_of_extended_variable_length_records);
+            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %llu.\n", laszip_dll->header.number_of_point_records, extended_number_of_point_records);
 #endif
           }
           laszip_dll->header.extended_number_of_point_records = extended_number_of_point_records;
@@ -4574,7 +4576,7 @@ laszip_I32 create_point_writer
 }
 
 /*---------------------------------------------------------------------------*/
-// The stream writer also supports software that writes the LAS header on its 
+// The stream writer also supports software that writes the LAS header on its
 // own simply by setting the BOOL 'do_not_write_header' to TRUE. This function
 // should then be called just prior to writing points as data is then written
 // to the current stream position
@@ -4603,11 +4605,6 @@ laszip_open_writer_stream(
       return 1;
     }
 
-    if (compress)
-    {
-      laszip_dll->request_native_extension = TRUE;
-    }
-
     if (do_not_write_header == FALSE)
     {
       sprintf(laszip_dll->error, "writing header via laszip_open_writer_stream not yet implemented.");
@@ -4634,7 +4631,7 @@ laszip_open_writer_stream(
   }
   laszip_dll->error[0] = '\0';
   return 0;
-} 
+}
 
 /*---------------------------------------------------------------------------*/
 // make LASzip VLR for given point type and size (always request native LAS 1.4 extension)
@@ -4656,7 +4653,7 @@ laszip_create_laszip_vlr(
   }
 
   ByteStreamOutArray* out = 0;
-  
+
   if (IS_LITTLE_ENDIAN())
     out = new ByteStreamOutArrayLE();
   else
