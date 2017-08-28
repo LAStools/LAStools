@@ -691,8 +691,9 @@ int main(int argc, char *argv[])
         break;
       case 'e': // the edge of flight line flag
       case 'd': // the direction of scan flag
-      case 'k': // the <k>eypoint flag
       case 'h': // the with<h>eld flag
+      case 'k': // the <k>eypoint flag
+      case 'g': // the synthetic fla<g>
       case 'o': // the (extended) <o>verlap flag
         decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_FLAGS;
         break;
@@ -992,8 +993,9 @@ int main(int argc, char *argv[])
       case 'p': // the point source ID
       case 'e': // the edge of flight line flag
       case 'd': // the direction of scan flag
-      case 'k': // the <k>eypoint flag
       case 'h': // the with<h>eld flag
+      case 'k': // the <k>eypoint flag
+      case 'g': // the synthetic fla<g>
       case 'm': // the index of the point (count starts at 0)
       case 'M': // the index of the point (count starts at 1)
         break;
@@ -1191,11 +1193,14 @@ int main(int argc, char *argv[])
         case 'd': // the direction of scan flag
           fprintf(file_out, "%d", lasreader->point.get_scan_direction_flag());
           break;
+        case 'h': // the withheld flag
+          fprintf(file_out, "%d", lasreader->point.get_withheld_flag());
+          break;
         case 'k': // the keypoint flag
           fprintf(file_out, "%d", lasreader->point.get_keypoint_flag());
           break;
-        case 'h': // the withheld flag
-          fprintf(file_out, "%d", lasreader->point.get_withheld_flag());
+        case 'g': // the synthetic flag
+          fprintf(file_out, "%d", lasreader->point.get_synthetic_flag());
           break;
         case 'o': // the (extended) overlap flag
           fprintf(file_out, "%d", lasreader->point.get_extended_overlap_flag());
