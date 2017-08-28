@@ -35,8 +35,17 @@
 
   Another alternative is to use the computed height to eliminate
   points with a particular height above or below a threshold with
-  options '-drop_below 1.5' or '-drop_above 6.8'. 
- 
+  options '-drop_below 1.5' or '-drop_above 6.8'.
+
+  It is also possible to classify points in a particular x/y range
+  from the trajectory with '-classify_xy_range_between min max class'
+  that takes three parameters. It classifies any point within the
+  specified min/max range from the trajectory as specified. Similar,
+  '-classify_xy_range_and_height_between min max min_h max_h class'
+  classifies any point within the specified min/max range from the
+  trajectory as specified but only if their height is between min_h
+  and max_h above (or below) the trajectory (plus offset).
+
   Please license from martin.isenburg@rapidlasso.com before using
   lastrack commercially.
 
