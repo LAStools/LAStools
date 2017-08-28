@@ -206,12 +206,12 @@ public:
     if (extended_point_type)
     {
       memcpy(buffer, &X, 14);
-      *((U8*)&(buffer[14])) = ((U8*)&X)[24];
-      *((U8*)&(buffer[15])) = (extended_classification_flags << 4) | (extended_scanner_channel << 2) | (((U8*)&X)[14] & 0x03);
-      *((U8*)&(buffer[16])) = extended_classification;
-      *((U8*)&(buffer[17])) = ((U8*)&X)[17];
-      *((I16*)&(buffer[18])) = *((I16*)&(((U8*)&X)[20]));
-      *((U16*)&(buffer[20])) = *((U16*)&(((U8*)&X)[18]));
+      buffer[14] = ((U8*)&X)[24]; // extended return number and number of returns
+      buffer[15] = (((U8*)&X)[14] & 0xC0) | (extended_scanner_channel << 4) | (extended_classification_flags & 0x08) | ((((U8*)&X)[15]) >> 5);
+      buffer[16] = ((U8*)&X)[23]; // extended classification
+      buffer[17] = ((U8*)&X)[17]; // user data
+      ((I16*)buffer)[9] = ((I16*)&X)[10]; // extended scan angle
+      ((U16*)buffer)[10] = ((U16*)&X)[9]; // point source ID
       memcpy(buffer+22, &gps_time, 8);
     }
     else
@@ -232,16 +232,17 @@ public:
     if (extended_point_type)
     {
       memcpy(&X, buffer, 14);
-      ((U8*)&X)[24] = *((U8*)&(buffer[14]));
-      extended_classification_flags = (*((U8*)&(buffer[15])) >> 4);
-      extended_scanner_channel = ((*((U8*)&(buffer[15])) >> 2) & 0x03);
-      scan_direction_flag = ((*((U8*)&(buffer[15])) >> 1) & 0x01);
-      edge_of_flight_line = (*((U8*)&(buffer[15])) & 0x01);
-      extended_classification = *((U8*)&(buffer[16]));
+      ((U8*)&X)[24] = buffer[14]; // extended return number and number of returns
+      extended_classification_flags = buffer[15] & 0x0F;
+      ((U8*)&X)[15] = (buffer[15] & 0x07) << 5; // legacy classification flags
+      extended_scanner_channel = (buffer[15] >> 4) & 0x03;
+      scan_direction_flag = (buffer[15] >> 6) & 0x01;
+      edge_of_flight_line = (buffer[15] >> 7) & 0x01;
+      ((U8*)&X)[23] = buffer[16]; // extended classification
       if (extended_classification < 32) classification = extended_classification;
-      ((U8*)&X)[17] = *((U8*)&(buffer[17]));
-      *((I16*)&(((U8*)&X)[20])) = *((I16*)&(buffer[18])); ;
-      *((U16*)&(((U8*)&X)[18])) = *((U16*)&(buffer[20]));
+      ((U8*)&X)[17] = buffer[17]; // user data
+      ((I16*)&X)[10] = ((I16*)buffer)[9]; // extended scan angle
+      ((U16*)&X)[9] = ((U16*)buffer)[10]; // point source ID
       memcpy(&gps_time, buffer+22, 8);
     }
     else
@@ -571,9 +572,9 @@ public:
   inline void set_scan_direction_flag(const U8 scan_direction_flag) { this->scan_direction_flag = scan_direction_flag; };
   inline void set_edge_of_flight_line(const U8 edge_of_flight_line) { this->edge_of_flight_line = edge_of_flight_line; };
   inline void set_classification(U8 classification) { this->classification = (classification & 31); };
-  inline void set_synthetic_flag(U8 synthetic_flag) { this->synthetic_flag = synthetic_flag; };
-  inline void set_keypoint_flag(U8 keypoint_flag) { this->keypoint_flag = keypoint_flag; };
-  inline void set_withheld_flag(U8 withheld_flag) { this->withheld_flag = withheld_flag; };
+  inline void set_synthetic_flag(U8 synthetic_flag) { if (synthetic_flag) { this->synthetic_flag = 1; this->extended_classification_flags |= 0x01; } else { this->synthetic_flag = 0; this->extended_classification_flags &= 0x0E; } };
+  inline void set_keypoint_flag(U8 keypoint_flag) { if (keypoint_flag) { this->keypoint_flag = 1; this->extended_classification_flags |= 0x02; } else { this->keypoint_flag = 0; this->extended_classification_flags &= 0x0D; } };
+  inline void set_withheld_flag(U8 withheld_flag) { if (withheld_flag) { this->withheld_flag = 1; this->extended_classification_flags |= 0x04; } else { this->withheld_flag = 0; this->extended_classification_flags &= 0x0B; } };
   inline void set_scan_angle_rank(I8 scan_angle_rank) { this->scan_angle_rank = scan_angle_rank; };
   inline void set_user_data(U8 user_data) { this->user_data = user_data; };
   inline void set_point_source_ID(U16 point_source_ID) { this->point_source_ID = point_source_ID; };
