@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    27 August 2017 -- added '-histo scanner_channel 1'
      1 June 2017 -- improved "fluff" detection
      3 May 2015 -- updated LASinventory to handle LAS 1.4 content 
     25 December 2010 -- created after swinging in Mara's hammock for hours
@@ -154,6 +155,7 @@ private:
   LASbin* user_data_bin;
   LASbin* point_source_id_bin;
   LASbin* gps_time_bin;
+  LASbin* scanner_channel_bin;
   LASbin* R_bin;
   LASbin* G_bin;
   LASbin* B_bin;
