@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    28 August 2017 -- moving 'context' from global development hack to interface  
     10 January 2011 -- licensing change for LGPL release and liblas integration
     7 January 2011 -- introduced swap buffers to reduce number of fwrite calls
     12 December 2010 -- refactored after watching two movies with silke
@@ -41,7 +42,7 @@ class LASwriteItemRaw_POINT10_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_POINT10_LE(){};
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     return outstream->putBytes(item, 20);
   };
@@ -51,7 +52,7 @@ class LASwriteItemRaw_POINT10_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_POINT10_BE(){};
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     ENDIAN_SWAP_32(&item[ 0], &swapped[ 0]);    // X
     ENDIAN_SWAP_32(&item[ 4], &swapped[ 4]);    // Y
@@ -69,7 +70,7 @@ class LASwriteItemRaw_GPSTIME11_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_GPSTIME11_LE() {};
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     return outstream->putBytes(item, 8);
   };
@@ -79,7 +80,7 @@ class LASwriteItemRaw_GPSTIME11_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_GPSTIME11_BE() {};
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     ENDIAN_SWAP_64(item, swapped);
     return outstream->putBytes(swapped, 8);
@@ -92,7 +93,7 @@ class LASwriteItemRaw_RGB12_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_RGB12_LE(){}
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     return outstream->putBytes(item, 6);
   };
@@ -102,7 +103,7 @@ class LASwriteItemRaw_RGB12_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_RGB12_BE(){}
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     ENDIAN_SWAP_32(&item[ 0], &swapped[ 0]); // R
     ENDIAN_SWAP_32(&item[ 2], &swapped[ 2]); // G
@@ -117,7 +118,7 @@ class LASwriteItemRaw_WAVEPACKET13_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_WAVEPACKET13_LE(){}
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     return outstream->putBytes(item, 29);
   };
@@ -127,7 +128,7 @@ class LASwriteItemRaw_WAVEPACKET13_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_WAVEPACKET13_BE(){}
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     swapped[0] = item[0];                    // wavepacket descriptor index
     ENDIAN_SWAP_64(&item[ 1], &swapped[ 1]); // byte offset to waveform data
@@ -149,7 +150,7 @@ public:
   {
     this->number = number;
   }
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     return outstream->putBytes(item, number);
   };
@@ -214,7 +215,7 @@ class LASwriteItemRaw_POINT14_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_POINT14_LE(){};
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     ((LAStempWritePoint14*)buffer)->X = ((LAStempWritePoint10*)item)->X;
     ((LAStempWritePoint14*)buffer)->Y = ((LAStempWritePoint10*)item)->Y;
@@ -255,7 +256,7 @@ class LASwriteItemRaw_POINT14_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_POINT14_BE(){};
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     ENDIAN_SWAP_32(&item[ 0], &swapped[ 0]);    // X
     ENDIAN_SWAP_32(&item[ 4], &swapped[ 4]);    // Y
@@ -296,7 +297,7 @@ class LASwriteItemRaw_RGBNIR14_LE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_RGBNIR14_LE(){}
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     return outstream->putBytes(item, 8);
   };
@@ -306,7 +307,7 @@ class LASwriteItemRaw_RGBNIR14_BE : public LASwriteItemRaw
 {
 public:
   LASwriteItemRaw_RGBNIR14_BE(){}
-  inline BOOL write(const U8* item)
+  inline BOOL write(const U8* item, U32& context)
   {
     ENDIAN_SWAP_32(&item[ 0], &swapped[ 0]); // R
     ENDIAN_SWAP_32(&item[ 2], &swapped[ 2]); // G

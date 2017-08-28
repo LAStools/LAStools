@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -100,7 +100,7 @@ LASreadItemCompressed_POINT10_v1::~LASreadItemCompressed_POINT10_v1()
   }
 }
 
-BOOL LASreadItemCompressed_POINT10_v1::init(const U8* item)
+BOOL LASreadItemCompressed_POINT10_v1::init(const U8* item, U32& context)
 {
   U32 i;
 
@@ -130,7 +130,7 @@ BOOL LASreadItemCompressed_POINT10_v1::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_POINT10_v1::read(U8* item)
+inline void LASreadItemCompressed_POINT10_v1::read(U8* item, U32& context)
 {
   // find median difference for x and y from 3 preceding differences
   I32 median_x;
@@ -276,7 +276,7 @@ LASreadItemCompressed_GPSTIME11_v1::~LASreadItemCompressed_GPSTIME11_v1()
   delete ic_gpstime;
 }
 
-BOOL LASreadItemCompressed_GPSTIME11_v1::init(const U8* item)
+BOOL LASreadItemCompressed_GPSTIME11_v1::init(const U8* item, U32& context)
 {
   /* init state */
   last_gpstime_diff = 0;
@@ -292,7 +292,7 @@ BOOL LASreadItemCompressed_GPSTIME11_v1::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_GPSTIME11_v1::read(U8* item)
+inline void LASreadItemCompressed_GPSTIME11_v1::read(U8* item, U32& context)
 {
   I32 multi;
   if (last_gpstime_diff == 0) // if the last integer difference was zero
@@ -389,7 +389,7 @@ LASreadItemCompressed_RGB12_v1::~LASreadItemCompressed_RGB12_v1()
   delete [] last_item;
 }
 
-BOOL LASreadItemCompressed_RGB12_v1::init(const U8* item)
+BOOL LASreadItemCompressed_RGB12_v1::init(const U8* item, U32& context)
 {
   /* init state */
 
@@ -402,7 +402,7 @@ BOOL LASreadItemCompressed_RGB12_v1::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_RGB12_v1::read(U8* item)
+inline void LASreadItemCompressed_RGB12_v1::read(U8* item, U32& context)
 {
   U32 sym = dec->decodeSymbol(m_byte_used);
   if (sym & (1 << 0)) ((U16*)item)[0] = (U16)ic_rgb->decompress(((U16*)last_item)[0]&255, 0);
@@ -461,7 +461,7 @@ LASreadItemCompressed_WAVEPACKET13_v1::~LASreadItemCompressed_WAVEPACKET13_v1()
   delete [] last_item;
 }
 
-BOOL LASreadItemCompressed_WAVEPACKET13_v1::init(const U8* item)
+BOOL LASreadItemCompressed_WAVEPACKET13_v1::init(const U8* item, U32& context)
 {
   /* init state */
   last_diff_32 = 0;
@@ -484,7 +484,7 @@ BOOL LASreadItemCompressed_WAVEPACKET13_v1::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_WAVEPACKET13_v1::read(U8* item)
+inline void LASreadItemCompressed_WAVEPACKET13_v1::read(U8* item, U32& context)
 {
   item[0] = (U8)(dec->decodeSymbol(m_packet_index));
   item++;
@@ -550,7 +550,7 @@ LASreadItemCompressed_BYTE_v1::~LASreadItemCompressed_BYTE_v1()
   delete [] last_item;
 }
 
-BOOL LASreadItemCompressed_BYTE_v1::init(const U8* item)
+BOOL LASreadItemCompressed_BYTE_v1::init(const U8* item, U32& context)
 {
   /* init state */
 
@@ -562,7 +562,7 @@ BOOL LASreadItemCompressed_BYTE_v1::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_BYTE_v1::read(U8* item)
+inline void LASreadItemCompressed_BYTE_v1::read(U8* item, U32& context)
 {
   U32 i;
   for (i = 0; i < number; i++)

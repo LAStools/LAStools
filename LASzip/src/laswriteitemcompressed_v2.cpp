@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -101,7 +101,7 @@ LASwriteItemCompressed_POINT10_v2::~LASwriteItemCompressed_POINT10_v2()
   delete ic_z;
 }
 
-BOOL LASwriteItemCompressed_POINT10_v2::init(const U8* item)
+BOOL LASwriteItemCompressed_POINT10_v2::init(const U8* item, U32& context)
 {
   U32 i;
 
@@ -136,7 +136,7 @@ BOOL LASwriteItemCompressed_POINT10_v2::init(const U8* item)
   return TRUE;
 }
 
-inline BOOL LASwriteItemCompressed_POINT10_v2::write(const U8* item)
+inline BOOL LASwriteItemCompressed_POINT10_v2::write(const U8* item, U32& context)
 {
   U32 r = ((LASpoint10*)item)->return_number;
   U32 n = ((LASpoint10*)item)->number_of_returns_of_given_pulse;
@@ -261,7 +261,7 @@ LASwriteItemCompressed_GPSTIME11_v2::~LASwriteItemCompressed_GPSTIME11_v2()
   delete ic_gpstime;
 }
 
-BOOL LASwriteItemCompressed_GPSTIME11_v2::init(const U8* item)
+BOOL LASwriteItemCompressed_GPSTIME11_v2::init(const U8* item, U32& context)
 {
   /* init state */
   last = 0, next = 0;
@@ -287,7 +287,7 @@ BOOL LASwriteItemCompressed_GPSTIME11_v2::init(const U8* item)
   return TRUE;
 }
 
-inline BOOL LASwriteItemCompressed_GPSTIME11_v2::write(const U8* item)
+inline BOOL LASwriteItemCompressed_GPSTIME11_v2::write(const U8* item, U32& context)
 {
   U64I64F64 this_gpstime;
   this_gpstime.i64 = *((I64*)item);
@@ -322,7 +322,7 @@ inline BOOL LASwriteItemCompressed_GPSTIME11_v2::write(const U8* item)
           {
             enc->encodeSymbol(m_gpstime_0diff, i+2); // it belongs to another sequence 
             last = (last+i)&3;
-            return write(item);
+            return write(item, context);
           }
         }
         // no other sequence found. start new sequence.
@@ -431,7 +431,7 @@ inline BOOL LASwriteItemCompressed_GPSTIME11_v2::write(const U8* item)
             // it belongs to this sequence 
             enc->encodeSymbol(m_gpstime_multi, LASZIP_GPSTIME_MULTI_CODE_FULL+i);
             last = (last+i)&3;
-            return write(item);
+            return write(item, context);
           }
         }
         // no other sequence found. start new sequence.
@@ -482,7 +482,7 @@ LASwriteItemCompressed_RGB12_v2::~LASwriteItemCompressed_RGB12_v2()
   enc->destroySymbolModel(m_rgb_diff_5);
 }
 
-BOOL LASwriteItemCompressed_RGB12_v2::init(const U8* item)
+BOOL LASwriteItemCompressed_RGB12_v2::init(const U8* item, U32& context)
 {
   /* init state */
 
@@ -500,7 +500,7 @@ BOOL LASwriteItemCompressed_RGB12_v2::init(const U8* item)
   return TRUE;
 }
 
-inline BOOL LASwriteItemCompressed_RGB12_v2::write(const U8* item)
+inline BOOL LASwriteItemCompressed_RGB12_v2::write(const U8* item, U32& context)
 {
   I32 diff_l = 0;
   I32 diff_h = 0;
@@ -590,7 +590,7 @@ LASwriteItemCompressed_BYTE_v2::~LASwriteItemCompressed_BYTE_v2()
   delete [] last_item;
 }
 
-BOOL LASwriteItemCompressed_BYTE_v2::init(const U8* item)
+BOOL LASwriteItemCompressed_BYTE_v2::init(const U8* item, U32& context)
 {
   U32 i;
   /* init state */
@@ -606,7 +606,7 @@ BOOL LASwriteItemCompressed_BYTE_v2::init(const U8* item)
   return TRUE;
 }
 
-inline BOOL LASwriteItemCompressed_BYTE_v2::write(const U8* item)
+inline BOOL LASwriteItemCompressed_BYTE_v2::write(const U8* item, U32& context)
 {
   U32 i;
   I32 diff;

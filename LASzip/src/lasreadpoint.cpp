@@ -394,6 +394,7 @@ BOOL LASreadPoint::seek(const U32 current, const U32 target)
 BOOL LASreadPoint::read(U8* const * point)
 {
   U32 i;
+  U32 context = 0;
 
   try
   {
@@ -440,14 +441,14 @@ BOOL LASreadPoint::read(U8* const * point)
       {
         for (i = 0; i < num_readers; i++)
         {
-          readers[i]->read(point[i]);
+          readers[i]->read(point[i], context);
         }
       }
       else
       {
         for (i = 0; i < num_readers; i++)
         {
-          readers_raw[i]->read(point[i]);
+          readers_raw[i]->read(point[i], context);
         }
         if (layered_las14_compression)
         {
@@ -463,7 +464,7 @@ BOOL LASreadPoint::read(U8* const * point)
           }
           for (i = 0; i < num_readers; i++)
           {
-            ((LASreadItemCompressed*)(readers_compressed[i]))->init(point[i]);
+            ((LASreadItemCompressed*)(readers_compressed[i]))->init(point[i], context);
           }
           if (DEBUG_OUTPUT_NUM_BYTES_DETAILS) fprintf(stderr, "\n");
         }
@@ -471,7 +472,7 @@ BOOL LASreadPoint::read(U8* const * point)
         {
           for (i = 0; i < num_readers; i++)
           {
-            ((LASreadItemCompressed*)(readers_compressed[i]))->init(point[i]);
+            ((LASreadItemCompressed*)(readers_compressed[i]))->init(point[i], context);
           }
           dec->init(instream);
         }
@@ -482,7 +483,7 @@ BOOL LASreadPoint::read(U8* const * point)
     {
       for (i = 0; i < num_readers; i++)
       {
-        readers[i]->read(point[i]);
+        readers[i]->read(point[i], context);
       }
     }
   }

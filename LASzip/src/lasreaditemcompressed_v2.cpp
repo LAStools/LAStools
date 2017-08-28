@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -95,7 +95,7 @@ LASreadItemCompressed_POINT10_v2::~LASreadItemCompressed_POINT10_v2()
   delete ic_z;
 }
 
-BOOL LASreadItemCompressed_POINT10_v2::init(const U8* item)
+BOOL LASreadItemCompressed_POINT10_v2::init(const U8* item, U32& context)
 {
   U32 i;
 
@@ -134,7 +134,7 @@ BOOL LASreadItemCompressed_POINT10_v2::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_POINT10_v2::read(U8* item)
+inline void LASreadItemCompressed_POINT10_v2::read(U8* item, U32& context)
 {
   U32 r, n, m, l;
   U32 k_bits;
@@ -268,7 +268,7 @@ LASreadItemCompressed_GPSTIME11_v2::~LASreadItemCompressed_GPSTIME11_v2()
   delete ic_gpstime;
 }
 
-BOOL LASreadItemCompressed_GPSTIME11_v2::init(const U8* item)
+BOOL LASreadItemCompressed_GPSTIME11_v2::init(const U8* item, U32& context)
 {
   /* init state */
   last = 0, next = 0;
@@ -294,7 +294,7 @@ BOOL LASreadItemCompressed_GPSTIME11_v2::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item)
+inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item, U32& context)
 {
   I32 multi;
   if (last_gpstime_diff[last] == 0) // if the last integer difference was zero
@@ -319,7 +319,7 @@ inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item)
     else if (multi > 2) // we switch to another sequence
     {
       last = (last+multi-2)&3;
-      read(item);
+      read(item, context);
     }
   }
   else
@@ -393,7 +393,7 @@ inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item)
     else if (multi >=  LASZIP_GPSTIME_MULTI_CODE_FULL)
     {
       last = (last+multi-LASZIP_GPSTIME_MULTI_CODE_FULL)&3;
-      read(item);
+      read(item, context);
     }
   }
   *((I64*)item) = last_gpstime[last].i64;
@@ -432,7 +432,7 @@ LASreadItemCompressed_RGB12_v2::~LASreadItemCompressed_RGB12_v2()
   dec->destroySymbolModel(m_rgb_diff_5);
 }
 
-BOOL LASreadItemCompressed_RGB12_v2::init(const U8* item)
+BOOL LASreadItemCompressed_RGB12_v2::init(const U8* item, U32& context)
 {
   /* init state */
 
@@ -450,7 +450,7 @@ BOOL LASreadItemCompressed_RGB12_v2::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_RGB12_v2::read(U8* item)
+inline void LASreadItemCompressed_RGB12_v2::read(U8* item, U32& context)
 {
   U8 corr;
   I32 diff = 0;
@@ -562,7 +562,7 @@ LASreadItemCompressed_BYTE_v2::~LASreadItemCompressed_BYTE_v2()
   delete [] last_item;
 }
 
-BOOL LASreadItemCompressed_BYTE_v2::init(const U8* item)
+BOOL LASreadItemCompressed_BYTE_v2::init(const U8* item, U32& context)
 {
   U32 i;
   /* init state */
@@ -578,7 +578,7 @@ BOOL LASreadItemCompressed_BYTE_v2::init(const U8* item)
   return TRUE;
 }
 
-inline void LASreadItemCompressed_BYTE_v2::read(U8* item)
+inline void LASreadItemCompressed_BYTE_v2::read(U8* item, U32& context)
 {
   U32 i;
   I32 value;

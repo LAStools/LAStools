@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    28 August 2017 -- moving 'context' from global development hack to interface  
     6 September 2014 -- removed inheritance of EntropyEncoder and EntropyDecoder
     5 March 2011 -- created first night in ibiza to improve the RGB compressor
   
@@ -44,8 +45,8 @@ public:
 
   LASreadItemCompressed_POINT10_v2(ArithmeticDecoder* dec);
 
-  BOOL init(const U8* item);
-  void read(U8* item);
+  BOOL init(const U8* item, U32& context); // context is unused
+  void read(U8* item, U32& context);       // context is unused
 
   ~LASreadItemCompressed_POINT10_v2();
 
@@ -75,8 +76,8 @@ public:
 
   LASreadItemCompressed_GPSTIME11_v2(ArithmeticDecoder* dec);
 
-  BOOL init(const U8* item);
-  void read(U8* item);
+  BOOL init(const U8* item, U32& context); // context is unused
+  void read(U8* item, U32& context);       // context is unused
 
   ~LASreadItemCompressed_GPSTIME11_v2();
 
@@ -98,8 +99,8 @@ public:
 
   LASreadItemCompressed_RGB12_v2(ArithmeticDecoder* dec);
 
-  BOOL init(const U8* item);
-  void read(U8* item);
+  BOOL init(const U8* item, U32& context); // context is unused
+  void read(U8* item, U32& context);       // context is unused
 
   ~LASreadItemCompressed_RGB12_v2();
 
@@ -122,8 +123,8 @@ public:
 
   LASreadItemCompressed_BYTE_v2(ArithmeticDecoder* dec, U32 number);
 
-  BOOL init(const U8* item);
-  void read(U8* item);
+  BOOL init(const U8* item, U32& context); // context is unused
+  void read(U8* item, U32& context);       // context is unused
 
   ~LASreadItemCompressed_BYTE_v2();
 

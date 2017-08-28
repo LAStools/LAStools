@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    28 August 2017 -- moving 'context' from global development hack to interface  
     23 August 2016 -- layering of items for selective decompression in LAS 1.4 
     6 September 2014 -- removed inheritance of EntropyEncoder and EntropyDecoder
     6 October 2011 -- large file support & reading with missing chunk table

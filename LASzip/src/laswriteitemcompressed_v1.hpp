@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    28 August 2017 -- moving 'context' from global development hack to interface  
     6 September 2014 -- removed inheritance of EntropyEncoder and EntropyDecoder
     10 January 2011 -- licensing change for LGPL release and liblas integration
     12 December 2010 -- refactored after watching two movies with silke
@@ -43,8 +44,8 @@ public:
 
   LASwriteItemCompressed_POINT10_v1(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
 
   ~LASwriteItemCompressed_POINT10_v1();
 
@@ -73,8 +74,8 @@ public:
 
   LASwriteItemCompressed_GPSTIME11_v1(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
 
   ~LASwriteItemCompressed_GPSTIME11_v1();
 
@@ -95,8 +96,8 @@ public:
 
   LASwriteItemCompressed_RGB12_v1(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
 
   ~LASwriteItemCompressed_RGB12_v1();
 
@@ -114,8 +115,8 @@ public:
 
   LASwriteItemCompressed_WAVEPACKET13_v1(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
 
   ~LASwriteItemCompressed_WAVEPACKET13_v1();
 
@@ -139,8 +140,8 @@ public:
 
   LASwriteItemCompressed_BYTE_v1(ArithmeticEncoder* enc, U32 number);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
 
   ~LASwriteItemCompressed_BYTE_v1();
 

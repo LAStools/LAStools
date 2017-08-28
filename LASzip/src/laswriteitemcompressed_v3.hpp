@@ -5,7 +5,7 @@
   
   CONTENTS:
   
-    Prototype for compressing the *newest* point types 6 to 10 of LAS 1.4 
+    Native extension for compressing the *new* point types 6 to 10 of LAS 1.4 
 
   PROGRAMMERS:
 
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    28 August 2017 -- moving 'context' from global development hack to interface  
     22 August 2016 -- finalizing at Basecamp in Bonn during FOSS4g hackfest
     23 February 2016 -- created at OSGeo Code Sprint in Paris to prototype
 
@@ -45,8 +46,8 @@ public:
 
   LASwriteItemCompressed_POINT14_v3(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
   BOOL chunk_sizes();
   BOOL chunk_bytes();
 
@@ -109,8 +110,8 @@ public:
 
   LASwriteItemCompressed_RGB14_v3(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item); //, U32 current_context=0);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
   BOOL chunk_sizes();
   BOOL chunk_bytes();
 
@@ -142,8 +143,8 @@ public:
 
   LASwriteItemCompressed_RGBNIR14_v3(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item); //, U32 current_context=0);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
   BOOL chunk_sizes();
   BOOL chunk_bytes();
 
@@ -179,8 +180,8 @@ public:
 
   LASwriteItemCompressed_WAVEPACKET14_v3(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item); //, U32 current_context=0);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
   BOOL chunk_sizes();
   BOOL chunk_bytes();
 
@@ -212,8 +213,8 @@ public:
 
   LASwriteItemCompressed_BYTE14_v3(ArithmeticEncoder* enc, U32 number);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item); //, U32 current_context=0);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
   BOOL chunk_sizes();
   BOOL chunk_bytes();
 
