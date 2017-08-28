@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2014, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    28 August 2017 -- moving 'context' from global development hack to interface  
     6 September 2014 -- removed inheritance of EntropyEncoder and EntropyDecoder
     5 March 2011 -- created first night in ibiza to improve the RGB compressor
 
@@ -44,8 +45,8 @@ public:
 
   LASwriteItemCompressed_POINT10_v2(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
 
   ~LASwriteItemCompressed_POINT10_v2();
 
@@ -75,8 +76,8 @@ public:
 
   LASwriteItemCompressed_GPSTIME11_v2(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
 
   ~LASwriteItemCompressed_GPSTIME11_v2();
 
@@ -98,8 +99,8 @@ public:
 
   LASwriteItemCompressed_RGB12_v2(ArithmeticEncoder* enc);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
 
   ~LASwriteItemCompressed_RGB12_v2();
 
@@ -122,8 +123,8 @@ public:
 
   LASwriteItemCompressed_BYTE_v2(ArithmeticEncoder* enc, U32 number);
 
-  BOOL init(const U8* item);
-  BOOL write(const U8* item);
+  BOOL init(const U8* item, U32& context);
+  BOOL write(const U8* item, U32& context);
 
   ~LASwriteItemCompressed_BYTE_v2();
 

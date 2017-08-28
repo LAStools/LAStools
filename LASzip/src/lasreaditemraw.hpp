@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    28 August 2017 -- moving 'context' from global development hack to interface  
     10 January 2011 -- licensing change for LGPL release and liblas integration
     7 December 2010 -- refactored after getting invited to KAUST in Saudi Arabia
   
@@ -40,7 +41,7 @@ class LASreadItemRaw_POINT10_LE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_POINT10_LE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(item, 20);
   }
@@ -50,7 +51,7 @@ class LASreadItemRaw_POINT10_BE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_POINT10_BE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(swapped, 20);
     ENDIAN_SWAP_32(&swapped[ 0], &item[ 0]);    // X
@@ -68,7 +69,7 @@ class LASreadItemRaw_GPSTIME11_LE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_GPSTIME11_LE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(item, 8);
   };
@@ -78,7 +79,7 @@ class LASreadItemRaw_GPSTIME11_BE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_GPSTIME11_BE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(swapped, 8);
     ENDIAN_SWAP_64(swapped, item);
@@ -91,7 +92,7 @@ class LASreadItemRaw_RGB12_LE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_RGB12_LE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(item, 6);
   };
@@ -101,7 +102,7 @@ class LASreadItemRaw_RGB12_BE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_RGB12_BE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(swapped, 6);
     ENDIAN_SWAP_32(&swapped[ 0], &item[ 0]); // R
@@ -116,7 +117,7 @@ class LASreadItemRaw_WAVEPACKET13_LE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_WAVEPACKET13_LE(){}
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(item, 29);
   };
@@ -126,7 +127,7 @@ class LASreadItemRaw_WAVEPACKET13_BE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_WAVEPACKET13_BE(){}
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(swapped, 29);
     item[0] = swapped[0];                    // wavepacket descriptor index
@@ -148,7 +149,7 @@ public:
   {
     this->number = number;
   }
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(item, number);
   };
@@ -209,7 +210,7 @@ class LASreadItemRaw_POINT14_LE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_POINT14_LE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(buffer, 30);
     ((LAStempReadPoint10*)item)->X = ((LAStempReadPoint14*)buffer)->X;
@@ -263,7 +264,7 @@ class LASreadItemRaw_POINT14_BE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_POINT14_BE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(swapped, 30);
     ENDIAN_SWAP_32(&swapped[ 0], &item[ 0]);    // X
@@ -317,7 +318,7 @@ class LASreadItemRaw_RGBNIR14_LE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_RGBNIR14_LE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(item, 8);
   };
@@ -327,7 +328,7 @@ class LASreadItemRaw_RGBNIR14_BE : public LASreadItemRaw
 {
 public:
   LASreadItemRaw_RGBNIR14_BE(){};
-  inline void read(U8* item)
+  inline void read(U8* item, U32& context)
   {
     instream->getBytes(swapped, 8);
     ENDIAN_SWAP_32(&swapped[ 0], &item[ 0]); // R

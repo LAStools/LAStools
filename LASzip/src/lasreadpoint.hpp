@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    28 August 2017 -- moving 'context' from global development hack to interface  
     18 July 2017 -- bug fix for spatial-indexed reading of native compressed LAS 1.4 
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 
     23 August 2016 -- layering of items for selective decompression in LAS 1.4 

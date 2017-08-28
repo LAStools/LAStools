@@ -1,7 +1,7 @@
 /*
 ===============================================================================
 
-  FILE:  LASwriteitem.hpp
+  FILE:  laswriteitem.hpp
   
   CONTENTS:
   
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    28 August 2017 -- moving 'context' from global development hack to interface  
     23 August 2016 -- layering of items for selective decompression in LAS 1.4 
     10 January 2011 -- licensing change for LGPL release and liblas integration
     12 December 2010 -- refactored after watching two movies with silke
@@ -40,7 +41,7 @@ class ByteStreamOut;
 class LASwriteItem
 {
 public:
-  virtual BOOL write(const U8* item)=0;
+  virtual BOOL write(const U8* item, U32& context)=0;
 
   virtual ~LASwriteItem(){};
 };
@@ -66,7 +67,7 @@ protected:
 class LASwriteItemCompressed : public LASwriteItem
 {
 public:
-  virtual BOOL init(const U8* item)=0;
+  virtual BOOL init(const U8* item, U32& context)=0;
   virtual BOOL chunk_sizes() { return FALSE; };
   virtual BOOL chunk_bytes() { return FALSE; };
 

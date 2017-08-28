@@ -285,6 +285,7 @@ BOOL LASwritePoint::init(ByteStreamOut* outstream)
 BOOL LASwritePoint::write(const U8 * const * point)
 {
   U32 i;
+  U32 context = 0;
 
   if (chunk_count == chunk_size)
   {
@@ -316,15 +317,15 @@ BOOL LASwritePoint::write(const U8 * const * point)
   {
     for (i = 0; i < num_writers; i++)
     {
-      writers[i]->write(point[i]);
+      writers[i]->write(point[i], context);
     }
   }
   else
   {
     for (i = 0; i < num_writers; i++)
     {
-      writers_raw[i]->write(point[i]);
-      ((LASwriteItemCompressed*)(writers_compressed[i]))->init(point[i]);
+      writers_raw[i]->write(point[i], context);
+      ((LASwriteItemCompressed*)(writers_compressed[i]))->init(point[i], context);
     }
     writers = writers_compressed;
     enc->init(outstream);
