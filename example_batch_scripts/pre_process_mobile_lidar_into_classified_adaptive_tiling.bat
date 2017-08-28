@@ -67,7 +67,7 @@ las2las -i %WORK_DIRECTORY%\strips_raw\*.laz ^
 
 rmdir %WORK_DIRECTORY%\tiles_buffered /s /q
 mkdir %WORK_DIRECTORY%\tiles_buffered
-lastile -i %WORK_DIRECTORY%\strips_processed\*.laz ^
+lastile -i %WORK_DIRECTORY%\strips_fixed\*.laz ^
         -apply_file_source_ID ^
         -tile_size 128 ^
         -buffer 1 -flag_as_withheld ^
@@ -188,9 +188,11 @@ laspublish -i %WORK_DIRECTORY%\tiles_optimized\%TILE_BASE_NAME%*.laz ^
            -description "This is so cool!" ^
            -odir %WORK_DIRECTORY%\portal -o portal.html -olaz
 
-pause
+::stop here
 
-====================== other stuff ==================
+GOTO:EOF
+
+::other unused stuff
 
 lasview -i "f:\Rail_noise_2\Noise_at_new_rec - Scanner 1 - 170512_131454.laz" ^
         -drop_intensity_above 0 -keep_first_of_many -filtered_transform -set_classification 7 
