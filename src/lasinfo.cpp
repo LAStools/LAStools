@@ -10,7 +10,7 @@
     headers and gives detailed info on any geokeys that may be present (this
     can be disabled with the '-no_vrls' flag). The real bounding box of the
     points is computed and compared with the bounding box specified in the header
-    (this can be disables with the '-no_check' flag). It is also possible to
+    (this can be disabled with the '-no_check' flag). It is also possible to
     change or repair some aspects of the header 
 
   PROGRAMMERS:
