@@ -6205,11 +6205,9 @@ bool GeoProjectionConverter::ECEFtoLL(const double ECEFMeterX, const double ECEF
  */
   ElevationMeter = (r - A*t)*cos( LatDegree ) + (z - B)*sin( LatDegree );
 /*
- *   6.0 compute longitude east of Greenwich
+ *   6.0 compute longitude 
  */
   zlong = atan2( y, x );
-  if( zlong < 0.0 )
-          zlong= zlong + TWO_PI;
 
   LongDegree = zlong;
 /*
