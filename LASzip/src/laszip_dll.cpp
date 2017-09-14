@@ -3861,10 +3861,10 @@ static laszip_I32 laszip_read_header(
           laszip_dll->header.number_of_extended_variable_length_records = 0;
           U64 extended_number_of_point_records = 0;
           in->get64bitsLE((U8*)&extended_number_of_point_records);
-          if (((U64)(laszip_dll->header.number_of_point_records)) != extended_number_of_point_records)
+          if (laszip_dll->header.number_of_point_records != 0 && ((U64)(laszip_dll->header.number_of_point_records)) != extended_number_of_point_records)
           {
 #ifdef _WIN32
-            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %I64d.\n", laszip_dll->header.number_of_point_records, extended_number_of_point_records);
+            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %I64u.\n", laszip_dll->header.number_of_point_records, extended_number_of_point_records);
 #else
             fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %llu.\n", laszip_dll->header.number_of_point_records, extended_number_of_point_records);
 #endif
@@ -3874,10 +3874,10 @@ static laszip_I32 laszip_read_header(
           for (U32 i = 0; i < 15; i++)
           {
             in->get64bitsLE((U8*)&extended_number_of_points_by_return);
-            if ((i < 5) && ((U64)(laszip_dll->header.number_of_points_by_return[i])) != extended_number_of_points_by_return)
+            if ((i < 5) && laszip_dll->header.number_of_points_by_return[i] != 0 && ((U64)(laszip_dll->header.number_of_points_by_return[i])) != extended_number_of_points_by_return)
             {
 #ifdef _WIN32
-              fprintf(stderr,"WARNING: number_of_points_by_return[%u] is %u. but extended_number_of_points_by_return[%u] is %I64d.\n", i, laszip_dll->header.number_of_points_by_return[i], i, extended_number_of_points_by_return);
+              fprintf(stderr,"WARNING: number_of_points_by_return[%u] is %u. but extended_number_of_points_by_return[%u] is %I64u.\n", i, laszip_dll->header.number_of_points_by_return[i], i, extended_number_of_points_by_return);
 #else
               fprintf(stderr,"WARNING: number_of_points_by_return[%u] is %u. but extended_number_of_points_by_return[%u] is %llu.\n", i, laszip_dll->header.number_of_points_by_return[i], i, extended_number_of_points_by_return);
 #endif
