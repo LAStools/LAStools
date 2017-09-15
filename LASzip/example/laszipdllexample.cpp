@@ -113,7 +113,7 @@ static double taketime()
 #define EXAMPLE_THIRTEEN 13
 #define EXAMPLE_FOURTEEN 14
 
-#define EXAMPLE EXAMPLE_FOURTEEN
+#define EXAMPLE EXAMPLE_TWO
 
 int main(int argc, char *argv[])
 {
