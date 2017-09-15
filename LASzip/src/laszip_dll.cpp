@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+   30 August 2017 -- completing stream-based writing (with writing LAS header)
    23 August 2017 -- turn on "native" by default
     3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
    29 July 2017 -- integrating minimal stream-based reading/writing into branch
@@ -39,10 +40,10 @@
 #define LASZIP_SOURCE
 
 #include "laszip_api.h"
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <vector>
 
 #include "laszip.hpp"
 #include "lasattributer.hpp"
@@ -146,6 +147,7 @@ typedef struct laszip_dll {
   I32 start_flags_and_channel;
   I32 start_NIR_band;
   laszip_dll_inventory* inventory;
+  std::vector<void *> buffers;
 } laszip_dll_struct;
 
 /*---------------------------------------------------------------------------*/
@@ -318,6 +320,11 @@ laszip_clean(
       delete laszip_dll->attributer;
       laszip_dll->attributer = 0;
     }
+
+    for (size_t i = 0; i < laszip_dll->buffers.size(); ++i)
+        free(laszip_dll->buffers[i]);
+    laszip_dll->buffers.clear();
+
 
     // zero everything
 
@@ -1689,23 +1696,418 @@ laszip_create_spatial_index(
 }
 
 /*---------------------------------------------------------------------------*/
-static U32 laszip_vrl_payload_size(
-    LASzip*                             laszip
+static I32
+laszip_prepare_header_for_write(
+    laszip_dll_struct*                 laszip_dll
+)
+{
+  if ((laszip_dll->header.version_major != 1) || (laszip_dll->header.version_minor > 4))
+  {
+    sprintf(laszip_dll->error, "unknown LAS version %d.%d", (I32)laszip_dll->header.version_major, (I32)laszip_dll->header.version_minor);
+    return 1;
+  }
+
+  // check counters
+  U32 i;
+
+  if (laszip_dll->header.point_data_format > 5)
+  {
+    // legacy counters are zero for new point types
+
+    laszip_dll->header.number_of_point_records = 0;
+    for (i = 0; i < 5; i++)
+    {
+      laszip_dll->header.number_of_points_by_return[i] = 0;
+    }
+  }
+  else if (laszip_dll->header.version_minor > 3)
+  {
+    // legacy counters must be zero or consistent for old point types
+
+    if (laszip_dll->header.number_of_point_records != laszip_dll->header.extended_number_of_point_records)
+    {
+      if (laszip_dll->header.number_of_point_records != 0)
+      {
+#ifdef _WIN32
+        sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %I64d", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
+#else
+        sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %llu", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
+#endif
+        return 1;
+      }
+      else if (laszip_dll->header.extended_number_of_point_records <= U32_MAX)
+      {
+        laszip_dll->header.number_of_point_records = (U32)laszip_dll->header.extended_number_of_point_records;
+      }
+    }
+    for (i = 0; i < 5; i++)
+    {
+      if (laszip_dll->header.number_of_points_by_return[i] != laszip_dll->header.extended_number_of_points_by_return[i])
+      {
+        if (laszip_dll->header.number_of_points_by_return[i] != 0)
+        {
+#ifdef _WIN32
+          sprintf(laszip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %I64d", i, laszip_dll->header.number_of_points_by_return[i], i, laszip_dll->header.extended_number_of_points_by_return[i]);
+#else
+          sprintf(laszip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %llu", i, laszip_dll->header.number_of_points_by_return[i], i, laszip_dll->header.extended_number_of_points_by_return[i]);
+#endif
+          return 1;
+        }
+        else if (laszip_dll->header.extended_number_of_points_by_return[i] <= U32_MAX)
+        {
+          laszip_dll->header.number_of_points_by_return[i] = (U32)laszip_dll->header.extended_number_of_points_by_return[i];
+        }
+      }
+    }
+  }
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+static I32
+laszip_prepare_point_for_write(
+    laszip_dll_struct*                 laszip_dll
+    , const laszip_BOOL                compress
+)
+{
+  U32 i;
+
+  if (laszip_dll->header.point_data_format > 5)
+  {
+    if (laszip_dll->request_native_extension)
+    {
+      // we are *not* operating in compatibility mode
+      laszip_dll->compatibility_mode = FALSE;
+    }
+    else if (laszip_dll->request_compatibility_mode)
+    {
+      // make sure there are no more than U32_MAX points
+
+      if (laszip_dll->header.extended_number_of_point_records > U32_MAX)
+      {
+#ifdef _WIN32
+        sprintf(laszip_dll->error, "extended_number_of_point_records of %I64d is too much for 32-bit counters of compatibility mode", laszip_dll->header.extended_number_of_point_records);
+#else
+        sprintf(laszip_dll->error, "extended_number_of_point_records of %llu is too much for 32-bit counters of compatibility mode", laszip_dll->header.extended_number_of_point_records);
+#endif
+        return 1;
+      }
+
+      // copy 64-bit extended counters back into 32-bit legacy counters
+
+      laszip_dll->header.number_of_point_records = (U32)(laszip_dll->header.extended_number_of_point_records);
+      for (i = 0; i < 5; i++)
+      {
+        laszip_dll->header.number_of_points_by_return[i] = (U32)(laszip_dll->header.extended_number_of_points_by_return[i]);
+      }
+
+      // are there any "extra bytes" already ... ?
+
+      I32 number_of_existing_extrabytes = 0;
+
+      switch (laszip_dll->header.point_data_format)
+      {
+      case 6:
+        number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 30;
+        break;
+      case 7:
+        number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 36;
+        break;
+      case 8:
+        number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 38;
+        break;
+      case 9:
+        number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 59;
+        break;
+      case 10:
+        number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 67;
+        break;
+      default:
+        sprintf(laszip_dll->error, "unknown point_data_format %d", laszip_dll->header.point_data_format);
+        return 1;
+      }
+
+      if (number_of_existing_extrabytes < 0)
+      {
+        sprintf(laszip_dll->error, "bad point_data_format %d point_data_record_length %d combination", laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length);
+        return 1;
+      }
+
+      // downgrade to LAS 1.2 or LAS 1.3
+      if (laszip_dll->header.point_data_format <= 8)
+      {
+        laszip_dll->header.version_minor = 2;
+        // LAS 1.2 header is 148 bytes less than LAS 1.4+ header
+        laszip_dll->header.header_size -= 148;
+        laszip_dll->header.offset_to_point_data -= 148;
+      }
+      else
+      {
+        laszip_dll->header.version_minor = 3;
+        // LAS 1.3 header is 140 bytes less than LAS 1.4+ header
+        laszip_dll->header.header_size -= 140;
+        laszip_dll->header.offset_to_point_data -= 140;
+      }
+      // turn off the bit indicating the presence of the OGC WKT
+      laszip_dll->header.global_encoding &= ~(1<<4);
+
+      // old point type is two bytes shorter
+      laszip_dll->header.point_data_record_length -= 2;
+      // but we add 5 bytes of attributes
+      laszip_dll->header.point_data_record_length += 5;
+
+      // create 2+2+4+148 bytes payload for compatibility VLR
+      ByteStreamOutArray* out;
+      if (IS_LITTLE_ENDIAN())
+        out = new ByteStreamOutArrayLE();
+      else
+        out = new ByteStreamOutArrayBE();
+      // write control info
+      U16 laszip_version = (U16)LASZIP_VERSION_BUILD_DATE;
+      out->put16bitsLE((U8*)&laszip_version);
+      U16 compatible_version = 3;
+      out->put16bitsLE((U8*)&compatible_version);
+      U32 unused = 0;
+      out->put32bitsLE((U8*)&unused);
+      // write the 148 bytes of the extended LAS 1.4 header
+      U64 start_of_waveform_data_packet_record = laszip_dll->header.start_of_waveform_data_packet_record;
+      if (start_of_waveform_data_packet_record != 0)
+      {
+#ifdef _WIN32
+        fprintf(stderr,"WARNING: header->start_of_waveform_data_packet_record is %I64d. writing 0 instead.\n", start_of_waveform_data_packet_record);
+#else
+        fprintf(stderr,"WARNING: header->start_of_waveform_data_packet_record is %llu. writing 0 instead.\n", start_of_waveform_data_packet_record);
+#endif
+        start_of_waveform_data_packet_record = 0;
+      }
+      out->put64bitsLE((U8*)&start_of_waveform_data_packet_record);
+      U64 start_of_first_extended_variable_length_record = laszip_dll->header.start_of_first_extended_variable_length_record;
+      if (start_of_first_extended_variable_length_record != 0)
+      {
+#ifdef _WIN32
+        fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %I64d. writing 0 instead.\n", start_of_first_extended_variable_length_record);
+#else
+        fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %llu. writing 0 instead.\n", start_of_first_extended_variable_length_record);
+#endif
+        start_of_first_extended_variable_length_record = 0;
+      }
+      out->put64bitsLE((U8*)&start_of_first_extended_variable_length_record);
+      U32 number_of_extended_variable_length_records = laszip_dll->header.number_of_extended_variable_length_records;
+      if (number_of_extended_variable_length_records != 0)
+      {
+        fprintf(stderr,"WARNING: EVLRs not supported. header->number_of_extended_variable_length_records is %u. writing 0 instead.\n", number_of_extended_variable_length_records);
+        number_of_extended_variable_length_records = 0;
+      }
+      out->put32bitsLE((U8*)&number_of_extended_variable_length_records);
+      U64 extended_number_of_point_records;
+      if (laszip_dll->header.number_of_point_records)
+        extended_number_of_point_records = laszip_dll->header.number_of_point_records;
+      else
+        extended_number_of_point_records = laszip_dll->header.extended_number_of_point_records;
+      out->put64bitsLE((U8*)&extended_number_of_point_records);
+      U64 extended_number_of_points_by_return;
+      for (i = 0; i < 15; i++)
+      {
+        if ((i < 5) && laszip_dll->header.number_of_points_by_return[i])
+          extended_number_of_points_by_return = laszip_dll->header.number_of_points_by_return[i];
+        else
+          extended_number_of_points_by_return = laszip_dll->header.extended_number_of_points_by_return[i];
+        out->put64bitsLE((U8*)&extended_number_of_points_by_return);
+      }
+
+      // add the compatibility VLR
+
+      if (laszip_add_vlr(laszip_dll, "lascompatible\0\0", 22204, 2+2+4+148, 0, (laszip_U8*)out->takeData()))
+      {
+        sprintf(laszip_dll->error, "adding the compatibility VLR");
+        return 1;
+      }
+      delete out;
+
+      // if needed create an attributer to describe the "extra bytes"
+
+      if (laszip_dll->attributer == 0)
+      {
+        laszip_dll->attributer = new LASattributer;
+        if (laszip_dll->attributer == 0)
+        {
+          sprintf(laszip_dll->error, "cannot allocate LASattributer");
+          return 1;
+        }
+      }
+
+      // were there any pre-existing extra bytes
+
+      if (number_of_existing_extrabytes > 0)
+      {
+        // make sure the existing "extra bytes" are documented
+
+        if (laszip_dll->attributer->get_attributes_size() > number_of_existing_extrabytes)
+        {
+          sprintf(laszip_dll->error, "bad \"extra bytes\" VLR describes %d bytes more than points actually have", laszip_dll->attributer->get_attributes_size() - number_of_existing_extrabytes);
+          return 1;
+        }
+        else if (laszip_dll->attributer->get_attributes_size() < number_of_existing_extrabytes)
+        {
+          // maybe the existing "extra bytes" are documented in a VLR
+          if (laszip_dll->header.vlrs)
+          {
+            for (i = 0; i < laszip_dll->header.number_of_variable_length_records; i++)
+            {
+              if ((strcmp(laszip_dll->header.vlrs[i].user_id, "LASF_Spec") == 0) && (laszip_dll->header.vlrs[i].record_id == 4))
+              {
+                laszip_dll->attributer->init_attributes(laszip_dll->header.vlrs[i].record_length_after_header/sizeof(LASattribute), (LASattribute*)laszip_dll->header.vlrs[i].data);
+              }
+            }
+          }
+
+          // describe any undocumented "extra bytes" as "unknown" U8  attributes
+          for (I32 i = (I32)(laszip_dll->attributer->get_attributes_size()); i < number_of_existing_extrabytes; i++)
+          {
+            CHAR unknown_name[16];
+            memset(unknown_name, 0, 16);
+            sprintf(unknown_name, "unknown %d", i);
+            LASattribute lasattribute_unknown(LAS_ATTRIBUTE_U8, unknown_name, unknown_name);
+            if (laszip_dll->attributer->add_attribute(lasattribute_unknown) == -1)
+            {
+              sprintf(laszip_dll->error, "cannot add unknown U8 attribute '%s' of %d to attributer", unknown_name, number_of_existing_extrabytes);
+              return 1;
+            }
+          }
+        }
+      }
+
+      // create the "extra bytes" that store the newer LAS 1.4 point attributes
+
+      // scan_angle (difference or remainder) is stored as a I16
+      LASattribute lasattribute_scan_angle(LAS_ATTRIBUTE_I16, "LAS 1.4 scan angle", "additional attributes");
+      lasattribute_scan_angle.set_scale(0.006, 0);
+      I32 index_scan_angle = laszip_dll->attributer->add_attribute(lasattribute_scan_angle);
+      laszip_dll->start_scan_angle = laszip_dll->attributer->get_attribute_start(index_scan_angle);
+      // extended returns stored as a U8
+      LASattribute lasattribute_extended_returns(LAS_ATTRIBUTE_U8, "LAS 1.4 extended returns", "additional attributes");
+      I32 index_extended_returns = laszip_dll->attributer->add_attribute(lasattribute_extended_returns);
+      laszip_dll->start_extended_returns = laszip_dll->attributer->get_attribute_start(index_extended_returns);
+      // classification stored as a U8
+      LASattribute lasattribute_classification(LAS_ATTRIBUTE_U8, "LAS 1.4 classification", "additional attributes");
+      I32 index_classification = laszip_dll->attributer->add_attribute(lasattribute_classification);
+      laszip_dll->start_classification = laszip_dll->attributer->get_attribute_start(index_classification);
+      // flags and channel stored as a U8
+      LASattribute lasattribute_flags_and_channel(LAS_ATTRIBUTE_U8, "LAS 1.4 flags and channel", "additional attributes");
+      I32 index_flags_and_channel = laszip_dll->attributer->add_attribute(lasattribute_flags_and_channel);
+      laszip_dll->start_flags_and_channel = laszip_dll->attributer->get_attribute_start(index_flags_and_channel);
+      // maybe store the NIR band as a U16
+      if (laszip_dll->header.point_data_format == 8 || laszip_dll->header.point_data_format == 10)
+      {
+        // the NIR band is stored as a U16
+        LASattribute lasattribute_NIR_band(LAS_ATTRIBUTE_U16, "LAS 1.4 NIR band", "additional attributes");
+        I32 index_NIR_band = laszip_dll->attributer->add_attribute(lasattribute_NIR_band);
+        laszip_dll->start_NIR_band = laszip_dll->attributer->get_attribute_start(index_NIR_band);
+      }
+      else
+      {
+        laszip_dll->start_NIR_band = -1;
+      }
+
+      // add the extra bytes VLR with the additional attributes
+
+      if (laszip_add_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4, laszip_dll->attributer->number_attributes*sizeof(LASattribute), 0, (laszip_U8*)laszip_dll->attributer->attributes))
+      {
+        sprintf(laszip_dll->error, "adding the extra bytes VLR with the additional attributes");
+        return 1;
+      }
+
+      // update point type
+
+      if (laszip_dll->header.point_data_format == 6)
+      {
+        laszip_dll->header.point_data_format = 1;
+      }
+      else if (laszip_dll->header.point_data_format <= 8)
+      {
+        laszip_dll->header.point_data_format = 3;
+      }
+      else // 9->4 and 10->5
+      {
+        laszip_dll->header.point_data_format -= 5;
+      }
+
+      // we are operating in compatibility mode
+      laszip_dll->compatibility_mode = TRUE;
+    }
+    else if (compress)
+    {
+      sprintf(laszip_dll->error, "LASzip DLL %d.%d r%d (%d) cannot compress point data format %d without requesting 'compatibility mode'", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE, (I32)laszip_dll->header.point_data_format);
+      return 1;
+    }
+  }
+  else
+  {
+    // we are *not* operating in compatibility mode
+    laszip_dll->compatibility_mode = FALSE;
+  }
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+static I32
+laszip_prepare_vlrs_for_write(
+    laszip_dll_struct*                 laszip_dll
+)
+{
+  U32 i, vlrs_size = 0;
+
+  if (laszip_dll->header.number_of_variable_length_records)
+  {
+    if (laszip_dll->header.vlrs == 0)
+    {
+      sprintf(laszip_dll->error, "number_of_variable_length_records is %u but vlrs pointer is zero", laszip_dll->header.number_of_variable_length_records);
+      return 1;
+    }
+
+    for (i = 0; i < laszip_dll->header.number_of_variable_length_records; i++)
+    {
+      vlrs_size += 54;
+      if (laszip_dll->header.vlrs[i].record_length_after_header)
+      {
+        if (laszip_dll->header.vlrs == 0)
+        {
+          sprintf(laszip_dll->error, "vlrs[%u].record_length_after_header is %u but vlrs[%u].data pointer is zero", i, laszip_dll->header.vlrs[i].record_length_after_header, i);
+          return 1;
+        }
+        vlrs_size += laszip_dll->header.vlrs[i].record_length_after_header;
+      }
+    }
+  }
+
+  if ((vlrs_size + laszip_dll->header.header_size + laszip_dll->header.user_data_after_header_size) != laszip_dll->header.offset_to_point_data)
+  {
+    sprintf(laszip_dll->error,"header_size (%u) plus vlrs_size (%u) plus user_data_after_header_size (%u) does not equal offset_to_point_data (%u)", (U32)laszip_dll->header.header_size, vlrs_size, laszip_dll->header.user_data_after_header_size, laszip_dll->header.offset_to_point_data);
+    return 1;
+  }
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+static U32
+laszip_vrl_payload_size(
+    const LASzip*                      laszip
 )
 {
   return 34 + (6 * laszip->num_items);
 }
 
 /*---------------------------------------------------------------------------*/
-static laszip_I32 write_laszip_vlr_header(
-    laszip_POINTER                     pointer
-    , LASzip*                          laszip
+static I32
+write_laszip_vlr_header(
+    laszip_dll_struct*                 laszip_dll
+    , const LASzip*                    laszip
     , ByteStreamOut*                   out
 )
 {
-  if (pointer == 0) return 1;
-  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
-
   // write the LASzip VLR header
 
   U16 reserved = 0x0;
@@ -1745,15 +2147,13 @@ static laszip_I32 write_laszip_vlr_header(
 }
 
 /*---------------------------------------------------------------------------*/
-static laszip_I32 write_laszip_vlr_payload(
-    laszip_POINTER                     pointer
-    , LASzip*                          laszip
+static I32
+write_laszip_vlr_payload(
+    laszip_dll_struct*                 laszip_dll
+    , const LASzip*                    laszip
     , ByteStreamOut*                   out
 )
 {
-  if (pointer == 0) return 1;
-  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
-
   // write the LASzip VLR payload
 
   //     U16  compressor                2 bytes
@@ -1846,7 +2246,395 @@ static laszip_I32 write_laszip_vlr_payload(
 }
 
 /*---------------------------------------------------------------------------*/
-static laszip_I32 setup_laszip_items(
+static I32
+laszip_write_header(
+    laszip_dll_struct*                 laszip_dll
+    , const LASzip*                    laszip
+    , const laszip_BOOL                compress
+)
+{
+  U32 i;
+
+  try { laszip_dll->streamout->putBytes((U8*)"LASF", 4); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.file_signature");
+    return 1;
+  }
+  try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.file_source_ID)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.file_source_ID");
+    return 1;
+  }
+  try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.global_encoding)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.global_encoding");
+    return 1;
+  }
+  try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.project_ID_GUID_data_1)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.project_ID_GUID_data_1");
+    return 1;
+  }
+  try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.project_ID_GUID_data_2)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.project_ID_GUID_data_2");
+    return 1;
+  }
+  try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.project_ID_GUID_data_3)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.project_ID_GUID_data_3");
+    return 1;
+  }
+  try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.project_ID_GUID_data_4, 8); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.project_ID_GUID_data_4");
+    return 1;
+  }
+  try { laszip_dll->streamout->putBytes((U8*)&(laszip_dll->header.version_major), 1); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.version_major");
+    return 1;
+  }
+  try { laszip_dll->streamout->putBytes((U8*)&(laszip_dll->header.version_minor), 1); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.version_minor");
+    return 1;
+  }
+  try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.system_identifier, 32); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.system_identifier");
+    return 1;
+  }
+  if (!laszip_dll->preserve_generating_software)
+  {
+    memset(laszip_dll->header.generating_software, 0, 32);
+    sprintf(laszip_dll->header.generating_software, "LASzip DLL %d.%d r%d (%d)", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE);
+  }
+  try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.generating_software, 32); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.generating_software");
+    return 1;
+  }
+  try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.file_creation_day)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.file_creation_day");
+    return 1;
+  }
+  try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.file_creation_year)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.file_creation_year");
+    return 1;
+  }
+  try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.header_size)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.header_size");
+    return 1;
+  }
+  if (compress)
+  {
+    laszip_dll->header.offset_to_point_data += (54 + laszip_vrl_payload_size(laszip));
+  }
+  try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.offset_to_point_data)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.offset_to_point_data");
+    return 1;
+  }
+  if (compress)
+  {
+    laszip_dll->header.offset_to_point_data -= (54 + laszip_vrl_payload_size(laszip));
+    laszip_dll->header.number_of_variable_length_records += 1;
+  }
+  try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_variable_length_records)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.number_of_variable_length_records");
+    return 1;
+  }
+  if (compress)
+  {
+    laszip_dll->header.number_of_variable_length_records -= 1;
+    laszip_dll->header.point_data_format |= 128;
+  }
+  try { laszip_dll->streamout->putBytes((U8*)&(laszip_dll->header.point_data_format), 1); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.point_data_format");
+    return 1;
+  }
+  if (compress)
+  {
+    laszip_dll->header.point_data_format &= 127;
+  }
+  try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.point_data_record_length)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.point_data_record_length");
+    return 1;
+  }
+  try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_point_records)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.number_of_point_records");
+    return 1;
+  }
+  for (i = 0; i < 5; i++)
+  {
+    try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_points_by_return[i])); } catch(...)
+    {
+      sprintf(laszip_dll->error, "writing header.number_of_points_by_return %d", i);
+      return 1;
+    }
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.x_scale_factor)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.x_scale_factor");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.y_scale_factor)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.y_scale_factor");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.z_scale_factor)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.z_scale_factor");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.x_offset)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.x_offset");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.y_offset)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.y_offset");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.z_offset)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.z_offset");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.max_x)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.max_x");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.min_x)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.min_x");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.max_y)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.max_y");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.min_y)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.min_y");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.max_z)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.max_z");
+    return 1;
+  }
+  try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.min_z)); } catch(...)
+  {
+    sprintf(laszip_dll->error, "writing header.min_z");
+    return 1;
+  }
+
+  // special handling for LAS 1.3
+  if ((laszip_dll->header.version_major == 1) && (laszip_dll->header.version_minor >= 3))
+  {
+    if (laszip_dll->header.header_size < 235)
+    {
+      sprintf(laszip_dll->error, "for LAS 1.%d header_size should at least be 235 but it is only %d", laszip_dll->header.version_minor, laszip_dll->header.header_size);
+      return 1;
+    }
+    else
+    {
+      if (laszip_dll->header.start_of_waveform_data_packet_record != 0)
+      {
+#ifdef _WIN32
+        sprintf(laszip_dll->warning, "header.start_of_waveform_data_packet_record is %I64d. writing 0 instead.", laszip_dll->header.start_of_waveform_data_packet_record);
+#else
+        sprintf(laszip_dll->warning, "header.start_of_waveform_data_packet_record is %llu. writing 0 instead.", laszip_dll->header.start_of_waveform_data_packet_record);
+#endif
+        laszip_dll->header.start_of_waveform_data_packet_record = 0;
+      }
+      try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.start_of_waveform_data_packet_record)); } catch(...)
+      {
+        sprintf(laszip_dll->error, "writing header.start_of_waveform_data_packet_record");
+        return 1;
+      }
+      laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 235;
+    }
+  }
+  else
+  {
+    laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 227;
+  }
+
+  // special handling for LAS 1.4
+  if ((laszip_dll->header.version_major == 1) && (laszip_dll->header.version_minor >= 4))
+  {
+    if (laszip_dll->header.header_size < 375)
+    {
+      sprintf(laszip_dll->error, "for LAS 1.%d header_size should at least be 375 but it is only %d", laszip_dll->header.version_minor, laszip_dll->header.header_size);
+      return 1;
+    }
+    else
+    {
+      try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.start_of_first_extended_variable_length_record)); } catch(...)
+      {
+        sprintf(laszip_dll->error, "writing header.start_of_first_extended_variable_length_record");
+        return 1;
+      }
+      try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_extended_variable_length_records)); } catch(...)
+      {
+        sprintf(laszip_dll->error, "writing header.number_of_extended_variable_length_records");
+        return 1;
+      }
+      try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.extended_number_of_point_records)); } catch(...)
+      {
+        sprintf(laszip_dll->error, "writing header.extended_number_of_point_records");
+        return 1;
+      }
+      for (i = 0; i < 15; i++)
+      {
+        try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.extended_number_of_points_by_return[i])); } catch(...)
+        {
+          sprintf(laszip_dll->error, "writing header.extended_number_of_points_by_return[%d]", i);
+          return 1;
+        }
+      }
+      laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 375;
+    }
+  }
+
+  // write any number of user-defined bytes that might have been added to the header
+  if (laszip_dll->header.user_data_in_header_size)
+  {
+    try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.user_data_in_header, laszip_dll->header.user_data_in_header_size); } catch(...)
+    {
+      sprintf(laszip_dll->error, "writing %d bytes of data into header.user_data_in_header", laszip_dll->header.user_data_in_header_size);
+      return 1;
+    }
+  }
+
+  // write variable length records into the header
+
+  if (laszip_dll->header.number_of_variable_length_records)
+  {
+    U32 i;
+
+    for (i = 0; i < laszip_dll->header.number_of_variable_length_records; i++)
+    {
+      // write variable length records variable after variable (to avoid alignment issues)
+
+      try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.vlrs[i].reserved)); } catch(...)
+      {
+        sprintf(laszip_dll->error, "writing header.vlrs[%d].reserved", i);
+        return 1;
+      }
+
+      try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.vlrs[i].user_id, 16); } catch(...)
+      {
+        sprintf(laszip_dll->error, "writing header.vlrs[%d].user_id", i);
+        return 1;
+      }
+      try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.vlrs[i].record_id)); } catch(...)
+      {
+        sprintf(laszip_dll->error, "writing header.vlrs[%d].record_id", i);
+        return 1;
+      }
+      try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.vlrs[i].record_length_after_header)); } catch(...)
+      {
+        sprintf(laszip_dll->error, "writing header.vlrs[%d].record_length_after_header", i);
+        return 1;
+      }
+      try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.vlrs[i].description, 32); } catch(...)
+      {
+        sprintf(laszip_dll->error, "writing header.vlrs[%d].description", i);
+        return 1;
+      }
+
+      // write data following the header of the variable length record
+
+      if (laszip_dll->header.vlrs[i].record_length_after_header)
+      {
+        try { laszip_dll->streamout->putBytes(laszip_dll->header.vlrs[i].data, laszip_dll->header.vlrs[i].record_length_after_header); } catch(...)
+        {
+          sprintf(laszip_dll->error, "writing %d bytes of data into header.vlrs[%d].data", laszip_dll->header.vlrs[i].record_length_after_header, i);
+          return 1;
+        }
+      }
+    }
+  }
+
+  if (compress)
+  {
+    // write the LASzip VLR header
+
+    if (write_laszip_vlr_header(laszip_dll, laszip, laszip_dll->streamout))
+    {
+      return 1;
+    }
+
+    // write the LASzip VLR payload
+
+    if (write_laszip_vlr_payload(laszip_dll, laszip, laszip_dll->streamout))
+    {
+      return 1;
+    }
+  }
+
+  // write any number of user-defined bytes that might have been added after the header
+
+  if (laszip_dll->header.user_data_after_header_size)
+  {
+    try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.user_data_after_header, laszip_dll->header.user_data_after_header_size); } catch(...)
+    {
+      sprintf(laszip_dll->error, "writing %u bytes of data into header.user_data_after_header", laszip_dll->header.user_data_after_header_size);
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+/*----------------------------------------------------------------------------*/
+laszip_I32 create_point_writer
+(
+    laszip_dll_struct *laszip_dll
+    , const LASzip *laszip
+)
+{
+  // create the point writer
+  laszip_dll->writer = new LASwritePoint();
+  if (laszip_dll->writer == 0)
+  {
+    sprintf(laszip_dll->error, "could not alloc LASwritePoint");
+    return 1;
+  }
+
+  if (!laszip_dll->writer->setup(laszip->num_items, laszip->items, laszip))
+  {
+    sprintf(laszip_dll->error, "setup of LASwritePoint failed");
+    return 1;
+  }
+
+  if (!laszip_dll->writer->init(laszip_dll->streamout))
+  {
+    sprintf(laszip_dll->error, "init of LASwritePoint failed");
+    return 1;
+  }
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+static I32
+setup_laszip_items(
     laszip_dll_struct*                 laszip_dll
     , LASzip*                          laszip
     , laszip_BOOL                      compress
@@ -1854,6 +2642,15 @@ static laszip_I32 setup_laszip_items(
 {
   laszip_U8 point_type = laszip_dll->header.point_data_format;
   laszip_U16 point_size = laszip_dll->header.point_data_record_length;
+
+  if (compress && (point_type > 5) && laszip_dll->request_compatibility_mode)
+  {
+    if (!laszip->request_compatibility_mode(1))
+    {
+      sprintf(laszip_dll->error, "requesting 'compatibility mode' has failed");
+      return 1;
+    }
+  }
 
   // create point items in the LASzip structure from point format and size
 
@@ -1977,392 +2774,6 @@ laszip_open_writer(
       return 1;
     }
 
-    // check header
-
-    if ((laszip_dll->header.version_major != 1) || (laszip_dll->header.version_minor > 4))
-    {
-      sprintf(laszip_dll->error, "unknown LAS version %d.%d", (I32)laszip_dll->header.version_major, (I32)laszip_dll->header.version_minor);
-      return 1;
-    }
-
-    // check counters
-    U32 i;
-
-    if (laszip_dll->header.point_data_format > 5)
-    {
-      // legacy counters are zero for new point types
-
-      laszip_dll->header.number_of_point_records = 0;
-      for (i = 0; i < 5; i++)
-      {
-        laszip_dll->header.number_of_points_by_return[i] = 0;
-      }
-    }
-    else if (laszip_dll->header.version_minor > 3)
-    {
-      // legacy counters must be zero or consistent for old point types
-
-      if (laszip_dll->header.number_of_point_records != laszip_dll->header.extended_number_of_point_records)
-      {
-        if (laszip_dll->header.number_of_point_records != 0)
-        {
-#ifdef _WIN32
-          sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %I64d", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
-#else
-          sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %llu", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
-#endif
-	return 1;
-        }
-        else if (laszip_dll->header.extended_number_of_point_records <= U32_MAX)
-        {
-          laszip_dll->header.number_of_point_records = (U32)laszip_dll->header.extended_number_of_point_records;
-        }
-      }
-      for (i = 0; i < 5; i++)
-      {
-        if (laszip_dll->header.number_of_points_by_return[i] != laszip_dll->header.extended_number_of_points_by_return[i])
-        {
-          if (laszip_dll->header.number_of_points_by_return[i] != 0)
-          {
-#ifdef _WIN32
-            sprintf(laszip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %I64d", i, laszip_dll->header.number_of_points_by_return[i], i, laszip_dll->header.extended_number_of_points_by_return[i]);
-#else
-            sprintf(laszip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %llu", i, laszip_dll->header.number_of_points_by_return[i], i, laszip_dll->header.extended_number_of_points_by_return[i]);
-#endif
-            return 1;
-          }
-          else if (laszip_dll->header.extended_number_of_points_by_return[i] <= U32_MAX)
-          {
-            laszip_dll->header.number_of_points_by_return[i] = (U32)laszip_dll->header.extended_number_of_points_by_return[i];
-          }
-        }
-      }
-    }
-
-    // prepare point
-
-    U32 vlrs_size = 0;
-
-    if (laszip_dll->header.point_data_format > 5)
-    {
-      if (laszip_dll->request_native_extension)
-      {
-        // we are *not* operating in compatibility mode
-        laszip_dll->compatibility_mode = FALSE;
-      }
-      else if (laszip_dll->request_compatibility_mode)
-      {
-        // make sure there are no more than U32_MAX points
-
-        if (laszip_dll->header.extended_number_of_point_records > U32_MAX)
-        {
-#ifdef _WIN32
-          sprintf(laszip_dll->error, "extended_number_of_point_records of %I64d is too much for 32-bit counters of compatibility mode", laszip_dll->header.extended_number_of_point_records);
-#else
-          sprintf(laszip_dll->error, "extended_number_of_point_records of %llu is too much for 32-bit counters of compatibility mode", laszip_dll->header.extended_number_of_point_records);
-#endif
-          return 1;
-        }
-
-        // copy 64-bit extended counters back into 32-bit legacy counters
-
-        laszip_dll->header.number_of_point_records = (U32)(laszip_dll->header.extended_number_of_point_records);
-        for (i = 0; i < 5; i++)
-        {
-          laszip_dll->header.number_of_points_by_return[i] = (U32)(laszip_dll->header.extended_number_of_points_by_return[i]);
-        }
-
-        // are there any "extra bytes" already ... ?
-
-        I32 number_of_existing_extrabytes = 0;
-
-        switch (laszip_dll->header.point_data_format)
-        {
-        case 6:
-          number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 30;
-          break;
-        case 7:
-          number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 36;
-          break;
-        case 8:
-          number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 38;
-          break;
-        case 9:
-          number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 59;
-          break;
-        case 10:
-          number_of_existing_extrabytes = laszip_dll->header.point_data_record_length - 67;
-          break;
-        default:
-          sprintf(laszip_dll->error, "unknown point_data_format %d", laszip_dll->header.point_data_format);
-          return 1;
-        }
-
-        if (number_of_existing_extrabytes < 0)
-        {
-          sprintf(laszip_dll->error, "bad point_data_format %d point_data_record_length %d combination", laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length);
-          return 1;
-        }
-
-        // downgrade to LAS 1.2 or LAS 1.3
-        if (laszip_dll->header.point_data_format <= 8)
-        {
-          laszip_dll->header.version_minor = 2;
-          // LAS 1.2 header is 148 bytes less than LAS 1.4+ header
-          laszip_dll->header.header_size -= 148;
-          laszip_dll->header.offset_to_point_data -= 148;
-        }
-        else
-        {
-          laszip_dll->header.version_minor = 3;
-          // LAS 1.3 header is 140 bytes less than LAS 1.4+ header
-          laszip_dll->header.header_size -= 140;
-          laszip_dll->header.offset_to_point_data -= 140;
-        }
-        // turn off the bit indicating the presence of the OGC WKT
-        laszip_dll->header.global_encoding &= ~(1<<4);
-
-        // old point type is two bytes shorter
-        laszip_dll->header.point_data_record_length -= 2;
-        // but we add 5 bytes of attributes
-        laszip_dll->header.point_data_record_length += 5;
-
-        // create 2+2+4+148 bytes payload for compatibility VLR
-        ByteStreamOutArray* out;
-        if (IS_LITTLE_ENDIAN())
-          out = new ByteStreamOutArrayLE();
-        else
-          out = new ByteStreamOutArrayBE();
-        // write control info
-        U16 laszip_version = (U16)LASZIP_VERSION_BUILD_DATE;
-        out->put16bitsLE((U8*)&laszip_version);
-        U16 compatible_version = 3;
-        out->put16bitsLE((U8*)&compatible_version);
-        U32 unused = 0;
-        out->put32bitsLE((U8*)&unused);
-        // write the 148 bytes of the extended LAS 1.4 header
-        U64 start_of_waveform_data_packet_record = laszip_dll->header.start_of_waveform_data_packet_record;
-        if (start_of_waveform_data_packet_record != 0)
-        {
-#ifdef _WIN32
-          fprintf(stderr,"WARNING: header->start_of_waveform_data_packet_record is %I64d. writing 0 instead.\n", start_of_waveform_data_packet_record);
-#else
-          fprintf(stderr,"WARNING: header->start_of_waveform_data_packet_record is %llu. writing 0 instead.\n", start_of_waveform_data_packet_record);
-#endif
-          start_of_waveform_data_packet_record = 0;
-        }
-        out->put64bitsLE((U8*)&start_of_waveform_data_packet_record);
-        U64 start_of_first_extended_variable_length_record = laszip_dll->header.start_of_first_extended_variable_length_record;
-        if (start_of_first_extended_variable_length_record != 0)
-        {
-#ifdef _WIN32
-          fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %I64d. writing 0 instead.\n", start_of_first_extended_variable_length_record);
-#else
-          fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %llu. writing 0 instead.\n", start_of_first_extended_variable_length_record);
-#endif
-          start_of_first_extended_variable_length_record = 0;
-        }
-        out->put64bitsLE((U8*)&start_of_first_extended_variable_length_record);
-        U32 number_of_extended_variable_length_records = laszip_dll->header.number_of_extended_variable_length_records;
-        if (number_of_extended_variable_length_records != 0)
-        {
-          fprintf(stderr,"WARNING: EVLRs not supported. header->number_of_extended_variable_length_records is %u. writing 0 instead.\n", number_of_extended_variable_length_records);
-          number_of_extended_variable_length_records = 0;
-        }
-        out->put32bitsLE((U8*)&number_of_extended_variable_length_records);
-        U64 extended_number_of_point_records;
-        if (laszip_dll->header.number_of_point_records)
-          extended_number_of_point_records = laszip_dll->header.number_of_point_records;
-        else
-          extended_number_of_point_records = laszip_dll->header.extended_number_of_point_records;
-        out->put64bitsLE((U8*)&extended_number_of_point_records);
-        U64 extended_number_of_points_by_return;
-        for (U32 i = 0; i < 15; i++)
-        {
-          if ((i < 5) && laszip_dll->header.number_of_points_by_return[i])
-            extended_number_of_points_by_return = laszip_dll->header.number_of_points_by_return[i];
-          else
-            extended_number_of_points_by_return = laszip_dll->header.extended_number_of_points_by_return[i];
-          out->put64bitsLE((U8*)&extended_number_of_points_by_return);
-        }
-
-        // add the compatibility VLR
-
-        if (laszip_add_vlr(laszip_dll, "lascompatible\0\0", 22204, 2+2+4+148, 0, (laszip_U8*)out->takeData()))
-        {
-          sprintf(laszip_dll->error, "adding the compatibility VLR");
-          return 1;
-        }
-        delete out;
-
-        // if needed create an attributer to describe the "extra bytes"
-
-        if (laszip_dll->attributer == 0)
-        {
-          laszip_dll->attributer = new LASattributer;
-          if (laszip_dll->attributer == 0)
-          {
-            sprintf(laszip_dll->error, "cannot allocate LASattributer");
-            return 1;
-          }
-        }
-
-        // were there any pre-existing extra bytes
-
-        if (number_of_existing_extrabytes > 0)
-        {
-          // make sure the existing "extra bytes" are documented
-
-          if (laszip_dll->attributer->get_attributes_size() > number_of_existing_extrabytes)
-          {
-            sprintf(laszip_dll->error, "bad \"extra bytes\" VLR describes %d bytes more than points actually have", laszip_dll->attributer->get_attributes_size() - number_of_existing_extrabytes);
-            return 1;
-          }
-          else if (laszip_dll->attributer->get_attributes_size() < number_of_existing_extrabytes)
-          {
-            // maybe the existing "extra bytes" are documented in a VLR
-            if (laszip_dll->header.vlrs)
-            {
-              for (i = 0; i < laszip_dll->header.number_of_variable_length_records; i++)
-              {
-                if ((strcmp(laszip_dll->header.vlrs[i].user_id, "LASF_Spec") == 0) && (laszip_dll->header.vlrs[i].record_id == 4))
-                {
-                  laszip_dll->attributer->init_attributes(laszip_dll->header.vlrs[i].record_length_after_header/sizeof(LASattribute), (LASattribute*)laszip_dll->header.vlrs[i].data);
-                }
-              }
-            }
-
-            // describe any undocumented "extra bytes" as "unknown" U8  attributes
-            for (I32 i = (I32)(laszip_dll->attributer->get_attributes_size()); i < number_of_existing_extrabytes; i++)
-            {
-              CHAR unknown_name[16];
-              memset(unknown_name, 0, 16);
-              sprintf(unknown_name, "unknown %d", i);
-              LASattribute lasattribute_unknown(LAS_ATTRIBUTE_U8, unknown_name, unknown_name);
-              if (laszip_dll->attributer->add_attribute(lasattribute_unknown) == -1)
-              {
-                sprintf(laszip_dll->error, "cannot add unknown U8 attribute '%s' of %d to attributer", unknown_name, number_of_existing_extrabytes);
-                return 1;
-              }
-            }
-          }
-        }
-
-        // create the "extra bytes" that store the newer LAS 1.4 point attributes
-
-        // scan_angle (difference or remainder) is stored as a I16
-        LASattribute lasattribute_scan_angle(LAS_ATTRIBUTE_I16, "LAS 1.4 scan angle", "additional attributes");
-        lasattribute_scan_angle.set_scale(0.006, 0);
-        I32 index_scan_angle = laszip_dll->attributer->add_attribute(lasattribute_scan_angle);
-        laszip_dll->start_scan_angle = laszip_dll->attributer->get_attribute_start(index_scan_angle);
-        // extended returns stored as a U8
-        LASattribute lasattribute_extended_returns(LAS_ATTRIBUTE_U8, "LAS 1.4 extended returns", "additional attributes");
-        I32 index_extended_returns = laszip_dll->attributer->add_attribute(lasattribute_extended_returns);
-        laszip_dll->start_extended_returns = laszip_dll->attributer->get_attribute_start(index_extended_returns);
-        // classification stored as a U8
-        LASattribute lasattribute_classification(LAS_ATTRIBUTE_U8, "LAS 1.4 classification", "additional attributes");
-        I32 index_classification = laszip_dll->attributer->add_attribute(lasattribute_classification);
-        laszip_dll->start_classification = laszip_dll->attributer->get_attribute_start(index_classification);
-        // flags and channel stored as a U8
-        LASattribute lasattribute_flags_and_channel(LAS_ATTRIBUTE_U8, "LAS 1.4 flags and channel", "additional attributes");
-        I32 index_flags_and_channel = laszip_dll->attributer->add_attribute(lasattribute_flags_and_channel);
-        laszip_dll->start_flags_and_channel = laszip_dll->attributer->get_attribute_start(index_flags_and_channel);
-        // maybe store the NIR band as a U16
-        if (laszip_dll->header.point_data_format == 8 || laszip_dll->header.point_data_format == 10)
-        {
-          // the NIR band is stored as a U16
-          LASattribute lasattribute_NIR_band(LAS_ATTRIBUTE_U16, "LAS 1.4 NIR band", "additional attributes");
-          I32 index_NIR_band = laszip_dll->attributer->add_attribute(lasattribute_NIR_band);
-          laszip_dll->start_NIR_band = laszip_dll->attributer->get_attribute_start(index_NIR_band);
-        }
-        else
-        {
-          laszip_dll->start_NIR_band = -1;
-        }
-
-        // add the extra bytes VLR with the additional attributes
-
-        if (laszip_add_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4, laszip_dll->attributer->number_attributes*sizeof(LASattribute), 0, (laszip_U8*)laszip_dll->attributer->attributes))
-        {
-          sprintf(laszip_dll->error, "adding the extra bytes VLR with the additional attributes");
-          return 1;
-        }
-
-        // update point type
-
-        if (laszip_dll->header.point_data_format == 6)
-        {
-          laszip_dll->header.point_data_format = 1;
-        }
-        else if (laszip_dll->header.point_data_format <= 8)
-        {
-          laszip_dll->header.point_data_format = 3;
-        }
-        else // 9->4 and 10->5
-        {
-          laszip_dll->header.point_data_format -= 5;
-        }
-
-        // we are operating in compatibility mode
-        laszip_dll->compatibility_mode = TRUE;
-      }
-      else if (compress)
-      {
-        sprintf(laszip_dll->error, "LASzip DLL %d.%d r%d (%d) cannot compress point data format %d without requesting 'compatibility mode'", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE, (I32)laszip_dll->header.point_data_format);
-        return 1;
-      }
-    }
-    else
-    {
-      // we are *not* operating in compatibility mode
-      laszip_dll->compatibility_mode = FALSE;
-    }
-
-    if (laszip_dll->header.number_of_variable_length_records)
-    {
-      if (laszip_dll->header.vlrs == 0)
-      {
-        sprintf(laszip_dll->error, "number_of_variable_length_records is %u but vlrs pointer is zero", laszip_dll->header.number_of_variable_length_records);
-        return 1;
-      }
-
-      for (i = 0; i < laszip_dll->header.number_of_variable_length_records; i++)
-      {
-        vlrs_size += 54;
-        if (laszip_dll->header.vlrs[i].record_length_after_header)
-        {
-          if (laszip_dll->header.vlrs == 0)
-          {
-            sprintf(laszip_dll->error, "vlrs[%u].record_length_after_header is %u but vlrs[%u].data pointer is zero", i, laszip_dll->header.vlrs[i].record_length_after_header, i);
-            return 1;
-          }
-          vlrs_size += laszip_dll->header.vlrs[i].record_length_after_header;
-        }
-      }
-    }
-
-    if ((vlrs_size + laszip_dll->header.header_size + laszip_dll->header.user_data_after_header_size) != laszip_dll->header.offset_to_point_data)
-    {
-      sprintf(laszip_dll->error,"header_size (%u) plus vlrs_size (%u) plus user_data_after_header_size (%u) does not equal offset_to_point_data (%u)", (U32)laszip_dll->header.header_size, vlrs_size, laszip_dll->header.user_data_after_header_size, laszip_dll->header.offset_to_point_data);
-      return 1;
-    }
-
-    LASzip laszip;
-
-    if (compress && laszip_dll->request_compatibility_mode && (laszip_dll->header.point_data_format > 5))
-    {
-      if (!laszip.request_compatibility_mode(1))
-      {
-        sprintf(laszip_dll->error, "requesting 'compatibility mode' has failed");
-        return 1;
-      }
-    }
-
-    if (setup_laszip_items(laszip_dll, &laszip, compress))
-    {
-      return 1;
-    }
-
     // open the file
 
     laszip_dll->file = fopen(file_name, "wb");
@@ -2378,6 +2789,8 @@ laszip_open_writer(
       sprintf(laszip_dll->warning, "setvbuf() failed with buffer size 262144\n");
     }
 
+    // create the outstream
+
     if (IS_LITTLE_ENDIAN())
       laszip_dll->streamout = new ByteStreamOutFileLE(laszip_dll->file);
     else
@@ -2389,370 +2802,46 @@ laszip_open_writer(
       return 1;
     }
 
-    // write the header variable after variable
+    // setup the items that make up the point
 
-    try { laszip_dll->streamout->putBytes((U8*)"LASF", 4); } catch(...)
+    LASzip laszip;
+    if (setup_laszip_items(laszip_dll, &laszip, compress))
     {
-      sprintf(laszip_dll->error, "writing header.file_signature");
-      return 1;
-    }
-    try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.file_source_ID)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.file_source_ID");
-      return 1;
-    }
-    try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.global_encoding)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.global_encoding");
-      return 1;
-    }
-    try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.project_ID_GUID_data_1)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.project_ID_GUID_data_1");
-      return 1;
-    }
-    try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.project_ID_GUID_data_2)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.project_ID_GUID_data_2");
-      return 1;
-    }
-    try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.project_ID_GUID_data_3)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.project_ID_GUID_data_3");
-      return 1;
-    }
-    try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.project_ID_GUID_data_4, 8); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.project_ID_GUID_data_4");
-      return 1;
-    }
-    try { laszip_dll->streamout->putBytes((U8*)&(laszip_dll->header.version_major), 1); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.version_major");
-      return 1;
-    }
-    try { laszip_dll->streamout->putBytes((U8*)&(laszip_dll->header.version_minor), 1); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.version_minor");
-      return 1;
-    }
-    try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.system_identifier, 32); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.system_identifier");
-      return 1;
-    }
-    if (!laszip_dll->preserve_generating_software)
-    {
-      memset(laszip_dll->header.generating_software, 0, 32);
-      sprintf(laszip_dll->header.generating_software, "LASzip DLL %d.%d r%d (%d)", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE);
-    }
-    try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.generating_software, 32); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.generating_software");
-      return 1;
-    }
-    try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.file_creation_day)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.file_creation_day");
-      return 1;
-    }
-    try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.file_creation_year)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.file_creation_year");
-      return 1;
-    }
-    try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.header_size)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.header_size");
-      return 1;
-    }
-    if (compress)
-    {
-      laszip_dll->header.offset_to_point_data += (54 + laszip_vrl_payload_size(&laszip));
-    }
-    try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.offset_to_point_data)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.offset_to_point_data");
-      return 1;
-    }
-    if (compress)
-    {
-      laszip_dll->header.offset_to_point_data -= (54 + laszip_vrl_payload_size(&laszip));
-      laszip_dll->header.number_of_variable_length_records += 1;
-    }
-    try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_variable_length_records)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.number_of_variable_length_records");
-      return 1;
-    }
-    if (compress)
-    {
-      laszip_dll->header.number_of_variable_length_records -= 1;
-      laszip_dll->header.point_data_format |= 128;
-    }
-    try { laszip_dll->streamout->putBytes((U8*)&(laszip_dll->header.point_data_format), 1); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.point_data_format");
-      return 1;
-    }
-    if (compress)
-    {
-      laszip_dll->header.point_data_format &= 127;
-    }
-    try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.point_data_record_length)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.point_data_record_length");
-      return 1;
-    }
-    try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_point_records)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.number_of_point_records");
-      return 1;
-    }
-    for (i = 0; i < 5; i++)
-    {
-      try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_points_by_return[i])); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing header.number_of_points_by_return %d", i);
-        return 1;
-      }
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.x_scale_factor)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.x_scale_factor");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.y_scale_factor)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.y_scale_factor");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.z_scale_factor)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.z_scale_factor");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.x_offset)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.x_offset");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.y_offset)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.y_offset");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.z_offset)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.z_offset");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.max_x)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.max_x");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.min_x)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.min_x");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.max_y)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.max_y");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.min_y)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.min_y");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.max_z)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.max_z");
-      return 1;
-    }
-    try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.min_z)); } catch(...)
-    {
-      sprintf(laszip_dll->error, "writing header.min_z");
       return 1;
     }
 
-    // special handling for LAS 1.3
-    if ((laszip_dll->header.version_major == 1) && (laszip_dll->header.version_minor >= 3))
+    // prepare header
+
+    if (laszip_prepare_header_for_write(laszip_dll))
     {
-      if (laszip_dll->header.header_size < 235)
-      {
-        sprintf(laszip_dll->error, "for LAS 1.%d header_size should at least be 235 but it is only %d", laszip_dll->header.version_minor, laszip_dll->header.header_size);
-        return 1;
-      }
-      else
-      {
-        if (laszip_dll->header.start_of_waveform_data_packet_record != 0)
-        {
-#ifdef _WIN32
-          sprintf(laszip_dll->warning, "header.start_of_waveform_data_packet_record is %I64d. writing 0 instead.", laszip_dll->header.start_of_waveform_data_packet_record);
-#else
-          sprintf(laszip_dll->warning, "header.start_of_waveform_data_packet_record is %llu. writing 0 instead.", laszip_dll->header.start_of_waveform_data_packet_record);
-#endif
-          laszip_dll->header.start_of_waveform_data_packet_record = 0;
-        }
-        try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.start_of_waveform_data_packet_record)); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing header.start_of_waveform_data_packet_record");
-          return 1;
-        }
-        laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 235;
-      }
-    }
-    else
-    {
-      laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 227;
+      return 1;
     }
 
-    // special handling for LAS 1.4
-    if ((laszip_dll->header.version_major == 1) && (laszip_dll->header.version_minor >= 4))
+    // prepare point
+
+    if (laszip_prepare_point_for_write(laszip_dll, compress))
     {
-      if (laszip_dll->header.header_size < 375)
-      {
-        sprintf(laszip_dll->error, "for LAS 1.%d header_size should at least be 375 but it is only %d", laszip_dll->header.version_minor, laszip_dll->header.header_size);
-        return 1;
-      }
-      else
-      {
-        try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.start_of_first_extended_variable_length_record)); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing header.start_of_first_extended_variable_length_record");
-          return 1;
-        }
-        try { laszip_dll->streamout->put32bitsLE((U8*)&(laszip_dll->header.number_of_extended_variable_length_records)); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing header.number_of_extended_variable_length_records");
-          return 1;
-        }
-        try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.extended_number_of_point_records)); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing header.extended_number_of_point_records");
-          return 1;
-        }
-        for (i = 0; i < 15; i++)
-        {
-          try { laszip_dll->streamout->put64bitsLE((U8*)&(laszip_dll->header.extended_number_of_points_by_return[i])); } catch(...)
-          {
-            sprintf(laszip_dll->error, "writing header.extended_number_of_points_by_return[%d]", i);
-            return 1;
-          }
-        }
-        laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 375;
-      }
+      return 1;
     }
 
-    // write any number of user-defined bytes that might have been added to the header
-    if (laszip_dll->header.user_data_in_header_size)
+    // prepare VLRs
+
+    if (laszip_prepare_vlrs_for_write(laszip_dll))
     {
-      try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.user_data_in_header, laszip_dll->header.user_data_in_header_size); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing %d bytes of data into header.user_data_in_header", laszip_dll->header.user_data_in_header_size);
-        return 1;
-      }
+      return 1;
     }
 
-    // write variable length records into the header
+    // write header variable after variable
 
-    if (laszip_dll->header.number_of_variable_length_records)
+    if (laszip_write_header(laszip_dll, &laszip, compress))
     {
-      U32 i;
-
-      for (i = 0; i < laszip_dll->header.number_of_variable_length_records; i++)
-      {
-        // write variable length records variable after variable (to avoid alignment issues)
-
-        try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.vlrs[i].reserved)); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing header.vlrs[%d].reserved", i);
-          return 1;
-        }
-
-        try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.vlrs[i].user_id, 16); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing header.vlrs[%d].user_id", i);
-          return 1;
-        }
-        try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.vlrs[i].record_id)); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing header.vlrs[%d].record_id", i);
-          return 1;
-        }
-        try { laszip_dll->streamout->put16bitsLE((U8*)&(laszip_dll->header.vlrs[i].record_length_after_header)); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing header.vlrs[%d].record_length_after_header", i);
-          return 1;
-        }
-        try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.vlrs[i].description, 32); } catch(...)
-        {
-          sprintf(laszip_dll->error, "writing header.vlrs[%d].description", i);
-          return 1;
-        }
-
-        // write data following the header of the variable length record
-
-        if (laszip_dll->header.vlrs[i].record_length_after_header)
-        {
-          try { laszip_dll->streamout->putBytes(laszip_dll->header.vlrs[i].data, laszip_dll->header.vlrs[i].record_length_after_header); } catch(...)
-          {
-            sprintf(laszip_dll->error, "writing %d bytes of data into header.vlrs[%d].data", laszip_dll->header.vlrs[i].record_length_after_header, i);
-            return 1;
-          }
-        }
-      }
-    }
-
-    if (compress)
-    {
-      // write the LASzip VLR header
-
-      if (write_laszip_vlr_header(laszip_dll, &laszip, laszip_dll->streamout))
-      {
-        return 1;
-      }
-
-      // write the LASzip VLR payload
-
-      if (write_laszip_vlr_payload(laszip_dll, &laszip, laszip_dll->streamout))
-      {
-        return 1;
-      }
-    }
-
-    // write any number of user-defined bytes that might have been added after the header
-
-    if (laszip_dll->header.user_data_after_header_size)
-    {
-      try { laszip_dll->streamout->putBytes((U8*)laszip_dll->header.user_data_after_header, laszip_dll->header.user_data_after_header_size); } catch(...)
-      {
-        sprintf(laszip_dll->error, "writing %u bytes of data into header.user_data_after_header", laszip_dll->header.user_data_after_header_size);
-        return 1;
-      }
+      return 1;
     }
 
     // create the point writer
 
-    laszip_dll->writer = new LASwritePoint();
-    if (laszip_dll->writer == 0)
+    if (create_point_writer(laszip_dll, &laszip))
     {
-      sprintf(laszip_dll->error, "could not alloc LASwritePoint");
-      return 1;
-    }
-
-    if (!laszip_dll->writer->setup(laszip.num_items, laszip.items, &laszip))
-    {
-      sprintf(laszip_dll->error, "setup of LASwritePoint failed");
-      return 1;
-    }
-
-    if (!laszip_dll->writer->init(laszip_dll->streamout))
-    {
-      sprintf(laszip_dll->error, "init of LASwritePoint failed");
       return 1;
     }
 
@@ -3095,7 +3184,8 @@ laszip_close_writer(
     delete laszip_dll->streamout;
     laszip_dll->streamout = 0;
 
-    fclose(laszip_dll->file);
+	if (laszip_dll->file)
+      fclose(laszip_dll->file);
     laszip_dll->file = 0;
   }
   catch (...)
@@ -3181,14 +3271,15 @@ laszip_decompress_selective(
 }
 
 /*---------------------------------------------------------------------------*/
-static laszip_I32 laszip_read_header(
-    laszip_dll_struct *laszip_dll
-    , laszip_BOOL* is_compressed
+static I32
+laszip_read_header(
+    laszip_dll_struct*                 laszip_dll
+    , laszip_BOOL*                     is_compressed
 )
 {
-  // read the header variable after variable
-
   U32 i;
+
+  // read the header variable after variable
 
   CHAR file_signature[5];
   try { laszip_dll->streamin->getBytes((U8*)file_signature, 4); } catch(...)
@@ -4447,7 +4538,6 @@ laszip_close_reader(
 {
   if (pointer == 0) return 1;
   laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
-
   try
   {
     if (laszip_dll->reader == 0)
@@ -4477,7 +4567,8 @@ laszip_close_reader(
       laszip_dll->lax_index = 0;
     }
 
-    fclose(laszip_dll->file);
+	if (laszip_dll->file)
+      fclose(laszip_dll->file);
     laszip_dll->file = 0;
   }
   catch (...)
@@ -4545,36 +4636,6 @@ laszip_open_reader_stream(
   }
 }
 
-/*----------------------------------------------------------------------------*/
-laszip_I32 create_point_writer
-(
-    laszip_dll_struct *laszip_dll
-    , LASzip *laszip
-)
-{
-  // create the point writer
-  laszip_dll->writer = new LASwritePoint();
-  if (laszip_dll->writer == 0)
-  {
-    sprintf(laszip_dll->error, "could not alloc LASwritePoint");
-    return 1;
-  }
-
-  if (!laszip_dll->writer->setup(laszip->num_items, laszip->items, laszip))
-  {
-    sprintf(laszip_dll->error, "setup of LASwritePoint failed");
-    return 1;
-  }
-
-  if (!laszip_dll->writer->init(laszip_dll->streamout))
-  {
-    sprintf(laszip_dll->error, "init of LASwritePoint failed");
-    return 1;
-  }
-
-  return 0;
-}
-
 /*---------------------------------------------------------------------------*/
 // The stream writer also supports software that writes the LAS header on its
 // own simply by setting the BOOL 'do_not_write_header' to TRUE. This function
@@ -4605,11 +4666,20 @@ laszip_open_writer_stream(
       return 1;
     }
 
-    if (do_not_write_header == FALSE)
+    // create the outstream
+
+    if (IS_LITTLE_ENDIAN())
+      laszip_dll->streamout = new ByteStreamOutOstreamLE(stream);
+    else
+      laszip_dll->streamout = new ByteStreamOutOstreamBE(stream);
+
+    if (laszip_dll->streamout == 0)
     {
-      sprintf(laszip_dll->error, "writing header via laszip_open_writer_stream not yet implemented.");
+      sprintf(laszip_dll->error, "could not alloc ByteStreamOutOstream");
       return 1;
     }
+
+    // setup the items that make up the point
 
     LASzip laszip;
     if (setup_laszip_items(laszip_dll, &laszip, compress))
@@ -4617,12 +4687,50 @@ laszip_open_writer_stream(
       return 1;
     }
 
-    if (IS_LITTLE_ENDIAN())
-      laszip_dll->streamout = new ByteStreamOutOstreamLE(stream);
-    else
-      laszip_dll->streamout = new ByteStreamOutOstreamBE(stream);
+    // this supports software that writes the LAS header on its own
 
-    create_point_writer(laszip_dll, &laszip);
+    if (do_not_write_header == FALSE)
+    {
+      // prepare header
+
+      if (laszip_prepare_header_for_write(laszip_dll))
+      {
+        return 1;
+      }
+
+      // prepare point
+
+      if (laszip_prepare_point_for_write(laszip_dll, compress))
+      {
+        return 1;
+      }
+
+      // prepare VLRs
+
+      if (laszip_prepare_vlrs_for_write(laszip_dll))
+      {
+        return 1;
+      }
+
+      // write header variable after variable
+
+      if (laszip_write_header(laszip_dll, &laszip, compress))
+      {
+        return 1;
+      }
+    }
+
+    // create the point writer
+
+    if (create_point_writer(laszip_dll, &laszip))
+    {
+      return 1;
+    }
+
+    // set the point number and point count
+
+    laszip_dll->npoints = (laszip_dll->header.number_of_point_records ? laszip_dll->header.number_of_point_records : laszip_dll->header.extended_number_of_point_records);
+    laszip_dll->p_count = 0;
   }
   catch (...)
   {
@@ -4634,17 +4742,17 @@ laszip_open_writer_stream(
 }
 
 /*---------------------------------------------------------------------------*/
-// make LASzip VLR for given point type and size (always request native LAS 1.4 extension)
+// creates complete LASzip VLR for currently selected point type and compression
+// The VLR data is valid until the laszip_dll pointer is destroyed.
 LASZIP_API laszip_I32
 laszip_create_laszip_vlr(
     laszip_POINTER                     pointer
-    , std::vector<laszip_U8>&          vlr
+    , laszip_U8**                      vlr
+    , laszip_U32*                      vlr_size
 )
 {
   if (pointer == 0) return 1;
   laszip_dll_struct *laszip_dll = (laszip_dll_struct *)pointer;
-
-  laszip_dll->request_native_extension = TRUE;
 
   LASzip laszip;
   if (setup_laszip_items(laszip_dll, &laszip, TRUE))
@@ -4659,6 +4767,12 @@ laszip_create_laszip_vlr(
   else
     out = new ByteStreamOutArrayBE();
 
+  if (out == 0)
+  {
+    sprintf(laszip_dll->error, "could not alloc ByteStreamOutArray");
+    return 1;
+  }
+
   if (write_laszip_vlr_header(laszip_dll, &laszip, out))
   {
     return 1;
@@ -4669,7 +4783,10 @@ laszip_create_laszip_vlr(
     return 1;
   }
 
-  vlr.assign(out->getData(), out->getData() + out->getSize());
+  *vlr = (laszip_U8*)malloc(out->getSize());
+  *vlr_size = (U32)out->getSize();
+  laszip_dll->buffers.push_back(*vlr);
+  memcpy(*vlr, out->getData(), out->getSize());
 
   delete out;
 
