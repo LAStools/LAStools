@@ -2,17 +2,17 @@
 ===============================================================================
 
   FILE:  lasinterval.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
-  
+
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
-  
+
   COPYRIGHT:
-  
+
     (c) 2011-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -21,14 +21,15 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasinterval.hpp"
+#include "laszip.hpp"
 
 #include "bytestreamin.hpp"
 #include "bytestreamout.hpp"
@@ -51,14 +52,21 @@ using namespace std;
 #     define UNORDERED_FOUND
 #    endif
 #  endif
-#  ifndef UNORDERED_FOUND
+#  ifdef HAVE_UNORDERED_MAP
+#     include <unordered_map>
+      using namespace std;
+#  elif UNORDERED_FOUND
 #    include <tr1/unordered_map>
     using namespace std;
     using namespace tr1;
-#   endif
+#  endif
 typedef unordered_map<I32, LASintervalStartCell*> my_cell_hash;
-#else
+#elif defined(LZ_WIN32_VC6)
 #include <hash_map>
+using namespace std;
+typedef hash_map<I32, LASintervalStartCell*> my_cell_hash;
+#else
+#include <unordered_map>
 using namespace std;
 typedef hash_map<I32, LASintervalStartCell*> my_cell_hash;
 #endif

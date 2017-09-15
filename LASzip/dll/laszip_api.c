@@ -29,7 +29,7 @@
 ===============================================================================
 */
 
-#include <laszip/laszip_api.h>
+#include "laszip_api.h"
 
 // DLL function definitions
 
