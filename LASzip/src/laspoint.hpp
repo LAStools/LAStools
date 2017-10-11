@@ -603,7 +603,7 @@ public:
   inline U8 get_extended_overlap_flag() const { return (extended_classification_flags >> 3); };
   inline U8 get_extended_scanner_channel() const { return extended_scanner_channel; };
 
-  inline void set_extended_classification(U8 extended_classification) { this->extended_classification = extended_classification; };
+  inline void set_extended_classification(U8 extended_classification) { this->extended_classification = extended_classification; if (extended_classification > 31) this->classification = 0; else this->classification = extended_classification; };
   inline void set_extended_return_number(U8 extended_return_number) { this->extended_return_number = extended_return_number; };
   inline void set_extended_number_of_returns(U8 extended_number_of_returns) { this->extended_number_of_returns = extended_number_of_returns; };
   inline void set_extended_scan_angle(I16 extended_scan_angle) { this->extended_scan_angle = extended_scan_angle; };
