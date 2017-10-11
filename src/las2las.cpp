@@ -64,6 +64,7 @@
 
 #include "lasreader.hpp"
 #include "laswriter.hpp"
+#include "lastransform.hpp"
 #include "geoprojectionconverter.hpp"
 
 static void usage(bool error=false, bool wait=false)
@@ -160,8 +161,8 @@ int main(int argc, char *argv[])
   bool remove_tiling_vlr = false;
   bool remove_original_vlr = false;
   // extract a subsequence
-  unsigned int subsequence_start = 0;
-  unsigned int subsequence_stop = U32_MAX;
+  I64 subsequence_start = 0;
+  I64 subsequence_stop = I64_MAX;
   // fix files with corrupt points
   bool clip_to_bounding_box = false;
   double start_time = 0;
@@ -260,7 +261,7 @@ int main(int argc, char *argv[])
         fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop\n", argv[i]);
         byebye(true);
       }
-      subsequence_start = (unsigned int)atoi(argv[i+1]); subsequence_stop = (unsigned int)atoi(argv[i+2]);
+      subsequence_start = (I64)atoi(argv[i+1]); subsequence_stop = (I64)atoi(argv[i+2]);
       i+=2;
     }
     else if (strcmp(argv[i],"-start_at_point") == 0)
@@ -270,7 +271,7 @@ int main(int argc, char *argv[])
         fprintf(stderr,"ERROR: '%s' needs 1 argument: start\n", argv[i]);
         byebye(true);
       }
-      subsequence_start = (unsigned int)atoi(argv[i+1]);
+      subsequence_start = (I64)atoi(argv[i+1]);
       i+=1;
     }
     else if (strcmp(argv[i],"-stop_at_point") == 0)
@@ -280,7 +281,7 @@ int main(int argc, char *argv[])
         fprintf(stderr,"ERROR: '%s' needs 1 argument: stop\n", argv[i]);
         byebye(true);
       }
-      subsequence_stop = (unsigned int)atoi(argv[i+1]);
+      subsequence_stop = (I64)atoi(argv[i+1]);
       i+=1;
     }
     else if (strcmp(argv[i],"-set_version") == 0)
@@ -440,6 +441,16 @@ int main(int argc, char *argv[])
   
   BOOL extra_pass = laswriteopener.is_piped();
 
+  // we only really need an extra pass if the coordinates are altered or if points are filtered
+
+  if (extra_pass)
+  {
+    if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || (lasreadopener.get_transform()->change_coordinates == FALSE)) && lasreadopener.get_filter() == 0)
+    {
+      extra_pass = FALSE;
+    }
+  }
+
   // for piped output we need an extra pass
 
   if (extra_pass)
@@ -585,6 +596,20 @@ int main(int argc, char *argv[])
         {
           lasreader->header.header_size += 140;
           lasreader->header.offset_to_point_data += 140;
+        }
+
+        if (lasreader->header.version_minor < 4)
+        {
+          if (set_point_data_format > 5)
+          {
+            lasreader->header.extended_number_of_point_records = lasreader->header.number_of_point_records;
+            lasreader->header.number_of_point_records = 0;
+            for (i = 0; i < 5; i++)
+            {
+              lasreader->header.extended_number_of_points_by_return[i] = lasreader->header.number_of_points_by_return[i];
+              lasreader->header.number_of_points_by_return[i] = 0;
+            }
+          }
         }
       }
 
@@ -915,6 +940,16 @@ int main(int argc, char *argv[])
     // do we need an extra pass
 
     BOOL extra_pass = laswriteopener.is_piped();
+
+    // we only really need an extra pass if the coordinates are altered or if points are filtered
+
+    if (extra_pass)
+    {
+      if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || (lasreadopener.get_transform()->change_coordinates == FALSE)) && lasreadopener.get_filter() == 0)
+      {
+        extra_pass = FALSE;
+      }
+    }
 
     // for piped output we need an extra pass
 
