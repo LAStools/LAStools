@@ -22,7 +22,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -33,6 +33,7 @@
   
   CHANGE HISTORY:
   
+    10 October 2017 -- allow piped input *and* output if no filter or coordinate change 
     14 July 2017 -- fixed missing 'comma' in compound (COMPD_CS) OGC WKT string
     23 October 2016 -- OGC WKT string stores COMPD_CS for projection + vertical
     22 October 2016 -- new '-set_ogc_wkt_in_evlr' store to EVLR instead of VLR
