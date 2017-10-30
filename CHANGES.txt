@@ -1,3 +1,7 @@
+30 October 2017 -- las2las: new option '-vertical_evrf2007' for European Vertical Reference Frame 2007
+26 October 2017 -- lasthin: optional minimum number of points needed for option '-percentile 40 10'
+14 October 2017 -- lasinfo: new WARNING when bounding box in LAS header miss-matches coordinate resolution
+10 October 2017 -- las2las: allow both piping input ('-stdin') *and* output ('-stdout') if no filter or coordinate change 
 14 September 2017 -- las2dem: fixed bug in elevation rasters when processing native compressed LAS 1.4 
 5 September 2017 -- lasthin: new option keeps only points closest to a certain elevation '-percentile 40'
 3 September 2017 -- lasgrid, las2dem, lasoverlap: option '-no_kml' avoids auto-creation of KML wrapper
