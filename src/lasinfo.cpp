@@ -14,7 +14,7 @@
     change or repair some aspects of the header 
 
   PROGRAMMERS:
-  
+
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
   
   COPYRIGHT:
@@ -2966,6 +2966,9 @@ int main(int argc, char *argv[])
                     break;
                   case 5206: // VertCS_Dansk_Vertikal_Reference_1990
                     fprintf(file_out, "VerticalCSTypeGeoKey: VertCS_Dansk_Vertikal_Reference_1990\012");
+                    break;
+                  case 5215: // VertCS_European_Vertical_Reference_Frame_2007
+                    fprintf(file_out, "VerticalCSTypeGeoKey: VertCS_European_Vertical_Reference_Frame_2007\012");
                     break;
                   case 5701: // ODN height (Reserved EPSG)
                     fprintf(file_out, "VerticalCSTypeGeoKey: ODN height (Reserved EPSG)\012");
