@@ -1,3 +1,6 @@
+30 October 2017 -- las2las: new option '-vertical_evrf2007' for European Vertical Reference Frame 2007
+14 October 2017 -- lasinfo: new WARNING when bounding box in LAS header miss-matches coordinate resolution
+10 October 2017 -- las2las: allow both piping input ('-stdin') *and* output ('-stdout') if no filter or coordinate change 
 17 August 2017 -- LASlib: switch on "native LAS 1.4 extension". turns off with '-no_native'.
 5 August 2017 -- LASlib: unless '-buffered 25' just created buffers always '-remain_buffered'
 5 August 2017 -- LASlib: removed option '-unbuffered' because it makes too many assumptions
