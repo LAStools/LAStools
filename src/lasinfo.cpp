@@ -1252,6 +1252,9 @@ int main(int argc, char *argv[])
                   case 4140: // GCSE_NAD83_CSRS
                     fprintf(file_out, "GeographicTypeGeoKey: GCSE_NAD83_CSRS\012");
                     break;
+                  case 4167: // GCSE_New_Zealand_Geodetic_Datum_2000
+                    fprintf(file_out, "GeographicTypeGeoKey: GCSE_New_Zealand_Geodetic_Datum_2000\012");
+                    break;
                   case 4267: // GCS_NAD27
                     fprintf(file_out, "GeographicTypeGeoKey: GCS_NAD27\012");
                     break;
@@ -1315,6 +1318,15 @@ int main(int argc, char *argv[])
                     break;
                   case 6140: // Datum_WGS84
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_NAD83_CSRS\012");
+                    break;
+                  case 6619: // Datum_SWEREF99
+                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_SWEREF99\012");
+                    break;
+                  case 6289: // Datum_Amersfoort
+                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_Amersfoort\012");
+                    break;
+                  case 6167: // Datum_NZGD2000
+                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_NZGD2000\012");
                     break;
                   case 6001: // DatumE_Airy1830
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: DatumE_Airy1830\012");
@@ -1387,12 +1399,6 @@ int main(int argc, char *argv[])
                     break;
                   case 6034: // DatumE_Clarke1880
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: DatumE_Clarke1880\012");
-                    break;
-                  case 6289: // Datum_Amersfoort
-                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_Amersfoort\012");
-                    break;
-                  case 6619: // Datum_SWEREF99
-                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_SWEREF99\012");
                     break;
                   default:
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
