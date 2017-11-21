@@ -14,7 +14,7 @@
     change or repair some aspects of the header 
 
   PROGRAMMERS:
-  
+
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
   
   COPYRIGHT:
@@ -30,6 +30,7 @@
 
   CHANGE HISTORY:
 
+    14 October 2017 -- WARN when bounding box miss-matches coordinate resolution
     16 May 2015 -- new option '-set_GUID F794F8A4-A23E-421E-A134-ACF7754E1C54'
      9 July 2012 -- fixed crash that occured when input had a corrupt VLRs
      7 January 2012 -- set bounding box / file source id / point type & size / ...
@@ -176,6 +177,18 @@ static int lidardouble2string(char* string, double value, double precision)
   else
     return lidardouble2string(string, value);
   return strlen(string)-1;
+}
+
+static bool valid_resolution(F64 coordinate, F64 offset, F64 scale_factor)
+{
+  F64 coordinate_without_offset = coordinate - offset;
+  F64 fixed_precision_multiplier = coordinate_without_offset / scale_factor;
+  I64 quantized_fixed_precision_multiplier = I64_QUANTIZE(fixed_precision_multiplier);
+  if ((fabs(fixed_precision_multiplier - quantized_fixed_precision_multiplier)) < (scale_factor/100))
+  {
+    return true;
+  }
+  return false;
 }
 
 #ifdef COMPILE_WITH_GUI
@@ -1039,6 +1052,30 @@ int main(int argc, char *argv[])
       fprintf(file_out, "  offset x y z:               "); lidardouble2string(printstring, lasheader->x_offset); fprintf(file_out, "%s ", printstring);  lidardouble2string(printstring, lasheader->y_offset); fprintf(file_out, "%s ", printstring);  lidardouble2string(printstring, lasheader->z_offset); fprintf(file_out, "%s\012", printstring);
       fprintf(file_out, "  min x y z:                  "); lidardouble2string(printstring, lasheader->min_x, lasheader->x_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->min_y, lasheader->y_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->min_z, lasheader->z_scale_factor); fprintf(file_out, "%s\012", printstring);
       fprintf(file_out, "  max x y z:                  "); lidardouble2string(printstring, lasheader->max_x, lasheader->x_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->max_y, lasheader->y_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->max_z, lasheader->z_scale_factor); fprintf(file_out, "%s\012", printstring);
+      if (!valid_resolution(lasheader->min_x, lasheader->x_offset, lasheader->x_scale_factor))
+      {
+        fprintf(file_out, "WARNING: full resolution of min_x not compatible with x_offset and x_scale_factor: "); lidardouble2string(printstring, lasheader->min_x); fprintf(file_out, "%s\n", printstring);
+      }
+      if (!valid_resolution(lasheader->min_y, lasheader->y_offset, lasheader->y_scale_factor))
+      {
+        fprintf(file_out, "WARNING: full resolution of min_y not compatible with y_offset and y_scale_factor: "); lidardouble2string(printstring, lasheader->min_y); fprintf(file_out, "%s\n", printstring);
+      }
+      if (!valid_resolution(lasheader->min_z, lasheader->z_offset, lasheader->z_scale_factor))
+      {
+        fprintf(file_out, "WARNING: full resolution of min_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->min_z); fprintf(file_out, "%s\n", printstring);
+      }
+      if (!valid_resolution(lasheader->max_x, lasheader->x_offset, lasheader->x_scale_factor))
+      {
+        fprintf(file_out, "WARNING: full resolution of max_x not compatible with x_offset and x_scale_factor: "); lidardouble2string(printstring, lasheader->max_x); fprintf(file_out, "%s\n", printstring);
+      }
+      if (!valid_resolution(lasheader->max_y, lasheader->y_offset, lasheader->y_scale_factor))
+      {
+        fprintf(file_out, "WARNING: full resolution of max_y not compatible with y_offset and y_scale_factor: "); lidardouble2string(printstring, lasheader->max_y); fprintf(file_out, "%s\n", printstring);
+      }
+      if (!valid_resolution(lasheader->max_z, lasheader->z_offset, lasheader->z_scale_factor))
+      {
+        fprintf(file_out, "WARNING: full resolution of max_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->min_z); fprintf(file_out, "%s\n", printstring);
+      }
       if ((lasheader->version_major == 1) && (lasheader->version_minor >= 3))
       {
 #ifdef _WIN32
@@ -1215,6 +1252,9 @@ int main(int argc, char *argv[])
                   case 4140: // GCSE_NAD83_CSRS
                     fprintf(file_out, "GeographicTypeGeoKey: GCSE_NAD83_CSRS\012");
                     break;
+                  case 4167: // GCSE_New_Zealand_Geodetic_Datum_2000
+                    fprintf(file_out, "GeographicTypeGeoKey: GCSE_New_Zealand_Geodetic_Datum_2000\012");
+                    break;
                   case 4267: // GCS_NAD27
                     fprintf(file_out, "GeographicTypeGeoKey: GCS_NAD27\012");
                     break;
@@ -1278,6 +1318,15 @@ int main(int argc, char *argv[])
                     break;
                   case 6140: // Datum_WGS84
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_NAD83_CSRS\012");
+                    break;
+                  case 6619: // Datum_SWEREF99
+                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_SWEREF99\012");
+                    break;
+                  case 6289: // Datum_Amersfoort
+                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_Amersfoort\012");
+                    break;
+                  case 6167: // Datum_NZGD2000
+                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_NZGD2000\012");
                     break;
                   case 6001: // DatumE_Airy1830
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: DatumE_Airy1830\012");
@@ -1350,12 +1399,6 @@ int main(int argc, char *argv[])
                     break;
                   case 6034: // DatumE_Clarke1880
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: DatumE_Clarke1880\012");
-                    break;
-                  case 6289: // Datum_Amersfoort
-                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_Amersfoort\012");
-                    break;
-                  case 6619: // Datum_SWEREF99
-                    fprintf(file_out, "GeogGeodeticDatumGeoKey: Datum_SWEREF99\012");
                     break;
                   default:
                     fprintf(file_out, "GeogGeodeticDatumGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
@@ -2929,6 +2972,9 @@ int main(int argc, char *argv[])
                     break;
                   case 5206: // VertCS_Dansk_Vertikal_Reference_1990
                     fprintf(file_out, "VerticalCSTypeGeoKey: VertCS_Dansk_Vertikal_Reference_1990\012");
+                    break;
+                  case 5215: // VertCS_European_Vertical_Reference_Frame_2007
+                    fprintf(file_out, "VerticalCSTypeGeoKey: VertCS_European_Vertical_Reference_Frame_2007\012");
                     break;
                   case 5701: // ODN height (Reserved EPSG)
                     fprintf(file_out, "VerticalCSTypeGeoKey: ODN height (Reserved EPSG)\012");

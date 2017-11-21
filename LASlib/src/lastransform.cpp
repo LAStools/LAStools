@@ -590,7 +590,6 @@ public:
     if (point->get_withheld_flag() || point->get_keypoint_flag() || point->get_synthetic_flag())
     {
       point->set_extended_classification((point->get_withheld_flag() ? 128 : 0) | (point->get_keypoint_flag() ? 64 : 0) | (point->get_synthetic_flag() ? 32 : 0) | point->get_classification());
-      point->set_classification(0);
       point->set_synthetic_flag(0);
       point->set_keypoint_flag(0);
       point->set_withheld_flag(0);

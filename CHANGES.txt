@@ -1,3 +1,14 @@
+30 October 2017 -- las2las: new option '-vertical_evrf2007' for European Vertical Reference Frame 2007
+26 October 2017 -- lasthin: optional minimum number of points needed for option '-percentile 40 10'
+15 October 2017 -- lasclassify: use height above ground from additional attribute with '-height_in_attribute 0'
+14 October 2017 -- lasinfo: new WARNING when bounding box in LAS header miss-matches coordinate resolution
+10 October 2017 -- las2las: allow both piping input ('-stdin') *and* output ('-stdout') if no filter or coordinate change 
+14 September 2017 -- las2dem: fixed bug in elevation rasters when processing native compressed LAS 1.4 
+5 September 2017 -- lasthin: new option keeps only points closest to a certain elevation '-percentile 40'
+3 September 2017 -- lasgrid, las2dem, lasoverlap: option '-no_kml' avoids auto-creation of KML wrapper
+28 August 2017 -- selected LAStools: fix issues when outputting LAS 1.4 as LAZ with "native LAS 1.4 extension"
+27 August 2017 -- lassort, lasoptimize: fixed bug when sorting new LAS 1.4 point types by return number 
+26 August 2017 -- lastrack: bug fix in new '-classify_xy_range_and_height_between' functionality
 18 August 2017 -- NEW: lasoptimize prepares files for maximal compression and efficient spatial indexing
 18 August 2017 -- all LAStools: support for Oblique Stereographic projection added for Volker Rail
 18 August 2017 -- lastrack: new '-classify_xy_range_between' and 'classify_xy_range_and_height_between'
