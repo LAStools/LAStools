@@ -703,6 +703,39 @@ void LASbin::add(F64 item, F64 value)
   }
 }
 
+static void lidardouble2string(CHAR* string, F64 value)
+{
+  int len;
+  len = sprintf(string, "%.15f", value) - 1;
+  while (string[len] == '0') len--;
+  if (string[len] != '.') len++;
+  string[len] = '\0';
+}
+
+static void lidardouble2string(CHAR* string, F64 value, F32 precision)
+{
+  if (precision == 0.1f)
+    sprintf(string, "%.1f", value);
+  else if (precision == 0.01f)
+    sprintf(string, "%.2f", value);
+  else if (precision == 0.001f)
+    sprintf(string, "%.3f", value);
+  else if (precision == 0.0001f)
+    sprintf(string, "%.4f", value);
+  else if (precision == 0.00001f)
+    sprintf(string, "%.5f", value);
+  else if (precision == 0.000001f)
+    sprintf(string, "%.6f", value);
+  else if (precision == 0.0000001f)
+    sprintf(string, "%.7f", value);
+  else if (precision == 0.00000001f)
+    sprintf(string, "%.8f", value);
+  else if (precision == 0.000000001f)
+    sprintf(string, "%.9f", value);
+  else
+    lidardouble2string(string, value);
+}
+
 void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
 {
   I32 i, bin;
@@ -718,6 +751,8 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
     else
       fprintf(file, "%s histogram with bin size %g\012", name, 1.0f/one_over_step);
   }
+  CHAR temp1[64];
+  CHAR temp2[64];
   if (size_neg)
   {
     for (i = size_neg-1; i >= 0; i--)
@@ -734,10 +769,12 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
         }
         else
         {
+          lidardouble2string(temp1, ((F64)bin)/one_over_step, step);
+          lidardouble2string(temp2, ((F64)bin+1)/one_over_step, step);
           if (values_neg)
-            fprintf(file, "  bin [%g,%g) has average %g (of %d)\012", ((F32)bin)/one_over_step, ((F32)(bin+1))/one_over_step, values_neg[i]/bins_neg[i], bins_neg[i]);
+            fprintf(file, "  bin [%s,%s) has average %g (of %d)\012", temp1, temp2, values_neg[i]/bins_neg[i], bins_neg[i]);
           else
-            fprintf(file, "  bin [%g,%g) has %d\012", ((F32)bin)/one_over_step, ((F32)(bin+1))/one_over_step, bins_neg[i]);
+            fprintf(file, "  bin [%s,%s) has %d\012", temp1, temp2, bins_neg[i]);
         }
       }
     }
@@ -758,26 +795,29 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
         }
         else
         {
+          lidardouble2string(temp1, ((F64)bin)/one_over_step, step);
+          lidardouble2string(temp2, ((F64)bin+1)/one_over_step, step);
           if (values_pos)
-            fprintf(file, "  bin [%g,%g) average has %g (of %d)\012", ((F32)bin)/one_over_step, ((F32)(bin+1))/one_over_step, values_pos[i]/bins_pos[i], bins_pos[i]);
+            fprintf(file, "  bin [%s,%s) average has %g (of %d)\012", temp1, temp2, values_pos[i]/bins_pos[i], bins_pos[i]);
           else
-            fprintf(file, "  bin [%g,%g) has %d\012", ((F32)bin)/one_over_step, ((F32)(bin+1))/one_over_step, bins_pos[i]);
+            fprintf(file, "  bin [%s,%s) has %d\012", temp1, temp2, bins_pos[i]);
         }
       }
     }
   }
   if (count)
   {
+    lidardouble2string(temp1, total/count, step);
 #ifdef _WIN32
     if (name)
-      fprintf(file, "  average %s %g for %I64d element(s)\012", name, total/count, count);
+      fprintf(file, "  average %s %s for %I64d element(s)\012", name, temp1, count);
     else
-      fprintf(file, "  average %g for %I64d element(s)\012", total/count, count);
+      fprintf(file, "  average %s for %I64d element(s)\012", temp1, count);
 #else
     if (name)
-      fprintf(file, "  average %s %g for %lld element(s)\012", name, total/count, count);
+      fprintf(file, "  average %s %s for %lld element(s)\012", name, temp1, count);
     else
-      fprintf(file, "  average %g for %lld element(s)\012", total/count, count);
+      fprintf(file, "  average %s for %lld element(s)\012", temp1, count);
 #endif
   }
 }

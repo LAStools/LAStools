@@ -51,6 +51,7 @@
   
   CHANGE HISTORY:
 
+    30 October 2017 -- '-vertical_evrf2007' for European Vertical Reference Frame 2007
      1 February 2017 -- set_projection_from_ogc_wkt() from EPSG code of OGC WKT string
      9 November 2016 -- support "user defined" AlbersEqualArea projection in GeoTIFF
     30 July 2016 -- no more special handling for stateplanes. just parse for EPSG code 
@@ -118,6 +119,7 @@ struct GeoProjectionGeoKeys
 #define GEO_VERTICAL_NGVD29        5102
 #define GEO_VERTICAL_NAVD88        5103
 #define GEO_VERTICAL_CGVD2013      1127
+#define GEO_VERTICAL_EVRF2007      5215
 #define GEO_VERTICAL_CGVD28        5114
 #define GEO_VERTICAL_DVR90         5206
 #define GEO_VERTICAL_NN54          5776
