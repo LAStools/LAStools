@@ -743,9 +743,9 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item, U32& context)
 
   // determine changed attributes
 
-  BOOL point_source_change = (changed_values & (1 << 5) ? TRUE : FALSE);
-  BOOL gps_time_change = (changed_values & (1 << 4) ? TRUE : FALSE);
-  BOOL scan_angle_change = (changed_values & (1 << 3) ? TRUE : FALSE);
+  U32 point_source_change = (changed_values & (1 << 5) ? TRUE : FALSE);
+  U32 gps_time_change = (changed_values & (1 << 4) ? TRUE : FALSE);
+  U32 scan_angle_change = (changed_values & (1 << 3) ? TRUE : FALSE);
 
   // get last return counts
 
