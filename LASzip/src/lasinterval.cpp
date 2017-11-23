@@ -68,7 +68,7 @@ typedef hash_map<I32, LASintervalStartCell*> my_cell_hash;
 #else
 #include <unordered_map>
 using namespace std;
-typedef hash_map<I32, LASintervalStartCell*> my_cell_hash;
+typedef unordered_map<I32, LASintervalStartCell*> my_cell_hash;
 #endif
 
 typedef multimap<U32, LASintervalCell*> my_cell_map;
