@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    21 November 2017 -- allow adding up to 32 (from 10) additional extra bytes attributes
      5 August 2017 -- unless '-buffered 25' just created buffers always '-remain_buffered'
      5 August 2017 -- removed option '-unbuffered' because it makes too many assumptions
      7 February 2014 -- added option '-apply_file_source_ID' when reading LAS/LAZ
@@ -247,14 +248,14 @@ private:
   F32 translate_scan_angle;
   F32 scale_scan_angle;
   I32 number_attributes;
-  I32 attribute_data_types[10];
-  CHAR* attribute_names[10];
-  CHAR* attribute_descriptions[10];
-  F64 attribute_scales[10];
-  F64 attribute_offsets[10];
-  F64 attribute_pre_scales[10];
-  F64 attribute_pre_offsets[10];
-  F64 attribute_no_datas[10];
+  I32 attribute_data_types[32];
+  CHAR* attribute_names[32];
+  CHAR* attribute_descriptions[32];
+  F64 attribute_scales[32];
+  F64 attribute_offsets[32];
+  F64 attribute_pre_scales[32];
+  F64 attribute_pre_offsets[32];
+  F64 attribute_no_datas[32];
   U8 point_type;
   CHAR* parse_string;
   I32 skip_lines;
