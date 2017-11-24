@@ -1499,11 +1499,25 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       point.scan_direction_flag = (temp_i ? 1 : 0);
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
     }
-    else if (p[0] >= '0' && p[0] <= '9') // we expect attribute number 0 to 9
+    else if ((p[0] >= '0') && (p[0] <= '9')) // we expect attribute number 0 to 9
     {
       while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
       if (l[0] == 0) return FALSE;
       I32 index = (I32)(p[0] - '0');
+      if (!parse_attribute(l, index)) return FALSE;
+      while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+    }
+    else if (p[0] == '(') // we expect attribute number 10 or higher
+    {
+      while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+      if (l[0] == 0) return FALSE;
+      p++;
+      I32 index = 0;
+      while (p[0] >= '0' && p[0] <= '9')
+      {
+        index = 10*index + (I32)(p[0] - '0');
+        p++;
+      }
       if (!parse_attribute(l, index)) return FALSE;
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
     }
@@ -1575,7 +1589,7 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
         (p[0] != 'H') && // we expect a hexadecimal coded RGB color
         (p[0] != 'I'))   // we expect a hexadecimal coded intensity
     {
-      if (p[0] >= '0' && p[0] <= '9')
+      if ((p[0] >= '0') && (p[0] <= '9'))
       {
         I32 index = (I32)(p[0] - '0');
         if (index >= header.number_attributes)
@@ -1584,6 +1598,35 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
           return FALSE;
         }
         attribute_starts[index] = header.get_attribute_start(index);
+      }
+      else if (p[0] == '(')
+      {
+        p++;
+        if ((p[0] >= '0') && (p[0] <= '9'))
+        {
+          I32 index = 0;
+          while ((p[0] >= '0') && (p[0] <= '9'))
+          {
+            index = 10*index + (I32)(p[0] - '0');
+            p++;
+          }
+          if (index >= header.number_attributes)
+          {
+            fprintf(stderr, "ERROR: extra bytes attribute '%d' was not described.\n", index);
+            return FALSE;
+          }
+          if (p[0] != ')')
+          {
+            fprintf(stderr, "ERROR: extra bytes attribute '%d' misses closing bracket.\n", index);
+            return FALSE;
+          }
+          attribute_starts[index] = header.get_attribute_start(index);
+        }
+        else
+        {
+          fprintf(stderr, "ERROR: parse string opening bracket '(' misses extra bytes index.\n");
+          return FALSE;
+        }
       }
       else
       {
@@ -1611,7 +1654,8 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
         fprintf(stderr, "       'p' : the <p>oint source ID\n");
         fprintf(stderr, "       'e' : the <e>dge of flight line flag\n");
         fprintf(stderr, "       'd' : the <d>irection of scan flag\n");
-        fprintf(stderr, "   '0'-'9' : additional point attributes described as extra bytes\n");
+        fprintf(stderr, "   '0'-'9' : additional attributes described as extra bytes (0 through 9)\n");
+        fprintf(stderr, "    '(13)' : additional attributes described as extra bytes (10 and up)\n");
         fprintf(stderr, "       'H' : a hexadecimal string encoding the RGB color\n");
         fprintf(stderr, "       'I' : a hexadecimal string encoding the intensity\n");
         return FALSE;
