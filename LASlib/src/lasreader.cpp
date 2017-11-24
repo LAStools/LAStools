@@ -2306,7 +2306,7 @@ LASreadOpener::LASreadOpener()
   translate_scan_angle = 0.0f;
   scale_scan_angle = 1.0f;
   number_attributes = 0;
-  for (I32 i = 0; i < 10; i++)
+  for (I32 i = 0; i < 32; i++)
   {
     attribute_data_types[i] = 0;
     attribute_names[i] = 0;
