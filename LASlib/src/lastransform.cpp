@@ -1182,6 +1182,14 @@ public:
   inline void transform(LASpoint* point) { point->set_intensity(point->get_NIR()); };
 };
 
+class LASoperationCopyIntensityIntoNIR : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_intensity_into_NIR"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_NIR(point->get_intensity()); };
+};
+
 class LASoperationFlipWaveformDirection : public LASoperation
 {
 public:
@@ -1296,6 +1304,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -translate_then_scale_intensity 0.5 3.1\n");
   fprintf(stderr,"  -clamp_intensity 0 255\n");
   fprintf(stderr,"  -clamp_intensity_above 255\n");
+  fprintf(stderr,"  -copy_RGB_into_intensity\n");
   fprintf(stderr,"  -copy_NIR_into_intensity\n");
   fprintf(stderr,"Transform scan_angle.\n");
   fprintf(stderr,"  -scale_scan_angle 1.944445\n");
@@ -1356,10 +1365,10 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_RGB_down (by 256)\n");
   fprintf(stderr,"  -scale_RGB_up (by 256)\n");
   fprintf(stderr,"  -switch_R_G -switch_R_B -switch_B_G\n");
-  fprintf(stderr,"  -copy_RGB_into_intensity\n");
   fprintf(stderr,"  -copy_R_into_NIR -copy_R_into_intensity\n");
   fprintf(stderr,"  -copy_G_into_NIR -copy_G_into_intensity\n");
   fprintf(stderr,"  -copy_B_into_NIR -copy_B_into_intensity\n");
+  fprintf(stderr,"  -copy_intensity_into_NIR\n");
 }
 
 BOOL LAStransform::parse(int argc, char* argv[])
@@ -1760,12 +1769,20 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationCopyNIRintoIntensity());
         *argv[i]='\0'; 
       }
-      else if (strcmp(argv[i],"-copy_intensity_into_z") == 0)
+      else if (strncmp(argv[i],"-copy_intensity_", 16) == 0)
       {
-        change_coordinates = TRUE;
-        add_operation(new LASoperationCopyIntensityIntoZ());
-        *argv[i]='\0'; 
-      } 
+        if (strcmp(argv[i],"-copy_intensity_into_z") == 0)
+        {
+          change_coordinates = TRUE;
+          add_operation(new LASoperationCopyIntensityIntoZ());
+          *argv[i]='\0'; 
+        } 
+        else if (strcmp(argv[i],"-copy_intensity_into_NIR") == 0)
+        {
+          add_operation(new LASoperationCopyIntensityIntoNIR());
+          *argv[i]='\0'; 
+        }
+      }
       else if (strcmp(argv[i],"-copy_classification_into_user_data") == 0)
       {
         add_operation(new LASoperationCopyClassificationIntoUserData());
