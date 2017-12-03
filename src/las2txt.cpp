@@ -28,6 +28,7 @@
   
   CHANGE HISTORY:
   
+    22 November 2017 -- parse attributes with indices > 9 by bracketing (12) them 
     19 April 2017 -- 1st example for selective decompression for new LAS 1.4 points 
     11 January 2017 -- added with<h>eld and scanner channe<l> for the parse string
     24 April 2015 -- added 'k'eypoint and 'o'verlap flags for the parse string
@@ -79,13 +80,17 @@ void usage(bool error=false, bool wait=false)
   fprintf(stderr,"n - number of returns for given pulse, r - number of\n");
   fprintf(stderr,"this return, c - classification, u - user data,\n");
   fprintf(stderr,"p - point source ID, e - edge of flight line flag, and\n");
-  fprintf(stderr,"d - direction of scan flag, R - red channel of RGB color,\n");
+  fprintf(stderr,"d - direction of scan flag, l - extended scanner channel,\n");
+  fprintf(stderr,"h - withheld flag, k - keypoint flag, g - synthetic flag,\n");
+  fprintf(stderr,"o - extended overlap flag, R - red channel of RGB color,\n");
   fprintf(stderr,"G - green channel of RGB color, B - blue channel of RGB color,\n");
-  fprintf(stderr,"M - the index for each point\n");
+  fprintf(stderr,"I - NIR channel, m - count for each point (starting at zero),\n");
+  fprintf(stderr,"M - count for each point (starting at one),\n");
   fprintf(stderr,"X, Y, and Z - the unscaled, raw LAS integer coordinates\n");
   fprintf(stderr,"w and W - for the wavepacket information (LAS 1.3 only)\n");
   fprintf(stderr,"V - for the waVeform from the *.wdp file (LAS 1.3 only)\n");
   fprintf(stderr,"E - for an extra string. specify it with '-extra <string>'\n");
+  fprintf(stderr,"0 through 9 - for additional attributes stored as extra bytes\n");
   fprintf(stderr,"---------------------------------------------\n");
   fprintf(stderr,"The '-sep space' flag specifies what separator to use. The\n");
   fprintf(stderr,"default is a space but 'tab', 'comma', 'colon', 'hyphen',\n");
@@ -192,7 +197,7 @@ static void output_waveform(FILE* file_out, CHAR separator_sign, LASwaveform13re
   }
 }
 
-static I32 attribute_starts[10];
+static I32 attribute_starts[32];
 
 static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint* point, I32 index, CHAR* printstring)
 {
@@ -657,7 +662,7 @@ int main(int argc, char *argv[])
     {
       switch (parse_string[i])
       {
-      case ')': // diff of unscaled raw integer X to prev point
+      case '_': // diff of unscaled raw integer X to prev point
       case '!': // diff of unscaled raw integer Y to prev point
         diff = true;
       case 'x': // the x coordinate
@@ -710,7 +715,7 @@ int main(int argc, char *argv[])
       case '%': // the G difference to the last point
       case '*': // the byte-wise G difference to the last point
       case '^': // the B difference to the last point
-      case '(': // the byte-wise B difference to the last point
+      case '+': // the byte-wise B difference to the last point
         diff = true;
       case 'R': // the red channel of the RGB field
       case 'B': // the blue channel of the RGB field
@@ -742,6 +747,8 @@ int main(int argc, char *argv[])
       case '7':
       case '8':
       case '9':
+      case '(':
+      case ')':
         decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
         break;
       default:
@@ -970,12 +977,13 @@ int main(int argc, char *argv[])
 
     // check requested fields and print warnings if attributes do not exist
 
+    I32 index;
     i = 0;
     while (parse_string[i])
     {
       switch (parse_string[i])
       {
-      case ')': // diff of unscaled raw integer X to prev point
+      case '_': // diff of unscaled raw integer X to prev point
       case '!': // diff of unscaled raw integer Y to prev point
       case 'x': // the x coordinate
       case 'y': // the y coordinate
@@ -1025,7 +1033,7 @@ int main(int argc, char *argv[])
           fprintf (stderr, "WARNING: requested 'G' but points do not have RGB\n");
         break;
       case '^': // the B difference to the last point
-      case '(': // the byte-wise B difference to the last point
+      case '+': // the byte-wise B difference to the last point
       case 'B': // the blue channel of the RGB field
         if (lasreader->point.have_rgb == false)
           fprintf (stderr, "WARNING: requested 'B' but points do not have RGB\n");
@@ -1074,6 +1082,24 @@ int main(int argc, char *argv[])
         else
         {
           attribute_starts[(parse_string[i] - '0')] = lasreader->header.get_attribute_start((parse_string[i] - '0'));
+        }
+        break;
+      case '(':
+        index = 0;
+        i++;
+        while (parse_string[i] && ('0' <= parse_string[i]) && (parse_string[i] <= '9'))
+        {
+          index = 10*index + (parse_string[i] - '0');
+          i++;
+        }
+        if (index >= lasreader->header.number_attributes)
+        {
+          fprintf(stderr, "ERROR: attribute '%d' does not exist. skipping ...\n", index);
+          byebye(true);
+        }
+        else
+        {
+          attribute_starts[index] = lasreader->header.get_attribute_start(index);
         }
         break;
       case 's':
@@ -1234,7 +1260,7 @@ int main(int argc, char *argv[])
           fprintf(file_out, "%lld", lasreader->p_count);
 #endif
           break;
-        case ')': // the raw integer X difference to the last point
+        case '_': // the raw integer X difference to the last point
           fprintf(file_out, "%d", lasreader->point.get_X()-last_XYZ[0]);
           break;
         case '!': // the raw integer Y difference to the last point
@@ -1261,7 +1287,7 @@ int main(int argc, char *argv[])
         case '*': // the byte-wise G difference to the last point
           fprintf(file_out, "%d%c%d", (lasreader->point.rgb[1]>>8)-(last_RGB[1]>>8), separator_sign, (lasreader->point.rgb[1]&255)-(last_RGB[1]&255));
           break;
-        case '(': // the byte-wise B difference to the last point
+        case '+': // the byte-wise B difference to the last point
           fprintf(file_out, "%d%c%d", (lasreader->point.rgb[2]>>8)-(last_RGB[2]>>8), separator_sign, (lasreader->point.rgb[2]&255)-(last_RGB[2]&255));
           break;
         case 'w': // the wavepacket index
@@ -1283,8 +1309,27 @@ int main(int argc, char *argv[])
         case 'E': // the extra string
           fprintf(file_out, "%s", extra_string);
           break;
-        default:
+        case '0': // the extra attributes
+        case '1': // the extra attributes
+        case '2': // the extra attributes
+        case '3': // the extra attributes
+        case '4': // the extra attributes
+        case '5': // the extra attributes
+        case '6': // the extra attributes
+        case '7': // the extra attributes
+        case '8': // the extra attributes
+        case '9': // the extra attributes
           print_attribute(file_out, &lasreader->header, &lasreader->point, (I32)(parse_string[i]-'0'), printstring);
+          break;
+        default:
+          index = 0;
+          i++;
+          while (parse_string[i] && ('0' <= parse_string[i]) && (parse_string[i] <= '9'))
+          {
+            index = 10*index + (parse_string[i] - '0');
+            i++;
+          }
+          print_attribute(file_out, &lasreader->header, &lasreader->point, index, printstring);
         }
         i++;
         if (parse_string[i])
