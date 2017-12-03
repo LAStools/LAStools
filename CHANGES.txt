@@ -1,3 +1,9 @@
+24 November 2017 -- lascanopy: use option '-height_in_attribute 0' if height is stored as additional attribute
+22 November 2017 -- las2txt: parse extra bytes attributes with indices larger than 9 by bracketing (12) them 
+21 November 2017 -- txt2las: allow adding up to 32 (from 10) additional extra bytes attributes
+21 November 2017 -- lasclip: use output file name from DBF attribute of SHP file with '-split Plot_Name'
+17 November 2017 -- LASlib: new transform '-copy_intensity_into_NIR' (makes only sense for point type 8)
+7 November 2017 -- lasthin: new '-gps_time 0.01' thins per 0.01 sec intervals instead of per spatial cells
 30 October 2017 -- las2las: new option '-vertical_evrf2007' for European Vertical Reference Frame 2007
 26 October 2017 -- lasthin: optional minimum number of points needed for option '-percentile 40 10'
 15 October 2017 -- lasclassify: use height above ground from additional attribute with '-height_in_attribute 0'
