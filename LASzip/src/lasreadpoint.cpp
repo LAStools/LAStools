@@ -228,9 +228,7 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
           return FALSE;
         break;
       case LASitem::POINT14:
-        if ((items[i].version == 4) || (items[i].version == 2)) // version == 2 from lasproto
-          readers_compressed[i] = new LASreadItemCompressed_POINT14_v4(dec, decompress_selective);
-        else if (items[i].version == 3)
+        if ((items[i].version == 3) || (items[i].version == 2)) // version == 2 from lasproto
           readers_compressed[i] = new LASreadItemCompressed_POINT14_v3(dec, decompress_selective);
         else
           return FALSE;

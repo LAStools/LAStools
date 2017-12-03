@@ -23,8 +23,7 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   
   CHANGE HISTORY:
-
-     3 December 2017 -- POINT14_v4 fixes inefficiency bug in 'context' switching
+  
     28 August 2017 -- moving 'context' from global development hack to interface  
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 
     22 June 2016 -- created after Island beat Austria 2:1 in the EM2016
@@ -53,82 +52,6 @@ public:
   void read(U8* item, U32& context);       // context is set
 
   ~LASreadItemCompressed_POINT14_v3();
-
-private:
-
-  /* not used as a decoder. just gives access to instream */
-  
-  ArithmeticDecoder* dec;
-
-  ByteStreamInArray* instream_channel_returns_XY;
-  ByteStreamInArray* instream_Z;
-  ByteStreamInArray* instream_classification;
-  ByteStreamInArray* instream_flags;
-  ByteStreamInArray* instream_intensity;
-  ByteStreamInArray* instream_scan_angle;
-  ByteStreamInArray* instream_user_data;
-  ByteStreamInArray* instream_point_source;
-  ByteStreamInArray* instream_gps_time;
-
-  ArithmeticDecoder* dec_channel_returns_XY;
-  ArithmeticDecoder* dec_Z;
-  ArithmeticDecoder* dec_classification;
-  ArithmeticDecoder* dec_flags;
-  ArithmeticDecoder* dec_intensity;
-  ArithmeticDecoder* dec_scan_angle;
-  ArithmeticDecoder* dec_user_data;
-  ArithmeticDecoder* dec_point_source;
-  ArithmeticDecoder* dec_gps_time;
-
-  BOOL changed_Z;
-  BOOL changed_classification;
-  BOOL changed_flags;
-  BOOL changed_intensity;
-  BOOL changed_scan_angle;
-  BOOL changed_user_data;
-  BOOL changed_point_source;
-  BOOL changed_gps_time;
-
-  U32 num_bytes_channel_returns_XY;
-  U32 num_bytes_Z;
-  U32 num_bytes_classification;
-  U32 num_bytes_flags;
-  U32 num_bytes_intensity;
-  U32 num_bytes_scan_angle;
-  U32 num_bytes_user_data;
-  U32 num_bytes_point_source;
-  U32 num_bytes_gps_time;
-
-  BOOL requested_Z;
-  BOOL requested_classification;
-  BOOL requested_flags;
-  BOOL requested_intensity;
-  BOOL requested_scan_angle;
-  BOOL requested_user_data;
-  BOOL requested_point_source;
-  BOOL requested_gps_time;
-
-  U8* bytes;
-  U32 num_bytes_allocated;
-
-  U32 current_context;
-  LAScontextPOINT14 contexts[4];
-
-  BOOL createAndInitModelsAndDecompressors(U32 context, const U8* item);
-  void read_gps_time();
-};
-
-class LASreadItemCompressed_POINT14_v4 : public LASreadItemCompressed
-{
-public:
-
-  LASreadItemCompressed_POINT14_v4(ArithmeticDecoder* dec, const U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
-
-  BOOL chunk_sizes();
-  BOOL init(const U8* item, U32& context); // context is set
-  void read(U8* item, U32& context);       // context is set
-
-  ~LASreadItemCompressed_POINT14_v4();
 
 private:
 

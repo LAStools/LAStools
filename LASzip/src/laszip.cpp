@@ -238,7 +238,7 @@ bool LASzip::check_item(const LASitem* item)
     break;
   case LASitem::POINT14:
     if (item->size != 30) return return_error("POINT14 has size != 30");
-    if ((item->version != 0) && (item->version != 2) && (item->version != 3) && (item->version != 4)) return return_error("POINT14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto
+    if ((item->version != 0) && (item->version != 2) && (item->version != 3)) return return_error("POINT14 has version != 0 and != 2 and != 3"); // version == 2 from lasproto
     break;
   case LASitem::RGB14:
     if (item->size != 6) return return_error("RGB14 has size != 6");
@@ -642,15 +642,6 @@ bool LASzip::request_version(const U16 requested_version)
       items[i].version = 1; // no version 2
       break;
     case LASitem::POINT14:
-      if (num_items == 1)
-      {
-        items[i].version = 3; // context switch inefficiency is irrelevant
-      }
-      else
-      {
-        items[i].version = 4; // context switch inefficiency becomes relevant if scanner_channel is populated
-      }
-      break;
     case LASitem::RGB14:
     case LASitem::RGBNIR14:
     case LASitem::WAVEPACKET14:
