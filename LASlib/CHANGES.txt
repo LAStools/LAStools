@@ -1,3 +1,6 @@
+22 November 2017 -- las2txt: parse extra bytes attributes with indices larger than 9 by bracketing (12) them 
+21 November 2017 -- txt2las: allow adding up to 32 (from 10) additional extra bytes attributes
+17 November 2017 -- LASlib: new transform '-copy_intensity_into_NIR' (makes only sense for point type 8)
 30 October 2017 -- las2las: new option '-vertical_evrf2007' for European Vertical Reference Frame 2007
 14 October 2017 -- lasinfo: new WARNING when bounding box in LAS header miss-matches coordinate resolution
 10 October 2017 -- las2las: allow both piping input ('-stdin') *and* output ('-stdout') if no filter or coordinate change 
