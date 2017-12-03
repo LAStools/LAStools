@@ -5,7 +5,7 @@
   
   CONTENTS:
   
-    Reads LIDAR points from the LAS format from more than one file.
+    Reads LiDAR points from the LAS format from more than one file.
 
   PROGRAMMERS:
 
@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     1 December 2017 -- support extra bytes during '-merged' operations
      3 May 2015 -- header sets file source ID to 0 when merging flightlines 
     20 January 2011 -- created missing Livermore and my Extra Virgin Olive Oil
   
