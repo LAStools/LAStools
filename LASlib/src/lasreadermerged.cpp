@@ -537,13 +537,14 @@ BOOL LASreaderMerged::open()
 
   U32 i,j;
   BOOL first = TRUE;
+  BOOL attributes = FALSE;
 
   for (i = 0; i < file_name_number; i++)
   {
     // open the lasreader with the next file name
     if (lasreaderlas)
     {
-      if (!lasreaderlas->open(file_names[i], 512, (first == FALSE))) // starting from second just "peek" into file to get bounding box and count
+      if (!lasreaderlas->open(file_names[i], 512, (first == FALSE) && (attributes == FALSE))) // starting from second just "peek" into file to get bounding box and count
       {
         fprintf(stderr, "ERROR: could not open lasreaderlas for file '%s'\n", file_names[i]);
         return FALSE;
@@ -672,114 +673,133 @@ BOOL LASreaderMerged::open()
       }
       // count the points up to 64 bits
       npoints = lasreader->npoints;
-      // special check for attributes in extra bytes
-      if (header.number_attributes)
-      {
-        header.number_attributes = 0;
-        header.init_attributes(lasreader->header.number_attributes, lasreader->header.attributes);
-      }
       // when merging multiple flightlines the merged header must have a file source ID of 0
       if (files_are_flightlines || apply_file_source_ID)
       {
         header.file_source_ID = 0;
-      }      
+      }
+      if (header.number_attributes)
+      {
+        attributes = TRUE;
+      }
     }
-    else if (lasreader->npoints)
+    else
     {
-      // count the points up to 64 bits
-      npoints += lasreader->npoints;
-      // have there not been any points before
-      if (npoints == lasreader->npoints)
+      if (lasreader->npoints)
       {
-        // use the counters 
-        header.number_of_point_records = lasreader->header.number_of_point_records;
-        for (j = 0; j < 5; j++)
+        // count the points up to 64 bits
+        npoints += lasreader->npoints;
+        // have there not been any points before
+        if (npoints == lasreader->npoints)
         {
-          header.number_of_points_by_return[j] = lasreader->header.number_of_points_by_return[j];
-        }
-        // and use the bounding box
-        header.max_x = lasreader->header.max_x;
-        header.max_y = lasreader->header.max_y;
-        header.max_z = lasreader->header.max_z;
-        header.min_x = lasreader->header.min_x;
-        header.min_y = lasreader->header.min_y;
-        header.min_z = lasreader->header.min_z;
-        // as well as scale factor and offset
-        header.x_scale_factor = lasreader->header.x_scale_factor;
-        header.y_scale_factor = lasreader->header.y_scale_factor;
-        header.z_scale_factor = lasreader->header.z_scale_factor;
-        header.x_offset = lasreader->header.x_offset;
-        header.y_offset = lasreader->header.y_offset;
-        header.z_offset = lasreader->header.z_offset;
-        // for LAS 1.4 (and 32-bit counter overflows)
-        header.extended_number_of_point_records = (lasreader->header.number_of_point_records ? lasreader->header.number_of_point_records : lasreader->header.extended_number_of_point_records);
-        for (j = 0; j < 5; j++)
-        {
-          header.extended_number_of_points_by_return[j] = (lasreader->header.number_of_points_by_return[j] ? lasreader->header.number_of_points_by_return[j] : lasreader->header.extended_number_of_points_by_return[j]);
-        }
-        if (header.version_minor >= 4)
-        {
-          for (j = 5; j < 15; j++)
+          // use the counters 
+          header.number_of_point_records = lasreader->header.number_of_point_records;
+          for (j = 0; j < 5; j++)
           {
-            header.extended_number_of_points_by_return[j] = lasreader->header.extended_number_of_points_by_return[j];
+            header.number_of_points_by_return[j] = lasreader->header.number_of_points_by_return[j];
+          }
+          // and use the bounding box
+          header.max_x = lasreader->header.max_x;
+          header.max_y = lasreader->header.max_y;
+          header.max_z = lasreader->header.max_z;
+          header.min_x = lasreader->header.min_x;
+          header.min_y = lasreader->header.min_y;
+          header.min_z = lasreader->header.min_z;
+          // as well as scale factor and offset
+          header.x_scale_factor = lasreader->header.x_scale_factor;
+          header.y_scale_factor = lasreader->header.y_scale_factor;
+          header.z_scale_factor = lasreader->header.z_scale_factor;
+          header.x_offset = lasreader->header.x_offset;
+          header.y_offset = lasreader->header.y_offset;
+          header.z_offset = lasreader->header.z_offset;
+          // for LAS 1.4 (and 32-bit counter overflows)
+          header.extended_number_of_point_records = (lasreader->header.number_of_point_records ? lasreader->header.number_of_point_records : lasreader->header.extended_number_of_point_records);
+          for (j = 0; j < 5; j++)
+          {
+            header.extended_number_of_points_by_return[j] = (lasreader->header.number_of_points_by_return[j] ? lasreader->header.number_of_points_by_return[j] : lasreader->header.extended_number_of_points_by_return[j]);
+          }
+          if (header.version_minor >= 4)
+          {
+            for (j = 5; j < 15; j++)
+            {
+              header.extended_number_of_points_by_return[j] = lasreader->header.extended_number_of_points_by_return[j];
+            }
           }
         }
-      }
-      else
-      {
-        // increment point counters 
-        header.number_of_point_records += lasreader->header.number_of_point_records;
-        for (j = 0; j < 5; j++)
+        else
         {
-          header.number_of_points_by_return[j] += lasreader->header.number_of_points_by_return[j];
-        }
-        // widen the bounding box
-        if (header.max_x < lasreader->header.max_x) header.max_x = lasreader->header.max_x;
-        if (header.max_y < lasreader->header.max_y) header.max_y = lasreader->header.max_y;
-        if (header.max_z < lasreader->header.max_z) header.max_z = lasreader->header.max_z;
-        if (header.min_x > lasreader->header.min_x) header.min_x = lasreader->header.min_x;
-        if (header.min_y > lasreader->header.min_y) header.min_y = lasreader->header.min_y;
-        if (header.min_z > lasreader->header.min_z) header.min_z = lasreader->header.min_z;
-        // for LAS 1.4 (and 32-bit counter overflows)
-        header.extended_number_of_point_records += (lasreader->header.number_of_point_records ? lasreader->header.number_of_point_records : lasreader->header.extended_number_of_point_records);
-        for (j = 0; j < 5; j++)
-        {
-          header.extended_number_of_points_by_return[j] += (lasreader->header.number_of_points_by_return[j] ? lasreader->header.number_of_points_by_return[j] : lasreader->header.extended_number_of_points_by_return[j]);
-        }
-        if (header.version_minor >= 4)
-        {
-          for (j = 5; j < 15; j++)
+          // increment point counters 
+          header.number_of_point_records += lasreader->header.number_of_point_records;
+          for (j = 0; j < 5; j++)
           {
-            header.extended_number_of_points_by_return[j] += lasreader->header.extended_number_of_points_by_return[j];
+            header.number_of_points_by_return[j] += lasreader->header.number_of_points_by_return[j];
+          }
+          // widen the bounding box
+          if (header.max_x < lasreader->header.max_x) header.max_x = lasreader->header.max_x;
+          if (header.max_y < lasreader->header.max_y) header.max_y = lasreader->header.max_y;
+          if (header.max_z < lasreader->header.max_z) header.max_z = lasreader->header.max_z;
+          if (header.min_x > lasreader->header.min_x) header.min_x = lasreader->header.min_x;
+          if (header.min_y > lasreader->header.min_y) header.min_y = lasreader->header.min_y;
+          if (header.min_z > lasreader->header.min_z) header.min_z = lasreader->header.min_z;
+          // for LAS 1.4 (and 32-bit counter overflows)
+          header.extended_number_of_point_records += (lasreader->header.number_of_point_records ? lasreader->header.number_of_point_records : lasreader->header.extended_number_of_point_records);
+          for (j = 0; j < 5; j++)
+          {
+            header.extended_number_of_points_by_return[j] += (lasreader->header.number_of_points_by_return[j] ? lasreader->header.number_of_points_by_return[j] : lasreader->header.extended_number_of_points_by_return[j]);
+          }
+          if (header.version_minor >= 4)
+          {
+            for (j = 5; j < 15; j++)
+            {
+              header.extended_number_of_points_by_return[j] += lasreader->header.extended_number_of_points_by_return[j];
+            }
           }
         }
-      }
-      // a point type change could be problematic
-      if (header.point_data_format != lasreader->header.point_data_format)
-      {
-        if (!point_type_change) fprintf(stderr, "WARNING: files have different point types: %d vs %d\n", header.point_data_format, lasreader->header.point_data_format);
-        point_type_change = TRUE;
-      }
-      // a point size change could be problematic
-      if (header.point_data_record_length != lasreader->header.point_data_record_length)
-      {
-        if (!point_size_change) fprintf(stderr, "WARNING: files have different point sizes: %d vs %d\n", header.point_data_record_length, lasreader->header.point_data_record_length);
-        point_size_change = TRUE;
-      }
-      // and check if we need to resample points because scalefactor of offsets change
-      if (header.x_scale_factor != lasreader->header.x_scale_factor ||
-          header.y_scale_factor != lasreader->header.y_scale_factor ||
-          header.z_scale_factor != lasreader->header.z_scale_factor)
-      {
-//        if (!rescale) fprintf(stderr, "WARNING: files have different scale factors: %g %g %g vs %g %g %g\n", header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, lasreader->header.x_scale_factor, lasreader->header.y_scale_factor, lasreader->header.z_scale_factor);
-        rescale = TRUE;
-      }
-      if (header.x_offset != lasreader->header.x_offset ||
-          header.y_offset != lasreader->header.y_offset ||
-          header.z_offset != lasreader->header.z_offset)
-      {
-//        if (!reoffset) fprintf(stderr, "WARNING: files have different offsets: %g %g %g vs %g %g %g\n", header.x_offset, header.y_offset, header.z_offset, lasreader->header.x_offset, lasreader->header.y_offset, lasreader->header.z_offset);
-        reoffset = TRUE;
+
+        // and check if we need to resample points because scalefactor of offsets change
+        if (header.x_scale_factor != lasreader->header.x_scale_factor ||
+            header.y_scale_factor != lasreader->header.y_scale_factor ||
+            header.z_scale_factor != lasreader->header.z_scale_factor)
+        {
+  //        if (!rescale) fprintf(stderr, "WARNING: files have different scale factors: %g %g %g vs %g %g %g\n", header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, lasreader->header.x_scale_factor, lasreader->header.y_scale_factor, lasreader->header.z_scale_factor);
+          rescale = TRUE;
+        }
+        if (header.x_offset != lasreader->header.x_offset ||
+            header.y_offset != lasreader->header.y_offset ||
+            header.z_offset != lasreader->header.z_offset)
+        {
+  //        if (!reoffset) fprintf(stderr, "WARNING: files have different offsets: %g %g %g vs %g %g %g\n", header.x_offset, header.y_offset, header.z_offset, lasreader->header.x_offset, lasreader->header.y_offset, lasreader->header.z_offset);
+          reoffset = TRUE;
+        }
+        // a point type change could be problematic
+        if (header.point_data_format != lasreader->header.point_data_format)
+        {
+          if (!point_type_change) fprintf(stderr, "WARNING: files have different point types: %d vs %d\n", header.point_data_format, lasreader->header.point_data_format);
+          point_type_change = TRUE;
+        }
+        // a point size change could be problematic
+        if (header.point_data_record_length != lasreader->header.point_data_record_length)
+        {
+          if (!point_size_change) fprintf(stderr, "WARNING: files have different point sizes: %d vs %d\n", header.point_data_record_length, lasreader->header.point_data_record_length);
+          point_size_change = TRUE;
+        }
+        // a change in additional attributes (in the extra bytes) could be problematic
+        if (header.number_attributes != lasreader->header.number_attributes)
+        {
+          if (!additional_attribute_change) fprintf(stderr, "WARNING: files have different number of attributes: %d vs %d\n", header.number_attributes, lasreader->header.number_attributes);
+          additional_attribute_change = TRUE;
+        }
+        else if (header.number_attributes)
+        {
+          for (j = 0; j < (U32)header.number_attributes; j++)
+          {
+            if (memcmp((const void*)&(header.attributes[j]), (const void*)&(lasreader->header.attributes[j]), 192))
+            {
+              if (!additional_attribute_change) fprintf(stderr, "WARNING: files have different attribute %d\n", j);
+              additional_attribute_change = TRUE;
+            }
+          }
+        }
       }
     }
     lasreader->close();
@@ -1208,6 +1228,7 @@ void LASreaderMerged::clean()
   }
   point_type_change = FALSE;
   point_size_change = FALSE;
+  additional_attribute_change = FALSE;
   rescale = FALSE;
   reoffset = FALSE;
   if (scale_factor)

@@ -98,6 +98,7 @@ private:
   LASreaderTXT* lasreadertxt;
   BOOL point_type_change;
   BOOL point_size_change;
+  BOOL additional_attribute_change;
   BOOL rescale;
   BOOL reoffset;
   F64* scale_factor;
