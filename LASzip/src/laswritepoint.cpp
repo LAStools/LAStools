@@ -194,7 +194,9 @@ BOOL LASwritePoint::setup(const U32 num_items, const LASitem* items, const LASzi
           return FALSE;
         break;
       case LASitem::POINT14:
-        if (items[i].version == 3)
+        if (items[i].version == 4)
+          writers_compressed[i] = new LASwriteItemCompressed_POINT14_v4(enc);
+        else if (items[i].version == 3)
           writers_compressed[i] = new LASwriteItemCompressed_POINT14_v3(enc);
         else
           return FALSE;
