@@ -31,6 +31,7 @@
   
   CHANGE HISTORY:
 
+    21 November 2017 -- allow adding up to 32 (from 10) additional attributes
      7 April 2017 -- new option to '-set_point_type 6' for new LAS 1.4 point types 
     17 January 2016 -- pre-scaling and pre-offsetting of "extra bytes" attributes
      1 January 2016 -- option '-set_ogc_wkt' to store CRS as OGC WKT string
@@ -652,13 +653,13 @@ int main(int argc, char *argv[])
 
     if (set_version_minor == 3)
     {
-      lasreader->header.header_size = 235;
-      lasreader->header.offset_to_point_data = 235;
+      lasreader->header.header_size += 8;
+      lasreader->header.offset_to_point_data += 8;
     }
     else if (set_version_minor == 4)
     {
-      lasreader->header.header_size = 375;
-      lasreader->header.offset_to_point_data = 375;
+      lasreader->header.header_size += 148;
+      lasreader->header.offset_to_point_data += 148;
     }
 
     // maybe set projection
