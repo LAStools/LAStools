@@ -734,12 +734,12 @@ inline void LASreadItemCompressed_POINT14_v3::read(U8* item, U32& context)
     }
     // switch context to current scanner channel
     current_context = scanner_channel;
-    context = current_context; // the POINT14 reader sets context for all other items
 
     // get last for new context
     last_item = contexts[current_context].last_item;
     ((LASpoint14*)last_item)->scanner_channel = scanner_channel;
   }
+  context = current_context; // the POINT14 reader sets context for all other items
 
   // determine changed attributes
 

@@ -560,8 +560,8 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
     }
     // switch context to current scanner channel
     current_context = scanner_channel;
-    context = current_context; // the POINT14 writer sets context for all other items
   }
+  context = current_context; // the POINT14 writer sets context for all other items
 
   // if number of returns is different we compress it
 
