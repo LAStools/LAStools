@@ -1294,9 +1294,11 @@ public:
     seed = rand();
     return ((F32)seed/(F32)RAND_MAX) > fraction;
   };
-  void reset() { seed = 0; };
-  LAScriterionKeepRandomFraction(F32 fraction) { seed = 0; this->fraction = fraction; };
+  void reset() { seed = requested_seed; };
+  LAScriterionKeepRandomFraction(F32 fraction) { requested_seed = seed = 0; this->fraction = fraction; };
+  LAScriterionKeepRandomFraction(U32 seed, F32 fraction) { requested_seed = this->seed = seed; this->fraction = fraction; };
 private:
+  U32 requested_seed;
   U32 seed;
   F32 fraction;
 };
@@ -1698,6 +1700,7 @@ void LASfilter::usage() const
   fprintf(stderr,"Filter points with simple thinning.\n");
   fprintf(stderr,"  -keep_every_nth 2 -drop_every_nth 3\n");
   fprintf(stderr,"  -keep_random_fraction 0.1\n");
+  fprintf(stderr,"  -keep_random_fraction 0.1 4711\n");
   fprintf(stderr,"  -thin_with_grid 1.0\n");
   fprintf(stderr,"  -thin_pulses_with_time 0.0001\n");
   fprintf(stderr,"  -thin_points_with_time 0.000001\n");
@@ -2297,7 +2300,19 @@ BOOL LASfilter::parse(int argc, char* argv[])
             return FALSE;
           }
           add_criterion(new LAScriterionKeepPointSource(atoi(argv[i+1])));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          while (((i+2) < argc) && ('1' <= argv[i+2][0]) && (argv[i+2][0] <= '9'))
+          {
+            *argv[i]='\0';
+            add_criterion(new LAScriterionKeepPointSource(atoi(argv[i+2])));
+            LAScriterion* filter_criterion = new LAScriterionAnd(criteria[num_criteria-2], criteria[num_criteria-1]);
+            num_criteria--;
+            criteria[num_criteria] = 0;
+            num_criteria--;
+            criteria[num_criteria] = 0;
+            add_criterion(filter_criterion);
+            i+=1;
+          } 
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=2;
         }
         else if (strcmp(argv[i],"-keep_point_source_between") == 0)
         {
@@ -2373,8 +2388,16 @@ BOOL LASfilter::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: fraction\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionKeepRandomFraction((F32)atof(argv[i+1])));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        if (((i+2) < argc) && (argv[i+2][0] >= '1') && (argv[i+2][0] <= '9')) // maybe a seed was specified
+        {
+          add_criterion(new LAScriterionKeepRandomFraction((U32)atoi(argv[i+2]), (F32)atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else // no seed was specified
+        {
+          add_criterion(new LAScriterionKeepRandomFraction((F32)atof(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
       }
       else if (strcmp(argv[i],"-keep_scan_direction_change") == 0)
       {
