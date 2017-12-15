@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    15 December 2017 -- optional '-files_are_flightline 101' start number like '-faf 101'
     21 November 2017 -- allow adding up to 32 (from 10) additional extra bytes attributes
      5 August 2017 -- unless '-buffered 25' just created buffers always '-remain_buffered'
      5 August 2017 -- removed option '-unbuffered' because it makes too many assumptions
@@ -174,8 +175,10 @@ public:
   BOOL add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique=FALSE);
   void set_auto_reoffset(const BOOL auto_reoffset);
   inline BOOL is_auto_reoffset() const { return auto_reoffset; };
-  void set_files_are_flightlines(const BOOL files_are_flightlines);
-  inline BOOL are_files_flightlines() const { return files_are_flightlines; };
+  void set_files_are_flightlines(const I32 files_are_flightlines);
+  inline I32 are_files_flightlines() const { return files_are_flightlines; };
+  void set_files_are_flightlines_index(const I32 files_are_flightlines_index);
+  inline I32 get_files_flight_index() const { return files_are_flightlines_index; };
   void set_apply_file_source_ID(const BOOL apply_file_source_ID);
   inline BOOL applying_file_source_ID() const { return apply_file_source_ID; };
   void set_scale_factor(const F64* scale_factor);
@@ -238,7 +241,8 @@ private:
   F64* scale_factor;
   F64* offset;
   BOOL auto_reoffset;
-  BOOL files_are_flightlines;
+  I32 files_are_flightlines;
+  I32 files_are_flightlines_index;
   BOOL apply_file_source_ID;
   BOOL itxt;
   BOOL ipts;
