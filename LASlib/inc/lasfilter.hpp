@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,8 @@
   
   CHANGE HISTORY:
   
+    14 December 2017 -- keep multiple flightlines with '-keep_point_source 2 3 4' 
+    10 December 2017 -- new '-keep_random_fraction 0.2 4711' uses 4711 as seed
     25 December 2010 -- created after swinging in Mara's hammock for hours
   
 ===============================================================================
