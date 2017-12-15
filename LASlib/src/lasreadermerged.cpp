@@ -1288,7 +1288,7 @@ LASreaderMerged::LASreaderMerged()
   lasreadertxt = 0;
   scale_factor = 0;
   offset = 0;
-  files_are_flightlines = FALSE;
+  files_are_flightlines = 0;
   apply_file_source_ID = FALSE;
   parse_string = 0;
   io_ibuffer_size = LAS_TOOLS_IO_IBUFFER_SIZE;
@@ -1440,7 +1440,7 @@ BOOL LASreaderMerged::open_next_file()
     file_name_current++;
     if (files_are_flightlines)
     {
-      transform->setPointSource(file_name_current);
+      transform->setPointSource(file_name_current + files_are_flightlines - 1);
     }
     else if (apply_file_source_ID)
     {
