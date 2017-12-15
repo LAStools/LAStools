@@ -1,10 +1,15 @@
 HALL OF SHAME
 =============
 
-1) [nominee was removed because issue was resolved]
+1) Virginia Geographic Information Network (whose purpose, powers and duties 
+are to facilitate the cost-effective development and use of spatial data, GIS,
+and related technologies throughout the Virginia Commonwealth, to foster the
+creative utilization of geographic information and oversee the development of
+a catalog of GIS data available in the Commonwealth) is nominated for providing
+state-wide LiDAR collected as part of 3DEP as "open data" solely in the closed
+and proprietary vendor format with the file extension *.zlas ...
    
 2) ...
-
 
 
 The "HALL OF SHAME" is our funny-provocative and dicussion-starting way to
@@ -17,9 +22,7 @@ clouds exclusively in closed formats such as *.sid, *.zlas, *.rar, ...
 
 
 
-
 We are taking "HALL OF SHAME" nominations ... (-;
-
 
 
 
