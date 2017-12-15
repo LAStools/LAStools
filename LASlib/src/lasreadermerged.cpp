@@ -450,7 +450,7 @@ void LASreaderMerged::set_offset(const F64* offset)
   }
 }
 
-void LASreaderMerged::set_files_are_flightlines(BOOL files_are_flightlines)
+void LASreaderMerged::set_files_are_flightlines(const I32 files_are_flightlines)
 {
   this->files_are_flightlines = files_are_flightlines;
   // when merging multiple flightlines the merged header must have a file source ID of 0
