@@ -1,3 +1,9 @@
+15 December 2017 -- LASlib: support for auto flightline assignment '-faf' and '-faf 101' even with '-cores 4' 
+14 December 2017 -- LASlib: keep multiple flightlines with '-keep_point_source 2 3 4' 
+10 December 2017 -- LASlib: new argument to '-keep_random_fraction 0.2 4711' uses 4711 as seed
+// 3 December 2017 -- LASzip: minor version incremen to 3.2 as POINT14_v4 fixes context inefficiency bug (DELETED for now)
+ 1 December 2017 -- LASlib: support additional point attributes (aka extra bytes) during '-merged' operations
+30 November 2017 -- las2las: set OGC WKT with '-set_ogc_wkt "PROJCS[\"WGS84\",GEOGCS[\"GCS_ ...". note the many '\'s in front of each '\"'
 22 November 2017 -- las2txt: parse extra bytes attributes with indices larger than 9 by bracketing (12) them 
 21 November 2017 -- txt2las: allow adding up to 32 (from 10) additional extra bytes attributes
 17 November 2017 -- LASlib: new transform '-copy_intensity_into_NIR' (makes only sense for point type 8)
