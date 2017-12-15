@@ -51,8 +51,8 @@ public:
   BOOL add_file_name(const CHAR* file_name);
   void set_scale_factor(const F64* scale_factor);
   void set_offset(const F64* offset);
-  void set_files_are_flightlines(BOOL files_are_flightlines);
-  void set_apply_file_source_ID(BOOL apply_file_source_ID);
+  void set_files_are_flightlines(const I32 files_are_flightlines);
+  void set_apply_file_source_ID(const BOOL apply_file_source_ID);
   void set_translate_intensity(F32 translate_intensity);
   void set_scale_intensity(F32 scale_intensity);
   void set_translate_scan_angle(F32 translate_scan_angle);
@@ -104,7 +104,7 @@ private:
   BOOL reoffset;
   F64* scale_factor;
   F64* offset;
-  BOOL files_are_flightlines;
+  I32 files_are_flightlines;
   BOOL apply_file_source_ID;
   F32 translate_intensity;
   F32 scale_intensity;
