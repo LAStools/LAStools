@@ -1,3 +1,9 @@
+15 December 2017 -- all LAStools: support for auto flightline assignment '-faf' and '-faf 101' even with '-cores 4' 
+14 December 2017 -- all LAStools: keep multiple flightlines with '-keep_point_source 2 3 4' 
+10 December 2017 -- all LAStools: support for auto flightline assignment '-faf' and '-faf 101' even with '-cores 4' 
+// 3 December 2017 -- LASzip: minor version increment to 3.2 as POINT14_v4 fixes context inefficiency bug (DELETED for now)
+ 1 December 2017 -- LASlib: support additional point attributes (aka extra bytes) during '-merged' operations
+30 November 2017 -- las2las: set OGC WKT with '-set_ogc_wkt "PROJCS[\"WGS84\",GEOGCS[\"GCS_ ...". note the '\'
 24 November 2017 -- lascanopy: use option '-height_in_attribute 0' if height is stored as additional attribute
 22 November 2017 -- las2txt: parse extra bytes attributes with indices larger than 9 by bracketing (12) them 
 21 November 2017 -- txt2las: allow adding up to 32 (from 10) additional extra bytes attributes
