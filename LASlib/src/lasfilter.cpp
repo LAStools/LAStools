@@ -2388,7 +2388,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: fraction\n", argv[i]);
           return FALSE;
         }
-        if (((i+2) < argc) && (argv[i+2][0] >= '1') && (argv[i+2][0] <= '9')) // maybe a seed was specified
+        if (((i+2) < argc) && ('1' <= argv[i+2][0]) && (argv[i+2][0] <= '9')) // maybe a seed was specified
         {
           add_criterion(new LAScriterionKeepRandomFraction((U32)atoi(argv[i+2]), (F32)atof(argv[i+1])));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
