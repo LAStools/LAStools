@@ -62,6 +62,7 @@ public:
   BOOL open(const char* file_name, I32 io_buffer_size=LAS_TOOLS_IO_IBUFFER_SIZE, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
   BOOL open(FILE* file, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
   BOOL open(istream& stream, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
+  virtual BOOL open(ByteStreamIn* stream, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
 
   I32 get_format() const;
 
@@ -74,7 +75,6 @@ public:
   virtual ~LASreaderLAS();
 
 protected:
-  virtual BOOL open(ByteStreamIn* stream, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
   virtual BOOL read_point_default();
 
 private:
