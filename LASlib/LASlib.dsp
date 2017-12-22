@@ -177,6 +177,10 @@ SOURCE=.\src\lasreaderpipeon.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\lasreaderstored.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\lasreaditemcompressed_v1.cpp
 # End Source File
 # Begin Source File
@@ -390,6 +394,10 @@ SOURCE=.\inc\lasreadermerged.hpp
 # Begin Source File
 
 SOURCE=.\inc\lasreaderpipeon.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\inc\lasreaderstored.hpp
 # End Source File
 # Begin Source File
 
