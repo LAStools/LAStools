@@ -489,12 +489,12 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
 
   if (ulxmap < F64_MAX)
   {
-    ulxcenter = ulxmap + 0.5*xdim;
+    ulxcenter = ulxmap;
   }
 
   if (ulymap < F64_MAX)
   {
-    ulycenter = ulymap - 0.5*ydim;
+    ulycenter = ulymap;
   }
 
   if ((ncols <= 0) || (nrows <= 0) || (nbands <= 0) || (nbits <= 0))
