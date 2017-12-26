@@ -95,6 +95,7 @@ are classified to class 31 instead of being removed.
 ****************************************************************
 
 overview of all tool-specific switches:
+
 -v                                   : more info reported in console
 -vv                                  : even more info reported in console
 -quiet                               : nothing reported in console
