@@ -79,18 +79,19 @@
 
 example usage:
 
->> lasthin -i *.las
+>> lasthin -i *.las -odix _thinned
 
 thins all LAS files with the grid spacing default of 1 unit
-and keeps the lowest point per grid cell
+and keeps the lowest point per grid cell and forms output file
+names by adding appendix '_thinned' to the input file names.
 
->> lasthin -i *.laz -olaz
+>> lasthin -i *.laz -odix _thinned -olaz
 
-same but with LAZ files
+same as above but with LAZ files
 
->> lasthin -i *.txt -iparse xyzt -otxt -oparse xyzt
+>> lasthin -i *.txt -iparse xyzt -oparse xyzt -odix _thinned -otxt
 
-same but with ASCII files
+same as above but with ASCII files
 
 >> lasthin -i in.las -o out.las
 
@@ -106,6 +107,25 @@ keeps the highest point per grid cell
 
 does point thinning with a grid spacing of 0.5 units and
 keeps a random point per grid cell
+
+>> lasthin -i in.laz -adaptive 0.2 5.0 -o out.laz
+
+thins out all points that can be removed from a TIN without 
+deviating more than 0.2 vertical units from the original while
+keeping the maximum horizontal distance to 5.0 units.
+
+>> lasthin -i in.laz -ignore_class 1 3 4 5 6 7 9 -adaptive 0.1 -classify_as 8 -o out.laz
+
+intends to only operate on ground points (class 8) and classifies
+those points with classification code 8 that form a TIN that deviates
+less than 0.1 vertical units from the original TIN while keeping the
+maximum horizontal distance between points to 10.0 units.
+
+>> lasthin -i in.laz -step 5.0 -percentile 50 20 -classify_as 8 -o out.laz -random
+
+keeps all the points but sets the classification of the point
+that is closest to the 50th percentile in z to 8. this is
+done in each 5.0 unit by 5.0 unit cell with 20 or more points
 
 >> lasthin -i in.laz -step 0.5 -o out.laz -sparse
 
@@ -135,6 +155,43 @@ thins them with a grid spacing of 1 unit
 looks at all the points from all the LAS or LAZ files listed
 in the text file 'file_list.txt', thins them with a grid
 spacing of 1 unit and outputs them compressed to 'combined.laz'
+
+****************************************************************
+
+overview of all tool-specific switches:
+
+-v                                   : more info reported in console
+-vv                                  : even more info reported in console
+-quiet                               : nothing reported in console
+-version                             : reports this tool's version number
+-fail                                : fail if license expired or invalid
+-gui                                 : start with files loaded into GUI
+-cores 4                             : process multiple inputs on 4 cores in parallel
+-step 1.5                            : grid cell size for thinning / classifying / flagging
+                                       default is 2.0
+-ignore_class 1 3 4 5 6 7 9          : ignores points with specified classification codes
+-subcircle 0.1                       : adds a circle of 8 points at radius 0.1 around the input point
+-lowest                              : thins, flags, or classifies the lowest point per cell
+-highest                             : thins, flags, or classifies the highest point per cell
+-random                              : thins, flags, or classifies some random point per cell
+-seed 4711                           : seeds the random generator with 4711
+-central                             : thins, flags, or classifies the point closest to the x/y center of each cell
+-adaptive 0.1 [5.0]                  : thins, flags, or classifies points forming TIN within vertical [and horizontal] tolerance
+-contours 2.0                        : thins, flags, or classifies points per cell that are as far as possible from contour intervals
+-percentile 40 [15]                  : thins, flags, or classifies points closest to 40th percentile in z [if a cell has 15 or more points]
+-gps_time                            : thin on GPS time instead (still in beta)
+-classify_as 8                       : keep all points in file (do not thin) but classify surviving points as 8 instead
+-flag_as_keypoint                    : keep all points in file (do not thin) but flag surviving points as keypoint instead
+-flag_as_withheld                    : keep all points in file (do not thin) but flag surviving points as withheld instead
+-sparse                              : always use hash to map points to cells internally  
+-remain_buffered                     : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-ilay                                : apply all LASlayers found in corresponding *.lay file on read
+-ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
+-ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
+-olay                                : write or append classification changes to a LASlayers *.lay file
+-olaydir E:\my_layers                : write the output *.lay file in directory E:\my_layers
+
+****************************************************************
 
 for more info:
 
