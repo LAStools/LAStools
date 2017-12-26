@@ -56,7 +56,7 @@
 #  ifdef HAVE_UNORDERED_MAP
 #     include <unordered_map>
       using namespace std;
-#  elif UNORDERED_FOUND
+#  elif defined(UNORDERED_FOUND)
 #    include <tr1/unordered_map>
     using namespace std;
     using namespace tr1;
