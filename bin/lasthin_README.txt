@@ -292,6 +292,7 @@ Filter points based on extra attributes.
 Filter points with simple thinning.
   -keep_every_nth 2 -drop_every_nth 3
   -keep_random_fraction 0.1
+  -keep_random_fraction 0.1 4711
   -thin_with_grid 1.0
   -thin_pulses_with_time 0.0001
   -thin_points_with_time 0.000001
@@ -320,6 +321,7 @@ Transform intensity.
   -translate_then_scale_intensity 0.5 3.1
   -clamp_intensity 0 255
   -clamp_intensity_above 255
+  -copy_RGB_into_intensity
   -copy_NIR_into_intensity
 Transform scan_angle.
   -scale_scan_angle 1.944445
@@ -380,10 +382,10 @@ Transform RGB/NIR colors.
   -scale_RGB_down (by 256)
   -scale_RGB_up (by 256)
   -switch_R_G -switch_R_B -switch_B_G
-  -copy_RGB_into_intensity
   -copy_R_into_NIR -copy_R_into_intensity
   -copy_G_into_NIR -copy_G_into_intensity
   -copy_B_into_NIR -copy_B_into_intensity
+  -copy_intensity_into_NIR
 Supported LAS Inputs
   -i lidar.las
   -i lidar.laz
@@ -417,7 +419,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 171030 (academic)
+LAStools (by martin@rapidlasso.com) version 171215 (non-profit)
 usage:
 lasthin -i *.las
 lasthin -i *.laz -olaz
@@ -429,6 +431,8 @@ lasthin -i in.las -ignore_class 3 4 5 6 7 -classify_as 8 -o out.las
 lasthin -i in.las -last_only -step 0.5 -sparse -o out.laz
 lasthin -i in.las -ignore_class 3 4 5 -step 2 -o out.laz
 lasthin -i in.las -random -seed 2 -o out.las
+lasthin -i in.laz -ignore_class 1 3 4 5 6 7 9  -adaptive 0.2 -classify_as 8 -o out.laz
+lasthin -i in.laz -percentile 50 20 -flag_as_keypoint  -o out.laz
 lasthin -i in.laz -ignore_class 2 -subcircle 0.2 -highest -o out.laz
 lasthin -h
 
