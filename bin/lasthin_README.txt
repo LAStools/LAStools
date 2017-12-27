@@ -167,9 +167,9 @@ overview of all tool-specific switches:
 -fail                                : fail if license expired or invalid
 -gui                                 : start with files loaded into GUI
 -cores 4                             : process multiple inputs on 4 cores in parallel
+-ignore_class 1 3 4 5 6 7 9          : ignores points with specified classification codes
 -step 1.5                            : grid cell size for thinning / classifying / flagging
                                        default is 2.0
--ignore_class 1 3 4 5 6 7 9          : ignores points with specified classification codes
 -subcircle 0.1                       : adds a circle of 8 points at radius 0.1 around the input point
 -lowest                              : thins, flags, or classifies the lowest point per cell
 -highest                             : thins, flags, or classifies the highest point per cell
