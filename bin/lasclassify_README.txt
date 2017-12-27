@@ -103,12 +103,12 @@ overview of all tool-specific switches:
 -fail                                : fail if license expired or invalid
 -gui                                 : start with files loaded into GUI
 -cores 4                             : process multiple inputs on 4 cores in parallel
--step 1.5                            : grid cell size for planar / non-planar analysis
-                                       default is 2.0
 -ignore_class 7 18                   : ignores points with specified classification codes
 -ignore_first                        : ignores first returns
 -ignore_last                         : ignores last returns
 -ignore_intermediate                 : ignores intermediate returns
+-step 1.5                            : grid cell size for planar / non-planar analysis
+                                       default is 2.0
 -ground_offset 1.5                   : only points that are 1.5 meters above ground are considered
                                        default is 2.0
 -planar 0.09                         : grid cell points up to this standard deviation are potential roofs
