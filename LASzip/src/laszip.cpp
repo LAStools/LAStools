@@ -238,19 +238,19 @@ bool LASzip::check_item(const LASitem* item)
     break;
   case LASitem::POINT14:
     if (item->size != 30) return return_error("POINT14 has size != 30");
-    if ((item->version != 0) && (item->version != 2) && (item->version != 3)) return return_error("POINT14 has version != 0 and != 2 and != 3"); // version == 2 from lasproto
+    if ((item->version != 0) && (item->version != 2) && (item->version != 3) && (item->version != 4)) return return_error("POINT14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
     break;
   case LASitem::RGB14:
     if (item->size != 6) return return_error("RGB14 has size != 6");
-    if ((item->version != 0) && (item->version != 2) && (item->version != 3)) return return_error("RGB14 has version != 0 and != 2 and != 3"); // version == 2 from lasproto
+    if ((item->version != 0) && (item->version != 2) && (item->version != 3) && (item->version != 4)) return return_error("RGB14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
     break;
   case LASitem::RGBNIR14:
     if (item->size != 8) return return_error("RGBNIR14 has size != 8");
-    if ((item->version != 0) && (item->version != 2) && (item->version != 3)) return return_error("RGBNIR14 has version != 0 and != 2 and != 3"); // version == 2 from lasproto
+    if ((item->version != 0) && (item->version != 2) && (item->version != 3) && (item->version != 4)) return return_error("RGBNIR14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
     break;
   case LASitem::BYTE14:
     if (item->size < 1) return return_error("BYTE14 has size < 1");
-    if ((item->version != 0) && (item->version != 2) && (item->version != 3)) return return_error("BYTE14 has version != 0 and != 2 and != 3"); // version == 2 from lasproto
+    if ((item->version != 0) && (item->version != 2) && (item->version != 3) && (item->version != 4)) return return_error("BYTE14 has version != 0 and != 2 and != 3 and != 4"); // version == 2 from lasproto, version == 4 fixes context-switch
     break;
   case LASitem::WAVEPACKET13:
     if (item->size != 29) return return_error("WAVEPACKET13 has size != 29");
@@ -258,7 +258,7 @@ bool LASzip::check_item(const LASitem* item)
     break;
   case LASitem::WAVEPACKET14:
     if (item->size != 29) return return_error("WAVEPACKET14 has size != 29");
-    if ((item->version != 0) && (item->version != 3)) return return_error("WAVEPACKET14 has version != 0 and != 3");
+    if ((item->version != 0) && (item->version != 3)) return return_error("WAVEPACKET14 has version != 0 and != 3 and != 4"); // version == 4 fixes context-switch
     break;
   default:
     if (1)
