@@ -63,6 +63,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "lasexample_write_only_with_extra_bytes"=.\example\lasexample_write_only_with_extra_bytes.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "laszippertest"=..\LASzip\example\laszippertest.dsp - Package Owner=<4>
 
 Package=<5>
