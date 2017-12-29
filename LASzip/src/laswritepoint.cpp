@@ -36,6 +36,7 @@
 #include "laswriteitemcompressed_v1.hpp"
 #include "laswriteitemcompressed_v2.hpp"
 #include "laswriteitemcompressed_v3.hpp"
+#include "laswriteitemcompressed_v4.hpp"
 
 #include <string.h>
 #include <stdlib.h>
@@ -196,24 +197,32 @@ BOOL LASwritePoint::setup(const U32 num_items, const LASitem* items, const LASzi
       case LASitem::POINT14:
         if (items[i].version == 3)
           writers_compressed[i] = new LASwriteItemCompressed_POINT14_v3(enc);
+        else if (items[i].version == 4)
+          writers_compressed[i] = new LASwriteItemCompressed_POINT14_v4(enc);
         else
           return FALSE;
         break;
       case LASitem::RGB14:
         if (items[i].version == 3)
           writers_compressed[i] = new LASwriteItemCompressed_RGB14_v3(enc);
+        else if (items[i].version == 4)
+          writers_compressed[i] = new LASwriteItemCompressed_RGB14_v4(enc);
         else
           return FALSE;
         break;
       case LASitem::RGBNIR14:
         if (items[i].version == 3)
           writers_compressed[i] = new LASwriteItemCompressed_RGBNIR14_v3(enc);
+        else if (items[i].version == 4)
+          writers_compressed[i] = new LASwriteItemCompressed_RGBNIR14_v4(enc);
         else
           return FALSE;
         break;
       case LASitem::BYTE14:
         if (items[i].version == 3)
           writers_compressed[i] = new LASwriteItemCompressed_BYTE14_v3(enc, items[i].size);
+        else if (items[i].version == 4)
+          writers_compressed[i] = new LASwriteItemCompressed_BYTE14_v4(enc, items[i].size);
         else
           return FALSE;
         break;
@@ -226,6 +235,8 @@ BOOL LASwritePoint::setup(const U32 num_items, const LASitem* items, const LASzi
       case LASitem::WAVEPACKET14:
         if (items[i].version == 3)
           writers_compressed[i] = new LASwriteItemCompressed_WAVEPACKET14_v3(enc);
+        else if (items[i].version == 4)
+          writers_compressed[i] = new LASwriteItemCompressed_WAVEPACKET14_v4(enc);
         else
           return FALSE;
         break;

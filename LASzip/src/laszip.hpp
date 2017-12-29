@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    28 December 2017 -- fix incorrect 'context switch' reported by Wanwannodao 
     23 August 2017 -- minor version increment for C++ stream-based read/write API
     28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
     8 April 2017 -- new check for whether point size and total size of items match
@@ -65,7 +66,7 @@ typedef long long SIGNED_INT64;
 #define LASZIP_VERSION_MAJOR                3
 #define LASZIP_VERSION_MINOR                1
 #define LASZIP_VERSION_REVISION             0
-#define LASZIP_VERSION_BUILD_DATE      170915
+#define LASZIP_VERSION_BUILD_DATE      171229
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1
