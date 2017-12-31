@@ -1,3 +1,5 @@
+28 December 2017 -- LASlib: prepare to correct 'context switch' bug reported by Wanwannodao on some future date
+25 December 2017 -- LASlib: fixed half-pixel shift in on-the-fly-reading of BIL without BLW (ulxmap/ulymap are used)
 15 December 2017 -- LASlib: support for auto flightline assignment '-faf' and '-faf 101' even with '-cores 4' 
 14 December 2017 -- LASlib: keep multiple flightlines with '-keep_point_source 2 3 4' 
 10 December 2017 -- LASlib: new '-keep_random_fraction 0.2 4711' allows seeding the random generator with 4711 
