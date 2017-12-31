@@ -495,6 +495,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "lastrajectory"=.\src_full\lastrajectory.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "lasview"=.\src_full\lasview.dsp - Package Owner=<4>
 
 Package=<5>
