@@ -193,6 +193,10 @@ SOURCE=..\LASzip\src\lasreaditemcompressed_v3.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASzip\src\lasreaditemcompressed_v4.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\lasreadpoint.cpp
 # End Source File
 # Begin Source File
@@ -222,6 +226,10 @@ SOURCE=..\LASzip\src\laswriteitemcompressed_v2.cpp
 # Begin Source File
 
 SOURCE=..\LASzip\src\laswriteitemcompressed_v3.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\laswriteitemcompressed_v4.cpp
 # End Source File
 # Begin Source File
 
@@ -417,6 +425,10 @@ SOURCE=..\LASzip\src\lasreaditemcompressed_v3.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASzip\src\lasreaditemcompressed_v4.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\lasreaditemraw.hpp
 # End Source File
 # Begin Source File
@@ -454,6 +466,10 @@ SOURCE=..\LASzip\src\laswriteitemcompressed_v2.hpp
 # Begin Source File
 
 SOURCE=..\LASzip\src\laswriteitemcompressed_v3.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\laswriteitemcompressed_v4.hpp
 # End Source File
 # Begin Source File
 
