@@ -135,6 +135,66 @@ buildings and other man-made structures.
 the same as above but uses even wider spacing to allow for
 very large buildings.
 
+****************************************************************
+
+overview of all tool-specific switches:
+
+-v                                   : more info reported in console
+-vv                                  : even more info reported in console
+-quiet                               : nothing reported in console
+-wait                                : wait for <ENTER> in the console at end of process
+-version                             : reports this tool's version number
+-fail                                : fail if license expired or invalid
+-gui                                 : start with files loaded into GUI
+-cores 4                             : process multiple inputs on 4 cores in parallel
+-ignore_class 1 3 4 5 6 7 9          : ignores points with specified classification codes
+-step 8.0                            : set resolution of grid used for initial ground to 8.0 [default is 5.0]
+-sub 5                               :
+-offset 0.02                         : offset that points can be above bulged ground TIN and still become ground [default is 0.05]
+-bulge 1.8                           : amount that TIN triangles with sloped neighbourhoods are bulging up or down [default is 
+-no_bulge                            : sets bulge to zero 
+-spike 0.5                           :
+-no_clean                            : do not perform cleaning steps that remove spikes from the current ground TIN estimate
+-stddev 0.1                          :
+-no_stddev                           : sets stddev to zero 
+-not_airborne                        : same as setting these three: '-no_bulge', '-all_returns', and '-stddev 0' 
+-pertube                             :
+-by_flightline
+-iterate 1                           :
+-no_iterate                          : sets max number of refinement loops to zero 
+-refine 3                            :
+-no_refine                           : sets max number of refinement loops to zero 
+-extra_coarse                        :
+-coarse                              :
+-fine                                :
+-extra_fine                          :
+-ultra_fine                          :
+-hyper_fine                          :
+-archeology                          :
+-wilderness                          :
+-nature                              :
+-town                                :
+-city                                :
+-metro                               :
+-ground_class 8                      :
+-non_ground_class 20                 :
+-non_ground_unchanged                :
+-all_returns                         :
+-extra_pass                          :
+-cutoff_z_above 180.0                : points above this elevation are completely excluded from ground search
+-compute_height                      : 
+-replace_z                           :
+-store_in_user_data                  :
+-skip_files                          : skip (instead of the default copy) files that have an insufficient number of ground points
+-remain_buffered                     : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-ilay                                : apply all LASlayers found in corresponding *.lay file on read
+-ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
+-ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
+-olay                                : write or append classification changes to a LASlayers *.lay file
+-olaydir E:\my_layers                : write the output *.lay file in directory E:\my_layers
+
+****************************************************************
+
 for more info:
 
 C:\lastools\bin>lasground -h
