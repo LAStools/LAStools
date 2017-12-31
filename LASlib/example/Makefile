@@ -13,7 +13,7 @@ INCLUDE  = -I/usr/include
 LASLIBS     = -L../lib
 LASINCLUDE  = -I../../LASzip/src -I../inc
 
-all: lasexample lasexample_write_only lasexample_add_rgb lasexample_simple_classification
+all: lasexample lasexample_write_only lasexample_add_rgb lasexample_simple_classification lasexample_write_only_with_extra_bytes
 
 lasexample: lasexample.o
 	${LINKER} ${BITS} ${COPTS} lasexample.o -llas -o $@ ${LIBS} ${LASLIBS} $(INCLUDE) $(LASINCLUDE)
@@ -27,6 +27,9 @@ lasexample_add_rgb: lasexample_add_rgb.o
 lasexample_simple_classification: lasexample_simple_classification.o
 	${LINKER} ${BITS} ${COPTS} lasexample_simple_classification.o -llas -o $@ ${LIBS} ${LASLIBS} $(INCLUDE) $(LASINCLUDE)
 
+lasexample_write_only_with_extra_bytes: lasexample_write_only_with_extra_bytes.o
+	${LINKER} ${BITS} ${COPTS} lasexample_write_only_with_extra_bytes.o -llas -o $@ ${LIBS} ${LASLIBS} $(INCLUDE) $(LASINCLUDE)
+
 .cpp.o: 
 	${COMPILER} ${BITS} -c ${COPTS} ${INCLUDE} $(LASINCLUDE) $< -o $@
 
@@ -35,9 +38,9 @@ lasexample_simple_classification: lasexample_simple_classification.o
 
 clean:
 	rm -rf *.o
-	rm -rf lasexample lasexample_write_only lasexample_add_rgb
+	rm -rf lasexample lasexample_write_only lasexample_add_rgb lasexample_simple_classification lasexample_write_only_with_extra_bytes
 
 clobber:
 	rm -rf *.o
-	rm -rf lasexample lasexample_write_only lasexample_add_rgb
+	rm -rf lasexample lasexample_write_only lasexample_add_rgb lasexample_simple_classification lasexample_write_only_with_extra_bytes
 	rm -rf *~
