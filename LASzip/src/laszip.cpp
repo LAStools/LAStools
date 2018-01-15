@@ -284,7 +284,7 @@ bool LASzip::check_items(const U16 num_items, const LASitem* items, const U16 po
   }
   if (point_size && (point_size != size))
   {
-    CHAR temp[64];
+    CHAR temp[66];
     sprintf(temp, "point has size of %d but items only add up to %d bytes", point_size, size);
     return return_error(temp);
   }
