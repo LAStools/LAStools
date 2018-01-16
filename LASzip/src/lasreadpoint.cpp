@@ -132,7 +132,7 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
         readers_raw[i] = new LASreadItemRaw_GPSTIME11_LE();
       else
         readers_raw[i] = new LASreadItemRaw_GPSTIME11_BE();
-        break;
+       break;
     case LASitem::RGB12:
     case LASitem::RGB14:
       if (IS_LITTLE_ENDIAN())
