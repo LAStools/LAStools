@@ -206,6 +206,7 @@ Filter points based on extra attributes.
 Filter points with simple thinning.
   -keep_every_nth 2 -drop_every_nth 3
   -keep_random_fraction 0.1
+  -keep_random_fraction 0.1 4711
   -thin_with_grid 1.0
   -thin_pulses_with_time 0.0001
   -thin_points_with_time 0.000001
@@ -234,6 +235,7 @@ Transform intensity.
   -translate_then_scale_intensity 0.5 3.1
   -clamp_intensity 0 255
   -clamp_intensity_above 255
+  -copy_RGB_into_intensity
   -copy_NIR_into_intensity
 Transform scan_angle.
   -scale_scan_angle 1.944445
@@ -269,7 +271,10 @@ Modify the extended scanner channel.
   -copy_user_data_into_scanner_channel
 Modify the user data.
   -set_user_data 0
+  -scale_user_data 1.5
   -change_user_data_from_to 23 26
+  -change_user_data_from_to 23 26
+  -copy_attribute_into_user_data 1
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
@@ -294,6 +299,7 @@ Transform RGB/NIR colors.
   -copy_R_into_NIR -copy_R_into_intensity
   -copy_G_into_NIR -copy_G_into_intensity
   -copy_B_into_NIR -copy_B_into_intensity
+  -copy_intensity_into_NIR
 Supported LAS Inputs
   -i lidar.las
   -i lidar.laz
@@ -327,7 +333,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 170419
+LAStools (by martin@rapidlasso.com) version 180131
 Supported ASCII Inputs:
   -i lidar.txt
   -i lidar.txt.gz
@@ -357,7 +363,11 @@ n - number of returns of given pulse, r - number
 of return, c - classification, u - user data, and
 p - point source ID, e - edge of flight line flag, and
 d - direction of scan flag, R - red channel of RGB
-color, G - green channel, B - blue channel
+color, G - green channel, B - blue channel, I - NIR channel,
+l - scanner channel, o - overlap flag, h - withheld
+flag, k - keypoint flag, g - synthetic flag, 0 - first
+additional attribute specified, 1 - second additional
+attribute specified, 2 - third ...
 ---------------------------------------------
 Other parameters are
 '-set_scale 0.05 0.05 0.001'
