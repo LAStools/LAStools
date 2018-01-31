@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
       }
       if ((i+1) < argc)
       {
-        if (argv[i+1][0] != '-')
+        if ((argv[i+1][0] != '-') && (argv[i+1][0] != '\0'))
         {
           set_ogc_wkt_string = argv[i+1];
           i++;
