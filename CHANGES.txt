@@ -1,3 +1,7 @@
+31 January 2017 -- many LAStools: improved command-line parsing for select tools and select argument combinations
+31 January 2017 -- las2las: fix proper functioning of '-set_ogc_wkt' for certain command line argument combinations
+30 January 2017 -- txt2las and LASlib: use 'I' to parse NIR channel and 'J' to parse hexadecimal intensities
+3 January 2017 -- lasgrid, las2dem, lascanopy: actually turn on compression when writing rasters as LAZ files 
 28 December 2017 -- all LAStools: prepare to correct 'context switch' bug reported by Wanwannodao on some future date
 25 December 2017 -- all LAStools: fixed half-pixel shift in on-the-fly-reading of BIL without BLW (ulxmap/ulymap are used)
 25 December 2017 -- lascanopy: support appendix in output file names '-odix _blub_blub' in addition to abbreviated metrics
