@@ -1,3 +1,5 @@
+31 January 2017 -- las2las: fix proper functioning of '-set_ogc_wkt' for certain command line argument combinations
+30 January 2017 -- txt2las and LASlib: use 'I' to parse NIR channel and 'J' to parse hexadecimal intensities
 28 December 2017 -- LASlib: prepare to correct 'context switch' bug reported by Wanwannodao on some future date
 25 December 2017 -- LASlib: fixed half-pixel shift in on-the-fly-reading of BIL without BLW (ulxmap/ulymap are used)
 15 December 2017 -- LASlib: support for auto flightline assignment '-faf' and '-faf 101' even with '-cores 4' 
