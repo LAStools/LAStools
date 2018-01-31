@@ -1319,6 +1319,14 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       point.rgb[2] = (short)temp_i;
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
     }
+    else if (p[0] == 'I') // we expect the NIR channel of LAS 1.4 point type 8
+    {
+      while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+      if (l[0] == 0) return FALSE;
+      if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+      point.rgb[3] = (short)temp_i;
+      while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+    }
     else if (p[0] == 's') // we expect a string or a number that we don't care about
     {
       while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
@@ -1539,7 +1547,7 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       l+=6;
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
     }
-    else if (p[0] == 'I') // we expect a hexadecimal coded intensity
+    else if (p[0] == 'J') // we expect a hexadecimal coded intensity
     {
       I32 hex_value;
       while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';' || l[0] == '\"')) l++; // first skip white spaces and quotes
@@ -1570,6 +1578,7 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
         (p[0] != 'R') && // we expect the red channel of the RGB field
         (p[0] != 'G') && // we expect the green channel of the RGB field
         (p[0] != 'B') && // we expect the blue channel of the RGB field
+        (p[0] != 'I') && // we expect the NIR channel
         (p[0] != 's') && // we expect a string or a number that we don't care about
         (p[0] != 'i') && // we expect the intensity
         (p[0] != 'a') && // we expect the scan angle
@@ -1586,8 +1595,8 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
         (p[0] != 'p') && // we expect the point source ID
         (p[0] != 'e') && // we expect the edge of flight line flag
         (p[0] != 'd') && // we expect the direction of scan flag
-        (p[0] != 'H') && // we expect a hexadecimal coded RGB color
-        (p[0] != 'I'))   // we expect a hexadecimal coded intensity
+        (p[0] != 'H') && // we expect hexadecimal coded RGB(I) colors
+        (p[0] != 'J'))   // we expect a hexadecimal coded intensity
     {
       if ((p[0] >= '0') && (p[0] <= '9'))
       {
@@ -1638,6 +1647,7 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
         fprintf(stderr, "       'R' : the <R>ed channel of the RGB field\n");
         fprintf(stderr, "       'G' : the <G>reen channel of the RGB field\n");
         fprintf(stderr, "       'B' : the <B>lue channel of the RGB field\n");
+        fprintf(stderr, "       'I' : the N<I>R channel of LAS 1.4 point type 8\n");
         fprintf(stderr, "       's' : <s>kip a string or a number that we don't care about\n");
         fprintf(stderr, "       'i' : the <i>ntensity\n");
         fprintf(stderr, "       'a' : the scan <a>ngle\n");
@@ -1646,8 +1656,8 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
         fprintf(stderr, "       'h' : the with<h>eld flag\n");
         fprintf(stderr, "       'k' : the <k>eypoint flag\n");
         fprintf(stderr, "       'g' : the synthetic fla<g>\n");
-        fprintf(stderr, "       'o' : the <o>verlap flag\n");
-        fprintf(stderr, "       'l' : the scanner channe<l>\n");
+        fprintf(stderr, "       'o' : the <o>verlap flag of LAS 1.4 point types 6, 7, 8\n");
+        fprintf(stderr, "       'l' : the scanner channe<l> of LAS 1.4 point types 6, 7, 8\n");
         fprintf(stderr, "       'E' : terrasolid <E>hco Encoding\n");
         fprintf(stderr, "       'c' : the <c>lassification\n");
         fprintf(stderr, "       'u' : the <u>ser data\n");
@@ -1657,7 +1667,7 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
         fprintf(stderr, "   '0'-'9' : additional attributes described as extra bytes (0 through 9)\n");
         fprintf(stderr, "    '(13)' : additional attributes described as extra bytes (10 and up)\n");
         fprintf(stderr, "       'H' : a hexadecimal string encoding the RGB color\n");
-        fprintf(stderr, "       'I' : a hexadecimal string encoding the intensity\n");
+        fprintf(stderr, "       'J' : a hexadecimal string encoding the intensity\n");
         return FALSE;
       }
     }
