@@ -1378,7 +1378,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
         add_file_name(argv[i], unique);
         *argv[i]='\0';
         i+=1;
-      } while (i < argc && *argv[i] != '-');
+      } while ((i < argc) && (*argv[i] != '-') && (*argv[i] != '\0'));
       i-=1;
     }
     else if (strcmp(argv[i],"-unique") == 0)
@@ -1686,7 +1686,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
         add_neighbor_file_name(argv[i]);
         *argv[i]='\0';
         i+=1;
-      } while (i < argc && *argv[i] != '-');
+      } while ((i < argc) && (*argv[i] != '-') && (*argv[i] != '\0'));
       i-=1;
     }
     else if (strcmp(argv[i],"-neighbors_lof") == 0)
