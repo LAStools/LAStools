@@ -1,3 +1,4 @@
+ 9 February 2018 -- LASlib: new LASreaderStored supports stdin/stdout piping for multi-pass tools
 31 January 2017 -- las2las: fix proper functioning of '-set_ogc_wkt' for certain command line argument combinations
 30 January 2017 -- txt2las and LASlib: use 'I' to parse NIR channel and 'J' to parse hexadecimal intensities
 28 December 2017 -- LASlib: prepare to correct 'context switch' bug reported by Wanwannodao on some future date
@@ -5,7 +6,7 @@
 15 December 2017 -- LASlib: support for auto flightline assignment '-faf' and '-faf 101' even with '-cores 4' 
 14 December 2017 -- LASlib: keep multiple flightlines with '-keep_point_source 2 3 4' 
 10 December 2017 -- LASlib: new '-keep_random_fraction 0.2 4711' allows seeding the random generator with 4711 
-// 3 December 2017 -- LASzip: minor version incremen to 3.2 as POINT14_v4 fixes context inefficiency bug (DELETED for now)
+// 3 December 2017 -- LASzip: minor version increment to 3.2 as POINT14_v4 fixes context inefficiency bug (DELETED for now)
  1 December 2017 -- LASlib: support additional point attributes (aka extra bytes) during '-merged' operations
 30 November 2017 -- las2las: set OGC WKT with '-set_ogc_wkt "PROJCS[\"WGS84\",GEOGCS[\"GCS_ ...". note the many '\'s in front of each '\"'
 22 November 2017 -- las2txt: parse extra bytes attributes with indices larger than 9 by bracketing (12) them 

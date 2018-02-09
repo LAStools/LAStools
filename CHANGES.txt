@@ -1,3 +1,5 @@
+ 9 February 2018 -- lassort: support for applying LASlayers with '-ilay' on read 
+ 9 February 2018 -- many LAStools: support stdin/stdout piping for multi-pass tools like lasground, lasnoise, ...
 31 January 2017 -- many LAStools: improved command-line parsing for select tools and select argument combinations
 31 January 2017 -- las2las: fix proper functioning of '-set_ogc_wkt' for certain command line argument combinations
 30 January 2017 -- txt2las and LASlib: use 'I' to parse NIR channel and 'J' to parse hexadecimal intensities
