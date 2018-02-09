@@ -1200,13 +1200,13 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
   return TRUE;
 }
 
-I64 LASwriterLAS::close(BOOL update_header)
+I64 LASwriterLAS::close(BOOL update_npoints)
 {
   I64 bytes = 0;
 
   if (p_count != npoints)
   {
-    if (npoints || !update_header)
+    if (npoints || !update_npoints)
     {
 #ifdef _WIN32
       fprintf(stderr,"WARNING: written %I64d points but expected %I64d points\n", p_count, npoints);
@@ -1296,7 +1296,7 @@ I64 LASwriterLAS::close(BOOL update_header)
 
   if (stream)
   {
-    if (update_header && p_count != npoints)
+    if (update_npoints && p_count != npoints)
     {
       if (!stream->isSeekable())
       {
@@ -1339,7 +1339,10 @@ I64 LASwriterLAS::close(BOOL update_header)
       }
     }
     bytes = stream->tell() - header_start_position;
-    delete stream;
+    if (delete_stream)
+    {
+      delete stream;
+    }
     stream = 0;
   }
 
@@ -1359,6 +1362,7 @@ LASwriterLAS::LASwriterLAS()
 {
   file = 0;
   stream = 0;
+  delete_stream = TRUE;
   writer = 0;
   writing_las_1_4 = FALSE;
   writing_new_point_type = FALSE;

@@ -247,13 +247,13 @@ BOOL LASwriterBIN::update_header(const LASheader* header, BOOL use_inventory, BO
   return TRUE;
 }
 
-I64 LASwriterBIN::close(BOOL update_header)
+I64 LASwriterBIN::close(BOOL update_npoints)
 {
   I64 bytes = 0;
   
   if (stream)
   {
-    if (update_header && p_count != npoints)
+    if (update_npoints && p_count != npoints)
     {
       if (!stream->isSeekable())
       {

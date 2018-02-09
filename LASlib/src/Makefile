@@ -8,7 +8,7 @@ AR  = ar rc
 
 INCLUDE		= -I/usr/include/ -I../../LASzip/src -I../inc -I.
 
-OBJ_LAS		= lasreader.o laswriter.o lasreader_las.o lasreader_bin.o lasreader_qfit.o lasreader_shp.o lasreader_asc.o lasreader_bil.o lasreader_dtm.o lasreader_txt.o lasreadermerged.o lasreaderbuffered.o lasreaderpipeon.o laswriter_las.o laswriter_bin.o laswriter_qfit.o laswriter_wrl.o laswriter_txt.o laswritercompatible.o laswaveform13reader.o laswaveform13writer.o lasutility.o lasfilter.o lastransform.o fopen_compressed.o
+OBJ_LAS		= lasreader.o laswriter.o lasreader_las.o lasreader_bin.o lasreader_qfit.o lasreader_shp.o lasreader_asc.o lasreader_bil.o lasreader_dtm.o lasreader_txt.o lasreadermerged.o lasreaderbuffered.o lasreaderstored.o lasreaderpipeon.o laswriter_las.o laswriter_bin.o laswriter_qfit.o laswriter_wrl.o laswriter_txt.o laswritercompatible.o laswaveform13reader.o laswaveform13writer.o lasutility.o lasfilter.o lastransform.o fopen_compressed.o
 
 OBJ_LAZ		= ../../LASzip/src/laszip.o ../../LASzip/src/lasreadpoint.o ../../LASzip/src/lasreaditemcompressed_v1.o ../../LASzip/src/lasreaditemcompressed_v2.o ../../LASzip/src/lasreaditemcompressed_v3.o ../../LASzip/src/lasreaditemcompressed_v4.o ../../LASzip/src/laswritepoint.o  ../../LASzip/src/laswriteitemcompressed_v1.o ../../LASzip/src/laswriteitemcompressed_v2.o ../../LASzip/src/laswriteitemcompressed_v3.o ../../LASzip/src/laswriteitemcompressed_v4.o ../../LASzip/src/integercompressor.o ../../LASzip/src/arithmeticdecoder.o ../../LASzip/src/arithmeticencoder.o ../../LASzip/src/arithmeticmodel.o ../../LASzip/src/lasindex.o ../../LASzip/src/lasquadtree.o ../../LASzip/src/lasinterval.o 
 
