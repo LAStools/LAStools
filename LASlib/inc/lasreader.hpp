@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+     8 February 2018 -- new LASreaderStored via '-stored' option to allow piped operation
     15 December 2017 -- optional '-files_are_flightline 101' start number like '-faf 101'
     21 November 2017 -- allow adding up to 32 (from 10) additional extra bytes attributes
      5 August 2017 -- unless '-buffered 25' just created buffers always '-remain_buffered'
@@ -169,6 +170,8 @@ public:
   I32 get_file_format(U32 number) const;
   void set_merged(const BOOL merged);
   BOOL is_merged() const { return merged; };
+  void set_stored(const BOOL stored);
+  BOOL is_stored() const { return stored; };
   void set_buffer_size(const F32 buffer_size);
   F32 get_buffer_size() const;
   void set_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique=FALSE);
@@ -229,6 +232,7 @@ private:
   CHAR** file_names;
   const CHAR* file_name;
   BOOL merged;
+  BOOL stored;
   U32 file_name_number;
   U32 file_name_allocated;
   U32 file_name_current;

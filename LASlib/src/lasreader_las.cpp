@@ -1411,7 +1411,10 @@ void LASreaderLAS::close(BOOL close_stream)
   {
     if (stream)
     {
-      delete stream;
+      if (delete_stream)
+      {
+        delete stream;
+      }
       stream = 0;
     }
     if (file)
@@ -1426,6 +1429,7 @@ LASreaderLAS::LASreaderLAS()
 {
   file = 0;
   stream = 0;
+  delete_stream = TRUE;
   reader = 0;
 }
 

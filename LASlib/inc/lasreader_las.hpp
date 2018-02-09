@@ -59,6 +59,8 @@ class LASreaderLAS : public LASreader
 {
 public:
 
+  void set_delete_stream(BOOL delete_stream=TRUE) { this->delete_stream = delete_stream; };
+
   BOOL open(const char* file_name, I32 io_buffer_size=LAS_TOOLS_IO_IBUFFER_SIZE, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
   BOOL open(FILE* file, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
   BOOL open(istream& stream, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
@@ -80,6 +82,7 @@ protected:
 private:
   FILE* file;
   ByteStreamIn* stream;
+  BOOL delete_stream;
   LASreadPoint* reader;
   BOOL checked_end;
 };
