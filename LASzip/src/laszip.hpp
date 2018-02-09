@@ -14,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    9 February 2018 -- minor version increment as it can read v4 compressed items
     28 December 2017 -- fix incorrect 'context switch' reported by Wanwannodao 
     23 August 2017 -- minor version increment for C++ stream-based read/write API
     28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
