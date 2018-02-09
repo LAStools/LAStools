@@ -94,7 +94,11 @@ void usage(bool error=false, bool wait=false)
   fprintf(stderr,"of return, c - classification, u - user data, and\n");
   fprintf(stderr,"p - point source ID, e - edge of flight line flag, and\n");
   fprintf(stderr,"d - direction of scan flag, R - red channel of RGB\n");
-  fprintf(stderr,"color, G - green channel, B - blue channel\n");
+  fprintf(stderr,"color, G - green channel, B - blue channel, I - NIR channel,\n");
+  fprintf(stderr,"l - scanner channel, o - overlap flag, h - withheld\n");
+  fprintf(stderr,"flag, k - keypoint flag, g - synthetic flag, 0 - first\n");
+  fprintf(stderr,"additional attribute specified, 1 - second additional\n");
+  fprintf(stderr,"attribute specified, 2 - third ...\n");
   fprintf(stderr,"---------------------------------------------\n");
   fprintf(stderr,"Other parameters are\n");
   fprintf(stderr,"'-set_scale 0.05 0.05 0.001'\n");
