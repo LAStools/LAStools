@@ -474,6 +474,20 @@ private:
   U16 above;
 };
 
+class LASoperationCopyAttributeIntoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_attribute_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline void transform(LASpoint* point) {
+    F64 intensity = point->get_attribute_as_float(index);
+    point->set_intensity(U16_CLAMP(intensity));
+  };
+  LASoperationCopyAttributeIntoIntensity(I32 index) { this->index = index; };
+private:
+  I32 index;
+};
+
 class LASoperationScaleScanAngle : public LASoperation
 {
 public:
@@ -1306,6 +1320,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -clamp_intensity_above 255\n");
   fprintf(stderr,"  -copy_RGB_into_intensity\n");
   fprintf(stderr,"  -copy_NIR_into_intensity\n");
+  fprintf(stderr,"  -copy_attribute_into_intensity 0\n");
   fprintf(stderr,"Transform scan_angle.\n");
   fprintf(stderr,"  -scale_scan_angle 1.944445\n");
   fprintf(stderr,"  -translate_scan_angle -5\n");
@@ -1699,6 +1714,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
             return FALSE;
           }
           add_operation(new LASoperationCopyAttributeIntoUserData(atoi(argv[i+1])));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        }
+        else if (strcmp(argv[i],"-copy_attribute_into_intensity") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
+            return FALSE;
+          }
+          add_operation(new LASoperationCopyAttributeIntoIntensity(atoi(argv[i+1])));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
       }
