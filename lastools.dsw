@@ -519,6 +519,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "lasvoxel"=.\src_full\lasvoxel.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "laswires"=.\src_full\laswires.dsp - Package Owner=<4>
 
 Package=<5>
