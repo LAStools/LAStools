@@ -867,8 +867,22 @@ void LASreaderBIL::populate_scale_and_offset()
     }
     else // then we assume utm or mercator / lambertian projections
     {
-      header.x_scale_factor = 0.01;
-      header.y_scale_factor = 0.01;
+      if (xdim >= 0.5f)
+      {
+        header.x_scale_factor = 0.01;
+      }
+      else
+      {
+        header.x_scale_factor = 0.001;
+      }
+      if (ydim >= 0.5f)
+      {
+        header.y_scale_factor = 0.01;
+      }
+      else
+      {
+        header.y_scale_factor = 0.001;
+      }
     }
     header.z_scale_factor = 0.01;
   }
