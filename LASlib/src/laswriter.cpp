@@ -439,7 +439,7 @@ BOOL LASwriteOpener::set_directory(const CHAR* directory)
     }
     this->directory = strdup(directory);
     int len = strlen(this->directory);
-    if ((len > 0) && ((this->directory[len-1] == '\\') || (this->directory[len-1] == '/') || (this->directory[len-1] == ':')))
+    if ((len > 0) && ((this->directory[len-1] == '\\') || (this->directory[len-1] == '/')))
     {
       this->directory[len-1] = '\0';
     }
@@ -447,15 +447,18 @@ BOOL LASwriteOpener::set_directory(const CHAR* directory)
 
     // return FALSE if it does not exist or is no directory
 
-    struct stat info;
+    if ((len > 0) && (this->directory[len-1] != ':'))
+    {
+      struct stat info;
 
-    if (stat(this->directory, &info) != 0)
-    {
-      return FALSE;
-    }
-    else if (!(info.st_mode & S_IFDIR))
-    {
-      return FALSE;
+      if (stat(this->directory, &info) != 0)
+      {
+        return FALSE;
+      }
+      else if (!(info.st_mode & S_IFDIR))
+      {
+        return FALSE;
+      }
     }
   }
   else
