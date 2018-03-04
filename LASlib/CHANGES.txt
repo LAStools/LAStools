@@ -1,3 +1,6 @@
+28 February 2017 -- LASlib, all LAStools: now '-set_RGB_of_class' also works for classifications > 31
+24 February 2018 -- las2las: automatically move eligible EVLRs to VLR section when downgrading LAS 1.4
+23 February 2018 -- las2las: bug fix when downgrading LAS 1.4 with new point types via '-set_version 1.3'
  9 February 2018 -- LASlib: new LASreaderStored supports stdin/stdout piping for multi-pass tools
 31 January 2017 -- las2las: fix proper functioning of '-set_ogc_wkt' for certain command line argument combinations
 30 January 2017 -- txt2las and LASlib: use 'I' to parse NIR channel and 'J' to parse hexadecimal intensities
