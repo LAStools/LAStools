@@ -219,6 +219,12 @@ overview of all tool-specific switches:
 -suppress_user_data                  : don't decompress RGB for native-compressed LAS 1.4 point types 6 or higher
 -suppress_point_source               : don't decompress RGB for native-compressed LAS 1.4 point types 6 or higher
 -suppress_RGB                        : don't decompress RGB for native-compressed LAS 1.4 point types 6 or higher
+-background_black                    : start viewer with a black background
+-background_white                    : start viewer with a white background
+-background_grey                     : start viewer with a grey background
+-background_red                      : start viewer with a red background
+-background_green                    : start viewer with a green background
+-background_blue                     : start viewer with a blue background
 -ilay                                : apply all LASlayers found in corresponding *.lay file on read
 -ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
 -ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers

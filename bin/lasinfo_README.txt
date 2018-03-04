@@ -209,6 +209,58 @@ without checking whether this will corrupt the file.
 CAREFUL! sets the start of waveform data packet record field of the LAS header
 to 0 without checking whether this will corrupt the file.
 
+****************************************************************
+
+overview of all tool-specific switches:
+
+-v                                   : more info reported in console
+-vv                                  : even more info reported in console
+-quiet                               : nothing reported in console
+-wait                                : wait for <ENTER> in the console at end of process
+-version                             : reports this tool's version number
+-fail                                : fail if license expired or invalid
+-gui                                 : start with files loaded into GUI
+-cores 4                             : process multiple inputs on 4 cores in parallel
+-nh or -no_header                    : don't output LAS header information
+-nv or -no_vlrs                      : don't output VLR information
+-nr or -no_returns                   : don't output return information
+-nmm or -no_min_max                  : don't output point minimum / maximum entry information
+-nc or -no_check                     : don't parse points (only check header and VLRs)
+-cd or -compute_density              : compute rough approximation for covered area, density, and spacing
+-gw or -gps_week                     : compute the GPS week (if data is Asjusted Standard GPS time)
+-nco or -no_check_outside            : don't check whether points fall outside of LAS header bounding box
+-ro or -report_outside               : report attributes of each point that falls outside of LAS header bounding box
+-subseq 1000000 2000000              : only load subsequence from 1 millionth to 2 millionth point
+-start_at_point 1500000              : start loading from point at position 1500000 in the file
+-stop_at_point 5000000               : stop loading points once the 5 millionth point was read
+-repaid_bb                           : set (in place) the bounding box in header such that it tightly enclose the points in the file
+-repair_counters                     : set (in place) the counters for point number and (extended) return histograms in header
+-repair                              : repair both bounding box and counters
+-auto_date                           : set (in place) creation year / day of year in header automatically based on file creation date
+-set_file_source_ID 23               : set (in place) file source ID in header to 23
+-set_file_source_ID_from_point_source_ID : set (in place) file source ID in header to value that *all* points have in point source ID
+-set_GUID F794F8A4-A23E-421E-A134-ACF7754E1C54 : sets the GUID in header (assuming it is given in example hexadecimal format shown)
+-set_system_identifier
+-set_generating_software
+-set_bb
+-set_offset
+-set_scale
+-set_global_encoding
+-set_version
+-set_creation_date
+-set_number_of_point_records
+-set_number_of_points_by_return
+-set_header_size
+-set_offset_to_point_data
+-set_number_of_variable_length_records
+-set_point_data_format
+-set_point_data_record_length
+-set_start_of_waveform_data_packet_record
+
+-progress
+
+****************************************************************
+
 for more info:
 
 D:\LAStools\bin>lasinfo -h
