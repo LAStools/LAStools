@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -1057,6 +1057,18 @@ private:
   U16 RGB[3];
 };
 
+class LASoperationSetRGBofExtendedClass : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_RGB_of_class"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d %d ", name(), c, RGB[0], RGB[1], RGB[2]); };
+  inline void transform(LASpoint* point) { if (point->get_extended_classification() == c) point->set_RGB(RGB); };
+  LASoperationSetRGBofExtendedClass(U8 c, U16 R, U16 G, U16 B) { this->c = c; RGB[0] = R; RGB[1] = G; RGB[2] = B; };
+private:
+  U8 c;
+  U16 RGB[3];
+};
+
 class LASoperationScaleRGB : public LASoperation
 {
 public:
@@ -1991,7 +2003,10 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs class between 0 and 255 but got %d\n", argv[i], c);
             return FALSE;
           }
-          add_operation(new LASoperationSetRGBofClass((U8)c, (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3]), (U16)atoi(argv[i+4])));
+          if (c < 32)
+            add_operation(new LASoperationSetRGBofClass((U8)c, (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3]), (U16)atoi(argv[i+4])));
+          else
+            add_operation(new LASoperationSetRGBofExtendedClass((U8)c, (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3]), (U16)atoi(argv[i+4])));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
         }
       }
