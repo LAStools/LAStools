@@ -1,3 +1,4 @@
+ 9 February 2018 -- minor version increment to 3.2 as POINT14_v4 fixes context inefficiency bug
 28 December 2017 -- prepare to correct 'context switch' bug reported by Wanwannodao on some future date
 15 September 2017 -- new C++ istream / ostream interface completed and released
 22 August 2017 -- new C++ istream / ostream interface 
