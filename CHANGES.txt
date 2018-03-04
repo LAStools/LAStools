@@ -1,3 +1,9 @@
+ 3 March 2018 -- lasboundary, lascanopy: use file name from output rollout of the GUI for meaningful modes
+28 February 2017 -- LASlib, all LAStools: now '-set_RGB_of_class' also works for classifications > 31
+24 February 2018 -- las2las: automatically move eligible EVLRs to VLR section when downgrading LAS 1.4
+23 February 2018 -- las2las: bug fix when downgrading LAS 1.4 with new point types via '-set_version 1.3'
+14 February 2018 -- lasview: expose possibility to visualize workings of "spike-free" algorithm via the GUI
+14 February 2018 -- lasgrid, lascanopy, las2dem: now CSV files represent "no_data" with ",," instead of ",-,"
  9 February 2018 -- lassort: support for applying LASlayers with '-ilay' on read 
  9 February 2018 -- many LAStools: support stdin/stdout piping for multi-pass tools like lasground, lasnoise, ...
 31 January 2017 -- many LAStools: improved command-line parsing for select tools and select argument combinations
