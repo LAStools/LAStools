@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 180209
+#define LAS_TOOLS_VERSION 180303
 
 #include <stdio.h>
 #include <string.h>
@@ -288,6 +288,11 @@ public:
   void set_global_encoding_bit(I32 bit)
   {
     global_encoding |= (1 << bit);
+  }
+
+  void unset_global_encoding_bit(I32 bit)
+  {
+    global_encoding &= ~(1 << bit);
   }
 
   BOOL get_global_encoding_bit(I32 bit) const
