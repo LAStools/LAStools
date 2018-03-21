@@ -34,6 +34,8 @@
 #ifndef LAS_POINT_HPP
 #define LAS_POINT_HPP
 
+#include <utility>
+
 #include "lasquantizer.hpp"
 #include "lasattributer.hpp"
 
@@ -713,6 +715,91 @@ public:
   {
     clean();
   };
+
+  LASpoint(LASpoint&& other)
+  {
+      *this = std::move(other);
+  }
+
+  LASpoint& operator = (LASpoint&& other)
+  {
+      X = other.X;
+      Y = other.Y;
+      Z = other.Z;
+      intensity = other.intensity;
+      return_number = other.return_number;
+      number_of_returns = other.number_of_returns;
+      scan_direction_flag = other.scan_direction_flag;
+      edge_of_flight_line = other.edge_of_flight_line;
+      classification = other.classification;
+      synthetic_flag = other.synthetic_flag;
+      keypoint_flag = other.keypoint_flag;
+      withheld_flag = other.withheld_flag;
+      scan_angle_rank = other.scan_angle_rank;
+      user_data = other.user_data;
+      point_source_ID = other.point_source_ID;
+      deleted_flag = other.deleted_flag;
+
+      if (other.have_gps_time)
+      {
+        gps_time = other.gps_time;
+      }
+
+      if (other.have_rgb)
+      {
+        rgb[0] = other.rgb[0];
+        rgb[1] = other.rgb[1];
+        rgb[2] = other.rgb[2];
+        if (other.have_nir)
+        {
+          rgb[3] = other.rgb[3];
+        }
+      }
+
+      if (other.have_wavepacket)
+      {
+        wavepacket = std::move(other.wavepacket);
+      }
+
+      if (other.extended_point_type)
+      {
+        extended_classification = other.extended_classification;
+        extended_classification_flags = other.extended_classification_flags;
+        extended_number_of_returns = other.extended_number_of_returns;
+        extended_return_number = other.extended_return_number;
+        extended_scan_angle = other.extended_scan_angle;
+        extended_scanner_channel = other.extended_scanner_channel;
+      }
+      else if (extended_point_type)
+      {
+        extended_classification = other.classification & 31;
+        extended_classification_flags = other.classification >> 5;
+        extended_number_of_returns = other.number_of_returns;
+        extended_return_number = other.return_number;
+        extended_scan_angle = I16_QUANTIZE(((F32)other.scan_angle_rank)/0.006);
+        extended_scanner_channel = 0;
+      }
+
+      extra_bytes = other.extra_bytes;
+      other.extra_bytes = nullptr;
+
+      point = other.point;
+      other.point = nullptr;
+
+      items = other.items;
+      other.items = nullptr;
+
+      quantizer = other.quantizer;
+      other.quantizer = nullptr;
+
+      attributer = other.attributer;
+      other.attributer = nullptr;
+
+      items = other.items;
+      other.items = nullptr;
+
+      return *this;
+  }
 };
 
 #endif
