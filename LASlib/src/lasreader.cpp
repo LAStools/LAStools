@@ -455,24 +455,24 @@ I32 LASreadOpener::unparse(CHAR* string) const
     {
       if ((scale_factor[0] != 0.0) && (scale_factor[1] != 0.0))
       {
-        n += sprintf(string + n, "-rescale_xy %g %g ", scale_factor[0], scale_factor[1]);
+        n += sprintf(string + n, "-rescale_xy %lf %lf ", scale_factor[0], scale_factor[1]);
       }
     }
     else
     {
       if ((scale_factor[0] == 0.0) && (scale_factor[1] == 0.0))
       {
-        n += sprintf(string + n, "-rescale_z %g ", scale_factor[2]);
+        n += sprintf(string + n, "-rescale_z %lf ", scale_factor[2]);
       }
       else
       {
-        n += sprintf(string + n, "-rescale %g %g %g ", scale_factor[0], scale_factor[1], scale_factor[2]);
+        n += sprintf(string + n, "-rescale %lf %lf %lf ", scale_factor[0], scale_factor[1], scale_factor[2]);
       }
     }
   }
   if (offset)
   {
-    n += sprintf(string + n, "-reoffset %g %g %g ", offset[0], offset[1], offset[2]);
+    n += sprintf(string + n, "-reoffset %lf %lf %lf ", offset[0], offset[1], offset[2]);
   }
   else if (auto_reoffset)
   {
