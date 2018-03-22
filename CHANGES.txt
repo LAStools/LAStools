@@ -1,3 +1,7 @@
+22 March 2018 -- lascanopy, lasgrid, las2dem: fix for bug in writing TIF rasters that appeared in version 180303
+21 March 2018 -- lasheight (and others): also allow '-ignore_class 2 5 0' to include classification 0
+20 March 2018 -- LASlib: new '-transform_helmert 598.1,73.7,418.2,0.202,0.045,-2.455,6.7' for ECEF coordinates 
+15 March 2018 -- lasvalidate: validation of files compressed with "native LAS 1.4 extension" of LASzip possible
  3 March 2018 -- LASlib, all LAStools: "allow '-odir' to just specify a drive such as '-odir f:' of '-odir f:\'
  2 March 2018 -- lasboundary, lascanopy: use file name from output rollout of the GUI for meaningful modes
 28 February 2018 -- LASlib, all LAStools: now '-set_RGB_of_class' also works for classifications > 31
