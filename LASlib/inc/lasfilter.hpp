@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     6 March 2018 -- changed '%g' to '%lf' for all sprintf() of F64 values
     14 December 2017 -- keep multiple flightlines with '-keep_point_source 2 3 4' 
     10 December 2017 -- new '-keep_random_fraction 0.2 4711' uses 4711 as seed
     25 December 2010 -- created after swinging in Mara's hammock for hours
