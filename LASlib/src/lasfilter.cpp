@@ -84,7 +84,7 @@ class LAScriterionKeepCircle : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_circle"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), center_x, center_y, radius); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), center_x, center_y, radius); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (!point->inside_circle(center_x, center_y, radius_squared)); };
   LAScriterionKeepCircle(F64 x, F64 y, F64 radius) { this->center_x = x; this->center_y = y; this->radius = radius; this->radius_squared = radius*radius; };
@@ -96,7 +96,7 @@ class LAScriterionKeepxyz : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_xyz"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g %g %g %g ", name(), min_x, min_y, min_z, max_x, max_y, max_z); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf %lf %lf %lf ", name(), min_x, min_y, min_z, max_x, max_y, max_z); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline BOOL filter(const LASpoint* point) { return (!point->inside_box(min_x, min_y, min_z, max_x, max_y, max_z)); };
   LAScriterionKeepxyz(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y, F64 max_z) { this->min_x = min_x; this->min_y = min_y; this->min_z = min_z; this->max_x = max_x; this->max_y = max_y; this->max_z = max_z; };
@@ -108,7 +108,7 @@ class LAScriterionDropxyz : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_xyz"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g %g %g %g ", name(), min_x, min_y, min_z, max_x, max_y, max_z); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf %lf %lf %lf ", name(), min_x, min_y, min_z, max_x, max_y, max_z); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline BOOL filter(const LASpoint* point) { return (point->inside_box(min_x, min_y, min_z, max_x, max_y, max_z)); };
   LAScriterionDropxyz(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y, F64 max_z) { this->min_x = min_x; this->min_y = min_y; this->min_z = min_z; this->max_x = max_x; this->max_y = max_y; this->max_z = max_z; };
@@ -120,7 +120,7 @@ class LAScriterionKeepxy : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_xy"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g %g ", name(), below_x, below_y, above_x, above_y); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf %lf ", name(), below_x, below_y, above_x, above_y); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (!point->inside_rectangle(below_x, below_y, above_x, above_y)); };
   LAScriterionKeepxy(F64 below_x, F64 below_y, F64 above_x, F64 above_y) { this->below_x = below_x; this->below_y = below_y; this->above_x = above_x; this->above_y = above_y; };
@@ -132,7 +132,7 @@ class LAScriterionDropxy : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_xy"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g %g ", name(), below_x, below_y, above_x, above_y); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf %lf ", name(), below_x, below_y, above_x, above_y); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->inside_rectangle(below_x, below_y, above_x, above_y)); };
   LAScriterionDropxy(F64 below_x, F64 below_y, F64 above_x, F64 above_y) { this->below_x = below_x; this->below_y = below_y; this->above_x = above_x; this->above_y = above_y; };
@@ -144,7 +144,7 @@ class LAScriterionKeepx : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_x"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_x, above_x); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_x, above_x); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { F64 x = point->get_x(); return (x < below_x) || (x >= above_x); };
   LAScriterionKeepx(F64 below_x, F64 above_x) { this->below_x = below_x; this->above_x = above_x; };
@@ -156,7 +156,7 @@ class LAScriterionDropx : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_x"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_x, above_x); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_x, above_x); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { F64 x = point->get_x(); return ((below_x <= x) && (x < above_x)); };
   LAScriterionDropx(F64 below_x, F64 above_x) { this->below_x = below_x; this->above_x = above_x; };
@@ -168,7 +168,7 @@ class LAScriterionKeepy : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_y"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_y, above_y); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { F64 y = point->get_y(); return (y < below_y) || (y >= above_y); };
   LAScriterionKeepy(F64 below_y, F64 above_y) { this->below_y = below_y; this->above_y = above_y; };
@@ -180,7 +180,7 @@ class LAScriterionDropy : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_y"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_y, above_y); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_y, above_y); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { F64 y = point->get_y(); return ((below_y <= y) && (y < above_y)); };
   LAScriterionDropy(F64 below_y, F64 above_y) { this->below_y = below_y; this->above_y = above_y; };
@@ -192,7 +192,7 @@ class LAScriterionKeepz : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_z"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_z, above_z); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_z, above_z); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline BOOL filter(const LASpoint* point) { F64 z = point->get_z(); return (z < below_z) || (z >= above_z); };
   LAScriterionKeepz(F64 below_z, F64 above_z) { this->below_z = below_z; this->above_z = above_z; };
@@ -204,7 +204,7 @@ class LAScriterionDropz : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_z"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_z, above_z); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_z, above_z); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline BOOL filter(const LASpoint* point) { F64 z = point->get_z(); return ((below_z <= z) && (z < above_z)); };
   LAScriterionDropz(F64 below_z, F64 above_z) { this->below_z = below_z; this->above_z = above_z; };
@@ -216,7 +216,7 @@ class LAScriterionDropxBelow : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_x_below"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), below_x); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below_x); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_x() < below_x); };
   LAScriterionDropxBelow(F64 below_x) { this->below_x = below_x; };
@@ -228,7 +228,7 @@ class LAScriterionDropxAbove : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_x_above"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), above_x); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above_x); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_x() >= above_x); };
   LAScriterionDropxAbove(F64 above_x) { this->above_x = above_x; };
@@ -240,7 +240,7 @@ class LAScriterionDropyBelow : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_y_below"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), below_y); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below_y); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_y() < below_y); };
   LAScriterionDropyBelow(F64 below_y) { this->below_y = below_y; };
@@ -252,7 +252,7 @@ class LAScriterionDropyAbove : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_y_above"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), above_y); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above_y); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_y() >= above_y); };
   LAScriterionDropyAbove(F64 above_y) { this->above_y = above_y; };
@@ -264,7 +264,7 @@ class LAScriterionDropzBelow : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_z_below"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), below_z); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below_z); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline BOOL filter(const LASpoint* point) { return (point->get_z() < below_z); };
   LAScriterionDropzBelow(F64 below_z) { this->below_z = below_z; };
@@ -276,7 +276,7 @@ class LAScriterionDropzAbove : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_z_above"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), above_z); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above_z); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline BOOL filter(const LASpoint* point) { return (point->get_z() >= above_z); };
   LAScriterionDropzAbove(F64 above_z) { this->above_z = above_z; };
@@ -1108,7 +1108,7 @@ class LAScriterionKeepGpsTime : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_gps_time"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %.6f %.6f ", name(), below_gpstime, above_gpstime); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_gpstime, above_gpstime); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && ((point->gps_time < below_gpstime) || (point->gps_time > above_gpstime))); };
   LAScriterionKeepGpsTime(F64 below_gpstime, F64 above_gpstime) { this->below_gpstime = below_gpstime; this->above_gpstime = above_gpstime; };
@@ -1120,7 +1120,7 @@ class LAScriterionDropGpsTimeBelow : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_gps_time_below"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %.6f ", name(), below_gpstime); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below_gpstime); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && (point->gps_time < below_gpstime)); };
   LAScriterionDropGpsTimeBelow(F64 below_gpstime) { this->below_gpstime = below_gpstime; };
@@ -1132,7 +1132,7 @@ class LAScriterionDropGpsTimeAbove : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_gps_time_above"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %.6f ", name(), above_gpstime); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above_gpstime); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && (point->gps_time > above_gpstime)); };
   LAScriterionDropGpsTimeAbove(F64 above_gpstime) { this->above_gpstime = above_gpstime; };
@@ -1144,7 +1144,7 @@ class LAScriterionDropGpsTimeBetween : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_gps_time_between"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %.6f %.6f ", name(), below_gpstime, above_gpstime); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_gpstime, above_gpstime); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && ((below_gpstime <= point->gps_time) && (point->gps_time <= above_gpstime))); };
   LAScriterionDropGpsTimeBetween(F64 below_gpstime, F64 above_gpstime) { this->below_gpstime = below_gpstime; this->above_gpstime = above_gpstime; };
@@ -1180,7 +1180,7 @@ class LAScriterionKeepAttributeBelow : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_attribute_below"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g ", name(), index, below_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf ", name(), index, below_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) >= below_attribute); };
   LAScriterionKeepAttributeBelow(I32 index, F64 below_attribute) { this->index = index; this->below_attribute = below_attribute; };
@@ -1193,7 +1193,7 @@ class LAScriterionKeepAttributeAbove : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_attribute_above"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g ", name(), index, above_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf ", name(), index, above_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) <= above_attribute); };
   LAScriterionKeepAttributeAbove(I32 index, F64 above_attribute) { this->index = index; this->above_attribute = above_attribute; };
@@ -1206,7 +1206,7 @@ class LAScriterionKeepAttributeBetween : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_attribute_between"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g %g ", name(), index, below_attribute, above_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %lf ", name(), index, below_attribute, above_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { F64 attribute = point->get_attribute_as_float(index); return (attribute < below_attribute) || (above_attribute < attribute); };
   LAScriterionKeepAttributeBetween(I32 index, F64 below_attribute, F64 above_attribute) { this->index = index; this->below_attribute = below_attribute; this->above_attribute = above_attribute; };
@@ -1220,7 +1220,7 @@ class LAScriterionDropAttributeBelow : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_attribute_below"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g ", name(), index, below_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf ", name(), index, below_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) < below_attribute); };
   LAScriterionDropAttributeBelow(I32 index, F64 below_attribute) { this->index = index; this->below_attribute = below_attribute; };
@@ -1233,7 +1233,7 @@ class LAScriterionDropAttributeAbove : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_attribute_above"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g ", name(), index, above_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf ", name(), index, above_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) > above_attribute); };
   LAScriterionDropAttributeAbove(I32 index, F64 above_attribute) { this->index = index; this->above_attribute = above_attribute; };
@@ -1246,7 +1246,7 @@ class LAScriterionDropAttributeBetween : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_attribute_between"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %g %g ", name(), index, below_attribute, above_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %lf ", name(), index, below_attribute, above_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { F64 attribute = point->get_attribute_as_float(index); return (below_attribute <= attribute) && (attribute <= above_attribute); };
   LAScriterionDropAttributeBetween(I32 index, F64 below_attribute, F64 above_attribute) { this->index = index; this->below_attribute = below_attribute; this->above_attribute = above_attribute; };
@@ -1519,7 +1519,7 @@ class LAScriterionThinPulsesWithTime : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "thin_pulses_with_time"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline BOOL filter(const LASpoint* point)
   { 
@@ -1557,7 +1557,7 @@ class LAScriterionThinPointsWithTime : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "thin_points_with_time"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline BOOL filter(const LASpoint* point)
   { 
@@ -2312,7 +2312,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             add_criterion(filter_criterion);
             i+=1;
           } 
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=2;
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
         else if (strcmp(argv[i],"-keep_point_source_between") == 0)
         {
@@ -2820,7 +2820,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionDropScanDirection(atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
-      else if (strncmp(argv[i],"-drop_intensity_above",15) == 0)
+      else if (strncmp(argv[i],"-drop_intensity",15) == 0)
       {
         if (strcmp(argv[i],"-drop_intensity_above") == 0)
         {
