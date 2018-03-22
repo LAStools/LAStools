@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     6 March 2018 -- changed '%g' to '%lf' for all sprintf() of F64 values
     28 February 2017 -- now '-set_RGB_of_class' also works for classifications > 31
      1 February 2017 -- new '-copy_intensity_into_z' for use in lasgrid or lascanopy
      9 May 2016 -- new '-translate_raw_xy_at_random 2 2' for random pertubation
