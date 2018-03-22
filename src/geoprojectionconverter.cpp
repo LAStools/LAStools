@@ -7235,17 +7235,17 @@ int GeoProjectionConverter::unparse(char* string) const
     else if (source_projection->type == GEO_PROJECTION_LCC)
     {
       GeoProjectionParametersLCC* lcc = (GeoProjectionParametersLCC*)source_projection;
-      n += sprintf(&string[n], "-lcc %.10g %.10g m %.10g %.10g %.10g %.10g ", lcc->lcc_false_easting_meter, lcc->lcc_false_northing_meter, lcc->lcc_lat_origin_degree, lcc->lcc_long_meridian_degree, lcc->lcc_first_std_parallel_degree, lcc->lcc_second_std_parallel_degree);
+      n += sprintf(&string[n], "-lcc %lf %lf m %lf %lf %lf %lf ", lcc->lcc_false_easting_meter, lcc->lcc_false_northing_meter, lcc->lcc_lat_origin_degree, lcc->lcc_long_meridian_degree, lcc->lcc_first_std_parallel_degree, lcc->lcc_second_std_parallel_degree);
     }
     else if (source_projection->type == GEO_PROJECTION_TM)
     {
       GeoProjectionParametersTM* tm = (GeoProjectionParametersTM*)source_projection;
-      n += sprintf(&string[n], "-tm %.10g %.10g m %.10g %.10g %.10g ", tm->tm_false_easting_meter, tm->tm_false_northing_meter, tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
+      n += sprintf(&string[n], "-tm %lf %lf m %lf %lf %lf ", tm->tm_false_easting_meter, tm->tm_false_northing_meter, tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
     }
     else if (source_projection->type == GEO_PROJECTION_AEAC)
     {
       GeoProjectionParametersAEAC* aeac = (GeoProjectionParametersAEAC*)source_projection;
-      n += sprintf(&string[n], "-aeac %.10g %.10g m %.10g %.10g %.10g %.10g ", aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter, aeac->aeac_latitude_of_center_degree, aeac->aeac_longitude_of_center_degree, aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree);
+      n += sprintf(&string[n], "-aeac %lf %lf m %lf %lf %lf %lf ", aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter, aeac->aeac_latitude_of_center_degree, aeac->aeac_longitude_of_center_degree, aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree);
     }
   }
   if (!have_epsg)
@@ -7358,17 +7358,17 @@ int GeoProjectionConverter::unparse(char* string) const
     else if (target_projection->type == GEO_PROJECTION_LCC)
     {
       GeoProjectionParametersLCC* lcc = (GeoProjectionParametersLCC*)target_projection;
-      n += sprintf(&string[n], "-target_lcc %g %g m %g %g %g %g ", lcc->lcc_false_easting_meter, lcc->lcc_false_northing_meter, lcc->lcc_lat_origin_degree, lcc->lcc_long_meridian_degree, lcc->lcc_first_std_parallel_degree, lcc->lcc_second_std_parallel_degree);
+      n += sprintf(&string[n], "-target_lcc %lf %lf m %lf %lf %lf %lf ", lcc->lcc_false_easting_meter, lcc->lcc_false_northing_meter, lcc->lcc_lat_origin_degree, lcc->lcc_long_meridian_degree, lcc->lcc_first_std_parallel_degree, lcc->lcc_second_std_parallel_degree);
     }
     else if (target_projection->type == GEO_PROJECTION_TM)
     {
       GeoProjectionParametersTM* tm = (GeoProjectionParametersTM*)target_projection;
-      n += sprintf(&string[n], "-target_tm %g %g m %g %g %g ", tm->tm_false_easting_meter, tm->tm_false_northing_meter, tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
+      n += sprintf(&string[n], "-target_tm %lf %lf m %lf %lf %lf ", tm->tm_false_easting_meter, tm->tm_false_northing_meter, tm->tm_lat_origin_degree, tm->tm_long_meridian_degree, tm->tm_scale_factor);
     }
     else if (target_projection->type == GEO_PROJECTION_AEAC)
     {
       GeoProjectionParametersAEAC* aeac = (GeoProjectionParametersAEAC*)target_projection;
-      n += sprintf(&string[n], "-target_aeac %g %g m %g %g %g %g ", aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter, aeac->aeac_latitude_of_center_degree, aeac->aeac_longitude_of_center_degree, aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree);
+      n += sprintf(&string[n], "-target_aeac %lf %lf m %lf %lf %lf %lf ", aeac->aeac_false_easting_meter, aeac->aeac_false_northing_meter, aeac->aeac_latitude_of_center_degree, aeac->aeac_longitude_of_center_degree, aeac->aeac_first_std_parallel_degree, aeac->aeac_second_std_parallel_degree);
     }
   }
   if (meter2coordinates != 1.0)
@@ -7395,11 +7395,11 @@ int GeoProjectionConverter::unparse(char* string) const
   }
   if (target_precision != 0.0)
   {
-    n += sprintf(&string[n], "-target_precision %g ", target_precision);
+    n += sprintf(&string[n], "-target_precision %lf ", target_precision);
   }
   if (target_elevation_precision != 0.0)
   {
-    n += sprintf(&string[n], "-target_elevation_precision %g ", target_elevation_precision);
+    n += sprintf(&string[n], "-target_elevation_precision %lf ", target_elevation_precision);
   }
 
   return n;
