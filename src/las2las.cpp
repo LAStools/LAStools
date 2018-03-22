@@ -672,9 +672,41 @@ int main(int argc, char *argv[])
             fprintf(stderr, "ERROR: unknown point_data_format %d\n", lasreader->header.point_data_format);
             byebye(true);
           }
+          point = new LASpoint;
+          lasreader->header.clean_laszip();
         }
-        point = new LASpoint;
-        point->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
+        if (lasreader->header.get_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS))
+        {
+          fprintf(stderr, "WARNING: unsetting global encoding bit %d when downgrading from version 1.%d to version 1.%d\n", LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS, lasreader->header.version_minor, set_version_minor);
+          lasreader->header.unset_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+        }
+        if (lasreader->header.number_of_extended_variable_length_records)
+        {
+          fprintf(stderr, "WARNING: loosing %d EVLR%s when downgrading from version 1.%d to version 1.%d\n         attempting to move %s to the VLR section ...\n", lasreader->header.number_of_extended_variable_length_records, (lasreader->header.number_of_extended_variable_length_records > 1 ? "s" : ""), lasreader->header.version_minor, set_version_minor, (lasreader->header.number_of_extended_variable_length_records > 1 ? "them" : "it"));
+
+          U32 u;
+          for (u = 0; u < lasreader->header.number_of_extended_variable_length_records; u++)
+          {
+            if (lasreader->header.evlrs[u].record_length_after_header <= U16_MAX)
+            {
+              lasreader->header.add_vlr(lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_id, (U16)lasreader->header.evlrs[u].record_length_after_header, lasreader->header.evlrs[u].data);
+              lasreader->header.evlrs[u].data = 0;
+#ifdef _WIN32
+              fprintf(stderr, "         moved EVLR %d with user ID '%s' and %I64d bytes of payload\n", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+#else
+              fprintf(stderr, "         moved EVLR %d with user ID '%s' and %lld bytes of payload\n", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+#endif
+            }
+            else
+            {
+#ifdef _WIN32
+              fprintf(stderr, "         lost EVLR %d with user ID '%s' and %I64d bytes of payload\n", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+#else
+              fprintf(stderr, "         lost EVLR %d with user ID '%s' and %lld bytes of payload\n", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+#endif
+            }
+          }
+        }
       }
 
       lasreader->header.version_minor = (U8)set_version_minor;
