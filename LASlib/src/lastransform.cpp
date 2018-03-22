@@ -41,7 +41,7 @@ class LASoperationTranslateX : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_x"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), offset); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
   inline void transform(LASpoint* point) {
     point->set_x(point->get_x() + offset);
   };
@@ -54,7 +54,7 @@ class LASoperationTranslateY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_y"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), offset); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
   inline void transform(LASpoint* point) {
     point->set_y(point->get_y() + offset);
   };
@@ -67,7 +67,7 @@ class LASoperationTranslateZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), offset); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
   inline void transform(LASpoint* point) {
     point->set_z(point->get_z() + offset);
   };
@@ -80,7 +80,7 @@ class LASoperationTranslateXYZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_xyz"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), offset[0], offset[1], offset[2]); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), offset[0], offset[1], offset[2]); };
   inline void transform(LASpoint* point) {
     point->set_x(point->get_x() + offset[0]);
     point->set_y(point->get_y() + offset[1]);
@@ -95,7 +95,7 @@ class LASoperationScaleX : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_x"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), scale); };
   inline void transform(LASpoint* point) {
     point->set_x(point->get_x() * scale);
   };
@@ -108,7 +108,7 @@ class LASoperationScaleY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_y"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), scale); };
   inline void transform(LASpoint* point) {
     point->set_y(point->get_y() * scale);
   };
@@ -121,7 +121,7 @@ class LASoperationScaleZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), scale); };
   inline void transform(LASpoint* point) {
     point->set_z(point->get_z() * scale);
   };
@@ -134,7 +134,7 @@ class LASoperationScaleXYZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_xyz"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), scale[0], scale[1], scale[2]); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), scale[0], scale[1], scale[2]); };
   inline void transform(LASpoint* point) {
     point->set_x(point->get_x() * scale[0]);
     point->set_y(point->get_y() * scale[1]);
@@ -149,7 +149,7 @@ class LASoperationTranslateThenScaleX : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_then_scale_x"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), offset, scale); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), offset, scale); };
   inline void transform(LASpoint* point) {
     point->set_x((point->get_x()+offset)*scale);
   };
@@ -163,7 +163,7 @@ class LASoperationTranslateThenScaleY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_then_scale_y"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), offset, scale); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), offset, scale); };
   inline void transform(LASpoint* point) {
     point->set_y((point->get_y()+offset)*scale);
   };
@@ -177,7 +177,7 @@ class LASoperationTranslateThenScaleZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_then_scale_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), offset, scale); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), offset, scale); };
   inline void transform(LASpoint* point) {
     point->set_z((point->get_z()+offset)*scale);
   };
@@ -191,7 +191,7 @@ class LASoperationRotateXY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "rotate_xy"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), angle, x_offset, y_offset); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), angle, x_offset, y_offset); };
   inline void transform(LASpoint* point) {
     F64 x = point->get_x() - x_offset;
     F64 y = point->get_y() - y_offset;
@@ -209,7 +209,7 @@ class LASoperationRotateXZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "rotate_xz"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), angle, x_offset, z_offset); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), angle, x_offset, z_offset); };
   inline void transform(LASpoint* point) {
     F64 x = point->get_x() - x_offset;
     F64 z = point->get_z() - z_offset;
@@ -223,11 +223,29 @@ private:
   F64 cos_angle, sin_angle;
 };
 
+class LASoperationTransformHelmert : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "transform_helmert"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf,%lf,%lf,%lf,%lf,%lf,%lf ", name(), dx, dy, dz, rx, ry, rz, m); };
+  inline void transform(LASpoint* point) {
+    F64 x = scale*( (       point->get_x())-(rz_rad*point->get_y())+(ry_rad*point->get_z())) + dx;
+    F64 y = scale*( (rz_rad*point->get_x())+(       point->get_y())-(rx_rad*point->get_z())) + dy;
+    F64 z = scale*(-(ry_rad*point->get_x())+(rx_rad*point->get_y())+(       point->get_z())) + dz;
+    point->set_x(x);
+    point->set_y(y);
+    point->set_z(z);
+  };
+  LASoperationTransformHelmert(F64 dx, F64 dy, F64 dz, F64 rx, F64 ry, F64 rz, F64 m) { this->dx = dx; this->dy = dy; this->dz = dz; this->rx = rx; this->ry = ry; this->rz = rz; this->m = m; rx_rad = 4.84813681109536e-6*rx; ry_rad = 4.84813681109536e-6*ry; rz_rad = 4.84813681109536e-6*rz; scale = 1.0+(1.0e-6*m); };
+private:
+  F64 dx, dy, dz, rx, ry, rz, m, rx_rad, ry_rad, rz_rad, scale;
+};
+
 class LASoperationClampZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below, above); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below, above); };
   inline void transform(LASpoint* point) {
     F64 z = point->get_z();
     if (z < below) point->set_z(below);
@@ -242,7 +260,7 @@ class LASoperationClampZbelow : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_z_below"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), below); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below); };
   inline void transform(LASpoint* point) {
     F64 z = point->get_z();
     if (z < below) point->set_z(below);
@@ -256,7 +274,7 @@ class LASoperationClampZabove : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_z_above"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), above); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above); };
   inline void transform(LASpoint* point) {
     F64 z = point->get_z();
     if (z > above) point->set_z(above);
@@ -633,7 +651,7 @@ class LASoperationClassifyZbelowAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_z_below_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %d ", name(), z_below, class_to); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %d ", name(), z_below, class_to); };
   inline void transform(LASpoint* point) {
     if (point->get_z() < z_below)
     {
@@ -657,7 +675,7 @@ class LASoperationClassifyZaboveAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_z_above_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %d ", name(), z_above, class_to); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %d ", name(), z_above, class_to); };
   inline void transform(LASpoint* point) {
     if (point->get_z() > z_above)
     {
@@ -681,7 +699,7 @@ class LASoperationClassifyZbetweenAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_z_between_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %d ", name(), z_below, z_above, class_to); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %d ", name(), z_below, z_above, class_to); };
   inline void transform(LASpoint* point) {
     if ((z_below <= point->get_z()) && (point->get_z() <= z_above))
     {
@@ -991,7 +1009,7 @@ class LASoperationSetGpsTime : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_gps_time"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), gps_time); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), gps_time); };
   inline void transform(LASpoint* point) { point->gps_time = gps_time; };
   LASoperationSetGpsTime(F64 gps_time) { this->gps_time = gps_time; };
 private:
@@ -1002,7 +1020,7 @@ class LASoperationTranslateGpsTime : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_gps_time"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), offset); };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
   inline void transform(LASpoint* point) { point->gps_time += offset; };
   LASoperationTranslateGpsTime(F64 offset) { this->offset = offset; };
 private:
@@ -1313,6 +1331,8 @@ void LAStransform::usage() const
   fprintf(stderr,"  -rotate_xy 15.0 620000 4100000 (angle + origin)\n");
   fprintf(stderr,"  -translate_xyz 0.5 0.5 0\n");
   fprintf(stderr,"  -translate_then_scale_y -0.5 1.001\n");
+  fprintf(stderr,"  -transform_helmert -199.87,74.79,246.62\n");
+  fprintf(stderr,"  -transform_helmert 598.1,73.7,418.2,0.202,0.045,-2.455,6.7\n");
   fprintf(stderr,"  -switch_x_y -switch_x_z -switch_y_z\n");
   fprintf(stderr,"  -clamp_z_below 70.5\n");
   fprintf(stderr,"  -clamp_z 70.5 72.5\n");
@@ -2295,6 +2315,30 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationBinAbsScanAngleIntoPointSource((F32)atof(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
+    }
+    else if (strcmp(argv[i],"-transform_helmert") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: 3 or 7 comma separated parameters\n", argv[i]);
+        return FALSE;
+      }
+      F64 dx, dy, dz, rx, ry, rz, m, dummy;
+      I32 num = sscanf(argv[i+1], "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &dx, &dy, &dz, &rx, &ry, &rz, &m, &dummy);
+      if (num == 7)
+      {
+        add_operation(new LASoperationTransformHelmert(dx, dy, dz, rx, ry, rz, m));
+      }
+      else if (num == 3)
+      {
+        add_operation(new LASoperationTranslateXYZ(dx, dy, dz));
+      }
+      else
+      {
+        fprintf(stderr,"ERROR: '%s' needs 3 or 7 comma separated parameters as argument\n", argv[i]);
+        return FALSE;
+      }
+      *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
     }
     else if (strcmp(argv[i],"-merge_scanner_channel_into_point_source") == 0)
     {
