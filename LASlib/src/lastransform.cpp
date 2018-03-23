@@ -1442,8 +1442,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
           return FALSE;
         }
+        F64 offset;
+        if (sscanf(argv[i+1], "%lf", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationTranslateX((F64)atof(argv[i+1])));
+        add_operation(new LASoperationTranslateX(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-translate_y") == 0)
@@ -1453,8 +1459,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
           return FALSE;
         }
+        F64 offset;
+        if (sscanf(argv[i+1], "%lf", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationTranslateY((F64)atof(argv[i+1])));
+        add_operation(new LASoperationTranslateY(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-translate_z") == 0)
@@ -1464,8 +1476,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
           return FALSE;
         }
+        F64 offset;
+        if (sscanf(argv[i+1], "%lf", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationTranslateZ((F64)atof(argv[i+1])));
+        add_operation(new LASoperationTranslateZ(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-translate_xyz") == 0)
@@ -1475,8 +1493,26 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: offset_x offset_y offset_z\n", argv[i]);
           return FALSE;
         }
+        F64 offset_x;
+        if (sscanf(argv[i+1], "%lf", &offset_x) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 offset_y;
+        if (sscanf(argv[i+2], "%lf", &offset_y) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        F64 offset_z;
+        if (sscanf(argv[i+3], "%lf", &offset_z) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number\n", argv[i], argv[i+3]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationTranslateXYZ((F64)atof(argv[i+1]), (F64)atof(argv[i+2]), (F64)atof(argv[i+3])));
+        add_operation(new LASoperationTranslateXYZ(offset_x, offset_y, offset_z));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
       else if (strcmp(argv[i],"-translate_then_scale_x") == 0)
@@ -1486,8 +1522,20 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale\n", argv[i]);
           return FALSE;
         }
+        F64 offset;
+        if (sscanf(argv[i+1], "%lf", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 scale;
+        if (sscanf(argv[i+2], "%lf", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid number\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationTranslateThenScaleX((F64)atof(argv[i+1]), (F64)atof(argv[i+2])));
+        add_operation(new LASoperationTranslateThenScaleX(offset, scale));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-translate_then_scale_y") == 0)
@@ -1497,8 +1545,20 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale\n", argv[i]);
           return FALSE;
         }
+        F64 offset;
+        if (sscanf(argv[i+1], "%lf", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 scale;
+        if (sscanf(argv[i+2], "%lf", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid number\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationTranslateThenScaleY((F64)atof(argv[i+1]), (F64)atof(argv[i+2])));
+        add_operation(new LASoperationTranslateThenScaleY(offset, scale));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-translate_then_scale_z") == 0)
@@ -1508,8 +1568,20 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale\n", argv[i]);
           return FALSE;
         }
+        F64 offset;
+        if (sscanf(argv[i+1], "%lf", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 scale;
+        if (sscanf(argv[i+2], "%lf", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid number\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationTranslateThenScaleZ((F64)atof(argv[i+1]), (F64)atof(argv[i+2])));
+        add_operation(new LASoperationTranslateThenScaleZ(offset, scale));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strncmp(argv[i],"-translate_raw_", 14) == 0)
@@ -2172,8 +2244,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
           return FALSE;
         }
+        F64 scale_x;
+        if (sscanf(argv[i+1], "%lf", &scale_x) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale_x but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationScaleX((F64)atof(argv[i+1])));
+        add_operation(new LASoperationScaleX(scale_x));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-scale_y") == 0)
@@ -2183,8 +2261,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
           return FALSE;
         }
+        F64 scale_y;
+        if (sscanf(argv[i+1], "%lf", &scale_y) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale_y but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationScaleY((F64)atof(argv[i+1])));
+        add_operation(new LASoperationScaleY(scale_y));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-scale_z") == 0)
@@ -2194,8 +2278,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
           return FALSE;
         }
+        F64 scale_z;
+        if (sscanf(argv[i+1], "%lf", &scale_z) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale_z but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationScaleZ((F64)atof(argv[i+1])));
+        add_operation(new LASoperationScaleZ(scale_z));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-scale_xyz") == 0)
@@ -2205,8 +2295,26 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: scale_x scale_y scale_z\n", argv[i]);
           return FALSE;
         }
+        F64 scale_x;
+        if (sscanf(argv[i+1], "%lf", &scale_x) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 scale_y;
+        if (sscanf(argv[i+2], "%lf", &scale_y) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        F64 scale_z;
+        if (sscanf(argv[i+3], "%lf", &scale_z) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number\n", argv[i], argv[i+3]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationScaleXYZ((F64)atof(argv[i+1]), (F64)atof(argv[i+2]), (F64)atof(argv[i+3])));
+        add_operation(new LASoperationScaleXYZ(scale_x, scale_y, scale_z));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
       else if (strcmp(argv[i],"-scale_intensity") == 0)
@@ -2216,7 +2324,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationScaleIntensity((F32)atof(argv[i+1])));
+        F32 scale;
+        if (sscanf(argv[i+1], "%f", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        add_operation(new LASoperationScaleIntensity(scale));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-scale_scan_angle") == 0)
@@ -2226,7 +2340,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationScaleScanAngle((F32)atof(argv[i+1])));
+        F32 scale;
+        if (sscanf(argv[i+1], "%f", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        add_operation(new LASoperationScaleScanAngle(scale));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-scale_RGB") == 0 || strcmp(argv[i],"-scale_rgb") == 0)
@@ -2236,7 +2356,25 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: scale_R scale_G scale_B\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationScaleRGB((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3])));
+        F32 scale_R;
+        if (sscanf(argv[i+1], "%f", &scale_R) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: scale_R scale_G scale_B but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F32 scale_G;
+        if (sscanf(argv[i+2], "%f", &scale_G) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: scale_R scale_G scale_B but '%s' is no valid number\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        F32 scale_B;
+        if (sscanf(argv[i+3], "%f", &scale_B) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: scale_R scale_G scale_B but '%s' is no valid number\n", argv[i], argv[i+3]);
+          return FALSE;
+        }
+        add_operation(new LASoperationScaleRGB(scale_R, scale_G, scale_B));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
       else if (strcmp(argv[i],"-scale_user_data") == 0)
@@ -2246,7 +2384,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationScaleUserData((F32)atof(argv[i+1])));
+        F32 scale;
+        if (sscanf(argv[i+1], "%f", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale but '%s' is no valid number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        add_operation(new LASoperationScaleUserData(scale));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-scale_RGB_down") == 0 || strcmp(argv[i],"-scale_rgb_down") == 0)
