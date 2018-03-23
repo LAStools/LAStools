@@ -1,3 +1,4 @@
+23 March 2018 -- LASlib, all LAStools: more checks for correct arguments for LAStransforms 
 20 March 2018 -- LASlib: new '-transform_helmert 598.1,73.7,418.2,0.202,0.045,-2.455,6.7' for ECEF coordinates 
  3 March 2018 -- LASlib, all LAStools: "allow '-odir' to just specify a drive such as '-odir f:' of '-odir f:\'
 28 February 2018 -- LASlib, all LAStools: now '-set_RGB_of_class' also works for classifications > 31
