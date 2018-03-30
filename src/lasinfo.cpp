@@ -1653,6 +1653,33 @@ int main(int argc, char *argv[])
                     fprintf(file_out, "GeogPrimeMeridianLongGeoKey: %.10g\012",lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                   }
                   break;
+                case 2062: // GeogTOWGS84GeoKey
+                  switch (lasreader->header.vlr_geo_key_entries[j].count)
+                  {
+                  case 3:
+                    if (lasreader->header.vlr_geo_double_params)
+                    {
+                      fprintf(file_out, "GeogTOWGS84GeoKey: TOWGS84[%.10g,%.10g,%.10g]\012",lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset+1], lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset+2]);
+                    }
+                    else
+                    {
+                      fprintf(file_out, "GeogTOWGS84GeoKey: no vlr_geo_double_params. cannot look up the three parameters.\012");
+                    }
+                    break;
+                  case 7:
+                    if (lasreader->header.vlr_geo_double_params)
+                    {
+                      fprintf(file_out, "GeogTOWGS84GeoKey: TOWGS84[%.10g,%.10g,%.10g,%.10g,%.10g,%.10g,%.10g]\012",lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset+1], lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset+2], lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset+3], lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset+4], lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset+5], lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset+6]);
+                    }
+                    else
+                    {
+                      fprintf(file_out, "GeogTOWGS84GeoKey: no vlr_geo_double_params. cannot look up the seven parameters.\012");
+                    }
+                    break;
+                  default:
+                    fprintf(file_out, "GeogTOWGS84GeoKey: look-up for type %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].count);
+                  }
+                  break;
                 case 3072: // ProjectedCSTypeGeoKey
                   if (geoprojectionconverter.set_ProjectedCSTypeGeoKey(lasreader->header.vlr_geo_key_entries[j].value_offset, printstring))
                   {
