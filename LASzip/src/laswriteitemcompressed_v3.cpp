@@ -68,7 +68,13 @@ typedef struct LASpoint14
   U8 return_number : 4;
   U8 number_of_returns : 4;
 
-  U8 dummy[3]; // for 8 byte alignment of the GPS time
+  // LASlib internal use only
+  U8 deleted_flag;
+
+  // for 8 byte alignment of the GPS time
+  U8 dummy[2];
+
+  // compressed LASzip 1.4 points only
   BOOL gps_time_change;
 
   F64 gps_time;
