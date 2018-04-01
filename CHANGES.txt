@@ -1,4 +1,10 @@
+30 March 2018 -- laspublish: support recently released version 1.6 of Potree via command switch '-potree16' 
+30 March 2018 -- blast2dem, blast2iso: support for input LASlayers '-ilay', '-ilaydir e:\layers', and '-ilay 2'
+29 March 2018 -- LASlib, all LAStools: fix for "missing points" when writing just decompressed "native" LAS 1.4
+28 March 2018 -- lasinfo: also report TOWGS84 Helmert transform stored in GeoTIFF key 2062 (GeogTOWGS84GeoKey)
+27 March 2018 -- lasground, lasnoise, lasheight, lasthin, ... : also allow '-ignore_class 0' for classification 0
 23 March 2018 -- LASlib, all LAStools: more checks for correct arguments for LAStransforms 
+25 March 2018 -- NEW: lasvoxel computes a number of different summarizing 3D voxelizations for high-density LiDAR 
 23 March 2018 -- lasvalidate: fixing bug introduced in LAStools release version 180322
 22 March 2018 -- lascanopy, lasgrid, las2dem: fix for bug in writing TIF rasters that appeared in version 180303
 21 March 2018 -- lasheight (and others): also allow '-ignore_class 2 5 0' to include classification 0
