@@ -148,6 +148,44 @@ typedef struct laszip_dll {
   I32 start_NIR_band;
   laszip_dll_inventory* inventory;
   std::vector<void *> buffers;
+
+  void zero()
+  {
+    memset(&header, 0, sizeof(laszip_header_struct));
+    p_count = 0;
+    npoints = 0;
+    memset(&point, 0, sizeof(laszip_point_struct));
+    point_items = NULL;
+    file = NULL;
+    streamin = NULL;
+    reader = NULL;
+    streamout = NULL;
+    writer = NULL;
+    attributer = NULL;
+    memset(error, 0, 1024);
+    memset(warning, 0, 1024);
+    lax_index = NULL;
+    lax_r_min_x = 0.0;
+    lax_r_min_y = 0.0;
+    lax_r_max_x = 0.0;
+    lax_r_max_y = 0.0;
+    lax_file_name = NULL;
+    lax_create = FALSE;
+    lax_append = FALSE;
+    lax_exploit = FALSE;
+    las14_decompress_selective = 0;
+    preserve_generating_software = FALSE;
+    request_native_extension = FALSE;
+    request_compatibility_mode = FALSE;
+    compatibility_mode = FALSE;
+    set_chunk_size = 0;
+    start_scan_angle = 0;
+    start_extended_returns = 0;
+    start_classification = 0;
+    start_flags_and_channel = 0;
+    start_NIR_band = 0;
+    inventory = NULL;
+  };
 } laszip_dll_struct;
 
 /*---------------------------------------------------------------------------*/
@@ -236,9 +274,9 @@ laszip_create(
       return 1;
     }
 
-    // zero everything
+    // zero every field of the laszip_dll struct
 
-    memset(laszip_dll, 0, sizeof(laszip_dll_struct));
+    laszip_dll->zero();
 
     // create the default
 
@@ -313,6 +351,38 @@ laszip_clean(
       laszip_dll->point.extra_bytes = 0;
     }
 
+    // dealloc point items although close_reader() / close_writer() call should have done this already
+
+    if (laszip_dll->point_items)
+    {
+      delete [] laszip_dll->point_items;
+      laszip_dll->point_items = 0;
+    }
+
+    // close file although close_reader() / close_writer() call should have done this already
+
+    if (laszip_dll->file)
+    {
+      fclose(laszip_dll->file);
+      laszip_dll->file = 0;
+    }
+
+    // dealloc streamin although close_reader() call should have done this already
+
+    if (laszip_dll->streamin)
+    {
+      delete laszip_dll->streamin;
+      laszip_dll->streamin = 0;
+    }
+
+    // dealloc streamout although close_writer() call should have done this already
+
+    if (laszip_dll->streamout)
+    {
+      delete laszip_dll->streamout;
+      laszip_dll->streamout = 0;
+    }
+
     // dealloc the attributer
 
     if (laszip_dll->attributer)
@@ -321,14 +391,44 @@ laszip_clean(
       laszip_dll->attributer = 0;
     }
 
-    for (size_t i = 0; i < laszip_dll->buffers.size(); ++i)
+    // dealloc lax_index although close_reader() / close_writer() call should have done this already
+
+    if (laszip_dll->lax_index)
+    {
+      delete laszip_dll->lax_index;
+      laszip_dll->lax_index = 0;
+    }
+
+    // dealloc lax_file_name although close_writer() call should have done this already
+
+    if (laszip_dll->lax_file_name)
+    {
+      free(laszip_dll->lax_file_name);
+      laszip_dll->lax_file_name = 0;
+    }
+
+    // dealloc the inventory although close_writer() call should have done this already
+    
+    if (laszip_dll->inventory == 0)
+    {
+      delete laszip_dll->inventory;
+      laszip_dll->inventory = 0;
+    }
+
+    // dealloc any data fields that were kept around in memory for others
+
+    if (laszip_dll->buffers.size())
+    {
+      for (size_t i = 0; i < laszip_dll->buffers.size(); i++)
+      {
         free(laszip_dll->buffers[i]);
-    laszip_dll->buffers.clear();
+      }
+      laszip_dll->buffers.clear();
+    }
 
+    // zero every field of the laszip_dll struct
 
-    // zero everything
-
-    memset(laszip_dll, 0, sizeof(laszip_dll_struct));
+    laszip_dll->zero();
 
     // create default header
 
@@ -505,7 +605,7 @@ laszip_set_header(
       return 1;
     }
 
-    // clean the attributer if needed
+    // dealloc the attributer (if needed)
 
     if (laszip_dll->attributer)
     {
@@ -3184,9 +3284,11 @@ laszip_close_writer(
     delete laszip_dll->streamout;
     laszip_dll->streamout = 0;
 
-	if (laszip_dll->file)
+	  if (laszip_dll->file)
+    {
       fclose(laszip_dll->file);
-    laszip_dll->file = 0;
+      laszip_dll->file = 0;
+    }
   }
   catch (...)
   {
@@ -4567,9 +4669,11 @@ laszip_close_reader(
       laszip_dll->lax_index = 0;
     }
 
-	if (laszip_dll->file)
+  	if (laszip_dll->file)
+    {
       fclose(laszip_dll->file);
-    laszip_dll->file = 0;
+      laszip_dll->file = 0;
+    }
   }
   catch (...)
   {
