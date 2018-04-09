@@ -157,6 +157,7 @@ overview of all tool-specific switches:
 -do_not_store_in_user_data           : do not modify the user_data field at all
 -skip_files                          : skip (instead of the default copy) files that have an insufficient number of ground points
 -remain_buffered                     : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-dont_remove_empty_files             : do not remove files that have zero points remaining from disk
 -ilay                                : apply all LASlayers found in corresponding *.lay file on read
 -ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
 -ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
