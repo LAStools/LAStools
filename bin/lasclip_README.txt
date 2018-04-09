@@ -103,6 +103,31 @@ following format:
 757800 3.6917e+006
 [...]
 
+****************************************************************
+
+overview of all tool-specific switches:
+
+-v                                   : more info reported in console
+-vv                                  : even more info reported in console
+-quiet                               : nothing reported in console
+-wait                                : wait for <ENTER> in the console at end of process
+-version                             : reports this tool's version number
+-fail                                : fail if license expired or invalid
+-gui                                 : start with files loaded into GUI
+-cores 4                             : process multiple inputs on 4 cores in parallel
+-ignore_class 0 1 3 5 6 7 9          : ignores points with specified classification codes
+
+... more to come ...
+
+-dont_remove_empty_files             : do not remove files that have zero points remaining from disk
+-ilay                                : apply all LASlayers found in corresponding *.lay file on read
+-ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
+-ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
+-olay                                : write or append classification changes to a LASlayers *.lay file
+-olaydir E:\my_layers                : write the output *.lay file in directory E:\my_layers
+
+****************************************************************
+
 
 for more info:
 
