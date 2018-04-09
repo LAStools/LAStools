@@ -747,24 +747,6 @@ int main(int argc, char *argv[])
 
   while (lasreadopener.active())
   {
-    // print name of input
-
-    if (file_out)
-    {
-      if (lasreadopener.is_merged())
-      {
-        fprintf(file_out, "lasinfo (%u) report for %u merged files\012", LAS_TOOLS_VERSION, lasreadopener.get_file_name_number());
-      }
-      else if (lasreadopener.is_piped())
-      {
-        fprintf(file_out, "lasinfo (%u) report for piped input\012", LAS_TOOLS_VERSION);
-      }
-      else if (lasreadopener.get_file_name())
-      {
-        fprintf(file_out, "lasinfo (%u) report for %s\012", LAS_TOOLS_VERSION, lasreadopener.get_file_name(lasreadopener.get_file_name_current()));
-      }
-    }
-
     if (edit_header)
     {
       if (lasreadopener.is_piped())
@@ -1012,6 +994,24 @@ int main(int argc, char *argv[])
       {
         fprintf (stderr, "WARNING: could not open output text file '%s'\n", laswriteopener.get_file_name());
         file_out = stderr;
+      }
+    }
+
+    // print name of input
+
+    if (file_out)
+    {
+      if (lasreadopener.is_merged())
+      {
+        fprintf(file_out, "lasinfo (%u) report for %u merged files\012", LAS_TOOLS_VERSION, lasreadopener.get_file_name_number());
+      }
+      else if (lasreadopener.is_piped())
+      {
+        fprintf(file_out, "lasinfo (%u) report for piped input\012", LAS_TOOLS_VERSION);
+      }
+      else if (lasreadopener.get_file_name())
+      {
+        fprintf(file_out, "lasinfo (%u) report for '%s'\012", LAS_TOOLS_VERSION, lasreadopener.get_file_name());
       }
     }
 
