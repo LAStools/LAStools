@@ -152,6 +152,7 @@ int main(int argc, char *argv[])
   int set_point_data_format = -1;
   int set_point_data_record_length = -1;
   int set_gps_time_endcoding = -1;
+  int set_lastiling_buffer_flag = -1;
   // variable header changes
   bool set_ogc_wkt = false;
   bool set_ogc_wkt_in_evlr = false;
@@ -163,6 +164,7 @@ int main(int argc, char *argv[])
   int remove_variable_length_record_to = -1;
   bool remove_tiling_vlr = false;
   bool remove_original_vlr = false;
+  bool remove_empty_files = true;
   // extract a subsequence
   I64 subsequence_start = 0;
   I64 subsequence_stop = I64_MAX;
@@ -320,6 +322,25 @@ int main(int argc, char *argv[])
       }
       set_version_minor = atoi(argv[i+1]);
       i+=1;
+    }
+    else if (strcmp(argv[i],"-set_lastiling_buffer_flag") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: 0 or 1\n", argv[i]);
+        byebye(true);
+      }
+      set_lastiling_buffer_flag = atoi(argv[i+1]);
+      if ((set_lastiling_buffer_flag < 0) || (set_lastiling_buffer_flag > 1))
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: 0 or 1\n", argv[i]);
+        byebye(true);
+      }
+      i+=1;
+    }
+    else if (strcmp(argv[i],"-dont_remove_empty_files") == 0)
+    {
+      remove_empty_files = false;
     }
     else if (strcmp(argv[i],"-remove_padding") == 0)
     {
@@ -820,6 +841,18 @@ int main(int argc, char *argv[])
       lasreader->header.clean_laszip();
     }
 
+    if (set_lastiling_buffer_flag != -1)
+    {
+      if (lasreader->header.vlr_lastiling)
+      {
+        lasreader->header.vlr_lastiling->buffer = set_lastiling_buffer_flag;
+      }
+      else
+      {
+        fprintf(stderr, "WARNING: file '%s' has no LAStiling VLR. cannot set buffer flag.\n", lasreadopener.get_file_name());
+      }
+    }
+
     // if the point needs to be copied set up the data fields
 
     if (point)
@@ -1214,6 +1247,12 @@ int main(int argc, char *argv[])
     }
 
     laswriter->close();
+    // delete empty output files
+    if (remove_empty_files && (laswriter->npoints == 0) && laswriteopener.get_file_name())
+    {        
+      remove(laswriteopener.get_file_name());
+      if (verbose) fprintf(stderr,"removing empty output file '%s'\n", laswriteopener.get_file_name());
+    }
     delete laswriter;
 
     lasreader->close();
