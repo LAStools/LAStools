@@ -310,14 +310,12 @@ BOOL LASwriteOpener::parse(int argc, char* argv[])
     }
     else if (strcmp(argv[i],"-olas") == 0)
     {
-      specified = TRUE;
-      format = LAS_TOOLS_FORMAT_LAS;
+      set_format(LAS_TOOLS_FORMAT_LAS);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-olaz") == 0)
     {
-      specified = TRUE;
-      format = LAS_TOOLS_FORMAT_LAZ;
+      set_format(LAS_TOOLS_FORMAT_LAZ);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-otxt") == 0)
@@ -328,20 +326,17 @@ BOOL LASwriteOpener::parse(int argc, char* argv[])
     }
     else if (strcmp(argv[i],"-obin") == 0)
     {
-      specified = TRUE;
-      format = LAS_TOOLS_FORMAT_BIN;
+      set_format(LAS_TOOLS_FORMAT_BIN);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-oqi") == 0)
     {
-      specified = TRUE;
-      format = LAS_TOOLS_FORMAT_QFIT;
+      set_format(LAS_TOOLS_FORMAT_QFIT);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-owrl") == 0)
     {
-      specified = TRUE;
-      format = LAS_TOOLS_FORMAT_VRML;
+      set_format(LAS_TOOLS_FORMAT_VRML);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-stdout") == 0)
