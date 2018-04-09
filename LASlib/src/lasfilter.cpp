@@ -2205,15 +2205,18 @@ BOOL LASfilter::parse(int argc, char* argv[])
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
         }
       }
-      else if (strcmp(argv[i],"-keep_scan_angle") == 0)
+      else if (strncmp(argv[i],"-keep_scan_angle", 16) == 0)
       {
-        if ((i+2) >= argc)
+        if ((strcmp(argv[i],"-keep_scan_angle") == 0) || (strcmp(argv[i],"-keep_scan_angle_between") == 0))
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
-          return FALSE;
+          if ((i+2) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepScanAngle(atoi(argv[i+1]), atoi(argv[i+2])));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
         }
-        add_criterion(new LAScriterionKeepScanAngle(atoi(argv[i+1]), atoi(argv[i+2])));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
       }
       else if (strcmp(argv[i],"-keep_synthetic") == 0)
       {
