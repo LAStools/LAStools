@@ -1,3 +1,8 @@
+ 9 April 2018 -- lasclip, las2las, lasheight, lasnoise: remove empty files unless '-dont_remove_empty_files'
+ 7 April 2018 -- lasview: also display point source ID (aka flightline number) for points picked with 'i'
+ 6 April 2018 -- las2iso and lasboundary: adding '-odbf' to the command line produces a 'z' attribute
+ 3 April 2018 -- lascolor: ability to process entire folders of LAS/LAZ and corresponding TIF files
+ 2 April 2018 -- blast2dem, blast2iso: improved generation of *.prj files
 30 March 2018 -- laspublish: support recently released version 1.6 of Potree via command switch '-potree16' 
 30 March 2018 -- blast2dem, blast2iso: support for input LASlayers '-ilay', '-ilaydir e:\layers', and '-ilay 2'
 29 March 2018 -- LASlib, all LAStools: fix for "missing points" when writing just decompressed "native" LAS 1.4
