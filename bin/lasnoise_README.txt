@@ -113,6 +113,7 @@ overview of all tool-specific switches:
 -remove_noise                        : remove noise points from the file
 -mem 2000                            : set amount of in-core memory to use for isolation grid to 2000 MB
 -remain_buffered                     : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-dont_remove_empty_files             : do not remove files that have zero points remaining from disk
 -ilay                                : apply all LASlayers found in corresponding *.lay file on read
 -ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
 -ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers

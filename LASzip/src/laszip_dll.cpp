@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    6 April 2018 == added zero() function to laszip_dll struct to fix memory leak
    30 August 2017 -- completing stream-based writing (with writing LAS header)
    23 August 2017 -- turn on "native" by default
     3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
