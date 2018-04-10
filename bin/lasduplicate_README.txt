@@ -155,7 +155,6 @@ overview of all tool-specific switches:
 -use_hash_map                        : use a different internal data structure (i.e. hash_map) for finding duplicates
 -two_pass                            : find duplicates in two instead of one pass over the file
 -remain_buffered                     : write buffer points to output when using '-buffered 25' on-the-fly buffering  
--dont_remove_empty_files             : do not remove files that have zero points remaining from disk
 -ilay                                : apply all LASlayers found in corresponding *.lay file on read
 -ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
 -ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
