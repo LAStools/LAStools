@@ -1,3 +1,4 @@
+11 April 2018 -- lasgrid: fix issue for huge rasters (using temp file storage) running on multiple cores
  9 April 2018 -- lasclip, las2las, lasheight, lasnoise: remove empty files unless '-dont_remove_empty_files'
  7 April 2018 -- lasview: also display point source ID (aka flightline number) for points picked with 'i'
  6 April 2018 -- las2iso and lasboundary: adding '-odbf' to the command line produces a 'z' attribute
