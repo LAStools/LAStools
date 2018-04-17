@@ -506,6 +506,17 @@ private:
   I32 index;
 };
 
+class LASoperationBinGpsTimeIntoIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "bin_gps_time_into_intensity"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g", name(), bin_size); };
+  inline void transform(LASpoint* point) { point->intensity = U16_CLAMP(point->get_gps_time()/bin_size); };
+  LASoperationBinGpsTimeIntoIntensity(F32 bin_size=1.0f) { this->bin_size = bin_size; };
+private:
+  F32 bin_size;
+};
+
 class LASoperationScaleScanAngle : public LASoperation
 {
 public:
@@ -1353,6 +1364,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -copy_RGB_into_intensity\n");
   fprintf(stderr,"  -copy_NIR_into_intensity\n");
   fprintf(stderr,"  -copy_attribute_into_intensity 0\n");
+  fprintf(stderr,"  -bin_gps_time_into_intensity 0.5\n");
   fprintf(stderr,"Transform scan_angle.\n");
   fprintf(stderr,"  -scale_scan_angle 1.944445\n");
   fprintf(stderr,"  -translate_scan_angle -5\n");
@@ -2457,6 +2469,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
           return FALSE;
         }
         add_operation(new LASoperationBinAbsScanAngleIntoPointSource((F32)atof(argv[i+1])));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i],"-bin_gps_time_into_intensity") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size\n", argv[i]);
+          return FALSE;
+        }
+        add_operation(new LASoperationBinGpsTimeIntoIntensity((F32)atof(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
     }
