@@ -162,6 +162,10 @@ int main(int argc, char *argv[])
   int remove_variable_length_record = -1;
   int remove_variable_length_record_from = -1;
   int remove_variable_length_record_to = -1;
+  bool remove_all_extended_variable_length_records = false;
+  int remove_extended_variable_length_record = -1;
+  int remove_extended_variable_length_record_from = -1;
+  int remove_extended_variable_length_record_to = -1;
   bool remove_tiling_vlr = false;
   bool remove_original_vlr = false;
   bool remove_empty_files = true;
@@ -398,6 +402,34 @@ int main(int argc, char *argv[])
       remove_variable_length_record = -1;
       remove_variable_length_record_from = atoi(argv[i+1]);
       remove_variable_length_record_to = atoi(argv[i+2]);
+      i+=2;
+    }
+    else if (strcmp(argv[i],"-remove_all_evlrs") == 0)
+    {
+      remove_all_extended_variable_length_records = true;
+    }
+    else if (strcmp(argv[i],"-remove_evlr") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+        byebye(true);
+      }
+      remove_extended_variable_length_record = atoi(argv[i+1]);
+      remove_extended_variable_length_record_from = -1;
+      remove_extended_variable_length_record_to = -1;
+      i++;
+    }
+    else if (strcmp(argv[i],"-remove_vlrs_from_to") == 0)
+    {
+      if ((i+2) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start end\n", argv[i]);
+        byebye(true);
+      }
+      remove_extended_variable_length_record = -1;
+      remove_extended_variable_length_record_from = atoi(argv[i+1]);
+      remove_extended_variable_length_record_to = atoi(argv[i+2]);
       i+=2;
     }
     else if (strcmp(argv[i],"-remove_tiling_vlr") == 0)
@@ -1021,6 +1053,26 @@ int main(int argc, char *argv[])
         for (i = remove_variable_length_record_to; i >= remove_variable_length_record_from; i--)
         {
           lasreader->header.remove_vlr(i);
+        }
+      }
+    }
+
+    if (remove_all_extended_variable_length_records)
+    {
+      lasreader->header.clean_evlrs();
+    }
+    else
+    {
+      if (remove_extended_variable_length_record != -1)
+      {
+        lasreader->header.remove_evlr(remove_extended_variable_length_record);
+      }
+    
+      if (remove_extended_variable_length_record_from != -1)
+      {
+        for (i = remove_extended_variable_length_record_to; i >= remove_extended_variable_length_record_from; i--)
+        {
+          lasreader->header.remove_evlr(i);
         }
       }
     }
