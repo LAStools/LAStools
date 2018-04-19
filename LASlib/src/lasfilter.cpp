@@ -2330,15 +2330,59 @@ BOOL LASfilter::parse(int argc, char* argv[])
       }
       else if (strncmp(argv[i],"-keep_gps", 9) == 0)
       {
-        if (strcmp(argv[i],"-keep_gps_time") == 0 || strcmp(argv[i],"-keep_gpstime") == 0)
+        if (strcmp(argv[i],"-keep_gps_time") == 0 || strcmp(argv[i],"-keep_gpstime") == 0 || strcmp(argv[i],"-keep_gps_time_between") == 0 || strcmp(argv[i],"-keep_gpstime_between") == 0)
         {
           if ((i+2) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: start end\n", argv[i]);
             return FALSE;
           }
-          add_criterion(new LAScriterionKeepGpsTime(atof(argv[i+1]), atof(argv[i+2])));
+          F64 start = 0.0;
+          if (sscanf(argv[i+1], "%lf", &start) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: start end but '%s' is no valid start\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F64 end = 0.0;
+          if (sscanf(argv[i+2], "%lf", &end) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: start end but '%s' is no valid end\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepGpsTime(start, end));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        }
+        else if (strcmp(argv[i],"-keep_gps_time_above") == 0 || strcmp(argv[i],"-keep_gpstime_above") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: time\n", argv[i]);
+            return FALSE;
+          }
+          F64 time = 0.0;
+          if (sscanf(argv[i+1], "%lf", &time) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: time but '%s' is no valid time\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropGpsTimeBelow(time));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+         }
+        else if (strcmp(argv[i],"-keep_gps_time_below") == 0 || strcmp(argv[i],"-keep_gpstime_below") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: time\n", argv[i]);
+            return FALSE;
+          }
+          F64 time = 0.0;
+          if (sscanf(argv[i+1], "%lf", &time) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: time but '%s' is no valid time\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropGpsTimeAbove(time));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
       }
       else if (strncmp(argv[i],"-keep_attribute", 15) == 0)
