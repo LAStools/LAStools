@@ -103,17 +103,17 @@ public:
   void add(F64 item, F64 value);
   void report(FILE* file, const CHAR* name=0, const CHAR* name_avg=0) const;
   void reset();
-  F32 get_step() const;
-  LASbin(F32 step, F32 clamp_min=F32_MIN, F32 clamp_max=F32_MAX);
+  F64 get_step() const;
+  LASbin(F64 step, F64 clamp_min=F64_MIN, F64 clamp_max=F64_MAX);
   ~LASbin();
 private:
   void add_to_bin(I32 bin);
   F64 total;
   I64 count;
-  F32 step;
-  F32 clamp_min;
-  F32 clamp_max;
-  F32 one_over_step;
+  F64 step;
+  F64 clamp_min;
+  F64 clamp_max;
+  F64 one_over_step;
   BOOL first;
   I32 anker;
   I32 size_pos;
@@ -130,8 +130,8 @@ public:
   BOOL active() const { return is_active; }; 
   BOOL parse(int argc, char* argv[]);
   I32 unparse(CHAR* string) const;
-  BOOL histo(const CHAR* name, F32 step);
-  BOOL histo_avg(const CHAR* name, F32 step, const CHAR* name_avg);
+  BOOL histo(const CHAR* name, F64 step);
+  BOOL histo_avg(const CHAR* name, F64 step, const CHAR* name_avg);
   void add(const LASpoint* point);
   void report(FILE* file) const;
   void reset();
