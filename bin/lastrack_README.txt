@@ -44,7 +44,19 @@
   '-classify_xy_range_and_height_between min max min_h max_h class'
   classifies any point within the specified min/max range from the
   trajectory as specified but only if their height is between min_h
-  and max_h above (or below) the trajectory (plus offset).
+  and max_h above (or below) the trajectory (plus offset). With the
+  '-classify_xyz_range_between min max class' classification will
+  be done using the 3D distance between point and trajectory.
+
+  You can also store the computed height and the range values as
+  additional point attributs via "extra bytes" using one of these
+  
+  -store_height_as_extra_bytes
+  -store_height_precise_as_extra_bytes
+  -store_xy_range_as_extra_bytes
+  -store_xy_range_precise_as_extra_bytes
+  -store_xyz_range_as_extra_bytes
+  -store_xyz_range_precise_as_extra_bytes
 
   Please license from martin.isenburg@rapidlasso.com before using
   lastrack commercially.
@@ -106,30 +118,37 @@ values with with this height, and then stores them with appendix
 
 overview of all tool-specific switches:
 
--v                                   : more info reported in console
--vv                                  : even more info reported in console
--quiet                               : nothing reported in console
--version                             : reports this tool's version number
--fail                                : fail if license expired or invalid
--gui                                 : start with files loaded into GUI
--cores 4                             : process multiple inputs on 4 cores in parallel
--ignore_class 1 3 4 5 6 7 9          : ignores points with specified classification codes
--track trajectory4.laz               : specifies file containing trajectory with GPS time
--offset -2.4                         : constant vertical offset from trajectory to ground (for mobile scans by truck or boat)
--replace_z                           : replace z values of points with vertical distance above / below (offset) trajectory
--drop_below -0.2                     : drop points with vertical distance of -0.2 or lower from (offset) trajectory
--drop_above 20.0                     : drop points with vertical distance of 20.0 or higher from (offset) trajectory
--drop_between 3.0 4.0                : drop points with vertical distance between 3.0 and 4.0 from (offset) trajectory
--classify_below -0.2 7               : classify points with vertical distance of -0.2 or lower from (offset) trajectory as 7
--classify_above 20.0 7               : classify points with vertical distance of 20.0 or higher from (offset) trajectory as 7
--classify_between 3.0 4.0 10         : classify points with vertical distance between 3.0 and 4.0 from (offset) trajectory as 10
--classify_xy_range_between 2 4 12    : classify points with xy-distance between 2.0 and 4.0 from trajectory as 12
+-v                                      : more info reported in console
+-vv                                     : even more info reported in console
+-quiet                                  : nothing reported in console
+-version                                : reports this tool's version number
+-fail                                   : fail if license expired or invalid
+-gui                                    : start with files loaded into GUI
+-cores 4                                : process multiple inputs on 4 cores in parallel
+-ignore_class 1 3 4 5 6 7 9             : ignores points with specified classification codes
+-track trajectory4.laz                  : specifies file containing trajectory with GPS time
+-offset -2.4                            : constant vertical offset from trajectory to ground (for mobile scans by truck or boat)
+-replace_z                              : replace z values of points with vertical distance above / below (offset) trajectory
+-drop_below -0.2                        : drop points with vertical distance of -0.2 or lower from (offset) trajectory
+-drop_above 20.0                        : drop points with vertical distance of 20.0 or higher from (offset) trajectory
+-drop_between 3.0 4.0                   : drop points with vertical distance between 3.0 and 4.0 from (offset) trajectory
+-classify_below -0.2 7                  : classify points with vertical distance of -0.2 or lower from (offset) trajectory as 7
+-classify_above 20.0 7                  : classify points with vertical distance of 20.0 or higher from (offset) trajectory as 7
+-classify_between 3.0 4.0 10            : classify points with vertical distance between 3.0 and 4.0 from (offset) trajectory as 10
+-classify_xy_range_between 2 4 12       : classify points with xy-distance between 2.0 and 4.0 from trajectory as 12
 -classify_xy_range_and_height_between 0 3 -5 5 7 : classify points with xy-distance between 0.0 and 3.0 from trajectory and vertical distance between -5 and 5 from (offset) trajectory as 7  
--ilay                                : apply all LASlayers found in corresponding *.lay file on read
--ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
--ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
--olay                                : write or append classification changes to a LASlayers *.lay file
--olaydir E:\my_layers                : write the output *.lay file in directory E:\my_layers
+-classify_xyz_range_between 50 999 7    : classify points with xyz-distance between 50.0 and 999.0 from trajectory as 7
+-store_height_as_extra_bytes            : store height of points above trajectory with cm resolution
+-store_height_precise_as_extra_bytes    : store height of points above trajectory with mm resolution
+-store_xy_range_as_extra_bytes          : store xy distance between points and trajectory with cm resolution
+-store_xy_range_precise_as_extra_bytes  : store xy distance between points and trajectory with mm resolution
+-store_xyz_range_as_extra_bytes         : store xyz distance between points and trajectory with cm resolution
+-store_xyz_range_precise_as_extra_bytes : store xyz distance between points and trajectory with mm resolution
+-ilay                                   : apply all LASlayers found in corresponding *.lay file on read
+-ilay 3                                 : apply first three LASlayers found in corresponding *.lay file on read
+-ilaydir E:\my_layers                   : look for corresponding *.lay file in directory E:\my_layers
+-olay                                   : write or append classification changes to a LASlayers *.lay file
+-olaydir E:\my_layers                   : write the output *.lay file in directory E:\my_layers
 
 ****************************************************************
 
