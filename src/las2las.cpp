@@ -420,7 +420,7 @@ int main(int argc, char *argv[])
       remove_extended_variable_length_record_to = -1;
       i++;
     }
-    else if (strcmp(argv[i],"-remove_vlrs_from_to") == 0)
+    else if (strcmp(argv[i],"-remove_evlrs_from_to") == 0)
     {
       if ((i+2) >= argc)
       {
