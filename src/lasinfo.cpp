@@ -184,7 +184,7 @@ static bool valid_resolution(F64 coordinate, F64 offset, F64 scale_factor)
   F64 coordinate_without_offset = coordinate - offset;
   F64 fixed_precision_multiplier = coordinate_without_offset / scale_factor;
   I64 quantized_fixed_precision_multiplier = I64_QUANTIZE(fixed_precision_multiplier);
-  if ((fabs(fixed_precision_multiplier - quantized_fixed_precision_multiplier)) < (1/100))
+  if ((fabs(fixed_precision_multiplier - quantized_fixed_precision_multiplier)) < 0.01)
   {
     return true;
   }
@@ -1054,27 +1054,27 @@ int main(int argc, char *argv[])
       fprintf(file_out, "  max x y z:                  "); lidardouble2string(printstring, lasheader->max_x, lasheader->x_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->max_y, lasheader->y_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->max_z, lasheader->z_scale_factor); fprintf(file_out, "%s\012", printstring);
       if (!valid_resolution(lasheader->min_x, lasheader->x_offset, lasheader->x_scale_factor))
       {
-        fprintf(file_out, "WARNING: full resolution of min_x not compatible with x_offset and x_scale_factor: "); lidardouble2string(printstring, lasheader->min_x); fprintf(file_out, "%s\n", printstring);
+        fprintf(file_out, "WARNING: stored resolution of min_x not compatible with x_offset and x_scale_factor: "); lidardouble2string(printstring, lasheader->min_x); fprintf(file_out, "%s\n", printstring);
       }
       if (!valid_resolution(lasheader->min_y, lasheader->y_offset, lasheader->y_scale_factor))
       {
-        fprintf(file_out, "WARNING: full resolution of min_y not compatible with y_offset and y_scale_factor: "); lidardouble2string(printstring, lasheader->min_y); fprintf(file_out, "%s\n", printstring);
+        fprintf(file_out, "WARNING: stored resolution of min_y not compatible with y_offset and y_scale_factor: "); lidardouble2string(printstring, lasheader->min_y); fprintf(file_out, "%s\n", printstring);
       }
       if (!valid_resolution(lasheader->min_z, lasheader->z_offset, lasheader->z_scale_factor))
       {
-        fprintf(file_out, "WARNING: full resolution of min_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->min_z); fprintf(file_out, "%s\n", printstring);
+        fprintf(file_out, "WARNING: stored resolution of min_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->min_z); fprintf(file_out, "%s\n", printstring);
       }
       if (!valid_resolution(lasheader->max_x, lasheader->x_offset, lasheader->x_scale_factor))
       {
-        fprintf(file_out, "WARNING: full resolution of max_x not compatible with x_offset and x_scale_factor: "); lidardouble2string(printstring, lasheader->max_x); fprintf(file_out, "%s\n", printstring);
+        fprintf(file_out, "WARNING: stored resolution of max_x not compatible with x_offset and x_scale_factor: "); lidardouble2string(printstring, lasheader->max_x); fprintf(file_out, "%s\n", printstring);
       }
       if (!valid_resolution(lasheader->max_y, lasheader->y_offset, lasheader->y_scale_factor))
       {
-        fprintf(file_out, "WARNING: full resolution of max_y not compatible with y_offset and y_scale_factor: "); lidardouble2string(printstring, lasheader->max_y); fprintf(file_out, "%s\n", printstring);
+        fprintf(file_out, "WARNING: stored resolution of max_y not compatible with y_offset and y_scale_factor: "); lidardouble2string(printstring, lasheader->max_y); fprintf(file_out, "%s\n", printstring);
       }
       if (!valid_resolution(lasheader->max_z, lasheader->z_offset, lasheader->z_scale_factor))
       {
-        fprintf(file_out, "WARNING: full resolution of max_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->max_z); fprintf(file_out, "%s\n", printstring);
+        fprintf(file_out, "WARNING: stored resolution of max_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->max_z); fprintf(file_out, "%s\n", printstring);
       }
       if ((lasheader->version_major == 1) && (lasheader->version_minor >= 3))
       {
