@@ -1074,7 +1074,7 @@ int main(int argc, char *argv[])
       }
       if (!valid_resolution(lasheader->max_z, lasheader->z_offset, lasheader->z_scale_factor))
       {
-        fprintf(file_out, "WARNING: full resolution of max_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->min_z); fprintf(file_out, "%s\n", printstring);
+        fprintf(file_out, "WARNING: full resolution of max_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->max_z); fprintf(file_out, "%s\n", printstring);
       }
       if ((lasheader->version_major == 1) && (lasheader->version_minor >= 3))
       {
