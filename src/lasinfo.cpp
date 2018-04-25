@@ -184,7 +184,7 @@ static bool valid_resolution(F64 coordinate, F64 offset, F64 scale_factor)
   F64 coordinate_without_offset = coordinate - offset;
   F64 fixed_precision_multiplier = coordinate_without_offset / scale_factor;
   I64 quantized_fixed_precision_multiplier = I64_QUANTIZE(fixed_precision_multiplier);
-  if ((fabs(fixed_precision_multiplier - quantized_fixed_precision_multiplier)) < (scale_factor/100))
+  if ((fabs(fixed_precision_multiplier - quantized_fixed_precision_multiplier)) < (1/100))
   {
     return true;
   }
