@@ -213,9 +213,9 @@ public:
   BOOL is_inside() const;
   I32 unparse(CHAR* string) const;
   void set_filter(LASfilter* filter);
-  const LASfilter* get_filter() { return filter; };
+  LASfilter* get_filter() { return filter; };
   void set_transform(LAStransform* transform);
-  const LAStransform* get_transform() { return transform; };
+  LAStransform* get_transform() { return transform; };
   void reset();
   const CHAR* get_temp_file_base() const { return temp_file_base; };
   LASreader* open(const CHAR* other_file_name=0, BOOL reset_after_other=TRUE);
