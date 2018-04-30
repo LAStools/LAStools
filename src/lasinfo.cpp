@@ -4022,32 +4022,32 @@ int main(int argc, char *argv[])
         value = lasheader->get_x(lassummary.max.get_X());
         if (value > enlarged_max_x)
         {
-          if (file_out) fprintf(file_out, "real max x larger than header max x by %lf\n", value - lasheader->max_x);
+          if (file_out) fprintf(file_out, "WARNING: real max x larger than header max x by %lf\n", value - lasheader->max_x);
         }
         value = lasheader->get_x(lassummary.min.get_X());
         if (value < enlarged_min_x)
         {
-          if (file_out) fprintf(file_out, "real min x smaller than header min x by %lf\n", lasheader->min_x - value);
+          if (file_out) fprintf(file_out, "WARNING: real min x smaller than header min x by %lf\n", lasheader->min_x - value);
         }
         value = lasheader->get_y(lassummary.max.get_Y());
         if (value > enlarged_max_y)
         {
-          if (file_out) fprintf(file_out, "real max y larger than header max y by %lf\n", value - lasheader->max_y);
+          if (file_out) fprintf(file_out, "WARNING: real max y larger than header max y by %lf\n", value - lasheader->max_y);
         }
         value = lasheader->get_y(lassummary.min.get_Y());
         if (value < enlarged_min_y)
         {
-          if (file_out) fprintf(file_out, "real min y smaller than header min y by %lf\n", lasheader->min_y - value);
+          if (file_out) fprintf(file_out, "WARNING: real min y smaller than header min y by %lf\n", lasheader->min_y - value);
         }
         value = lasheader->get_z(lassummary.max.get_Z());
         if (value > enlarged_max_z)
         {
-          if (file_out) fprintf(file_out, "real max z larger than header max z by %lf\n", value - lasheader->max_z);
+          if (file_out) fprintf(file_out, "WARNING: real max z larger than header max z by %lf\n", value - lasheader->max_z);
         }
         value = lasheader->get_z(lassummary.min.get_Z());
         if (value < enlarged_min_z)
         {
-          if (file_out) fprintf(file_out, "real min z smaller than header min z by %lf\n", lasheader->min_z - value);
+          if (file_out) fprintf(file_out, "WARNING: real min z smaller than header min z by %lf\n", lasheader->min_z - value);
         }
       }
     }
