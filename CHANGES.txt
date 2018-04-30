@@ -1,6 +1,14 @@
+29 April 2018 -- all LAStools GUIs: allow to overlay a PNG assuming it has a world-coordinate PGW file
+23 April 2018 -- lasview: for manual editing also "<r>egister changes" avaulable via pop-up menu 
+22 April 2018 -- lasview: also display 'user data' attribute for points picked with 'i'
+21 April 2018 -- lasgrid, las2dem, lascanopy: fix bug of removed filters/transforms when gridding/rasterizing '-attribute ...' 
+21 April 2018 -- lastrack: '-store_height_as_extra_bytes', '-store_yz_range_as_extra_bytes', '-store_xyz_range_as_extra_bytes' 
+20 April 2018 -- lastrack: new '-classify_xyz_range_between 50 1000 7' uses 3D distance from point to track
+19 April 2018 -- las2las: 'remove_all_evlrs' and '-remove_all_evlr 0' and '-remove_evlrs_from_to 1 3'
+17 April 2018 -- lasinfo: better formatted output when bins of histograms have decimal digitls
 11 April 2018 -- lasgrid: fix issue for huge rasters (using temp file storage) running on multiple cores
  9 April 2018 -- lasclip, las2las, lasheight, lasnoise: remove empty files unless '-dont_remove_empty_files'
- 7 April 2018 -- lasview: also display point source ID (aka flightline number) for points picked with 'i'
+ 7 April 2018 -- lasview: also display 'point source ID' (aka flightline number) for points picked with 'i'
  6 April 2018 -- las2iso and lasboundary: adding '-odbf' to the command line produces a 'z' attribute
  3 April 2018 -- lascolor: ability to process entire folders of LAS/LAZ and corresponding TIF files
  2 April 2018 -- blast2dem, blast2iso: improved generation of *.prj files
