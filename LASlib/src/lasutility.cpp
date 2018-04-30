@@ -1054,15 +1054,15 @@ BOOL LAShistogram::histo(const CHAR* name, F64 step)
     B_bin = new LASbin(step);
   else if (strcmp(name, "I") == 0)
     I_bin = new LASbin(step);
-  else if (strcmp(name, "0") == 0)
+  else if (strcmp(name, "0") == 0 || strcmp(name, "attribute0") == 0)
     attribute0_bin = new LASbin(step);
-  else if (strcmp(name, "1") == 0)
+  else if (strcmp(name, "1") == 0 || strcmp(name, "attribute1") == 0)
     attribute1_bin = new LASbin(step);
-  else if (strcmp(name, "2") == 0)
+  else if (strcmp(name, "2") == 0 || strcmp(name, "attribute2") == 0)
     attribute2_bin = new LASbin(step);
-  else if (strcmp(name, "3") == 0)
+  else if (strcmp(name, "3") == 0 || strcmp(name, "attribute3") == 0)
     attribute3_bin = new LASbin(step);
-  else if (strcmp(name, "4") == 0)
+  else if (strcmp(name, "4") == 0 || strcmp(name, "attribute4") == 0)
     attribute4_bin = new LASbin(step);
   else if (strstr(name, "wavepacket_index") != 0)
     wavepacket_index_bin = new LASbin(step);
