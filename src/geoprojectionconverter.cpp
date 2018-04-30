@@ -5022,7 +5022,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             fprintf(stderr, "False easting:  %.10g\n", false_easting_meter);
             fprintf(stderr, "False northing: %.10g\n", false_northing_meter);
 */
-            if (scale_factor_at_natural_origin != 1.0) fprintf(stderr, "WARNING: current implementation for Lambert Conic Conformal (1SP) ignores scale factor\n");
+            if (scale_factor_at_natural_origin != 1.0) fprintf(stderr, "\nWARNING: current implementation for Lambert Conic Conformal (1SP) ignores scale factor %.10g and uses 1.0 instead\n", scale_factor_at_natural_origin);
             set_lambert_conformal_conic_projection(false_easting_meter, false_northing_meter, latitude_of_natural_origin_decdeg, longitude_of_natural_origin_decdeg, latitude_of_natural_origin, latitude_of_natural_origin, 0, source, name);
             set_geokey(value, source);
             if (description) sprintf(description, "%s", name);
