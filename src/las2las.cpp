@@ -892,17 +892,35 @@ int main(int argc, char *argv[])
       point->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
     }
 
-    // maybe we should add / change the projection information
+    // reproject or just set the projection?
+
     LASquantizer* reproject_quantizer = 0;
     LASquantizer* saved_quantizer = 0;
-    if (geoprojectionconverter.has_projection(true) || geoprojectionconverter.has_projection(false))
-    {
-      if (!geoprojectionconverter.has_projection(true) && lasreader->header.vlr_geo_keys)
-      {
-        geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
-      }
+    bool set_projection_in_header = false;
 
-      if (geoprojectionconverter.has_projection(true) && geoprojectionconverter.has_projection(false))
+    if (geoprojectionconverter.has_projection(false)) // reproject because a target projection was provided in the command line
+    {
+      if (!geoprojectionconverter.has_projection(true))      // if no source projection was provided in the command line ...
+      {
+        if (lasreader->header.vlr_geo_ogc_wkt)               // ... try to get it from the OGC WKT string ...
+        {
+          geoprojectionconverter.set_projection_from_ogc_wkt(lasreader->header.vlr_geo_ogc_wkt);
+        }
+        if (!geoprojectionconverter.has_projection(true))    // ... nothing ... ? ...
+        {
+          if (lasreader->header.vlr_geo_keys)                // ... try to get it from the geo keys.
+          {
+            geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+          }
+        }
+      }
+      if (!geoprojectionconverter.has_projection(true))
+      {
+        fprintf(stderr, "WARNING: cannot determine source projection of '%s'. not reprojecting ... \n", lasreadopener.get_file_name());
+
+        set_projection_in_header = false;
+      }
+      else
       {
         reproject_quantizer = new LASquantizer();
         double point[3];
@@ -916,8 +934,17 @@ int main(int argc, char *argv[])
         reproject_quantizer->x_offset = ((I64)((point[0]/reproject_quantizer->x_scale_factor)/10000000))*10000000*reproject_quantizer->x_scale_factor;
         reproject_quantizer->y_offset = ((I64)((point[1]/reproject_quantizer->y_scale_factor)/10000000))*10000000*reproject_quantizer->y_scale_factor;
         reproject_quantizer->z_offset = ((I64)((point[2]/reproject_quantizer->z_scale_factor)/10000000))*10000000*reproject_quantizer->z_scale_factor;
-      }
 
+        set_projection_in_header = true;
+      }
+    }
+    else if (geoprojectionconverter.has_projection(true)) // set because only a source projection was provided in the command line
+    {
+      set_projection_in_header = true;
+    }
+
+    if (set_projection_in_header)
+    {
       int number_of_keys;
       GeoProjectionGeoKeys* geo_keys = 0;
       int num_geo_double_params;
@@ -937,6 +964,7 @@ int main(int argc, char *argv[])
           lasreader->header.del_geo_double_params();
         }
         lasreader->header.del_geo_ascii_params();
+        lasreader->header.del_geo_ogc_wkt();
       }
 
       if (set_ogc_wkt) // maybe also set the OCG WKT 
@@ -945,7 +973,7 @@ int main(int argc, char *argv[])
         I32 len = (ogc_wkt ? strlen(ogc_wkt) : 0);
         if (ogc_wkt == 0)
         { 
-          if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false)))
+          if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, false))
           {
             fprintf(stderr, "WARNING: cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'\n", lasreadopener.get_file_name());
             if (ogc_wkt) free(ogc_wkt);
