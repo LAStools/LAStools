@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 180429
+#define LAS_TOOLS_VERSION 180510
 
 #include <stdio.h>
 #include <string.h>
@@ -951,6 +951,7 @@ public:
     if (vlr_geo_ogc_wkt)
     {
       remove_vlr("LASF_Projection", 2112);
+      remove_evlr("LASF_Projection", 2112);
       vlr_geo_ogc_wkt = 0;
     }
   }
