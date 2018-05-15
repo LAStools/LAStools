@@ -78,7 +78,7 @@ void usage(bool error=false, bool wait=false)
   fprintf(stderr,"and the next number should be the scan angle.\n");
   fprintf(stderr,"The supported entries are a - scan angle, i - intensity,\n");
   fprintf(stderr,"n - number of returns for given pulse, r - number of\n");
-  fprintf(stderr,"this return, c - classification, u - user data,\n");
+  fprintf(stderr,"this return, t - gpstime, c - classification, u - user data,\n");
   fprintf(stderr,"p - point source ID, e - edge of flight line flag, and\n");
   fprintf(stderr,"d - direction of scan flag, l - extended scanner channel,\n");
   fprintf(stderr,"h - withheld flag, k - keypoint flag, g - synthetic flag,\n");
