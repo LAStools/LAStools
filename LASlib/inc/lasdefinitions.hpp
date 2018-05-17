@@ -556,7 +556,7 @@ public:
     {
       number_of_variable_length_records = 1;
       offset_to_point_data += 54;
-      vlrs = (LASvlr*)malloc(sizeof(LASvlr)*number_of_variable_length_records);
+      vlrs = (LASvlr*)calloc(1, sizeof(LASvlr)*number_of_variable_length_records);
     }
     vlrs[i].reserved = 0; // used to be 0xAABB
     strncpy(vlrs[i].user_id, user_id, 16);
