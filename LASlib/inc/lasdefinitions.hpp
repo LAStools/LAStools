@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 180519
+#define LAS_TOOLS_VERSION 180520
 
 #include <stdio.h>
 #include <string.h>
@@ -556,8 +556,9 @@ public:
     {
       number_of_variable_length_records = 1;
       offset_to_point_data += 54;
-      vlrs = (LASvlr*)malloc(sizeof(LASvlr)*number_of_variable_length_records);
+      vlrs = (LASvlr*)malloc(sizeof(LASvlr));
     }
+    memset(&(vlrs[i]), 0, sizeof(LASvlr));
     vlrs[i].reserved = 0; // used to be 0xAABB
     strncpy(vlrs[i].user_id, user_id, 16);
     vlrs[i].record_id = record_id;
