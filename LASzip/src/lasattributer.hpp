@@ -262,6 +262,7 @@ private:
 class LASattributer
 {
 public:
+  BOOL attributes_linked;
   I32 number_attributes;
   LASattribute* attributes;
   I32* attribute_starts;
@@ -269,6 +270,7 @@ public:
 
   LASattributer()
   {
+    attributes_linked = TRUE;
     number_attributes = 0;
     attributes = 0;
     attribute_starts = 0;
@@ -282,12 +284,15 @@ public:
 
   void clean_attributes()
   {
-    if (number_attributes)
+    if (attributes_linked)
     {
-      number_attributes = 0;
-      free(attributes); attributes = 0;
-      free(attribute_starts); attribute_starts = 0;
-      free(attribute_sizes); attribute_sizes = 0;
+      if (attributes)
+      {
+        number_attributes = 0;
+        free(attributes); attributes = 0;
+        free(attribute_starts); attribute_starts = 0;
+        free(attribute_sizes); attribute_sizes = 0;
+      }
     }
   };
 
