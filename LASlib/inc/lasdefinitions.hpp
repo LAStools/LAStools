@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 180510
+#define LAS_TOOLS_VERSION 180519
 
 #include <stdio.h>
 #include <string.h>
@@ -440,7 +440,7 @@ public:
     vlr_lasoriginal = 0;
     user_data_after_header_size = 0;
     user_data_after_header = 0;
-    number_attributes = 0;
+    attributes_linked = FALSE;
     offset_to_point_data = header_size;
   }
 
