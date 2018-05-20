@@ -105,7 +105,7 @@ c = c + 1
 if sys.argv[c] == "flag as withheld":
     command.append("-flag_as_withheld")
 elif sys.argv[c] == "remove from output":
-    command.append("-remove_from_output")
+    command.append("-remove_overage")
 c = c + 1
 
 ### maybe an output format was selected
