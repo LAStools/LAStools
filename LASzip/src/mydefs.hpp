@@ -74,6 +74,7 @@ typedef bool               BOOL;
 
 typedef union U32I32F32 { U32 u32; I32 i32; F32 f32; } U32I32F32;
 typedef union U64I64F64 { U64 u64; I64 i64; F64 f64; } U64I64F64;
+typedef union I64U32I32F32 { I64 i64; U32 u32[2]; I32 i32[2]; F32 f32[2]; } I64U32I32F32;
 
 #define F32_MAX            +2.0e+37f
 #define F32_MIN            -2.0e+37f
