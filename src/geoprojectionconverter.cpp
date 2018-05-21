@@ -3535,11 +3535,11 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
         {
           if (utm->utm_northern_hemisphere)
           {
-            if (3 <= utm->utm_zone_number && utm->utm_zone_number <= 23)
+            if ((3 <= utm->utm_zone_number) && (utm->utm_zone_number <= 23))
             {
               return utm->utm_zone_number + 26900;
             }
-            else if (28 <= utm->utm_zone_number && utm->utm_zone_number <= 38)
+            else if ((28 <= utm->utm_zone_number) && (utm->utm_zone_number <= 38))
             {
               return utm->utm_zone_number + 25800;
             }
@@ -3550,14 +3550,28 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
           }
           else
           {
-            fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD83 does not exist\n", utm->utm_zone_number);
+            if (gcs_code == GEO_GCS_GDA94)
+            {
+              if ((48 <= utm->utm_zone_number) && (utm->utm_zone_number <= 58))
+              {
+                return utm->utm_zone_number + 28300;
+              }
+              else
+              {
+                fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern MGA zone %d for GDA94 does not exist\n", utm->utm_zone_number);
+              }
+            }
+            else
+            {
+              fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD83 does not exist\n", utm->utm_zone_number);
+            }
           }
         }
         else if (ellipsoid->id == GEO_ELLIPSOID_CLARKE1866)
         {
           if (utm->utm_northern_hemisphere)
           {
-            if (3 <= utm->utm_zone_number && utm->utm_zone_number <= 22)
+            if ((3 <= utm->utm_zone_number) && (utm->utm_zone_number <= 22))
             {
               return utm->utm_zone_number + 26700;
             }
@@ -3575,7 +3589,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
         {
           if (utm->utm_northern_hemisphere)
           {
-            if (18 <= utm->utm_zone_number && utm->utm_zone_number <= 22)
+            if ((18 <= utm->utm_zone_number) && (utm->utm_zone_number <= 22))
             {
               return utm->utm_zone_number + 29100;
             }
@@ -3600,7 +3614,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
         {
           if (utm->utm_northern_hemisphere)
           {
-            if (28 <= utm->utm_zone_number && utm->utm_zone_number <= 38)
+            if ((28 <= utm->utm_zone_number) && (utm->utm_zone_number <= 38))
             {
               return utm->utm_zone_number + 23000;
             }
@@ -3618,7 +3632,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
         {
           if (utm->utm_northern_hemisphere)
           {
-            if (46 <= utm->utm_zone_number && utm->utm_zone_number <= 53)
+            if ((46 <= utm->utm_zone_number) && (utm->utm_zone_number <= 53))
             {
               return utm->utm_zone_number + 23800;
             }
@@ -3629,7 +3643,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
           }
           else
           {
-            if (46 <= utm->utm_zone_number && utm->utm_zone_number <= 54)
+            if ((46 <= utm->utm_zone_number) && (utm->utm_zone_number <= 54))
             {
               return utm->utm_zone_number + 23840;
             }
