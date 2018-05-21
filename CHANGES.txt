@@ -1,3 +1,7 @@
+20 May 2018 -- LASlib, all LAStools: bug fix when trying to set CRS via '-gda94 -utm 56south' in command line 
+19 May 2018 -- lasnoise, lasheight, & others: bug fix when on-the-fly filtering on additional attributes
+12 May 2018 -- las2las, LASlib: new filters '-drop_RGB_red 5000 6000' and '-drop_RGB_green 200 10000' 
+ 8 May 2018 -- las2las: handling of OGC WKT and more clear "setting" versus "reprojecting" the CRS
 29 April 2018 -- all LAStools GUIs: allow to overlay a PNG assuming it has a world-coordinate PGW file
 23 April 2018 -- lasview: for manual editing also "<r>egister changes" avaulable via pop-up menu 
 22 April 2018 -- lasview: also display 'user data' attribute for points picked with 'i'
