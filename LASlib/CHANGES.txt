@@ -1,3 +1,6 @@
+20 May 2018 -- LASlib, all LAStools: bug fix when trying to set CRS via '-gda94 -utm 56south' in command line 
+12 May 2018 -- las2las, LASlib: new filters '-drop_RGB_red 5000 6000' and '-drop_RGB_green 200 10000' 
+ 8 May 2018 -- las2las: handling of OGC WKT and more clear "setting" versus "reprojecting" the CRS
 19 April 2018 -- las2las: 'remove_all_evlrs' and '-remove_all_evlr 0' and '-remove_evlrs_from_to 1 3'
 17 April 2018 -- lasinfo: better formatted output when bins of histograms have decimal digitls
 29 March 2018 -- LASlib, all LAStools: fix for "missing points" when writing just decompressed "native" LAS 1.4
