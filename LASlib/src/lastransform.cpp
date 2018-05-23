@@ -414,8 +414,8 @@ public:
   inline const CHAR* name() const { return "scale_intensity"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
   inline void transform(LASpoint* point) {
-    F32 intensity = scale*point->intensity;
-    point->intensity = U16_CLAMP((I32)intensity);
+    F32 intensity = scale*point->get_intensity();
+    point->set_intensity(U16_CLAMP(intensity));
   };
   LASoperationScaleIntensity(F32 scale) { this->scale = scale; };
 private:
@@ -428,8 +428,8 @@ public:
   inline const CHAR* name() const { return "translate_intensity"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), offset); };
   inline void transform(LASpoint* point) {
-    F32 intensity = offset+point->intensity;
-    point->intensity = U16_CLAMP((I32)intensity);
+    F32 intensity = offset+point->get_intensity();
+    point->set_intensity(U16_CLAMP(intensity));
   };
   LASoperationTranslateIntensity(F32 offset) { this->offset = offset; };
 private:
@@ -442,8 +442,8 @@ public:
   inline const CHAR* name() const { return "translate_then_scale_intensity"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), offset, scale); };
   inline void transform(LASpoint* point) {
-    F32 intensity = (offset+point->intensity)*scale;
-    point->intensity = U16_CLAMP((I32)intensity);
+    F32 intensity = (offset+point->get_intensity())*scale;
+    point->set_intensity(U16_CLAMP(intensity));
   };
   LASoperationTranslateThenScaleIntensity(F32 offset, F32 scale) { this->offset = offset; this->scale = scale; };
 private:
@@ -457,8 +457,8 @@ public:
   inline const CHAR* name() const { return "clamp_intensity"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %u %u ", name(), (U32)below, (U32)above); };
   inline void transform(LASpoint* point) {
-    if (point->intensity > above ) point->intensity = above;
-    else if (point->intensity < below ) point->intensity = below;
+    if (point->get_intensity() > above ) point->set_intensity(above);
+    else if (point->get_intensity() < below ) point->set_intensity(below);
   };
   LASoperationClampIntensity(U16 below, U16 above) { this->below = below; this->above = above; };
 private:
@@ -472,7 +472,7 @@ public:
   inline const CHAR* name() const { return "clamp_intensity_below"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), (U32)below); };
   inline void transform(LASpoint* point) {
-    if (point->intensity < below ) point->intensity = below;
+    if (point->get_intensity() < below ) point->set_intensity(below);
   };
   LASoperationClampIntensityBelow(U16 below) { this->below = below; };
 private:
@@ -485,7 +485,7 @@ public:
   inline const CHAR* name() const { return "clamp_intensity_above"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), (U32)above); };
   inline void transform(LASpoint* point) {
-    if (point->intensity > above ) point->intensity = above;
+    if (point->get_intensity() > above ) point->set_intensity(above);
   };
   LASoperationClampIntensityAbove(U16 above) { this->above = above; };
 private:
@@ -511,7 +511,7 @@ class LASoperationBinGpsTimeIntoIntensity : public LASoperation
 public:
   inline const CHAR* name() const { return "bin_gps_time_into_intensity"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g", name(), bin_size); };
-  inline void transform(LASpoint* point) { point->intensity = U16_CLAMP(point->get_gps_time()/bin_size); };
+  inline void transform(LASpoint* point) { point->set_intensity(U16_CLAMP(point->get_gps_time()/bin_size)); };
   LASoperationBinGpsTimeIntoIntensity(F32 bin_size=1.0f) { this->bin_size = bin_size; };
 private:
   F32 bin_size;
@@ -737,15 +737,15 @@ public:
   inline const CHAR* name() const { return "classify_intensity_below_as"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), (I32)intensity_below, (I32)class_to); };
   inline void transform(LASpoint* point) {
-    if (point->intensity < intensity_below)
+    if (point->get_intensity() < intensity_below)
     {
       if (class_to >= 32)
       {
-        point->classification = class_to;
+        point->set_extended_classification(class_to);
       }
       else
       {
-        point->classification = (point->classification & 224) | class_to;
+        point->set_classification(class_to);
       }
     }
   };
@@ -761,15 +761,15 @@ public:
   inline const CHAR* name() const { return "classify_intensity_above_as"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), (I32)intensity_above, (I32)class_to); };
   inline void transform(LASpoint* point) {
-    if (point->intensity > intensity_above)
+    if (point->get_intensity() > intensity_above)
     {
       if (class_to >= 32)
       {
-        point->classification = class_to;
+        point->set_extended_classification(class_to);
       }
       else
       {
-        point->classification = (point->classification & 224) | class_to;
+        point->set_classification(class_to);
       }
     }
   };
@@ -785,15 +785,15 @@ public:
   inline const CHAR* name() const { return "classify_intensity_between_as"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), (I32)intensity_below, (I32)intensity_above, (I32)class_to); };
   inline void transform(LASpoint* point) {
-    if ((intensity_above <= point->intensity) && (point->intensity <= intensity_above))
+    if ((intensity_below <= point->get_intensity()) && (point->get_intensity() <= intensity_above))
     {
       if (class_to >= 32)
       {
-        point->classification = class_to;
+        point->set_extended_classification(class_to);
       }
       else
       {
-        point->classification = (point->classification & 224) | class_to;
+        point->set_classification(class_to);
       }
     }
   };
@@ -2219,30 +2219,107 @@ BOOL LAStransform::parse(int argc, char* argv[])
         {
           if ((i+2) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classification\n", argv[i]);
             return FALSE;
           }
-          add_operation(new LASoperationClassifyIntensityBelowAs(U16_CLAMP(atoi(argv[i+1])), U8_CLAMP(atoi(argv[i+2]))));
+          U32 value;
+          if (sscanf(argv[i+1], "%u", &value) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classification but '%s' is no valid value\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          U32 classification;
+          if (sscanf(argv[i+2], "%u", &classification) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classificationn but '%s' is no valid classification\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          if (value > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot classify intensity because value of %u is larger than %u\n", value, U16_MAX);
+            return FALSE;
+          }
+          if (classification > 255)
+          {
+            fprintf(stderr,"ERROR: cannot classify intensity because classification of %u is larger than 255\n", classification);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyIntensityBelowAs(value, classification));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
         else if (strcmp(argv[i],"-classify_intensity_above_as") == 0)
         {
           if ((i+2) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: intensity_value classification_code\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classification\n", argv[i]);
             return FALSE;
           }
-          add_operation(new LASoperationClassifyIntensityAboveAs(U16_CLAMP(atoi(argv[i+1])), (U8)atoi(argv[i+2])));
+          U32 value;
+          if (sscanf(argv[i+1], "%u", &value) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classification but '%s' is no valid value\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          U32 classification;
+          if (sscanf(argv[i+2], "%u", &classification) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classificationn but '%s' is no valid classification\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          if (value > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot classify intensity because value of %u is larger than %u\n", value, U16_MAX);
+            return FALSE;
+          }
+          if (classification > 255)
+          {
+            fprintf(stderr,"ERROR: cannot classify intensity because classification of %u is larger than 255\n", classification);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyIntensityAboveAs(value, classification));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
         else if (strcmp(argv[i],"-classify_intensity_between_as") == 0)
         {
           if ((i+3) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 3 arguments: min_intensity_value max_intensity_value classification_code\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: min_value max_value classification\n", argv[i]);
             return FALSE;
           }
-          add_operation(new LASoperationClassifyIntensityBetweenAs(U16_CLAMP(atoi(argv[i+1])), U16_CLAMP(atoi(argv[i+2])), (U8)atoi(argv[i+3])));
+          U32 min_value;
+          if (sscanf(argv[i+1], "%u", &min_value) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: min_value max_value classification but '%s' is no valid min_value\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          U32 max_value;
+          if (sscanf(argv[i+2], "%u", &max_value) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: min_value max_value classification but '%s' is no valid max_value\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          U32 classification;
+          if (sscanf(argv[i+3], "%u", &classification) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: min_value max_value classification but '%s' is no valid classification\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          if (min_value > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot classify intensity because min_value of %u is larger than %u\n", min_value, U16_MAX);
+            return FALSE;
+          }
+          if (max_value > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot classify intensity because max_value of %u is larger than %u\n", max_value, U16_MAX);
+            return FALSE;
+          }
+          if (classification > 255)
+          {
+            fprintf(stderr,"ERROR: cannot classify intensity because classification of %u is larger than 255\n", classification);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyIntensityBetweenAs(min_value, max_value, classification));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
         }
       }
