@@ -1605,8 +1605,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: raw_offset\n", argv[i]);
             return FALSE;
           }
+          I32 raw_offset;
+          if (sscanf(argv[i+1], "%d", &raw_offset) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
           change_coordinates = TRUE;
-          add_operation(new LASoperationTranslateRawX((I32)atoi(argv[i+1])));
+          add_operation(new LASoperationTranslateRawX(raw_offset));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
         else if (strcmp(argv[i],"-translate_raw_y") == 0)
@@ -1616,8 +1622,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: raw_offset\n", argv[i]);
             return FALSE;
           }
+          I32 raw_offset;
+          if (sscanf(argv[i+1], "%d", &raw_offset) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
           change_coordinates = TRUE;
-          add_operation(new LASoperationTranslateRawY((I32)atoi(argv[i+1])));
+          add_operation(new LASoperationTranslateRawY(raw_offset));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
         else if (strcmp(argv[i],"-translate_raw_z") == 0)
@@ -1627,8 +1639,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: raw_offset\n", argv[i]);
             return FALSE;
           }
+          I32 raw_offset;
+          if (sscanf(argv[i+1], "%d", &raw_offset) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
           change_coordinates = TRUE;
-          add_operation(new LASoperationTranslateRawZ((I32)atoi(argv[i+1])));
+          add_operation(new LASoperationTranslateRawZ(raw_offset));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
         else if (strcmp(argv[i],"-translate_raw_xyz") == 0)
@@ -1638,8 +1656,26 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z\n", argv[i]);
             return FALSE;
           }
+          I32 raw_offset_x;
+          if (sscanf(argv[i+1], "%d", &raw_offset_x) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_x\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          I32 raw_offset_y;
+          if (sscanf(argv[i+2], "%d", &raw_offset_y) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_y\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          I32 raw_offset_z;
+          if (sscanf(argv[i+3], "%d", &raw_offset_z) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_z\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
           change_coordinates = TRUE;
-          add_operation(new LASoperationTranslateRawXYZ((I32)atoi(argv[i+1]), (I32)atoi(argv[i+2]), (I32)atoi(argv[i+3])));
+          add_operation(new LASoperationTranslateRawXYZ(raw_offset_x, raw_offset_y, raw_offset_z));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
         }
         else if (strcmp(argv[i],"-translate_raw_xy_at_random") == 0)
@@ -1649,8 +1685,20 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y\n", argv[i]);
             return FALSE;
           }
+          I32 max_raw_offset_x;
+          if (sscanf(argv[i+1], "%d", &max_raw_offset_x) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y but '%s' is no valid max_raw_offset_x\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          I32 max_raw_offset_y;
+          if (sscanf(argv[i+2], "%d", &max_raw_offset_y) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y but '%s' is no valid max_raw_offset_y\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
           change_coordinates = TRUE;
-          add_operation(new LASoperationTranslateRawXYatRandom((I32)atoi(argv[i+1]), (I32)atoi(argv[i+2])));
+          add_operation(new LASoperationTranslateRawXYatRandom(max_raw_offset_x, max_raw_offset_y));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
       }
@@ -1661,7 +1709,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationTranslateIntensity((F32)atof(argv[i+1])));
+        F32 offset;
+        if (sscanf(argv[i+1], "%f", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset but '%s' is no valid offset\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        add_operation(new LASoperationTranslateIntensity(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-translate_then_scale_intensity") == 0)
@@ -1671,7 +1725,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationTranslateThenScaleIntensity((F32)atof(argv[i+1]), (F32)atof(argv[i+2])));
+        F32 offset;
+        if (sscanf(argv[i+1], "%f", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid offset\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F32 scale;
+        if (sscanf(argv[i+2], "%f", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid scale\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        add_operation(new LASoperationTranslateThenScaleIntensity(offset, scale));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-translate_scan_angle") == 0)
@@ -1681,7 +1747,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationTranslateScanAngle((F32)atof(argv[i+1])));
+        F32 offset;
+        if (sscanf(argv[i+1], "%f", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset but '%s' is no valid offset\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        add_operation(new LASoperationTranslateScanAngle(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-translate_then_scale_scan_angle") == 0)
@@ -1691,7 +1763,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationTranslateThenScaleScanAngle((F32)atof(argv[i+1]), (F32)atof(argv[i+2])));
+        F32 offset;
+        if (sscanf(argv[i+1], "%f", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid offset\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F32 scale;
+        if (sscanf(argv[i+2], "%f", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid scale\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        add_operation(new LASoperationTranslateThenScaleScanAngle(offset, scale));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-translate_gps_time") == 0)
@@ -1701,7 +1785,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationTranslateGpsTime(atof(argv[i+1])));
+        F64 offset;
+        if (sscanf(argv[i+1], "%lf", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset but '%s' is no valid offset\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        add_operation(new LASoperationTranslateGpsTime(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
     }
@@ -1711,22 +1801,58 @@ BOOL LAStransform::parse(int argc, char* argv[])
       {
         if ((i+3) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle, x, y\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_y\n", argv[i]);
+          return FALSE;
+        }
+        F64 angle;
+        if (sscanf(argv[i+1], "%lf", &angle) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid angle\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 rot_center_x;
+        if (sscanf(argv[i+2], "%lf", &rot_center_x) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid rot_center_x\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        F64 rot_center_y;
+        if (sscanf(argv[i+3], "%lf", &rot_center_y) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid rot_center_y\n", argv[i], argv[i+3]);
           return FALSE;
         }
         change_coordinates = TRUE;
-        add_operation(new LASoperationRotateXY((F64)atof(argv[i+1]), (F64)atof(argv[i+2]), (F64)atof(argv[i+3])));
+        add_operation(new LASoperationRotateXY(angle, rot_center_x, rot_center_y));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
       else if (strcmp(argv[i],"-rotate_xz") == 0)
       {
         if ((i+3) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle, x, y\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_z\n", argv[i]);
+          return FALSE;
+        }
+        F64 angle;
+        if (sscanf(argv[i+1], "%lf", &angle) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid angle\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 rot_center_x;
+        if (sscanf(argv[i+2], "%lf", &rot_center_x) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid rot_center_x\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        F64 rot_center_z;
+        if (sscanf(argv[i+3], "%lf", &rot_center_z) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid rot_center_z\n", argv[i], argv[i+3]);
           return FALSE;
         }
         change_coordinates = TRUE;
-        add_operation(new LASoperationRotateXZ((F64)atof(argv[i+1]), (F64)atof(argv[i+2]), (F64)atof(argv[i+3])));
+        add_operation(new LASoperationRotateXZ(angle, rot_center_x, rot_center_z));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
     }
@@ -1739,8 +1865,20 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above\n", argv[i]);
           return FALSE;
         }
+        F64 below;
+        if (sscanf(argv[i+1], "%lf", &below) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above but '%s' is no valid below value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 above;
+        if (sscanf(argv[i+2], "%lf", &above) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above but '%s' is no valid above value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationClampZ(atof(argv[i+1]), atof(argv[i+2])));
+        add_operation(new LASoperationClampZ(below, above));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-clamp_z_below") == 0)
@@ -1750,8 +1888,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: below\n", argv[i]);
           return FALSE;
         }
+        F64 below;
+        if (sscanf(argv[i+1], "%lf", &below) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: below but '%s' is no valid below value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationClampZbelow(atof(argv[i+1])));
+        add_operation(new LASoperationClampZbelow(below));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-clamp_z_above") == 0)
@@ -1761,8 +1905,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: above\n", argv[i]);
           return FALSE;
         }
+        F64 above;
+        if (sscanf(argv[i+1], "%lf", &above) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: above but '%s' is no valid above value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationClampZabove(atof(argv[i+1])));
+        add_operation(new LASoperationClampZabove(above));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-clamp_intensity") == 0)
@@ -1772,7 +1922,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationClampIntensity(U16_CLAMP(atoi(argv[i+1])), U16_CLAMP(atoi(argv[i+2]))));
+        U32 below;
+        if (sscanf(argv[i+1], "%u", &below) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above but '%s' is no valid below value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        U32 above;
+        if (sscanf(argv[i+2], "%u", &above) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above but '%s' is no valid above value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (below > U16_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot clamp intensity because below value of %u is larger than %u\n", below, U16_MAX);
+          return FALSE;
+        }
+        if (above > U16_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot clamp intensity because above value of %u is larger than %u\n", above, U16_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationClampIntensity((U16)below, (U16)above));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-clamp_intensity_below") == 0)
@@ -1782,7 +1954,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: below\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationClampIntensityBelow(U16_CLAMP(atoi(argv[i+1]))));
+        U32 below;
+        if (sscanf(argv[i+1], "%u", &below) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: below but '%s' is no valid below value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (below > U16_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot clamp intensity because below value of %u is larger than %u\n", below, U16_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationClampIntensityBelow((U16)below));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-clamp_intensity_above") == 0)
@@ -1792,7 +1975,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: above\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationClampIntensityAbove(U16_CLAMP(atoi(argv[i+1]))));
+        U32 above;
+        if (sscanf(argv[i+1], "%u", &above) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: above but '%s' is no valid above value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (above > U16_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot clamp intensity because above value of %u is larger than %u\n", above, U16_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationClampIntensityAbove((U16)above));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-clamp_raw_z") == 0)
