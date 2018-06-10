@@ -172,11 +172,11 @@ BOOL LASreaderBuffered::open()
 
   if (header.laszip)
   {
-    if (!point.init(&header, header.laszip->num_items, header.laszip->items)) return FALSE;
+    if (!point.init(&header, header.laszip->num_items, header.laszip->items, &header)) return FALSE;
   }
   else
   {
-    if (!point.init(&header, header.point_data_format, header.point_data_record_length)) return FALSE;
+    if (!point.init(&header, header.point_data_format, header.point_data_record_length, &header)) return FALSE;
   }
 
   // maybe we have to look for neighbors from which we load buffer points
