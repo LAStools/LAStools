@@ -1,3 +1,7 @@
+12 June 2018 -- las2las: new option '-set_global_encoding_gps_bit 1' because this bit is simply so often set wrong
+11 June 2018 -- lasview: new option '-points_all' loads all points from input (especially useful for manual editing)
+10 June 2018 -- LASlib, all LAStools: fix for additional attributes in "extra bytes" combined with '-buffered 15'
+28 May 2018 -- lasclip: remove leading spaces from '-split 2' file name from DBF file, use LAZ if format not specified
 20 May 2018 -- LASlib, all LAStools: bug fix when trying to set CRS via '-gda94 -utm 56south' in command line 
 19 May 2018 -- lasnoise, lasheight, & others: bug fix when on-the-fly filtering on additional attributes
 12 May 2018 -- las2las, LASlib: new filters '-drop_RGB_red 5000 6000' and '-drop_RGB_green 200 10000' 
