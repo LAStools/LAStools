@@ -1,3 +1,5 @@
+12 June 2018 -- las2las: new option '-set_global_encoding_gps_bit 1' because this bit is simply so often set wrong
+10 June 2018 -- LASlib, all LAStools: fix for additional attributes in "extra bytes" combined with '-buffered 15'
 20 May 2018 -- LASlib, all LAStools: bug fix when trying to set CRS via '-gda94 -utm 56south' in command line 
 12 May 2018 -- las2las, LASlib: new filters '-drop_RGB_red 5000 6000' and '-drop_RGB_green 200 10000' 
  8 May 2018 -- las2las: handling of OGC WKT and more clear "setting" versus "reprojecting" the CRS
