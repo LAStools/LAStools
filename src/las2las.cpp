@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
   int set_version_minor = -1;
   int set_point_data_format = -1;
   int set_point_data_record_length = -1;
-  int set_gps_time_endcoding = -1;
+  int set_global_encoding_gps_bit = -1;
   int set_lastiling_buffer_flag = -1;
   // variable header changes
   bool set_ogc_wkt = false;
@@ -202,11 +202,11 @@ int main(int argc, char *argv[])
       if (argv[i][0] == '–') argv[i][0] = '-';
       if (strcmp(argv[i],"-week_to_adjusted") == 0)
       {
-        set_gps_time_endcoding = 1;
+        set_global_encoding_gps_bit = 1;
       }
       else if (strcmp(argv[i],"-adjusted_to_week") == 0)
       {
-        set_gps_time_endcoding = 0;
+        set_global_encoding_gps_bit = 0;
       }
     }
     if (!geoprojectionconverter.parse(argc, argv)) byebye(true);
@@ -291,6 +291,16 @@ int main(int argc, char *argv[])
         byebye(true);
       }
       subsequence_stop = (I64)atoi(argv[i+1]);
+      i+=1;
+    }
+    else if (strcmp(argv[i],"-set_global_encoding_gps_bit") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: 0 or 1\n", argv[i]);
+        byebye(true);
+      }
+      set_global_encoding_gps_bit = atoi(argv[i+1]);
       i+=1;
     }
     else if (strcmp(argv[i],"-set_version") == 0)
@@ -560,9 +570,9 @@ int main(int argc, char *argv[])
 
     // prepare the header for output
 
-    if (set_gps_time_endcoding != -1)
+    if (set_global_encoding_gps_bit != -1)
     {
-      if (set_gps_time_endcoding == 0)
+      if (set_global_encoding_gps_bit == 0)
       {
         if ((lasreader->header.global_encoding & 1) == 0)
         {
@@ -582,7 +592,7 @@ int main(int argc, char *argv[])
           lasreader->header.global_encoding &= ~1;
         }
       }
-      else if (set_gps_time_endcoding == 1)
+      else if (set_global_encoding_gps_bit == 1)
       {
         if ((lasreader->header.global_encoding & 1) == 1)
         {
@@ -601,6 +611,10 @@ int main(int argc, char *argv[])
         {
           lasreader->header.global_encoding |= 1;
         }
+      }
+      else
+      {
+        fprintf(stderr, "WARNING: ignoring invalid option '-set_global_encoding_gps_bit %d'\n", set_global_encoding_gps_bit);
       }
     }
 
