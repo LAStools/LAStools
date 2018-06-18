@@ -107,6 +107,27 @@ Same as before but with a second additional attribute marked by '1' in the
 parse string and specified by a second occurance of the '-add_attribute'
 option. These are unsigned integers numbers so no scale value is required.
 
+****************************************************************
+
+overview of all tool-specific switches:
+
+-v                                      : more info reported in console
+-vv                                     : even more info reported in console
+-quiet                                  : nothing reported in console
+-version                                : reports this tool's version number
+-gui                                    : start with files loaded into GUI
+-cores 4                                : process multiple inputs on 4 cores in parallel
+-set_point_type 6                       : use point type 6 of LAS 1.4 instead of point type 1 of LAS 1.2
+-set_version 1.4                        : force version 1.4 (even if point type 0, 1, 2, or 3 are used)
+-set_scale 0.05 0.05 0.001              : quantize ASCII points with 5 cm in x and y and 1 mm in z
+-set_offset 500000 2000000 0            : use offset 500000 2000000 0 instead of auto choosing one
+-set_file_creation 67 2011              : set file creation date to specified dayofyear / year
+-set_system_identifier "Riegl Q680i"    : set system identifier to specified 31 character string
+-set_generating_software "LAStools"     : set generating software to specified 31 character string
+-set_global_encoding 1                  : set global encoding in LAS header to 1
+
+****************************************************************
+
 for more info:
 
 E:\LAStools\bin>txt2las -h
