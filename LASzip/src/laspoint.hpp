@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    15 June 2018 -- fix in flag copy from legacy (0-5) to extended (6-10) type
     10 March 2017 -- fix in copy_to() and copy_from() new LAS 1.4 point types
     10 October 2016 -- small fixes for NIR and extended scanner channel
     19 July 2015 -- created after FOSS4GE in the train back from Lake Como
@@ -193,8 +194,8 @@ public:
     }
     else if (extended_point_type)
     {
-      extended_classification = other.classification & 31;
-      extended_classification_flags = other.classification >> 5;
+      extended_classification = other.classification;
+      extended_classification_flags = ((other.withheld_flag) << 2) | ((other.keypoint_flag) << 1) | (other.synthetic_flag);
       extended_number_of_returns = other.number_of_returns;
       extended_return_number = other.return_number;
       extended_scan_angle = I16_QUANTIZE(((F32)other.scan_angle_rank)/0.006);
@@ -615,6 +616,8 @@ public:
 
   inline F32 get_scan_angle() const { if (extended_point_type) return 0.006f*extended_scan_angle; else return (F32)scan_angle_rank; };
   inline F32 get_abs_scan_angle() const { if (extended_point_type) return (extended_scan_angle < 0 ? -0.006f*extended_scan_angle : 0.006f*extended_scan_angle) ; else return (scan_angle_rank < 0 ? (F32)-scan_angle_rank : (F32)scan_angle_rank); };
+
+  inline void set_scan_angle(F32 scan_angle) { if (extended_point_type) set_extended_scan_angle(I16_QUANTIZE(scan_angle/0.006f)); else set_scan_angle_rank(I8_QUANTIZE(scan_angle)); };
 
   inline void compute_coordinates()
   {
