@@ -4549,7 +4549,7 @@ laszip_read_point(
       point->extended_number_of_returns = number_of_returns_increment + point->number_of_returns;
       point->extended_classification = classification + point->classification;
       point->extended_scanner_channel = scanner_channel;
-      point->extended_classification_flags = (overlap_bit << 3) | (point->classification >> 5);
+      point->extended_classification_flags = (overlap_bit << 3) | ((point->withheld_flag) << 2) | ((point->keypoint_flag) << 1) | (point->synthetic_flag);
     }
 
     laszip_dll->p_count++;
