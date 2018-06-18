@@ -565,19 +565,8 @@ class LASoperationSetClassification : public LASoperation
 public:
   inline const CHAR* name() const { return "set_classification"; };
   inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), classification); };
-  inline void transform(LASpoint* point) { if (classification > 31) point->extended_classification = classification; else point->classification = classification; };
+  inline void transform(LASpoint* point) { point->set_extended_classification(classification); };
   LASoperationSetClassification(U8 classification) { this->classification = classification; };
-private:
-  U8 classification;
-};
-
-class LASoperationSetExtendedClassification : public LASoperation
-{
-public:
-  inline const CHAR* name() const { return "set_extended_classification"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), classification); };
-  inline void transform(LASpoint* point) { point->extended_classification = classification; };
-  LASoperationSetExtendedClassification(U8 classification) { this->classification = classification; };
 private:
   U8 classification;
 };
@@ -666,14 +655,7 @@ public:
   inline void transform(LASpoint* point) {
     if (point->get_z() < z_below)
     {
-      if (class_to >= 32)
-      {
-        point->classification = class_to;
-      }
-      else
-      {
-        point->classification = (point->classification & 224) | class_to;
-      }
+      point->set_extended_classification(class_to);
     }
   };
   LASoperationClassifyZbelowAs(F64 z_below, U8 class_to) { this->z_below = z_below; this->class_to = class_to; };
@@ -690,14 +672,7 @@ public:
   inline void transform(LASpoint* point) {
     if (point->get_z() > z_above)
     {
-      if (class_to >= 32)
-      {
-        point->classification = class_to;
-      }
-      else
-      {
-        point->classification = (point->classification & 224) | class_to;
-      }
+      point->set_extended_classification(class_to);
     }
   };
   LASoperationClassifyZaboveAs(F64 z_above, U8 class_to) { this->z_above = z_above; this->class_to = class_to; };
@@ -714,14 +689,7 @@ public:
   inline void transform(LASpoint* point) {
     if ((z_below <= point->get_z()) && (point->get_z() <= z_above))
     {
-      if (class_to >= 32)
-      {
-        point->classification = class_to;
-      }
-      else
-      {
-        point->classification = (point->classification & 224) | class_to;
-      }
+      point->set_extended_classification(class_to);
     }
   };
   LASoperationClassifyZbetweenAs(F64 z_below, F64 z_above, U8 class_to) { this->z_below = z_below; this->z_above = z_above; this->class_to = class_to; };
@@ -1379,7 +1347,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -change_number_of_returns_from_to 0 2\n");
   fprintf(stderr,"Modify the classification.\n");
   fprintf(stderr,"  -set_classification 2\n");
-  fprintf(stderr,"  -set_extended_classification 0\n");
+  fprintf(stderr,"  -set_extended_classification 41\n");
   fprintf(stderr,"  -change_classification_from_to 2 4\n");
   fprintf(stderr,"  -classify_z_below_as -5.0 7\n");
   fprintf(stderr,"  -classify_z_above_as 70.0 7\n");
@@ -2126,7 +2094,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-set_", 5) == 0)
     {
-      if (strncmp(argv[i],"-set_classification", 19) == 0)
+      if ((strncmp(argv[i],"-set_classification", 19) == 0) || (strncmp(argv[i],"-set_extended_classification", 28) == 0))
       {
         if ((i+1) >= argc)
         {
@@ -2134,16 +2102,6 @@ BOOL LAStransform::parse(int argc, char* argv[])
           return FALSE;
         }
         add_operation(new LASoperationSetClassification(U8_CLAMP(atoi(argv[i+1]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
-      }
-      else if (strncmp(argv[i],"-set_extended_classification", 28) == 0)
-      {
-        if ((i+1) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: classification\n", argv[i]);
-          return FALSE;
-        }
-        add_operation(new LASoperationSetExtendedClassification(U8_CLAMP(atoi(argv[i+1]))));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_intensity") == 0)
