@@ -1341,7 +1341,7 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       if (translate_intensity != 0.0f) temp_f = temp_f+translate_intensity;
       if (scale_intensity != 1.0f) temp_f = temp_f*scale_intensity;
       if (temp_f < 0.0f || temp_f >= 65535.5f) fprintf(stderr, "WARNING: intensity %g is out of range of unsigned short\n", temp_f);
-      point.intensity = (unsigned short)(temp_f+0.5f);
+      point.set_intensity(U16_QUANTIZE(temp_f));
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
     }
     else if (p[0] == 'a') // we expect the scan angle
@@ -1352,7 +1352,7 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       if (translate_scan_angle != 0.0f) temp_f = temp_f+translate_scan_angle;
       if (scale_scan_angle != 1.0f) temp_f = temp_f*scale_scan_angle;
       if (temp_f < -128.0f || temp_f > 127.0f) fprintf(stderr, "WARNING: scan angle %g is out of range of char\n", temp_f);
-      point.scan_angle_rank = (char)temp_f;
+      point.set_scan_angle(temp_f);
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
     }
     else if (p[0] == 'n') // we expect the number of returns of given pulse
