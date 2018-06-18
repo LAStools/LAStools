@@ -101,11 +101,14 @@ void usage(bool error=false, bool wait=false)
   fprintf(stderr,"attribute specified, 2 - third ...\n");
   fprintf(stderr,"---------------------------------------------\n");
   fprintf(stderr,"Other parameters are\n");
+  fprintf(stderr,"'-set_point_type 6\n");
+  fprintf(stderr,"'-set_version 1.4\n");
   fprintf(stderr,"'-set_scale 0.05 0.05 0.001'\n");
   fprintf(stderr,"'-set_offset 500000 2000000 0'\n");
   fprintf(stderr,"'-set_file_creation 67 2011'\n");
   fprintf(stderr,"'-set_system_identifier \"Riegl 500,000 Hz\"'\n");
   fprintf(stderr,"'-set_generating_software \"LAStools\"'\n");
+  fprintf(stderr,"'-set_global_encoding 1\n");  
   fprintf(stderr,"'-utm 14T'\n");
   fprintf(stderr,"'-sp83 CA_I -feet -elevation_survey_feet'\n");
   fprintf(stderr,"'-longlat -elevation_feet'\n");
@@ -152,15 +155,18 @@ int main(int argc, char *argv[])
   I32 cores = 1;
 #endif
   bool verbose = false;
+  bool very_verbose = false;
   bool projection_was_set = false;
   bool quiet = false;
   int file_creation_day = -1;
   int file_creation_year = -1;
   int set_version_major = -1;
   int set_version_minor = -1;
+  int set_global_encoding = -1;
   char* set_system_identifier = 0;
   char* set_generating_software = 0;
   bool set_ogc_wkt = false;
+  double full_start_time = 0.0;
   double start_time = 0.0;
 
   LASreadOpener lasreadopener;
@@ -249,6 +255,11 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
     {
       verbose = true;
+    }
+    else if (strcmp(argv[i],"-vv") == 0 || strcmp(argv[i],"-very_verbose") == 0)
+    {
+      verbose = true;
+      very_verbose = true;
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
@@ -419,6 +430,16 @@ int main(int argc, char *argv[])
       i++;
       sscanf(argv[i], "%d", &file_creation_year);
     }
+    else if (strcmp(argv[i],"-set_global_encoding") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
+        usage(true);
+      }
+      i++;
+      set_global_encoding = atoi(argv[i]);
+    }
     else if (strcmp(argv[i],"-set_system_identifier") == 0)
     {
       if ((i+1) >= argc)
@@ -454,6 +475,16 @@ int main(int argc, char *argv[])
       if (sscanf(argv[i],"%d.%d",&set_version_major,&set_version_minor) != 2)
       {
         fprintf(stderr, "ERROR: cannot understand argument '%s' of '%s'\n", argv[i], argv[i-1]);
+        usage(true);
+      }
+      if (set_version_major != 1)
+      {
+        fprintf(stderr, "ERROR: major version %d not supported\n", set_version_major);
+        usage(true);
+      }
+      if ((set_version_minor < 0) || (set_version_minor > 4))
+      {
+        fprintf(stderr, "ERROR: minor version %d not supported\n", set_version_minor);
         usage(true);
       }
     }
@@ -502,12 +533,27 @@ int main(int argc, char *argv[])
     byebye(true, argc==1);
   }
 
-  // make sure that input and output are not *both* piped
+  // for piped output some checks are needed
 
-  if (lasreadopener.is_piped() && laswriteopener.is_piped())
+  if (laswriteopener.is_piped())
   {
-    fprintf(stderr, "ERROR: input and output cannot both be piped\n");
-    byebye(true, argc==1);
+    // make sure that input and output are not *both* piped
+
+    if (lasreadopener.is_piped())
+    {
+      fprintf(stderr, "ERROR: input and output cannot both be piped\n");
+      byebye(true, argc==1);
+    }
+
+    // make sure there is only one input file
+
+    if ((lasreadopener.get_file_name_number() > 1) && (!lasreadopener.is_merged()))
+    {
+      fprintf(stderr, "ERROR: multiple (unmerged) input files cannot produce piped output\n");
+      byebye(true, argc==1);
+    }
+
+    lasreadopener.set_populate_header(TRUE);
   }
 
   // check if projection info was set in the command line
@@ -526,7 +572,11 @@ int main(int argc, char *argv[])
 
   while (lasreadopener.active())
   {
-    if (verbose) start_time = taketime();
+    if (verbose)
+    {
+      full_start_time = start_time = taketime();
+      fprintf(stderr, "reading from '%s' and writing to '%s'\n", (lasreadopener.is_piped() ? "stdin" : lasreadopener.get_file_name()), (laswriteopener.is_piped() ? "stdout" : laswriteopener.get_file_name()));
+    }
 
     // open lasreader
 
@@ -538,57 +588,18 @@ int main(int argc, char *argv[])
       byebye(true, argc==1);
     }
 
+    if (verbose)
+    {
+      fprintf(stderr,"opening reader took %g sec.\n", taketime()-start_time);
+      start_time = taketime();
+    }
+
     // check output
 
     if (!laswriteopener.active())
     {
       // create name from input name
       laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
-    }
-
-    // if the output was piped we need to precompute the bounding box, etc ...
-
-    if (laswriteopener.is_piped())
-    {
-      // because the output goes to a pipe we have to precompute the header
-      // information with an additional pass.
-
-      if (verbose) { fprintf(stderr, "piped output. extra read pass over file '%s' ...\n", lasreadopener.get_file_name()); }
-
-      while (lasreader->read_point());
-      lasreader->close();
-
-      // output some stats
-    
-      if (verbose)
-      {
-#ifdef _WIN32
-        fprintf(stderr, "npoints %I64d min %g %g %g max %g %g %g\n", lasreader->npoints, lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z);
-#else
-        fprintf(stderr, "npoints %lld min %g %g %g max %g %g %g\n", lasreader->npoints, lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z);
-#endif
-        if (lasreader->header.point_data_format > 5)
-        {
-#ifdef _WIN32
-          fprintf(stderr, "return histogram %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d\n", lasreader->header.extended_number_of_points_by_return[0], lasreader->header.extended_number_of_points_by_return[1], lasreader->header.extended_number_of_points_by_return[2], lasreader->header.extended_number_of_points_by_return[3], lasreader->header.extended_number_of_points_by_return[4], lasreader->header.extended_number_of_points_by_return[5], lasreader->header.extended_number_of_points_by_return[6], lasreader->header.extended_number_of_points_by_return[7], lasreader->header.extended_number_of_points_by_return[8], lasreader->header.extended_number_of_points_by_return[9], lasreader->header.extended_number_of_points_by_return[10], lasreader->header.extended_number_of_points_by_return[11], lasreader->header.extended_number_of_points_by_return[12], lasreader->header.extended_number_of_points_by_return[13], lasreader->header.extended_number_of_points_by_return[14]); 
-#else
-          fprintf(stderr, "return histogram %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld\n", lasreader->header.extended_number_of_points_by_return[0], lasreader->header.extended_number_of_points_by_return[1], lasreader->header.extended_number_of_points_by_return[2], lasreader->header.extended_number_of_points_by_return[3], lasreader->header.extended_number_of_points_by_return[4], lasreader->header.extended_number_of_points_by_return[5], lasreader->header.extended_number_of_points_by_return[6], lasreader->header.extended_number_of_points_by_return[7], lasreader->header.extended_number_of_points_by_return[8], lasreader->header.extended_number_of_points_by_return[9], lasreader->header.extended_number_of_points_by_return[10], lasreader->header.extended_number_of_points_by_return[11], lasreader->header.extended_number_of_points_by_return[12], lasreader->header.extended_number_of_points_by_return[13], lasreader->header.extended_number_of_points_by_return[14]); 
-#endif
-        }
-        else
-        {
-          fprintf(stderr, "return histogram %d %d %d %d %d\n", lasreader->header.number_of_points_by_return[0], lasreader->header.number_of_points_by_return[1], lasreader->header.number_of_points_by_return[2], lasreader->header.number_of_points_by_return[3], lasreader->header.number_of_points_by_return[4]);
-        }
-        fprintf(stderr,"took %g sec.\n", taketime()-start_time); start_time = taketime();
-      }
-
-      // reopen lasreader for the second pass
-
-      if (!lasreadopener.reopen(lasreader))
-      {
-        fprintf(stderr, "ERROR: could not reopen '%s' for main pass\n", lasreadopener.get_file_name());
-        byebye(true, argc==1);
-      }
     }
 
     // populate header
@@ -623,6 +634,13 @@ int main(int argc, char *argv[])
       lasreader->header.generating_software[31] = '\0';
     }
 
+    // maybe set global encoding
+
+    if (set_global_encoding != -1)
+    {
+      lasreader->header.global_encoding = set_global_encoding;
+    }
+
     // maybe set creation date
 
 #ifdef _WIN32
@@ -641,8 +659,8 @@ int main(int argc, char *argv[])
 #endif
     if (file_creation_day == -1 && file_creation_year == -1)
     {
-      lasreader->header.file_creation_day = (U16)333;
-      lasreader->header.file_creation_year = (U16)2011;
+      lasreader->header.file_creation_day = (U16)111;
+      lasreader->header.file_creation_year = (U16)2018;
     }
     else
     {
@@ -652,18 +670,52 @@ int main(int argc, char *argv[])
 
     // maybe set version
 
-    if (set_version_major != -1) lasreader->header.version_major = (U8)set_version_major;
-    if (set_version_minor != -1) lasreader->header.version_minor = (U8)set_version_minor;
-
-    if (set_version_minor == 3)
+    if (set_version_major != -1)
     {
-      lasreader->header.header_size += 8;
-      lasreader->header.offset_to_point_data += 8;
+      lasreader->header.version_major = (U8)set_version_major;
     }
-    else if (set_version_minor == 4)
+    if (set_version_minor != -1)
     {
-      lasreader->header.header_size += 148;
-      lasreader->header.offset_to_point_data += 148;
+      if (lasreader->header.version_minor < 3)
+      {
+        if (set_version_minor == 3)
+        {
+          lasreader->header.header_size += 8;
+          lasreader->header.offset_to_point_data += 8;
+        }
+        else if (set_version_minor == 4)
+        {
+          lasreader->header.header_size += 148;
+          lasreader->header.offset_to_point_data += 148;
+        }
+      }
+      else if (lasreader->header.version_minor == 3)
+      {
+        if (set_version_minor < 3)
+        {
+          lasreader->header.header_size -= 8;
+          lasreader->header.offset_to_point_data -= 8;
+        }
+        else if (set_version_minor == 4)
+        {
+          lasreader->header.header_size += 140;
+          lasreader->header.offset_to_point_data += 140;
+        }
+      }
+      else if (lasreader->header.version_minor == 4)
+      {
+        if (set_version_minor < 3)
+        {
+          lasreader->header.header_size -= 148;
+          lasreader->header.offset_to_point_data -= 148;
+        }
+        else if (set_version_minor == 3)
+        {
+          lasreader->header.header_size -= 140;
+          lasreader->header.offset_to_point_data -= 140;
+        }
+      }
+      lasreader->header.version_minor = (U8)set_version_minor;
     }
 
     // maybe set projection
@@ -696,7 +748,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-          fprintf(stderr, "WARNING: cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'\n", lasreadopener.get_file_name());
+          if (!quiet) fprintf(stderr, "WARNING: cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'\n", lasreadopener.get_file_name());
         }
       }
     }
@@ -711,8 +763,6 @@ int main(int argc, char *argv[])
       byebye(true, argc==1);
     }
 
-    if (verbose) fprintf(stderr, "reading file '%s' and writing to '%s'\n", lasreadopener.get_file_name(), laswriteopener.get_file_name());
-
     // loop over points
 
     while (lasreader->read_point())
@@ -722,10 +772,15 @@ int main(int argc, char *argv[])
     }
     lasreader->close();
 
+    if (verbose)
+    {
+      fprintf(stderr,"main pass took %g sec.\n", taketime()-start_time);
+    }
+
     if (!laswriteopener.is_piped())
     {
       laswriter->update_header(&lasreader->header, FALSE, TRUE);
-      if (verbose)
+      if (very_verbose)
       {
 #ifdef _WIN32
         fprintf(stderr, "npoints %I64d min %g %g %g max %g %g %g\n", lasreader->npoints, lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z);
@@ -744,16 +799,15 @@ int main(int argc, char *argv[])
         {
           fprintf(stderr, "return histogram %d %d %d %d %d\n", lasreader->header.number_of_points_by_return[0], lasreader->header.number_of_points_by_return[1], lasreader->header.number_of_points_by_return[2], lasreader->header.number_of_points_by_return[3], lasreader->header.number_of_points_by_return[4]);
         }
-     }
+      }
     }
     laswriter->close();
 
     delete laswriter;
     delete lasreader;
 
+    if (!quiet) fprintf(stderr, "done with '%s'. total time %g sec.\n", (laswriteopener.is_piped() ? lasreadopener.get_file_name() : laswriteopener.get_file_name()), taketime()-full_start_time);
     laswriteopener.set_file_name(0);
-
-    if (verbose) fprintf(stderr,"took %g sec.\n", taketime()-start_time);
   }
 
   byebye(false, argc==1);
