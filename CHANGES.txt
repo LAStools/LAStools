@@ -1,3 +1,7 @@
+20 June 2018 -- LASlib, all LAStools: fix for '-set_classification 0' transform for new LAS 1.4 point types 6-10
+20 June 2018 -- lascontrol: generate report even if input point data does not cover any of the control points
+17 June 2018 -- LASlib, all LAStools: fix in flag copy from old LAS 1.3 (0-5) to new LAS 1.4 point types (6-10)
+16 June 2018 -- txt2las: new option '-set_global_encoding 1' because this bit is simply so often set wrong
 12 June 2018 -- las2las: new option '-set_global_encoding_gps_bit 1' because this bit is simply so often set wrong
 11 June 2018 -- lasview: new option '-points_all' loads all points from input (especially useful for manual editing)
 10 June 2018 -- LASlib, all LAStools: fix for additional attributes in "extra bytes" combined with '-buffered 15'
