@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 180620
+#define LAS_TOOLS_VERSION 180706
 
 #include <stdio.h>
 #include <string.h>
@@ -370,9 +370,9 @@ public:
       }
       free(evlrs);
       evlrs = 0;
-      start_of_first_extended_variable_length_record = 0;
-      number_of_extended_variable_length_records = 0;
     }
+    start_of_first_extended_variable_length_record = 0;
+    number_of_extended_variable_length_records = 0;
   };
 
   void clean_laszip()
@@ -732,6 +732,7 @@ public:
         {
           free(evlrs);
           evlrs = 0;
+          start_of_first_extended_variable_length_record = 0;
         }
         return TRUE;
       }
