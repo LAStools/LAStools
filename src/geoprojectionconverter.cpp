@@ -3973,6 +3973,10 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value)
   {
     vertical_geokey = value;
   }
+  else if (value == 6647)
+  {
+    vertical_geokey = value;
+  }
   else
   {
     fprintf(stderr, "set_VerticalCSTypeGeoKey: look-up for %d not implemented\012", value);

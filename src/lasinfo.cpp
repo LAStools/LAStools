@@ -3042,6 +3042,9 @@ int main(int argc, char *argv[])
                   case 5941: // Norway Normal Null 2000
                     fprintf(file_out, "VerticalCSTypeGeoKey: Norway Normal Null 2000\012");
                     break;
+                  case 6647: // Norway Normal Null 2000
+                    fprintf(file_out, "VerticalCSTypeGeoKey: Canadian Geodetic Vertical Datum of 2013\012");
+                    break;
                   default:
                     fprintf(file_out, "VerticalCSTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
                   }
