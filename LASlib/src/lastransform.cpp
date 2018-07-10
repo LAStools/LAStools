@@ -772,6 +772,62 @@ private:
   U8 class_to;
 };
 
+class LASoperationClassifyAttributeBelowAs : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "classify_attribute_below_as"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %d ", name(), index, below, class_to); };
+  inline void transform(LASpoint* point) {
+    if (point->get_attribute_as_float(index) < below)
+    {
+      point->set_extended_classification(class_to);
+    }
+  };
+  LASoperationClassifyAttributeBelowAs(U32 index, F64 below, U8 class_to) { this->index = index; this->below = below; this->class_to = class_to; };
+private:
+  U32 index;
+  F64 below;
+  U8 class_to;
+};
+
+class LASoperationClassifyAttributeAboveAs : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "classify_attribute_above_as"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %d ", name(), index, above, class_to); };
+  inline void transform(LASpoint* point) {
+    if (point->get_attribute_as_float(index) > above)
+    {
+      point->set_extended_classification(class_to);
+    }
+  };
+  LASoperationClassifyAttributeAboveAs(U32 index, F64 above, U8 class_to) { this->index = index; this->above = above; this->class_to = class_to; };
+private:
+  U32 index;
+  F64 above;
+  U8 class_to;
+};
+
+class LASoperationClassifyAttributeBetweenAs : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "classify_attribute_between_as"; };
+  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %lf %d ", name(), index, below, above, class_to); };
+  inline void transform(LASpoint* point) {
+    F64 value = point->get_attribute_as_float(index);
+    if ((below <= value) && (value <= above))
+    {
+      point->set_extended_classification(class_to);
+    }
+  };
+  LASoperationClassifyAttributeBetweenAs(U32 index, F64 z_below, F64 z_above, U8 class_to) { this->index = index; this->below = below; this->above = above; this->class_to = class_to; };
+private:
+  U32 index;
+  F64 below;
+  F64 above;
+  U8 class_to;
+};
+
 class LASoperationSetWithheldFlag : public LASoperation
 {
 public:
@@ -1355,6 +1411,9 @@ void LAStransform::usage() const
   fprintf(stderr,"  -classify_intensity_above_as 200 9\n");
   fprintf(stderr,"  -classify_intensity_below_as 30 11 \n");
   fprintf(stderr,"  -classify_intensity_between_as 500 900 15\n");
+  fprintf(stderr,"  -classify_attribute_below_as 0 -5.0 7\n");
+  fprintf(stderr,"  -classify_attribute_above_as 1 70.0 7\n");
+  fprintf(stderr,"  -classify_attribute_between_as 1 2.0 5.0 4\n");
   fprintf(stderr,"  -change_extended_classification_from_to 6 46\n");
   fprintf(stderr,"  -move_ancient_to_extended_classification\n");
   fprintf(stderr,"Change the flags.\n");
@@ -2101,7 +2160,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: classification\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetClassification(U8_CLAMP(atoi(argv[i+1]))));
+        U32 classification;
+        if (sscanf(argv[i+1], "%u", &classification) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: classification but '%s' is no valid classification\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (classification > 255)
+        {
+          fprintf(stderr,"ERROR: cannot set classification because classification of %u is larger than 255\n", classification);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetClassification(U8_CLAMP(classification)));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_intensity") == 0)
@@ -2111,7 +2181,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetIntensity(U16_CLAMP(atof(argv[i+1]))));
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > U16_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot set intensity because value of %u is larger than %u\n", value, U16_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetIntensity(U16_CLAMP(value)));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_withheld_flag") == 0)
@@ -2121,7 +2202,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetWithheldFlag((U8)atoi(argv[i+1])));
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid flag\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > 1)
+        {
+          fprintf(stderr,"ERROR: cannot set withheld flag because value %u is larger than 1\n", value);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetWithheldFlag((U8)value));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_synthetic_flag") == 0)
@@ -2131,7 +2223,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetSyntheticFlag((U8)atoi(argv[i+1])));
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid flag\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > 1)
+        {
+          fprintf(stderr,"ERROR: cannot set synthetic flag because value %u is larger than 1\n", value);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetSyntheticFlag((U8)value));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_keypoint_flag") == 0)
@@ -2141,7 +2244,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetKeypointFlag((U8)atoi(argv[i+1])));
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid flag\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > 1)
+        {
+          fprintf(stderr,"ERROR: cannot set keypoint flag because value %u is larger than 1\n", value);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetKeypointFlag((U8)value));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if ((strcmp(argv[i],"-set_extended_overlap_flag") == 0) || (strcmp(argv[i],"-set_overlap_flag") == 0))
@@ -2151,7 +2265,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetExtendedOverlapFlag((U8)atoi(argv[i+1])));
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid flag\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > 1)
+        {
+          fprintf(stderr,"ERROR: cannot set overlap flag because value %u is larger than 1\n", value);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetExtendedOverlapFlag((U8)value));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if ((strcmp(argv[i],"-set_extended_scanner_channel") == 0) || (strcmp(argv[i],"-set_scanner_channel") == 0))
@@ -2161,7 +2286,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetExtendedScannerChannel((U8)atoi(argv[i+1])));
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > 3)
+        {
+          fprintf(stderr,"ERROR: cannot set scanner channel because value %u is larger than 3\n", value);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetExtendedScannerChannel((U8)value));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_user_data") == 0)
@@ -2171,7 +2307,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetUserData((U8)atoi(argv[i+1])));
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > U8_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot set user data because value %u is larger than %d\n", value, U8_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetUserData((U8)value));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strncmp(argv[i],"-set_point_source", 17) == 0)
@@ -2181,7 +2328,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' need 1 argument: psid\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetPointSource((U16)atoi(argv[i+1])));
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > U16_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot set point source ID because value %u is larger than %d\n", value, U16_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetPointSource((U16)value));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_return_number") == 0)
@@ -2338,34 +2496,91 @@ BOOL LAStransform::parse(int argc, char* argv[])
         {
           if ((i+2) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification\n", argv[i]);
             return FALSE;
           }
-          add_operation(new LASoperationClassifyZbelowAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
+          F64 z_value;
+          if (sscanf(argv[i+1], "%lf", &z_value) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification but '%s' is no valid z_value\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          U32 classification;
+          if (sscanf(argv[i+2], "%u", &classification) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification but '%s' is no valid classification\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          if (classification > 255)
+          {
+            fprintf(stderr,"ERROR: cannot classify z_value because classification of %u is larger than 255\n", classification);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyZbelowAs(z_value, U8_CLAMP(classification)));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
         else if (strcmp(argv[i],"-classify_z_above_as") == 0)
         {
           if ((i+2) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification_code\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification\n", argv[i]);
             return FALSE;
           }
-          add_operation(new LASoperationClassifyZaboveAs(atof(argv[i+1]), U8_CLAMP(atoi(argv[i+2]))));
+          F64 z_value;
+          if (sscanf(argv[i+1], "%lf", &z_value) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification but '%s' is no valid z_value\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          U32 classification;
+          if (sscanf(argv[i+2], "%u", &classification) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: z_value classification but '%s' is no valid classification\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          if (classification > 255)
+          {
+            fprintf(stderr,"ERROR: cannot classify z_value because classification of %u is larger than 255\n", classification);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyZaboveAs(z_value, U8_CLAMP(classification)));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
         else if (strcmp(argv[i],"-classify_z_between_as") == 0)
         {
           if ((i+3) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 3 arguments: z_min z_max classification_code\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: z_min z_max classification\n", argv[i]);
             return FALSE;
           }
-          add_operation(new LASoperationClassifyZbetweenAs(atof(argv[i+1]), atof(argv[i+2]), U8_CLAMP(atoi(argv[i+3]))));
+          F64 z_min;
+          if (sscanf(argv[i+1], "%lf", &z_min) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: z_min z_max classification but '%s' is no valid z_min\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F64 z_max;
+          if (sscanf(argv[i+2], "%lf", &z_max) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: z_min z_max classification but '%s' is no valid z_max\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          U32 classification;
+          if (sscanf(argv[i+3], "%u", &classification) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: z_min z_max classification but '%s' is no valid classification\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          if (classification > 255)
+          {
+            fprintf(stderr,"ERROR: cannot classify z_value because classification of %u is larger than 255\n", classification);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyZbetweenAs(z_min, z_max, U8_CLAMP(classification)));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
         }
       }
-      if (strncmp(argv[i],"-classify_intensity_", 20) == 0)
+      else if (strncmp(argv[i],"-classify_intensity_", 20) == 0)
       {
         if (strcmp(argv[i],"-classify_intensity_below_as") == 0)
         {
@@ -2383,7 +2598,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           U32 classification;
           if (sscanf(argv[i+2], "%u", &classification) != 1)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classificationn but '%s' is no valid classification\n", argv[i], argv[i+2]);
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classification but '%s' is no valid classification\n", argv[i], argv[i+2]);
             return FALSE;
           }
           if (value > U16_MAX)
@@ -2415,7 +2630,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           U32 classification;
           if (sscanf(argv[i+2], "%u", &classification) != 1)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classificationn but '%s' is no valid classification\n", argv[i], argv[i+2]);
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: value classification but '%s' is no valid classification\n", argv[i], argv[i+2]);
             return FALSE;
           }
           if (value > U16_MAX)
@@ -2473,6 +2688,114 @@ BOOL LAStransform::parse(int argc, char* argv[])
           }
           add_operation(new LASoperationClassifyIntensityBetweenAs(min_value, max_value, classification));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+        }
+      }
+      else if (strncmp(argv[i],"-classify_attribute_", 12) == 0)
+      {
+        if (strcmp(argv[i],"-classify_attribute_below_as") == 0)
+        {
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: attribute_index value classification\n", argv[i]);
+            return FALSE;
+          }
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: attribute_index value classification but '%s' is no valid attribute_index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F64 value;
+          if (sscanf(argv[i+2], "%lf", &value) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: attribute_index value classification but '%s' is no valid value\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          U32 classification;
+          if (sscanf(argv[i+3], "%u", &classification) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: attribute_index value classification but '%s' is no valid classification\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          if (classification > 255)
+          {
+            fprintf(stderr,"ERROR: cannot classify attribute below because classification of %u is larger than 255\n", classification);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyAttributeBelowAs(index, value, U8_CLAMP(classification)));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+        }
+        else if (strcmp(argv[i],"-classify_attribute_above_as") == 0)
+        {
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: attribute_index value classification\n", argv[i]);
+            return FALSE;
+          }
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: attribute_index value classification but '%s' is no valid attribute_index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F64 value;
+          if (sscanf(argv[i+2], "%lf", &value) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: attribute_index value classification but '%s' is no valid value\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          U32 classification;
+          if (sscanf(argv[i+3], "%u", &classification) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: attribute_index value classification but '%s' is no valid classification\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          if (classification > 255)
+          {
+            fprintf(stderr,"ERROR: cannot classify attribute above because classification of %u is larger than 255\n", classification);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyAttributeAboveAs(index, value, U8_CLAMP(classification)));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+        }
+        else if (strcmp(argv[i],"-classify_attribute_between_as") == 0)
+        {
+          if ((i+4) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: attribute_index min max classification\n", argv[i]);
+            return FALSE;
+          }
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid attribute_index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F64 min;
+          if (sscanf(argv[i+2], "%lf", &min) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid min\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          F64 max;
+          if (sscanf(argv[i+3], "%lf", &max) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid max\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          U32 classification;
+          if (sscanf(argv[i+4], "%u", &classification) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid classification\n", argv[i], argv[i+4]);
+            return FALSE;
+          }
+          if (classification > 255)
+          {
+            fprintf(stderr,"ERROR: cannot classify attribute between because classification of %u is larger than 255\n", classification);
+            return FALSE;
+          }
+          add_operation(new LASoperationClassifyAttributeBetweenAs(index, min, max, U8_CLAMP(classification)));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
         }
       }
     }
