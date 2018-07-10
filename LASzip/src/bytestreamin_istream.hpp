@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    10 July 2018 -- because it's hard to determine seek-ability, user must set it
      1 October 2011 -- added 64 bit file support in MSVC 6.0 at McCafe at Hbf Linz
     10 January 2011 -- licensing change for LGPL release and liblas integration
     12 December 2010 -- created from ByteStreamOutFile after Howard got pushy (-;
@@ -46,13 +47,13 @@ using namespace std;
 class ByteStreamInIstream : public ByteStreamIn
 {
 public:
-  ByteStreamInIstream(istream& stream);
+  ByteStreamInIstream(istream& stream, BOOL seekable=TRUE);
 /* read a single byte                                        */
   U32 getByte();
 /* read an array of bytes                                    */
   void getBytes(U8* bytes, const U32 num_bytes);
-/* is the stream seekable (e.g. standard in is not)          */
-  BOOL isSeekable() const;
+/* is the stream seekable (e.g. stdin is not)                */
+  BOOL isSeekable() const { return seekable; };
 /* get current position of stream                            */
   I64 tell() const;
 /* seek to this position in the stream                       */
@@ -63,12 +64,13 @@ public:
   ~ByteStreamInIstream(){};
 protected:
   istream& stream;
+  BOOL seekable;
 };
 
 class ByteStreamInIstreamLE : public ByteStreamInIstream
 {
 public:
-  ByteStreamInIstreamLE(istream& stream);
+  ByteStreamInIstreamLE(istream& stream, BOOL seekable=TRUE);
 /* read 16 bit low-endian field                              */
   void get16bitsLE(U8* bytes);
 /* read 32 bit low-endian field                              */
@@ -88,7 +90,7 @@ private:
 class ByteStreamInIstreamBE : public ByteStreamInIstream
 {
 public:
-  ByteStreamInIstreamBE(istream& stream);
+  ByteStreamInIstreamBE(istream& stream, BOOL seekable=TRUE);
 /* read 16 bit low-endian field                              */
   void get16bitsLE(U8* bytes);
 /* read 32 bit low-endian field                              */
@@ -105,8 +107,7 @@ private:
   U8 swapped[8];
 };
 
-inline ByteStreamInIstream::ByteStreamInIstream(istream& stream_param) :
-  stream(stream_param)
+inline ByteStreamInIstream::ByteStreamInIstream(istream& stream_param, BOOL seekable_param) : stream(stream_param), seekable(seekable_param)
 {
 }
 
@@ -127,11 +128,6 @@ inline void ByteStreamInIstream::getBytes(U8* bytes, const U32 num_bytes)
   {
     throw EOF;
   }
-}
-
-inline BOOL ByteStreamInIstream::isSeekable() const
-{
-  return !!(static_cast<ifstream&>(stream));
 }
 
 inline I64 ByteStreamInIstream::tell() const
@@ -155,7 +151,7 @@ inline BOOL ByteStreamInIstream::seekEnd(const I64 distance)
   return stream.good();
 }
 
-inline ByteStreamInIstreamLE::ByteStreamInIstreamLE(istream& stream) : ByteStreamInIstream(stream)
+inline ByteStreamInIstreamLE::ByteStreamInIstreamLE(istream& stream, BOOL seekable) : ByteStreamInIstream(stream, seekable)
 {
 }
 
@@ -203,7 +199,7 @@ inline void ByteStreamInIstreamLE::get64bitsBE(U8* bytes)
   bytes[7] = swapped[0];
 }
 
-inline ByteStreamInIstreamBE::ByteStreamInIstreamBE(istream& stream) : ByteStreamInIstream(stream)
+inline ByteStreamInIstreamBE::ByteStreamInIstreamBE(istream& stream, BOOL seekable) : ByteStreamInIstream(stream, seekable)
 {
 }
 

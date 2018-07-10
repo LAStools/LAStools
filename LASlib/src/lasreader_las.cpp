@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -103,14 +103,14 @@ BOOL LASreaderLAS::open(FILE* file, BOOL peek_only, U32 decompress_selective)
   return open(in, peek_only, decompress_selective);
 }
 
-BOOL LASreaderLAS::open(istream& stream, BOOL peek_only, U32 decompress_selective)
+BOOL LASreaderLAS::open(istream& stream, BOOL peek_only, U32 decompress_selective, BOOL seekable)
 {
   // create input
   ByteStreamIn* in;
   if (IS_LITTLE_ENDIAN())
-    in = new ByteStreamInIstreamLE(stream);
+    in = new ByteStreamInIstreamLE(stream, seekable);
   else
-    in = new ByteStreamInIstreamBE(stream);
+    in = new ByteStreamInIstreamBE(stream, seekable);
 
   return open(in, peek_only, decompress_selective);
 }
