@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+   22 July 2018 -- bug fix for parsing classfication to point type 6 (or higher)
    11 January 2017 -- added with<h>eld and scanner channe<l> for the parse string
    11 January 2017 -- added 'k'eypoint and 'o'verlap flags for the parse string
    17 January 2016 -- pre-scaling and pre-offsetting of "extra bytes" attributes

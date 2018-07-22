@@ -1,3 +1,4 @@
+22 July 2018 -- LASib, txt2las: fixed LASreader_txt bug for parsing 'c'lassfication to '-set_version 1.4' and '-set_point_type 6'
 20 June 2018 -- LASlib, all LAStools: fix for '-set_classification 0' transform for new LAS 1.4 point types 6-10
 17 June 2018 -- LASlib, all LAStools: fix in flag copy from old LAS 1.3 (0-5) to new LAS 1.4 point types (6-10)
 16 June 2018 -- txt2las: new option '-set_global_encoding 1' because this bit is simply so often set wrong
