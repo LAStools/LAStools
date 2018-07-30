@@ -41,7 +41,7 @@ class LASoperationTranslateX : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_x"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
   inline void transform(LASpoint* point) {
     point->set_x(point->get_x() + offset);
   };
@@ -54,7 +54,7 @@ class LASoperationTranslateY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_y"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
   inline void transform(LASpoint* point) {
     point->set_y(point->get_y() + offset);
   };
@@ -67,7 +67,8 @@ class LASoperationTranslateZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     point->set_z(point->get_z() + offset);
   };
@@ -80,7 +81,8 @@ class LASoperationTranslateXYZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_xyz"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), offset[0], offset[1], offset[2]); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), offset[0], offset[1], offset[2]); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     point->set_x(point->get_x() + offset[0]);
     point->set_y(point->get_y() + offset[1]);
@@ -95,7 +97,7 @@ class LASoperationScaleX : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_x"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), scale); };
   inline void transform(LASpoint* point) {
     point->set_x(point->get_x() * scale);
   };
@@ -108,7 +110,7 @@ class LASoperationScaleY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_y"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), scale); };
   inline void transform(LASpoint* point) {
     point->set_y(point->get_y() * scale);
   };
@@ -121,7 +123,8 @@ class LASoperationScaleZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), scale); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     point->set_z(point->get_z() * scale);
   };
@@ -134,7 +137,8 @@ class LASoperationScaleXYZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_xyz"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), scale[0], scale[1], scale[2]); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), scale[0], scale[1], scale[2]); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     point->set_x(point->get_x() * scale[0]);
     point->set_y(point->get_y() * scale[1]);
@@ -149,7 +153,7 @@ class LASoperationTranslateThenScaleX : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_then_scale_x"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), offset, scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), offset, scale); };
   inline void transform(LASpoint* point) {
     point->set_x((point->get_x()+offset)*scale);
   };
@@ -163,7 +167,7 @@ class LASoperationTranslateThenScaleY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_then_scale_y"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), offset, scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), offset, scale); };
   inline void transform(LASpoint* point) {
     point->set_y((point->get_y()+offset)*scale);
   };
@@ -177,7 +181,8 @@ class LASoperationTranslateThenScaleZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_then_scale_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), offset, scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), offset, scale); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     point->set_z((point->get_z()+offset)*scale);
   };
@@ -191,7 +196,7 @@ class LASoperationRotateXY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "rotate_xy"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), angle, x_offset, y_offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), angle, x_offset, y_offset); };
   inline void transform(LASpoint* point) {
     F64 x = point->get_x() - x_offset;
     F64 y = point->get_y() - y_offset;
@@ -209,7 +214,8 @@ class LASoperationRotateXZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "rotate_xz"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), angle, x_offset, z_offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), angle, x_offset, z_offset); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     F64 x = point->get_x() - x_offset;
     F64 z = point->get_z() - z_offset;
@@ -227,7 +233,8 @@ class LASoperationTransformHelmert : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "transform_helmert"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf,%lf,%lf,%lf,%lf,%lf,%lf ", name(), dx, dy, dz, rx, ry, rz, m); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf,%lf,%lf,%lf,%lf,%lf,%lf ", name(), dx, dy, dz, rx, ry, rz, m); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     F64 x = scale*( (       point->get_x())-(rz_rad*point->get_y())+(ry_rad*point->get_z())) + dx;
     F64 y = scale*( (rz_rad*point->get_x())+(       point->get_y())-(rx_rad*point->get_z())) + dy;
@@ -245,7 +252,8 @@ class LASoperationClampZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below, above); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below, above); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     F64 z = point->get_z();
     if (z < below) point->set_z(below);
@@ -260,7 +268,8 @@ class LASoperationClampZbelow : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_z_below"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     F64 z = point->get_z();
     if (z < below) point->set_z(below);
@@ -274,7 +283,8 @@ class LASoperationClampZabove : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_z_above"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     F64 z = point->get_z();
     if (z > above) point->set_z(above);
@@ -288,7 +298,8 @@ class LASoperationCopyAttributeIntoZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_attribute_into_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     F64 z = point->get_attribute_as_float(index);
     point->set_z(z);
@@ -302,7 +313,8 @@ class LASoperationCopyIntensityIntoZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_intensity_into_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) { point->set_z((F64)point->get_intensity()); };
 };
 
@@ -310,7 +322,7 @@ class LASoperationTranslateRawX : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_raw_x"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), offset); };
   inline void transform(LASpoint* point) {
     point->set_X(point->get_X() + offset);
   };
@@ -323,7 +335,7 @@ class LASoperationTranslateRawY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_raw_y"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), offset); };
   inline void transform(LASpoint* point) {
     point->set_Y(point->get_Y() + offset);
   };
@@ -336,7 +348,8 @@ class LASoperationTranslateRawZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_raw_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), offset); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     point->set_Z(point->get_Z() + offset);
   };
@@ -349,7 +362,8 @@ class LASoperationTranslateRawXYZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_raw_xyz"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), raw_offset[0], raw_offset[1], raw_offset[2]); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), raw_offset[0], raw_offset[1], raw_offset[2]); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     point->set_X(point->get_X() + raw_offset[0]);
     point->set_Y(point->get_Y() + raw_offset[1]);
@@ -364,7 +378,7 @@ class LASoperationTranslateRawXYatRandom : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_raw_xy_at_random"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), max_raw_offset[0], max_raw_offset[1]); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), max_raw_offset[0], max_raw_offset[1]); };
   inline void transform(LASpoint* point) {
     I32 r;
     srand(seed);
@@ -385,7 +399,8 @@ class LASoperationClampRawZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_raw_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), below, above); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), below, above); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     if (point->get_Z() < below) point->set_Z(below);
     else if (point->get_Z() > above) point->set_Z(above);
@@ -399,7 +414,7 @@ class LASoperationSetIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), (I32)intensity); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), (I32)intensity); };
   inline void transform(LASpoint* point) {
     point->set_intensity(intensity);
   };
@@ -412,7 +427,8 @@ class LASoperationScaleIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) {
     F32 intensity = scale*point->get_intensity();
     point->set_intensity(U16_CLAMP(intensity));
@@ -426,7 +442,8 @@ class LASoperationTranslateIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), offset); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) {
     F32 intensity = offset+point->get_intensity();
     point->set_intensity(U16_CLAMP(intensity));
@@ -440,7 +457,8 @@ class LASoperationTranslateThenScaleIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_then_scale_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), offset, scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), offset, scale); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) {
     F32 intensity = (offset+point->get_intensity())*scale;
     point->set_intensity(U16_CLAMP(intensity));
@@ -455,7 +473,8 @@ class LASoperationClampIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %u %u ", name(), (U32)below, (U32)above); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %u ", name(), (U32)below, (U32)above); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) {
     if (point->get_intensity() > above ) point->set_intensity(above);
     else if (point->get_intensity() < below ) point->set_intensity(below);
@@ -470,7 +489,8 @@ class LASoperationClampIntensityBelow : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_intensity_below"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), (U32)below); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), (U32)below); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) {
     if (point->get_intensity() < below ) point->set_intensity(below);
   };
@@ -483,7 +503,8 @@ class LASoperationClampIntensityAbove : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "clamp_intensity_above"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), (U32)above); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), (U32)above); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) {
     if (point->get_intensity() > above ) point->set_intensity(above);
   };
@@ -496,7 +517,8 @@ class LASoperationCopyAttributeIntoIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_attribute_into_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     F64 intensity = point->get_attribute_as_float(index);
     point->set_intensity(U16_CLAMP(intensity));
@@ -510,7 +532,8 @@ class LASoperationBinGpsTimeIntoIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "bin_gps_time_into_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g", name(), bin_size); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g", name(), bin_size); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline void transform(LASpoint* point) { point->set_intensity(U16_CLAMP(point->get_gps_time()/bin_size)); };
   LASoperationBinGpsTimeIntoIntensity(F32 bin_size=1.0f) { this->bin_size = bin_size; };
 private:
@@ -521,7 +544,8 @@ class LASoperationScaleScanAngle : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_scan_angle"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE; };
   inline void transform(LASpoint* point) {
     F32 scan_angle_rank = scale*point->scan_angle_rank;
     point->scan_angle_rank = I8_CLAMP(I32_QUANTIZE(scan_angle_rank));
@@ -535,7 +559,8 @@ class LASoperationTranslateScanAngle : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_scan_angle"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), offset); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE; };
   inline void transform(LASpoint* point) {
     F32 scan_angle_rank = offset+point->scan_angle_rank;
     point->scan_angle_rank = I8_CLAMP(I32_QUANTIZE(scan_angle_rank));
@@ -549,7 +574,8 @@ class LASoperationTranslateThenScaleScanAngle : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_then_scale_scan_angle"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), offset, scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), offset, scale); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE; };
   inline void transform(LASpoint* point) {
     F32 scan_angle_rank = (offset+point->scan_angle_rank)*scale;
     point->scan_angle_rank = I8_CLAMP(I32_QUANTIZE(scan_angle_rank));
@@ -564,7 +590,7 @@ class LASoperationSetClassification : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_classification"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), classification); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), classification); };
   inline void transform(LASpoint* point) { point->set_extended_classification(classification); };
   LASoperationSetClassification(U8 classification) { this->classification = classification; };
 private:
@@ -575,7 +601,8 @@ class LASoperationChangeClassificationFromTo : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "change_classification_from_to"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), class_from, class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), class_from, class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
   inline void transform(LASpoint* point) {
     if (class_from > 31)
     {
@@ -617,7 +644,8 @@ class LASoperationMoveAncientToExtendedClassification : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "move_ancient_to_extended_classification"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS | LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
   inline void transform(LASpoint* point) {
     if (point->get_withheld_flag() || point->get_keypoint_flag() || point->get_synthetic_flag())
     {
@@ -634,7 +662,8 @@ class LASoperationChangeExtendedClassificationFromTo : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "change_extended_classification_from_to"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), class_from, class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), class_from, class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
   inline void transform(LASpoint* point) {
     if (point->extended_classification == class_from)
     {
@@ -651,7 +680,8 @@ class LASoperationClassifyZbelowAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_z_below_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %d ", name(), z_below, class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %d ", name(), z_below, class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     if (point->get_z() < z_below)
     {
@@ -668,7 +698,8 @@ class LASoperationClassifyZaboveAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_z_above_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %d ", name(), z_above, class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %d ", name(), z_above, class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     if (point->get_z() > z_above)
     {
@@ -685,7 +716,8 @@ class LASoperationClassifyZbetweenAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_z_between_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %d ", name(), z_below, z_above, class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %d ", name(), z_below, z_above, class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) {
     if ((z_below <= point->get_z()) && (point->get_z() <= z_above))
     {
@@ -703,7 +735,8 @@ class LASoperationClassifyIntensityBelowAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_intensity_below_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), (I32)intensity_below, (I32)class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), (I32)intensity_below, (I32)class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) {
     if (point->get_intensity() < intensity_below)
     {
@@ -727,7 +760,8 @@ class LASoperationClassifyIntensityAboveAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_intensity_above_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), (I32)intensity_above, (I32)class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), (I32)intensity_above, (I32)class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) {
     if (point->get_intensity() > intensity_above)
     {
@@ -751,7 +785,8 @@ class LASoperationClassifyIntensityBetweenAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_intensity_between_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), (I32)intensity_below, (I32)intensity_above, (I32)class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), (I32)intensity_below, (I32)intensity_above, (I32)class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) {
     if ((intensity_below <= point->get_intensity()) && (point->get_intensity() <= intensity_above))
     {
@@ -776,7 +811,8 @@ class LASoperationClassifyAttributeBelowAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_attribute_below_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %d ", name(), index, below, class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %d ", name(), index, below, class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     if (point->get_attribute_as_float(index) < below)
     {
@@ -794,7 +830,8 @@ class LASoperationClassifyAttributeAboveAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_attribute_above_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %d ", name(), index, above, class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %d ", name(), index, above, class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     if (point->get_attribute_as_float(index) > above)
     {
@@ -812,7 +849,8 @@ class LASoperationClassifyAttributeBetweenAs : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "classify_attribute_between_as"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %lf %d ", name(), index, below, above, class_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %lf %d ", name(), index, below, above, class_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     F64 value = point->get_attribute_as_float(index);
     if ((below <= value) && (value <= above))
@@ -832,7 +870,7 @@ class LASoperationSetWithheldFlag : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_withheld_flag"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
   inline void transform(LASpoint* point) { point->set_withheld_flag(flag); };
   LASoperationSetWithheldFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
 private:
@@ -843,7 +881,7 @@ class LASoperationSetSyntheticFlag : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_synthetic_flag"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
   inline void transform(LASpoint* point) { point->set_synthetic_flag(flag); };
   LASoperationSetSyntheticFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
 private:
@@ -854,7 +892,7 @@ class LASoperationSetKeypointFlag : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_keypoint_flag"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
   inline void transform(LASpoint* point) { point->set_keypoint_flag(flag); };
   LASoperationSetKeypointFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
 private:
@@ -865,7 +903,7 @@ class LASoperationSetExtendedOverlapFlag : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_overlap_flag"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
   inline void transform(LASpoint* point) { point->set_extended_overlap_flag(flag); };
   LASoperationSetExtendedOverlapFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
 private:
@@ -876,7 +914,7 @@ class LASoperationSetExtendedScannerChannel : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_scanner_channel"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), channel); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), channel); };
   inline void transform(LASpoint* point) { point->set_extended_scanner_channel(channel); };
   LASoperationSetExtendedScannerChannel(U8 channel) { this->channel = (channel >= 3 ? 3 : channel); };
 private:
@@ -887,7 +925,7 @@ class LASoperationSetUserData : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_user_data"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), user_data); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), user_data); };
   inline void transform(LASpoint* point) { point->user_data = user_data; };
   LASoperationSetUserData(U8 user_data) { this->user_data = user_data; };
 private:
@@ -898,7 +936,8 @@ class LASoperationScaleUserData : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_user_data"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scale); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
   inline void transform(LASpoint* point) {
     point->set_user_data(U8_CLAMP(scale*point->get_user_data()));
   };
@@ -911,7 +950,8 @@ class LASoperationChangeUserDataFromTo : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "change_user_data_from_to"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), user_data_from, user_data_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), user_data_from, user_data_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
   inline void transform(LASpoint* point) { if (point->user_data == user_data_from) point->user_data = user_data_to; };
   LASoperationChangeUserDataFromTo(U8 user_data_from, U8 user_data_to) { this->user_data_from = user_data_from; this->user_data_to = user_data_to; };
 private:
@@ -923,7 +963,8 @@ class LASoperationCopyClassificationIntoUserData : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_classification_into_user_data"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
   inline void transform(LASpoint* point) { point->set_user_data(point->get_classification() ? point->get_classification() : point->get_extended_classification()); };
 };
 
@@ -931,7 +972,8 @@ class LASoperationCopyAttributeIntoUserData : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_attribute_into_user_data"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     F64 user_data = point->get_attribute_as_float(index);
     point->set_user_data(U8_CLAMP(user_data));
@@ -945,7 +987,7 @@ class LASoperationSetPointSource : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_point_source"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), psid); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), psid); };
   inline void transform(LASpoint* point) { point->point_source_ID = psid; };
   LASoperationSetPointSource(U16 psid) { this->psid = psid; };
 private:
@@ -956,7 +998,8 @@ class LASoperationChangePointSourceFromTo : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "change_point_source_from_to"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), psid_from, psid_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), psid_from, psid_to); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
   inline void transform(LASpoint* point) { if (point->point_source_ID == psid_from) point->point_source_ID = psid_to; };
   LASoperationChangePointSourceFromTo(U16 psid_from, U16 psid_to) { this->psid_from = psid_from; this->psid_to = psid_to; };
 private:
@@ -968,7 +1011,7 @@ class LASoperationRepairZeroReturns : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "repair_zero_returns"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) { if (point->number_of_returns == 0) point->number_of_returns = 1; if (point->return_number == 0) point->return_number = 1; };
 };
 
@@ -976,7 +1019,7 @@ class LASoperationSetReturnNumber : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_return_number"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), return_number); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), return_number); };
   inline void transform(LASpoint* point) { point->return_number = return_number; };
   LASoperationSetReturnNumber(U8 return_number) { this->return_number = return_number; };
 private:
@@ -987,7 +1030,7 @@ class LASoperationSetExtendedReturnNumber : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_extended_return_number"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), extended_return_number); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), extended_return_number); };
   inline void transform(LASpoint* point) { point->extended_return_number = extended_return_number; };
   LASoperationSetExtendedReturnNumber(U8 extended_return_number) { this->extended_return_number = extended_return_number; };
 private:
@@ -998,7 +1041,7 @@ class LASoperationChangeReturnNumberFromTo : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "change_return_number_from_to"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), return_number_from, return_number_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), return_number_from, return_number_to); };
   inline void transform(LASpoint* point) { if (point->return_number == return_number_from) point->return_number = return_number_to; };
   LASoperationChangeReturnNumberFromTo(U8 return_number_from, U8 return_number_to) { this->return_number_from = return_number_from; this->return_number_to = return_number_to; };
 private:
@@ -1010,7 +1053,7 @@ class LASoperationSetNumberOfReturns : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_number_of_returns"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), number_of_returns); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), number_of_returns); };
   inline void transform(LASpoint* point) { point->number_of_returns = number_of_returns; };
   LASoperationSetNumberOfReturns(U8 number_of_returns) { this->number_of_returns = number_of_returns; };
 private:
@@ -1021,7 +1064,7 @@ class LASoperationSetExtendedNumberOfReturns : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_extended_number_of_returns"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), extended_number_of_returns); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), extended_number_of_returns); };
   inline void transform(LASpoint* point) { point->extended_number_of_returns = extended_number_of_returns; };
   LASoperationSetExtendedNumberOfReturns(U8 extended_number_of_returns) { this->extended_number_of_returns = extended_number_of_returns; };
 private:
@@ -1032,7 +1075,7 @@ class LASoperationChangeNumberOfReturnsFromTo : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "change_number_of_returns_from_to"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), number_of_returns_from, number_of_returns_to); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), number_of_returns_from, number_of_returns_to); };
   inline void transform(LASpoint* point) { if (point->number_of_returns == number_of_returns_from) point->number_of_returns = number_of_returns_to; };
   LASoperationChangeNumberOfReturnsFromTo(U8 number_of_returns_from, U8 number_of_returns_to) { this->number_of_returns_from = number_of_returns_from; this->number_of_returns_to = number_of_returns_to; };
 private:
@@ -1044,7 +1087,7 @@ class LASoperationSetGpsTime : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_gps_time"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), gps_time); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), gps_time); };
   inline void transform(LASpoint* point) { point->gps_time = gps_time; };
   LASoperationSetGpsTime(F64 gps_time) { this->gps_time = gps_time; };
 private:
@@ -1055,7 +1098,8 @@ class LASoperationTranslateGpsTime : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "translate_gps_time"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), offset); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline void transform(LASpoint* point) { point->gps_time += offset; };
   LASoperationTranslateGpsTime(F64 offset) { this->offset = offset; };
 private:
@@ -1066,7 +1110,8 @@ class LASoperationConvertAdjustedGpsToWeek : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "adjusted_to_week"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline void transform(LASpoint* point)
   {
     I32 week = (I32)(point->gps_time/604800.0 + 1653.4391534391534391534391534392);
@@ -1079,7 +1124,8 @@ class LASoperationConvertWeekToAdjustedGps : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "week_to_adjusted"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), week); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), week); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline void transform(LASpoint* point) { point->gps_time += delta_secs; }
   LASoperationConvertWeekToAdjustedGps(I32 week) { this->week = week; delta_secs = week; delta_secs *= 604800; delta_secs -= 1000000000; };
 private:
@@ -1091,7 +1137,7 @@ class LASoperationSetRGB : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_RGB"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), RGB[0], RGB[1], RGB[2]); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d ", name(), RGB[0], RGB[1], RGB[2]); };
   inline void transform(LASpoint* point) { point->set_RGB(RGB); };
   LASoperationSetRGB(U16 R, U16 G, U16 B) { RGB[0] = R; RGB[1] = G; RGB[2] = B; };
 private:
@@ -1102,7 +1148,8 @@ class LASoperationSetRGBofClass : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_RGB_of_class"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d %d ", name(), c, RGB[0], RGB[1], RGB[2]); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d %d ", name(), c, RGB[0], RGB[1], RGB[2]); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
   inline void transform(LASpoint* point) { if (point->get_classification() == c) point->set_RGB(RGB); };
   LASoperationSetRGBofClass(U8 c, U16 R, U16 G, U16 B) { this->c = c; RGB[0] = R; RGB[1] = G; RGB[2] = B; };
 private:
@@ -1114,7 +1161,8 @@ class LASoperationSetRGBofExtendedClass : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "set_RGB_of_class"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d %d ", name(), c, RGB[0], RGB[1], RGB[2]); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d %d ", name(), c, RGB[0], RGB[1], RGB[2]); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
   inline void transform(LASpoint* point) { if (point->get_extended_classification() == c) point->set_RGB(RGB); };
   LASoperationSetRGBofExtendedClass(U8 c, U16 R, U16 G, U16 B) { this->c = c; RGB[0] = R; RGB[1] = G; RGB[2] = B; };
 private:
@@ -1126,7 +1174,8 @@ class LASoperationScaleRGB : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_RGB"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), scale[0], scale[1], scale[2]); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), scale[0], scale[1], scale[2]); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->rgb[0] = U16_CLAMP(scale[0]*point->rgb[0]); point->rgb[1] = U16_CLAMP(scale[1]*point->rgb[1]); point->rgb[2] = U16_CLAMP(scale[2]*point->rgb[2]); };
   LASoperationScaleRGB(F32 scale_R, F32 scale_G, F32 scale_B) { scale[0] = scale_R; scale[1] = scale_G; scale[2] = scale_B; };
 private:
@@ -1137,7 +1186,8 @@ class LASoperationScaleRGBdown : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_RGB_down"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->rgb[0] = point->rgb[0]/256; point->rgb[1] = point->rgb[1]/256; point->rgb[2] = point->rgb[2]/256; };
 };
 
@@ -1145,7 +1195,8 @@ class LASoperationScaleRGBup : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "scale_RGB_up"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->rgb[0] = point->rgb[0]*256; point->rgb[1] = point->rgb[1]*256; point->rgb[2] = point->rgb[2]*256; };
 };
 
@@ -1153,7 +1204,7 @@ class LASoperationSwitchXY : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "switch_x_y"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) { I32 temp = point->get_X(); point->set_X(point->get_Y()); point->set_Y(temp); };
 };
 
@@ -1161,7 +1212,8 @@ class LASoperationSwitchXZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "switch_x_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) { I32 temp = point->get_X(); point->set_X(point->get_Z()); point->set_Z(temp); };
 };
 
@@ -1169,7 +1221,8 @@ class LASoperationSwitchYZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "switch_y_z"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) { I32 temp = point->get_Y(); point->set_Y(point->get_Z()); point->set_Z(temp); };
 };
 
@@ -1177,7 +1230,8 @@ class LASoperationSwitchRG : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "switch_R_G"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { I16 temp = point->get_R(); point->set_R(point->get_G()); point->set_G(temp); };
 };
 
@@ -1185,7 +1239,8 @@ class LASoperationSwitchRB : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "switch_R_B"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { I16 temp = point->get_R(); point->set_R(point->get_B()); point->set_B(temp); };
 };
 
@@ -1193,7 +1248,8 @@ class LASoperationSwitchGB : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "switch_G_B"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { I16 temp = point->get_G(); point->set_G(point->get_B()); point->set_B(temp); };
 };
 
@@ -1201,7 +1257,8 @@ class LASoperationCopyRGBintoIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_RGB_into_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->set_intensity(U16_QUANTIZE((0.2989*point->get_R())+(0.5870*point->get_G())+(0.1140*point->get_B()))); };
 };
 
@@ -1209,7 +1266,8 @@ class LASoperationCopyRintoIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_R_into_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->set_intensity(point->get_R()); };
 };
 
@@ -1217,7 +1275,8 @@ class LASoperationCopyRintoNIR : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_R_into_NIR"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->set_NIR(point->get_R()); };
 };
 
@@ -1225,7 +1284,8 @@ class LASoperationCopyGintoIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_G_into_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->set_intensity(point->get_G()); };
 };
 
@@ -1233,7 +1293,8 @@ class LASoperationCopyGintoNIR : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_G_into_NIR"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->set_NIR(point->get_G()); };
 };
 
@@ -1241,7 +1302,8 @@ class LASoperationCopyBintoIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_B_into_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->set_intensity(point->get_B()); };
 };
 
@@ -1249,7 +1311,8 @@ class LASoperationCopyBintoNIR : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_B_into_NIR"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline void transform(LASpoint* point) { point->set_NIR(point->get_B()); };
 };
 
@@ -1257,7 +1320,8 @@ class LASoperationCopyNIRintoIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_NIR_into_intensity"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_NIR; };
   inline void transform(LASpoint* point) { point->set_intensity(point->get_NIR()); };
 };
 
@@ -1265,7 +1329,8 @@ class LASoperationCopyIntensityIntoNIR : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_intensity_into_NIR"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline void transform(LASpoint* point) { point->set_NIR(point->get_intensity()); };
 };
 
@@ -1273,7 +1338,8 @@ class LASoperationFlipWaveformDirection : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "flip_waveform_direction"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET; };
   inline void transform(LASpoint* point) { point->wavepacket.flipDirection(); };
 };
 
@@ -1281,7 +1347,8 @@ class LASoperationCopyUserDataIntoPointSource : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_user_data_into_point_source"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
   inline void transform(LASpoint* point) { point->point_source_ID = point->get_user_data(); };
 };
 
@@ -1289,7 +1356,8 @@ class LASoperationCopyUserDataIntoScannerChannel : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_user_data_into_scanner_channel"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
   inline void transform(LASpoint* point) { point->extended_scanner_channel = (point->get_user_data() & 0x0003); };
 };
 
@@ -1297,7 +1365,7 @@ class LASoperationCopyScannerChannelIntoPointSource : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_scanner_channel_into_point_source"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline void transform(LASpoint* point) { point->point_source_ID = point->get_extended_scanner_channel(); };
 };
 
@@ -1305,7 +1373,8 @@ class LASoperationMergeScannerChannelIntoPointSource : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "merge_scanner_channel_into_point_source"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
   inline void transform(LASpoint* point) { point->point_source_ID = (point->get_point_source_ID() << 2) | point->get_extended_scanner_channel(); };
 };
 
@@ -1313,7 +1382,8 @@ class LASoperationSplitScannerChannelFromPointSource : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "split_scanner_channel_from_point_source"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
   inline void transform(LASpoint* point) { point->extended_scanner_channel = (point->get_point_source_ID() & 0x0003); point->point_source_ID = (point->get_point_source_ID() >> 2); };
 };
 
@@ -1321,7 +1391,8 @@ class LASoperationBinZintoPointSource : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "bin_Z_into_point_source"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %d", name(), bin_size); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d", name(), bin_size); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
   inline void transform(LASpoint* point) { point->point_source_ID = U16_CLAMP(point->get_Z()/bin_size); };
   LASoperationBinZintoPointSource(I32 bin_size=1) { this->bin_size = bin_size; };
 private:
@@ -1332,7 +1403,8 @@ class LASoperationBinAbsScanAngleIntoPointSource : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "bin_abs_scan_angle_into_point_source"; };
-  inline int get_command(CHAR* string) const { return sprintf(string, "-%s %g", name(), bin_size); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g", name(), bin_size); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE; };
   inline void transform(LASpoint* point) { point->point_source_ID = U16_CLAMP(point->get_abs_scan_angle()/bin_size); };
   LASoperationBinAbsScanAngleIntoPointSource(F32 bin_size=1.0f) { this->bin_size = bin_size; };
 private:
@@ -3144,6 +3216,17 @@ I32 LAStransform::unparse(CHAR* string) const
     n += operations[i]->get_command(&string[n]);
   }
   return n;
+}
+
+U32 LAStransform::get_decompress_selective() const
+{
+  U32 decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;
+  U32 i;
+  for (i = 0; i < num_operations; i++)
+  {
+    decompress_selective |= operations[i]->get_decompress_selective();
+  }
+  return decompress_selective;
 }
 
 void LAStransform::transform(LASpoint* point)

@@ -2518,6 +2518,10 @@ void LASreadOpener::set_decompress_selective(U32 decompress_selective)
   {
     this->decompress_selective |= filter->get_decompress_selective();
   }
+  if (transform)
+  {
+    this->decompress_selective |= transform->get_decompress_selective();
+  }
 }
 
 void LASreadOpener::set_inside_tile(const F32 ll_x, const F32 ll_y, const F32 size)
