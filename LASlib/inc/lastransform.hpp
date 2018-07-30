@@ -40,6 +40,7 @@
 #define LAS_TRANSFORM_HPP
 
 #include "lasdefinitions.hpp"
+#include "laszip_decompress_selective_v3.hpp"
 
 class LASfilter;
 
@@ -47,7 +48,8 @@ class LASoperation
 {
 public:
   virtual const CHAR * name() const = 0;
-  virtual int get_command(CHAR* string) const = 0;
+  virtual I32 get_command(CHAR* string) const = 0;
+  virtual U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   virtual void transform(LASpoint* point) = 0;
   virtual void reset(){};
   virtual ~LASoperation(){};
@@ -65,6 +67,7 @@ public:
   BOOL parse(CHAR* string);
   I32 unparse(CHAR* string) const;
   inline BOOL active() const { return (num_operations != 0); };
+  U32 get_decompress_selective() const;
   inline BOOL filtered() const { return is_filtered; };
 
   void setFilter(LASfilter* filter);
