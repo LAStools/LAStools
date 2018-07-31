@@ -389,6 +389,10 @@ SOURCE=..\LASzip\src\laszip.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASzip\src\laszip_decompress_selective_v3.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src_full\linereader.hpp
 # End Source File
 # Begin Source File
