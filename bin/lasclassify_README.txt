@@ -7,7 +7,9 @@
   have already been identified (e.g. with lasground) and that the
   elevation of each point above the ground was already computed
   with lasheight (which stores this height in the 'user data' field
-  of each point).
+  of each point). In case the height above ground is stored as an
+  additional attribute in the "extra bytes" you can specify how to
+  find it with '-height_in_attribute 0' on '-height_in_attribute 2'.
 
   The tool essentially tries to find neighboring points that are
   at least 2 meter (or 6 feet) above the ground and form '-planar 0.1'
