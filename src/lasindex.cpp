@@ -54,6 +54,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "lasreader.hpp"
 #include "laszip_decompress_selective_v3.hpp"
@@ -331,6 +332,15 @@ int main(int argc, char *argv[])
     if (tile_size == 0.0f)
     {
       F32 t;
+      if (((lasreader->header.max_x - lasreader->header.min_x) < 100) && ((lasreader->header.max_y - lasreader->header.min_y) < 100)){
+        double xrange = lasreader->header.max_x - lasreader->header.min_x;
+        double yrange = lasreader->header.max_y - lasreader->header.min_y;
+        double max_range;
+        max_range = xrange > yrange ? xrange : yrange;
+        t = (pow(10, (int)log10(max_range)))/1000;
+        fprintf(stderr,"Estimating appropriate tile size = %g (10^%d / 1000) based on a range of %g\n",t, ((int)log10(max_range)),max_range);
+  
+      }else
       if (((lasreader->header.max_x - lasreader->header.min_x) < 1000) && ((lasreader->header.max_y - lasreader->header.min_y) < 1000))
       {
         t = 10.0f;
