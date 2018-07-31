@@ -29,7 +29,6 @@
 ===============================================================================
 */
 #include "lasfilter.hpp"
-#include "laszip_decompress_selective_v3.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,7 +72,6 @@ class LAScriterionKeepTile : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_tile"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), ll_x, ll_y, tile_size); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (!point->inside_tile(ll_x, ll_y, ur_x, ur_y)); };
   LAScriterionKeepTile(F32 ll_x, F32 ll_y, F32 tile_size) { this->ll_x = ll_x; this->ll_y = ll_y; this->ur_x = ll_x+tile_size; this->ur_y = ll_y+tile_size; this->tile_size = tile_size; };
 private:
@@ -85,7 +83,6 @@ class LAScriterionKeepCircle : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_circle"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), center_x, center_y, radius); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (!point->inside_circle(center_x, center_y, radius_squared)); };
   LAScriterionKeepCircle(F64 x, F64 y, F64 radius) { this->center_x = x; this->center_y = y; this->radius = radius; this->radius_squared = radius*radius; };
 private:
@@ -121,7 +118,6 @@ class LAScriterionKeepxy : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_xy"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf %lf ", name(), below_x, below_y, above_x, above_y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (!point->inside_rectangle(below_x, below_y, above_x, above_y)); };
   LAScriterionKeepxy(F64 below_x, F64 below_y, F64 above_x, F64 above_y) { this->below_x = below_x; this->below_y = below_y; this->above_x = above_x; this->above_y = above_y; };
 private:
@@ -133,7 +129,6 @@ class LAScriterionDropxy : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_xy"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf %lf ", name(), below_x, below_y, above_x, above_y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->inside_rectangle(below_x, below_y, above_x, above_y)); };
   LAScriterionDropxy(F64 below_x, F64 below_y, F64 above_x, F64 above_y) { this->below_x = below_x; this->below_y = below_y; this->above_x = above_x; this->above_y = above_y; };
 private:
@@ -145,7 +140,6 @@ class LAScriterionKeepx : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_x"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_x, above_x); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { F64 x = point->get_x(); return (x < below_x) || (x >= above_x); };
   LAScriterionKeepx(F64 below_x, F64 above_x) { this->below_x = below_x; this->above_x = above_x; };
 private:
@@ -157,7 +151,6 @@ class LAScriterionDropx : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_x"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_x, above_x); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { F64 x = point->get_x(); return ((below_x <= x) && (x < above_x)); };
   LAScriterionDropx(F64 below_x, F64 above_x) { this->below_x = below_x; this->above_x = above_x; };
 private:
@@ -169,7 +162,6 @@ class LAScriterionKeepy : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_y"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_y, above_y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { F64 y = point->get_y(); return (y < below_y) || (y >= above_y); };
   LAScriterionKeepy(F64 below_y, F64 above_y) { this->below_y = below_y; this->above_y = above_y; };
 private:
@@ -181,7 +173,6 @@ class LAScriterionDropy : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_y"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_y, above_y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { F64 y = point->get_y(); return ((below_y <= y) && (y < above_y)); };
   LAScriterionDropy(F64 below_y, F64 above_y) { this->below_y = below_y; this->above_y = above_y; };
 private:
@@ -217,7 +208,6 @@ class LAScriterionDropxBelow : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_x_below"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below_x); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_x() < below_x); };
   LAScriterionDropxBelow(F64 below_x) { this->below_x = below_x; };
 private:
@@ -229,7 +219,6 @@ class LAScriterionDropxAbove : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_x_above"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above_x); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_x() >= above_x); };
   LAScriterionDropxAbove(F64 above_x) { this->above_x = above_x; };
 private:
@@ -241,7 +230,6 @@ class LAScriterionDropyBelow : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_y_below"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below_y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_y() < below_y); };
   LAScriterionDropyBelow(F64 below_y) { this->below_y = below_y; };
 private:
@@ -253,7 +241,6 @@ class LAScriterionDropyAbove : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_y_above"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above_y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_y() >= above_y); };
   LAScriterionDropyAbove(F64 above_y) { this->above_y = above_y; };
 private:
@@ -289,7 +276,6 @@ class LAScriterionKeepXY : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_XY"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d %d %d ", name(), below_X, below_Y, above_X, above_Y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_X() < below_X) || (point->get_Y() < below_Y) || (point->get_X() >= above_X) || (point->get_Y() >= above_Y); };
   LAScriterionKeepXY(I32 below_X, I32 below_Y, I32 above_X, I32 above_Y) { this->below_X = below_X; this->below_Y = below_Y; this->above_X = above_X; this->above_Y = above_Y; };
 private:
@@ -301,7 +287,6 @@ class LAScriterionKeepX : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_X"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_X() < below_X) || (above_X <= point->get_X()); };
   LAScriterionKeepX(I32 below_X, I32 above_X) { this->below_X = below_X; this->above_X = above_X; };
 private:
@@ -313,7 +298,6 @@ class LAScriterionDropX : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_X"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), below_X, above_X); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((below_X <= point->get_X()) && (point->get_X() < above_X)); };
   LAScriterionDropX(I32 below_X, I32 above_X) { this->below_X = below_X; this->above_X = above_X; };
 private:
@@ -326,7 +310,6 @@ class LAScriterionKeepY : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_Y"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_Y() < below_Y) || (above_Y <= point->get_Y()); };
   LAScriterionKeepY(I32 below_Y, I32 above_Y) { this->below_Y = below_Y; this->above_Y = above_Y; };
 private:
@@ -338,7 +321,6 @@ class LAScriterionDropY : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_Y"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), below_Y, above_Y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((below_Y <= point->get_Y()) && (point->get_Y() < above_Y)); };
   LAScriterionDropY(I32 below_Y, I32 above_Y) { this->below_Y = below_Y; this->above_Y = above_Y; };
 private:
@@ -376,7 +358,6 @@ class LAScriterionDropXBelow : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_X_below"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), below_X); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_X() < below_X); };
   LAScriterionDropXBelow(I32 below_X) { this->below_X = below_X; };
 private:
@@ -388,7 +369,6 @@ class LAScriterionDropXAbove : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_X_above"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), above_X); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_X() >= above_X); };
   LAScriterionDropXAbove(I32 above_X) { this->above_X = above_X; };
 private:
@@ -400,7 +380,6 @@ class LAScriterionDropYBelow : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_Y_below"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), below_Y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_Y() < below_Y); };
   LAScriterionDropYBelow(I32 below_Y) { this->below_Y = below_Y; };
 private:
@@ -412,7 +391,6 @@ class LAScriterionDropYAbove : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_Y_above"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), above_Y); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_Y() >= above_Y); };
   LAScriterionDropYAbove(I32 above_Y) { this->above_Y = above_Y; };
 private:
@@ -448,7 +426,6 @@ class LAScriterionKeepFirstReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_first"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->return_number > 1); };
 };
 
@@ -457,7 +434,6 @@ class LAScriterionKeepFirstOfManyReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_first_of_many"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns == 1) || (point->return_number > 1)); };
 };
 
@@ -466,7 +442,6 @@ class LAScriterionKeepMiddleReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_middle"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((point->return_number == 1) || (point->return_number >= point->number_of_returns)); };
 };
 
@@ -475,7 +450,6 @@ class LAScriterionKeepLastReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_last"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->return_number < point->number_of_returns); };
 };
 
@@ -484,7 +458,6 @@ class LAScriterionKeepLastOfManyReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_last_of_many"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((point->return_number == 1) || (point->return_number < point->number_of_returns)); };
 };
 
@@ -493,7 +466,6 @@ class LAScriterionKeepSecondLast : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_second_last"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns <= 1) || (point->return_number != (point->number_of_returns-1))); };
 };
 
@@ -502,7 +474,6 @@ class LAScriterionDropFirstReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_first"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->return_number == 1); };
 };
 
@@ -511,7 +482,6 @@ class LAScriterionDropFirstOfManyReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_first_of_many"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns > 1) && (point->return_number == 1)); };
 };
 
@@ -520,7 +490,6 @@ class LAScriterionDropMiddleReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_middle"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((point->return_number > 1) && (point->return_number < point->number_of_returns)); };
 };
 
@@ -529,7 +498,6 @@ class LAScriterionDropLastReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_last"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->return_number >= point->number_of_returns); };
 };
 
@@ -538,7 +506,6 @@ class LAScriterionDropLastOfManyReturn : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_last_of_many"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns > 1) && (point->return_number >= point->number_of_returns)); };
 };
 
@@ -547,7 +514,6 @@ class LAScriterionDropSecondLast : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_second_last"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns > 1) && (point->return_number == (point->number_of_returns-1))); };
 };
 
@@ -555,36 +521,57 @@ class LAScriterionKeepReturns : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_return_mask"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), ~drop_return_mask); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
-  inline BOOL filter(const LASpoint* point) { return ((1 << point->return_number) & drop_return_mask); };
-  LAScriterionKeepReturns(U32 keep_return_mask) { drop_return_mask = ~keep_return_mask; };
+  inline I32 get_command(CHAR* string) const { 
+    U32 i;
+    U32 n = sprintf(string, "-keep_return ");
+    U16 keep_return_mask = ~drop_return_mask;
+    for (i = 0; i < 16; i++) if ((1 << i) & keep_return_mask) n += sprintf(string + n, "%u ", i);
+    return n;
+  };
+  inline BOOL filter(const LASpoint* point) { return ((1 << point->get_return_number()) & drop_return_mask); };
+  LAScriterionKeepReturns(U16 keep_return_mask) { drop_return_mask = ~keep_return_mask; };
+  inline U16 get_keep_return_mask() const { return ~drop_return_mask; };
 private:
-  U32 drop_return_mask;
+  U16 drop_return_mask;
+};
+
+class LAScriterionDropReturns : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_return_mask"; };
+  inline I32 get_command(CHAR* string) const { 
+    U32 i;
+    U32 n = sprintf(string, "-drop_return ");
+    for (i = 0; i < 16; i++) if ((1 << i) & drop_return_mask) n += sprintf(string + n, "%u ", i);
+    return n;
+  };
+  inline BOOL filter(const LASpoint* point) { return ((1 << point->get_return_number()) & drop_return_mask); };
+  LAScriterionDropReturns(U16 drop_return_mask) { this->drop_return_mask = drop_return_mask; };
+  inline U16 get_drop_return_mask() const { return drop_return_mask; };
+private:
+  U16 drop_return_mask;
 };
 
 class LAScriterionKeepSpecificNumberOfReturns : public LAScriterion
 {
 public:
-  inline const CHAR* name() const { return (numberOfReturns == 1 ? "keep_single" : (numberOfReturns == 2 ? "keep_double" : (numberOfReturns == 3 ? "keep_triple" : (numberOfReturns == 4 ? "keep_quadruple" : "keep_quintuple")))); };
+  inline const CHAR* name() const { return (number_of_returns == 1 ? "keep_single" : (number_of_returns == 2 ? "keep_double" : (number_of_returns == 3 ? "keep_triple" : (number_of_returns == 4 ? "keep_quadruple" : "keep_quintuple")))); };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
-  inline BOOL filter(const LASpoint* point) { return (point->number_of_returns != numberOfReturns); };
-  LAScriterionKeepSpecificNumberOfReturns(U32 numberOfReturns) { this->numberOfReturns = numberOfReturns; };
+  inline BOOL filter(const LASpoint* point) { return (point->get_number_of_returns() != number_of_returns); };
+  LAScriterionKeepSpecificNumberOfReturns(U32 number_of_returns) { this->number_of_returns = number_of_returns; };
 private:
-  U32 numberOfReturns;
+  U32 number_of_returns;
 };
 
 class LAScriterionDropSpecificNumberOfReturns : public LAScriterion
 {
 public:
-  inline const CHAR* name() const { return (numberOfReturns == 1 ? "drop_single" : (numberOfReturns == 2 ? "drop_double" : (numberOfReturns == 3 ? "drop_triple" : (numberOfReturns == 4 ? "drop_quadruple" : "drop_quintuple")))); };
+  inline const CHAR* name() const { return (number_of_returns == 1 ? "drop_single" : (number_of_returns == 2 ? "drop_double" : (number_of_returns == 3 ? "drop_triple" : (number_of_returns == 4 ? "drop_quadruple" : "drop_quintuple")))); };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
-  inline BOOL filter(const LASpoint* point) { return (point->number_of_returns == numberOfReturns); };
-  LAScriterionDropSpecificNumberOfReturns(U32 numberOfReturns) { this->numberOfReturns = numberOfReturns; };
+  inline BOOL filter(const LASpoint* point) { return (point->get_number_of_returns() == number_of_returns); };
+  LAScriterionDropSpecificNumberOfReturns(U32 number_of_returns) { this->number_of_returns = number_of_returns; };
 private:
-  U32 numberOfReturns;
+  U32 number_of_returns;
 };
 
 class LAScriterionDropScanDirection : public LAScriterion
@@ -626,7 +613,6 @@ class LAScriterionKeepScannerChannel : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_scanner_channel"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), scanner_channel); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_extended_scanner_channel() != scanner_channel); };
   LAScriterionKeepScannerChannel(I32 scanner_channel) { this->scanner_channel = scanner_channel; };
 private:
@@ -638,7 +624,6 @@ class LAScriterionDropScannerChannel : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_scanner_channel"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), scanner_channel); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { return (point->get_extended_scanner_channel() == scanner_channel); };
   LAScriterionDropScannerChannel(I32 scanner_channel) { this->scanner_channel = scanner_channel; };
 private:
@@ -838,28 +823,39 @@ private:
   I32 below_intensity, above_intensity;
 };
 
+class LAScriterionKeepClassifications : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_classification_mask"; };
+  inline I32 get_command(CHAR* string) const { 
+    U32 i;
+    U32 n = sprintf(string, "-keep_class ");
+    U32 keep_classification_mask = ~drop_classification_mask;
+    for (i = 0; i < 32; i++) if ((1u << i) & keep_classification_mask) n += sprintf(string + n, "%u ", i);
+    return n;
+  };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
+  inline BOOL filter(const LASpoint* point) { return ((1u << point->classification) & drop_classification_mask); };
+  LAScriterionKeepClassifications(U32 keep_classification_mask) { drop_classification_mask = ~keep_classification_mask; };
+  inline U32 get_keep_classification_mask() const { return ~drop_classification_mask; };
+private:
+  U32 drop_classification_mask;
+};
+
 class LAScriterionDropClassifications : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_classification_mask"; };
   inline I32 get_command(CHAR* string) const { 
-    U32 i, n, drop = 0;
-    for (i = 0; i < 32; i++) if ((1 << i) & drop_classification_mask) drop++;
-    if (drop < 16)
-    {
-      n = sprintf(string, "-drop_class ");
-      for (i = 0; i < 32; i++) if ((1 << i) & drop_classification_mask) n += sprintf(string + n, "%u ", i);
-    }
-    else
-    {
-      n = sprintf(string, "-keep_class ");
-      for (i = 0; i < 32; i++) if (!((1 << i) & drop_classification_mask)) n += sprintf(string + n, "%u ", i);
-    }
+    U32 i;
+    U32 n = sprintf(string, "-drop_class ");
+    for (i = 0; i < 32; i++) if ((1 << i) & drop_classification_mask) n += sprintf(string + n, "%u ", i);
     return n;
   };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
   inline BOOL filter(const LASpoint* point) { return ((1 << point->classification) & drop_classification_mask); };
   LAScriterionDropClassifications(U32 drop_classification_mask) { this->drop_classification_mask = drop_classification_mask; };
+  inline U32 get_drop_classification_mask() const { return drop_classification_mask; };
 private:
   U32 drop_classification_mask;
 };
@@ -1273,7 +1269,6 @@ class LAScriterionKeepEveryNth : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_every_nth"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), every); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { if (counter == every) { counter = 1; return FALSE; } else { counter++; return TRUE; } };
   LAScriterionKeepEveryNth(I32 every) { this->every = every; counter = 1; };
 private:
@@ -1286,7 +1281,6 @@ class LAScriterionDropEveryNth : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_every_nth"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), every); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point) { if (counter == every) { counter = 1; return TRUE; } else { counter++; return FALSE; } };
   LAScriterionDropEveryNth(I32 every) { this->every = every; counter = 1; };
 private:
@@ -1299,7 +1293,6 @@ class LAScriterionKeepRandomFraction : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_random_fraction"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), fraction); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point)
   {
     srand(seed);
@@ -1320,7 +1313,6 @@ class LAScriterionThinWithGrid : public LAScriterion
 public:
   inline const CHAR* name() const { return "thin_with_grid"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), (grid_spacing > 0 ? grid_spacing : -grid_spacing)); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   inline BOOL filter(const LASpoint* point)
   { 
     if (grid_spacing < 0)
@@ -1726,12 +1718,6 @@ BOOL LASfilter::parse(int argc, char* argv[])
 {
   int i;
 
-  U32 keep_return_mask = 0;
-  U32 drop_return_mask = 0;
-
-  U32 keep_classification_mask = 0;
-  U32 drop_classification_mask = 0;
-
   U32 keep_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
   U32 drop_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -1843,6 +1829,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
           *argv[i]='\0';
           i+=1;
           U32 classification;
+          U32 keep_classification_mask = 0;
           do
           {
             if (sscanf(argv[i], "%u", &classification) != 1)
@@ -1860,6 +1847,31 @@ BOOL LASfilter::parse(int argc, char* argv[])
             i+=1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
           i-=1;
+          // if last criteria was also keep_class filter then combine them
+          if (num_criteria && (strcmp(criteria[num_criteria-1]->name(), "keep_classification_mask") == 0))
+          {
+            LAScriterionKeepClassifications* criterion = (LAScriterionKeepClassifications*)(criteria[num_criteria-1]);
+            num_criteria--;
+            keep_classification_mask |= criterion->get_keep_classification_mask();
+            delete criterion;
+          }
+          add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
+        }
+        else if (strcmp(argv[i],"-keep_classification_mask") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: mask\n", argv[i]);
+            return FALSE;
+          }
+          U32 keep_classification_mask;
+          if (sscanf(argv[i+1], "%u", &keep_classification_mask) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: mask but '%s' is no valid mask\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
       }
       else if (strncmp(argv[i],"-keep_extended_", 15) == 0)
@@ -2271,47 +2283,67 @@ BOOL LASfilter::parse(int argc, char* argv[])
         add_criterion(new LAScriterionKeepCircle(center_x, center_y, radius));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
       }
-      else if (strcmp(argv[i],"-keep_return") == 0)
+      else if (strncmp(argv[i],"-keep_return", 12) == 0)
       {
-        if ((i+1) >= argc)
+        if (strcmp(argv[i],"-keep_return") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs at least 1 argument: return_number\n", argv[i]);
-          return FALSE;
-        }
-        *argv[i]='\0';
-        i+=1;
-        U32 return_number;
-        do
-        {
-          if (sscanf(argv[i], "%u", &return_number) != 1)
+          if ((i+1) >= argc)
           {
-            fprintf(stderr,"ERROR: '-keep_return' needs at least 1 argument: return_number but '%s' is no valid return_number\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: return_number\n", argv[i]);
             return FALSE;
           }
-          if (return_number > 15)
-          {
-            fprintf(stderr,"ERROR: cannot keep return_number %u because it is larger than 15\n", return_number);
-            return FALSE;
-          }
-          keep_return_mask |= (1u << return_number);
           *argv[i]='\0';
           i+=1;
-        } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-        i-=1;
-      }
-      else if (strcmp(argv[i],"-keep_return_mask") == 0)
-      {
-        if ((i+1) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: return_mask\n", argv[i]);
-          return FALSE;
+          U32 return_number;
+          U16 keep_return_mask = 0;
+          do
+          {
+            if (sscanf(argv[i], "%u", &return_number) != 1)
+            {
+              fprintf(stderr,"ERROR: '-keep_return' needs at least 1 argument: return_number but '%s' is no valid return_number\n", argv[i]);
+              return FALSE;
+            }
+            if (return_number > 15)
+            {
+              fprintf(stderr,"ERROR: cannot keep return_number %u because it is larger than 15\n", return_number);
+              return FALSE;
+            }
+            keep_return_mask |= (1u << return_number);
+            *argv[i]='\0';
+            i+=1;
+          } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+          i-=1;
+          // if last criteria was also keep_return filter then combine them
+          if (num_criteria && (strcmp(criteria[num_criteria-1]->name(), "keep_return_mask") == 0))
+          {
+            LAScriterionKeepReturns* criterion = (LAScriterionKeepReturns*)(criteria[num_criteria-1]);
+            num_criteria--;
+            keep_return_mask |= criterion->get_keep_return_mask();
+            delete criterion;
+          }
+          add_criterion(new LAScriterionKeepReturns(keep_return_mask));
         }
-        if (sscanf(argv[i+1], "%u", &keep_return_mask) != 1)
+        else if (strcmp(argv[i],"-keep_return_mask") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: return_mask but '%s' is no valid return_mask\n", argv[i], argv[i+1]);
-          return FALSE;
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: return_mask\n", argv[i]);
+            return FALSE;
+          }
+          U32 keep_return_mask;
+          if (sscanf(argv[i+1], "%u", &keep_return_mask) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: return_mask but '%s' is no valid return_mask\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          if (keep_return_mask > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: '%s' needs a return_mask between 0 and %u but return_mask is %u\n", argv[i], U16_MAX, keep_return_mask);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepReturns((U16)keep_return_mask));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
       else if (strcmp(argv[i],"-keep_number_of_returns") == 0)
       {
@@ -2963,6 +2995,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
           *argv[i]='\0';
           i+=1;
           U32 classification;
+          U32 drop_classification_mask = 0;
           do
           {
             if (sscanf(argv[i], "%u", &classification) != 1)
@@ -2980,6 +3013,15 @@ BOOL LASfilter::parse(int argc, char* argv[])
             i+=1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
           i-=1;
+          // if last criteria was also drop_class filter then combine them
+          if (num_criteria && (strcmp(criteria[num_criteria-1]->name(), "drop_classification_mask") == 0))
+          {
+            LAScriterionDropClassifications* criterion = (LAScriterionDropClassifications*)(criteria[num_criteria-1]);
+            num_criteria--;
+            drop_classification_mask |= criterion->get_drop_classification_mask();
+            delete criterion;
+          }
+          add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
         }
         else if (strcmp(argv[i],"-drop_classification_mask") == 0)
         {
@@ -2988,7 +3030,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: mask\n", argv[i]);
             return FALSE;
           }
-          drop_classification_mask = atoi(argv[i+1]);
+          U32 drop_classification_mask;
+          if (sscanf(argv[i+1], "%u", &drop_classification_mask) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: mask but '%s' is no valid mask\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
       }
@@ -3390,22 +3438,67 @@ BOOL LASfilter::parse(int argc, char* argv[])
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
       }
-      else if (strcmp(argv[i],"-drop_return") == 0)
+      else if (strncmp(argv[i],"-drop_return", 12) == 0)
       {
-        if ((i+1) >= argc)
+        if (strcmp(argv[i],"-drop_return") == 0)
         {
-          fprintf(stderr,"ERROR: '%s' needs at least 1 argument: return_number\n", argv[i]);
-          return FALSE;
-        }
-        *argv[i]='\0';
-        i+=1;
-        do
-        {
-          drop_return_mask |= (1 << atoi(argv[i]));
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: return_number\n", argv[i]);
+            return FALSE;
+          }
           *argv[i]='\0';
           i+=1;
-        } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-        i-=1;
+          U32 return_number;
+          U16 drop_return_mask = 0;
+          do
+          {
+            if (sscanf(argv[i], "%u", &return_number) != 1)
+            {
+              fprintf(stderr,"ERROR: '-drop_return' needs at least 1 argument: return_number but '%s' is no valid return_number\n", argv[i]);
+              return FALSE;
+            }
+            if (return_number > 15)
+            {
+              fprintf(stderr,"ERROR: cannot drop return_number %u because it is larger than 15\n", return_number);
+              return FALSE;
+            }
+            drop_return_mask |= (1u << return_number);
+            *argv[i]='\0';
+            i+=1;
+          } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
+          i-=1;
+          // if last criteria was also drop_return filter then combine them
+          if (num_criteria && (strcmp(criteria[num_criteria-1]->name(), "drop_return_mask") == 0))
+          {
+            LAScriterionDropReturns* criterion = (LAScriterionDropReturns*)(criteria[num_criteria-1]);
+            num_criteria--;
+            drop_return_mask |= criterion->get_drop_return_mask();
+            delete criterion;
+          }
+          add_criterion(new LAScriterionDropReturns(drop_return_mask));
+        }
+        else if (strcmp(argv[i],"-drop_return_mask") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: return_mask\n", argv[i]);
+            return FALSE;
+          }
+          U32 drop_return_mask;
+          if (sscanf(argv[i+1], "%u", &drop_return_mask) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: return_mask but '%s' is no valid return_mask\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          if (drop_return_mask > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: '%s' needs a return_mask between 0 and %u but return_mask is %u\n", argv[i], U16_MAX, drop_return_mask);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropReturns((U16)drop_return_mask));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        }
       }
       else if (strcmp(argv[i],"-drop_number_of_returns") == 0)
       {
@@ -4000,40 +4093,6 @@ BOOL LASfilter::parse(int argc, char* argv[])
         *argv[i]='\0';
       }
     }
-  }
-
-  if (drop_return_mask)
-  {
-    if (keep_return_mask)
-    {
-      fprintf(stderr,"ERROR: cannot use '-drop_return' and '-keep_return' simultaneously\n");
-      return FALSE;
-    }
-    else
-    {
-      keep_return_mask = 255 & ~drop_return_mask;
-    }
-  }
-  if (keep_return_mask)
-  {
-    add_criterion(new LAScriterionKeepReturns(keep_return_mask));
-  }
-
-  if (keep_classification_mask)
-  {
-    if (drop_classification_mask)
-    {
-      fprintf(stderr,"ERROR: cannot use '-drop_class' and '-keep_class' simultaneously\n");
-      return FALSE;
-    }
-    else
-    {
-      drop_classification_mask = ~keep_classification_mask;
-    }
-  }
-  if (drop_classification_mask)
-  {
-    add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
   }
 
   if (keep_extended_classification_mask[0] || keep_extended_classification_mask[1] || keep_extended_classification_mask[2] || keep_extended_classification_mask[3] || keep_extended_classification_mask[4] || keep_extended_classification_mask[5] || keep_extended_classification_mask[6] || keep_extended_classification_mask[7])
