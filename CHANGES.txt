@@ -1,3 +1,10 @@
+31 July 2018 -- lasheight: now the '-class 2 8 75 76' option can also select extended classifications as ground points
+30 July 2018 -- lasclassify: for height-normalized data you can use '-height_in_z' instead of the user data values
+30 July 2018 -- LASlib, all LAStools: bug fix in selective decompression of "extra_bytes" for point types 6 and higher
+27 July 2018 -- lasduplicate: added option '-highest_z' which was a logical (but missing) complement to '-lowest_z'
+22 July 2018 -- LASib, txt2las: fixed LASreader_txt bug for parsing 'c'lassfication to '-set_version 1.4' and '-set_point_type 6'
+10 July 2018 -- LASlib: when reading from an istream user must manually set seek-ability (hard to determine)
+ 8 July 2018 -- LASlib, all LAStools: '-classify_attribute_below_as', '-classify_attribute_above_as', '-classify_attribute_between_as'
  6 July 2018 -- lasground, lasnoise: testing options '-ignore_withheld' and '-ignore_overlap' (but not with '-olay')
 20 June 2018 -- LASlib, all LAStools: fix for '-set_classification 0' transform for new LAS 1.4 point types 6-10
 20 June 2018 -- lascontrol: generate report even if input point data does not cover any of the control points
