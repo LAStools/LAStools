@@ -1,3 +1,4 @@
+30 July 2018 -- bug fix in selective decompression of "extra_bytes" for point types 6 and higher
 29 March 2018 -- add LASlib only fields to some structs to avoid future mix-up for "native" LAS 1.4
  9 February 2018 -- minor version increment to 3.2 as POINT14_v4 fixes context inefficiency bug
 28 December 2017 -- prepare to correct 'context switch' bug reported by Wanwannodao on some future date
