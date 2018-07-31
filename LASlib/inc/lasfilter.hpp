@@ -35,13 +35,14 @@
 #define LAS_FILTER_HPP
 
 #include "lasdefinitions.hpp"
+#include "laszip_decompress_selective_v3.hpp"
 
 class LAScriterion
 {
 public:
   virtual const CHAR * name() const = 0;
   virtual I32 get_command(CHAR* string) const = 0;
-  virtual U32 get_decompress_selective() const = 0;
+  virtual U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
   virtual BOOL filter(const LASpoint* point) = 0;
   virtual void reset(){};
   virtual ~LAScriterion(){};
