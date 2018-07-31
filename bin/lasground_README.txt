@@ -148,6 +148,8 @@ overview of all tool-specific switches:
 -gui                                 : start with files loaded into GUI
 -cores 4                             : process multiple inputs on 4 cores in parallel
 -ignore_class 1 3 4 5 6 7 9          : ignores points with specified classification codes
+-ignore_withheld                     : ignores points flagged withheld
+-ignore_overlap                      : ignores points flagged overlap (new LAS 1.4 point types only)
 -step 8.0                            : set resolution of grid used for initial ground to 8.0 [default is 5.0]
 -sub 5                               :
 -offset 0.02                         : offset that points can be above bulged ground TIN and still become ground [default is 0.05]

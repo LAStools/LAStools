@@ -104,6 +104,8 @@ overview of all tool-specific switches:
 -gui                                 : start with files loaded into GUI
 -cores 4                             : process multiple inputs on 4 cores in parallel
 -ignore_class 1 3 4 5 6 7 9          : ignores points with specified classification codes
+-ignore_withheld                     : ignores points flagged withheld
+-ignore_overlap                      : ignores points flagged overlap (new LAS 1.4 point types only)
 -step 1.0                            : use 1 x 1 x 1 uniform grid for finding isolated points
 -step_xy 2.0                         : set the horizontal x and y spacing of the grid to 2
 -step_z 0.5                          : set the vertical z spacing of the grid to 0.5
