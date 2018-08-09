@@ -60,6 +60,11 @@
 #include "laszip.hpp"
 #include "laspoint.hpp"
 
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable:4267)
+#endif
+
 #define LAS_TOOLS_FORMAT_DEFAULT 0
 #define LAS_TOOLS_FORMAT_LAS     1
 #define LAS_TOOLS_FORMAT_LAZ     2
@@ -978,5 +983,9 @@ public:
     clean();
   };
 };
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
 
 #endif
