@@ -304,9 +304,9 @@ public:
     F64 z = point->get_attribute_as_float(index);
     point->set_z(z);
   };
-  LASoperationCopyAttributeIntoZ(I32 index) { this->index = index; };
+  LASoperationCopyAttributeIntoZ(U32 index) { this->index = index; };
 private:
-  I32 index;
+  U32 index;
 };
 
 class LASoperationCopyIntensityIntoZ : public LASoperation
@@ -523,9 +523,9 @@ public:
     F64 intensity = point->get_attribute_as_float(index);
     point->set_intensity(U16_CLAMP(intensity));
   };
-  LASoperationCopyAttributeIntoIntensity(I32 index) { this->index = index; };
+  LASoperationCopyAttributeIntoIntensity(U32 index) { this->index = index; };
 private:
-  I32 index;
+  U32 index;
 };
 
 class LASoperationBinGpsTimeIntoIntensity : public LASoperation
@@ -606,32 +606,14 @@ public:
   inline void transform(LASpoint* point) {
     if (class_from > 31)
     {
-      if (point->extended_classification == class_from)
+      if (point->get_extended_classification() == class_from)
       {
-        if (class_to > 31)
-        {
-          point->extended_classification = class_to;
-          point->classification = 0;
-        }
-        else
-        {
-          point->classification = class_to;
-          point->extended_classification = 0;
-        }
+        point->set_extended_classification(class_to);
       }
     }
-    else if (point->classification == class_from)
+    else if (point->get_classification() == class_from)
     {
-      if (class_to > 31)
-      {
-        point->extended_classification = class_to;
-        point->classification = 0;
-      }
-      else
-      {
-        point->classification = class_to;
-        point->extended_classification = 0;
-      }
+      point->set_extended_classification(class_to);
     }
   };
   LASoperationChangeClassificationFromTo(U8 class_from, U8 class_to) { this->class_from = class_from; this->class_to = class_to; };
@@ -656,24 +638,6 @@ public:
     }
   };
   LASoperationMoveAncientToExtendedClassification() { };
-};
-
-class LASoperationChangeExtendedClassificationFromTo : public LASoperation
-{
-public:
-  inline const CHAR* name() const { return "change_extended_classification_from_to"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), class_from, class_to); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
-  inline void transform(LASpoint* point) {
-    if (point->extended_classification == class_from)
-    {
-      point->extended_classification = class_to;
-    }
-  };
-  LASoperationChangeExtendedClassificationFromTo(U8 class_from, U8 class_to) { this->class_from = class_from; this->class_to = class_to; };
-private:
-  U8 class_from;
-  U8 class_to;
 };
 
 class LASoperationClassifyZbelowAs : public LASoperation
@@ -740,14 +704,7 @@ public:
   inline void transform(LASpoint* point) {
     if (point->get_intensity() < intensity_below)
     {
-      if (class_to >= 32)
-      {
-        point->set_extended_classification(class_to);
-      }
-      else
-      {
-        point->set_classification(class_to);
-      }
+      point->set_extended_classification(class_to);
     }
   };
   LASoperationClassifyIntensityBelowAs(U16 intensity_below, U8 class_to) { this->intensity_below = intensity_below; this->class_to = class_to; };
@@ -765,14 +722,7 @@ public:
   inline void transform(LASpoint* point) {
     if (point->get_intensity() > intensity_above)
     {
-      if (class_to >= 32)
-      {
-        point->set_extended_classification(class_to);
-      }
-      else
-      {
-        point->set_classification(class_to);
-      }
+      point->set_extended_classification(class_to);
     }
   };
   LASoperationClassifyIntensityAboveAs(U16 intensity_above, U8 class_to) { this->intensity_above = intensity_above; this->class_to = class_to; };
@@ -790,14 +740,7 @@ public:
   inline void transform(LASpoint* point) {
     if ((intensity_below <= point->get_intensity()) && (point->get_intensity() <= intensity_above))
     {
-      if (class_to >= 32)
-      {
-        point->set_extended_classification(class_to);
-      }
-      else
-      {
-        point->set_classification(class_to);
-      }
+      point->set_extended_classification(class_to);
     }
   };
   LASoperationClassifyIntensityBetweenAs(U16 intensity_below, U16 intensity_above, U8 class_to) { this->intensity_below = intensity_below; this->intensity_above = intensity_above; this->class_to = class_to; };
@@ -978,9 +921,9 @@ public:
     F64 user_data = point->get_attribute_as_float(index);
     point->set_user_data(U8_CLAMP(user_data));
   };
-  LASoperationCopyAttributeIntoUserData(I32 index) { this->index = index; };
+  LASoperationCopyAttributeIntoUserData(U32 index) { this->index = index; };
 private:
-  I32 index;
+  U32 index;
 };
 
 class LASoperationSetPointSource : public LASoperation
@@ -2095,8 +2038,20 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above\n", argv[i]);
           return FALSE;
         }
+        I32 below;
+        if (sscanf(argv[i+1], "%d", &below) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above but '%s' is no valid below value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        I32 above;
+        if (sscanf(argv[i+2], "%d", &above) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above but '%s' is no valid above value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
         change_coordinates = TRUE;
-        add_operation(new LASoperationClampRawZ((I32)atoi(argv[i+1]), (I32)atoi(argv[i+2])));
+        add_operation(new LASoperationClampRawZ(below, above));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
     }
@@ -2111,8 +2066,14 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
             return FALSE;
           }
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute but '%s' is no valid index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
           change_coordinates = TRUE;
-          add_operation(new LASoperationCopyAttributeIntoZ(atoi(argv[i+1])));
+          add_operation(new LASoperationCopyAttributeIntoZ(index));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
         else if (strcmp(argv[i],"-copy_attribute_into_user_data") == 0)
@@ -2122,7 +2083,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
             return FALSE;
           }
-          add_operation(new LASoperationCopyAttributeIntoUserData(atoi(argv[i+1])));
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute but '%s' is no valid index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_operation(new LASoperationCopyAttributeIntoUserData(index));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
         else if (strcmp(argv[i],"-copy_attribute_into_intensity") == 0)
@@ -2132,7 +2099,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
             return FALSE;
           }
-          add_operation(new LASoperationCopyAttributeIntoIntensity(atoi(argv[i+1])));
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute but '%s' is no valid index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_operation(new LASoperationCopyAttributeIntoIntensity(index));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
       }
@@ -2243,7 +2216,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: cannot set classification because classification of %u is larger than 255\n", classification);
           return FALSE;
         }
-        add_operation(new LASoperationSetClassification(U8_CLAMP(classification)));
+        add_operation(new LASoperationSetClassification((U8)classification));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_intensity") == 0)
@@ -2421,7 +2394,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: return_number\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetReturnNumber((U8)atoi(argv[i+1])));
+        U32 return_number;
+        if (sscanf(argv[i+1], "%u", &return_number) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: return_number but '%s' is no valid return_number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (return_number > 7)
+        {
+          fprintf(stderr,"ERROR: cannot set return_number because %u is larger than 7\n", return_number);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetReturnNumber((U8)return_number));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_extended_return_number") == 0)
@@ -2431,7 +2415,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: extended_return_number\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetExtendedReturnNumber((U8)atoi(argv[i+1])));
+        U32 extended_return_number;
+        if (sscanf(argv[i+1], "%u", &extended_return_number) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: extended_return_number but '%s' is no valid extended_return_number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (extended_return_number > 15)
+        {
+          fprintf(stderr,"ERROR: cannot set extended_return_number because %u is larger than 15\n", extended_return_number);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetExtendedReturnNumber((U8)extended_return_number));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_number_of_returns") == 0)
@@ -2441,7 +2436,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: number_of_returns\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetNumberOfReturns((U8)atoi(argv[i+1])));
+        U32 number_of_returns;
+        if (sscanf(argv[i+1], "%u", &number_of_returns) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: number_of_returns but '%s' is no valid number_of_returns\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (number_of_returns > 7)
+        {
+          fprintf(stderr,"ERROR: cannot set number_of_returns because %u is larger than 7\n", number_of_returns);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetNumberOfReturns((U8)number_of_returns));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_extended_number_of_returns") == 0)
@@ -2451,6 +2457,17 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: extended_number_of_returns\n", argv[i]);
           return FALSE;
         }
+        U32 extended_number_of_returns;
+        if (sscanf(argv[i+1], "%u", &extended_number_of_returns) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: extended_number_of_returns but '%s' is no valid extended_return_number\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (extended_number_of_returns > 15)
+        {
+          fprintf(stderr,"ERROR: cannot set extended_number_of_returns because %u is larger than 15\n", extended_number_of_returns);
+          return FALSE;
+        }
         add_operation(new LASoperationSetExtendedNumberOfReturns((U8)atoi(argv[i+1])));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -2458,10 +2475,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: gps_time\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationSetGpsTime(atof(argv[i+1])));
+        F64 gps_time;
+        if (sscanf(argv[i+1], "%lf", &gps_time) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: gps_time but '%s' is no valid gps_time\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetGpsTime(gps_time));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strncmp(argv[i],"-set_RGB", 8) == 0)
@@ -2499,24 +2522,36 @@ BOOL LAStransform::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-change_",8) == 0)
     {
-      if (strcmp(argv[i],"-change_classification_from_to") == 0)
+      if ((strcmp(argv[i],"-change_classification_from_to") == 0) || (strcmp(argv[i],"-change_extended_classification_from_to") == 0))
       {
         if ((i+2) >= argc)
         {
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationChangeClassificationFromTo(U8_CLAMP(atoi(argv[i+1])), U8_CLAMP(atoi(argv[i+2]))));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
-      }
-      else if (strcmp(argv[i],"-change_extended_classification_from_to") == 0)
-      {
-        if ((i+2) >= argc)
+        U32 from_value;
+        if (sscanf(argv[i+1], "%u", &from_value) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        add_operation(new LASoperationChangeExtendedClassificationFromTo(U8_CLAMP(atoi(argv[i+1])), U8_CLAMP(atoi(argv[i+2]))));
+        if (from_value > U8_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change classification because from_value %u is larger than %u\n", from_value, U8_MAX);
+          return FALSE;
+        }
+        U32 to_value;
+        if (sscanf(argv[i+2], "%u", &to_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (to_value > U8_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change classification because to_value %u is larger than %u\n", to_value, U8_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationChangeClassificationFromTo((U8)from_value, (U8)to_value));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-change_user_data_from_to") == 0)
@@ -2526,7 +2561,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationChangeUserDataFromTo((U8)atoi(argv[i+1]), (U8)atoi(argv[i+2])));
+        U32 from_value;
+        if (sscanf(argv[i+1], "%u", &from_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (from_value > U8_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change classification because from_value %u is larger than %u\n", from_value, U8_MAX);
+          return FALSE;
+        }
+        U32 to_value;
+        if (sscanf(argv[i+2], "%u", &to_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (to_value > U8_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change classification because to_value %u is larger than %u\n", to_value, U8_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationChangeUserDataFromTo(from_value, to_value));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-change_point_source_from_to") == 0)
@@ -2536,27 +2593,93 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationChangePointSourceFromTo((U16)atoi(argv[i+1]), (U16)atoi(argv[i+2])));
+        U32 from_value;
+        if (sscanf(argv[i+1], "%u", &from_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (from_value > U16_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change classification because from_value %u is larger than %u\n", from_value, U16_MAX);
+          return FALSE;
+        }
+        U32 to_value;
+        if (sscanf(argv[i+2], "%u", &to_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (to_value > U16_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change classification because to_value %u is larger than %u\n", to_value, U16_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationChangePointSourceFromTo((U16)from_value, (U16)to_value));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-change_return_number_from_to") == 0)
       {
         if ((i+2) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_return_number to_return_number\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationChangeReturnNumberFromTo((U8)atoi(argv[i+1]), (U8)atoi(argv[i+2])));
+        U32 from_value;
+        if (sscanf(argv[i+1], "%u", &from_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (from_value > U8_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change return_number because from_value %u is larger than %u\n", from_value, U8_MAX);
+          return FALSE;
+        }
+        U32 to_value;
+        if (sscanf(argv[i+2], "%u", &to_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (to_value > U8_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change return_number because to_value %u is larger than %u\n", to_value, U8_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationChangeReturnNumberFromTo((U8)from_value, (U8)to_value));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
       else if (strcmp(argv[i],"-change_number_of_returns_from_to") == 0)
       {
         if ((i+2) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_number_of_returns to_number_of_returns\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationChangeNumberOfReturnsFromTo((U8)atoi(argv[i+1]), (U8)atoi(argv[i+2])));
+        U32 from_value;
+        if (sscanf(argv[i+1], "%u", &from_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (from_value > U8_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change return_number because from_value %u is larger than %u\n", from_value, U8_MAX);
+          return FALSE;
+        }
+        U32 to_value;
+        if (sscanf(argv[i+2], "%u", &to_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (to_value > U8_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot change return_number because to_value %u is larger than %u\n", to_value, U8_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationChangeNumberOfReturnsFromTo((U8)from_value, (U8)to_value));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
     }
