@@ -1067,12 +1067,12 @@ class LASoperationConvertWeekToAdjustedGps : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "week_to_adjusted"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), week); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), week); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline void transform(LASpoint* point) { point->gps_time += delta_secs; }
-  LASoperationConvertWeekToAdjustedGps(I32 week) { this->week = week; delta_secs = week; delta_secs *= 604800; delta_secs -= 1000000000; };
+  LASoperationConvertWeekToAdjustedGps(U32 week) { this->week = week; delta_secs = week; delta_secs *= 604800; delta_secs -= 1000000000; };
 private:
-  I32 week;
+  U32 week;
   I64 delta_secs;
 };
 
@@ -2468,7 +2468,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: cannot set extended_number_of_returns because %u is larger than 15\n", extended_number_of_returns);
           return FALSE;
         }
-        add_operation(new LASoperationSetExtendedNumberOfReturns((U8)atoi(argv[i+1])));
+        add_operation(new LASoperationSetExtendedNumberOfReturns((U8)extended_number_of_returns));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-set_gps_time") == 0)
@@ -2496,27 +2496,102 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 3 arguments: R G B\n", argv[i]);
             return FALSE;
           }
-          add_operation(new LASoperationSetRGB((U16)atoi(argv[i+1]), (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3])));
+          U32 R;
+          if (sscanf(argv[i+1], "%u", &R) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: R G B but '%s' is no valid R\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          if (R > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot set RGB because R is %u, which is larger than %u\n", R, U16_MAX);
+            return FALSE;
+          }
+          U32 G;
+          if (sscanf(argv[i+2], "%u", &G) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: R G B but '%s' is no valid G\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          if (G > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot set RGB because G is %u, which is larger than %u\n", G, U16_MAX);
+            return FALSE;
+          }
+          U32 B;
+          if (sscanf(argv[i+3], "%u", &B) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: R G B but '%s' is no valid B\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          if (B > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot set RGB because B is %u, which is larger than %u\n", B, U16_MAX);
+            return FALSE;
+          }
+          add_operation(new LASoperationSetRGB((U16)R, (U16)G, (U16)B));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
         }
         else if (strcmp(argv[i],"-set_RGB_of_class") == 0)
         {
           if ((i+4) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 4 arguments: class R G B\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: classification R G B\n", argv[i]);
             return FALSE;
           }
-          I32 c = atoi(argv[i+1]);
-          if ((c < 0) || (c > 255))
+          U32 classification;
+          if (sscanf(argv[i+1], "%u", &classification) != 1)
           {
-            fprintf(stderr,"ERROR: '%s' needs class between 0 and 255 but got %d\n", argv[i], c);
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: classification R G B but '%s' is no valid classification\n", argv[i], argv[i+1]);
             return FALSE;
           }
-          if (c < 32)
-            add_operation(new LASoperationSetRGBofClass((U8)c, (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3]), (U16)atoi(argv[i+4])));
+          if (classification > U8_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot set RGB because classification is %u, which is larger than %u\n", classification, U8_MAX);
+            return FALSE;
+          }
+          U32 R;
+          if (sscanf(argv[i+2], "%u", &R) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: classification R G B but '%s' is no valid R\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          if (R > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot set RGB because R is %u, which is larger than %u\n", R, U16_MAX);
+            return FALSE;
+          }
+          U32 G;
+          if (sscanf(argv[i+3], "%u", &G) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: classification R G B but '%s' is no valid G\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          if (G > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot set RGB because G is %u, which is larger than %u\n", G, U16_MAX);
+            return FALSE;
+          }
+          U32 B;
+          if (sscanf(argv[i+4], "%u", &B) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: classification R G B but '%s' is no valid B\n", argv[i], argv[i+4]);
+            return FALSE;
+          }
+          if (B > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot set RGB because B is %u, which is larger than %u\n", B, U16_MAX);
+            return FALSE;
+          }
+          if (classification < 32)
+          {
+            add_operation(new LASoperationSetRGBofClass((U8)classification, (U16)R, (U16)G, (U16)B));
+          }
           else
-            add_operation(new LASoperationSetRGBofExtendedClass((U8)c, (U16)atoi(argv[i+2]), (U16)atoi(argv[i+3]), (U16)atoi(argv[i+4])));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
+          {
+            add_operation(new LASoperationSetRGBofExtendedClass((U8)classification, (U16)R, (U16)G, (U16)B));
+          }
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4;
         }
       }
     }
@@ -3205,7 +3280,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationBinZintoPointSource(atoi(argv[i+1])));
+        U32 bin_size;
+        if (sscanf(argv[i+1], "%u", &bin_size) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size but '%s' is no valid bin_size\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (bin_size == 0)
+        {
+          fprintf(stderr,"ERROR: %u is no valid bin_size for '%s'\n", bin_size, argv[i]);
+          return FALSE;
+        }
+        add_operation(new LASoperationBinZintoPointSource(bin_size));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-bin_abs_scan_angle_into_point_source") == 0)
@@ -3215,7 +3301,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationBinAbsScanAngleIntoPointSource((F32)atof(argv[i+1])));
+        F32 bin_size;
+        if (sscanf(argv[i+1], "%f", &bin_size) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size but '%s' is no valid bin_size\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (bin_size <= 0.0f)
+        {
+          fprintf(stderr,"ERROR: %f is no valid bin_size for '%s'\n", bin_size, argv[i]);
+          return FALSE;
+        }
+        add_operation(new LASoperationBinAbsScanAngleIntoPointSource(bin_size));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strcmp(argv[i],"-bin_gps_time_into_intensity") == 0)
@@ -3225,7 +3322,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size\n", argv[i]);
           return FALSE;
         }
-        add_operation(new LASoperationBinGpsTimeIntoIntensity((F32)atof(argv[i+1])));
+        F32 bin_size;
+        if (sscanf(argv[i+1], "%f", &bin_size) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size but '%s' is no valid bin_size\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (bin_size <= 0.0f)
+        {
+          fprintf(stderr,"ERROR: %f is no valid bin_size for '%s'\n", bin_size, argv[i]);
+          return FALSE;
+        }
+        add_operation(new LASoperationBinGpsTimeIntoIntensity(bin_size));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
     }
@@ -3290,7 +3398,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
         fprintf(stderr,"ERROR: '%s' needs 1 argument: week\n", argv[i]);
         return FALSE;
       }
-      add_operation(new LASoperationConvertWeekToAdjustedGps(atoi(argv[i+1])));
+      U32 week;
+      if (sscanf(argv[i+1], "%u", &week) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: week but '%s' is no valid week\n", argv[i], argv[i+1]);
+        return FALSE;
+      }
+      add_operation(new LASoperationConvertWeekToAdjustedGps(week));
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
     }
     else if (strcmp(argv[i],"-filtered_transform") == 0)
