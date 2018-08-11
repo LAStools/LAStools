@@ -1188,12 +1188,12 @@ class LAScriterionKeepAttributeBelow : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_attribute_below"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf ", name(), index, below_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %lf ", name(), index, below_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) >= below_attribute); };
-  LAScriterionKeepAttributeBelow(I32 index, F64 below_attribute) { this->index = index; this->below_attribute = below_attribute; };
+  LAScriterionKeepAttributeBelow(U32 index, F64 below_attribute) { this->index = index; this->below_attribute = below_attribute; };
 private:
-  I32 index;
+  U32 index;
   F64 below_attribute;
 };
 
@@ -1201,12 +1201,12 @@ class LAScriterionKeepAttributeAbove : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_attribute_above"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf ", name(), index, above_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %lf ", name(), index, above_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) <= above_attribute); };
-  LAScriterionKeepAttributeAbove(I32 index, F64 above_attribute) { this->index = index; this->above_attribute = above_attribute; };
+  LAScriterionKeepAttributeAbove(U32 index, F64 above_attribute) { this->index = index; this->above_attribute = above_attribute; };
 private:
-  I32 index;
+  U32 index;
   F64 above_attribute;
 };
 
@@ -1214,12 +1214,12 @@ class LAScriterionKeepAttributeBetween : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_attribute_between"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %lf ", name(), index, below_attribute, above_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %lf %lf ", name(), index, below_attribute, above_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { F64 attribute = point->get_attribute_as_float(index); return (attribute < below_attribute) || (above_attribute < attribute); };
-  LAScriterionKeepAttributeBetween(I32 index, F64 below_attribute, F64 above_attribute) { this->index = index; this->below_attribute = below_attribute; this->above_attribute = above_attribute; };
+  LAScriterionKeepAttributeBetween(U32 index, F64 below_attribute, F64 above_attribute) { this->index = index; this->below_attribute = below_attribute; this->above_attribute = above_attribute; };
 private:
-  I32 index;
+  U32 index;
   F64 below_attribute;
   F64 above_attribute;
 };
@@ -1228,12 +1228,12 @@ class LAScriterionDropAttributeBelow : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_attribute_below"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf ", name(), index, below_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %lf ", name(), index, below_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) < below_attribute); };
-  LAScriterionDropAttributeBelow(I32 index, F64 below_attribute) { this->index = index; this->below_attribute = below_attribute; };
+  LAScriterionDropAttributeBelow(U32 index, F64 below_attribute) { this->index = index; this->below_attribute = below_attribute; };
 private:
-  I32 index;
+  U32 index;
   F64 below_attribute;
 };
 
@@ -1241,12 +1241,12 @@ class LAScriterionDropAttributeAbove : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_attribute_above"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf ", name(), index, above_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %lf ", name(), index, above_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { return (point->get_attribute_as_float(index) > above_attribute); };
-  LAScriterionDropAttributeAbove(I32 index, F64 above_attribute) { this->index = index; this->above_attribute = above_attribute; };
+  LAScriterionDropAttributeAbove(U32 index, F64 above_attribute) { this->index = index; this->above_attribute = above_attribute; };
 private:
-  I32 index;
+  U32 index;
   F64 above_attribute;
 };
 
@@ -1254,12 +1254,12 @@ class LAScriterionDropAttributeBetween : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_attribute_between"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %lf %lf ", name(), index, below_attribute, above_attribute); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %lf %lf ", name(), index, below_attribute, above_attribute); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline BOOL filter(const LASpoint* point) { F64 attribute = point->get_attribute_as_float(index); return (below_attribute <= attribute) && (attribute <= above_attribute); };
-  LAScriterionDropAttributeBetween(I32 index, F64 below_attribute, F64 above_attribute) { this->index = index; this->below_attribute = below_attribute; this->above_attribute = above_attribute; };
+  LAScriterionDropAttributeBetween(U32 index, F64 below_attribute, F64 above_attribute) { this->index = index; this->below_attribute = below_attribute; this->above_attribute = above_attribute; };
 private:
-  I32 index;
+  U32 index;
   F64 below_attribute;
   F64 above_attribute;
 };
@@ -1268,24 +1268,24 @@ class LAScriterionKeepEveryNth : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_every_nth"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), every); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), every); };
   inline BOOL filter(const LASpoint* point) { if (counter == every) { counter = 1; return FALSE; } else { counter++; return TRUE; } };
-  LAScriterionKeepEveryNth(I32 every) { this->every = every; counter = 1; };
+  LAScriterionKeepEveryNth(U32 every) { this->every = every; counter = 1; };
 private:
-  I32 counter;
-  I32 every;
+  U32 counter;
+  U32 every;
 };
 
 class LAScriterionDropEveryNth : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_every_nth"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), every); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), every); };
   inline BOOL filter(const LASpoint* point) { if (counter == every) { counter = 1; return TRUE; } else { counter++; return FALSE; } };
-  LAScriterionDropEveryNth(I32 every) { this->every = every; counter = 1; };
+  LAScriterionDropEveryNth(U32 every) { this->every = every; counter = 1; };
 private:
-  I32 counter;
-  I32 every;
+  U32 counter;
+  U32 every;
 };
 
 class LAScriterionKeepRandomFraction : public LAScriterion
@@ -2684,20 +2684,35 @@ BOOL LASfilter::parse(int argc, char* argv[])
         {
           if ((i+1) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 1 argument: ID\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: ID\n", argv[i]);
             return FALSE;
           }
-          I32 ID;
-          if (sscanf(argv[i+1], "%d", &ID) != 1)
+          U32 ID;
+          if (sscanf(argv[i+1], "%u", &ID) != 1)
           {
-            fprintf(stderr,"ERROR: '%s' needs 1 argument: ID but '%s' is no valid ID\n", argv[i], argv[i+1]);
+            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: ID but '%s' is no valid ID\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          if (ID > U16_MAX)
+          {
+            fprintf(stderr,"ERROR: cannot keep_point_source ID %u because it is larger than %u\n", ID, U16_MAX);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepPointSource(ID));
           while (((i+2) < argc) && ('0' <= argv[i+2][0]) && (argv[i+2][0] <= '9'))
           {
             *argv[i]='\0';
-            add_criterion(new LAScriterionKeepPointSource(atoi(argv[i+2])));
+            if (sscanf(argv[i+2], "%d", &ID) != 1)
+            {
+              fprintf(stderr,"ERROR: '-keep_point_source' takes one or more IDs but '%s' is no valid ID\n", argv[i+2]);
+              return FALSE;
+            }
+            if (ID > U16_MAX)
+            {
+              fprintf(stderr,"ERROR: cannot keep_point_source ID %u because it is larger than %u\n", ID, U16_MAX);
+              return FALSE;
+            }
+            add_criterion(new LAScriterionKeepPointSource(ID));
             LAScriterion* filter_criterion = new LAScriterionAnd(criteria[num_criteria-2], criteria[num_criteria-1]);
             num_criteria--;
             criteria[num_criteria] = 0;
@@ -2880,10 +2895,15 @@ BOOL LASfilter::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: nth\n", argv[i]);
           return FALSE;
         }
-        I32 nth;
-        if (sscanf(argv[i+1], "%d", &nth) != 1)
+        U32 nth;
+        if (sscanf(argv[i+1], "%u", &nth) != 1)
         {
           fprintf(stderr,"ERROR: '%s' needs 1 argument: nth but '%s' is no valid nth\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (nth == 0)
+        {
+          fprintf(stderr,"ERROR: %u is no valid nth for '%s'\n", nth, argv[i]);
           return FALSE;
         }
         add_criterion(new LAScriterionKeepEveryNth(nth));
@@ -2899,12 +2919,18 @@ BOOL LASfilter::parse(int argc, char* argv[])
         F32 fraction;
         if (sscanf(argv[i+1], "%f", &fraction) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: fraction but '%s' is no valid fraction\n", argv[i], argv[i+1]);
+          fprintf(stderr,"ERROR: '%s' needs at least 1 argument: fraction [seed] but '%s' is no valid fraction\n", argv[i], argv[i+1]);
           return FALSE;
         }
         if (((i+2) < argc) && ('0' <= argv[i+2][0]) && (argv[i+2][0] <= '9')) // maybe a seed was specified
         {
-          add_criterion(new LAScriterionKeepRandomFraction((U32)atoi(argv[i+2]), fraction));
+          U32 seed;
+          if (sscanf(argv[i+2], "%u", &seed) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' takes seed as second argument but '%s' is no valid seed\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepRandomFraction(seed, fraction));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
         }
         else // no seed was specified
@@ -3848,7 +3874,18 @@ BOOL LASfilter::parse(int argc, char* argv[])
           i+=1;
           do
           {
-            add_criterion(new LAScriterionDropPointSource(atoi(argv[i])));
+            U32 ID;
+            if (sscanf(argv[i], "%u", &ID) != 1)
+            {
+              fprintf(stderr,"ERROR: '-drop_point_source' needs at least 1 argument: ID but '%s' is no valid ID\n", argv[i]);
+              return FALSE;
+            }
+            if (ID > U16_MAX)
+            {
+              fprintf(stderr,"ERROR: cannot drop_point_source ID %u because it is larger than %u\n", ID, U16_MAX);
+              return FALSE;
+            }
+            add_criterion(new LAScriterionDropPointSource(ID));
             *argv[i]='\0';
             i+=1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
@@ -3938,7 +3975,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: max_gps_time\n", argv[i]);
             return FALSE;
           }
-          add_criterion(new LAScriterionDropGpsTimeAbove(atof(argv[i+1])));
+          F64 max_gps_time;
+          if (sscanf(argv[i+1], "%lf", &max_gps_time) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: max_gps_time but '%s' is no valid max_gps_time\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropGpsTimeAbove(max_gps_time));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
         else if (strcmp(argv[i],"-drop_gps_time_below") == 0 || strcmp(argv[i],"-drop_gpstime_below") == 0)
@@ -3948,7 +3991,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: min_gps_time\n", argv[i]);
             return FALSE;
           }
-          add_criterion(new LAScriterionDropGpsTimeBelow(atof(argv[i+1])));
+          F64 min_gps_time;
+          if (sscanf(argv[i+1], "%lf", &min_gps_time) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: min_gps_time but '%s' is no valid min_gps_time\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropGpsTimeBelow(min_gps_time));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
         else if (strcmp(argv[i],"-drop_gps_time_between") == 0 || strcmp(argv[i],"-drop_gpstime_between") == 0)
@@ -3958,7 +4007,19 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
             return FALSE;
           }
-          add_criterion(new LAScriterionDropGpsTimeBetween(atof(argv[i+1]), atof(argv[i+2])));
+          F64 min;
+          if (sscanf(argv[i+1], "%lf", &min) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max but '%s' is no valid min\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F64 max;
+          if (sscanf(argv[i+2], "%lf", &max) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min max but '%s' is no valid max\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropGpsTimeBetween(min, max));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
         }
       }
@@ -3991,7 +4052,25 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 3 arguments: index below above\n", argv[i]);
             return FALSE;
           }
-          add_criterion(new LAScriterionDropAttributeBetween(atoi(argv[i+1]), atof(argv[i+2]), atof(argv[i+3])));
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: index below above but '%s' is no valid index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F64 below;
+          if (sscanf(argv[i+2], "%lf", &below) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: index below above but '%s' is no valid below\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          F64 above;
+          if (sscanf(argv[i+3], "%lf", &above) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: index below above but '%s' is no valid above\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionDropAttributeBetween(index, below, above));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
         }
       }
@@ -4002,7 +4081,18 @@ BOOL LASfilter::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: nth\n", argv[i]);
           return FALSE;
         }
-        add_criterion(new LAScriterionDropEveryNth((I32)atoi(argv[i+1])));
+        U32 nth;
+        if (sscanf(argv[i+1], "%u", &nth) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument nth but '%s' is no valid nth\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (nth == 0)
+        {
+          fprintf(stderr,"ERROR: %u is no valid nth for '%s'\n", nth, argv[i]);
+          return FALSE;
+        }
+        add_criterion(new LAScriterionDropEveryNth(nth));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
 
