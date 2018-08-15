@@ -1,3 +1,4 @@
+10 August 2018 -- LASlib, all LAStools: fix bug in LAStransform 'change_classification_from_to 19 2' reported by Kirk
 30 July 2018 -- LASlib, all LAStools: bug fix in selective decompression of "extra_bytes" for point types 6 and higher
 22 July 2018 -- LASib, txt2las: fixed LASreader_txt bug for parsing 'c'lassfication to '-set_version 1.4' and '-set_point_type 6'
 20 June 2018 -- LASlib, all LAStools: fix for '-set_classification 0' transform for new LAS 1.4 point types 6-10
