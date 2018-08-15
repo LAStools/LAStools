@@ -642,11 +642,11 @@ public:
 
   // generic functions for attributes in extra bytes
 
-  inline BOOL has_attribute(I32 index) const
+  inline BOOL has_attribute(U32 index) const
   {
     if (attributer)
     {
-      if (index < attributer->number_attributes)
+      if (((I32)index) < attributer->number_attributes)
       {
         return TRUE;
       }
@@ -654,7 +654,7 @@ public:
     return FALSE;
   };
 
-  inline BOOL get_attribute(I32 index, U8* data) const
+  inline BOOL get_attribute(U32 index, U8* data) const
   {
     if (has_attribute(index))
     {
@@ -664,7 +664,7 @@ public:
     return FALSE;
   };
 
-  inline BOOL set_attribute(I32 index, const U8* data) 
+  inline BOOL set_attribute(U32 index, const U8* data) 
   {
     if (has_attribute(index))
     {
@@ -674,7 +674,7 @@ public:
     return FALSE;
   };
 
-  inline const CHAR* get_attribute_name(I32 index) const
+  inline const CHAR* get_attribute_name(U32 index) const
   {
     if (has_attribute(index))
     {
@@ -683,7 +683,7 @@ public:
     return 0;
   };
 
-  inline F64 get_attribute_as_float(I32 index) const
+  inline F64 get_attribute_as_float(U32 index) const
   {
     if (has_attribute(index))
     {
