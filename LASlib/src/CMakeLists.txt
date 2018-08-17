@@ -58,12 +58,12 @@ foreach(file ${LAZ_SRC})
 	list(APPEND LAZ_SRC_FULL ../../LASzip/src/${file})
 endforeach(file)
 
-add_library(LASlib STATIC ${LAS_SRC} ${LAZ_SRC_FULL})
-set_target_properties(LASlib PROPERTIES
+add_library(las STATIC ${LAS_SRC} ${LAZ_SRC_FULL})
+set_target_properties(las PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../lib)
 
 
-install(TARGETS LASlib DESTINATION lib/LASlib)
+install(TARGETS las DESTINATION lib/LASlib)
 install(DIRECTORY ../inc/ DESTINATION include/LASlib
         FILES_MATCHING PATTERN "*.hpp")
 install(DIRECTORY ../../LASzip/src/ DESTINATION include/LASlib
