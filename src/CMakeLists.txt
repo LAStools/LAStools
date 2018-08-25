@@ -1,4 +1,6 @@
+if (!MSVC)
 add_compile_options(-Wno-deprecated -Wno-write-strings -Wno-unused-result)
+endif()
 add_definitions(-DNDEBUG )
 
 include_directories(../LASzip/src)

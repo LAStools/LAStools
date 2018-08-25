@@ -4,3 +4,6 @@ Debug
 lastools.ncb
 lastools.opt
 *~
+.vs
+*.pdb
+*.ilk
