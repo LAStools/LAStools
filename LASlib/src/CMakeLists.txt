@@ -1,4 +1,6 @@
-add_compile_options(-Wno-deprecated -Wno-write-strings -Wno-unused-result -std=c++11)
+if (!MSVC)
+	add_compile_options(-Wno-deprecated -Wno-write-strings -Wno-unused-result -std=c++11)
+endif()
 add_definitions(-DNDEBUG -DUNORDERED -DHAVE_UNORDERED_MAP)
 
 include_directories(../../LASzip/src)
