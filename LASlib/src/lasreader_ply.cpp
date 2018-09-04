@@ -1468,13 +1468,31 @@ BOOL LASreaderPLY::parse_header(FILE* file)
     
     if (strncmp(line, "format", 6) == 0)
     {
-      if (strncmp(line, "format binary_little_endian 1.0", 31) != 0)
+      if (strncmp(&line[7], "binary_little_endian 1.0", 24) == 0)
       {
+        // little endian
+      }
+      else
+      {
+        fprintf(stderr, "format: %snot implemented. contact martin@rapidlasso.com\n", &line[7]);
         return FALSE;
       }
     }
+    else if (strncmp(line, "comment", 7) == 0)
+    {
+      // ignore comments
+    }
     else if (strncmp(line, "element vertex", 14) == 0)
     {
+#ifdef _WIN32
+      if (sscanf(&line[15], "%I64d", &npoints) != 1)
+#else
+      if (sscanf(&line[15], "%lld", &npoints) != 1)
+#endif
+      {
+        fprintf(stderr, "element vertex: %scannot parse number of points. contact martin@rapidlasso.com\n", &line[15]);
+        return FALSE;
+      }
     }
     else if (strncmp(line, "property", 8) == 0)
     {
@@ -1574,7 +1592,7 @@ BOOL LASreaderPLY::parse_header(FILE* file)
       }
       else
       {
-        fprintf(stderr, "property type: %snot implemented. contact martin@rapidlasso.com\n", line[9]);
+        fprintf(stderr, "property type: %snot implemented. contact martin@rapidlasso.com\n", &line[9]);
         return FALSE;
       }
     }
