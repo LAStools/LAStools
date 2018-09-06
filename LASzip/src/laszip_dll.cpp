@@ -2958,7 +2958,7 @@ laszip_open_writer(
 
       // copy the file name for later
 
-      laszip_dll->lax_file_name = strdup(file_name);
+      laszip_dll->lax_file_name = _strdup(file_name);
     }
 
     // set the point number and point count

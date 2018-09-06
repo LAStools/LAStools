@@ -152,15 +152,15 @@ int main(int argc, char *argv[])
     fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     fprintf(stderr,"enter input file%s: ", ((EXAMPLE == EXAMPLE_THREE) ? " (not used)" : "")); fgets(file_name, 256, stdin);
     file_name[strlen(file_name)-1] = '\0';
-    file_name_in = strdup(file_name);
+    file_name_in = _strdup(file_name);
     fprintf(stderr,"enter output file: "); fgets(file_name, 256, stdin);
     file_name[strlen(file_name)-1] = '\0';
-    file_name_out = strdup(file_name);
+    file_name_out = _strdup(file_name);
   }
   else if (argc == 3)
   {
-    file_name_in = strdup(argv[1]);
-    file_name_out = strdup(argv[2]);
+    file_name_in = _strdup(argv[1]);
+    file_name_out = _strdup(argv[2]);
   }
   else
   {
