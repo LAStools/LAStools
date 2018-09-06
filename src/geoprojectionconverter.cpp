@@ -1795,7 +1795,7 @@ static FILE* open_geo_file(const char* program_name, bool pcs=true)
   if (program_name)
   {
     GetModuleFileName(GetModuleHandle(program_name),(LPTSTR)path, MAX_GEO_PATH_LENGTH);
-    path_len = strlen(path);
+    path_len = (int)strlen(path);
   }
   else
   {
@@ -1836,8 +1836,8 @@ bool get_unit_from_ogc_wkt(const char* ogc_wkt, double* value)
   const char* unit = strstr(ogc_wkt, "UNIT[");
   if (unit)
   {
-    int len = strlen(ogc_wkt);
-    int curr = (unit - ogc_wkt) + 5;
+    int len = (int)strlen(ogc_wkt);
+    int curr = (int)((unit - ogc_wkt) + 5);
     while (curr < len)
     {
       if (ogc_wkt[curr] == '[')
@@ -1868,8 +1868,8 @@ bool get_parameter_from_ogc_wkt(const char* ogc_wkt, const char* name, double* v
   const char* para = strstr(ogc_wkt, name);
   if (para)
   {
-    int len = strlen(ogc_wkt);
-    int curr = (para - ogc_wkt) + strlen(name);
+    int len = (int)strlen(ogc_wkt);
+    int curr = (int)((para - ogc_wkt) + strlen(name));
     while (curr < len)
     {
       if (ogc_wkt[curr] == '[')
@@ -1916,14 +1916,14 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
 
   // check if we have a projection (e.g. string contains a PROJCS)
 
-  int len = strlen(ogc_wkt);
+  int len = (int)strlen(ogc_wkt);
   const char* projcs = strstr(ogc_wkt, "PROJCS[");
 
   if (projcs)
   {
     // if we can find an AUTHORITY containing the EPSG code we are done
     int open_bracket = 1;
-    int curr = (projcs - ogc_wkt) + 7;
+    int curr = (int)((projcs - ogc_wkt) + 7);
     while ((curr < len) && open_bracket)
     {
       if (ogc_wkt[curr] == '[')
@@ -1974,7 +1974,7 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
     if (proj)
     {
       int open_bracket = 1;
-      int curr = (proj - ogc_wkt) + 11;
+      int curr = (int)((proj - ogc_wkt) + 11);
 
       while (curr < len)
       {
