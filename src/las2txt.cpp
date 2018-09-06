@@ -495,12 +495,12 @@ int main(int argc, char *argv[])
       }
       i++;
       if (parse_string) free(parse_string);
-      parse_string = strdup(argv[i]);
+      parse_string = _strdup(argv[i]);
     }
     else if (strcmp(argv[i],"-parse_all") == 0)
     {
       if (parse_string) free(parse_string);
-      parse_string = strdup("txyzirndecaup");
+      parse_string = _strdup("txyzirndecaup");
     }
     else if (strcmp(argv[i],"-extra") == 0)
     {
@@ -839,11 +839,11 @@ int main(int argc, char *argv[])
           if (parse_string) free(parse_string);
           if (ptsVLR && (ptsVLR->record_length_after_header >= 32))
           {
-            parse_string = strdup((CHAR*)(ptsVLR->data + 16));
+            parse_string = _strdup((CHAR*)(ptsVLR->data + 16));
           }
           else if (ptxVLR && (ptxVLR->record_length_after_header >= 32))
           {
-            parse_string = strdup((CHAR*)(ptxVLR->data + 16));
+            parse_string = _strdup((CHAR*)(ptxVLR->data + 16));
           }
           else if (ptsVLR)
           {
@@ -890,7 +890,7 @@ int main(int argc, char *argv[])
         if ((parse_string == 0) || (strcmp(parse_string, "original") == 0))
         {
           if (parse_string) free(parse_string);
-          parse_string = strdup((CHAR*)(payload + 16));
+          parse_string = _strdup((CHAR*)(payload + 16));
         }
         fprintf(file_out, "%u     \012", (U32)((I64*)payload)[4]); // ncols
         fprintf(file_out, "%u     \012", (U32)((I64*)payload)[5]); // nrows
@@ -973,7 +973,7 @@ int main(int argc, char *argv[])
 
     // maybe create default parse string
 
-    if (parse_string == 0) parse_string = strdup("xyz");
+    if (parse_string == 0) parse_string = _strdup("xyz");
 
     // check requested fields and print warnings if attributes do not exist
 

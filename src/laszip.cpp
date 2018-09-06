@@ -881,7 +881,7 @@ int main(int argc, char *argv[])
         char* wave_form_file_name;
         if (laswriteopener.get_file_name())
         {
-          wave_form_file_name = strdup(laswriteopener.get_file_name());
+          wave_form_file_name = _strdup(laswriteopener.get_file_name());
           int len = strlen(wave_form_file_name);
           if (wave_form_file_name[len-3] == 'L')
           {
@@ -898,7 +898,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-          wave_form_file_name = strdup("wave_form.wdp");
+          wave_form_file_name = _strdup("wave_form.wdp");
         }
         FILE* file = fopen(wave_form_file_name, "wb");
         if (file)
