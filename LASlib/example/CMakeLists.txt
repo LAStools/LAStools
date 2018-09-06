@@ -13,7 +13,7 @@ set(TARGETS
 
 foreach(TARGET ${TARGETS})
 	add_executable(${TARGET} ${TARGET}.cpp)
-	target_link_libraries(${TARGET} las)
+	target_link_libraries(${TARGET} LASlib)
 	set_target_properties(${TARGET} PROPERTIES
 		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endforeach(TARGET)
