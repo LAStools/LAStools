@@ -519,7 +519,7 @@ public:
 
   // note that data needs to be allocated with new [] and not malloc and that LASheader
   // will become the owner over this and manage its deallocation 
-  void add_vlr(const CHAR* user_id, const U16 record_id, const U16 record_length_after_header, U8* data, const BOOL keep_description=FALSE, const CHAR* description=0, const BOOL keep_existing=FALSE)
+  BOOL add_vlr(const CHAR* user_id, const U16 record_id, const U16 record_length_after_header, U8* data, const BOOL keep_description=FALSE, const CHAR* description=0, const BOOL keep_existing=FALSE)
   {
     U32 i = 0;
     BOOL found_description = FALSE;
@@ -585,6 +585,7 @@ public:
     {
       vlrs[i].data = 0;
     }
+		return TRUE;
   };
 
   const LASvlr* get_vlr(const CHAR* user_id, U16 record_id) const
@@ -855,8 +856,12 @@ public:
     return FALSE;
   }
 
-  void set_geo_keys(const I32 number_of_keys, const LASvlr_key_entry* geo_keys)
+  BOOL set_geo_keys(const I32 number_of_keys, const LASvlr_key_entry* geo_keys)
   {
+    if ((sizeof(LASvlr_geo_keys)*(number_of_keys+1)) > U16_MAX)
+		{
+			return FALSE;
+		}
     vlr_geo_keys = new LASvlr_geo_keys[number_of_keys+1];
     vlr_geo_keys->key_directory_version = 1;
     vlr_geo_keys->key_revision = 1;
@@ -864,14 +869,18 @@ public:
     vlr_geo_keys->number_of_keys = number_of_keys;
     vlr_geo_key_entries = (LASvlr_key_entry*)&vlr_geo_keys[1];
     memcpy(vlr_geo_key_entries, geo_keys, sizeof(LASvlr_key_entry)*number_of_keys);
-    add_vlr("LASF_Projection", 34735, sizeof(LASvlr_geo_keys)*(number_of_keys+1), (U8*)vlr_geo_keys);
+    return add_vlr("LASF_Projection", 34735, (U16)(sizeof(LASvlr_geo_keys)*(number_of_keys+1)), (U8*)vlr_geo_keys);
   }
 
-  void set_geo_double_params(const I32 num_geo_double_params, const F64* geo_double_params)
+  BOOL set_geo_double_params(const I32 num_geo_double_params, const F64* geo_double_params)
   {
+    if ((sizeof(F64)*num_geo_double_params) > U16_MAX)
+		{
+			return FALSE;
+		}
     vlr_geo_double_params = new F64[num_geo_double_params];
     memcpy(vlr_geo_double_params, geo_double_params, sizeof(F64)*num_geo_double_params);
-    add_vlr("LASF_Projection", 34736, sizeof(F64)*num_geo_double_params, (U8*)vlr_geo_double_params);
+    return add_vlr("LASF_Projection", 34736, (U16)(sizeof(F64)*num_geo_double_params), (U8*)vlr_geo_double_params);
   }
 
   void del_geo_double_params()
@@ -883,11 +892,15 @@ public:
     }
   }
 
-  void set_geo_ascii_params(const I32 num_geo_ascii_params, const CHAR* geo_ascii_params)
+  BOOL set_geo_ascii_params(const I32 num_geo_ascii_params, const CHAR* geo_ascii_params)
   {
+    if ((sizeof(CHAR)*num_geo_ascii_params) > U16_MAX)
+		{
+			return FALSE;
+		}
     vlr_geo_ascii_params = new CHAR[num_geo_ascii_params];
     memcpy(vlr_geo_ascii_params, geo_ascii_params, sizeof(CHAR)*num_geo_ascii_params);
-    add_vlr("LASF_Projection", 34737, sizeof(CHAR)*num_geo_ascii_params, (U8*)vlr_geo_ascii_params);
+    return add_vlr("LASF_Projection", 34737, (U16)(sizeof(CHAR)*num_geo_ascii_params), (U8*)vlr_geo_ascii_params);
   }
 
   void del_geo_ascii_params()
