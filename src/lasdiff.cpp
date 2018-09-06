@@ -219,14 +219,14 @@ int main(int argc, char *argv[])
     if (lasreadopener.get_file_name_number() == 2)
     {
       lasreader1 = lasreadopener.open();
-      file_name1 = strdup(lasreadopener.get_file_name());
+      file_name1 = _strdup(lasreadopener.get_file_name());
       if (lasreader1 == 0)
       {
         fprintf (stderr, "ERROR: cannot open '%s'\n", file_name1);
         byebye(true, argc==1);
       }
       lasreader2 = lasreadopener.open();
-      file_name2 = strdup(lasreadopener.get_file_name());
+      file_name2 = _strdup(lasreadopener.get_file_name());
       if (lasreader2 == 0)
       {
         fprintf (stderr, "ERROR: cannot open '%s'\n", file_name2);
@@ -236,13 +236,13 @@ int main(int argc, char *argv[])
     else
     {
       lasreader1 = lasreadopener.open();
-      file_name1 = strdup(lasreadopener.get_file_name());
+      file_name1 = _strdup(lasreadopener.get_file_name());
       if (lasreader1 == 0)
       {
         fprintf (stderr, "ERROR: cannot open '%s'\n", file_name1);
         byebye(true, argc==1);
       }
-      file_name2 = strdup(lasreadopener.get_file_name());
+      file_name2 = _strdup(lasreadopener.get_file_name());
       int len = strlen(file_name1);
       if (strncmp(&file_name1[len-4], ".las", 4) == 0)
       {

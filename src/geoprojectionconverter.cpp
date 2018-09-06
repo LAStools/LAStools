@@ -2109,7 +2109,7 @@ static char* get_epsg_name_from_pcs_file(const char* program_name, short value)
           line[run] = '\0';
         }
         // copy the name
-        epsg_name = strdup(name);
+        epsg_name = _strdup(name);
         break;
       }
     }
@@ -6714,7 +6714,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
   char tmp[256];
 
   if (argv_zero) free(argv_zero);
-  argv_zero = strdup(argv[0]);
+  argv_zero = _strdup(argv[0]);
 
   for (i = 1; i < argc; i++)
   {
@@ -7766,7 +7766,7 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
   {
     if (ellipsoid->id == GEO_ELLIPSOID_WGS84)
     {
-      *psDatumame = strdup("NAD27");
+      *psDatumame = _strdup("NAD27");
 
         if (utm->utm_northern_hemisphere)
         {
