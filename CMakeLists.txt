@@ -9,6 +9,5 @@ endif()
 
 add_subdirectory(LASlib/src)
 add_subdirectory(LASlib/example)
-add_subdirectory(LASzip/example)
 add_subdirectory(src)
 
