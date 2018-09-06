@@ -1,4 +1,4 @@
-# makefile for cleanup of laszip
+# makefile for cleanup of LAStools\LASzip\src
 #
 
 clean:

@@ -1,6 +1,3 @@
-all:
-	cd example && make
-
 clean:
 	cd example && make clean
 	cd src && make clean
