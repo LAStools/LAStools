@@ -958,7 +958,7 @@ public:
     }
     else
     {
-      add_vlr("LASF_Projection", 2112, sizeof(CHAR)*(num_geo_ogc_wkt+null_terminator), (U8*)vlr_geo_ogc_wkt);
+      add_vlr("LASF_Projection", 2112, (U16)(sizeof(CHAR)*(num_geo_ogc_wkt+null_terminator)), (U8*)vlr_geo_ogc_wkt);
     }
   }
 
@@ -972,18 +972,22 @@ public:
     }
   }
 
-  void update_extra_bytes_vlr(const BOOL keep_description=FALSE)
+  BOOL update_extra_bytes_vlr(const BOOL keep_description=FALSE)
   {
     if (number_attributes)
     {
-      U16 record_length_after_header = sizeof(LASattribute)*number_attributes;
+      if ((sizeof(LASattribute)*number_attributes) > U16_MAX)
+      {
+        return FALSE;
+      }
+      U16 record_length_after_header = (U16)(sizeof(LASattribute)*number_attributes);
       U8* data = new U8[record_length_after_header];
       memcpy(data, attributes, record_length_after_header);
-      add_vlr("LASF_Spec", 4, record_length_after_header, data, keep_description);
+      return add_vlr("LASF_Spec", 4, record_length_after_header, data, keep_description);
     }
     else
     {
-      remove_vlr("LASF_Spec", 4);
+      return remove_vlr("LASF_Spec", 4);
     }
   }
 
