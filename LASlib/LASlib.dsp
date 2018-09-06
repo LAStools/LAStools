@@ -153,6 +153,10 @@ SOURCE=.\src\lasreader_las.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\lasreader_ply.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\lasreader_qfit.cpp
 # End Source File
 # Begin Source File
@@ -378,6 +382,10 @@ SOURCE=.\inc\lasreader_dtm.hpp
 # Begin Source File
 
 SOURCE=.\inc\lasreader_las.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\inc\lasreader_ply.hpp
 # End Source File
 # Begin Source File
 
