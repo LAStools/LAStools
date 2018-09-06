@@ -156,7 +156,7 @@ static int lidardouble2string(char* string, double value)
   return len;
 }
 
-static int lidardouble2string(char* string, double value, double precision)
+static I32 lidardouble2string(char* string, double value, double precision)
 {
   if (precision == 0.1)
     sprintf(string, "%.1f", value);
@@ -176,7 +176,7 @@ static int lidardouble2string(char* string, double value, double precision)
     sprintf(string, "%.8f", value);
   else
     return lidardouble2string(string, value);
-  return strlen(string)-1;
+  return (I32)strlen(string)-1;
 }
 
 static bool valid_resolution(F64 coordinate, F64 offset, F64 scale_factor)
