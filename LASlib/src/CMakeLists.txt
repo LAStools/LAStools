@@ -11,11 +11,12 @@ set(LAS_SRC
 	laswriter.cpp
 	lasreader_las.cpp
 	lasreader_bin.cpp
-	lasreader_qfit.cpp
 	lasreader_shp.cpp
 	lasreader_asc.cpp
 	lasreader_bil.cpp
 	lasreader_dtm.cpp
+	lasreader_ply.cpp
+	lasreader_qfit.cpp
 	lasreader_txt.cpp
 	lasreadermerged.cpp
 	lasreaderbuffered.cpp
