@@ -21,10 +21,8 @@ set(STANDALONE_TARGETS
 )
 set(ALL_TARGETS ${GEOPROJECTION_TARGETS} ${STANDALONE_TARGETS})
 
-add_library(geoprojectionconverter OBJECT geoprojectionconverter.cpp)
-
 foreach(TARGET ${GEOPROJECTION_TARGETS})
-	add_executable(${TARGET} ${TARGET}.cpp $<TARGET_OBJECTS:geoprojectionconverter>)
+	add_executable(${TARGET} ${TARGET}.cpp geoprojectionconverter.cpp)
 endforeach(TARGET)
 
 foreach(TARGET ${STANDALONE_TARGETS})
