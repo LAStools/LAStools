@@ -926,7 +926,7 @@ public:
       vlr_geo_ogc_wkt_math[num_geo_wkt_ogc_math] = '\0';
     }
     memcpy(vlr_geo_ogc_wkt_math, geo_wkt_ogc_math, sizeof(CHAR)*num_geo_wkt_ogc_math);
-    add_vlr("LASF_Projection", 2111, sizeof(CHAR)*(num_geo_wkt_ogc_math+null_terminator), (U8*)vlr_geo_ogc_wkt_math);
+    add_vlr("LASF_Projection", 2111, (U16)(sizeof(CHAR)*(num_geo_wkt_ogc_math+null_terminator)), (U8*)vlr_geo_ogc_wkt_math);
   }
 
   void del_geo_wkt_ogc_math()
