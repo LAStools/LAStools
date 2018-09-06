@@ -275,11 +275,11 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     char* parse_less;
     if (parse_string == 0)
     {
-      parse_less = strdup("xyz");
+      parse_less = _strdup("xyz");
     }
     else
     {
-      parse_less = strdup(parse_string);
+      parse_less = _strdup(parse_string);
       for (i = 0; i < (int)strlen(parse_string); i++)
       {
         if (parse_less[i] != 'x' && parse_less[i] != 'y' && parse_less[i] != 'z' && parse_less[i] != 'r' && (parse_less[i] < '0' || parse_less[i] > '0')) 
@@ -441,11 +441,11 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 
   if (parse_string == 0)
   {
-    this->parse_string = strdup("xyz");
+    this->parse_string = _strdup("xyz");
   }
   else
   {
-    this->parse_string = strdup(parse_string);
+    this->parse_string = _strdup(parse_string);
   }
 
   // read the first line with full parse_string
@@ -554,17 +554,17 @@ void LASreaderPLY::add_attribute(I32 data_type, const char* name, const char* de
   attributes_data_types[number_attributes] = data_type;
   if (name)
   {
-    attribute_names[number_attributes] = strdup(name);
+    attribute_names[number_attributes] = _strdup(name);
   }
   else
   {
     char temp[32];
     sprintf(temp, "attribute %d", number_attributes);
-    attribute_names[number_attributes] = strdup(temp);
+    attribute_names[number_attributes] = _strdup(temp);
   }
   if (description)
   {
-    attribute_descriptions[number_attributes] = strdup(description);
+    attribute_descriptions[number_attributes] = _strdup(description);
   }
   else
   {
