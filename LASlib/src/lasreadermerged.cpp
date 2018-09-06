@@ -413,7 +413,7 @@ BOOL LASreaderMerged::add_file_name(const char* file_name)
       return FALSE;
     }
   }
-  file_names[file_name_number] = strdup(file_name);
+  file_names[file_name_number] = _strdup(file_name);
   file_name_number++;
   return TRUE;
 }
@@ -495,7 +495,7 @@ void LASreaderMerged::set_parse_string(const char* parse_string)
   if (this->parse_string) free(this->parse_string);
   if (parse_string)
   {
-    this->parse_string = strdup(parse_string);
+    this->parse_string = _strdup(parse_string);
   }
   else
   {

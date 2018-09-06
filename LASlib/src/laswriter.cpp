@@ -432,7 +432,7 @@ BOOL LASwriteOpener::set_directory(const CHAR* directory)
       fprintf(stderr,"         probably fail. please use -odir \"D:\" or -odir \"..\\tiles\"\n");
       fprintf(stderr,"         instead.\n");
     }
-    this->directory = strdup(directory);
+    this->directory = _strdup(directory);
     int len = strlen(this->directory);
     if ((len > 0) && ((this->directory[len-1] == '\\') || (this->directory[len-1] == '/')))
     {
@@ -468,7 +468,7 @@ void LASwriteOpener::set_file_name(const CHAR* file_name)
   if (this->file_name) free(this->file_name);
   if (file_name)
   {
-    this->file_name = strdup(file_name);
+    this->file_name = _strdup(file_name);
 
     // get length of file name
     int len = strlen(this->file_name);
@@ -605,7 +605,7 @@ void LASwriteOpener::set_appendix(const CHAR* appendix)
   if (this->appendix) free(this->appendix);
   if (appendix)
   {
-    this->appendix = strdup(appendix);
+    this->appendix = _strdup(appendix);
     if (file_name) add_appendix();
   }
   else
@@ -749,7 +749,7 @@ void LASwriteOpener::make_numbered_file_name(const CHAR* file_name, I32 digits)
   }
   else
   {
-    if (this->file_name == 0) this->file_name = strdup("output.xxx");
+    if (this->file_name == 0) this->file_name = _strdup("output.xxx");
     len = strlen(this->file_name);
     this->file_name = (CHAR*)realloc(this->file_name, len + digits + 2);
   }
@@ -798,7 +798,7 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
     {
       if (this->file_name == 0)
       {
-        this->file_name = strdup("output_0000000.xxx");
+        this->file_name = _strdup("output_0000000.xxx");
       }
       len = strlen(this->file_name);
     }
@@ -848,7 +848,7 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
     else
     {
       len = 7;
-      this->file_name = strdup("output.xxx");
+      this->file_name = _strdup("output.xxx");
     }
   }
   if (format <= LAS_TOOLS_FORMAT_LAS)
@@ -892,27 +892,27 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
       free(this->file_name);
       if (format <= LAS_TOOLS_FORMAT_LAS)
       {
-        this->file_name = strdup("temp.las");
+        this->file_name = _strdup("temp.las");
       }
       else if (format == LAS_TOOLS_FORMAT_LAZ)
       {
-        this->file_name = strdup("temp.laz");
+        this->file_name = _strdup("temp.laz");
       }
       else if (format == LAS_TOOLS_FORMAT_BIN)
       {
-        this->file_name = strdup("temp.bin");
+        this->file_name = _strdup("temp.bin");
       }
       else if (format == LAS_TOOLS_FORMAT_QFIT)
       {
-        this->file_name = strdup("temp.qi");
+        this->file_name = _strdup("temp.qi");
       }
       else if (format == LAS_TOOLS_FORMAT_VRML)
       {
-        this->file_name = strdup("temp.wrl");
+        this->file_name = _strdup("temp.wrl");
       }
       else // if (format == LAS_TOOLS_FORMAT_TXT)
       {
-        this->file_name = strdup("temp.txt");
+        this->file_name = _strdup("temp.txt");
       }
       fprintf(stderr,"WARNING: generated output name '%s'\n", file_name);
       fprintf(stderr,"         identical to input name. changed to '%s'.\n", this->file_name);
@@ -937,7 +937,7 @@ CHAR* LASwriteOpener::get_file_name_base() const
 
   if (file_name)
   {
-    file_name_base = strdup(file_name);
+    file_name_base = _strdup(file_name);
     // remove extension
     int len = strlen(file_name_base);
     while ((len > 0) && (file_name_base[len] != '.') && (file_name_base[len] != '\\') && (file_name_base[len] != '/') && (file_name_base[len] != ':')) len--;
@@ -1044,7 +1044,7 @@ void LASwriteOpener::set_parse_string(const CHAR* parse_string)
   if (this->parse_string) free(this->parse_string);
   if (parse_string)
   {
-    this->parse_string = strdup(parse_string);
+    this->parse_string = _strdup(parse_string);
   }
   else
   {
@@ -1057,7 +1057,7 @@ void LASwriteOpener::set_separator(const CHAR* separator)
   if (this->separator) free(this->separator);
   if (separator)
   {
-    this->separator = strdup(separator);
+    this->separator = _strdup(separator);
   }
   else
   {

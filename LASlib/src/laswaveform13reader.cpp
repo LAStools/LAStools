@@ -118,7 +118,7 @@ BOOL LASwaveform13reader::open(const char* file_name, I64 start_of_waveform_data
     }
     else
     {
-      char* file_name_temp = strdup(file_name);
+      char* file_name_temp = _strdup(file_name);
       int len = strlen(file_name_temp);
       if ((file_name_temp[len-3] == 'L') || (file_name_temp[len-3] == 'W'))
       {
