@@ -1977,7 +1977,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       while (fgets(line, 1024, file))
       {
         // find end of line
-        int len = strlen(line) - 1;
+        int len = (int)strlen(line) - 1;
         // remove extra white spaces and line return at the end
         while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
         {
@@ -2119,7 +2119,7 @@ const CHAR* LASreadOpener::get_file_name_only() const
 
   if (file_name_curr)
   {
-    int len = strlen(file_name_curr);
+    int len = (int)strlen(file_name_curr);
     while ((len > 0) && (file_name_curr[len] != '\\') && (file_name_curr[len] != '/') && (file_name_curr[len] != ':')) len--;
     if (len)
     {
@@ -2266,7 +2266,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
   if (h != INVALID_HANDLE_VALUE)
   {
     // find the path
-    int len = strlen(file_name);
+    int len = (int)strlen(file_name);
     while (len && (file_name[len] != '\\') && (file_name[len] != '/') && (file_name[len] != ':')) len--;
     if (len)
     {
@@ -2343,7 +2343,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
   while (fgets(line, 1024, file))
   {
     // find end of line
-    int len = strlen(line) - 1;
+    int len = (int)strlen(line) - 1;
     // remove extra white spaces and line return at the end
     while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
     {
@@ -2392,7 +2392,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
   if (h != INVALID_HANDLE_VALUE)
   {
     // find the path
-    int len = strlen(neighbor_file_name);
+    int len = (int)strlen(neighbor_file_name);
     while (len && (neighbor_file_name[len] != '\\') && (neighbor_file_name[len] != '/') && (neighbor_file_name[len] != ':')) len--;
     if (len)
     {

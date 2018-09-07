@@ -123,7 +123,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
 
     if (comma_not_point)
     {
-      I32 i, len = strlen(line);
+      I32 i, len = (I32)strlen(line);
       for (i = 0; i < len; i++)
       {
         if (line[i] == ',') line[i] = '.';
@@ -262,7 +262,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
 
         if (comma_not_point)
         {
-          I32 i, len = strlen(line);
+          I32 i, len = (I32)strlen(line);
           for (i = 0; i < len; i++)
           {
             if (line[i] == ',') line[i] = '.';
@@ -378,7 +378,7 @@ BOOL LASreaderASC::read_point_default()
 
       if (comma_not_point)
       {
-        I32 i, len = strlen(line);
+        I32 i, len = (I32)strlen(line);
         for (i = 0; i < len; i++)
         {
           if (line[i] == ',') line[i] = '.';
@@ -465,7 +465,7 @@ BOOL LASreaderASC::reopen(const CHAR* file_name)
 
   if (comma_not_point)
   {
-    I32 i, len = strlen(line);
+    I32 i, len = (I32)strlen(line);
     for (i = 0; i < len; i++)
     {
       if (line[i] == ',') line[i] = '.';

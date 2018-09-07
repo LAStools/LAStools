@@ -122,7 +122,7 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
 
   char* file_name_temp = LASCopyString(file_name);
 
-  int len = strlen(file_name_temp);
+  I32 len = (I32)strlen(file_name_temp);
   if (file_name_temp[len-3] == 'L' || file_name_temp[len-3] == 'W')
   {
     file_name_temp[len-3] = 'W';
