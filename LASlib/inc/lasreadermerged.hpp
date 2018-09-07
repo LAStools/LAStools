@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  lasreadermerged.hpp
-
+  
   CONTENTS:
-
+  
     Reads LiDAR points from the LAS format from more than one file.
 
   PROGRAMMERS:
@@ -21,14 +21,14 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
+  
   CHANGE HISTORY:
-
-     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
+  
+     5 September 2018 -- support for reading points from the PLY format
      1 December 2017 -- support extra bytes during '-merged' operations
-     3 May 2015 -- header sets file source ID to 0 when merging flightlines
+     3 May 2015 -- header sets file source ID to 0 when merging flightlines 
     20 January 2011 -- created missing Livermore and my Extra Virgin Olive Oil
-
+  
 ===============================================================================
 */
 #ifndef LAS_READER_MERGED_HPP
@@ -37,10 +37,11 @@
 #include "lasreader_las.hpp"
 #include "lasreader_bin.hpp"
 #include "lasreader_shp.hpp"
-#include "lasreader_qfit.hpp"
 #include "lasreader_asc.hpp"
 #include "lasreader_bil.hpp"
 #include "lasreader_dtm.hpp"
+#include "lasreader_ply.hpp"
+#include "lasreader_qfit.hpp"
 #include "lasreader_txt.hpp"
 
 class LASreaderMerged : public LASreader
@@ -93,10 +94,11 @@ private:
   LASreaderLAS* lasreaderlas;
   LASreaderBIN* lasreaderbin;
   LASreaderSHP* lasreadershp;
-  LASreaderQFIT* lasreaderqfit;
   LASreaderASC* lasreaderasc;
   LASreaderBIL* lasreaderbil;
   LASreaderDTM* lasreaderdtm;
+  LASreaderPLY* lasreaderply;
+  LASreaderQFIT* lasreaderqfit;
   LASreaderTXT* lasreadertxt;
   BOOL point_type_change;
   BOOL point_size_change;
