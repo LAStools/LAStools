@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  laswriter_txt.hpp
-  
+
   CONTENTS:
-  
+
     Writes LIDAR points to ASCII through on-the-fly conversion from LAS.
 
   PROGRAMMERS:
@@ -21,11 +21,12 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
+     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     10 April 2011 -- created after a sunny weekend of biking to/from Buergel
-  
+
 ===============================================================================
 */
 #ifndef LAS_WRITER_TXT_HPP

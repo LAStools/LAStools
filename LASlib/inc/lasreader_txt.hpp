@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  lasreader_txt.hpp
-  
+
   CONTENTS:
-  
+
     Reads LIDAR points in LAS format through on-the-fly conversion from ASCII.
 
   PROGRAMMERS:
@@ -21,16 +21,17 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
+    7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
    22 July 2018 -- bug fix for parsing classfication to point type 6 (or higher)
    11 January 2017 -- added with<h>eld and scanner channe<l> for the parse string
    11 January 2017 -- added 'k'eypoint and 'o'verlap flags for the parse string
    17 January 2016 -- pre-scaling and pre-offsetting of "extra bytes" attributes
     9 July 2014 -- allowing input from stdin after the 7:1 in the World Cup
     8 April 2011 -- created after starting a google group for LAStools users
-  
+
 ===============================================================================
 */
 #ifndef LAS_READER_TXT_HPP

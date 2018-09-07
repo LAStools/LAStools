@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  laswaveform13reader.hpp
-  
+
   CONTENTS:
-  
+
     Interface to read the Waveform Data Packets that are associated with points
     of type 4 and 5 in LAS 1.3.
 
@@ -22,11 +22,12 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
+     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     17 October 2011 -- created after bauarbeiter on the roof next door woke me
-  
+
 ===============================================================================
 */
 #ifndef LAS_WAVEFORM_13_READER_HPP

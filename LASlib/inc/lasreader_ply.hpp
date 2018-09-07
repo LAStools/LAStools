@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  lasreader_ply.hpp
-  
+
   CONTENTS:
-  
+
     Reads LIDAR points from binary PLY format through on-the-fly conversion.
 
   PROGRAMMERS:
@@ -21,11 +21,12 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
+    7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     4 September 2018 -- created after returning to Samara with locks changed
-  
+
 ===============================================================================
 */
 #ifndef LAS_READER_PLY_HPP

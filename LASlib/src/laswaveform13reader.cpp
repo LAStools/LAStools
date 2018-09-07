@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  laswaveform13reader.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
 
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "laswaveform13reader.hpp"
@@ -63,7 +63,7 @@ LASwaveform13reader::LASwaveform13reader()
   ic8 = 0;
   ic16 = 0;
 }
-  
+
 LASwaveform13reader::~LASwaveform13reader()
 {
   if (samples) delete [] samples;
@@ -108,17 +108,17 @@ BOOL LASwaveform13reader::open(const char* file_name, I64 start_of_waveform_data
 
   if (start_of_waveform_data_packet_record == 0)
   {
-    if (!compressed && (strstr(".wdp", file_name) || strstr(".WDP", file_name))) 
+    if (!compressed && (strstr(".wdp", file_name) || strstr(".WDP", file_name)))
     {
       file = fopen(file_name, "rb");
     }
-    else if (compressed && (strstr(".wdz", file_name) || strstr(".WDZ", file_name))) 
+    else if (compressed && (strstr(".wdz", file_name) || strstr(".WDZ", file_name)))
     {
       file = fopen(file_name, "rb");
     }
     else
     {
-      char* file_name_temp = _strdup(file_name);
+      char* file_name_temp = LASCopyString(file_name);
       int len = strlen(file_name_temp);
       if ((file_name_temp[len-3] == 'L') || (file_name_temp[len-3] == 'W'))
       {
@@ -173,7 +173,7 @@ BOOL LASwaveform13reader::open(const char* file_name, I64 start_of_waveform_data
 
   if (strncmp(magic, "LAStools waveform ", 18) == 0)
   {
-    // do waveform descriptor cross-check 
+    // do waveform descriptor cross-check
 
     U16 i, number;
     try { stream->get16bitsLE((U8*)&number); } catch(...)
@@ -278,7 +278,7 @@ BOOL LASwaveform13reader::read_waveform(const LASpoint* point)
   nsamples = wave_packet_descr[index]->getNumberOfSamples();
 
 //  temporary Optech Fix
-//  nsamples = point->wavepacket.getSize(); 
+//  nsamples = point->wavepacket.getSize();
 //  if (nbits == 16) nsamples / 2;
 
   if (nsamples == 0)
