@@ -1951,7 +1951,7 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
             const char* epsg = strstr(&ogc_wkt[curr], "\"EPSG\"");
             if (epsg)
             {
-              curr = (epsg - ogc_wkt) + 6;
+              curr = (int)((epsg - ogc_wkt) + 6);
               while ((curr < len) && ogc_wkt[curr] != ',')
               {
                 curr++;

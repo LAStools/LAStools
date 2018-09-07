@@ -984,7 +984,7 @@ int main(int argc, char *argv[])
       if (set_ogc_wkt) // maybe also set the OCG WKT 
       {
         CHAR* ogc_wkt = set_ogc_wkt_string;
-        I32 len = (ogc_wkt ? strlen(ogc_wkt) : 0);
+        I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
         if (ogc_wkt == 0)
         { 
           if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, false))
@@ -1023,7 +1023,7 @@ int main(int argc, char *argv[])
     else if (set_ogc_wkt) // maybe only set the OCG WKT 
     {
       CHAR* ogc_wkt = set_ogc_wkt_string;
-      I32 len = (ogc_wkt ? strlen(ogc_wkt) : 0);
+      I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
 
       if (ogc_wkt == 0)
       {
