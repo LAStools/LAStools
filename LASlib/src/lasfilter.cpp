@@ -4217,7 +4217,7 @@ BOOL LASfilter::parse(CHAR* string)
   int p = 0;
   int argc = 1;
   char* argv[64];
-  int len = strlen(string);
+  I32 len = (I32)strlen(string);
 
   while (p < len)
   {

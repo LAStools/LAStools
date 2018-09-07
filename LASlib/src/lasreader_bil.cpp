@@ -347,7 +347,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
 
   // create *.hdr file name
 
-  I32 len = strlen(file_name) - 3;
+  I32 len = (I32)strlen(file_name) - 3;
   CHAR* file_name_hdr = LASCopyString(file_name);
 
   while ((len > 0) && (file_name_hdr[len] != '.')) len--;
@@ -520,7 +520,7 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
 
   // create *.blw file name
 
-  I32 len = strlen(file_name) - 3;
+  I32 len = (I32)strlen(file_name) - 3;
   CHAR* file_name_bwl = LASCopyString(file_name);
 
   while ((len > 0) && (file_name_bwl[len] != '.')) len--;

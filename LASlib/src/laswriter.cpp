@@ -433,7 +433,7 @@ BOOL LASwriteOpener::set_directory(const CHAR* directory)
       fprintf(stderr,"         instead.\n");
     }
     this->directory = LASCopyString(directory);
-    int len = strlen(this->directory);
+    I32 len = (I32)strlen(this->directory);
     if ((len > 0) && ((this->directory[len-1] == '\\') || (this->directory[len-1] == '/')))
     {
       this->directory[len-1] = '\0';
@@ -471,7 +471,7 @@ void LASwriteOpener::set_file_name(const CHAR* file_name)
     this->file_name = LASCopyString(file_name);
 
     // get length of file name
-    int len = strlen(this->file_name);
+    I32 len = (I32)strlen(this->file_name);
 
     // remove tailing white spaces
     while (len && (this->file_name[len-1] == ' '))
@@ -637,7 +637,7 @@ BOOL LASwriteOpener::set_format(I32 format)
 
   if (file_name)
   {
-    I32 len = strlen(file_name);
+    I32 len = (I32)strlen(file_name);
     while (len > 0 && this->file_name[len] != '.')
     {
       len--;
@@ -739,18 +739,18 @@ void LASwriteOpener::set_chunk_size(U32 chunk_size)
 
 void LASwriteOpener::make_numbered_file_name(const CHAR* file_name, I32 digits)
 {
-  int len;
+  I32 len;
   if (file_name)
   {
     if (this->file_name != 0) free(this->file_name);
-    len = strlen(file_name);
+    len = (I32)strlen(file_name);
     this->file_name = (CHAR*)malloc(len + digits + 2);
     strcpy(this->file_name, file_name);
   }
   else
   {
     if (this->file_name == 0) this->file_name = LASCopyString("output.xxx");
-    len = strlen(this->file_name);
+    len = (I32)strlen(this->file_name);
     this->file_name = (CHAR*)realloc(this->file_name, len + digits + 2);
   }
   while (len > 0 && this->file_name[len] != '.')
@@ -778,20 +778,20 @@ void LASwriteOpener::make_numbered_file_name(const CHAR* file_name, I32 digits)
 
 void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
 {
-  int len;
+  I32 len;
 
   if (file_number > -1)
   {
     if (file_name)
     {
       if (this->file_name) free(this->file_name);
-      len = strlen(file_name);
+      len = (I32)strlen(file_name);
       this->file_name = (CHAR*)malloc(len+10);
       strcpy(this->file_name, file_name);
       if (cut)
       {
         cut_characters();
-        len = strlen(file_name);
+        len = (I32)strlen(file_name);
       }
     }
     else
@@ -800,7 +800,7 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
       {
         this->file_name = LASCopyString("output_0000000.xxx");
       }
-      len = strlen(this->file_name);
+      len = (I32)strlen(this->file_name);
     }
     while (len > 0 && this->file_name[len] != '.') len--;
     len++;
@@ -822,7 +822,7 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
     if (this->file_name) free(this->file_name);
     if (file_name)
     {
-      len = strlen(file_name);
+      len = (I32)strlen(file_name);
       this->file_name = (CHAR*)malloc(len + (appendix ? strlen(appendix) + 5 : 10));
       strcpy(this->file_name, file_name);
       while (len > 0 && this->file_name[len] != '.') len--;
@@ -834,7 +834,7 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
       if (appendix != 0)
       {
         strcpy(&(this->file_name[len]), appendix);
-        len += strlen(appendix);
+        len += (I32)strlen(appendix);
       }
       else if ((directory == 0) && (cut == 0) && (file_number == -1))
       {
@@ -939,7 +939,7 @@ CHAR* LASwriteOpener::get_file_name_base() const
   {
     file_name_base = LASCopyString(file_name);
     // remove extension
-    int len = strlen(file_name_base);
+    I32 len = (I32)strlen(file_name_base);
     while ((len > 0) && (file_name_base[len] != '.') && (file_name_base[len] != '\\') && (file_name_base[len] != '/') && (file_name_base[len] != ':')) len--;
     if (file_name_base[len] == '.')
     {
@@ -948,7 +948,7 @@ CHAR* LASwriteOpener::get_file_name_base() const
   }
   else if (directory)
   {
-    int len = strlen(directory);
+    I32 len = (I32)strlen(directory);
     file_name_base = (CHAR*)malloc(len+2);
     sprintf(file_name_base, "%s\\", directory);
   }
@@ -962,7 +962,7 @@ const CHAR* LASwriteOpener::get_file_name_only() const
 
   if (file_name)
   {
-    int len = strlen(file_name);
+    I32 len = (I32)strlen(file_name);
     while ((len > 0) && (file_name[len] != '\\') && (file_name[len] != '/') && (file_name[len] != ':')) len--;
     if (len)
     {
@@ -1081,7 +1081,7 @@ void LASwriteOpener::add_directory(const CHAR* directory)
 
   if (file_name && directory)
   {
-    I32 len = strlen(file_name);
+    I32 len = (I32)strlen(file_name);
     while ((len > 0) && (file_name[len] != '\\') && (file_name[len] != '/') && (file_name[len] != ':')) len--;
     if (len > 0) len++;
     CHAR* new_file_name = (CHAR*)malloc(strlen(directory) + strlen(&(file_name[len])) + 5);
@@ -1097,7 +1097,7 @@ void LASwriteOpener::add_appendix(const CHAR* appendix)
 
   if (file_name && appendix)
   {
-    I32 len = strlen(file_name);
+    I32 len = (I32)strlen(file_name);
     CHAR* new_file_name = (CHAR*)malloc(len + strlen(appendix) + 5);
     while ((len > 0) && (file_name[len] != '.') && (file_name[len] != '\\') && (file_name[len] != '/') && (file_name[len] != ':')) len--;
 
@@ -1121,13 +1121,13 @@ void LASwriteOpener::cut_characters(U32 cut)
 
   if (file_name && cut)
   {
-    I32 len = strlen(file_name);
+    I32 len = (I32)strlen(file_name);
     CHAR* new_file_name = (CHAR*)malloc(len - cut + 5);
     while ((len > 0) && (file_name[len] != '.') && (file_name[len] != '\\') && (file_name[len] != '/') && (file_name[len] != ':')) len--;
 
     if ((len == 0) || (file_name[len] == '\\') || (file_name[len] == '/') || (file_name[len] == ':'))
     {
-      len = strlen(file_name);
+      len = (I32)strlen(file_name);
       strncpy(new_file_name, file_name, len-cut);
     }
     else
