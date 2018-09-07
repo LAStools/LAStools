@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     6 April 2018 == added zero() function to laszip_dll struct to fix memory leak
    30 August 2017 -- completing stream-based writing (with writing LAS header)
    23 August 2017 -- turn on "native" by default
@@ -409,7 +410,7 @@ laszip_clean(
     }
 
     // dealloc the inventory although close_writer() call should have done this already
-    
+
     if (laszip_dll->inventory == 0)
     {
       delete laszip_dll->inventory;
@@ -2958,7 +2959,7 @@ laszip_open_writer(
 
       // copy the file name for later
 
-      laszip_dll->lax_file_name = _strdup(file_name);
+      laszip_dll->lax_file_name = LASCopyString(file_name);
     }
 
     // set the point number and point count

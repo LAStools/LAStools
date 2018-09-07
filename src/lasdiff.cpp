@@ -10,11 +10,11 @@
     are checked.
 
   PROGRAMMERS:
-  
+
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-17, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -26,12 +26,13 @@
 
   CHANGE HISTORY:
 
+    7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     13 July 2017 -- added missing checks for LAS 1.4 EVLR size and payloads
-    18 August 2015 -- fixed report for truncated files (fewer or more points) 
+    18 August 2015 -- fixed report for truncated files (fewer or more points)
     11 September 2014 -- added missing checks for LAS 1.4 files and points
     27 July 2011 -- added capability to create a difference output file
-    2 December 2010 -- updated to merely warn when the point scaling is off  
-    12 March 2009 -- updated to ask for input if started without arguments 
+    2 December 2010 -- updated to merely warn when the point scaling is off
+    12 March 2009 -- updated to ask for input if started without arguments
     17 September 2008 -- updated to deal with LAS format version 1.2
     11 July 2007 -- added more complete reporting about differences
     23 February 2007 -- created just before getting ready for the cabin trip
@@ -132,7 +133,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == '–') argv[i][0] = '-';
+      if (argv[i][0] == 'ï¿½') argv[i][0] = '-';
     }
     if (!lasreadopener.parse(argc, argv)) byebye(true);
     if (!laswriteopener.parse(argc, argv)) byebye(true);
@@ -219,14 +220,14 @@ int main(int argc, char *argv[])
     if (lasreadopener.get_file_name_number() == 2)
     {
       lasreader1 = lasreadopener.open();
-      file_name1 = _strdup(lasreadopener.get_file_name());
+      file_name1 = LASCopyString(lasreadopener.get_file_name());
       if (lasreader1 == 0)
       {
         fprintf (stderr, "ERROR: cannot open '%s'\n", file_name1);
         byebye(true, argc==1);
       }
       lasreader2 = lasreadopener.open();
-      file_name2 = _strdup(lasreadopener.get_file_name());
+      file_name2 = LASCopyString(lasreadopener.get_file_name());
       if (lasreader2 == 0)
       {
         fprintf (stderr, "ERROR: cannot open '%s'\n", file_name2);
@@ -236,13 +237,13 @@ int main(int argc, char *argv[])
     else
     {
       lasreader1 = lasreadopener.open();
-      file_name1 = _strdup(lasreadopener.get_file_name());
+      file_name1 = LASCopyString(lasreadopener.get_file_name());
       if (lasreader1 == 0)
       {
         fprintf (stderr, "ERROR: cannot open '%s'\n", file_name1);
         byebye(true, argc==1);
       }
-      file_name2 = _strdup(lasreadopener.get_file_name());
+      file_name2 = LASCopyString(lasreadopener.get_file_name());
       int len = strlen(file_name1);
       if (strncmp(&file_name1[len-4], ".las", 4) == 0)
       {
@@ -287,7 +288,7 @@ int main(int argc, char *argv[])
     if (memcmp((const void*)&(lasreader1->header), (const void*)&(lasreader2->header), memcmp_until))
     {
       char printstring[128];
-    
+
       LASheader* lasheader1 = &(lasreader1->header);
       LASheader* lasheader2 = &(lasreader2->header);
 
@@ -732,7 +733,7 @@ int main(int argc, char *argv[])
                 different_scaled_offset_coordinates++;
               }
             }
-            else 
+            else
             {
               if (lasreader1->point.get_X() != lasreader2->point.get_X())
               {

@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  lasreadermerged.hpp
-  
+
   CONTENTS:
-  
+
     Reads LiDAR points from the LAS format from more than one file.
 
   PROGRAMMERS:
@@ -21,13 +21,14 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
+     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
      1 December 2017 -- support extra bytes during '-merged' operations
-     3 May 2015 -- header sets file source ID to 0 when merging flightlines 
+     3 May 2015 -- header sets file source ID to 0 when merging flightlines
     20 January 2011 -- created missing Livermore and my Extra Virgin Olive Oil
-  
+
 ===============================================================================
 */
 #ifndef LAS_READER_MERGED_HPP

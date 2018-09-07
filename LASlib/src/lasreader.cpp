@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  lasreader.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
 
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasreader.hpp"
@@ -79,7 +79,7 @@ LASreader::LASreader()
   orig_max_x = 0;
   orig_max_y = 0;
 }
-  
+
 LASreader::~LASreader()
 {
   if (index) delete index;
@@ -1662,7 +1662,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
           return FALSE;
         }
         set_inside_tile((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3]));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
       }
       else if (strcmp(argv[i],"-inside_circle") == 0)
       {
@@ -1682,7 +1682,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
           return FALSE;
         }
         set_inside_rectangle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4;
       }
       else
       {
@@ -1940,7 +1940,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
         fprintf(stderr,"ERROR: '%s' needs 1 argument: base name\n", argv[i]);
         return FALSE;
       }
-      temp_file_base = _strdup(argv[i+1]);
+      temp_file_base = LASCopyString(argv[i+1]);
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
     else if (strcmp(argv[i],"-neighbors") == 0)
@@ -1978,7 +1978,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       {
         // find end of line
         int len = strlen(line) - 1;
-        // remove extra white spaces and line return at the end 
+        // remove extra white spaces and line return at the end
         while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
         {
           line[len] = '\0';
@@ -2326,7 +2326,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
       fprintf(stderr, "ERROR: alloc for file_names pointer array failed at %d\n", file_name_allocated);
     }
   }
-  file_names[file_name_number] = _strdup(file_name);
+  file_names[file_name_number] = LASCopyString(file_name);
   file_name_number++;
   return TRUE;
 }
@@ -2344,7 +2344,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
   {
     // find end of line
     int len = strlen(line) - 1;
-    // remove extra white spaces and line return at the end 
+    // remove extra white spaces and line return at the end
     while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
     {
       line[len] = '\0';
@@ -2452,7 +2452,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
       fprintf(stderr, "ERROR: alloc for neighbor_file_names pointer array failed at %d\n", neighbor_file_name_allocated);
     }
   }
-  neighbor_file_names[neighbor_file_name_number] = _strdup(neighbor_file_name);
+  neighbor_file_names[neighbor_file_name_number] = LASCopyString(neighbor_file_name);
   neighbor_file_name_number++;
   return TRUE;
 }
@@ -2472,7 +2472,7 @@ void LASreadOpener::set_parse_string(const CHAR* parse_string)
   if (this->parse_string) free(this->parse_string);
   if (parse_string)
   {
-    this->parse_string = _strdup(parse_string);
+    this->parse_string = LASCopyString(parse_string);
   }
   else
   {
@@ -2540,8 +2540,8 @@ void LASreadOpener::set_scale_scan_angle(F32 scale_scan_angle)
 void LASreadOpener::add_attribute(I32 data_type, const CHAR* name, const CHAR* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset, F64 no_data)
 {
   attribute_data_types[number_attributes] = data_type;
-  attribute_names[number_attributes] = (name ? _strdup(name) : 0);
-  attribute_descriptions[number_attributes] = (description ? _strdup(description) : 0);
+  attribute_names[number_attributes] = (name ? LASCopyString(name) : 0);
+  attribute_descriptions[number_attributes] = (description ? LASCopyString(description) : 0);
   attribute_scales[number_attributes] = scale;
   attribute_offsets[number_attributes] = offset;
   attribute_pre_scales[number_attributes] = pre_scale;

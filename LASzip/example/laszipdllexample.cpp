@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  laszipdllexample.cpp
-  
+
   CONTENTS:
-  
+
     This source code implements several different  easy-to-follow examples on
     how to use the LASzip DLL. The first and the second examples implement a
     small compression and decompression utilitity. The third example shows
@@ -24,11 +24,12 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
+     7 September 2018 -- introduced the LASCopyString macro to replace _strdup
     28 May 2017 -- 14th example reads compressed LAS 1.4 with "selective decompression"
-    25 April 2017 -- 13th example writes LAS 1.4 using new "native LAS 1.4 extension" 
+    25 April 2017 -- 13th example writes LAS 1.4 using new "native LAS 1.4 extension"
     11 January 2017 -- 12th example changes the default chunk size from 50000 to 5000
      8 January 2017 -- changed from "laszip_dll.h" to "laszip_api.h" because of hobu
     23 September 2015 -- 11th example writes without a-priori bounding box or counters
@@ -36,9 +37,9 @@
      5 September 2015 -- eighth and nineth example show pre-existing "extra bytes"
     19 July 2015 -- sixth and seventh example show LAS 1.4 compatibility mode
      2 April 2015 -- fourth and fifth example with integrated spatially indexing
-    11 August 2013 -- added third example for exporting geo-referenced points 
-    29 July 2013 -- created for the LASzip DLL after returning to Sommerhausen 
-  
+    11 August 2013 -- added third example for exporting geo-referenced points
+    29 July 2013 -- created for the LASzip DLL after returning to Sommerhausen
+
 ===============================================================================
 */
 
@@ -48,6 +49,13 @@
 #include <string.h>
 
 #include "laszip_api.h"
+
+#if defined(_MSC_VER) && \
+    (_MSC_FULL_VER >= 150000000)
+#define LASCopyString _strdup
+#else
+#define LASCopyString strdup
+#endif
 
 void usage(bool wait=false)
 {
@@ -82,7 +90,7 @@ static void dll_error(laszip_POINTER laszip)
 static void byebye(bool error=false, bool wait=false, laszip_POINTER laszip=0)
 {
   if (error)
-  {  
+  {
     dll_error(laszip);
   }
   if (wait)
@@ -152,15 +160,15 @@ int main(int argc, char *argv[])
     fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     fprintf(stderr,"enter input file%s: ", ((EXAMPLE == EXAMPLE_THREE) ? " (not used)" : "")); fgets(file_name, 256, stdin);
     file_name[strlen(file_name)-1] = '\0';
-    file_name_in = _strdup(file_name);
+    file_name_in = LASCopyString(file_name);
     fprintf(stderr,"enter output file: "); fgets(file_name, 256, stdin);
     file_name[strlen(file_name)-1] = '\0';
-    file_name_out = _strdup(file_name);
+    file_name_out = LASCopyString(file_name);
   }
   else if (argc == 3)
   {
-    file_name_in = _strdup(argv[1]);
-    file_name_out = _strdup(argv[2]);
+    file_name_in = LASCopyString(argv[1]);
+    file_name_out = LASCopyString(argv[2]);
   }
   else
   {
@@ -194,7 +202,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // get a pointer to the header of the reader that was just populated
@@ -234,7 +242,7 @@ int main(int argc, char *argv[])
       byebye(true, argc==1);
     }
 
-    // initialize the header for the writer using the header of the reader 
+    // initialize the header for the writer using the header of the reader
 
     if (laszip_set_header(laszip_writer, header))
     {
@@ -251,7 +259,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // read the points
@@ -324,7 +332,7 @@ int main(int argc, char *argv[])
     fprintf(stderr,"total time: %g sec for reading %scompressed and writing %scompressed\n", taketime()-start_time, (is_compressed ? "" : "un"), (compress ? "" : "un"));
 
   } // end of EXAMPLE_ONE
-  
+
   if (EXAMPLE == EXAMPLE_TWO)
   {
     fprintf(stderr,"running EXAMPLE_TWO (another way of reading *without* and writing *without* compatibility mode)\n");
@@ -346,7 +354,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // get a pointer to the header of the reader that was just populated
@@ -401,7 +409,7 @@ int main(int argc, char *argv[])
     header_write->file_creation_day = header_read->file_creation_day;
     header_write->file_creation_year = header_read->file_creation_year;
     header_write->header_size = header_read->header_size;
-    header_write->offset_to_point_data = header_read->header_size; /* note !!! */ 
+    header_write->offset_to_point_data = header_read->header_size; /* note !!! */
     header_write->number_of_variable_length_records = header_read->number_of_variable_length_records;
     header_write->point_data_format = header_read->point_data_format;
     header_write->point_data_record_length = header_read->point_data_record_length;
@@ -476,7 +484,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // get a pointer to the point of the reader will be read
@@ -593,7 +601,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: destroying laszip reader\n");
       byebye(true, argc==1);
     }
-  
+
     fprintf(stderr,"total time: %g sec for reading %scompressed and writing %scompressed\n", taketime()-start_time, (is_compressed ? "" : "un"), (compress ? "" : "un"));
 
   } // end of EXAMPLE_TWO
@@ -703,7 +711,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: adding funny VLR to the header\n");
       byebye(true, argc==1, laszip_writer);
     }
-    
+
     fprintf(stderr,"offset_to_point_data after adding two VLRs         : %d\n", (laszip_I32)header->offset_to_point_data);
 
     // open the writer
@@ -715,7 +723,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // get a pointer to the point of the writer that we will populate and write
@@ -788,10 +796,10 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
     p_count++;
-    
+
     // populate the third point
 
-    coordinates[0] = 630499.54;  
+    coordinates[0] = 630499.54;
     coordinates[1] = 4834749.66;
     coordinates[2] = 62.66;
 
@@ -819,7 +827,7 @@ int main(int argc, char *argv[])
 
     // populate the fourth point
 
-    coordinates[0] = 630498.56;     
+    coordinates[0] = 630498.56;
     coordinates[1] = 4834749.41;
     coordinates[2] = 63.68;
 
@@ -847,7 +855,7 @@ int main(int argc, char *argv[])
 
     // populate the fifth point
 
-    coordinates[0] = 630498.80; 
+    coordinates[0] = 630498.80;
     coordinates[1] = 4834748.73;
     coordinates[2] = 62.16;
 
@@ -872,7 +880,7 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
     p_count++;
-    
+
     // get the number of points written so far
 
     if (laszip_get_point_count(laszip_writer, &p_count))
@@ -898,7 +906,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: destroying laszip writer\n");
       byebye(true, argc==1);
     }
-  
+
     fprintf(stderr,"total time: %g sec for writing %scompressed\n", taketime()-start_time, (compress ? "" : "un"));
 
   } // end of EXAMPLE_THREE
@@ -933,7 +941,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // check whether spatial indexing information is available
@@ -1010,7 +1018,7 @@ int main(int argc, char *argv[])
       byebye(true, argc==1);
     }
 
-    // initialize the header for the writer using the header of the reader 
+    // initialize the header for the writer using the header of the reader
 
     if (laszip_set_header(laszip_writer, header))
     {
@@ -1027,7 +1035,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // read the points
@@ -1120,7 +1128,7 @@ int main(int argc, char *argv[])
   if (EXAMPLE == EXAMPLE_FIVE)
   {
     fprintf(stderr,"running EXAMPLE_FIVE (reading from one file and writing to another file while simultaneously generating a spatial index)\n");
- 
+
     // create the reader
 
     laszip_POINTER laszip_reader;
@@ -1138,7 +1146,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // get a pointer to the header of the reader that was just populated
@@ -1178,7 +1186,7 @@ int main(int argc, char *argv[])
       byebye(true, argc==1);
     }
 
-    // initialize the header for the writer using the header of the reader 
+    // initialize the header for the writer using the header of the reader
 
     if (laszip_set_header(laszip_writer, header))
     {
@@ -1206,7 +1214,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' spatially indexed and %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // read the points
@@ -1360,7 +1368,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: adding funny VLR to the header\n");
       byebye(true, argc==1, laszip_writer);
     }
-    
+
     fprintf(stderr,"offset_to_point_data after adding VLRs                   : %d\n", (laszip_I32)header->offset_to_point_data);
 
     // open the writer
@@ -1374,7 +1382,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // get a pointer to the point of the writer that we will populate and write
@@ -1457,10 +1465,10 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
     p_count++;
-    
+
     // populate the third point
 
-    coordinates[0] = 630499.54;  
+    coordinates[0] = 630499.54;
     coordinates[1] = 4834749.66;
     coordinates[2] = 62.66;
 
@@ -1491,7 +1499,7 @@ int main(int argc, char *argv[])
 
     // populate the fourth point
 
-    coordinates[0] = 630498.56;     
+    coordinates[0] = 630498.56;
     coordinates[1] = 4834749.41;
     coordinates[2] = 63.68;
 
@@ -1522,7 +1530,7 @@ int main(int argc, char *argv[])
 
     // populate the fifth point
 
-    coordinates[0] = 630498.80; 
+    coordinates[0] = 630498.80;
     coordinates[1] = 4834748.73;
     coordinates[2] = 62.16;
 
@@ -1550,7 +1558,7 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
     p_count++;
-    
+
     // get the number of points written so far
 
     if (laszip_get_point_count(laszip_writer, &p_count))
@@ -1576,7 +1584,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: destroying laszip writer\n");
       byebye(true, argc==1);
     }
-  
+
     fprintf(stderr,"total time: %g sec for writing %scompressed\n", taketime()-start_time, (compress ? "" : "un"));
 
   } // end of EXAMPLE_SIX
@@ -1661,7 +1669,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: adding funny VLR to the header\n");
       byebye(true, argc==1, laszip_writer);
     }
-    
+
     fprintf(stderr,"offset_to_point_data after adding VLRs                   : %d\n", (laszip_I32)header->offset_to_point_data);
 
     // enable the compatibility mode
@@ -1682,7 +1690,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // get a pointer to the point of the writer that we will populate and write
@@ -1765,10 +1773,10 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
     p_count++;
-    
+
     // populate the third point
 
-    coordinates[0] = 630499.54;  
+    coordinates[0] = 630499.54;
     coordinates[1] = 4834749.66;
     coordinates[2] = 62.66;
 
@@ -1799,7 +1807,7 @@ int main(int argc, char *argv[])
 
     // populate the fourth point
 
-    coordinates[0] = 630498.56;     
+    coordinates[0] = 630498.56;
     coordinates[1] = 4834749.41;
     coordinates[2] = 63.68;
 
@@ -1830,7 +1838,7 @@ int main(int argc, char *argv[])
 
     // populate the fifth point
 
-    coordinates[0] = 630498.80; 
+    coordinates[0] = 630498.80;
     coordinates[1] = 4834748.73;
     coordinates[2] = 62.16;
 
@@ -1859,7 +1867,7 @@ int main(int argc, char *argv[])
     }
     p_count++;
 
-    
+
     // get the number of points written so far
 
     if (laszip_get_point_count(laszip_writer, &p_count))
@@ -1885,11 +1893,11 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: destroying laszip writer\n");
       byebye(true, argc==1);
     }
-  
+
     fprintf(stderr,"total time: %g sec for writing %scompressed\n", taketime()-start_time, (compress ? "" : "un"));
 
   } // end of EXAMPLE_SEVEN
-  
+
   if (EXAMPLE == EXAMPLE_EIGHT)
   {
     fprintf(stderr,"running EXAMPLE_EIGHT (always *with* compatibility mode when reading but when writing *only* for compressed output)\n");
@@ -1920,7 +1928,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // get a pointer to the header of the reader that was just populated
@@ -1976,7 +1984,7 @@ int main(int argc, char *argv[])
       }
     }
 
-    // initialize the header for the writer using the header of the reader 
+    // initialize the header for the writer using the header of the reader
 
     if (laszip_set_header(laszip_writer, header))
     {
@@ -1991,7 +1999,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // read the points
@@ -2163,7 +2171,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: adding funny VLR to the header\n");
       byebye(true, argc==1, laszip_writer);
     }
-    
+
     fprintf(stderr,"offset_to_point_data after adding VLRs                      : %d\n", (laszip_I32)header->offset_to_point_data);
 
     // enable the compatibility mode
@@ -2184,7 +2192,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // get a pointer to the point of the writer that we will populate and write
@@ -2279,10 +2287,10 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
     p_count++;
-    
+
     // populate the third point
 
-    coordinates[0] = 630499.54;  
+    coordinates[0] = 630499.54;
     coordinates[1] = 4834749.66;
     coordinates[2] = 62.66;
 
@@ -2319,7 +2327,7 @@ int main(int argc, char *argv[])
 
     // populate the fourth point
 
-    coordinates[0] = 630498.56;     
+    coordinates[0] = 630498.56;
     coordinates[1] = 4834749.41;
     coordinates[2] = 63.68;
 
@@ -2356,7 +2364,7 @@ int main(int argc, char *argv[])
 
     // populate the fifth point
 
-    coordinates[0] = 630498.80; 
+    coordinates[0] = 630498.80;
     coordinates[1] = 4834748.73;
     coordinates[2] = 62.16;
 
@@ -2390,7 +2398,7 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
     p_count++;
-    
+
     // get the number of points written so far
 
     if (laszip_get_point_count(laszip_writer, &p_count))
@@ -2416,7 +2424,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: destroying laszip writer\n");
       byebye(true, argc==1);
     }
-  
+
     fprintf(stderr,"total time: %g sec for writing %scompressed\n", taketime()-start_time, (compress ? "" : "un"));
 
   } // end of EXAMPLE_NINE
@@ -2451,7 +2459,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // get a pointer to the header of the reader that was just populated
@@ -2540,7 +2548,7 @@ int main(int argc, char *argv[])
     header_write->file_creation_day = header_read->file_creation_day;
     header_write->file_creation_year = header_read->file_creation_year;
     header_write->header_size = header_read->header_size;
-    header_write->offset_to_point_data = header_read->header_size; /* note !!! */ 
+    header_write->offset_to_point_data = header_read->header_size; /* note !!! */
     header_write->number_of_variable_length_records = header_read->number_of_variable_length_records;
     header_write->point_data_format = header_read->point_data_format;
     header_write->point_data_record_length = header_read->point_data_record_length;
@@ -2668,7 +2676,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // get a pointer to the point of the writer that we will populate and write
@@ -2843,7 +2851,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: adding funny VLR to the header\n");
       byebye(true, argc==1, laszip_writer);
     }
-    
+
     fprintf(stderr,"offset_to_point_data after adding VLRs                   : %d\n", (laszip_I32)header->offset_to_point_data);
 
     // compressed output or not?
@@ -2869,7 +2877,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // get a pointer to the point of the writer that we will populate and write
@@ -2970,10 +2978,10 @@ int main(int argc, char *argv[])
     }
 
     p_count++;
-    
+
     // populate the third point
 
-    coordinates[0] = 630499.54;  
+    coordinates[0] = 630499.54;
     coordinates[1] = 4834749.66;
     coordinates[2] = 62.66;
 
@@ -3013,7 +3021,7 @@ int main(int argc, char *argv[])
 
     // populate the fourth point
 
-    coordinates[0] = 630498.56;     
+    coordinates[0] = 630498.56;
     coordinates[1] = 4834749.41;
     coordinates[2] = 63.68;
 
@@ -3053,7 +3061,7 @@ int main(int argc, char *argv[])
 
     // populate the fifth point
 
-    coordinates[0] = 630498.80; 
+    coordinates[0] = 630498.80;
     coordinates[1] = 4834748.73;
     coordinates[2] = 62.16;
 
@@ -3090,7 +3098,7 @@ int main(int argc, char *argv[])
     }
 
     p_count++;
-    
+
     // get the number of points written so far
 
     if (laszip_get_point_count(laszip_writer, &p_count))
@@ -3116,7 +3124,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: destroying laszip writer\n");
       byebye(true, argc==1);
     }
-  
+
     fprintf(stderr,"total time: %g sec for writing %scompressed\n", taketime()-start_time, (compress ? "" : "un"));
 
   } // end of EXAMPLE_ELEVEN
@@ -3151,7 +3159,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // get a pointer to the header of the reader that was just populated
@@ -3207,7 +3215,7 @@ int main(int argc, char *argv[])
       }
     }
 
-    // initialize the header for the writer using the header of the reader 
+    // initialize the header for the writer using the header of the reader
 
     if (laszip_set_header(laszip_writer, header))
     {
@@ -3215,7 +3223,7 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
 
-    // change the chunk size from the default value to 50000 
+    // change the chunk size from the default value to 50000
 
     if (laszip_set_chunk_size(laszip_writer, 5000))
     {
@@ -3230,7 +3238,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // read the points
@@ -3334,7 +3342,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // get a pointer to the header of the reader that was just populated
@@ -3383,7 +3391,7 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
 
-    // initialize the header for the writer using the header of the reader 
+    // initialize the header for the writer using the header of the reader
 
     if (laszip_set_header(laszip_writer, header))
     {
@@ -3402,7 +3410,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // read the points
@@ -3515,7 +3523,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // get a pointer to the header of the reader that was just populated
@@ -3564,7 +3572,7 @@ int main(int argc, char *argv[])
       byebye(true, argc==1, laszip_writer);
     }
 
-    // initialize the header for the writer using the header of the reader 
+    // initialize the header for the writer using the header of the reader
 
     if (laszip_set_header(laszip_writer, header))
     {
@@ -3583,7 +3591,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // read the points
@@ -3687,7 +3695,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip reader for '%s'\n", file_name_in);
       byebye(true, argc==1, laszip_reader);
     }
-  
+
     fprintf(stderr,"file '%s' is %scompressed\n", file_name_in, (is_compressed ? "" : "un"));
 
     // get a pointer to the header of the reader that was just populated
@@ -3753,7 +3761,7 @@ int main(int argc, char *argv[])
     if ((header_read->point_data_format > 5) || (header_read->extended_number_of_point_records > (2<<32-1)))
     {
       // legacy 32-bit counters should be zero for new point types > 5 or if there are more than 2<<32-1 points
-      header_write->number_of_point_records = 0;           
+      header_write->number_of_point_records = 0;
       for (i = 0; i < 5; i++)
       {
         header_write->number_of_points_by_return[i] = 0;
@@ -3762,7 +3770,7 @@ int main(int argc, char *argv[])
     else
     {
       // legacy 32-bit counters should be populated
-      header_write->number_of_point_records = (header_read->number_of_point_records ? header_read->number_of_point_records : (laszip_U32)(header_read->extended_number_of_point_records)); 
+      header_write->number_of_point_records = (header_read->number_of_point_records ? header_read->number_of_point_records : (laszip_U32)(header_read->extended_number_of_point_records));
       for (i = 0; i < 5; i++)
       {
         header_write->number_of_points_by_return[i] = (header_read->number_of_points_by_return[i] ? header_read->number_of_points_by_return[i] : (laszip_U32)(header_read->extended_number_of_points_by_return[i]));
@@ -3813,7 +3821,7 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: opening laszip writer for '%s'\n", file_name_out);
       byebye(true, argc==1, laszip_writer);
     }
-  
+
     fprintf(stderr,"writing file '%s' %scompressed\n", file_name_out, (compress ? "" : "un"));
 
     // get a pointer to the point of the writer that we will populate and write
@@ -3930,9 +3938,9 @@ int main(int argc, char *argv[])
       fprintf(stderr,"DLL ERROR: destroying laszip reader\n");
       byebye(true, argc==1);
     }
-  
+
     fprintf(stderr,"total time: %g sec for reading %scompressed and writing %scompressed\n", taketime()-start_time, (is_compressed ? "" : "un"), (compress ? "" : "un"));
-  
+
   } // end of EXAMPLE_FIFTEEN
 
   // unload LASzip DLL

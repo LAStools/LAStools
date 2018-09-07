@@ -27,10 +27,11 @@
 
   CHANGE HISTORY:
 
+     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
      7 January 2017 -- add read(FILE* file) for Trimble LASzip DLL improvement
      2 April 2015 -- add seek_next(LASreadPoint* reader, I64 &p_count) for DLL
      2 April 2015 -- delete read_next(LASreader* lasreader) that was not used
-    31 March 2015 -- remove unused LASquadtree inheritance of abstract LASspatial 
+    31 March 2015 -- remove unused LASquadtree inheritance of abstract LASspatial
     29 April 2011 -- created after cable outage during the royal wedding (-:
 
 ===============================================================================
