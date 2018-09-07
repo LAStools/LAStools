@@ -74,10 +74,10 @@ static FILE* fopen7zipped(const char* filename, const char* mode)
 		}
 
     // close original write end of pipe
-		close(hPipe[WRITE_HANDLE]);
+		_close(hPipe[WRITE_HANDLE]);
 
 		// Spawn process
-		HANDLE hProcess = (HANDLE) spawnlp(P_NOWAIT, "7z", "7z", "e", "-so", filename, NULL);
+		HANDLE hProcess = (HANDLE)_spawnlp(P_NOWAIT, "7z", "7z", "e", "-so", filename, NULL);
 
 		// redirect stdout back into stdout
 		if (_dup2(hStdOut, _fileno(stdout)) != 0)
@@ -126,10 +126,10 @@ static FILE* fopenZIPped(const char* filename, const char* mode)
 		}
 
     // close original write end of pipe
-		close(hPipe[WRITE_HANDLE]);
+		_close(hPipe[WRITE_HANDLE]);
 
 		// Spawn process
-		HANDLE hProcess = (HANDLE) spawnlp(P_NOWAIT, "unzip", "unzip", "-p", filename, NULL);
+		HANDLE hProcess = (HANDLE)_spawnlp(P_NOWAIT, "unzip", "unzip", "-p", filename, NULL);
 
 		// redirect stdout back into stdout
 		if (_dup2(hStdOut, _fileno(stdout)) != 0)
@@ -183,7 +183,7 @@ static FILE* fopenGzipped(const char* filename, const char* mode)
 		}
 
 		// close original write end of pipe
-		close(hPipe[WRITE_HANDLE]);
+		_close(hPipe[WRITE_HANDLE]);
 
 		// redirect read end of pipe to input file
 		if (_dup2(hPipe[READ_HANDLE], _fileno(gzipInput)) != 0)
@@ -193,10 +193,10 @@ static FILE* fopenGzipped(const char* filename, const char* mode)
 		}
 
 		// close original read end of pipe
-		close(hPipe[READ_HANDLE]);
+		_close(hPipe[READ_HANDLE]);
 
 		// Spawn process
-		HANDLE hProcess = (HANDLE) spawnlp(P_NOWAIT, "gzip", "gzip", "-d", NULL);
+		HANDLE hProcess = (HANDLE)_spawnlp(P_NOWAIT, "gzip", "gzip", "-d", NULL);
 
 		// redirect stdin back into stdin
 		if (_dup2(hStdIn, _fileno(stdin)) != 0)
@@ -252,10 +252,10 @@ static FILE* fopenGzippedNew(const char* filename, const char* mode)
 		}
 
     // close original write end of pipe
-		close(hPipe[WRITE_HANDLE]);
+		_close(hPipe[WRITE_HANDLE]);
 
 		// Spawn process
-		HANDLE hProcess = (HANDLE) spawnlp(P_NOWAIT, "gzip", "gzip", "-dc", filename, NULL);
+		HANDLE hProcess = (HANDLE)_spawnlp(P_NOWAIT, "gzip", "gzip", "-dc", filename, NULL);
 
 		// redirect stdout back into stdout
 		if (_dup2(hStdOut, _fileno(stdout)) != 0)
@@ -304,10 +304,10 @@ static FILE* fopenRARed(const char* filename, const char* mode)
 		}
 
     // close original write end of pipe
-		close(hPipe[WRITE_HANDLE]);
+		_close(hPipe[WRITE_HANDLE]);
 
 		// Spawn process
-		HANDLE hProcess = (HANDLE) spawnlp(P_NOWAIT, "unrar", "unrar", "p", "-ierr", filename, NULL);
+		HANDLE hProcess = (HANDLE)_spawnlp(P_NOWAIT, "unrar", "unrar", "p", "-ierr", filename, NULL);
 
 		// redirect stdout back into stdout
 		if (_dup2(hStdOut, _fileno(stdout)) != 0)
