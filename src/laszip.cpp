@@ -883,7 +883,7 @@ int main(int argc, char *argv[])
         if (laswriteopener.get_file_name())
         {
           wave_form_file_name = LASCopyString(laswriteopener.get_file_name());
-          int len = strlen(wave_form_file_name);
+          I32 len = (I32)strlen(wave_form_file_name);
           if (wave_form_file_name[len-3] == 'L')
           {
             wave_form_file_name[len-3] = 'W';

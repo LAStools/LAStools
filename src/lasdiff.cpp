@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
         byebye(true, argc==1);
       }
       file_name2 = LASCopyString(lasreadopener.get_file_name());
-      int len = strlen(file_name1);
+      I32 len = (I32)strlen(file_name1);
       if (strncmp(&file_name1[len-4], ".las", 4) == 0)
       {
         file_name2[len-1] = 'z';
