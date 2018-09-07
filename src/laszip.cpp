@@ -2,18 +2,18 @@
 ===============================================================================
 
   FILE:  laszip.cpp
-  
+
   CONTENTS:
-  
+
     This tool compresses and uncompresses LiDAR data in the LAS format to our
     losslessly compressed LAZ format.
 
   PROGRAMMERS:
-  
+
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -22,21 +22,22 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
-    29 March 2015 -- using LASwriterCompatible for LAS 1.4 compatibility mode  
-    9 September 2014 -- prototyping forward-compatible coding of LAS 1.4 points  
+
+    7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
+    29 March 2015 -- using LASwriterCompatible for LAS 1.4 compatibility mode
+    9 September 2014 -- prototyping forward-compatible coding of LAS 1.4 points
     5 August 2011 -- possible to add/change projection info in command line
-    23 June 2011 -- turned on LASzip version 2.0 compressor with chunking 
+    23 June 2011 -- turned on LASzip version 2.0 compressor with chunking
     17 May 2011 -- enabling batch processing with wildcards or multiple file names
     25 April 2011 -- added chunking for random access decompression
-    23 January 2011 -- added LASreadOpener and LASwriteOpener 
+    23 January 2011 -- added LASreadOpener and LASwriteOpener
     16 December 2010 -- updated to use the new library
-    12 March 2009 -- updated to ask for input if started without arguments 
+    12 March 2009 -- updated to ask for input if started without arguments
     17 September 2008 -- updated to deal with LAS format version 1.2
     14 February 2007 -- created after picking flowers for the Valentine dinner
-  
+
 ===============================================================================
 */
 
@@ -165,7 +166,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == '–') argv[i][0] = '-';
+      if (argv[i][0] == 'ï¿½') argv[i][0] = '-';
     }
     if (!geoprojectionconverter.parse(argc, argv)) byebye(true);
     if (!lasreadopener.parse(argc, argv)) byebye(true);
@@ -452,7 +453,7 @@ int main(int argc, char *argv[])
     {
       I64 start_of_waveform_data_packet_record = 0;
 
-      // create output file name if no output was specified 
+      // create output file name if no output was specified
       if (!laswriteopener.active())
       {
         if (lasreadopener.get_file_name() == 0)
@@ -529,7 +530,7 @@ int main(int argc, char *argv[])
         if (lasreader->header.global_encoding & 2) // if bit # 1 is set we have internal waveform data
         {
           lasreader->header.global_encoding &= ~((U16)2); // remove internal bit
-          if (lasreader->header.start_of_waveform_data_packet_record) // offset to 
+          if (lasreader->header.start_of_waveform_data_packet_record) // offset to
           {
             start_of_waveform_data_packet_record = lasreader->header.start_of_waveform_data_packet_record;
             lasreader->header.start_of_waveform_data_packet_record = 0;
@@ -543,7 +544,7 @@ int main(int argc, char *argv[])
       // open laswriter
 
       LASwriter* laswriter = 0;
-      
+
       if ((lasreader->header.point_data_format > 5) && !laswriteopener.get_native() && (laswriteopener.get_format() == LAS_TOOLS_FORMAT_LAZ))
       {
         LASwriterCompatibleDown* laswritercompatibledown = new LASwriterCompatibleDown();
@@ -735,7 +736,7 @@ int main(int argc, char *argv[])
             // create lax index
             LASindex lasindex;
             lasindex.prepare(lasquadtree, threshold);
-  
+
             // compress points and add to index
             while (lasreader->read_point())
             {
@@ -802,7 +803,7 @@ int main(int argc, char *argv[])
             // create lax index
             LASindex lasindex;
             lasindex.prepare(lasquadtree, threshold);
-  
+
             // compress points and add to index
             while (lasreader->read_point())
             {
@@ -866,7 +867,7 @@ int main(int argc, char *argv[])
       }
 
       delete laswriter;
-  
+
 #ifdef _WIN32
       if (verbose) fprintf(stderr,"%g secs to write %I64d bytes for '%s' with %I64d points of type %d\n", taketime()-start_time, bytes_written, laswriteopener.get_file_name(), lasreader->p_count, lasreader->header.point_data_format);
 #else
@@ -881,7 +882,7 @@ int main(int argc, char *argv[])
         char* wave_form_file_name;
         if (laswriteopener.get_file_name())
         {
-          wave_form_file_name = _strdup(laswriteopener.get_file_name());
+          wave_form_file_name = LASCopyString(laswriteopener.get_file_name());
           int len = strlen(wave_form_file_name);
           if (wave_form_file_name[len-3] == 'L')
           {
@@ -898,7 +899,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-          wave_form_file_name = _strdup("wave_form.wdp");
+          wave_form_file_name = LASCopyString("wave_form.wdp");
         }
         FILE* file = fopen(wave_form_file_name, "wb");
         if (file)
@@ -926,7 +927,7 @@ int main(int argc, char *argv[])
         laswriteopener.set_format((const CHAR*)NULL);
       }
     }
-  
+
     lasreader->close();
 
     delete lasreader;

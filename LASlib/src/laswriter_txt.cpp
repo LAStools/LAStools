@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  laswriter_txt.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
 
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "laswriter_txt.hpp"
@@ -89,7 +89,7 @@ BOOL LASwriterTXT::open(FILE* file, const LASheader* header, const CHAR* parse_s
   if (this->parse_string) free (this->parse_string);
   if (parse_string)
   {
-    this->parse_string = _strdup(parse_string);
+    this->parse_string = LASCopyString(parse_string);
   }
   else
   {
@@ -145,11 +145,11 @@ BOOL LASwriterTXT::open(FILE* file, const LASheader* header, const CHAR* parse_s
         if (this->parse_string) free(this->parse_string);
         if (ptsVLR && (ptsVLR->record_length_after_header >= 32))
         {
-          this->parse_string = _strdup((CHAR*)(ptsVLR->data + 16));
+          this->parse_string = LASCopyString((CHAR*)(ptsVLR->data + 16));
         }
         else if (ptxVLR && (ptxVLR->record_length_after_header >= 32))
         {
-          this->parse_string = _strdup((CHAR*)(ptxVLR->data + 16));
+          this->parse_string = LASCopyString((CHAR*)(ptxVLR->data + 16));
         }
         else if (ptsVLR)
         {
@@ -196,7 +196,7 @@ BOOL LASwriterTXT::open(FILE* file, const LASheader* header, const CHAR* parse_s
       if ((this->parse_string == 0) || (strcmp(this->parse_string, "original") == 0))
       {
         if (this->parse_string) free(this->parse_string);
-        this->parse_string = _strdup((CHAR*)(payload + 16));
+        this->parse_string = LASCopyString((CHAR*)(payload + 16));
       }
       fprintf(file, "%u     \012", (U32)((I64*)payload)[4]); // ncols
       fprintf(file, "%u     \012", (U32)((I64*)payload)[5]); // nrows
@@ -247,19 +247,19 @@ BOOL LASwriterTXT::open(FILE* file, const LASheader* header, const CHAR* parse_s
   {
     if (header->point_data_format == 1 || header->point_data_format == 4)
     {
-      this->parse_string = _strdup("xyzt");
+      this->parse_string = LASCopyString("xyzt");
     }
     else if (header->point_data_format == 2)
     {
-      this->parse_string = _strdup("xyzRGB");
+      this->parse_string = LASCopyString("xyzRGB");
     }
     else if (header->point_data_format == 3 || header->point_data_format == 5)
     {
-      this->parse_string = _strdup("xyztRGB");
+      this->parse_string = LASCopyString("xyztRGB");
     }
     else
     {
-      this->parse_string = _strdup("xyz");
+      this->parse_string = LASCopyString("xyz");
     }
   }
 

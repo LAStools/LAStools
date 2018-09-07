@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  lasreader_bil.hpp
-  
+
   CONTENTS:
-  
+
     Reads a binary BIL raster (*.bil + *.hdr) as if it was a LiDAR point cloud.
 
   PROGRAMMERS:
@@ -21,12 +21,13 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
+     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     20 June 2017 -- fixed reading of signed versus unsigned 16 and 8 bit intergers
      3 April 2012 -- created after joining the Spar Europe 2012 Advisory Board
-  
+
 ===============================================================================
 */
 #ifndef LAS_READER_BIL_HPP

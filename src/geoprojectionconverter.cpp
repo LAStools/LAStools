@@ -2,20 +2,20 @@
 ===============================================================================
 
   FILE:  geoprojectionconverter.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
-  
+
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
     chuck.gantz@globalstar.com
     gpotts@imagelinks.com
     craig.larrimore@noaa.gov
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -26,9 +26,9 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "geoprojectionconverter.hpp"
@@ -41,6 +41,13 @@
 #include <windows.h>
 #else
 #include <unistd.h>
+#endif
+
+#if defined(_MSC_VER) && \
+    (_MSC_FULL_VER >= 150000000)
+#define LASCopyString _strdup
+#else
+#define LASCopyString strdup
 #endif
 
 static const double PI = 3.141592653589793238462643383279502884197169;
@@ -70,21 +77,21 @@ public:
   ReferenceEllipsoid(int id, char* name, double equatorialRadius, double eccentricitySquared, double inverseFlattening)
   {
     this->id = id;
-    this->name = name; 
+    this->name = name;
     this->equatorialRadius = equatorialRadius;
     this->eccentricitySquared = eccentricitySquared;
     this->inverseFlattening = inverseFlattening;
   }
   int id;
   char* name;
-  double equatorialRadius; 
-  double eccentricitySquared;  
-  double inverseFlattening;  
+  double equatorialRadius;
+  double eccentricitySquared;
+  double inverseFlattening;
 };
 
-static const ReferenceEllipsoid ellipsoid_list[] = 
+static const ReferenceEllipsoid ellipsoid_list[] =
 {
-  //  d, Ellipsoid name, Equatorial Radius, square of eccentricity, inverse flattening  
+  //  d, Ellipsoid name, Equatorial Radius, square of eccentricity, inverse flattening
   ReferenceEllipsoid( -1, "Placeholder", 0, 0, 0),  //placeholder to allow array indices to match id numbers
   ReferenceEllipsoid( 1, "Airy", 6377563.396, 0.00667054, 299.3249646),
   ReferenceEllipsoid( 2, "Australian National", 6378160.0, 0.006694542, 298.25),
@@ -511,7 +518,7 @@ public:
 
 static const StatePlaneLCC state_plane_lcc_nad27_list[] =
 {
-  // zone, false east [m], false north [m], ProjOrig(Lat), CentMerid(Long), 1st std para, 2nd std para 
+  // zone, false east [m], false north [m], ProjOrig(Lat), CentMerid(Long), 1st std para, 2nd std para
   StatePlaneLCC(PCS_NAD27_Alaska_zone_10, "AK_10",914401.8288,0,51,-176,51.83333333,53.83333333),
   StatePlaneLCC(PCS_NAD27_Arkansas_North, "AR_N",609601.2192,0,34.33333333,-92,34.93333333,36.23333333),
   StatePlaneLCC(PCS_NAD27_Arkansas_South, "AR_S",609601.2192,0,32.66666667,-92,33.3,34.76666667),
@@ -590,7 +597,7 @@ static const StatePlaneLCC state_plane_lcc_nad27_list[] =
 
 static const StatePlaneLCC state_plane_lcc_nad83_list[] =
 {
-  // geotiff key, zone, false east [m], false north [m], ProjOrig(Lat), CentMerid(Long), 1st std para, 2nd std para 
+  // geotiff key, zone, false east [m], false north [m], ProjOrig(Lat), CentMerid(Long), 1st std para, 2nd std para
   StatePlaneLCC(PCS_NAD83_Alaska_zone_10, "AK_10",1000000,0,51.000000,-176.000000,51.833333,53.833333),
   StatePlaneLCC(PCS_NAD83_Arkansas_North, "AR_N",400000,0,34.333333,-92.000000,34.933333,36.233333),
   StatePlaneLCC(PCS_NAD83_Arkansas_South, "AR_S",400000,400000,32.666667,-92.000000,33.300000,34.766667),
@@ -855,7 +862,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
     case 4099: // VerticalUnitsGeoKey
       set_VerticalUnitsGeoKey(geo_keys[i].value_offset);
       break;
-    case 4096: // VerticalCSTypeGeoKey 
+    case 4096: // VerticalCSTypeGeoKey
       set_VerticalCSTypeGeoKey(geo_keys[i].value_offset);
       break;
     case 2048: // GeographicTypeGeoKey
@@ -898,7 +905,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
       case 4001: // GCSE_Airy1830
         ellipsoid = GEO_ELLIPSOID_AIRY;
         break;
-      case 4002: // GCSE_AiryModified1849 
+      case 4002: // GCSE_AiryModified1849
         ellipsoid = 16;
         break;
       case 4003: // GCSE_AustralianNationalSpheroid
@@ -945,7 +952,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         fprintf(stderr, "GeographicTypeGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
       }
       break;
-    case 2050: // GeogGeodeticDatumGeoKey 
+    case 2050: // GeogGeodeticDatumGeoKey
       switch (geo_keys[i].value_offset)
       {
       case 32767: // user-defined GCS
@@ -1035,7 +1042,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         fprintf(stderr, "GeogGeodeticDatumGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
       }
       break;
-    case 2052: // GeogLinearUnitsGeoKey 
+    case 2052: // GeogLinearUnitsGeoKey
       switch (geo_keys[i].value_offset)
       {
       case 9001: // Linear_Meter
@@ -1148,7 +1155,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
       break;
     case 3079: // ProjStdParallel2GeoKey
       offsetProjStdParallel2GeoKey = geo_keys[i].value_offset;
-      break;        
+      break;
     case 3080 : // ProjNatOriginLongGeoKey
       offsetProjNatOriginLongGeoKey = geo_keys[i].value_offset;
       break;
@@ -1343,7 +1350,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[0].count = 1;
         (*geo_keys)[0].value_offset = 1; // ModelTypeProjected
 
-        // user-defined custom LCC projection 
+        // user-defined custom LCC projection
         (*geo_keys)[1].key_id = 3072; // ProjectedCSTypeGeoKey
         (*geo_keys)[1].tiff_tag_location = 0;
         (*geo_keys)[1].count = 1;
@@ -1353,13 +1360,13 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[2].key_id = 3075; // ProjCoordTransGeoKey
         (*geo_keys)[2].tiff_tag_location = 0;
         (*geo_keys)[2].count = 1;
-        (*geo_keys)[2].value_offset = 8; // CT_LambertConfConic_2SP 
+        (*geo_keys)[2].value_offset = 8; // CT_LambertConfConic_2SP
 
         // which units do we use
         (*geo_keys)[3].key_id = 3076; // ProjCoordTransGeoKey
         (*geo_keys)[3].tiff_tag_location = 0;
         (*geo_keys)[3].count = 1;
-        (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source); 
+        (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source);
 
         // here come the 6 double parameters
 
@@ -1442,7 +1449,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[0].count = 1;
         (*geo_keys)[0].value_offset = 1; // ModelTypeProjected
 
-        // user-defined custom TM projection 
+        // user-defined custom TM projection
         (*geo_keys)[1].key_id = 3072; // ProjectedCSTypeGeoKey
         (*geo_keys)[1].tiff_tag_location = 0;
         (*geo_keys)[1].count = 1;
@@ -1458,7 +1465,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[3].key_id = 3076; // ProjCoordTransGeoKey
         (*geo_keys)[3].tiff_tag_location = 0;
         (*geo_keys)[3].count = 1;
-        (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source); 
+        (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source);
 
         // here come the 5 double parameters
 
@@ -1535,7 +1542,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[0].count = 1;
         (*geo_keys)[0].value_offset = 1; // ModelTypeProjected
 
-        // user-defined custom AEAC projection 
+        // user-defined custom AEAC projection
         (*geo_keys)[1].key_id = 3072; // ProjectedCSTypeGeoKey
         (*geo_keys)[1].tiff_tag_location = 0;
         (*geo_keys)[1].count = 1;
@@ -1545,13 +1552,13 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[2].key_id = 3075; // ProjCoordTransGeoKey
         (*geo_keys)[2].tiff_tag_location = 0;
         (*geo_keys)[2].count = 1;
-        (*geo_keys)[2].value_offset = 11; // CT_AlbersEqualArea 
+        (*geo_keys)[2].value_offset = 11; // CT_AlbersEqualArea
 
         // which units do we use
         (*geo_keys)[3].key_id = 3076; // ProjCoordTransGeoKey
         (*geo_keys)[3].tiff_tag_location = 0;
         (*geo_keys)[3].count = 1;
-        (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source); 
+        (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source);
 
         // here come the 6 double parameters
 
@@ -1634,7 +1641,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[0].count = 1;
         (*geo_keys)[0].value_offset = 1; // ModelTypeProjected
 
-        // user-defined custom LCC projection 
+        // user-defined custom LCC projection
         (*geo_keys)[1].key_id = 3072; // ProjectedCSTypeGeoKey
         (*geo_keys)[1].tiff_tag_location = 0;
         (*geo_keys)[1].count = 1;
@@ -1644,13 +1651,13 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[2].key_id = 3075; // ProjCoordTransGeoKey
         (*geo_keys)[2].tiff_tag_location = 0;
         (*geo_keys)[2].count = 1;
-        (*geo_keys)[2].value_offset = 11; // CT_AlbersEqualArea 
+        (*geo_keys)[2].value_offset = 11; // CT_AlbersEqualArea
 
         // which units do we use
         (*geo_keys)[3].key_id = 3076; // ProjCoordTransGeoKey
         (*geo_keys)[3].tiff_tag_location = 0;
         (*geo_keys)[3].count = 1;
-        (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source); 
+        (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source);
 
         // here come the 6 double parameters
 /*
@@ -1968,7 +1975,7 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
     }
 
     // otherwise try to find the PROJECTION and all its parameters
- 
+
     const char* proj = strstr(projcs, "PROJECTION[");
 
     if (proj)
@@ -2090,10 +2097,10 @@ static char* get_epsg_name_from_pcs_file(const char* program_name, short value)
         if (line[run] == '\"')
         {
           // remove opening parentheses
-          run++; 
+          run++;
           // this is where the name starts
           name = &line[run];
-          run++; 
+          run++;
           // skip until closing parentheses
           while (line[run] != '\"') run++;
           // this is where the name ends
@@ -2109,7 +2116,7 @@ static char* get_epsg_name_from_pcs_file(const char* program_name, short value)
           line[run] = '\0';
         }
         // copy the name
-        epsg_name = _strdup(name);
+        epsg_name = LASCopyString(name);
         break;
       }
     }
@@ -2121,7 +2128,7 @@ static char* get_epsg_name_from_pcs_file(const char* program_name, short value)
 static int print_ogc_wkt_spheroid(char* string, short spheroid_code)
 {
   int n = 0;
-  
+
   if (spheroid_code == GEO_SPHEROID_WGS84)
   {
     n = sprintf(string, "SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],");
@@ -2160,7 +2167,7 @@ static int print_ogc_wkt_spheroid(char* string, short spheroid_code)
 static int print_ogc_wkt_datum(char* string, const char* datum_name, short datum_code, short spheroid_code)
 {
   int n = 0;
-  
+
   n += sprintf(&string[n], "DATUM[\"%s\",", datum_name);
   n += print_ogc_wkt_spheroid(&string[n], spheroid_code);
   n += sprintf(&string[n], "AUTHORITY[\"EPSG\",\"%d\"]],", datum_code);
@@ -2171,7 +2178,7 @@ static int print_ogc_wkt_datum(char* string, const char* datum_name, short datum
 static int print_ogc_wkt_geogcs(char* string, const char* gcs_name, short gcs_code, const char* datum_name, short datum_code, short spheroid_code)
 {
   int n = 0;
-  
+
   n += sprintf(&string[n], "GEOGCS[\"%s\",", gcs_name);
   n += print_ogc_wkt_datum(&string[n], datum_name, datum_code, spheroid_code);
   n += sprintf(&string[n], "PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"%d\"]],", gcs_code);
@@ -2193,7 +2200,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
     {
       n += sprintf(&string[n], "GEOCCS[\"WGS 84\",DATUM[\"World Geodetic System 1984\",SPHEROID[\"WGS 84\",6378137.0,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0.0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"m\",1.0],AXIS[\"Geocentric X\",OTHER],AXIS[\"Geocentric Y\",EAST],AXIS[\"Geocentric Z\",NORTH],AUTHORITY[\"EPSG\",\"4978\"]]");
     }
-    else 
+    else
     {
       // if not geographic we have a projection
       if ((projection->type != GEO_PROJECTION_LAT_LONG) && (projection->type != GEO_PROJECTION_LONG_LAT))
@@ -2213,7 +2220,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
             n += sprintf(&string[n], "NAVD88");
             if (vertical_geoid)
             {
-              if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B) 
+              if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B)
               {
                 n += sprintf(&string[n], " height - Geoid12B");
               }
@@ -2415,7 +2422,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
             n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", os->os_false_easting_meter*meter2coordinates, os->os_false_northing_meter*meter2coordinates);
           }
         }
-        else 
+        else
         {
           free(string);
           len = 0;
@@ -2479,7 +2486,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
           n += sprintf(&string[n], "VERT_CS[\"NAVD88");
           if (vertical_geoid)
           {
-            if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B) 
+            if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B)
             {
               n += sprintf(&string[n], " height - Geoid12B");
             }
@@ -2628,7 +2635,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
 static int print_prj_spheroid(char* string, short spheroid_code)
 {
   int n = 0;
-  
+
   if (spheroid_code == GEO_SPHEROID_WGS84)
   {
     n = sprintf(string, "SPHEROID[\"WGS 84\",6378137,298.257223563]");
@@ -2667,7 +2674,7 @@ static int print_prj_spheroid(char* string, short spheroid_code)
 static int print_prj_datum(char* string, const char* datum_name, short datum_code, short spheroid_code)
 {
   int n = 0;
-  
+
   if (datum_code == (GEO_GCS_WGS84 + 2000))
   {
     n += sprintf(&string[n], "DATUM[\"D_WGS_1984\",");
@@ -2685,7 +2692,7 @@ static int print_prj_datum(char* string, const char* datum_name, short datum_cod
 static int print_prj_geogcs(char* string, const char* gcs_name, short gcs_code, const char* datum_name, short datum_code, short spheroid_code)
 {
   int n = 0;
-  
+
   n += sprintf(&string[n], "GEOGCS[\"%s\",", gcs_name);
   n += print_prj_datum(&string[n], datum_name, datum_code, spheroid_code);
   n += sprintf(&string[n], "PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],");
@@ -2707,7 +2714,7 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
     {
       n += sprintf(&string[n], "GEOCCS[\"WGS 84\",DATUM[\"World Geodetic System 1984\",SPHEROID[\"WGS 84\",6378137.0,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0.0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"m\",1.0],AXIS[\"Geocentric X\",OTHER],AXIS[\"Geocentric Y\",EAST],AXIS[\"Geocentric Z\",NORTH],AUTHORITY[\"EPSG\",\"4978\"]]");
     }
-    else 
+    else
     {
       // if not geographic we have a projection
       if ((projection->type != GEO_PROJECTION_LAT_LONG) && (projection->type != GEO_PROJECTION_LONG_LAT))
@@ -2840,7 +2847,7 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
             n += sprintf(&string[n], "PARAMETER[\"false_easting\",%.15g],PARAMETER[\"false_northing\",%.15g],", os->os_false_easting_meter*meter2coordinates, os->os_false_northing_meter*meter2coordinates);
           }
         }
-        else 
+        else
         {
           free(string);
           len = 0;
@@ -3089,7 +3096,7 @@ bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** p
     {
       n += sprintf(&string[n], "+datum=bessel ");
     }
-    else 
+    else
     {
       free(string);
       len = 0;
@@ -3197,7 +3204,7 @@ short GeoProjectionConverter::get_GeographicTypeGeoKey() const
     return 4022;
   case GEO_ELLIPSOID_KRASSOWSKY: // GCSE_Krassowsky1940
     return 4024;
-  case 16: // GCSE_AiryModified1849 
+  case 16: // GCSE_AiryModified1849
     return 4002;
   case 17: // GCSE_Everest1830Modified
     return 4018;
@@ -3431,7 +3438,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
           {
             if ((1 <= utm->utm_zone_number) && (utm->utm_zone_number <= 23))
             {
-              return 26900 + utm->utm_zone_number; 
+              return 26900 + utm->utm_zone_number;
             }
             else if ((59 <= utm->utm_zone_number) && (utm->utm_zone_number <= 60))
             {
@@ -3456,7 +3463,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
           {
             if ((1 <= utm->utm_zone_number) && (utm->utm_zone_number <= 19))
             {
-              return 6329 + utm->utm_zone_number; 
+              return 6329 + utm->utm_zone_number;
             }
             else if ((59 <= utm->utm_zone_number) && (utm->utm_zone_number <= 60))
             {
@@ -3470,7 +3477,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
           {
             if ((1 <= utm->utm_zone_number) && (utm->utm_zone_number <= 19))
             {
-              return 3707 + utm->utm_zone_number; 
+              return 3707 + utm->utm_zone_number;
             }
             else if ((59 <= utm->utm_zone_number) && (utm->utm_zone_number <= 60))
             {
@@ -3484,11 +3491,11 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
           {
             if ((10 <= utm->utm_zone_number) && (utm->utm_zone_number <= 19))
             {
-              return 3730 + utm->utm_zone_number; 
+              return 3730 + utm->utm_zone_number;
             }
             else if ((4 <= utm->utm_zone_number) && (utm->utm_zone_number <= 5))
             {
-              return 3746 + utm->utm_zone_number; 
+              return 3746 + utm->utm_zone_number;
             }
           }
           else
@@ -3505,7 +3512,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
           {
             if ((7 <= utm->utm_zone_number) && (utm->utm_zone_number <= 22))
             {
-              return 6643 + utm->utm_zone_number; 
+              return 6643 + utm->utm_zone_number;
             }
           }
         }
@@ -4014,7 +4021,7 @@ bool GeoProjectionConverter::set_reference_ellipsoid(int id, char* description)
   ellipsoid->eccentricity_squared = ellipsoid_list[id].eccentricitySquared;
   ellipsoid->inverse_flattening = ellipsoid_list[id].inverseFlattening;
   ellipsoid->eccentricity_prime_squared = (ellipsoid->eccentricity_squared)/(1-ellipsoid->eccentricity_squared);
-  ellipsoid->polar_radius = ellipsoid->equatorial_radius*sqrt(1-ellipsoid->eccentricity_squared);    
+  ellipsoid->polar_radius = ellipsoid->equatorial_radius*sqrt(1-ellipsoid->eccentricity_squared);
   ellipsoid->eccentricity = sqrt(ellipsoid->eccentricity_squared);
   ellipsoid->eccentricity_e1 = (1-sqrt(1-ellipsoid->eccentricity_squared))/(1+sqrt(1-ellipsoid->eccentricity_squared));
 
@@ -4191,10 +4198,10 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
           if (line[run] == '\"')
           {
             // remove opening parentheses
-            run++; 
+            run++;
             // this is where the name starts
             gname = &line[run];
-            run++; 
+            run++;
             // skip until closing parentheses
             while (line[run] != '\"') run++;
             // this is where the name ends
@@ -4226,10 +4233,10 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
           if (line[run] == '\"')
           {
             // remove opening parentheses
-            run++; 
+            run++;
             // this is where the name starts
             dname = &line[run];
-            run++; 
+            run++;
             // skip until closing parentheses
             while (line[run] != '\"') run++;
             // this is where the name ends
@@ -4523,7 +4530,7 @@ bool GeoProjectionConverter::set_target_utm_projection(char* description, const 
 // Conformal Conic  projection parameters as inputs and sets the corresponding
 // state variables.
 //
-// falseEastingMeter & falseNorthingMeter are just an offset in meters added 
+// falseEastingMeter & falseNorthingMeter are just an offset in meters added
 // to the final coordinate calculated.
 //
 // latOriginDegree & longMeridianDegree are the "center" latitiude and
@@ -4566,7 +4573,7 @@ void GeoProjectionConverter::set_lambert_conformal_conic_projection(double false
 /*
   * The function set_transverse_mercator_projection() receives the Tranverse
   * Mercator projection parameters as input and sets the corresponding state
-  * variables. 
+  * variables.
   * falseEastingMeter   : Easting/X in meters at the center of the projection
   * falseNorthingMeter  : Northing/Y in meters at the center of the projection
   * latOriginDegree     : Latitude in decimal degree at the origin of the projection
@@ -4602,11 +4609,11 @@ void GeoProjectionConverter::set_transverse_mercator_projection(double falseEast
 
 // Configure a Albers Equal Area Conic Projection
 //
-// The function set_albers_equal_area_conic_projection() receives the Albers 
+// The function set_albers_equal_area_conic_projection() receives the Albers
 // Equal Area Conic projection parameters as inputs and sets the corresponding
 // state variables.
 //
-// falseEastingMeter & falseNorthingMeter are just an offset in meters added 
+// falseEastingMeter & falseNorthingMeter are just an offset in meters added
 // to the final coordinate calculated.
 //
 // latCenterDegree & longCenterDegree are the "center" latitiude and
@@ -4648,11 +4655,11 @@ void GeoProjectionConverter::set_albers_equal_area_conic_projection(double false
 
 // Configure an Oblique Mercator Projection
 //
-// The function set_hotine_oblique_mercator_projection() receives the Hotine  
+// The function set_hotine_oblique_mercator_projection() receives the Hotine
 // Oblique Mercator projection parameters as inputs and sets the corresponding
 // state variables.
 //
-// falseEastingMeter & falseNorthingMeter are just an offset in meters added 
+// falseEastingMeter & falseNorthingMeter are just an offset in meters added
 // to the final coordinate calculated.
 //
 // latCenterDegree & longCenterDegree are the "center" latitiude and
@@ -4689,7 +4696,7 @@ void GeoProjectionConverter::set_hotine_oblique_mercator_projection(double false
 /*
   * The function set_oblique_stereographic_projection() receives the Oblique
   * Stereographic projection parameters as input and sets the corresponding
-  * state variables. 
+  * state variables.
   * falseEastingMeter   : Easting/X in meters at the center of the projection
   * falseNorthingMeter  : Northing/Y in meters at the center of the projection
   * latOriginDegree     : Latitude in decimal degree at the origin of the projection
@@ -4903,10 +4910,10 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
           if (line[run] == '\"')
           {
             // remove opening parentheses
-            run++; 
+            run++;
             // this is where the name starts
             name = &line[run];
-            run++; 
+            run++;
             // skip until closing parentheses
             while (line[run] != '\"') run++;
             // this is where the name ends
@@ -5132,7 +5139,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             if (description) sprintf(description, "%s", name);
             return true;
           }
-          else 
+          else
           {
             fprintf(stderr, "transform %d of EPSG code %d not implemented.\n", transform, value);
             return false;
@@ -5469,7 +5476,7 @@ void GeoProjectionConverter::compute_os_parameters(bool source)
   double sphi = sin(os->os_lat_origin_radian);
   double cphi = cos(os->os_lat_origin_radian);
   cphi *= cphi;
-  
+
   os->os_R2 = 2.0 * sqrt(1.0 - ellipsoid->eccentricity_squared) / (1.0 - ellipsoid->eccentricity_squared * sphi * sphi);
   os->os_C = sqrt(1.0 + ellipsoid->eccentricity_squared * cphi * cphi / (1.0 - ellipsoid->eccentricity_squared));
   os->os_phic0 = asin(sphi / os->os_C);
@@ -5480,10 +5487,10 @@ void GeoProjectionConverter::compute_os_parameters(bool source)
   os->os_gf = os->os_scale_factor * ellipsoid->equatorial_radius;
 }
 
-// converts UTM coords to lat/long.  Equations from USGS Bulletin 1532 
-// East Longitudes are positive, West longitudes are negative. 
+// converts UTM coords to lat/long.  Equations from USGS Bulletin 1532
+// East Longitudes are positive, West longitudes are negative.
 // North latitudes are positive, South latitudes are negative
-// Lat and LongDegree are in decimal degrees. 
+// Lat and LongDegree are in decimal degrees.
 // adapted from code written by Chuck Gantz- chuck.gantz@globalstar.com
 
 bool GeoProjectionConverter::UTMtoLL(const double UTMEastingMeter, const double UTMNorthingMeter, double& LatDegree,  double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersUTM* utm) const
@@ -5501,7 +5508,7 @@ bool GeoProjectionConverter::UTMtoLL(const double UTMEastingMeter, const double 
   double M = y / k0;
   double mu = M/(ellipsoid->equatorial_radius*(1-ellipsoid->eccentricity_squared/4-3*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/64-5*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/256));
 
-  double phi1Rad = mu  + (3*ellipsoid->eccentricity_e1/2-27*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1/32)*sin(2*mu) 
+  double phi1Rad = mu  + (3*ellipsoid->eccentricity_e1/2-27*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1/32)*sin(2*mu)
                        + (21*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1/16-55*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1/32)*sin(4*mu)
                        + (151*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1*ellipsoid->eccentricity_e1/96)*sin(6*mu);
 
@@ -5521,8 +5528,8 @@ bool GeoProjectionConverter::UTMtoLL(const double UTMEastingMeter, const double 
   return true;
 }
 
-// converts lat/long to UTM coords.  Equations from USGS Bulletin 1532 
-// East Longitudes are positive, West longitudes are negative. 
+// converts lat/long to UTM coords.  Equations from USGS Bulletin 1532
+// East Longitudes are positive, West longitudes are negative.
 // North latitudes are positive, South latitudes are negative
 // LatDegree and LongDegree are in decimal degrees
 // adapted from code written by Chuck Gantz- chuck.gantz@globalstar.com
@@ -5535,7 +5542,7 @@ bool GeoProjectionConverter::compute_utm_zone(const double LatDegree, const doub
   utm->utm_zone_number = (int)((LongTemp + 180)/6) + 1;
   if( LatDegree >= 56.0 && LatDegree < 64.0 && LongTemp >= 3.0 && LongTemp < 12.0 ) utm->utm_zone_number = 32;
   // Special zones for Svalbard
-  if( LatDegree >= 72.0 && LatDegree < 84.0 ) 
+  if( LatDegree >= 72.0 && LatDegree < 84.0 )
   {
     if(      LongTemp >= 0.0  && LongTemp <  9.0 ) utm->utm_zone_number = 31;
     else if( LongTemp >= 9.0  && LongTemp < 21.0 ) utm->utm_zone_number = 33;
@@ -5570,7 +5577,7 @@ bool GeoProjectionConverter::compute_utm_zone(const double LatDegree, const doub
 bool GeoProjectionConverter::LLtoUTM(const double LatDegree, const double LongDegree, double &UTMEastingMeter, double &UTMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersUTM* utm) const
 {
   const double k0 = 0.9996;
-  
+
   // Make sure the longitude is between -180.00 .. 179.9
   double LongTemp = (LongDegree+180)-int((LongDegree+180)/360)*360-180; // -180.00 .. 179.9;
   double LatRad = LatDegree*deg2rad;
@@ -5582,11 +5589,11 @@ bool GeoProjectionConverter::LLtoUTM(const double LatDegree, const double LongDe
   double C = ellipsoid->eccentricity_prime_squared*cos(LatRad)*cos(LatRad);
   double A = cos(LatRad)*(LongRad-LongOriginRad);
 
-  double M = ellipsoid->equatorial_radius*((1  - ellipsoid->eccentricity_squared/4 - 3*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/64  - 5*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/256)*LatRad 
+  double M = ellipsoid->equatorial_radius*((1  - ellipsoid->eccentricity_squared/4 - 3*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/64  - 5*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/256)*LatRad
               - (3*ellipsoid->eccentricity_squared/8  + 3*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/32  + 45*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/1024)*sin(2*LatRad)
-             + (15*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/256 + 45*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/1024)*sin(4*LatRad) 
+             + (15*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/256 + 45*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/1024)*sin(4*LatRad)
              - (35*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared*ellipsoid->eccentricity_squared/3072)*sin(6*LatRad));
-  
+
   UTMEastingMeter = (double)(k0*N*(A+(1-T+C)*A*A*A/6
           + (5-18*T+T*T+72*C-58*ellipsoid->eccentricity_prime_squared)*A*A*A*A*A/120)
           + 500000.0);
@@ -5605,11 +5612,11 @@ bool GeoProjectionConverter::LLtoUTM(const double LatDegree, const double LongDe
 /*
 An alternate way to convert Lambert Conic Conformal Northing/Easting coordinates
 into Latitude & Longitude coordinates. The code adapted from Brenor Brophy
-(brenor dot brophy at gmail dot com) Homepage:  www.brenorbrophy.com 
+(brenor dot brophy at gmail dot com) Homepage:  www.brenorbrophy.com
 */
 void lcc2ll( double e2, // Square of ellipsoid->eccentricity
              double a,  // Equatorial Radius
-             double firstStdParallel, 
+             double firstStdParallel,
              double secondStdParallel,
              double latOfOrigin,
              double longOfOrigin,
@@ -5647,7 +5654,7 @@ void lcc2ll( double e2, // Square of ellipsoid->eccentricity
    phi1  = PI_OVER_2 - 2*atan(t_*pow(((1-e*sin(phi0))/(1+e*sin(phi0))),e/2));
    phi2  = PI_OVER_2 - 2*atan(t_*pow(((1-e*sin(phi1))/(1+e*sin(phi1))),e/2));
   double phi  = PI_OVER_2 - 2*atan(t_*pow(((1-e*sin(phi2))/(1+e*sin(phi2))),e/2));
-  
+
   LatDegree = rad2deg*phi;
   LongDegree = rad2deg*lamda;
 }
@@ -5660,11 +5667,11 @@ meters) and are relative to the falseNorthing/falseEasting coordinate.
 Which in turn is relative to the Lat/Long of origin. The formula were
 obtained from URL: http://www.ihsenergy.com/epsg/guid7_2.html.
 The code adapted from Brenor Brophy (brenor dot brophy at gmail dot com)
-Homepage:  www.brenorbrophy.com 
+Homepage:  www.brenorbrophy.com
 */
 void ll2lcc( double e2, // Square of ellipsoid->eccentricity
              double a,  // Equatorial Radius
-             double firstStdParallel, 
+             double firstStdParallel,
              double secondStdParallel,
              double latOfOrigin,
              double longOfOrigin,
@@ -5705,7 +5712,7 @@ void ll2lcc( double e2, // Square of ellipsoid->eccentricity
   * coordinates, according to the current ellipsoid and Lambert Conformal
   * Conic projection parameters.
   *
-  *   LCCEastingMeter   : input Easting/X in meters 
+  *   LCCEastingMeter   : input Easting/X in meters
   *   LLCNorthingMeter  : input Northing/Y in meters
   *   LatDegree         : output Latitude in decimal degrees
   *   LongDegree        : output Longitude in decimal degrees
@@ -5792,18 +5799,18 @@ bool GeoProjectionConverter::LCCtoLL(const double LCCEastingMeter, const double 
   * The function LLtoLCC() converts Geodetic (latitude and longitude)
   * coordinates to Lambert Conformal Conic projection (easting and
   * northing) coordinates, according to the current ellipsoid and
-  * Lambert Conformal Conic projection parameters. 
+  * Lambert Conformal Conic projection parameters.
   *
   *   LatDegree         : input Latitude in decimal degrees
   *   LongDegree        : input Longitude in decimal degrees
-  *   LCCEastingMeter   : output Easting/X in meters 
+  *   LCCEastingMeter   : output Easting/X in meters
   *   LCCNorthingMeter  : output Northing/Y in meters
   *
   * adapted from code by Garrett Potts ((C) 2000 ImageLinks Inc.)
 */
 bool GeoProjectionConverter::LLtoLCC(const double LatDegree, const double LongDegree, double& LCCEastingMeter,  double& LCCNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersLCC* lcc) const
 {
-/* >>> alternate way to compute (but seems less precise) <<< 
+/* >>> alternate way to compute (but seems less precise) <<<
   ll2lcc(ellipsoid->eccentricity_squared,
             ellipsoid->equatorial_radius,
             lcc->lcc_first_std_parallel_degree,
@@ -5859,12 +5866,12 @@ bool GeoProjectionConverter::LLtoLCC(const double LatDegree, const double LongDe
 /*
   * The function LLtoTM() converts geodetic (latitude and longitude)
   * coordinates to Transverse Mercator projection (easting and northing)
-  * coordinates, according to the current ellipsoid and Transverse Mercator 
-  * projection parameters.  
+  * coordinates, according to the current ellipsoid and Transverse Mercator
+  * projection parameters.
   *
   *   LatDegree        : input Latitude in decimal degrees
   *   LongDegree       : input Longitude in decimal degrees
-  *   TMEastingMeter   : output Easting/X in meters 
+  *   TMEastingMeter   : output Easting/X in meters
   *   TMNorthingMeter  : output Northing/Y in meters
   *
   * adapted from code by Garrett Potts ((C) 2000 ImageLinks Inc.)
@@ -5944,24 +5951,24 @@ bool GeoProjectionConverter::LLtoTM(const double LatDegree, const double LongDeg
   /* northing */
   t1 = (tmd - tmdo) * tm->tm_scale_factor;
   t2 = sn * s * c * tm->tm_scale_factor/ 2.e0;
-  t3 = sn * s * c3 * tm->tm_scale_factor * (5.e0 - tan2 + 9.e0 * eta 
-                                             + 4.e0 * eta2) /24.e0; 
+  t3 = sn * s * c3 * tm->tm_scale_factor * (5.e0 - tan2 + 9.e0 * eta
+                                             + 4.e0 * eta2) /24.e0;
 
   t4 = sn * s * c5 * tm->tm_scale_factor * (61.e0 - 58.e0 * tan2
                                              + tan4 + 270.e0 * eta - 330.e0 * tan2 * eta + 445.e0 * eta2
-                                             + 324.e0 * eta3 -680.e0 * tan2 * eta2 + 88.e0 * eta4 
+                                             + 324.e0 * eta3 -680.e0 * tan2 * eta2 + 88.e0 * eta4
                                              -600.e0 * tan2 * eta3 - 192.e0 * tan2 * eta4) / 720.e0;
 
-  t5 = sn * s * c7 * tm->tm_scale_factor * (1385.e0 - 3111.e0 * 
+  t5 = sn * s * c7 * tm->tm_scale_factor * (1385.e0 - 3111.e0 *
                                              tan2 + 543.e0 * tan4 - tan6) / 40320.e0;
 
-  TMNorthingMeter = tm->tm_false_northing_meter + t1 + pow(dlam,2.e0) * t2 + pow(dlam,4.e0) * t3 + pow(dlam,6.e0) * t4 + pow(dlam,8.e0) * t5; 
+  TMNorthingMeter = tm->tm_false_northing_meter + t1 + pow(dlam,2.e0) * t2 + pow(dlam,4.e0) * t3 + pow(dlam,6.e0) * t4 + pow(dlam,8.e0) * t5;
 
   /* Easting */
   t6 = sn * c * tm->tm_scale_factor;
   t7 = sn * c3 * tm->tm_scale_factor * (1.e0 - tan2 + eta ) /6.e0;
   t8 = sn * c5 * tm->tm_scale_factor * (5.e0 - 18.e0 * tan2 + tan4
-                                         + 14.e0 * eta - 58.e0 * tan2 * eta + 13.e0 * eta2 + 4.e0 * eta3 
+                                         + 14.e0 * eta - 58.e0 * tan2 * eta + 13.e0 * eta2 + 4.e0 * eta3
                                          - 64.e0 * tan2 * eta2 - 24.e0 * tan2 * eta3 )/ 120.e0;
   t9 = sn * c7 * tm->tm_scale_factor * ( 61.e0 - 479.e0 * tan2
                                           + 179.e0 * tan4 - tan6 ) /5040.e0;
@@ -5970,14 +5977,14 @@ bool GeoProjectionConverter::LLtoTM(const double LatDegree, const double LongDeg
 
   return true;
 }
- 
+
 /*
   * The function TMtoLL() converts Transverse Mercator projection (easting and
-  * northing) coordinates to geodetic (latitude and longitude) coordinates, 
+  * northing) coordinates to geodetic (latitude and longitude) coordinates,
   * according to the current ellipsoid and Transverse Mercator projection
   * parameters.
   *
-  *   TMEastingMeter   : input Easting/X in meters 
+  *   TMEastingMeter   : input Easting/X in meters
   *   TMNorthingMeter  : input Northing/Y in meters
   *   LatDegree        : output Latitude in decimal degrees
   *   LongDegree       : output Longitude in decimal degrees
@@ -6015,7 +6022,7 @@ bool GeoProjectionConverter::TMtoLL(const double TMEastingMeter, const double TM
   tmdo = SPHTMD(tm->tm_lat_origin_radian);
 
   /*  Origin  */
-  tmd = tmdo + (TMNorthingMeter - tm->tm_false_northing_meter) / tm->tm_scale_factor; 
+  tmd = tmdo + (TMNorthingMeter - tm->tm_false_northing_meter) / tm->tm_scale_factor;
 
   /* First Estimate */
   sr = SPHSR(0.e0);
@@ -6054,31 +6061,31 @@ bool GeoProjectionConverter::TMtoLL(const double TMEastingMeter, const double TM
   double Latitude;
   t10 = t / (2.e0 * sr * sn * pow(tm->tm_scale_factor, 2));
   t11 = t * (5.e0  + 3.e0 * tan2 + eta - 4.e0 * pow(eta,2)
-            - 9.e0 * tan2 * eta) / (24.e0 * sr * pow(sn,3) 
+            - 9.e0 * tan2 * eta) / (24.e0 * sr * pow(sn,3)
                                     * pow(tm->tm_scale_factor,4));
   t12 = t * (61.e0 + 90.e0 * tan2 + 46.e0 * eta + 45.E0 * tan4
-            - 252.e0 * tan2 * eta  - 3.e0 * eta2 + 100.e0 
+            - 252.e0 * tan2 * eta  - 3.e0 * eta2 + 100.e0
             * eta3 - 66.e0 * tan2 * eta2 - 90.e0 * tan4
             * eta + 88.e0 * eta4 + 225.e0 * tan4 * eta2
             + 84.e0 * tan2* eta3 - 192.e0 * tan2 * eta4)
        / ( 720.e0 * sr * pow(sn,5) * pow(tm->tm_scale_factor, 6) );
-  t13 = t * ( 1385.e0 + 3633.e0 * tan2 + 4095.e0 * tan4 + 1575.e0 
+  t13 = t * ( 1385.e0 + 3633.e0 * tan2 + 4095.e0 * tan4 + 1575.e0
              * pow(t,6))/ (40320.e0 * sr * pow(sn,7) * pow(tm->tm_scale_factor,8));
   Latitude = ftphi - pow(de,2) * t10 + pow(de,4) * t11 - pow(de,6) * t12 + pow(de,8) * t13;
 
   t14 = 1.e0 / (sn * c * tm->tm_scale_factor);
 
-  t15 = (1.e0 + 2.e0 * tan2 + eta) / (6.e0 * pow(sn,3) * c * 
+  t15 = (1.e0 + 2.e0 * tan2 + eta) / (6.e0 * pow(sn,3) * c *
                                      pow(tm->tm_scale_factor,3));
 
   t16 = (5.e0 + 6.e0 * eta + 28.e0 * tan2 - 3.e0 * eta2
-        + 8.e0 * tan2 * eta + 24.e0 * tan4 - 4.e0 
-        * eta3 + 4.e0 * tan2 * eta2 + 24.e0 
-        * tan2 * eta3) / (120.e0 * pow(sn,5) * c  
+        + 8.e0 * tan2 * eta + 24.e0 * tan4 - 4.e0
+        * eta3 + 4.e0 * tan2 * eta2 + 24.e0
+        * tan2 * eta3) / (120.e0 * pow(sn,5) * c
                           * pow(tm->tm_scale_factor,5));
 
-  t17 = (61.e0 +  662.e0 * tan2 + 1320.e0 * tan4 + 720.e0 
-        * pow(t,6)) / (5040.e0 * pow(sn,7) * c 
+  t17 = (61.e0 +  662.e0 * tan2 + 1320.e0 * tan4 + 720.e0
+        * pow(t,6)) / (5040.e0 * pow(sn,7) * c
                        * pow(tm->tm_scale_factor,7));
 
   /* Difference in Longitude */
@@ -6117,9 +6124,9 @@ bool GeoProjectionConverter::TMtoLL(const double TMEastingMeter, const double TM
   * (ECEF)coordinates to geodetic (latitude and longitude) coordinates on
   * the provided ellipsoid
   *
-  *   ECEFMeterX       : input X coordinate in meters 
-  *   ECEFMeterY       : input Y coordinate in meters 
-  *   ECEFMeterZ       : input Z coordinate in meters 
+  *   ECEFMeterX       : input X coordinate in meters
+  *   ECEFMeterY       : input Y coordinate in meters
+  *   ECEFMeterZ       : input Z coordinate in meters
   *   LatDegree        : output Latitude in decimal degrees
   *   LongDegree       : output Longitude in decimal degrees
   *   ElevationMeter   : output Elevation in meters
@@ -6245,7 +6252,7 @@ bool GeoProjectionConverter::ECEFtoLL(const double ECEFMeterX, const double ECEF
  */
   ElevationMeter = (r - A*t)*cos( LatDegree ) + (z - B)*sin( LatDegree );
 /*
- *   6.0 compute longitude 
+ *   6.0 compute longitude
  */
   zlong = atan2( y, x );
 
@@ -6267,9 +6274,9 @@ bool GeoProjectionConverter::ECEFtoLL(const double ECEFMeterX, const double ECEF
   *   LatDegree        : input Latitude in decimal degrees
   *   LongDegree       : input Longitude in decimal degrees
   *   ElevationMeter   : input Elevation in meters
-  *   ECEFMeterX       : output X coordinate in meters 
-  *   ECEFMeterY       : output Y coordinate in meters 
-  *   ECEFMeterZ       : output Z coordinate in meters 
+  *   ECEFMeterX       : output X coordinate in meters
+  *   ECEFMeterY       : output Y coordinate in meters
+  *   ECEFMeterZ       : output Z coordinate in meters
   *
   * adapted from code by Craig Larrimore (Craig.Larrimore@noaa.gov) and C. Goad
 */
@@ -6361,10 +6368,10 @@ bool GeoProjectionConverter::LLtoECEF(const double LatDegree, const double LongD
 /*
   * The function AEACtoLL() converts Albers Equal Area Conic projection
   * (easting and northing) coordinates to Geodetic (latitude and longitude)
-  * coordinates, according to the current ellipsoid and Albers Equal Area 
+  * coordinates, according to the current ellipsoid and Albers Equal Area
   * Conic projection parameters.
   *
-  *   AEACEastingMeter  : input Easting/X in meters 
+  *   AEACEastingMeter  : input Easting/X in meters
   *   AEACNorthingMeter : input Northing/Y in meters
   *   LatDegree         : output Latitude in decimal degrees
   *   LongDegree        : output Longitude in decimal degrees
@@ -6392,7 +6399,7 @@ bool GeoProjectionConverter::AEACtoLL(const double AEACEastingMeter, const doubl
   }
 
   if ((AEACNorthingMeter < (aeac->aeac_false_northing_meter - Albers_Delta_Northing)) || (AEACNorthingMeter > aeac->aeac_false_northing_meter + Albers_Delta_Northing))
-  { 
+  {
     return false; /* Northing out of range */
   }
 
@@ -6461,7 +6468,7 @@ bool GeoProjectionConverter::AEACtoLL(const double AEACEastingMeter, const doubl
     else
       LatDegree = -PI_OVER_2;
   }
-  
+
   LongDegree = aeac->aeac_longitude_of_center_radian + theta / aeac->aeac_n;
 
   if (LongDegree > PI)
@@ -6484,11 +6491,11 @@ bool GeoProjectionConverter::AEACtoLL(const double AEACEastingMeter, const doubl
   * The function LLtoAEAC() converts Geodetic (latitude and longitude)
   * coordinates to Albers Equal Area Conic projection (easting and
   * northing) coordinates, according to the current ellipsoid and
-  * Albers Equal Area Conic projection parameters. 
+  * Albers Equal Area Conic projection parameters.
   *
   *   LatDegree         : input Latitude in decimal degrees
   *   LongDegree        : input Longitude in decimal degrees
-  *   AEACEastingMeter  : output Easting/X in meters 
+  *   AEACEastingMeter  : output Easting/X in meters
   *   AEACNorthingMeter : output Northing/Y in meters
   *
   * adapted from ALBERS code of U.S. Army Topographic Engineering Center
@@ -6544,10 +6551,10 @@ bool GeoProjectionConverter::LLtoAEAC(const double LatDegree, const double LongD
 /*
   * The function HOMtoLL() converts the Hotine Oblique Mercator projection
   * (easting and northing) coordinates to Geodetic (latitude and longitude)
-  * coordinates, according to the current ellipsoid and Oblique Mercator 
+  * coordinates, according to the current ellipsoid and Oblique Mercator
   * projection parameters.
   *
-  *   HOMEastingMeter    : input Easting/X in meters 
+  *   HOMEastingMeter    : input Easting/X in meters
   *   HOMNorthingMeter   : input Northing/Y in meters
   *   LatDegree         : output Latitude in decimal degrees
   *   LongDegree        : output Longitude in decimal degrees
@@ -6562,11 +6569,11 @@ bool GeoProjectionConverter::HOMtoLL(const double OMEastingMeter, const double O
   * The function LLtoHOM() converts Geodetic (latitude and longitude)
   * coordinates to the Hotine Oblique Mercator projection (easting and
   * northing) coordinates, according to the current ellipsoid and
-  * Oblique Mercator projection parameters. 
+  * Oblique Mercator projection parameters.
   *
   *   LatDegree         : input Latitude in decimal degrees
   *   LongDegree        : input Longitude in decimal degrees
-  *   HOMEastingMeter    : output Easting/X in meters 
+  *   HOMEastingMeter    : output Easting/X in meters
   *   HOMNorthingMeter   : output Northing/Y in meters
   *
 */
@@ -6581,7 +6588,7 @@ bool GeoProjectionConverter::LLtoHOM(const double LatDegree, const double LongDe
   * coordinates, according to the current ellipsoid and Oblique Stereographic
   * projection parameters.
   *
-  *   OSEastingMeter    : input Easting/X in meters 
+  *   OSEastingMeter    : input Easting/X in meters
   *   OSNorthingMeter   : input Northing/Y in meters
   *   LatDegree         : output Latitude in decimal degrees
   *   LongDegree        : output Longitude in decimal degrees
@@ -6640,11 +6647,11 @@ bool GeoProjectionConverter::OStoLL(const double OSEastingMeter, const double OS
   * The function LLtoOS() converts Geodetic (latitude and longitude)
   * coordinates to the Oblique Stereographic projection (easting and
   * northing) coordinates, according to the current ellipsoid and
-  * Oblique Stereographic projection parameters. 
+  * Oblique Stereographic projection parameters.
   *
   *   LatDegree         : input Latitude in decimal degrees
   *   LongDegree        : input Longitude in decimal degrees
-  *   OSEastingMeter    : output Easting/X in meters 
+  *   OSEastingMeter    : output Easting/X in meters
   *   OSNorthingMeter   : output Northing/Y in meters
   *
   * formulas from "Oblique Stereographic Alternative" by Gerald Evenden and Rueben Schulz
@@ -6693,7 +6700,7 @@ GeoProjectionConverter::GeoProjectionConverter()
   elevation_units_set[1] = false;
   elevation2meter = 1.0;
   meter2elevation = 1.0;
- 
+
   target_precision = 0;
   target_elevation_precision = 0;
 
@@ -6714,7 +6721,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
   char tmp[256];
 
   if (argv_zero) free(argv_zero);
-  argv_zero = _strdup(argv[0]);
+  argv_zero = LASCopyString(argv[0]);
 
   for (i = 1; i < argc; i++)
   {
@@ -6825,7 +6832,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         vertical_geokey = GEO_VERTICAL_NAVD88;
         if (strcmp(argv[i] + 16,"") == 0)
         {
-          vertical_geoid = 0; // none 
+          vertical_geoid = 0; // none
         }
         else if (strcmp(argv[i] + 16,"_geoid12b") == 0)
         {
@@ -7766,7 +7773,7 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
   {
     if (ellipsoid->id == GEO_ELLIPSOID_WGS84)
     {
-      *psDatumame = _strdup("NAD27");
+      *psDatumame = LASCopyString("NAD27");
 
         if (utm->utm_northern_hemisphere)
         {
@@ -7919,7 +7926,7 @@ bool GeoProjectionConverter::get_img_projection_parameters(char** proName, int* 
     {
       *proNumber = 0;
     }
-    else if (projection->type == 
+    else if (projection->type ==
   }
   else if ()
   {
@@ -8527,7 +8534,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   *
   * REUSE NOTES
   *
-  *    OBLIQUE MERCATOR is intended for reuse by any application that 
+  *    OBLIQUE MERCATOR is intended for reuse by any application that
   *    performs an Oblique Mercator projection or its inverse.
   *
   * REFERENCES
@@ -8560,14 +8567,14 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   *    ----              -----------
   *    06-07-00          Original Code
   *    03-02-07          Original C++ Code
-  *    
+  *
   *
   */
- 
- 
+
+
  #include "CoordinateSystem.h"
- 
- 
+
+
  namespace MSP
  {
    namespace CCS
@@ -8575,21 +8582,21 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
      class ObliqueMercatorParameters;
      class MapProjectionCoordinates;
      class GeodeticCoordinates;
- 
- 
+
+
      /***************************************************************************/
      /*
       *                              DEFINES
       */
- 
+
      class ObliqueMercator : public CoordinateSystem
      {
      public:
- 
+
        /*
         * The constructor receives the ellipsoid parameters and
         * projection parameters as inputs, and sets the corresponding state
-        * variables.  If any errors occur, an exception is thrown with a description 
+        * variables.  If any errors occur, an exception is thrown with a description
         * of the error.
         *
         *    ellipsoidSemiMajorAxis   : Semi-major axis of ellipsoid, in meters  (input)
@@ -8611,21 +8618,21 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
         *    scaleFactor              : Multiplier which reduces distances in the
         *                               projection to the actual distance on the
         *                               ellipsoid                                (input)
-        *    errorStatus              : Error status                             (output) 
+        *    errorStatus              : Error status                             (output)
         */
- 
+
          ObliqueMercator( double ellipsoidSemiMajorAxis, double ellipsoidFlattening, double originLatitude, double longitude1, double latitude1, double longitude2, double latitude2, double falseEasting, double falseNorthing, double scaleFactor );
- 
- 
+
+
        ObliqueMercator( const ObliqueMercator &om );
- 
- 
+
+
          ~ObliqueMercator( void );
- 
- 
+
+
        ObliqueMercator& operator=( const ObliqueMercator &om );
- 
- 
+
+
        /*
         * The function getParameters returns the current ellipsoid
         * parameters and Oblique Mercator projection parameters.
@@ -8650,15 +8657,15 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
         *                              projection to the actual distance on the
         *                              ellipsoid                              (output)
         */
- 
+
        ObliqueMercatorParameters* getParameters() const;
- 
- 
+
+
        /*
         * The function convertFromGeodetic converts geodetic (latitude and
         * longitude) coordinates to Oblique Mercator projection (easting and
-        * northing) coordinates, according to the current ellipsoid and Oblique Mercator 
-        * projection parameters.  If any errors occur, an exception is thrown with a description 
+        * northing) coordinates, according to the current ellipsoid and Oblique Mercator
+        * projection parameters.  If any errors occur, an exception is thrown with a description
         * of the error.
         *
         *    longitude         : Longitude (lambda), in radians       (input)
@@ -8666,15 +8673,15 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
         *    easting           : Easting (X), in meters               (output)
         *    northing          : Northing (Y), in meters              (output)
         */
- 
+
        MSP::CCS::MapProjectionCoordinates* convertFromGeodetic( MSP::CCS::GeodeticCoordinates* geodeticCoordinates );
- 
- 
+
+
        /*
         * The function convertToGeodetic converts Oblique Mercator projection
         * (easting and northing) coordinates to geodetic (latitude and longitude)
         * coordinates, according to the current ellipsoid and Oblique Mercator projection
-        * coordinates.  If any errors occur, an exception is thrown with a description 
+        * coordinates.  If any errors occur, an exception is thrown with a description
         * of the error.
         *
         *    easting           : Easting (X), in meters                  (input)
@@ -8682,11 +8689,11 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
         *    longitude         : Longitude (lambda), in radians          (output)
         *    latitude          : Latitude (phi), in radians              (output)
         */
- 
+
        MSP::CCS::GeodeticCoordinates* convertToGeodetic( MSP::CCS::MapProjectionCoordinates* mapProjectionCoordinates );
- 
+
      private:
-     
+
        /* Ellipsoid Parameters, default to WGS 84 */
        double es;
        double es_OVER_2;
@@ -8698,7 +8705,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
        double OMerc_Origin_Long;                 /* Longitude at center of projection */
        double cos_gamma;
        double sin_gamma;
-       double sin_azimuth;  
+       double sin_azimuth;
        double cos_azimuth;
        double A_over_B;
        double B_over_A;
@@ -8713,13 +8720,13 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
        double OMerc_Scale_Factor;                /* Scale factor at projection center */
        double OMerc_False_Northing;              /* False northing, in meters, at projection center */
        double OMerc_False_Easting;               /* False easting, in meters, at projection center */
- 
+
        double OMerc_Delta_Northing;
        double OMerc_Delta_Easting;
- 
- 
+
+
        double omercT( double lat, double e_sinlat, double e_over_2 );
- 
+
      };
    }
  }
@@ -8776,7 +8783,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   *
   * REUSE NOTES
   *
-  *    OBLIQUE MERCATOR is intended for reuse by any application that 
+  *    OBLIQUE MERCATOR is intended for reuse by any application that
   *    performs an Oblique Mercator projection or its inverse.
   *
   * REFERENCES
@@ -8812,13 +8819,13 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   *    05-11-11          BAEts28017 - Fix Oblique Mercator near poles
   *
   */
- 
- 
+
+
  /***************************************************************************/
  /*
   *                               INCLUDES
   */
- 
+
  #include <math.h>
  #include "ObliqueMercator.h"
  #include "ObliqueMercatorParameters.h"
@@ -8827,7 +8834,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
  #include "CoordinateConversionException.h"
  #include "ErrorMessages.h"
  #include "WarningMessages.h"
- 
+
  /*
   *    math.h     - Standard C math library
   *    ObliqueMercator.h   - Is for prototype error checking
@@ -8837,29 +8844,29 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   *    ErrorMessages.h  - Contains exception messages
   *    WarningMessages.h  - Contains warning messages
   */
- 
- 
+
+
  using namespace MSP::CCS;
- 
- 
+
+
  /***************************************************************************/
- /*                               DEFINES 
+ /*                               DEFINES
   *
   */
- 
+
  const double PI = 3.14159265358979323e0;  /* PI                            */
- const double PI_OVER_2 = ( PI / 2.0);                 
- const double PI_OVER_4 = ( PI / 4.0);                 
- const double TWO_PI = ( 2.0 * PI);                 
+ const double PI_OVER_2 = ( PI / 2.0);
+ const double PI_OVER_4 = ( PI / 4.0);
+ const double TWO_PI = ( 2.0 * PI);
  const double MIN_SCALE_FACTOR = 0.3;
  const double MAX_SCALE_FACTOR = 3.0;
- 
- 
+
+
  /************************************************************************/
- /*                              FUNCTIONS     
+ /*                              FUNCTIONS
   *
   */
- 
+
  ObliqueMercator::ObliqueMercator( double ellipsoidSemiMajorAxis, double ellipsoidFlattening, double originLatitude, double longitude1, double latitude1, double longitude2, double latitude2, double falseEasting, double falseNorthing, double scaleFactor ) :
    CoordinateSystem(),
    es( 0.08181919084262188000 ),
@@ -8872,7 +8879,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
    OMerc_Origin_Long( -.46732023406900 ),
    cos_gamma( .91428423352628 ),
    sin_gamma( .40507325303611 ),
-   sin_azimuth( .57237890829911 ),  
+   sin_azimuth( .57237890829911 ),
    cos_azimuth( .81998925927985 ),
    A_over_B( 6378101.0302010 ),
    B_over_A( 1.5678647849335e-7 ),
@@ -8891,7 +8898,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
  /*
   * The constructor receives the ellipsoid parameters and
   * projection parameters as inputs, and sets the corresponding state
-  * variables.  If any errors occur, an exception is thrown with a description 
+  * variables.  If any errors occur, an exception is thrown with a description
   * of the error.
   *
   *    ellipsoidSemiMajorAxis   : Semi-major axis of ellipsoid, in meters  (input)
@@ -8914,7 +8921,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   *                               projection to the actual distance on the
   *                               ellipsoid                                (input)
   */
- 
+
    double inv_f = 1 / ellipsoidFlattening;
    double es2, one_MINUS_es2;
    double cos_olat, cos_olat2;
@@ -8925,7 +8932,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
    double E2;
    double F, G, J, P;
    double dlon;
- 
+
    if (ellipsoidSemiMajorAxis <= 0.0)
    { /* Semi-major axis must be greater than zero */
      throw CoordinateConversionException( ErrorMessages::semiMajorAxis );
@@ -8971,10 +8978,10 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
    { /* scale factor out of range */
      throw CoordinateConversionException( ErrorMessages::scaleFactor );
    }
- 
+
    semiMajorAxis = ellipsoidSemiMajorAxis;
    flattening = ellipsoidFlattening;
- 
+
    OMerc_Origin_Lat = originLatitude;
    OMerc_Lon_1 = longitude1;
    OMerc_Lat_1 = latitude1;
@@ -8983,28 +8990,28 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
    OMerc_False_Northing = falseNorthing;
    OMerc_False_Easting = falseEasting;
    OMerc_Scale_Factor = scaleFactor;
- 
+
    es2 = 2 * flattening - flattening * flattening;
    es = sqrt(es2);
    one_MINUS_es2 = 1 - es2;
    es_OVER_2 = es / 2.0;
- 
+
    cos_olat = cos(OMerc_Origin_Lat);
    cos_olat2 = cos_olat * cos_olat;
    sin_olat = sin(OMerc_Origin_Lat);
    sin_olat2 = sin_olat * sin_olat;
    es2_sin_olat2 = es2 * sin_olat2;
- 
+
    OMerc_B = sqrt(1 + (es2 * cos_olat2 * cos_olat2) / one_MINUS_es2);
-   OMerc_A = (semiMajorAxis * OMerc_B * OMerc_Scale_Factor * sqrt(one_MINUS_es2)) / (1.0 - es2_sin_olat2);  
+   OMerc_A = (semiMajorAxis * OMerc_B * OMerc_Scale_Factor * sqrt(one_MINUS_es2)) / (1.0 - es2_sin_olat2);
    A_over_B = OMerc_A / OMerc_B;
    B_over_A = OMerc_B / OMerc_A;
- 
+
    t0 = omercT(OMerc_Origin_Lat, es * sin_olat, es_OVER_2);
-   t1 = omercT(OMerc_Lat_1, es * sin(OMerc_Lat_1), es_OVER_2);  
-   t2 = omercT(OMerc_Lat_2, es * sin(OMerc_Lat_2), es_OVER_2);  
- 
-   D = (OMerc_B * sqrt(one_MINUS_es2)) / (cos_olat * sqrt(1.0 - es2_sin_olat2)); 
+   t1 = omercT(OMerc_Lat_1, es * sin(OMerc_Lat_1), es_OVER_2);
+   t2 = omercT(OMerc_Lat_2, es * sin(OMerc_Lat_2), es_OVER_2);
+
+   D = (OMerc_B * sqrt(one_MINUS_es2)) / (cos_olat * sqrt(1.0 - es2_sin_olat2));
    D2 = D * D;
    if (D2 < 1.0)
      D2 = 1.0;
@@ -9027,7 +9034,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
    LH = L * H;
    J = (E2 - LH) / (E2 + LH);
    P = (L - H) / (L + H);
- 
+
    dlon = OMerc_Lon_1 - OMerc_Lon_2;
    if (dlon < -PI )
      OMerc_Lon_2 -= TWO_PI;
@@ -9035,103 +9042,103 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
      OMerc_Lon_2 += TWO_PI;
    dlon = OMerc_Lon_1 - OMerc_Lon_2;
    OMerc_Origin_Long = (OMerc_Lon_1 + OMerc_Lon_2) / 2.0 - (atan(J * tan(OMerc_B * dlon / 2.0) / P)) / OMerc_B;
- 
+
    dlon = OMerc_Lon_1 - OMerc_Origin_Long;
    if (dlon < -PI )
      OMerc_Origin_Long -= TWO_PI;
    if (dlon > PI)
      OMerc_Origin_Long += TWO_PI;
-  
+
    dlon = OMerc_Lon_1 - OMerc_Origin_Long;
    OMerc_gamma = atan(sin(OMerc_B * dlon) / G);
    cos_gamma = cos(OMerc_gamma);
    sin_gamma = sin(OMerc_gamma);
- 
+
    OMerc_azimuth = asin(D * sin_gamma);
    cos_azimuth = cos(OMerc_azimuth);
    sin_azimuth = sin(OMerc_azimuth);
- 
+
    if (OMerc_Origin_Lat >= 0)
      OMerc_u =  A_over_B * atan(sqrt_D2_MINUS_1/cos_azimuth);
    else
      OMerc_u = -A_over_B * atan(sqrt_D2_MINUS_1/cos_azimuth);
  }
- 
- 
+
+
  ObliqueMercator::ObliqueMercator( const ObliqueMercator &om )
  {
    semiMajorAxis = om.semiMajorAxis;
    flattening = om.flattening;
-   es = om.es;     
-   es_OVER_2 = om.es_OVER_2;     
-   OMerc_A = om.OMerc_A;     
-   OMerc_B = om.OMerc_B;     
-   OMerc_E = om.OMerc_E;     
-   OMerc_gamma = om.OMerc_gamma; 
-   OMerc_azimuth = om.OMerc_azimuth; 
-   OMerc_Origin_Long = om.OMerc_Origin_Long; 
-   cos_gamma = om.cos_gamma; 
-   sin_gamma = om.sin_gamma; 
-   sin_azimuth = om.sin_azimuth; 
-   cos_azimuth = om.cos_azimuth; 
-   A_over_B = om.A_over_B; 
-   B_over_A = om.B_over_A; 
-   OMerc_u = om.OMerc_u; 
-   OMerc_Origin_Lat = om.OMerc_Origin_Lat; 
-   OMerc_Lon_1 = om.OMerc_Lon_1; 
-   OMerc_Lat_1 = om.OMerc_Lat_1; 
-   OMerc_Lon_2 = om.OMerc_Lon_2; 
-   OMerc_Lat_2 = om.OMerc_Lat_2; 
-   OMerc_False_Easting = om.OMerc_False_Easting; 
-   OMerc_False_Northing = om.OMerc_False_Northing; 
-   OMerc_Scale_Factor = om.OMerc_Scale_Factor; 
-   OMerc_Delta_Northing = om.OMerc_Delta_Northing; 
-   OMerc_Delta_Easting = om.OMerc_Delta_Easting; 
+   es = om.es;
+   es_OVER_2 = om.es_OVER_2;
+   OMerc_A = om.OMerc_A;
+   OMerc_B = om.OMerc_B;
+   OMerc_E = om.OMerc_E;
+   OMerc_gamma = om.OMerc_gamma;
+   OMerc_azimuth = om.OMerc_azimuth;
+   OMerc_Origin_Long = om.OMerc_Origin_Long;
+   cos_gamma = om.cos_gamma;
+   sin_gamma = om.sin_gamma;
+   sin_azimuth = om.sin_azimuth;
+   cos_azimuth = om.cos_azimuth;
+   A_over_B = om.A_over_B;
+   B_over_A = om.B_over_A;
+   OMerc_u = om.OMerc_u;
+   OMerc_Origin_Lat = om.OMerc_Origin_Lat;
+   OMerc_Lon_1 = om.OMerc_Lon_1;
+   OMerc_Lat_1 = om.OMerc_Lat_1;
+   OMerc_Lon_2 = om.OMerc_Lon_2;
+   OMerc_Lat_2 = om.OMerc_Lat_2;
+   OMerc_False_Easting = om.OMerc_False_Easting;
+   OMerc_False_Northing = om.OMerc_False_Northing;
+   OMerc_Scale_Factor = om.OMerc_Scale_Factor;
+   OMerc_Delta_Northing = om.OMerc_Delta_Northing;
+   OMerc_Delta_Easting = om.OMerc_Delta_Easting;
  }
- 
- 
+
+
  ObliqueMercator::~ObliqueMercator()
  {
  }
- 
- 
+
+
  ObliqueMercator& ObliqueMercator::operator=( const ObliqueMercator &om )
  {
    if( this != &om )
    {
      semiMajorAxis = om.semiMajorAxis;
      flattening = om.flattening;
-     es = om.es;     
-     es_OVER_2 = om.es_OVER_2;     
-     OMerc_A = om.OMerc_A;     
-     OMerc_B = om.OMerc_B;     
-     OMerc_E = om.OMerc_E;     
-     OMerc_gamma = om.OMerc_gamma; 
-     OMerc_azimuth = om.OMerc_azimuth; 
-     OMerc_Origin_Long = om.OMerc_Origin_Long; 
-     cos_gamma = om.cos_gamma; 
-     sin_gamma = om.sin_gamma; 
-     sin_azimuth = om.sin_azimuth; 
-     cos_azimuth = om.cos_azimuth; 
-     A_over_B = om.A_over_B; 
-     B_over_A = om.B_over_A; 
-     OMerc_u = om.OMerc_u; 
-     OMerc_Origin_Lat = om.OMerc_Origin_Lat; 
-     OMerc_Lon_1 = om.OMerc_Lon_1; 
-     OMerc_Lat_1 = om.OMerc_Lat_1; 
-     OMerc_Lon_2 = om.OMerc_Lon_2; 
-     OMerc_Lat_2 = om.OMerc_Lat_2; 
-     OMerc_False_Easting = om.OMerc_False_Easting; 
-     OMerc_False_Northing = om.OMerc_False_Northing; 
-     OMerc_Scale_Factor = om.OMerc_Scale_Factor; 
-     OMerc_Delta_Northing = om.OMerc_Delta_Northing; 
-     OMerc_Delta_Easting = om.OMerc_Delta_Easting; 
+     es = om.es;
+     es_OVER_2 = om.es_OVER_2;
+     OMerc_A = om.OMerc_A;
+     OMerc_B = om.OMerc_B;
+     OMerc_E = om.OMerc_E;
+     OMerc_gamma = om.OMerc_gamma;
+     OMerc_azimuth = om.OMerc_azimuth;
+     OMerc_Origin_Long = om.OMerc_Origin_Long;
+     cos_gamma = om.cos_gamma;
+     sin_gamma = om.sin_gamma;
+     sin_azimuth = om.sin_azimuth;
+     cos_azimuth = om.cos_azimuth;
+     A_over_B = om.A_over_B;
+     B_over_A = om.B_over_A;
+     OMerc_u = om.OMerc_u;
+     OMerc_Origin_Lat = om.OMerc_Origin_Lat;
+     OMerc_Lon_1 = om.OMerc_Lon_1;
+     OMerc_Lat_1 = om.OMerc_Lat_1;
+     OMerc_Lon_2 = om.OMerc_Lon_2;
+     OMerc_Lat_2 = om.OMerc_Lat_2;
+     OMerc_False_Easting = om.OMerc_False_Easting;
+     OMerc_False_Northing = om.OMerc_False_Northing;
+     OMerc_Scale_Factor = om.OMerc_Scale_Factor;
+     OMerc_Delta_Northing = om.OMerc_Delta_Northing;
+     OMerc_Delta_Easting = om.OMerc_Delta_Easting;
    }
- 
+
    return *this;
  }
- 
- 
+
+
  ObliqueMercatorParameters* ObliqueMercator::getParameters() const
  {
  /*
@@ -9158,18 +9165,18 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   *                              projection to the actual distance on the
   *                              ellipsoid                              (output)
   */
- 
+
    return new ObliqueMercatorParameters( CoordinateType::obliqueMercator, OMerc_Origin_Lat, OMerc_Lon_1, OMerc_Lat_1, OMerc_Lon_2, OMerc_Lat_2, OMerc_False_Easting, OMerc_False_Northing, OMerc_Scale_Factor );
  }
- 
- 
+
+
  MSP::CCS::MapProjectionCoordinates* ObliqueMercator::convertFromGeodetic( MSP::CCS::GeodeticCoordinates* geodeticCoordinates )
  {
  /*
   * The function convertFromGeodetic converts geodetic (latitude and
   * longitude) coordinates to Oblique Mercator projection (easting and
-  * northing) coordinates, according to the current ellipsoid and Oblique Mercator 
-  * projection parameters.  If any errors occur, an exception is thrown with a description 
+  * northing) coordinates, according to the current ellipsoid and Oblique Mercator
+  * projection parameters.  If any errors occur, an exception is thrown with a description
   * of the error.
   *
   *    longitude         : Longitude (lambda), in radians       (input)
@@ -9177,7 +9184,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   *    easting           : Easting (X), in meters               (output)
   *    northing          : Northing (Y), in meters              (output)
   */
- 
+
    double dlam, B_dlam, cos_B_dlam;
    double t, S, T, V, U;
    double Q, Q_inv;
@@ -9185,10 +9192,10 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
    /* Natural origin*/
    double v = 0;
    double u = 0;
- 
+
    double longitude = geodeticCoordinates->longitude();
    double latitude = geodeticCoordinates->latitude();
- 
+
    if ((latitude < -PI_OVER_2) || (latitude > PI_OVER_2))
    { /* Latitude out of range */
      throw CoordinateConversionException( ErrorMessages::latitude );
@@ -9197,16 +9204,16 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
    { /* Longitude out of range */
      throw CoordinateConversionException( ErrorMessages::longitude );
    }
- 
+
    dlam = longitude - OMerc_Origin_Long;
- 
+
    char warning[256];
    warning[0] = '\0';
    if (fabs(dlam) >= PI_OVER_2)
    { /* Distortion will result if Longitude is 90 degrees or more from the Central Meridian */
      strcat( warning, MSP::CCS::WarningMessages::longitude );
    }
- 
+
    if (dlam > PI)
    {
      dlam -= TWO_PI;
@@ -9215,10 +9222,10 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
    {
      dlam += TWO_PI;
    }
- 
+
    if (fabs(fabs(latitude) - PI_OVER_2) > 1.0e-10)
    {
-     t = omercT(latitude, es * sin(latitude), es_OVER_2);  
+     t = omercT(latitude, es * sin(latitude), es_OVER_2);
      Q = OMerc_E / pow(t, OMerc_B);
      Q_inv = 1.0 / Q;
      S = (Q - Q_inv) / 2.0;
@@ -9257,25 +9264,25 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
        v = A_over_B * log(tan(PI_OVER_4 + (OMerc_gamma / 2.0)));
      u = A_over_B * latitude;
    }
- 
- 
+
+
    u = u - OMerc_u;
- 
+
    double easting = OMerc_False_Easting + v * cos_azimuth + u * sin_azimuth;
    double northing = OMerc_False_Northing + u * cos_azimuth - v * sin_azimuth;
- 
+
    return new MapProjectionCoordinates(
       CoordinateType::obliqueMercator, warning, easting, northing );
  }
- 
- 
+
+
  MSP::CCS::GeodeticCoordinates* ObliqueMercator::convertToGeodetic( MSP::CCS::MapProjectionCoordinates* mapProjectionCoordinates )
  {
  /*
   * The function convertToGeodetic converts Oblique Mercator projection
   * (easting and northing) coordinates to geodetic (latitude and longitude)
   * coordinates, according to the current ellipsoid and Oblique Mercator projection
-  * coordinates.  If any errors occur, an exception is thrown with a description 
+  * coordinates.  If any errors occur, an exception is thrown with a description
   * of the error.
   *
   *    easting           : Easting (X), in meters                  (input)
@@ -9283,7 +9290,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
   *    longitude         : Longitude (lambda), in radians          (output)
   *    latitude          : Latitude (phi), in radians              (output)
   */
- 
+
    double dx, dy;
    /* Coordinate axes defined with respect to the azimuth of the center line */
    /* Natural origin*/
@@ -9297,21 +9304,21 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
    double temp_phi = 0.0;
    int count = 60;
    double longitude, latitude;
- 
+
    double easting  = mapProjectionCoordinates->easting();
    double northing = mapProjectionCoordinates->northing();
- 
-   if ((easting < (OMerc_False_Easting - OMerc_Delta_Easting)) 
+
+   if ((easting < (OMerc_False_Easting - OMerc_Delta_Easting))
        || (easting > (OMerc_False_Easting + OMerc_Delta_Easting)))
    { /* Easting out of range  */
      throw CoordinateConversionException( ErrorMessages::easting );
    }
-   if ((northing < (OMerc_False_Northing - OMerc_Delta_Northing)) 
+   if ((northing < (OMerc_False_Northing - OMerc_Delta_Northing))
        || (northing > (OMerc_False_Northing + OMerc_Delta_Northing)))
    { /* Northing out of range */
      throw CoordinateConversionException( ErrorMessages::northing );
    }
- 
+
    dy = northing - OMerc_False_Northing;
    dx = easting - OMerc_False_Easting;
    v = dx * cos_azimuth - dy * sin_azimuth;
@@ -9343,48 +9350,48 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
        phi = PI_OVER_2 - 2.0 * atan(t * pow((1.0 - es_sin) / (1.0 + es_sin), es_OVER_2));
        count --;
      }
- 
+
      if(!count)
        throw CoordinateConversionException( ErrorMessages::northing );
- 
+
      latitude = phi;
      longitude = OMerc_Origin_Long - atan2((S_prime * cos_gamma - V_prime * sin_gamma), cos(u_B_over_A)) / OMerc_B;
    }
- 
+
    if (fabs(latitude) < 2.0e-7)  /* force lat to 0 to avoid -0 degrees */
      latitude = 0.0;
    if (latitude > PI_OVER_2)  /* force distorted values to 90, -90 degrees */
      latitude = PI_OVER_2;
    else if (latitude < -PI_OVER_2)
      latitude = -PI_OVER_2;
- 
+
    if (longitude > PI)
      longitude -= TWO_PI;
    if (longitude < -PI)
      longitude += TWO_PI;
- 
+
    if (fabs(longitude) < 2.0e-7)  /* force lon to 0 to avoid -0 degrees */
      longitude = 0.0;
    if (longitude > PI)  /* force distorted values to 180, -180 degrees */
      longitude = PI;
    else if (longitude < -PI)
      longitude = -PI;
- 
+
    char warning[256];
    warning[0] = '\0';
    if (fabs(longitude - OMerc_Origin_Long) >= PI_OVER_2)
    { /* Distortion results if Longitude > 90 degrees from the Central Meridian */
      strcat( warning, MSP::CCS::WarningMessages::longitude );
    }
- 
+
    return new GeodeticCoordinates(
       CoordinateType::geodetic, warning, longitude, latitude );
  }
- 
- 
+
+
  double ObliqueMercator::omercT( double lat, double e_sinlat, double e_over_2 )
- {  
+ {
    return (tan(PI_OVER_4 - lat / 2.0)) / (pow((1 - e_sinlat) / (1 + e_sinlat), e_over_2));
  }
- 
+
 #endif // NOT

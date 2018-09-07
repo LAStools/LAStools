@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  las2txt.cpp
-  
+
   CONTENTS:
-  
+
     This tool converts LIDAR data from the binary LAS format to a human
     readable ASCII format. The tool can create different formattings for
     the textual representation that are controlable via the 'parse' and
@@ -12,11 +12,11 @@
     beginning of the file each line preceeded by some comment symbol.
 
   PROGRAMMERS:
-  
+
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -25,23 +25,24 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
-    22 November 2017 -- parse attributes with indices > 9 by bracketing (12) them 
-    19 April 2017 -- 1st example for selective decompression for new LAS 1.4 points 
+
+     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
+    22 November 2017 -- parse attributes with indices > 9 by bracketing (12) them
+    19 April 2017 -- 1st example for selective decompression for new LAS 1.4 points
     11 January 2017 -- added with<h>eld and scanner channe<l> for the parse string
     24 April 2015 -- added 'k'eypoint and 'o'verlap flags for the parse string
-    30 March 2015 -- support LAS 1.4 extended return counts and number of returns 
+    30 March 2015 -- support LAS 1.4 extended return counts and number of returns
     25 October 2011 -- changed LAS 1.3 parsing to use new LASwaveform13reader
     17 May 2011 -- enabling batch processing with wildcards or multiple file names
     13 May 2011 -- moved indexing, filtering, transforming into LASreader
-    15 March 2011 -- added the 'E' option to place an '-extra STRING' 
-    26 January 2011 -- added the LAStransform to modify before output 
-     4 January 2011 -- added the LASfilter to drop or keep points 
+    15 March 2011 -- added the 'E' option to place an '-extra STRING'
+    26 January 2011 -- added the LAStransform to modify before output
+     4 January 2011 -- added the LASfilter to drop or keep points
      1 January 2011 -- added LAS 1.3 waveforms while homesick for Livermore
      1 December 2010 -- support output of raw unscaled XYZ coordinates
-    12 March 2009 -- updated to ask for input if started without arguments 
+    12 March 2009 -- updated to ask for input if started without arguments
     17 September 2008 -- updated to deal with LAS format version 1.2
     13 June 2007 -- added 'e' and 'd' for the parse string and fixed 'n'
      6 June 2007 -- added lidardouble2string() after Vinton Valentine's bug report
@@ -425,7 +426,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == '–') argv[i][0] = '-';
+      if (argv[i][0] == 'ï¿½') argv[i][0] = '-';
       if (strcmp(argv[i],"-opts") == 0)
       {
         opts = TRUE;
@@ -495,12 +496,12 @@ int main(int argc, char *argv[])
       }
       i++;
       if (parse_string) free(parse_string);
-      parse_string = _strdup(argv[i]);
+      parse_string = LASCopyString(argv[i]);
     }
     else if (strcmp(argv[i],"-parse_all") == 0)
     {
       if (parse_string) free(parse_string);
-      parse_string = _strdup("txyzirndecaup");
+      parse_string = LASCopyString("txyzirndecaup");
     }
     else if (strcmp(argv[i],"-extra") == 0)
     {
@@ -787,7 +788,7 @@ int main(int argc, char *argv[])
     LASheader* header = &(lasreader->header);
 
     // open output file
-  
+
     FILE* file_out;
 
     if (laswriteopener.is_piped())
@@ -796,7 +797,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      // create output file name if needed 
+      // create output file name if needed
 
       if (laswriteopener.get_file_name() == 0)
       {
@@ -839,11 +840,11 @@ int main(int argc, char *argv[])
           if (parse_string) free(parse_string);
           if (ptsVLR && (ptsVLR->record_length_after_header >= 32))
           {
-            parse_string = _strdup((CHAR*)(ptsVLR->data + 16));
+            parse_string = LASCopyString((CHAR*)(ptsVLR->data + 16));
           }
           else if (ptxVLR && (ptxVLR->record_length_after_header >= 32))
           {
-            parse_string = _strdup((CHAR*)(ptxVLR->data + 16));
+            parse_string = LASCopyString((CHAR*)(ptxVLR->data + 16));
           }
           else if (ptsVLR)
           {
@@ -890,7 +891,7 @@ int main(int argc, char *argv[])
         if ((parse_string == 0) || (strcmp(parse_string, "original") == 0))
         {
           if (parse_string) free(parse_string);
-          parse_string = _strdup((CHAR*)(payload + 16));
+          parse_string = LASCopyString((CHAR*)(payload + 16));
         }
         fprintf(file_out, "%u     \012", (U32)((I64*)payload)[4]); // ncols
         fprintf(file_out, "%u     \012", (U32)((I64*)payload)[5]); // nrows
@@ -973,7 +974,7 @@ int main(int argc, char *argv[])
 
     // maybe create default parse string
 
-    if (parse_string == 0) parse_string = _strdup("xyz");
+    if (parse_string == 0) parse_string = LASCopyString("xyz");
 
     // check requested fields and print warnings if attributes do not exist
 

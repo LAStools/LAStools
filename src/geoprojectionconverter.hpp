@@ -2,7 +2,7 @@
 ===============================================================================
 
   FILE:  geoprojectionconverter.hpp
-  
+
   CONTENTS:
 
     Easy conversion between horizontal datums: UTM coodinates, Transverse
@@ -12,7 +12,7 @@
 
     Converting between UTM coodinates and latitude / longitude coodinates
     adapted from code written by Chuck Gantz (chuck.gantz@globalstar.com)
-  
+
     Converting between Lambert Conformal Conic and latitude / longitude
     adapted from code written by Garrett Potts (gpotts@imagelinks.com)
 
@@ -32,14 +32,14 @@
     formulas from "Oblique Stereographic Alternative" by Gerald Evenden and Rueben Schulz
 
   PROGRAMMERS:
-  
+
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
     chuck.gantz@globalstar.com
     gpotts@imagelinks.com
     craig.larrimore@noaa.gov
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -48,13 +48,14 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
 
+     7 September 2018 -- introduced the LASCopyString macro to replace _strdup
     30 October 2017 -- '-vertical_evrf2007' for European Vertical Reference Frame 2007
      1 February 2017 -- set_projection_from_ogc_wkt() from EPSG code of OGC WKT string
      9 November 2016 -- support "user defined" AlbersEqualArea projection in GeoTIFF
-    30 July 2016 -- no more special handling for stateplanes. just parse for EPSG code 
+    30 July 2016 -- no more special handling for stateplanes. just parse for EPSG code
      9 January 2016 -- use GeographicTypeGeoKey not GeogGeodeticDatumGeoKey for custom
      2 January 2016 -- parse 'pcs.csv' file when unknown EPSG code is encountered
     28 June 2015 -- tried to add the Oblique Mercator projection (very incomplete)
@@ -62,7 +63,7 @@
      3 March 2015 -- LCC/TM custom projections write GeogGeodeticDatumGeoKey
     13 August 2014 -- added long overdue ECEF (geocentric) conversion
      8 February 2007 -- created after interviews with purdue and google
-  
+
 ===============================================================================
 */
 #ifndef GEO_PROJECTION_CONVERTER_HPP
@@ -395,7 +396,7 @@ public:
   bool to_lon_lat_ele(double* point) const;
   bool to_lon_lat_ele(const double* point, double& longitude, double& latitude, double& elevation_in_meter) const;
 
-  // from current projection to target projection 
+  // from current projection to target projection
 
   bool to_target(double* point) const;
   bool to_target(const double* point, double& x, double& y, double& elevation) const;
@@ -411,7 +412,7 @@ public:
 //  int get_img_projection_number(bool source=true) const;
   bool get_dtm_projection_parameters(short* horizontal_units, short* vertical_units, short* coordinate_system, short* coordinate_zone, short* horizontal_datum, short* vertical_datum, bool source=true);
   bool set_dtm_projection_parameters(short horizontal_units, short vertical_units, short coordinate_system, short coordinate_zone, short horizontal_datum, short vertical_datum, bool source=true);
-  
+
   // helps us to find the 'pcs.csv' file
   char* argv_zero;
 
