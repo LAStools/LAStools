@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  lasreader_txt.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
 
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasreader_txt.hpp"
@@ -92,7 +92,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     {
       I32 type = (attributes_data_types[i]-1)%10;
       I32 dim = (attributes_data_types[i]-1)/10 + 1;
-      try { 
+      try {
         LASattribute attribute(type, attribute_names[i], attribute_descriptions[i], dim);
         if (attribute_scales[i] != 1.0 || attribute_offsets[i] != 0.0)
         {
@@ -154,7 +154,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 #endif
   if (point_type)
   {
-    switch (point_type) 
+    switch (point_type)
     {
     case 1:
       header.point_data_record_length = 28;
@@ -255,7 +255,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
   point.init(&header, header.point_data_format, header.point_data_record_length, &header);
 
   // we do not know yet how many points to expect
-  
+
   npoints = 0;
 
   // should we perform an extra pass to fully populate the header
@@ -267,14 +267,14 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     char* parse_less;
     if (parse_string == 0)
     {
-      parse_less = _strdup("xyz");
+      parse_less = LASCopyString("xyz");
     }
     else
     {
-      parse_less = _strdup(parse_string);
+      parse_less = LASCopyString(parse_string);
       for (i = 0; i < (int)strlen(parse_string); i++)
       {
-        if (parse_less[i] != 'x' && parse_less[i] != 'y' && parse_less[i] != 'z' && parse_less[i] != 'r' && (parse_less[i] < '0' || parse_less[i] > '0')) 
+        if (parse_less[i] != 'x' && parse_less[i] != 'y' && parse_less[i] != 'z' && parse_less[i] != 'r' && (parse_less[i] < '0' || parse_less[i] > '0'))
         {
           parse_less[i] = 's';
         }
@@ -315,7 +315,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
       fprintf(stderr, "ERROR: could not parse any lines with '%s'\n", parse_less);
       fclose(file);
       file = 0;
-      free(parse_less);    
+      free(parse_less);
       return FALSE;
     }
 
@@ -405,9 +405,9 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     free(parse_less);
 
     // close the input file
-    
+
     fclose(file);
-    
+
     // populate scale and offset
 
     populate_scale_and_offset();
@@ -437,11 +437,11 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 
   if (parse_string == 0)
   {
-    this->parse_string = _strdup("xyz");
+    this->parse_string = LASCopyString("xyz");
   }
   else
   {
-    this->parse_string = _strdup(parse_string);
+    this->parse_string = LASCopyString(parse_string);
   }
 
   // skip lines if we have to
@@ -704,7 +704,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     this->parse_string = 0;
     return FALSE;
   }
-  
+
   if (!populated_header)
   {
     // init the bounding box that we will incrementally compute
@@ -805,17 +805,17 @@ void LASreaderTXT::add_attribute(I32 data_type, const char* name, const char* de
   attributes_data_types[number_attributes] = data_type;
   if (name)
   {
-    attribute_names[number_attributes] = _strdup(name);
+    attribute_names[number_attributes] = LASCopyString(name);
   }
   else
   {
     char temp[32];
     sprintf(temp, "attribute %d", number_attributes);
-    attribute_names[number_attributes] = _strdup(temp);
+    attribute_names[number_attributes] = LASCopyString(temp);
   }
   if (description)
   {
-    attribute_descriptions[number_attributes] = _strdup(description);
+    attribute_descriptions[number_attributes] = LASCopyString(description);
   }
   else
   {
@@ -1558,10 +1558,10 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       if (l[0] == 0) return FALSE;
       hex_string[0] = l[0]; hex_string[1] = l[1];
       sscanf(hex_string,"%x",&hex_value);
-      point.rgb[0] = hex_value; 
+      point.rgb[0] = hex_value;
       hex_string[0] = l[2]; hex_string[1] = l[3];
       sscanf(hex_string,"%x",&hex_value);
-      point.rgb[1] = hex_value; 
+      point.rgb[1] = hex_value;
       hex_string[0] = l[4]; hex_string[1] = l[5];
       sscanf(hex_string,"%x",&hex_value);
       point.rgb[2] = hex_value;

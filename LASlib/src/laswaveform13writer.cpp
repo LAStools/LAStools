@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  laswaveform13writer.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
 
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "laswaveform13writer.hpp"
@@ -51,7 +51,7 @@ LASwaveform13writer::LASwaveform13writer()
   ic8 = 0;
   ic16 = 0;
 }
-  
+
 LASwaveform13writer::~LASwaveform13writer()
 {
   if (waveforms)
@@ -120,7 +120,7 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
 
   // create file name and open file
 
-  char* file_name_temp = _strdup(file_name);
+  char* file_name_temp = LASCopyString(file_name);
 
   int len = strlen(file_name_temp);
   if (file_name_temp[len-3] == 'L' || file_name_temp[len-3] == 'W')
@@ -186,7 +186,7 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
   }
   I8 description[32];
   memset(description, 0, 32);
-  sprintf(description, "%s by LAStools (%d)", (compressed ? "compressed" : "created"), LAS_TOOLS_VERSION);  
+  sprintf(description, "%s by LAStools (%d)", (compressed ? "compressed" : "created"), LAS_TOOLS_VERSION);
   if (!stream->putBytes((U8*)description, 32))
   {
     fprintf(stderr,"ERROR: writing EVLR description\n");

@@ -2,17 +2,17 @@
 ===============================================================================
 
   FILE:  lasreadermerged.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
-  
+
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasreadermerged.hpp"
@@ -413,7 +413,7 @@ BOOL LASreaderMerged::add_file_name(const char* file_name)
       return FALSE;
     }
   }
-  file_names[file_name_number] = _strdup(file_name);
+  file_names[file_name_number] = LASCopyString(file_name);
   file_name_number++;
   return TRUE;
 }
@@ -495,7 +495,7 @@ void LASreaderMerged::set_parse_string(const char* parse_string)
   if (this->parse_string) free(this->parse_string);
   if (parse_string)
   {
-    this->parse_string = _strdup(parse_string);
+    this->parse_string = LASCopyString(parse_string);
   }
   else
   {
@@ -692,7 +692,7 @@ BOOL LASreaderMerged::open()
         // have there not been any points before
         if (npoints == lasreader->npoints)
         {
-          // use the counters 
+          // use the counters
           header.number_of_point_records = lasreader->header.number_of_point_records;
           for (j = 0; j < 5; j++)
           {
@@ -728,7 +728,7 @@ BOOL LASreaderMerged::open()
         }
         else
         {
-          // increment point counters 
+          // increment point counters
           header.number_of_point_records += lasreader->header.number_of_point_records;
           for (j = 0; j < 5; j++)
           {
@@ -913,7 +913,7 @@ BOOL LASreaderMerged::open()
       reoffset = TRUE;
     }
   }
-    
+
   // check y
 
   if ((((header.max_y - header.y_offset) / header.y_scale_factor) > I32_MAX) || (((header.min_y - header.y_offset) / header.y_scale_factor) < I32_MIN))
@@ -939,7 +939,7 @@ BOOL LASreaderMerged::open()
       reoffset = TRUE;
     }
   }
-    
+
   // check z
 
   if ((((header.max_z - header.z_offset) / header.z_scale_factor) > I32_MAX) || (((header.min_z - header.z_offset) / header.z_scale_factor) < I32_MIN))
@@ -1196,7 +1196,7 @@ BOOL LASreaderMerged::read_point_default()
 
 void LASreaderMerged::close(BOOL close_stream)
 {
-  if (lasreader) 
+  if (lasreader)
   {
     lasreader->close(close_stream);
   }
@@ -1213,7 +1213,7 @@ BOOL LASreaderMerged::reopen()
 
 void LASreaderMerged::clean()
 {
-  if (lasreader) 
+  if (lasreader)
   {
     delete lasreader;
     lasreader = 0;

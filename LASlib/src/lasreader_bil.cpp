@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  lasreader_bil.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
 
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasreader_bil.hpp"
@@ -348,7 +348,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
   // create *.hdr file name
 
   I32 len = strlen(file_name) - 3;
-  CHAR* file_name_hdr = _strdup(file_name);
+  CHAR* file_name_hdr = LASCopyString(file_name);
 
   while ((len > 0) && (file_name_hdr[len] != '.')) len--;
 
@@ -445,7 +445,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
       {
         floatpixels = TRUE;
       }
-      else if ((strcmp(pixeltype, "signedint") == 0) || (strcmp(pixeltype, "SIGNEDINT") == 0)) 
+      else if ((strcmp(pixeltype, "signedint") == 0) || (strcmp(pixeltype, "SIGNEDINT") == 0))
       {
         signedpixels = TRUE;
       }
@@ -521,7 +521,7 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
   // create *.blw file name
 
   I32 len = strlen(file_name) - 3;
-  CHAR* file_name_bwl = _strdup(file_name);
+  CHAR* file_name_bwl = LASCopyString(file_name);
 
   while ((len > 0) && (file_name_bwl[len] != '.')) len--;
 

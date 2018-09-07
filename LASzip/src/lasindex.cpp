@@ -327,7 +327,7 @@ BOOL LASindex::write(FILE* file) const
 BOOL LASindex::read(const char* file_name)
 {
   if (file_name == 0) return FALSE;
-  char* name = _strdup(file_name);
+  char* name = LASCopyString(file_name);
   if (strstr(file_name, ".las") || strstr(file_name, ".laz"))
   {
     name[strlen(name)-1] = 'x';
@@ -502,7 +502,7 @@ BOOL LASindex::append(const char* file_name) const
 BOOL LASindex::write(const char* file_name) const
 {
   if (file_name == 0) return FALSE;
-  char* name = _strdup(file_name);
+  char* name = LASCopyString(file_name);
   if (strstr(file_name, ".las") || strstr(file_name, ".laz"))
   {
     name[strlen(name)-1] = 'x';
