@@ -600,6 +600,8 @@ public:
   inline void set_y(const F64 y) { this->Y = quantizer->get_Y(y); };
   inline void set_z(const F64 z) { this->Z = quantizer->get_Z(z); };
 
+  inline BOOL is_extended_point_type() const { return extended_point_type; };
+
   inline U8 get_extended_classification() const { return extended_classification; };
   inline U8 get_extended_return_number() const { return extended_return_number; };
   inline U8 get_extended_number_of_returns() const { return extended_number_of_returns; };
