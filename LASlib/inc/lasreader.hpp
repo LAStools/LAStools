@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
      8 February 2018 -- new LASreaderStored via '-stored' option to allow piped operation
     15 December 2017 -- optional '-files_are_flightline 101' start number like '-faf 101'
     21 November 2017 -- allow adding up to 32 (from 10) additional extra bytes attributes

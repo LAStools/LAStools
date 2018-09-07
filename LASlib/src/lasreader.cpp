@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  lasreader.cpp
-
+  
   CONTENTS:
-
+  
     see corresponding header file
-
+  
   PROGRAMMERS:
 
     martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
+  
   CHANGE HISTORY:
-
+  
     see corresponding header file
-
+  
 ===============================================================================
 */
 #include "lasreader.hpp"
@@ -79,7 +79,7 @@ LASreader::LASreader()
   orig_max_x = 0;
   orig_max_y = 0;
 }
-
+  
 LASreader::~LASreader()
 {
   if (index) delete index;
@@ -1047,14 +1047,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         if (scale_intensity != 1.0f) lasreaderply->set_scale_intensity(scale_intensity);
         lasreaderply->set_scale_factor(scale_factor);
         lasreaderply->set_offset(offset);
-        if (number_attributes)
-        {
-          for (I32 i = 0; i < number_attributes; i++)
-          {
-            lasreaderply->add_attribute(attribute_data_types[i], attribute_names[i], attribute_descriptions[i], attribute_scales[i], attribute_offsets[i], attribute_pre_scales[i], attribute_pre_offsets[i], attribute_no_datas[i]);
-          }
-        }
-        if (!lasreaderply->open(file_name, point_type, parse_string, populate_header))
+        if (!lasreaderply->open(file_name, point_type, populate_header))
         {
           fprintf(stderr,"ERROR: cannot open lasreaderply with file name '%s'\n", file_name);
           delete lasreaderply;
@@ -1662,7 +1655,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
           return FALSE;
         }
         set_inside_tile((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3]));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
       else if (strcmp(argv[i],"-inside_circle") == 0)
       {
@@ -1682,7 +1675,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
           return FALSE;
         }
         set_inside_rectangle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4;
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
       }
       else
       {
@@ -1977,8 +1970,8 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       while (fgets(line, 1024, file))
       {
         // find end of line
-        int len = (int)strlen(line) - 1;
-        // remove extra white spaces and line return at the end
+        I32 len = (I32)strlen(line) - 1;
+        // remove extra white spaces and line return at the end 
         while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
         {
           line[len] = '\0';
@@ -2119,7 +2112,7 @@ const CHAR* LASreadOpener::get_file_name_only() const
 
   if (file_name_curr)
   {
-    int len = (int)strlen(file_name_curr);
+    I32 len = (I32)strlen(file_name_curr);
     while ((len > 0) && (file_name_curr[len] != '\\') && (file_name_curr[len] != '/') && (file_name_curr[len] != ':')) len--;
     if (len)
     {
@@ -2266,7 +2259,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
   if (h != INVALID_HANDLE_VALUE)
   {
     // find the path
-    int len = (int)strlen(file_name);
+    I32 len = (I32)strlen(file_name);
     while (len && (file_name[len] != '\\') && (file_name[len] != '/') && (file_name[len] != ':')) len--;
     if (len)
     {
@@ -2343,8 +2336,8 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
   while (fgets(line, 1024, file))
   {
     // find end of line
-    int len = (int)strlen(line) - 1;
-    // remove extra white spaces and line return at the end
+    I32 len = (I32)strlen(line) - 1;
+    // remove extra white spaces and line return at the end 
     while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
     {
       line[len] = '\0';
@@ -2392,7 +2385,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
   if (h != INVALID_HANDLE_VALUE)
   {
     // find the path
-    int len = (int)strlen(neighbor_file_name);
+    I32 len = (I32)strlen(neighbor_file_name);
     while (len && (neighbor_file_name[len] != '\\') && (neighbor_file_name[len] != '/') && (neighbor_file_name[len] != ':')) len--;
     if (len)
     {
