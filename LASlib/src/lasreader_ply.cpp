@@ -1015,7 +1015,7 @@ BOOL LASreaderPLY::set_attribute(I32 index, F64 value)
 
 F64 LASreaderPLY::read_binary_value(CHAR type)
 {
-  F64 value;
+  F64 value = 0;
 
   if (type == 'f')
   {
