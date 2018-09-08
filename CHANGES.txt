@@ -1,3 +1,9 @@
+7 September 2018 -- NEW: many 64 bit command-line tools (without GUI). limited raster formats: BIL, ASC, XYZ, FLT, DTM, LAZ 
+7 September 2018 -- laspublish: dropping support for Potree 1.4
+31 August 2018 -- lasheight: fixed *serious* run-time performance bug introduced in version 180731 and 180812. update!!!
+12 August 2018 -- laspublish: fix in bug on chrome for Potree 1.4. by default Potree 1.6 is used (old one with '-potree14')
+10 August 2018 -- LASlib, all LAStools: fix bug in LAStransform 'change_classification_from_to 19 2' reported by Kirk
+6 August 2018 -- lasview, lascontrol: '-cp control_points.txt' file can also be parsed when separated by semicolons 
 31 July 2018 -- lasheight: now '-class 2 8 75 76' option can also include extended classifications as ground points
 30 July 2018 -- lasclassify: for height-normalized data you can use '-height_in_z' instead of the user data values
 30 July 2018 -- LASlib, all LAStools: bug fix in selective decompression of "extra_bytes" for point types 6 and higher
