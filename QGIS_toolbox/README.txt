@@ -1,13 +1,42 @@
 ****************************************************************
 
-  The LAStools LiDAR processing toolbox for QGIS 1.8.0 - 2.14.1
+  The LAStools LiDAR processing toolbox for QGIS 2.18 and 3.2
 
-  (c) 2013-2016 - martin.isenburg@rapidlasso.com
+  (c) 2013-2018 - martin.isenburg@rapidlasso.com
 
   rapidlasso GmbH - fast tools to catch reality
 
   legal details: http://rapidlasso.com/LICENSE.txt
 
+****************************************************************
+
+For QGIS 2.18 all is great. Just activate the LAStools toolbox
+and make sure the LAStools folder (+maybe the Wine folder) are
+set correctly.
+
+For QGIS 3.2 simply use the plugin manager to download the new
+LAStools plugin. Also make sure the LAStools folder (+maybe the
+Wine folder) are set correctly. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+****************************************************************
+                    OBSOLETE INSTRUCTIONS
 ****************************************************************
 
 For QGIS 1.8, 2.0, and 2.2 follow all steps in this blog
