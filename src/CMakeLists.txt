@@ -31,7 +31,7 @@ endforeach(TARGET)
 
 foreach(TARGET ${ALL_TARGETS})
 	target_link_libraries(${TARGET} LASlib)
-	set_target_properties(${TARGET} PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../bin)
+	set_target_properties(${TARGET} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../bin64)
+	set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${TARGET}64)
 	install(TARGETS ${TARGET} RUNTIME DESTINATION bin)
 endforeach(TARGET)
