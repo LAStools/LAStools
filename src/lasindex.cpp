@@ -96,7 +96,7 @@ extern int lasindex_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int lasindex_multi_core(int argc, char *argv[], LASreadOpener* lasreadopener, int cores);
+extern int lasindex_multi_core(int argc, char *argv[], LASreadOpener* lasreadopener, int cores, BOOL cpu64);
 #endif
 
 int main(int argc, char *argv[])
@@ -107,6 +107,7 @@ int main(int argc, char *argv[])
 #endif
 #ifdef COMPILE_WITH_MULTI_CORE
   I32 cores = 1;
+  BOOL cpu64 = FALSE;
 #endif
   bool verbose = false;
   F32 tile_size = 0.0f;
@@ -185,6 +186,15 @@ int main(int argc, char *argv[])
       i++;
 #endif
     }
+    else if (strcmp(argv[i],"-cpu64") == 0)
+    {
+#ifdef COMPILE_WITH_MULTI_CORE
+      cpu64 = TRUE;
+#else
+      fprintf(stderr, "WARNING: not compiled with 64 bit support. ignoring '-cpu64' ...\n");
+#endif
+      argv[i][0] = '\0';
+    }
     else if (strcmp(argv[i],"-tile_size") == 0)
     {
       if ((i+1) >= argc)
@@ -256,8 +266,12 @@ int main(int argc, char *argv[])
     }
     else
     {
-      return lasindex_multi_core(argc, argv, &lasreadopener, cores);
+      return lasindex_multi_core(argc, argv, &lasreadopener, cores, cpu64);
     }
+  }
+  else if (cpu64)
+  {
+    return lasindex_multi_core(argc, argv, &lasreadopener, 1, TRUE);
   }
 #endif
 
