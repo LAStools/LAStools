@@ -88,7 +88,7 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
 
   // create parse string
 
-  if (!parse_header())
+  if (!parse_header(FALSE))
   {
     return FALSE;
   }
@@ -270,62 +270,40 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
 
   if (populate_header && file_name)
   {
-    if (streamin)
-    {
-      return FALSE; // not implemented
-    }
+    // read the first point
 
-    // create a cheaper parse string that only looks for 'x' 'y' 'z' 'r' and attributes in extra bytes
-
-    char* parse_less;
-    if (parse_string == 0)
+    if (streamin) // binary
     {
-      parse_less = LASCopyString("xyz");
+      // read the first point 
+      read_binary_point();
     }
     else
     {
-      parse_less = LASCopyString(parse_string);
-      for (i = 0; i < (int)strlen(parse_string); i++)
+      BOOL found = FALSE;
+      while (fgets(line, 512, file))
       {
-        if (parse_less[i] != 'x' && parse_less[i] != 'y' && parse_less[i] != 'z' && parse_less[i] != 'r' && (parse_less[i] < '0' || parse_less[i] > '0')) 
+        if (parse(parse_string))
         {
-          parse_less[i] = 's';
+          // mark that we found the first point
+          found = TRUE;
+          break;
+        }
+        else
+        {
+          line[strlen(line)-1] = '\0';
+          fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, parse_string);
         }
       }
-      do
-      {
-        parse_less[i] = '\0';
-        i--;
-      } while (parse_less[i] == 's');
-    }
 
-    // read the first line
+      // did we not manage to read a point
 
-    while (fgets(line, 512, file))
-    {
-      if (parse(parse_less))
+      if (!found)
       {
-        // mark that we found the first point
-        npoints++;
-        // we can stop this loop
-        break;
+        fprintf(stderr, "ERROR: could not parse any lines with '%s'\n", parse_string);
+        fclose(file);
+        file = 0;
+        return FALSE;
       }
-      else
-      {
-        line[strlen(line)-1] = '\0';
-        fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, parse_less);
-      }
-    }
-
-    // did we manage to parse a line
-
-    if (npoints == 0)
-    {
-      fprintf(stderr, "ERROR: could not parse any lines with '%s'\n", parse_less);
-      fclose(file);
-      file = 0;
-      free(parse_less);    
-      return FALSE;
     }
 
     // init the bounding box
@@ -356,62 +334,76 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
       }
     }
 
-    // loop over the remaining lines
+    // read the remaining points 
 
-    while (fgets(line, 512, file))
+    for (i = 1; i < npoints; i++)
     {
-      if (parse(parse_less))
+      BOOL found = FALSE;
+      if (streamin) // binary
       {
-        // count points
-        npoints++;
-        // create return histogram
-        if (point.extended_point_type)
+        if (read_binary_point())
         {
-          if (point.extended_return_number >= 1 && point.extended_return_number <= 15) header.extended_number_of_points_by_return[point.extended_return_number-1]++;
-        }
-        else
-        {
-          if (point.return_number >= 1 && point.return_number <= 5) header.number_of_points_by_return[point.return_number-1]++;
-        }
-        // update bounding box
-        if (point.coordinates[0] < header.min_x) header.min_x = point.coordinates[0];
-        else if (point.coordinates[0] > header.max_x) header.max_x = point.coordinates[0];
-        if (point.coordinates[1] < header.min_y) header.min_y = point.coordinates[1];
-        else if (point.coordinates[1] > header.max_y) header.max_y = point.coordinates[1];
-        if (point.coordinates[2] < header.min_z) header.min_z = point.coordinates[2];
-        else if (point.coordinates[2] > header.max_z) header.max_z = point.coordinates[2];
-        // update the min and max of attributes in extra bytes
-        if (number_attributes)
-        {
-          for (i = 0; i < number_attributes; i++)
-          {
-            header.attributes[i].update_min(point.extra_bytes + header.attribute_starts[i]);
-            header.attributes[i].update_max(point.extra_bytes + header.attribute_starts[i]);
-          }
+          found = TRUE;
         }
       }
       else
       {
-        line[strlen(line)-1] = '\0';
-        fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, parse_less);
+        while (fgets(line, 512, file))
+        {
+          if (parse(parse_string))
+          {
+            found = TRUE;
+            break;
+          }
+          else
+          {
+            line[strlen(line)-1] = '\0';
+            fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, parse_string);
+          }
+        }
+      }
+
+      if (!found)
+      {
+        break;
+      }
+
+      // create return histogram
+      if (point.extended_point_type)
+      {
+        if (point.extended_return_number >= 1 && point.extended_return_number <= 15) header.extended_number_of_points_by_return[point.extended_return_number-1]++;
+      }
+      else
+      {
+        if (point.return_number >= 1 && point.return_number <= 5) header.number_of_points_by_return[point.return_number-1]++;
+      }
+      // update bounding box
+      if (point.coordinates[0] < header.min_x) header.min_x = point.coordinates[0];
+      else if (point.coordinates[0] > header.max_x) header.max_x = point.coordinates[0];
+      if (point.coordinates[1] < header.min_y) header.min_y = point.coordinates[1];
+      else if (point.coordinates[1] > header.max_y) header.max_y = point.coordinates[1];
+      if (point.coordinates[2] < header.min_z) header.min_z = point.coordinates[2];
+      else if (point.coordinates[2] > header.max_z) header.max_z = point.coordinates[2];
+      // update the min and max of attributes in extra bytes
+      if (number_attributes)
+      {
+        for (i = 0; i < number_attributes; i++)
+        {
+          header.attributes[i].update_min(point.extra_bytes + header.attribute_starts[i]);
+          header.attributes[i].update_max(point.extra_bytes + header.attribute_starts[i]);
+        }
       }
     }
+
     if (point.extended_point_type || (npoints > U32_MAX))
     {
-      header.version_minor = 4;
       header.number_of_point_records = 0;
       header.number_of_points_by_return[0] = 0;
       header.number_of_points_by_return[1] = 0;
       header.number_of_points_by_return[2] = 0;
       header.number_of_points_by_return[3] = 0;
       header.number_of_points_by_return[4] = 0;
-      header.extended_number_of_point_records = npoints;
     }
-    else
-    {
-      header.number_of_point_records = (U32)npoints;
-    }
-    free(parse_less);
 
     // close the input file
     
@@ -431,7 +423,7 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
 
     // reopen input file for the second pass
 
-    file = fopen_compressed(file_name, "r", &piped);
+    file = fopen_compressed(file_name, "rb", &piped);
     if (file == 0)
     {
       fprintf(stderr, "ERROR: could not open '%s' for second pass\n", file_name);
@@ -441,6 +433,17 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
     if (setvbuf(file, NULL, _IOFBF, 10*LAS_TOOLS_IO_IBUFFER_SIZE) != 0)
     {
       fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", 10*LAS_TOOLS_IO_IBUFFER_SIZE);
+    }
+
+    // set the file pointer
+
+    this->file = file;
+
+    // load the header a second time
+
+    if (!parse_header(TRUE))
+    {
+      return FALSE;
     }
   }
 
@@ -1518,7 +1521,7 @@ BOOL LASreaderPLY::parse(const char* parse_string)
   return TRUE;
 }
 
-BOOL LASreaderPLY::parse_header()
+BOOL LASreaderPLY::parse_header(BOOL quiet)
 {
   BOOL skip_remaining = FALSE;
   CHAR line[512];
@@ -1596,7 +1599,7 @@ BOOL LASreaderPLY::parse_header()
       }
       else
       {
-        fprintf(stderr, "not supported: %sskipping remaining header ...\n", line);
+        if (!quiet) fprintf(stderr, "not supported: %sskipping remaining header ...\n", line);
         skip_remaining = TRUE;
         continue;
       }
@@ -1789,7 +1792,7 @@ BOOL LASreaderPLY::parse_header()
       fprintf(stderr, "unknown header item: %snot implemented. contact martin@rapidlasso.com", line);
     }
 
-    fprintf(stderr, "parsed: %s", line);
+    if (!quiet) fprintf(stderr, "parsed: %s", line);
   }
 
   return TRUE;
