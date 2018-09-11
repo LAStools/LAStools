@@ -142,7 +142,7 @@ extern int txt2las_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int txt2las_multi_core(int argc, char *argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, I32 cores);
+extern int txt2las_multi_core(int argc, char *argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, I32 cores, BOOL cpu64);
 #endif
 
 int main(int argc, char *argv[])
@@ -153,6 +153,7 @@ int main(int argc, char *argv[])
 #endif
 #ifdef COMPILE_WITH_MULTI_CORE
   I32 cores = 1;
+  BOOL cpu64 = FALSE;
 #endif
   bool verbose = false;
   bool very_verbose = false;
@@ -290,6 +291,15 @@ int main(int argc, char *argv[])
       fprintf(stderr, "WARNING: not compiled with multi-core batching. ignoring '-cores' ...\n");
       i++;
 #endif
+    }
+    else if (strcmp(argv[i],"-cpu64") == 0)
+    {
+#ifdef COMPILE_WITH_MULTI_CORE
+      cpu64 = TRUE;
+#else
+      fprintf(stderr, "WARNING: not compiled with 64 bit support. ignoring '-cpu64' ...\n");
+#endif
+      argv[i][0] = '\0';
     }
     else if (strcmp(argv[i],"-quiet") == 0)
     {
@@ -520,8 +530,12 @@ int main(int argc, char *argv[])
     }
     else
     {
-      return txt2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, cores);
+      return txt2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, cores, cpu64);
     }
+  }
+  else if (cpu64)
+  {
+    return txt2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, 1, TRUE);
   }
 #endif
 
