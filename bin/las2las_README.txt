@@ -190,49 +190,52 @@ point.Z).
 
 other commandline arguments are
 
--auto_reoffset                : puts a reasonable offset in the header and translates the points accordingly
--reoffset 10000 40000 0       : puts a new offset into the header and translates the points accordingly
--rescale 0.01 0.01 0.01       : puts a new scale into the header and rescales the points accordingly
--clip_to_bounding_box         : removes all points that falls outsize the bouding box specified in the LAS header 
--repair_zero_returns          : sets return counts and number of returns that are zero to one
--start_at_point 100           : skips all points until point number 100
--start_at_point 900           : omits all points after point number 900
--subseq 20 100                : extract a subsequence of 100 points starting from point 20
--point_type 0                 : force point type to be 0
--point_size 26                : force point size to be 26
--set_classification 0         : sets all classifications fields to zero
--set_user_data 0              : sets all user_data fields to zero
--remove_all_vlrs              : remove all VLRs
--remove_vlr 2                 : remove VLR number 2 (couting starts at 0)
--remove_vlrs_from_to 0 2      : remove the first three VLRs
--remove_all_evlrs             : remove all EVLRs
--remove_evlr 2                : remove EVLR number 2 (couting starts at 0)
--remove_evlrs_from_to 0 2     : remove the first three EVLRs
--remove_padding               : remove user-defined bytes before and after the header
--week_to_adjusted             : converts time stamps from GPS week to Adjusted Standard GPS 
--adjusted_to_week             : converts time stamps from Adjusted Standard GPS to GPS week
--scale_rgb_up                 : multiplies all RGB values by 256 (to go from 8 bit to 16 bit numbers)
--scale_rgb_down               : divides all RGB values by 256 (to go from 16 bit to 8 bit numbers)
--set_version 1.2              : set LAS version number to 1.2
--set_lastiling_buffer_flag 0  : sets buffer flag in LAStiling VLR (if it exists) to zero
--dont_remove_empty_files      : does not remove files that have zero points remaining from disk
--wgs84                        : use datum WGS-84
--wgs72                        : use datum WGS-72
--nad83                        : use datum NAD83
--nad27                        : use datum NAD27
--utm 12T                      : input is UTM zone 12T 
--epsg 2972                    : input is EPSG code 2972 (e.g. Reseau Geodesique Francais Guyane 1995)
--sp83 CO_S                    : input is state plane NAD83 Colorado South
--sp27 SC_N                    : input is state plane NAD27 South Carolina North 
--longlat                      : input is geometric coordinates in longitude/latitude 
--latlong                      : input is geometric coordinates in latitude/longitude
--ecef                         : input is geocentric (Earth-centered Earth-fixed)
--survey_feet                  : input uses survey feet
--feet                         : input uses feet
--meter                        : input uses meter
--elevation_surveyfeet         : input uses survey feet for elevation
--elevation_feet               : input uses feet for elevation
--elevation_meter              : input uses meter for elevation
+-auto_reoffset                 : puts a reasonable offset in the header and translates the points accordingly
+-reoffset 10000 40000 0        : puts a new offset into the header and translates the points accordingly
+-rescale 0.01 0.01 0.01        : puts a new scale into the header and rescales the points accordingly
+-clip_to_bounding_box          : removes all points that falls outsize the bouding box specified in the LAS header 
+-repair_zero_returns           : sets return counts and number of returns that are zero to one
+-start_at_point 100            : skips all points until point number 100
+-start_at_point 900            : omits all points after point number 900
+-subseq 20 100                 : extract a subsequence of 100 points starting from point 20
+-point_type 0                  : force point type to be 0
+-point_size 26                 : force point size to be 26
+-set_classification 0          : sets all classifications fields to zero
+-set_user_data 0               : sets all user_data fields to zero
+-remove_all_vlrs               : remove all VLRs
+-remove_vlr 2                  : remove VLR number 2 (couting starts at 0)
+-remove_vlrs_from_to 0 2       : remove the first three VLRs
+-remove_all_evlrs              : remove all EVLRs
+-remove_evlr 2                 : remove EVLR number 2 (couting starts at 0)
+-remove_evlrs_from_to 0 2      : remove the first three EVLRs
+-remove_padding                : remove user-defined bytes before and after the header
+-week_to_adjusted              : converts time stamps from GPS week to Adjusted Standard GPS 
+-adjusted_to_week              : converts time stamps from Adjusted Standard GPS to GPS week
+-scale_rgb_up                  : multiplies all RGB values by 256 (to go from 8 bit to 16 bit numbers)
+-scale_rgb_down                : divides all RGB values by 256 (to go from 16 bit to 8 bit numbers)
+-set_version 1.2               : set LAS version number to 1.2
+-set_global_encoding_gps_bit 1 : sets bit in global encoding field specifying Adjusted GPS Standard time stamps
+-set_attribute_scale 0 0.1     : sets the scale of the *first* attribute in the extra bytes to 0.1 
+-set_attribute_offset 1 10.0   : sets the offset of the *second* attribute in the extra bytes to 10.0 
+-set_lastiling_buffer_flag 0   : sets buffer flag in LAStiling VLR (if it exists) to zero
+-dont_remove_empty_files       : does not remove files that have zero points remaining from disk
+-wgs84                         : use datum WGS-84
+-wgs72                         : use datum WGS-72
+-nad83                         : use datum NAD83
+-nad27                         : use datum NAD27
+-utm 12T                       : input is UTM zone 12T 
+-epsg 2972                     : input is EPSG code 2972 (e.g. Reseau Geodesique Francais Guyane 1995)
+-sp83 CO_S                     : input is state plane NAD83 Colorado South
+-sp27 SC_N                     : input is state plane NAD27 South Carolina North 
+-longlat                       : input is geometric coordinates in longitude/latitude 
+-latlong                       : input is geometric coordinates in latitude/longitude
+-ecef                          : input is geocentric (Earth-centered Earth-fixed)
+-survey_feet                   : input uses survey feet
+-feet                          : input uses feet
+-meter                         : input uses meter
+-elevation_surveyfeet          : input uses survey feet for elevation
+-elevation_feet                : input uses feet for elevation
+-elevation_meter               : input uses meter for elevation
 -target_utm 12T                  : output is UTM zone 12T 
 -target_epsg 2193                : output is EPSG code 2193 (e.g. NZGD2000)
 -target_sp83 CO_S                : output is state plane NAD83 Colorado South
