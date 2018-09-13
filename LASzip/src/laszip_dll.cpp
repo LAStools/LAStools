@@ -1361,8 +1361,8 @@ laszip_add_attribute(
     }
 
     LASattribute lasattribute(type, name, description);
-    lasattribute.set_scale(scale, 0);
-    lasattribute.set_offset(offset, 0);
+    lasattribute.set_scale(scale);
+    lasattribute.set_offset(offset);
 
     if (laszip_dll->attributer == 0)
     {
@@ -2084,7 +2084,7 @@ laszip_prepare_point_for_write(
 
       // scan_angle (difference or remainder) is stored as a I16
       LASattribute lasattribute_scan_angle(LAS_ATTRIBUTE_I16, "LAS 1.4 scan angle", "additional attributes");
-      lasattribute_scan_angle.set_scale(0.006, 0);
+      lasattribute_scan_angle.set_scale(0.006);
       I32 index_scan_angle = laszip_dll->attributer->add_attribute(lasattribute_scan_angle);
       laszip_dll->start_scan_angle = laszip_dll->attributer->get_attribute_start(index_scan_angle);
       // extended returns stored as a U8
