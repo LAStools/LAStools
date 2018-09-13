@@ -167,6 +167,12 @@ int main(int argc, char *argv[])
   int remove_extended_variable_length_record = -1;
   int remove_extended_variable_length_record_from = -1;
   int remove_extended_variable_length_record_to = -1;
+  int set_attribute_scales = 0;
+  int set_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
+  double set_attribute_scale_scale[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
+  int set_attribute_offsets = 0;
+  int set_attribute_offset_index[5] = { -1, -1, -1, -1, -1 };
+  double set_attribute_offset_offset[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
   bool remove_tiling_vlr = false;
   bool remove_original_vlr = false;
   bool remove_empty_files = true;
@@ -251,9 +257,13 @@ int main(int argc, char *argv[])
         fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
         usage(true);
       }
+      if (sscanf(argv[i+1],"%u",&cores) != 1)
+      {
+        fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
+        usage(true);
+      }
       argv[i][0] = '\0';
       i++;
-      cores = atoi(argv[i]);
       argv[i][0] = '\0';
 #else
       fprintf(stderr, "WARNING: not compiled with multi-core batching. ignoring '-cores' ...\n");
@@ -280,207 +290,343 @@ int main(int argc, char *argv[])
         fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop\n", argv[i]);
         byebye(true);
       }
-      subsequence_start = (I64)atoi(argv[i+1]); subsequence_stop = (I64)atoi(argv[i+2]);
+#ifdef _WIN32
+      if (sscanf(argv[i+1],"%I64d",&subsequence_start) != 1)
+#else
+      if (sscanf(argv[i+1],"%lld",&subsequence_start) != 1)
+#endif // _WIN32
+      {
+        fprintf(stderr, "ERROR: cannot understand first argument '%s' for '%s'\n", argv[i+1], argv[i]);
+        usage(true);
+      }
+#ifdef _WIN32
+      if (sscanf(argv[i+2],"%I64d",&subsequence_stop) != 1)
+#else
+      if (sscanf(argv[i+2],"%lld",&subsequence_stop) != 1)
+#endif // _WIN32
+      {
+        fprintf(stderr, "ERROR: cannot understand second argument '%s' for '%s'\n", argv[i+2], argv[i]);
+        usage(true);
+      }
       i+=2;
     }
     else if (strcmp(argv[i],"-start_at_point") == 0)
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: start\n", argv[i]);
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: index of start point\n", argv[i]);
         byebye(true);
       }
-      subsequence_start = (I64)atoi(argv[i+1]);
-      i+=1;
-    }
-    else if (strcmp(argv[i],"-stop_at_point") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: stop\n", argv[i]);
-        byebye(true);
-      }
-      subsequence_stop = (I64)atoi(argv[i+1]);
-      i+=1;
-    }
-    else if (strcmp(argv[i],"-set_global_encoding_gps_bit") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: 0 or 1\n", argv[i]);
-        byebye(true);
-      }
-      set_global_encoding_gps_bit = atoi(argv[i+1]);
-      i+=1;
-    }
-    else if (strcmp(argv[i],"-set_version") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: major.minor\n", argv[i]);
-        byebye(true);
-      }
-      if (sscanf(argv[i+1],"%d.%d",&set_version_major,&set_version_minor) != 2)
+#ifdef _WIN32
+      if (sscanf(argv[i+1],"%I64d",&subsequence_start) != 1)
+#else
+      if (sscanf(argv[i+1],"%lld",&subsequence_start) != 1)
+#endif // _WIN32
       {
         fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
         usage(true);
       }
       i+=1;
     }
-    else if (strcmp(argv[i],"-set_version_major") == 0)
+    else if (strcmp(argv[i],"-stop_at_point") == 0)
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: major\n", argv[i]);
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: index of stop point\n", argv[i]);
         byebye(true);
       }
-      set_version_major = atoi(argv[i+1]);
-      i+=1;
-    }
-    else if (strcmp(argv[i],"-set_version_minor") == 0)
-    {
-      if ((i+1) >= argc)
+#ifdef _WIN32
+      if (sscanf(argv[i+1],"%I64d",&subsequence_stop) != 1)
+#else
+      if (sscanf(argv[i+1],"%lld",&subsequence_stop) != 1)
+#endif // _WIN32
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: minor\n", argv[i]);
-        byebye(true);
-      }
-      set_version_minor = atoi(argv[i+1]);
-      i+=1;
-    }
-    else if (strcmp(argv[i],"-set_lastiling_buffer_flag") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: 0 or 1\n", argv[i]);
-        byebye(true);
-      }
-      set_lastiling_buffer_flag = atoi(argv[i+1]);
-      if ((set_lastiling_buffer_flag < 0) || (set_lastiling_buffer_flag > 1))
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: 0 or 1\n", argv[i]);
-        byebye(true);
+        fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
+        usage(true);
       }
       i+=1;
     }
-    else if (strcmp(argv[i],"-dont_remove_empty_files") == 0)
+    else if (strncmp(argv[i],"-set_", 5) == 0)
     {
-      remove_empty_files = false;
-    }
-    else if (strcmp(argv[i],"-remove_padding") == 0)
-    {
-      remove_header_padding = true;
-    }
-    else if (strncmp(argv[i],"-set_ogc_wkt", 12) == 0)
-    {
-      if (strcmp(argv[i],"-set_ogc_wkt") == 0)
+      if (strncmp(argv[i],"-set_point_", 11) == 0)
       {
-        set_ogc_wkt = true;
-        set_ogc_wkt_in_evlr = false;
+        if (strcmp(argv[i],"-set_point_type") == 0 || strcmp(argv[i],"-set_point_data_format") == 0) 
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: type\n", argv[i]);
+            byebye(true);
+          }
+          if (sscanf(argv[i+1],"%u",&set_point_data_format) != 1)
+          {
+            fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
+            usage(true);
+          }
+          i++;
+        }
+        else if (strcmp(argv[i],"-set_point_data_record_length") == 0 || strcmp(argv[i],"-set_point_size") == 0) 
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
+            byebye(true);
+          }
+          if (sscanf(argv[i+1],"%u",&set_point_data_record_length) != 1)
+          {
+            fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
+            usage(true);
+          }
+          i++;
+        }
+        else
+        {
+          fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+          usage(true);
+        }
       }
-      else if (strcmp(argv[i],"-set_ogc_wkt_in_evlr") == 0)
+      else if (strcmp(argv[i],"-set_global_encoding_gps_bit") == 0)
       {
-        set_ogc_wkt = true;
-        set_ogc_wkt_in_evlr = true;
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: 0 or 1\n", argv[i]);
+          byebye(true);
+        }
+        if (sscanf(argv[i+1],"%u",&set_global_encoding_gps_bit) != 1)
+        {
+          fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
+          usage(true);
+        }
+        i+=1;
+      }
+      else if (strcmp(argv[i],"-set_version") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: major.minor\n", argv[i]);
+          byebye(true);
+        }
+        if (sscanf(argv[i+1],"%u.%u",&set_version_major,&set_version_minor) != 2)
+        {
+          fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
+          usage(true);
+        }
+        i+=1;
+      }
+      else if (strcmp(argv[i],"-set_version_major") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: major\n", argv[i]);
+          byebye(true);
+        }
+        if (sscanf(argv[i+1],"%u",&set_version_major) != 1)
+        {
+          fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
+          usage(true);
+        }
+        i+=1;
+      }
+      else if (strcmp(argv[i],"-set_version_minor") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: minor\n", argv[i]);
+          byebye(true);
+        }
+        if (sscanf(argv[i+1],"%u",&set_version_minor) != 1)
+        {
+          fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
+          usage(true);
+        }
+        i+=1;
+      }
+      else if (strcmp(argv[i],"-set_lastiling_buffer_flag") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: 0 or 1\n", argv[i]);
+          byebye(true);
+        }
+        if (sscanf(argv[i+1],"%u",&set_lastiling_buffer_flag) != 1)
+        {
+          fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i+1], argv[i]);
+          usage(true);
+        }
+        if (set_lastiling_buffer_flag > 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: 0 or 1\n", argv[i]);
+          byebye(true);
+        }
+        i+=1;
+      }
+      else if (strncmp(argv[i],"-set_ogc_wkt", 12) == 0)
+      {
+        if (strcmp(argv[i],"-set_ogc_wkt") == 0)
+        {
+          set_ogc_wkt = true;
+          set_ogc_wkt_in_evlr = false;
+        }
+        else if (strcmp(argv[i],"-set_ogc_wkt_in_evlr") == 0)
+        {
+          set_ogc_wkt = true;
+          set_ogc_wkt_in_evlr = true;
+        }
+        else
+        {
+          fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+          usage(true);
+        }
+        if ((i+1) < argc)
+        {
+          if ((argv[i+1][0] != '-') && (argv[i+1][0] != '\0'))
+          {
+            set_ogc_wkt_string = argv[i+1];
+            i++;
+          }
+        }
+      }
+      else if (strcmp(argv[i],"-set_attribute_scale") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index scale\n", argv[i]);
+          byebye(true);
+        }
+        if (set_attribute_scales < 5)
+        {
+          if (sscanf(argv[i+1],"%u",&(set_attribute_scale_index[set_attribute_scales])) != 1)
+          {
+            fprintf(stderr, "ERROR: cannot understand first argument '%s' for '%s'\n", argv[i+1], argv[i]);
+            usage(true);
+          }
+          if (sscanf(argv[i+2],"%lf",&(set_attribute_scale_scale[set_attribute_scales])) != 1)
+          {
+            fprintf(stderr, "ERROR: cannot understand second argument '%s' for '%s'\n", argv[i+2], argv[i]);
+            usage(true);
+          }
+          set_attribute_scales++;
+        }
+        else
+        {
+          fprintf(stderr,"ERROR: cannot '%s' more than 5 times\n", argv[i]);
+          byebye(true);
+        }
+        i+=2;
+      }
+      else if (strcmp(argv[i],"-set_attribute_offset") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index offset\n", argv[i]);
+          byebye(true);
+        }
+        if (set_attribute_offsets < 5)
+        {
+          if (sscanf(argv[i+1],"%u",&(set_attribute_offset_index[set_attribute_offsets])) != 1)
+          {
+            fprintf(stderr, "ERROR: cannot understand first argument '%s' for '%s'\n", argv[i+1], argv[i]);
+            usage(true);
+          }
+          if (sscanf(argv[i+2],"%lf",&(set_attribute_offset_offset[set_attribute_offsets])) != 1)
+          {
+            fprintf(stderr, "ERROR: cannot understand second argument '%s' for '%s'\n", argv[i+2], argv[i]);
+            usage(true);
+          }
+        }
+        else
+        {
+          fprintf(stderr,"ERROR: cannot '%s' more than 5 times\n", argv[i]);
+          byebye(true);
+        }
+        i+=2;
       }
       else
       {
         fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
         usage(true);
       }
-      if ((i+1) < argc)
+    }
+    else if (strncmp(argv[i],"-remove_", 8) == 0)
+    {
+      if (strcmp(argv[i],"-remove_padding") == 0)
       {
-        if ((argv[i+1][0] != '-') && (argv[i+1][0] != '\0'))
+        remove_header_padding = true;
+      }
+      else if (strcmp(argv[i],"-remove_all_vlrs") == 0)
+      {
+        remove_all_variable_length_records = true;
+      }
+      else if (strcmp(argv[i],"-remove_vlr") == 0)
+      {
+        if ((i+1) >= argc)
         {
-          set_ogc_wkt_string = argv[i+1];
-          i++;
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+          byebye(true);
         }
+        remove_variable_length_record = atoi(argv[i+1]);
+        remove_variable_length_record_from = -1;
+        remove_variable_length_record_to = -1;
+        i++;
       }
-    }
-    else if (strcmp(argv[i],"-remove_all_vlrs") == 0)
-    {
-      remove_all_variable_length_records = true;
-    }
-    else if (strcmp(argv[i],"-remove_vlr") == 0)
-    {
-      if ((i+1) >= argc)
+      else if (strcmp(argv[i],"-remove_vlrs_from_to") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
-        byebye(true);
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: start end\n", argv[i]);
+          byebye(true);
+        }
+        remove_variable_length_record = -1;
+        remove_variable_length_record_from = atoi(argv[i+1]);
+        remove_variable_length_record_to = atoi(argv[i+2]);
+        i+=2;
       }
-      remove_variable_length_record = atoi(argv[i+1]);
-      remove_variable_length_record_from = -1;
-      remove_variable_length_record_to = -1;
-      i++;
-    }
-    else if (strcmp(argv[i],"-remove_vlrs_from_to") == 0)
-    {
-      if ((i+2) >= argc)
+      else if (strcmp(argv[i],"-remove_all_evlrs") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start end\n", argv[i]);
-        byebye(true);
+        remove_all_extended_variable_length_records = true;
       }
-      remove_variable_length_record = -1;
-      remove_variable_length_record_from = atoi(argv[i+1]);
-      remove_variable_length_record_to = atoi(argv[i+2]);
-      i+=2;
-    }
-    else if (strcmp(argv[i],"-remove_all_evlrs") == 0)
-    {
-      remove_all_extended_variable_length_records = true;
-    }
-    else if (strcmp(argv[i],"-remove_evlr") == 0)
-    {
-      if ((i+1) >= argc)
+      else if (strcmp(argv[i],"-remove_evlr") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
-        byebye(true);
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+          byebye(true);
+        }
+        remove_extended_variable_length_record = atoi(argv[i+1]);
+        remove_extended_variable_length_record_from = -1;
+        remove_extended_variable_length_record_to = -1;
+        i++;
       }
-      remove_extended_variable_length_record = atoi(argv[i+1]);
-      remove_extended_variable_length_record_from = -1;
-      remove_extended_variable_length_record_to = -1;
-      i++;
-    }
-    else if (strcmp(argv[i],"-remove_evlrs_from_to") == 0)
-    {
-      if ((i+2) >= argc)
+      else if (strcmp(argv[i],"-remove_evlrs_from_to") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start end\n", argv[i]);
-        byebye(true);
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: start end\n", argv[i]);
+          byebye(true);
+        }
+        remove_extended_variable_length_record = -1;
+        remove_extended_variable_length_record_from = atoi(argv[i+1]);
+        remove_extended_variable_length_record_to = atoi(argv[i+2]);
+        i+=2;
       }
-      remove_extended_variable_length_record = -1;
-      remove_extended_variable_length_record_from = atoi(argv[i+1]);
-      remove_extended_variable_length_record_to = atoi(argv[i+2]);
-      i+=2;
-    }
-    else if (strcmp(argv[i],"-remove_tiling_vlr") == 0)
-    {
-      remove_tiling_vlr = true;
-      i++;
-    }
-    else if (strcmp(argv[i],"-remove_original_vlr") == 0)
-    {
-      remove_original_vlr = true;
-      i++;
-    }
-    else if (strcmp(argv[i],"-set_point_type") == 0 || strcmp(argv[i],"-set_point_data_format") == 0 || strcmp(argv[i],"-point_type") == 0) 
-    {
-      if ((i+1) >= argc)
+      else if (strcmp(argv[i],"-remove_tiling_vlr") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: type\n", argv[i]);
-        byebye(true);
+        remove_tiling_vlr = true;
+        i++;
       }
-      set_point_data_format = atoi(argv[i+1]);
-      i++;
-    }
-    else if (strcmp(argv[i],"-set_point_data_record_length") == 0 || strcmp(argv[i],"-set_point_size") == 0 || strcmp(argv[i],"-point_size") == 0) 
-    {
-      if ((i+1) >= argc)
+      else if (strcmp(argv[i],"-remove_original_vlr") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
-        byebye(true);
+        remove_original_vlr = true;
+        i++;
       }
-      set_point_data_record_length = atoi(argv[i+1]);
-      i++;
+      else
+      {
+        fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+        usage(true);
+      }
+    }
+    else if (strcmp(argv[i],"-dont_remove_empty_files") == 0)
+    {
+      remove_empty_files = false;
     }
     else if (strcmp(argv[i],"-clip_to_bounding_box") == 0 || strcmp(argv[i],"-clip_to_bb") == 0) 
     {
@@ -630,6 +776,39 @@ int main(int argc, char *argv[])
       {
         fprintf(stderr, "WARNING: ignoring invalid option '-set_global_encoding_gps_bit %d'\n", set_global_encoding_gps_bit);
       }
+    }
+
+    if (set_attribute_scales)
+    {
+      for (i = 0; i < set_attribute_scales; i++)
+      {
+        if (set_attribute_scale_index[i] != -1)
+        {
+          if (set_attribute_scale_index[i] < lasreader->header.number_attributes)
+          {
+            lasreader->header.attributes[set_attribute_scale_index[i]].scale[0] = set_attribute_scale_scale[i];
+          }
+        }
+      }
+    }
+
+    if (set_attribute_offsets)
+    {
+      for (i = 0; i < set_attribute_offsets; i++)
+      {
+        if (set_attribute_offset_index[i] != -1)
+        {
+          if (set_attribute_offset_index[i] < lasreader->header.number_attributes)
+          {
+            lasreader->header.attributes[set_attribute_offset_index[i]].offset[0] = set_attribute_offset_offset[i];
+          }
+        }
+      }
+    }
+
+    if (set_attribute_scales || set_attribute_offsets)
+    {
+      lasreader->header.update_extra_bytes_vlr();
     }
 
     if (set_point_data_format > 5)
