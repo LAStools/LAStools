@@ -91,23 +91,19 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     for (i = 0; i < number_attributes; i++)
     {
       I32 type = (attributes_data_types[i]-1)%10;
-      I32 dim = (attributes_data_types[i]-1)/10 + 1;
       try {
-        LASattribute attribute(type, attribute_names[i], attribute_descriptions[i], dim);
+        LASattribute attribute(type, attribute_names[i], attribute_descriptions[i]);
         if (attribute_scales[i] != 1.0 || attribute_offsets[i] != 0.0)
         {
-          for (I32 d = 0; d < dim; d++)
-            attribute.set_scale(attribute_scales[i], d);
+          attribute.set_scale(attribute_scales[i]);
         }
         if (attribute_offsets[i] != 0.0)
         {
-          for (I32 d = 0; d < dim; d++)
-            attribute.set_offset(attribute_offsets[i], d);
+          attribute.set_offset(attribute_offsets[i]);
         }
         if (attribute_no_datas[i] != F64_MAX)
         {
-          for (I32 d = 0; d < dim; d++)
-            attribute.set_no_data(attribute_no_datas[i], d);
+          attribute.set_no_data(attribute_no_datas[i]);
         }
         header.add_attribute(attribute);
       }

@@ -170,7 +170,7 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
 
   // scan_angle (difference or remainder) is stored as a I16
   LASattribute lasattribute_scan_angle(3, "LAS 1.4 scan angle", "additional attributes");
-  lasattribute_scan_angle.set_scale(0.006, 0);
+  lasattribute_scan_angle.set_scale(0.006);
   I32 index_scan_angle = header->add_attribute(lasattribute_scan_angle);
   start_scan_angle = header->get_attribute_start(index_scan_angle);
   // extended returns stored as a U8
