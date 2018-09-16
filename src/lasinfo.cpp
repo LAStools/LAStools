@@ -215,6 +215,7 @@ int main(int argc, char *argv[])
   bool no_variable_header = false;
   bool no_returns = false;
   bool no_min_max = false;
+  bool no_warnings = false;
   bool check_points = true;
   bool compute_density = false;
   bool gps_week = false;
@@ -372,6 +373,10 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[i],"-nmm") == 0 || strcmp(argv[i],"-no_min_max") == 0)
     {
       no_min_max = true;
+    }
+    else if (strcmp(argv[i],"-nw") == 0 || strcmp(argv[i],"-no_warnings") == 0)
+    {
+      no_warnings = true;
     }
     else if (strcmp(argv[i],"-nc") == 0 || strcmp(argv[i],"-no_check") == 0)
     {
@@ -1066,27 +1071,27 @@ int main(int argc, char *argv[])
       fprintf(file_out, "  offset x y z:               "); lidardouble2string(printstring, lasheader->x_offset); fprintf(file_out, "%s ", printstring);  lidardouble2string(printstring, lasheader->y_offset); fprintf(file_out, "%s ", printstring);  lidardouble2string(printstring, lasheader->z_offset); fprintf(file_out, "%s\012", printstring);
       fprintf(file_out, "  min x y z:                  "); lidardouble2string(printstring, lasheader->min_x, lasheader->x_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->min_y, lasheader->y_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->min_z, lasheader->z_scale_factor); fprintf(file_out, "%s\012", printstring);
       fprintf(file_out, "  max x y z:                  "); lidardouble2string(printstring, lasheader->max_x, lasheader->x_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->max_y, lasheader->y_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->max_z, lasheader->z_scale_factor); fprintf(file_out, "%s\012", printstring);
-      if (!valid_resolution(lasheader->min_x, lasheader->x_offset, lasheader->x_scale_factor))
+      if (!no_warnings && !valid_resolution(lasheader->min_x, lasheader->x_offset, lasheader->x_scale_factor))
       {
         fprintf(file_out, "WARNING: stored resolution of min_x not compatible with x_offset and x_scale_factor: "); lidardouble2string(printstring, lasheader->min_x); fprintf(file_out, "%s\n", printstring);
       }
-      if (!valid_resolution(lasheader->min_y, lasheader->y_offset, lasheader->y_scale_factor))
+      if (!no_warnings && !valid_resolution(lasheader->min_y, lasheader->y_offset, lasheader->y_scale_factor))
       {
         fprintf(file_out, "WARNING: stored resolution of min_y not compatible with y_offset and y_scale_factor: "); lidardouble2string(printstring, lasheader->min_y); fprintf(file_out, "%s\n", printstring);
       }
-      if (!valid_resolution(lasheader->min_z, lasheader->z_offset, lasheader->z_scale_factor))
+      if (!no_warnings && !valid_resolution(lasheader->min_z, lasheader->z_offset, lasheader->z_scale_factor))
       {
         fprintf(file_out, "WARNING: stored resolution of min_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->min_z); fprintf(file_out, "%s\n", printstring);
       }
-      if (!valid_resolution(lasheader->max_x, lasheader->x_offset, lasheader->x_scale_factor))
+      if (!no_warnings && !valid_resolution(lasheader->max_x, lasheader->x_offset, lasheader->x_scale_factor))
       {
         fprintf(file_out, "WARNING: stored resolution of max_x not compatible with x_offset and x_scale_factor: "); lidardouble2string(printstring, lasheader->max_x); fprintf(file_out, "%s\n", printstring);
       }
-      if (!valid_resolution(lasheader->max_y, lasheader->y_offset, lasheader->y_scale_factor))
+      if (!no_warnings && !valid_resolution(lasheader->max_y, lasheader->y_offset, lasheader->y_scale_factor))
       {
         fprintf(file_out, "WARNING: stored resolution of max_y not compatible with y_offset and y_scale_factor: "); lidardouble2string(printstring, lasheader->max_y); fprintf(file_out, "%s\n", printstring);
       }
-      if (!valid_resolution(lasheader->max_z, lasheader->z_offset, lasheader->z_scale_factor))
+      if (!no_warnings && !valid_resolution(lasheader->max_z, lasheader->z_offset, lasheader->z_scale_factor))
       {
         fprintf(file_out, "WARNING: stored resolution of max_z not compatible with z_offset and z_scale_factor: "); lidardouble2string(printstring, lasheader->max_z); fprintf(file_out, "%s\n", printstring);
       }
@@ -3473,7 +3478,7 @@ int main(int argc, char *argv[])
           fprintf(file_out, "  gps_time %f %f\012",lassummary.min.gps_time, lassummary.max.gps_time);
           if ((lasreader->header.global_encoding & 1) == 0)
           {
-            if (lassummary.min.gps_time < 0.0 || lassummary.max.gps_time > 604800.0)
+            if (!no_warnings && (lassummary.min.gps_time < 0.0 || lassummary.max.gps_time > 604800.0))
             {
               fprintf(file_out, "WARNING: range violates GPS week time specified by global encoding bit 0\012");
             }
@@ -3529,7 +3534,7 @@ int main(int argc, char *argv[])
           fprintf(file_out, "  max x y z                  "); lidardouble2string(printstring, lasheader->max_x, lasheader->x_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->max_y, lasheader->y_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->max_z, lasheader->z_scale_factor); fprintf(file_out, "%s\012", printstring);
         }
       }
-      if (file_out && outside_bounding_box)
+      if (!no_warnings && file_out && outside_bounding_box)
       {
 #ifdef _WIN32
         fprintf(file_out, "WARNING: %I64d points outside of header bounding box\012", outside_bounding_box);
@@ -3537,7 +3542,7 @@ int main(int argc, char *argv[])
         fprintf(file_out, "WARNING: %lld points outside of header bounding box\012", outside_bounding_box);
 #endif
       }
-      if (file_out && lassummary.has_fluff())
+      if (!no_warnings && file_out && lassummary.has_fluff())
       {
         fprintf(file_out, "WARNING: there is coordinate resolution fluff (x10) in %s%s%s\012", (lassummary.has_fluff(0) ? "X" : ""), (lassummary.has_fluff(1) ? "Y" : ""), (lassummary.has_fluff(2) ? "Z" : ""));
         if (lassummary.has_serious_fluff())
@@ -3687,7 +3692,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-          if (file_out)
+          if (!no_warnings && file_out)
           {
             if (lassummary.number_of_point_records <= U32_MAX)
             {
@@ -3724,7 +3729,7 @@ int main(int argc, char *argv[])
           fseek(file, 107, SEEK_SET);
           fwrite(&number_of_point_records, sizeof(U32), 1, file);
         }
-        if (file_out)
+        if (!no_warnings && file_out)
         {
           fprintf(file_out, "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s\n", lasheader->point_data_format, lasheader->number_of_point_records, (repair_counters ? "it was repaired." : ""));
         }
@@ -3752,7 +3757,7 @@ int main(int argc, char *argv[])
             fseek(file, 235 + 12, SEEK_SET);
             fwrite(&extended_number_of_point_records, sizeof(I64), 1, file);
           }
-          if (file_out)
+          if (!no_warnings && file_out)
           {
 #ifdef _WIN32
             fprintf(file_out, "WARNING: real number of point records (%I64d) is different from extended header entry (%I64d).%s\n", lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
@@ -3789,7 +3794,7 @@ int main(int argc, char *argv[])
           {
             number_of_points_by_return[i-1] = (U32)lassummary.number_of_points_by_return[i];
             wrong_entry = true;
-            if (file_out)
+            if (!no_warnings && file_out)
             {
               if (was_set)
               {
@@ -3803,7 +3808,7 @@ int main(int argc, char *argv[])
           }
           else if (lasheader->version_minor < 4)
           {
-            if (file_out)
+            if (!no_warnings && file_out)
             {
 #ifdef _WIN32
               fprintf(file_out, "WARNING: for return %d real number of points by return (%I64d) exceeds 4,294,967,295.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
@@ -3816,7 +3821,7 @@ int main(int argc, char *argv[])
           {
             number_of_points_by_return[i-1] = 0;
             wrong_entry = true;
-            if (file_out)
+            if (!no_warnings && file_out)
             {
 #ifdef _WIN32
               fprintf(file_out, "WARNING: for return %d real number of points by return (%I64d) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
@@ -3834,7 +3839,7 @@ int main(int argc, char *argv[])
         {
           number_of_points_by_return[i-1] = 0;
           wrong_entry = true;
-          if (file_out)
+          if (!no_warnings && file_out)
           {
             fprintf(file_out, "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s\n", lasheader->point_data_format, i, lasheader->number_of_points_by_return[i-1], (repair_counters ? "it was repaired." : ""));
           }
@@ -3871,21 +3876,24 @@ int main(int argc, char *argv[])
           if ((I64)lasheader->extended_number_of_points_by_return[i-1] != lassummary.number_of_points_by_return[i])
           {
             wrong_entry = true;
-            if (was_set)
+            if (!no_warnings && file_out)
             {
+              if (was_set)
+              {
 #ifdef _WIN32
-              fprintf(file_out, "WARNING: real extended number of points by return [%d] is %I64d - different from header entry %I64d.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
+                fprintf(file_out, "WARNING: real extended number of points by return [%d] is %I64d - different from header entry %I64d.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
 #else
-              fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
+                fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
 #endif
-            }
-            else
-            {
+              }
+              else
+              {
 #ifdef _WIN32
-              fprintf(file_out, "WARNING: real extended number of points by return [%d] is %I64d but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
+                fprintf(file_out, "WARNING: real extended number of points by return [%d] is %I64d but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
 #else
-              fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
+                fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
 #endif
+              }
             }
           }
         }
@@ -3904,7 +3912,7 @@ int main(int argc, char *argv[])
         }
       }
 
-      if (file_out && !no_returns)
+      if (!no_warnings && file_out && !no_returns)
       {
 #ifdef _WIN32
         if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there %s %I64d point%s with return number 0\n", (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[0], (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
@@ -4042,32 +4050,32 @@ int main(int argc, char *argv[])
         value = lasheader->get_x(lassummary.max.get_X());
         if (value > enlarged_max_x)
         {
-          if (file_out) fprintf(file_out, "WARNING: real max x larger than header max x by %lf\n", value - lasheader->max_x);
+          if (!no_warnings && file_out) fprintf(file_out, "WARNING: real max x larger than header max x by %lf\n", value - lasheader->max_x);
         }
         value = lasheader->get_x(lassummary.min.get_X());
         if (value < enlarged_min_x)
         {
-          if (file_out) fprintf(file_out, "WARNING: real min x smaller than header min x by %lf\n", lasheader->min_x - value);
+          if (!no_warnings && file_out) fprintf(file_out, "WARNING: real min x smaller than header min x by %lf\n", lasheader->min_x - value);
         }
         value = lasheader->get_y(lassummary.max.get_Y());
         if (value > enlarged_max_y)
         {
-          if (file_out) fprintf(file_out, "WARNING: real max y larger than header max y by %lf\n", value - lasheader->max_y);
+          if (!no_warnings && file_out) fprintf(file_out, "WARNING: real max y larger than header max y by %lf\n", value - lasheader->max_y);
         }
         value = lasheader->get_y(lassummary.min.get_Y());
         if (value < enlarged_min_y)
         {
-          if (file_out) fprintf(file_out, "WARNING: real min y smaller than header min y by %lf\n", lasheader->min_y - value);
+          if (!no_warnings && file_out) fprintf(file_out, "WARNING: real min y smaller than header min y by %lf\n", lasheader->min_y - value);
         }
         value = lasheader->get_z(lassummary.max.get_Z());
         if (value > enlarged_max_z)
         {
-          if (file_out) fprintf(file_out, "WARNING: real max z larger than header max z by %lf\n", value - lasheader->max_z);
+          if (!no_warnings && file_out) fprintf(file_out, "WARNING: real max z larger than header max z by %lf\n", value - lasheader->max_z);
         }
         value = lasheader->get_z(lassummary.min.get_Z());
         if (value < enlarged_min_z)
         {
-          if (file_out) fprintf(file_out, "WARNING: real min z smaller than header min z by %lf\n", lasheader->min_z - value);
+          if (!no_warnings && file_out) fprintf(file_out, "WARNING: real min z smaller than header min z by %lf\n", lasheader->min_z - value);
         }
       }
     }
