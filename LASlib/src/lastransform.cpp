@@ -513,6 +513,48 @@ private:
   U16 above;
 };
 
+class LASoperationMapIntensity : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "map_intensity"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s \"%s\" ", name(), map_file_name); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
+  inline void transform(LASpoint* point) { U16 intensity = point->get_intensity(); point->set_intensity(map[intensity]); };
+  LASoperationMapIntensity(const CHAR* file_name)
+  {
+    for (U32 u = 0; u < 65536; u++)
+    {
+      map[u] = u;
+    }
+    FILE* file = fopen(file_name, "r");
+    if (file)
+    {
+      U32 from, to;
+      CHAR line[128];
+      while (fgets(line, 128, file))
+      {
+        if (sscanf(line, "%u %u", &from, &to) == 2)
+        {
+          if ((from < 65536) && (to < 65536))
+          {
+            map[from] = to;
+          }
+        }
+      }
+      fclose(file);
+      map_file_name = LASCopyString(file_name);
+    }
+    else
+    {
+      map_file_name = 0;
+    }
+  };
+  ~LASoperationMapIntensity() { if (map_file_name) free(map_file_name); };
+private:
+  U16 map[65536];
+  CHAR* map_file_name;
+};
+
 class LASoperationCopyAttributeIntoIntensity : public LASoperation
 {
 public:
@@ -906,14 +948,14 @@ class LASoperationMapUserData : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "map_user_data"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s \"%s\" ", name(), user_data_map_file_name); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s \"%s\" ", name(), map_file_name); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
-  inline void transform(LASpoint* point) { U8 user_data = point->get_user_data(); point->set_user_data(user_data_map[user_data]); };
+  inline void transform(LASpoint* point) { U8 user_data = point->get_user_data(); point->set_user_data(map[user_data]); };
   LASoperationMapUserData(const CHAR* file_name)
   {
     for (U32 u = 0; u < 256; u++)
     {
-      user_data_map[u] = u;
+      map[u] = u;
     }
     FILE* file = fopen(file_name, "r");
     if (file)
@@ -926,22 +968,22 @@ public:
         {
           if ((from < 256) && (to < 256))
           {
-            user_data_map[from] = to;
+            map[from] = to;
           }
         }
       }
       fclose(file);
-      user_data_map_file_name = LASCopyString(file_name);
+      map_file_name = LASCopyString(file_name);
     }
     else
     {
-      user_data_map_file_name = 0;
+      map_file_name = 0;
     }
   };
-  ~LASoperationMapUserData() { if (user_data_map_file_name) free(user_data_map_file_name); };
+  ~LASoperationMapUserData() { if (map_file_name) free(map_file_name); };
 private:
-  U8 user_data_map[256];
-  CHAR* user_data_map_file_name;
+  U8 map[256];
+  CHAR* map_file_name;
 };
 
 class LASoperationCopyClassificationIntoUserData : public LASoperation
@@ -990,6 +1032,48 @@ public:
 private:
   U16 psid_from;
   U16 psid_to;
+};
+
+class LASoperationMapPointSource : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "map_point_source"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s \"%s\" ", name(), map_file_name); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
+  inline void transform(LASpoint* point) { U16 point_source = point->get_point_source_ID(); point->set_point_source_ID(map[point_source]); };
+  LASoperationMapPointSource(const CHAR* file_name)
+  {
+    for (U32 u = 0; u < 65536; u++)
+    {
+      map[u] = u;
+    }
+    FILE* file = fopen(file_name, "r");
+    if (file)
+    {
+      U32 from, to;
+      CHAR line[128];
+      while (fgets(line, 128, file))
+      {
+        if (sscanf(line, "%u %u", &from, &to) == 2)
+        {
+          if ((from < 65536) && (to < 65536))
+          {
+            map[from] = to;
+          }
+        }
+      }
+      fclose(file);
+      map_file_name = LASCopyString(file_name);
+    }
+    else
+    {
+      map_file_name = 0;
+    }
+  };
+  ~LASoperationMapPointSource() { if (map_file_name) free(map_file_name); };
+private:
+  U16 map[65536];
+  CHAR* map_file_name;
 };
 
 class LASoperationBinGpsTimeIntoPointSource : public LASoperation
@@ -3432,6 +3516,46 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fclose(file);
         }
         add_operation(new LASoperationMapUserData(argv[i+1]));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i],"-map_point_source") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: map_file_name.txt\n", argv[i]);
+          return FALSE;
+        }
+        FILE* file = fopen(argv[i+1], "r");
+        if (file == 0)
+        {
+          fprintf(stderr,"ERROR: cannot '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        else
+        {
+          fclose(file);
+        }
+        add_operation(new LASoperationMapPointSource(argv[i+1]));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i],"-map_intensity") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: map_file_name.txt\n", argv[i]);
+          return FALSE;
+        }
+        FILE* file = fopen(argv[i+1], "r");
+        if (file == 0)
+        {
+          fprintf(stderr,"ERROR: cannot '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        else
+        {
+          fclose(file);
+        }
+        add_operation(new LASoperationMapIntensity(argv[i+1]));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
     }
