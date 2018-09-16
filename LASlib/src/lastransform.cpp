@@ -532,12 +532,12 @@ class LASoperationBinGpsTimeIntoIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "bin_gps_time_into_intensity"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g", name(), bin_size); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf", name(), bin_size); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
-  inline void transform(LASpoint* point) { point->set_intensity(U16_CLAMP(point->get_gps_time()/bin_size)); };
-  LASoperationBinGpsTimeIntoIntensity(F32 bin_size=1.0f) { this->bin_size = bin_size; };
+  inline void transform(LASpoint* point) { point->set_intensity((U16)(I32_QUANTIZE(point->get_gps_time()/bin_size) & 0xFFFF)); };
+  LASoperationBinGpsTimeIntoIntensity(F64 bin_size=1.0) { this->bin_size = bin_size; };
 private:
-  F32 bin_size;
+  F64 bin_size;
 };
 
 class LASoperationScaleScanAngle : public LASoperation
@@ -895,11 +895,53 @@ public:
   inline const CHAR* name() const { return "change_user_data_from_to"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), user_data_from, user_data_to); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
-  inline void transform(LASpoint* point) { if (point->user_data == user_data_from) point->user_data = user_data_to; };
+  inline void transform(LASpoint* point) { if (point->get_user_data() == user_data_from) point->set_user_data(user_data_to); };
   LASoperationChangeUserDataFromTo(U8 user_data_from, U8 user_data_to) { this->user_data_from = user_data_from; this->user_data_to = user_data_to; };
 private:
   U8 user_data_from;
   U8 user_data_to;
+};
+
+class LASoperationMapUserData : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "map_user_data"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s \"%s\" ", name(), user_data_map_file_name); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
+  inline void transform(LASpoint* point) { U8 user_data = point->get_user_data(); point->set_user_data(user_data_map[user_data]); };
+  LASoperationMapUserData(const CHAR* file_name)
+  {
+    for (U32 u = 0; u < 256; u++)
+    {
+      user_data_map[u] = u;
+    }
+    FILE* file = fopen(file_name, "r");
+    if (file)
+    {
+      U32 from, to;
+      CHAR line[128];
+      while (fgets(line, 128, file))
+      {
+        if (sscanf(line, "%u %u", &from, &to) == 2)
+        {
+          if ((from < 256) && (to < 256))
+          {
+            user_data_map[from] = to;
+          }
+        }
+      }
+      fclose(file);
+      user_data_map_file_name = LASCopyString(file_name);
+    }
+    else
+    {
+      user_data_map_file_name = 0;
+    }
+  };
+  ~LASoperationMapUserData() { if (user_data_map_file_name) free(user_data_map_file_name); };
+private:
+  U8 user_data_map[256];
+  CHAR* user_data_map_file_name;
 };
 
 class LASoperationCopyClassificationIntoUserData : public LASoperation
@@ -948,6 +990,18 @@ public:
 private:
   U16 psid_from;
   U16 psid_to;
+};
+
+class LASoperationBinGpsTimeIntoPointSource : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "bin_gps_time_into_point_source"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf", name(), bin_size); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
+  inline void transform(LASpoint* point) { point->set_point_source_ID((U16)(I32_QUANTIZE(point->get_gps_time()/bin_size) & 0xFFFF)); };
+  LASoperationBinGpsTimeIntoPointSource(F64 bin_size=1.0) { this->bin_size = bin_size; };
+private:
+  F64 bin_size;
 };
 
 class LASoperationRepairZeroReturns : public LASoperation
@@ -3322,18 +3376,62 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size\n", argv[i]);
           return FALSE;
         }
-        F32 bin_size;
-        if (sscanf(argv[i+1], "%f", &bin_size) != 1)
+        F64 bin_size;
+        if (sscanf(argv[i+1], "%lf", &bin_size) != 1)
         {
           fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size but '%s' is no valid bin_size\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        if (bin_size <= 0.0f)
+        if (bin_size <= 0.0)
         {
-          fprintf(stderr,"ERROR: %f is no valid bin_size for '%s'\n", bin_size, argv[i]);
+          fprintf(stderr,"ERROR: %g is no valid bin_size for '%s'\n", bin_size, argv[i]);
           return FALSE;
         }
         add_operation(new LASoperationBinGpsTimeIntoIntensity(bin_size));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i],"-bin_gps_time_into_point_source") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size\n", argv[i]);
+          return FALSE;
+        }
+        F64 bin_size;
+        if (sscanf(argv[i+1], "%lf", &bin_size) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: bin_size but '%s' is no valid bin_size\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (bin_size <= 0.0)
+        {
+          fprintf(stderr,"ERROR: %g is no valid bin_size for '%s'\n", bin_size, argv[i]);
+          return FALSE;
+        }
+        add_operation(new LASoperationBinGpsTimeIntoPointSource(bin_size));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+    }
+    else if (strncmp(argv[i],"-map_", 5) == 0)
+    {
+      if (strcmp(argv[i],"-map_user_data") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: map_file_name.txt\n", argv[i]);
+          return FALSE;
+        }
+        FILE* file = fopen(argv[i+1], "r");
+        if (file == 0)
+        {
+          fprintf(stderr,"ERROR: cannot '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        else
+        {
+          fclose(file);
+        }
+        add_operation(new LASoperationMapUserData(argv[i+1]));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
     }
