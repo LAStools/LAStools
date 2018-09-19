@@ -63,6 +63,7 @@ of each point.
 
 other available options are
 
+-do_not_zero_user_data
 -do_not_move_EVLRs
 -do_not_remove_padding
 -do_not_set_nice_offset
