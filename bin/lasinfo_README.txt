@@ -225,6 +225,7 @@ overview of all tool-specific switches:
 -nv or -no_vlrs                      : don't output VLR information
 -nr or -no_returns                   : don't output return information
 -nmm or -no_min_max                  : don't output point minimum / maximum entry information
+-nw or -no_warnings                  : don't output WARNINGs
 -nc or -no_check                     : don't parse points (only check header and VLRs)
 -cd or -compute_density              : compute rough approximation for covered area, density, and spacing
 -gw or -gps_week                     : compute the GPS week (if data is Asjusted Standard GPS time)
