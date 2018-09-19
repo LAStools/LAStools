@@ -1,3 +1,7 @@
+17 September 2018 -- LASlib: no more support for deprecated LASattributes (aka "extra bytes") with dimensions 2 or 3 
+16 September 2018 -- LASlib: new '-map_user_data map.txt' and '-map_intensity map.txt' and '-map_point_source map.txt'
+15 September 2018 -- lasgrid, las2dem, lascanopy: auto switch nodata value from -9999 to 0 for 16 bit integer BIL
+14 September 2018 -- lasinfo: new option '-nw' or '-no_warnings' to suppress output of WARNING messages
 13 September 2018 -- las2las: new options 'set_attribute_scale 0 0.1' and '-set_attribute_offset 1 10.0'
 10 September 2018 -- all LAStools: command-line option '-cpu64' invokes 64 bit tool instead where available.
 9 September 2018 -- LASlib, all LAStools: tools can now also read points from PLY format (binary and ASCII).
