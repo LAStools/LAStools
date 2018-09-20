@@ -162,10 +162,9 @@ int main(int argc, char *argv[])
 
   try {
     I32 type = 2; // unsigned short
-    I32 dim = 1;  // 2 and 3 dimensional arrays are deprecated
-    LASattribute attribute(type, "echo width", "full width at half maximum [ns]", dim);
-    attribute.set_scale(echo_width_scale, 0);
-    attribute.set_offset(echo_width_offset, 0);
+    LASattribute attribute(type, "echo width", "full width at half maximum [ns]");
+    attribute.set_scale(echo_width_scale);
+    attribute.set_offset(echo_width_offset);
     attribute_index_echo_width = lasheader.add_attribute(attribute);
   }
   catch(...) {
@@ -180,10 +179,9 @@ int main(int argc, char *argv[])
 
   try {
     I32 type = 3; // signed short
-    I32 dim = 1;  // 2 and 3 dimensional arrays are deprecated
-    LASattribute attribute(type, "height above ground", "vertical distance to TIN [m]", dim);
-    attribute.set_scale(height_above_ground_scale, 0);
-    attribute.set_offset(height_above_ground_offset, 0);
+    LASattribute attribute(type, "height above ground", "vertical distance to TIN [m]");
+    attribute.set_scale(height_above_ground_scale);
+    attribute.set_offset(height_above_ground_offset);
     attribute_index_height_above_ground = lasheader.add_attribute(attribute);
   }
   catch(...) {
