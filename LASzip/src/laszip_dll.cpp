@@ -24,8 +24,10 @@
 
   CHANGE HISTORY:
 
+   29 September 2018 -- laszip_prepare_point_for_write() sets extended_point_type 
+   19 September 2018 -- removed tuples and triple support from attributes
     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
-    6 April 2018 == added zero() function to laszip_dll struct to fix memory leak
+    6 April 2018 -- added zero() function to laszip_dll struct to fix memory leak
    30 August 2017 -- completing stream-based writing (with writing LAS header)
    23 August 2017 -- turn on "native" by default
     3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
@@ -1670,6 +1672,11 @@ laszip_request_native_extension(
     }
 
     laszip_dll->request_native_extension = request;
+
+    if (request) // only one should be on
+    {
+      laszip_dll->request_compatibility_mode = FALSE;
+    }
   }
   catch (...)
   {
@@ -1706,6 +1713,11 @@ laszip_request_compatibility_mode(
     }
 
     laszip_dll->request_compatibility_mode = request;
+
+    if (request) // only one should be on
+    {
+      laszip_dll->request_native_extension = FALSE;
+    }
   }
   catch (...)
   {
@@ -1877,13 +1889,22 @@ laszip_prepare_point_for_write(
 
   if (laszip_dll->header.point_data_format > 5)
   {
+    // must be set for the new point types 6 or higher ...
+
+    laszip_dll->point.extended_point_type = 1;
+
     if (laszip_dll->request_native_extension)
     {
       // we are *not* operating in compatibility mode
+
       laszip_dll->compatibility_mode = FALSE;
     }
     else if (laszip_dll->request_compatibility_mode)
     {
+      // we are *not* using the native extension
+
+      laszip_dll->request_native_extension = FALSE;
+
       // make sure there are no more than U32_MAX points
 
       if (laszip_dll->header.extended_number_of_point_records > U32_MAX)
@@ -2146,7 +2167,12 @@ laszip_prepare_point_for_write(
   }
   else
   {
+    // must *not* be set for the old point type 5 or lower
+
+    laszip_dll->point.extended_point_type = 0;
+    
     // we are *not* operating in compatibility mode
+
     laszip_dll->compatibility_mode = FALSE;
   }
 
