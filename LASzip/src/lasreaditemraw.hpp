@@ -243,7 +243,7 @@ public:
     }
     ((LAStempReadPoint10*)item)->scan_direction_flag = ((LAStempReadPoint14*)buffer)->scan_direction_flag;
     ((LAStempReadPoint10*)item)->edge_of_flight_line = ((LAStempReadPoint14*)buffer)->edge_of_flight_line;
-    ((LAStempReadPoint10*)item)->classification = (((LAStempReadPoint14*)buffer)->classification_flags << 5);
+    ((LAStempReadPoint10*)item)->classification = (U8)(((((LAStempReadPoint14*)buffer)->classification_flags) << 5) & 0xE0);
     if (((LAStempReadPoint14*)buffer)->classification < 32) ((LAStempReadPoint10*)item)->classification |= ((LAStempReadPoint14*)buffer)->classification;
     ((LAStempReadPoint10*)item)->scan_angle_rank = I8_CLAMP(I16_QUANTIZE(0.006f*((LAStempReadPoint14*)buffer)->scan_angle));
     ((LAStempReadPoint10*)item)->user_data = ((LAStempReadPoint14*)buffer)->user_data;
