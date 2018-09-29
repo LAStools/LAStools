@@ -25,21 +25,22 @@
 
   CHANGE HISTORY:
 
-    9 February 2018 -- minor version increment as it can read v4 compressed items
+    28 September 2018 -- upped to 3.2 r5 for fix in extended classification writing 
+     9 February 2018 -- minor version increment as it can read v4 compressed items
     28 December 2017 -- fix incorrect 'context switch' reported by Wanwannodao
     23 August 2017 -- minor version increment for C++ stream-based read/write API
     28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
-    8 April 2017 -- new check for whether point size and total size of items match
+     8 April 2017 -- new check for whether point size and total size of items match
     30 March 2017 -- support for "native LAS 1.4 extension" added into main branch
-    7 January 2017 -- set reserved VLR field from 0xAABB to 0x0 in DLL
-    7 January 2017 -- consistent compatibility mode scan angle quantization in DLL
-    7 January 2017 -- compatibility mode *decompression* fix for waveforms in DLL
+     7 January 2017 -- set reserved VLR field from 0xAABB to 0x0 in DLL
+     7 January 2017 -- consistent compatibility mode scan angle quantization in DLL
+     7 January 2017 -- compatibility mode *decompression* fix for waveforms in DLL
     25 February 2016 -- depreciating old libLAS laszipper/lasunzipper binding
     29 July 2013 -- reorganized to create an easy-to-use LASzip DLL
-    5 December 2011 -- learns the chunk table if it is missing (e.g. truncated LAZ)
-    6 October 2011 -- large file support, ability to read with missing chunk table
+     5 December 2011 -- learns the chunk table if it is missing (e.g. truncated LAZ)
+     6 October 2011 -- large file support, ability to read with missing chunk table
     23 June 2011 -- turned on LASzip version 2.0 compressor with chunking
-    8 May 2011 -- added an option for variable chunking via chunk()
+     8 May 2011 -- added an option for variable chunking via chunk()
     23 April 2011 -- changed interface for simplicity and chunking support
     20 March 2011 -- incrementing LASZIP_VERSION to 1.2 for improved compression
     10 January 2011 -- licensing change for LGPL release and liblas integration
@@ -66,8 +67,8 @@ typedef long long SIGNED_INT64;
 
 #define LASZIP_VERSION_MAJOR                3
 #define LASZIP_VERSION_MINOR                2
-#define LASZIP_VERSION_REVISION             4
-#define LASZIP_VERSION_BUILD_DATE      180617
+#define LASZIP_VERSION_REVISION             5
+#define LASZIP_VERSION_BUILD_DATE      180929
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1
