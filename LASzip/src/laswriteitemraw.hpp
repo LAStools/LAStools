@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    29 September 2018 -- fix: extended_classification when classification not set 
     28 August 2017 -- moving 'context' from global development hack to interface  
     10 January 2011 -- licensing change for LGPL release and liblas integration
     7 January 2011 -- introduced swap buffers to reduce number of fwrite calls
@@ -230,7 +231,7 @@ public:
     if (((LAStempWritePoint10*)item)->extended_point_type)
     {
       ((LAStempWritePoint14*)buffer)->classification_flags = (((LAStempWritePoint10*)item)->extended_classification_flags & 8) | (((LAStempWritePoint10*)item)->classification >> 5);
-      if (((LAStempWritePoint10*)item)->extended_classification > 31) ((LAStempWritePoint14*)buffer)->classification = ((LAStempWritePoint10*)item)->extended_classification;
+      if (((LAStempWritePoint14*)buffer)->classification == 0) ((LAStempWritePoint14*)buffer)->classification = ((LAStempWritePoint10*)item)->extended_classification;
       ((LAStempWritePoint14*)buffer)->scanner_channel = ((LAStempWritePoint10*)item)->extended_scanner_channel;
       ((LAStempWritePoint14*)buffer)->return_number = ((LAStempWritePoint10*)item)->extended_return_number;
       ((LAStempWritePoint14*)buffer)->number_of_returns = ((LAStempWritePoint10*)item)->extended_number_of_returns;
@@ -271,7 +272,7 @@ public:
     if (((LAStempWritePoint10*)item)->extended_point_type)
     {
       ((LAStempWritePoint14*)swapped)->classification_flags = (((LAStempWritePoint10*)item)->extended_classification_flags & 8) | (((LAStempWritePoint10*)item)->classification >> 5);
-      if (((LAStempWritePoint10*)item)->extended_classification > 31) ((LAStempWritePoint14*)swapped)->classification = ((LAStempWritePoint10*)item)->extended_classification;
+      if (((LAStempWritePoint14*)swapped)->classification == 0) ((LAStempWritePoint14*)swapped)->classification = ((LAStempWritePoint10*)item)->extended_classification;
       ((LAStempWritePoint14*)swapped)->scanner_channel = ((LAStempWritePoint10*)item)->extended_scanner_channel;
       ((LAStempWritePoint14*)swapped)->return_number = ((LAStempWritePoint10*)item)->extended_return_number;
       ((LAStempWritePoint14*)swapped)->number_of_returns = ((LAStempWritePoint10*)item)->extended_number_of_returns;
