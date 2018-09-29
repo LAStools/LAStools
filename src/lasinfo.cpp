@@ -53,6 +53,7 @@
 
 #include "geoprojectionconverter.hpp"
 #include "lasreader.hpp"
+#include "laszip_decompress_selective_v3.hpp"
 #include "lasutility.hpp"
 #include "laswriter.hpp"
 
@@ -221,10 +222,18 @@ int main(int argc, char *argv[])
   bool gps_week = false;
   bool check_outside = true;
   bool report_outside = false;
+  bool suppress_z = false;
+  bool suppress_classification = false;
+  bool suppress_flags = false;
+  bool suppress_intensity = false;
+  bool suppress_user_data = false;
+  bool suppress_point_source = false;
+  bool suppress_scan_angle = false;
+  bool suppress_RGB = false;
+  bool suppress_extra_bytes = false;
   bool repair_bb = false;
   bool repair_counters = false;
-  bool edit_header = false;
-  I32 set_file_source_ID = -1;
+  bool edit_header = false;  I32 set_file_source_ID = -1;
   bool set_file_source_ID_from_point_source_ID = false;
   I32 set_global_encoding = -1;
   I64 set_project_ID_GUID_data_1 = -1;
@@ -703,6 +712,50 @@ int main(int argc, char *argv[])
       set_start_of_waveform_data_packet_record = atoi(argv[i]);
       edit_header = true;
     }
+    else if ((strncmp(argv[i],"-suppress_", 10)  == 0))
+    {
+      if (strcmp(argv[i],"-suppress_z") == 0)
+      {
+        suppress_z = true;
+      }
+      else if (strcmp(argv[i],"-suppress_classification") == 0)
+      {
+        suppress_classification = true;
+      }
+      else if (strcmp(argv[i],"-suppress_flags") == 0)
+      {
+        suppress_flags = true;
+      }
+      else if (strcmp(argv[i],"-suppress_intensity") == 0)
+      {
+        suppress_intensity = true;
+      }
+      else if (strcmp(argv[i],"-suppress_user_data") == 0)
+      {
+        suppress_user_data = true;
+      }
+      else if (strcmp(argv[i],"-suppress_point_source") == 0)
+      {
+        suppress_point_source = true;
+      }
+      else if (strcmp(argv[i],"-suppress_scan_angle") == 0)
+      {
+        suppress_scan_angle = true;
+      }
+      else if (strcmp(argv[i],"-suppress_RGB") == 0)
+      {
+        suppress_RGB = true;
+      }
+      else if (strcmp(argv[i],"-suppress_extra_bytes") == 0)
+      {
+        suppress_extra_bytes = true;
+      }
+      else
+      {
+        fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+        byebye(TRUE);
+      }
+    }
     else if (strcmp(argv[i],"-progress") == 0)
     {
       if ((i+1) >= argc)
@@ -761,6 +814,57 @@ int main(int argc, char *argv[])
     fprintf (stderr, "ERROR: no input specified\n");
     byebye(true, argc==1);
   }
+
+  // omit "suppressed" layers from LAZ decompression (for new LAS 1.4 point types only)
+
+  U32 decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL;
+
+  if (suppress_z)
+  {
+    decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_Z;
+  }
+
+  if (suppress_classification)
+  {
+    decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
+  }
+
+  if (suppress_flags)
+  {
+    decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_FLAGS;
+  }
+  
+  if (suppress_intensity)
+  {
+    decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
+  }
+
+  if (suppress_user_data)
+  {
+    decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
+  }
+
+  if (suppress_point_source)
+  {
+    decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE;
+  }
+
+  if (suppress_scan_angle)
+  {
+    decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE;
+  }
+  
+  if (suppress_RGB)
+  {
+    decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_RGB;
+  }
+
+  if (suppress_extra_bytes)
+  {
+    decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
+  }
+  
+  lasreadopener.set_decompress_selective(decompress_selective);
 
   // possibly loop over multiple input files
 
