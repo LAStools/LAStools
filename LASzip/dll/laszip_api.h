@@ -251,7 +251,7 @@ typedef struct laszip_point
 #define laszip_DECOMPRESS_SELECTIVE_BYTE5              0x00200000
 #define laszip_DECOMPRESS_SELECTIVE_BYTE6              0x00400000
 #define laszip_DECOMPRESS_SELECTIVE_BYTE7              0x00800000
-#define laszip_DECOMPRESS_SELECTIVE_EXTRA_BYTES        0xFFF00000
+#define laszip_DECOMPRESS_SELECTIVE_EXTRA_BYTES        0xFFFF0000
 
 /*---------------------------------------------------------------------------*/
 /*---------------- DLL functions to manage the LASzip DLL -------------------*/
