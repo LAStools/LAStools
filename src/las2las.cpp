@@ -146,6 +146,7 @@ int main(int argc, char *argv[])
   BOOL cpu64 = FALSE;
 #endif
   bool verbose = false;
+  bool very_verbose = false;
   bool force = false;
   // fixed header changes 
   int set_version_major = -1;
@@ -167,6 +168,7 @@ int main(int argc, char *argv[])
   int remove_extended_variable_length_record = -1;
   int remove_extended_variable_length_record_from = -1;
   int remove_extended_variable_length_record_to = -1;
+  bool move_evlrs_to_vlrs = false;
   int set_attribute_scales = 0;
   int set_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
   double set_attribute_scale_scale[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
@@ -235,6 +237,10 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
     {
       verbose = true;
+    }
+    else if (strcmp(argv[i],"-vv") == 0 || strcmp(argv[i],"-very_verbose") == 0)
+    {
+      very_verbose = true;
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
@@ -611,18 +617,20 @@ int main(int argc, char *argv[])
       else if (strcmp(argv[i],"-remove_tiling_vlr") == 0)
       {
         remove_tiling_vlr = true;
-        i++;
       }
       else if (strcmp(argv[i],"-remove_original_vlr") == 0)
       {
         remove_original_vlr = true;
-        i++;
       }
       else
       {
         fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
         usage(true);
       }
+    }
+    else if (strcmp(argv[i],"-move_evlrs_to_vlrs") == 0)
+    {
+      move_evlrs_to_vlrs = true;
     }
     else if (strcmp(argv[i],"-dont_remove_empty_files") == 0)
     {
@@ -1089,6 +1097,38 @@ int main(int argc, char *argv[])
       else
       {
         fprintf(stderr, "WARNING: file '%s' has no LAStiling VLR. cannot set buffer flag.\n", lasreadopener.get_file_name());
+      }
+    }
+
+    if (move_evlrs_to_vlrs)
+    {
+      if (lasreader->header.number_of_extended_variable_length_records > 0)
+      {
+        U32 u;
+        for (u = 0; u < lasreader->header.number_of_extended_variable_length_records; u++)
+        {
+          if (lasreader->header.evlrs[u].record_length_after_header <= U16_MAX)
+          {
+            lasreader->header.add_vlr(lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_id, (U16)lasreader->header.evlrs[u].record_length_after_header, lasreader->header.evlrs[u].data);
+            lasreader->header.evlrs[u].data = 0;
+#ifdef _WIN32
+            if (very_verbose) fprintf(stderr, "         moved EVLR %d with user ID '%s' and %I64d bytes of payload\n", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+#else
+            if (very_verbose) fprintf(stderr, "         moved EVLR %d with user ID '%s' and %lld bytes of payload\n", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+#endif
+          }
+        }
+        U32 remaining = 0;
+        for (u = 0; u < lasreader->header.number_of_extended_variable_length_records; u++)
+        {
+          if (lasreader->header.evlrs[u].record_length_after_header > U16_MAX)
+          {
+            lasreader->header.evlrs[remaining] = lasreader->header.evlrs[u];
+            remaining++;
+          }
+        }
+        if (verbose) fprintf(stderr, "moved %u EVLRs to VLRs. %u EVLRs with large payload remain.\n", u-remaining, remaining);
+        lasreader->header.number_of_extended_variable_length_records = remaining;
       }
     }
 
