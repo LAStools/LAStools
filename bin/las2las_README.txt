@@ -208,6 +208,7 @@ other commandline arguments are
 -remove_all_evlrs              : remove all EVLRs
 -remove_evlr 2                 : remove EVLR number 2 (couting starts at 0)
 -remove_evlrs_from_to 0 2      : remove the first three EVLRs
+-move_evlrs_to_vlrs            : move all EVLRs with small enough payload to VLR section
 -remove_padding                : remove user-defined bytes before and after the header
 -week_to_adjusted              : converts time stamps from GPS week to Adjusted Standard GPS 
 -adjusted_to_week              : converts time stamps from Adjusted Standard GPS to GPS week

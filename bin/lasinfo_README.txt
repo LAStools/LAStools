@@ -257,7 +257,15 @@ overview of all tool-specific switches:
 -set_point_data_format
 -set_point_data_record_length
 -set_start_of_waveform_data_packet_record
-
+-suppress_z                          : do not decompress z for native LAS 1.4 point types 6 to 10
+-suppress_classification             : do not decompress classification for native LAS 1.4 point types 6 to 10
+-suppress_flags                      : do not decompress flags for native LAS 1.4 point types 6 to 10
+-suppress_intensity                  : do not decompress intensity for native LAS 1.4 point types 6 to 10
+-suppress_user_data                  : do not decompress user data for native LAS 1.4 point types 6 to 10
+-suppress_point_source               : do not decompress point source ID for native LAS 1.4 point types 6 to 10
+-suppress_scan_angle                 : do not decompress scan angle for native LAS 1.4 point types 6 to 10
+-suppress_RGB                        : do not decompress RGB for native LAS 1.4 point types 6 to 10
+-suppress_extra_bytes                : do not decompress "extra bytes" for native LAS 1.4 point types 6 to 10
 -progress
 
 ****************************************************************
