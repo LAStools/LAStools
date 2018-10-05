@@ -25,6 +25,7 @@
 
   CHANGE HISTORY:
 
+     5 October 2018 -- upped to 3.2 r6 for corrected 'is_empty' return value
     28 September 2018 -- upped to 3.2 r5 for fix in extended classification writing 
      9 February 2018 -- minor version increment as it can read v4 compressed items
     28 December 2017 -- fix incorrect 'context switch' reported by Wanwannodao
@@ -67,8 +68,8 @@ typedef long long SIGNED_INT64;
 
 #define LASZIP_VERSION_MAJOR                3
 #define LASZIP_VERSION_MINOR                2
-#define LASZIP_VERSION_REVISION             5
-#define LASZIP_VERSION_BUILD_DATE      180929
+#define LASZIP_VERSION_REVISION             6
+#define LASZIP_VERSION_BUILD_DATE      181005
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1

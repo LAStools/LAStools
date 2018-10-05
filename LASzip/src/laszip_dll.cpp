@@ -24,18 +24,19 @@
 
   CHANGE HISTORY:
 
-   29 September 2018 -- laszip_prepare_point_for_write() sets extended_point_type 
-   19 September 2018 -- removed tuples and triple support from attributes
-    7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
-    6 April 2018 -- added zero() function to laszip_dll struct to fix memory leak
-   30 August 2017 -- completing stream-based writing (with writing LAS header)
-   23 August 2017 -- turn on "native" by default
-    3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
-   29 July 2017 -- integrating minimal stream-based reading/writing into branch
-   20 July 2017 -- Andrew Bell adds support for stream-based reading/writing
-   28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
-   25 April 2017 -- adding initial support for new "native LAS 1.4 extension"
-    8 January 2017 -- changed from "laszip_dll.h" to "laszip_api.h" for hobu
+     5 October 2018 -- corrected 'is_empty' return value in laszip_inside_rectangle()
+    29 September 2018 -- laszip_prepare_point_for_write() sets extended_point_type 
+    19 September 2018 -- removed tuples and triple support from attributes
+     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
+     6 April 2018 -- added zero() function to laszip_dll struct to fix memory leak
+    30 August 2017 -- completing stream-based writing (with writing LAS header)
+    23 August 2017 -- turn on "native" by default
+     3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
+    29 July 2017 -- integrating minimal stream-based reading/writing into branch
+    20 July 2017 -- Andrew Bell adds support for stream-based reading/writing
+    28 May 2017 -- support for "LAS 1.4 selective decompression" added into DLL API
+    25 April 2017 -- adding initial support for new "native LAS 1.4 extension"
+     8 January 2017 -- changed from "laszip_dll.h" to "laszip_api.h" for hobu
 
 ===============================================================================
 */
@@ -4449,12 +4450,12 @@ laszip_inside_rectangle(
     {
       if (laszip_dll->lax_index->intersect_rectangle(r_min_x, r_min_y, r_max_x, r_max_y))
       {
-        // no overlap between spatial indexing cells and query reactangle
-        *is_empty = 1;
+        *is_empty = 0;
       }
       else
       {
-        *is_empty = 0;
+        // no overlap between spatial indexing cells and query reactangle
+        *is_empty = 1;
       }
     }
     else
@@ -4469,8 +4470,6 @@ laszip_inside_rectangle(
         *is_empty = 0;
       }
     }
-
-
   }
   catch (...)
   {
