@@ -1,6 +1,9 @@
+5 October 2018 -- laszip DLL: corrected 'is_empty' return value in laszip_inside_rectangle()
+28 September 2018 -- laszip DLL: tiny bug fix for writing extended classifications via DLL and updated examples
+17 September 2018 -- laszip DLL: no more support for deprecated LASattributes (aka "extra bytes") with dimensions 2 or 3 
 30 July 2018 -- bug fix in selective decompression of "extra_bytes" for point types 6 and higher
 29 March 2018 -- add LASlib only fields to some structs to avoid future mix-up for "native" LAS 1.4
- 9 February 2018 -- minor version increment to 3.2 as POINT14_v4 fixes context inefficiency bug
+9 February 2018 -- minor version increment to 3.2 as POINT14_v4 fixes context inefficiency bug
 28 December 2017 -- prepare to correct 'context switch' bug reported by Wanwannodao on some future date
 15 September 2017 -- new C++ istream / ostream interface completed and released
 22 August 2017 -- new C++ istream / ostream interface 
