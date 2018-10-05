@@ -16,7 +16,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -123,7 +123,7 @@ static double taketime()
 #define EXAMPLE_FIFTEEN 15
 #define EXAMPLE_SIXTEEN 16
 
-#define EXAMPLE EXAMPLE_SIXTEEN
+#define EXAMPLE EXAMPLE_FOUR
 
 int main(int argc, char *argv[])
 {
