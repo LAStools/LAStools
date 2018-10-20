@@ -239,9 +239,6 @@ void LASinterval::merge_intervals(U32 maximum_intervals, const BOOL verbose)
     hash_element++;
   }
 
-  my_cell_map::iterator map_element = map.begin();
-  diff = (*map_element).first;
-
   // maybe nothing to do
   if (map.size() <= maximum_intervals)
   {
@@ -253,13 +250,16 @@ void LASinterval::merge_intervals(U32 maximum_intervals, const BOOL verbose)
       }
       else
       {
+        diff = (*(map.begin())).first;
         fprintf(stderr,"maximum_intervals: %u number of interval gaps: %u next largest interval gap %u\n", maximum_intervals, (U32)map.size(), diff);
       }
     }
     return;
   }
 
+  my_cell_map::iterator map_element;
   U32 size = (U32)map.size();
+
   while (size > maximum_intervals)
   {
     map_element = map.begin();
