@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    20 October 2018 -- fixed rare bug in merge_intervals() when verbose is TRUE
     29 April 2011 -- created after cable outage during the royal wedding (-:
   
 ===============================================================================
