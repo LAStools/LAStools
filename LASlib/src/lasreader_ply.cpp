@@ -1762,6 +1762,12 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
           type_string[items] = 'C';
           items++;
         }
+        else if (strstr(&line[15], "gray"))
+        {
+          parse_string[items] = 'i';
+          type_string[items] = 'C';
+          items++;
+        }
         else
         {
           I32 num = number_attributes;
