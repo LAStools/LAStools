@@ -1,3 +1,9 @@
+30 September 2018 -- lasliberate and lasliberateGUI: now also liberating new LAS 1.4 point types 6 to 10 to LAS and LAZ
+29 September 2018 -- lasvalidate: bug fix for LAS 1.4 point type 7 containing RGB colors
+29 September 2018 -- lasinfo: new options '-supress_z', '-supress_flags', '-supress_rgb', '-supress_point_source', ...
+28 September 2018 -- las2las: new option '-move_evlrs_to_vlrs'
+28 September 2018 -- laszip DLL: tiny bug fix for writing extended classifications via DLL and updated examples
+27 September 2018 -- lasgrid, las2dem, lascanopy: further improved handling of 16 bit integer BIL
 17 September 2018 -- LASlib: no more support for deprecated LASattributes (aka "extra bytes") with dimensions 2 or 3 
 16 September 2018 -- LASlib: new '-map_user_data map.txt' and '-map_intensity map.txt' and '-map_point_source map.txt'
 15 September 2018 -- lasgrid, las2dem, lascanopy: auto switch nodata value from -9999 to 0 for 16 bit integer BIL
