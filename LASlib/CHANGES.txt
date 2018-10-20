@@ -1,3 +1,5 @@
+29 September 2018 -- lasinfo: new options '-supress_z', '-supress_flags', '-supress_rgb', '-supress_point_source', ...
+28 September 2018 -- las2las: new option '-move_evlrs_to_vlrs'
 17 September 2018 -- LASlib: no more support for deprecated LASattributes (aka "extra bytes") with dimensions 2 or 3 
 16 September 2018 -- LASlib: new '-map_user_data map.txt' and '-map_intensity map.txt' and '-map_point_source map.txt'
 14 September 2018 -- lasinfo: new option '-nw' or '-no_warnings' to suppress output of WARNING messages
