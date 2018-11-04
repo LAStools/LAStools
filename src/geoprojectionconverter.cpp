@@ -890,6 +890,22 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
       case 4617: // Datum_NAD83_CSRS
         datum_code = GEO_GCS_NAD83_CSRS;
         break;
+      case 4759: // NAD83_2007
+      case 4893: // NAD83_2007_3D
+        gcs_code = GEO_GCS_NAD83_NSRS2007;
+        break;
+      case 4957: // NAD83_HARN_3D
+      case 4152: // NAD83_HARN
+        gcs_code = GEO_GCS_NAD83_HARN;
+        break;
+      case 6783: // CORS96
+      case 6782: // CORS96 3D
+        gcs_code = GEO_GCS_NAD83_CORS96;
+        break;
+      case 6318: // NAD83_2011
+      case 6319: // NAD83_2011_3D
+        gcs_code = GEO_GCS_NAD83_2011;
+        break;
       case 4030: // GCSE_WGS84 (unknown datum based on WGS 84 ellipsoid)
         ellipsoid = GEO_ELLIPSOID_WGS84;
         break;
@@ -6719,6 +6735,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
 {
   int i;
   char tmp[256];
+  bool verbose = false;
 
   if (argv_zero) free(argv_zero);
   argv_zero = LASCopyString(argv[0]);
@@ -6733,6 +6750,10 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     {
       return true;
     }
+    else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
+    {
+      verbose = true;
+    }
     else if (strcmp(argv[i],"-ellipsoid") == 0)
     {
       if ((i+1) >= argc)
@@ -6743,7 +6764,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       int ellipsoid_id = atoi(argv[i+1]);
       if (set_reference_ellipsoid(ellipsoid_id, tmp))
       {
-        fprintf(stderr, "using ellipsoid '%s'\n", tmp);
+        if (verbose) fprintf(stderr, "using ellipsoid '%s'\n", tmp);
       }
       else
       {
@@ -6760,25 +6781,25 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     else if (strcmp(argv[i],"-wgs72") == 0)
     {
       set_gcs(GEO_GCS_WGS72, tmp);
-      fprintf(stderr, "using ellipsoid '%s'\n", tmp);
+      if (verbose) fprintf(stderr, "using ellipsoid '%s'\n", tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-wgs84") == 0)
     {
       set_gcs(GEO_GCS_WGS84, tmp);
-      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-grs80") == 0)
     {
       set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980, tmp);
-      fprintf(stderr, "using ellipsoid '%s'\n", tmp);
+      if (verbose) fprintf(stderr, "using ellipsoid '%s'\n", tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-nad27") == 0)
     {
       set_gcs(GEO_GCS_NAD27, tmp);
-      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strncmp(argv[i],"-nad83", 6) == 0)
@@ -6786,25 +6807,25 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       if (strcmp(argv[i],"-nad83") == 0)
       {
         set_gcs(GEO_GCS_NAD83, tmp);
-        fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
       else if (strcmp(argv[i],"-nad83_2011") == 0)
       {
         set_gcs(GEO_GCS_NAD83_2011, tmp);
-        fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
       else if (strcmp(argv[i],"-nad83_harn") == 0)
       {
         set_gcs(GEO_GCS_NAD83_HARN, tmp);
-        fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
       else if (strcmp(argv[i],"-nad83_csrs") == 0)
       {
         set_gcs(GEO_GCS_NAD83_CSRS, tmp);
-        fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
       else
@@ -6816,13 +6837,13 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     else if (strcmp(argv[i],"-gda94") == 0)
     {
       set_gcs(GEO_GCS_GDA94, tmp);
-      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-etrs89") == 0)
     {
       set_gcs(GEO_GCS_ETRS89, tmp);
-      fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strncmp(argv[i],"-vertical_", 10) == 0)
@@ -6922,21 +6943,21 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     {
       bool source = (strcmp(argv[i],"-latlong") == 0);
       set_latlong_projection(tmp, source);
-      fprintf(stderr, "using %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      if (verbose) fprintf(stderr, "using %s '%s'\n", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-longlat") == 0 || strcmp(argv[i],"-target_longlat") == 0)
     {
       bool source = (strcmp(argv[i],"-longlat") == 0);
       set_longlat_projection(tmp, source);
-      fprintf(stderr, "using %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      if (verbose) fprintf(stderr, "using %s '%s'\n", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-ecef") == 0 || strcmp(argv[i],"-target_ecef") == 0)
     {
       bool source = (strcmp(argv[i],"-ecef") == 0);
       set_ecef_projection(tmp, source);
-      fprintf(stderr, "using %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      if (verbose) fprintf(stderr, "using %s '%s'\n", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-utm") == 0 || strcmp(argv[i],"-target_utm") == 0)
@@ -6945,7 +6966,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       if (!source && (strcmp(argv[i+1],"auto") == 0))
       {
         set_target_utm_projection(tmp);
-        fprintf(stderr, "using target projection UTM '%s'\n", tmp);
+        if (verbose) fprintf(stderr, "using target projection UTM '%s'\n", tmp);
       }
       else
       {
@@ -6971,7 +6992,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         }
         if (set_utm_projection(argv[i+1], tmp, source))
         {
-          fprintf(stderr, "using %s UTM '%s'\n", (source ? "projection" : "target projection"), tmp);
+          if (verbose) fprintf(stderr, "using %s UTM '%s'\n", (source ? "projection" : "target projection"), tmp);
         }
         else
         {
@@ -6989,6 +7010,10 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       {
         fprintf(stderr, "ERROR: unknown EPSG code in '%s %s'.\n", argv[i], argv[i+1]);
         return false;
+      }
+      else
+      {
+        if (verbose) fprintf(stderr, "using %s EPSG %d\n", (source ? "projection" : "target projection"), value);
       }
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
@@ -7028,7 +7053,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       double firstStdParallelDeg = atof(argv[i+6]);
       double secondStdParallelDeg = atof(argv[i+7]);
       set_lambert_conformal_conic_projection(falseEasting, falseNorthing, latOfOriginDeg, longOfOriginDeg, firstStdParallelDeg, secondStdParallelDeg, tmp, source);
-      fprintf(stderr, "using LCC %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      if (verbose) fprintf(stderr, "using LCC %s '%s'\n", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0';  *argv[i+3]='\0';  *argv[i+4]='\0';  *argv[i+5]='\0';  *argv[i+6]='\0';  *argv[i+7]='\0'; i+=7;
     }
     else if (strcmp(argv[i],"-sp83") == 0 || strcmp(argv[i],"-target_sp83") == 0)
@@ -7036,11 +7061,11 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       bool source = (strcmp(argv[i],"-sp83") == 0);
       if (set_state_plane_nad83_lcc(argv[i+1], tmp, source))
       {
-        fprintf(stderr, "using %s '%s' (NAD83 LCC) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
+        if (verbose) fprintf(stderr, "using %s '%s' (NAD83 LCC) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
       }
       else if (set_state_plane_nad83_tm(argv[i+1], tmp, source))
       {
-        fprintf(stderr, "using %s '%s' (NAD83 TM) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
+        if (verbose) fprintf(stderr, "using %s '%s' (NAD83 TM) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
       }
       else
       {
@@ -7056,11 +7081,11 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       bool source = (strcmp(argv[i],"-sp27") == 0);
       if (set_state_plane_nad27_lcc(argv[i+1], tmp, source))
       {
-        fprintf(stderr, "using %s '%s' (NAD27 LCC) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
+        if (verbose) fprintf(stderr, "using %s '%s' (NAD27 LCC) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
       }
       else if (set_state_plane_nad27_tm(argv[i+1], tmp, source))
       {
-        fprintf(stderr, "using %s '%s' (NAD27 TM) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
+        if (verbose) fprintf(stderr, "using %s '%s' (NAD27 TM) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
       }
       else
       {
@@ -7106,7 +7131,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       double longMeridianDeg; sscanf(argv[i+5], "%lf", &longMeridianDeg);
       double scaleFactor; sscanf(argv[i+6], "%lf", &scaleFactor);
       set_transverse_mercator_projection(falseEasting, falseNorthing, latOriginDeg, longMeridianDeg, scaleFactor, tmp, source);
-      fprintf(stderr, "using TM %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      if (verbose) fprintf(stderr, "using TM %s '%s'\n", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0';  *argv[i+3]='\0';  *argv[i+4]='\0';  *argv[i+5]='\0';  *argv[i+6]='\0'; i+=6;
     }
     else if (strcmp(argv[i],"-aeac") == 0 || strcmp(argv[i],"-target_aeac") == 0)
@@ -7145,7 +7170,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       double firstStdParallelDeg = atof(argv[i+6]);
       double secondStdParallelDeg = atof(argv[i+7]);
       set_albers_equal_area_conic_projection(falseEasting, falseNorthing, latOfCenterDeg, longOfCenterDeg, firstStdParallelDeg, secondStdParallelDeg, tmp, source);
-      fprintf(stderr, "using AEAC %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      if (verbose) fprintf(stderr, "using AEAC %s '%s'\n", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0';  *argv[i+3]='\0';  *argv[i+4]='\0';  *argv[i+5]='\0';  *argv[i+6]='\0';  *argv[i+7]='\0'; i+=7;
     }
     else if (strcmp(argv[i],"-surveyfeet") == 0 || strcmp(argv[i],"-survey_feet") == 0)

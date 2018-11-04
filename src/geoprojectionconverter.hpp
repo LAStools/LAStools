@@ -51,6 +51,7 @@
 
   CHANGE HISTORY:
 
+     1 November 2018 -- changes requested by Kirk Waters including GEO_GCS_NAD83_CORS96
      7 September 2018 -- introduced the LASCopyString macro to replace _strdup
     30 October 2017 -- '-vertical_evrf2007' for European Vertical Reference Frame 2007
      1 February 2017 -- set_projection_from_ogc_wkt() from EPSG code of OGC WKT string
@@ -106,6 +107,7 @@ struct GeoProjectionGeoKeys
 #define GEO_GCS_SWEREF99           4619
 #define GEO_GCS_NAD83_NSRS2007     4759
 #define GEO_GCS_NAD83_2011         6318
+#define GEO_GCS_NAD83_CORS96       6783
 
 #define GEO_SPHEROID_AIRY          7001
 #define GEO_SPHEROID_BESSEL1841    7004
