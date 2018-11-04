@@ -1220,7 +1220,7 @@ int main(int argc, char *argv[])
         I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
         if (ogc_wkt == 0)
         { 
-          if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, false))
+          if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false)))
           {
             fprintf(stderr, "WARNING: cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'\n", lasreadopener.get_file_name());
             if (ogc_wkt) free(ogc_wkt);
