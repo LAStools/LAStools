@@ -1,4 +1,6 @@
-5 October 2018 -- laszip DLL: corrected 'is_empty' return value in laszip_inside_rectangle()
+7 November 2018 -- laszip DLL: upped to 3.2 r8 for identical legacy and extended flags check
+20 October 2018 -- fixed rare bug in LASinterval::merge_intervals()
+5 October 2018 -- laszip DLL: upped to 3.2 r6 for corrected 'is_empty' return value in laszip_inside_rectangle()
 28 September 2018 -- laszip DLL: tiny bug fix for writing extended classifications via DLL and updated examples
 17 September 2018 -- laszip DLL: no more support for deprecated LASattributes (aka "extra bytes") with dimensions 2 or 3 
 30 July 2018 -- bug fix in selective decompression of "extra_bytes" for point types 6 and higher
