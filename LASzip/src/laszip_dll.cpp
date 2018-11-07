@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+     7 November 2018 -- assure identical legacy and extended flags in laszip_write_point()
     20 October 2018 -- changed (U8*) to (const U8*) for all out->put___() calls
      5 October 2018 -- corrected 'is_empty' return value in laszip_inside_rectangle()
     29 September 2018 -- laszip_prepare_point_for_write() sets extended_point_type 
@@ -3016,6 +3017,18 @@ laszip_write_point(
 
   try
   {
+    // temporary fix to avoid corrupt LAZ files
+
+    if (laszip_dll->point.extended_point_type)
+    {
+      // make sure legacy flags and extended flags are identical
+      if ((laszip_dll->point.extended_classification_flags & 0x7) != ((((U8*)&(laszip_dll->point.intensity))[3]) >> 5))
+      {
+        sprintf(laszip_dll->error, "legacy flags and extended flags are not identical");
+        return 1;
+      }
+    }
+
     // special recoding of points (in compatibility mode only)
 
     if (laszip_dll->compatibility_mode)
@@ -3145,7 +3158,7 @@ laszip_write_indexed_point(
   }
   catch (...)
   {
-    sprintf(laszip_dll->error, "internal error in laszip_write_point");
+    sprintf(laszip_dll->error, "internal error in laszip_write_indexed_point");
     return 1;
   }
 
