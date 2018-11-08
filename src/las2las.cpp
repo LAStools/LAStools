@@ -675,7 +675,7 @@ int main(int argc, char *argv[])
       return las2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, cores, cpu64);
     }
   }
-  else if (cpu64)
+  if (cpu64)
   {
     return las2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, 1, TRUE);
   }
