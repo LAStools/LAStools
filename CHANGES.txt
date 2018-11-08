@@ -1,3 +1,9 @@
+7 November 2018 -- LASzip DLL: assure that legacy and extended flags are identical to prevent corrupt LAZ files
+6 November 2018 -- all LAStools: fix for '-cpu64' and '-cores 2' on single input files that started 32 bit exes
+5 November 2018 -- lasthin: bug fix when using option '-central' for '-step 200' sizes larger than 50
+4 November 2018 -- lasview: new option '-point_size 5' to render fatter points on start-up
+1 November 2018 -- all LAStools: parse more NAD83 GCS representations requested by Kirk Waters from NOAA
+31 October 2018 -- las2las: fix for bug with '-set_ogc_wkt' introduced with the change on 8 May 2018
 30 September 2018 -- lasliberate and lasliberateGUI: now also liberating new LAS 1.4 point types 6 to 10 to LAS and LAZ
 29 September 2018 -- lasvalidate: bug fix for LAS 1.4 point type 7 containing RGB colors
 29 September 2018 -- lasinfo: new options '-supress_z', '-supress_flags', '-supress_rgb', '-supress_point_source', ...
