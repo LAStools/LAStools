@@ -20,7 +20,7 @@
 
   COPYRIGHT:
 
-    (c) 2005-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2005-2018, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 181001
+#define LAS_TOOLS_VERSION 181108
 
 #include <stdio.h>
 #include <string.h>
