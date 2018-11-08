@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
       return lasindex_multi_core(argc, argv, &lasreadopener, cores, cpu64);
     }
   }
-  else if (cpu64)
+  if (cpu64)
   {
     return lasindex_multi_core(argc, argv, &lasreadopener, 1, TRUE);
   }

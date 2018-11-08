@@ -643,7 +643,7 @@ int main(int argc, char *argv[])
       return las2txt_multi_core(argc, argv, &lasreadopener, &laswriteopener, cores, cpu64);
     }
   }
-  else if (cpu64)
+  if (cpu64)
   {
     return las2txt_multi_core(argc, argv, &lasreadopener, &laswriteopener, 1, TRUE);
   }

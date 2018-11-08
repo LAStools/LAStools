@@ -801,7 +801,7 @@ int main(int argc, char *argv[])
       return lasinfo_multi_core(argc, argv, &lasreadopener, &lashistogram, &laswriteopener, cores, cpu64);
     }
   }
-  else if (cpu64)
+  if (cpu64)
   {
     return lasinfo_multi_core(argc, argv, &lasreadopener, &lashistogram, &laswriteopener, 1, TRUE);
   }
