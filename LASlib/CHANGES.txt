@@ -1,3 +1,7 @@
+7 November 2018 -- LASzip DLL: assure that legacy and extended flags are identical to prevent corrupt LAZ files
+1 November 2018 -- all LAStools: parse more NAD83 GCS representations requested by Kirk Waters from NOAA
+31 October 2018 -- las2las: fix for bug with '-set_ogc_wkt' introduced with the change on 8 May 2018
+29 September 2018 -- lasvalidate: bug fix for LAS 1.4 point type 7 containing RGB colors
 29 September 2018 -- lasinfo: new options '-supress_z', '-supress_flags', '-supress_rgb', '-supress_point_source', ...
 28 September 2018 -- las2las: new option '-move_evlrs_to_vlrs'
 17 September 2018 -- LASlib: no more support for deprecated LASattributes (aka "extra bytes") with dimensions 2 or 3 
