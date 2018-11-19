@@ -68,6 +68,8 @@
 #include "laswriter.hpp"
 #include "lastransform.hpp"
 #include "geoprojectionconverter.hpp"
+#include "bytestreamout_file.hpp"
+#include "bytestreamin_file.hpp"
 
 static void usage(bool error=false, bool wait=false)
 {
@@ -109,6 +111,150 @@ static void byebye(bool error=false, bool wait=false)
 static double taketime()
 {
   return (double)(clock())/CLOCKS_PER_SEC;
+}
+
+static bool save_vlrs_to_file(const LASheader* header)
+{
+  U32 i;
+  FILE* file = fopen("vlrs.vlr", "wb");
+  if (file == 0)
+  {
+    return false;
+  }
+  ByteStreamOut* out;
+  if (IS_LITTLE_ENDIAN())
+    out = new ByteStreamOutFileLE(file);
+  else
+    out = new ByteStreamOutFileBE(file);
+  // write number of VLRs
+  if (!out->put32bitsLE((U8*)&(header->number_of_variable_length_records)))
+  {
+    fprintf(stderr,"ERROR: writing header->number_of_variable_length_records\n");
+    return false;
+  }
+  // loop over VLRs
+  for (i = 0; i < header->number_of_variable_length_records; i++)
+  {
+    if (!out->put16bitsLE((U8*)&(header->vlrs[i].reserved)))
+    {
+      fprintf(stderr,"ERROR: writing header->vlrs[%d].reserved\n", i);
+      return false;
+    }
+    if (!out->putBytes((U8*)header->vlrs[i].user_id, 16))
+    {
+      fprintf(stderr,"ERROR: writing header->vlrs[%d].user_id\n", i);
+      return false;
+    }
+    if (!out->put16bitsLE((U8*)&(header->vlrs[i].record_id)))
+    {
+      fprintf(stderr,"ERROR: writing header->vlrs[%d].record_id\n", i);
+      return false;
+    }
+    if (!out->put16bitsLE((U8*)&(header->vlrs[i].record_length_after_header)))
+    {
+      fprintf(stderr,"ERROR: writing header->vlrs[%d].record_length_after_header\n", i);
+      return false;
+    }
+    if (!out->putBytes((U8*)header->vlrs[i].description, 32))
+    {
+      fprintf(stderr,"ERROR: writing header->vlrs[%d].description\n", i);
+      return false;
+    }
+
+    // write the data following the header of the variable length record
+
+    if (header->vlrs[i].record_length_after_header)
+    {
+      if (header->vlrs[i].data)
+      {
+        if (!out->putBytes((U8*)header->vlrs[i].data, header->vlrs[i].record_length_after_header))
+        {
+          fprintf(stderr,"ERROR: writing %d bytes of data from header->vlrs[%d].data\n", header->vlrs[i].record_length_after_header, i);
+          return false;
+        }
+      }
+      else
+      {
+        fprintf(stderr,"ERROR: there should be %d bytes of data in header->vlrs[%d].data\n", header->vlrs[i].record_length_after_header, i);
+        return false;
+      }
+    }
+  }
+  delete out;
+  fclose(file);
+  return true;
+}
+
+static bool load_vlrs_from_file(LASheader* header)
+{
+  U32 i;
+  FILE* file = fopen("vlrs.vlr", "rb");
+  if (file == 0)
+  {
+    return false;
+  }
+  ByteStreamIn* in;
+  if (IS_LITTLE_ENDIAN())
+    in = new ByteStreamInFileLE(file);
+  else
+    in = new ByteStreamInFileBE(file);
+  // read number of VLRs
+  U32 number_of_variable_length_records;
+  try { in->get32bitsLE((U8*)&number_of_variable_length_records); } catch (...)
+  {
+    fprintf(stderr,"ERROR: reading number_of_variable_length_records\n");
+    return false;
+  }
+  // loop over VLRs
+  LASvlr vlr;
+  for (i = 0; i < number_of_variable_length_records; i++)
+  {
+    try { in->get16bitsLE((U8*)&(vlr.reserved)); } catch (...)
+    {
+      fprintf(stderr,"ERROR: reading vlr.reserved\n");
+      return false;
+    }
+    try { in->getBytes((U8*)vlr.user_id, 16); } catch (...)
+    {
+      fprintf(stderr,"ERROR: reading vlr.user_id\n");
+      return false;
+    }
+    try { in->get16bitsLE((U8*)&(vlr.record_id)); } catch (...)
+    {
+      fprintf(stderr,"ERROR: reading vlr.record_id\n");
+      return false;
+    }
+    try { in->get16bitsLE((U8*)&(vlr.record_length_after_header)); } catch (...)
+    {
+      fprintf(stderr,"ERROR: reading vlr.record_length_after_header\n");
+      return false;
+    }
+    try { in->getBytes((U8*)vlr.description, 32); } catch (...)
+    {
+      fprintf(stderr,"ERROR: reading vlr.description\n");
+      return false;
+    }
+
+    // write the data following the header of the variable length record
+
+    if (vlr.record_length_after_header)
+    {
+      vlr.data = new U8[vlr.record_length_after_header];
+      try { in->getBytes((U8*)vlr.data, vlr.record_length_after_header); } catch (...)
+      {
+        fprintf(stderr,"ERROR: reading %d bytes into vlr.data\n", vlr.record_length_after_header);
+        return false;
+      }
+    }
+    else
+    {
+      vlr.data = 0;
+    }
+    header->add_vlr(vlr.user_id, vlr.record_id, vlr.record_length_after_header, vlr.data, TRUE, vlr.description);
+  }
+  delete in;
+  fclose(file);
+  return true;
 }
 
 // for point type conversions
@@ -169,6 +315,8 @@ int main(int argc, char *argv[])
   int remove_extended_variable_length_record_from = -1;
   int remove_extended_variable_length_record_to = -1;
   bool move_evlrs_to_vlrs = false;
+  bool save_vlrs = false;
+  bool load_vlrs = false;
   int set_attribute_scales = 0;
   int set_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
   double set_attribute_scale_scale[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
@@ -632,6 +780,14 @@ int main(int argc, char *argv[])
     {
       move_evlrs_to_vlrs = true;
     }
+    else if (strcmp(argv[i],"-save_vlrs") == 0)
+    {
+      save_vlrs = true;
+    }
+    else if (strcmp(argv[i],"-load_vlrs") == 0)
+    {
+      load_vlrs = true;
+    }
     else if (strcmp(argv[i],"-dont_remove_empty_files") == 0)
     {
       remove_empty_files = false;
@@ -710,6 +866,14 @@ int main(int argc, char *argv[])
       fprintf(stderr, "ERROR: input and output cannot both be piped\n");
       usage(true);
     }
+  }
+
+  // only save or load
+
+  if (save_vlrs && load_vlrs)
+  {
+    fprintf(stderr, "ERROR: cannot save and load VLRs at the same time\n");
+    usage(true);
   }
     
   // possibly loop over multiple input files
@@ -1360,6 +1524,17 @@ int main(int argc, char *argv[])
     if (remove_original_vlr)
     {
       lasreader->header.clean_lasoriginal();
+    }
+
+    if (save_vlrs)
+    {
+      save_vlrs_to_file(&lasreader->header);
+      save_vlrs = false;
+    }
+
+    if (load_vlrs)
+    {
+      load_vlrs_from_file(&lasreader->header);
     }
 
     // do we need an extra pass

@@ -310,6 +310,22 @@ SOURCE=..\src_full\sr_api\srreader_png.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=..\LASzip\src\bytestreamin.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\bytestreamin_file.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\bytestreamout.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\bytestreamout_file.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src_full\dbfreader.hpp
 # End Source File
 # Begin Source File
@@ -391,6 +407,10 @@ SOURCE=..\laslib\inc\laswriter.hpp
 # Begin Source File
 
 SOURCE=..\LASzip\src\laszip.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\laszip_decompress_selective_v3.hpp
 # End Source File
 # Begin Source File
 
