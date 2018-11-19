@@ -98,6 +98,7 @@ struct GeoProjectionGeoKeys
 #define GEO_GCS_ETRS89             4258
 #define GEO_GCS_NAD27              4267
 #define GEO_GCS_NAD83              4269
+#define GEO_GCS_OSGB1936           4277
 #define GEO_GCS_GDA94              4283
 #define GEO_GCS_SAD69              4291
 #define GEO_GCS_WGS72              4322
@@ -236,6 +237,16 @@ public:
   double hom_azimuth_degree;
   double hom_rectified_grid_angle_degree;
   double hom_scale_factor;
+  double hom_latitude_of_center_radian;
+  double hom_longitude_of_center_radian;
+  double hom_azimuth_radian;
+  double hom_rectified_grid_angle_radian;
+
+  double hom_A;
+  double hom_B;
+  double hom_H;
+  double hom_g0;
+  double hom_l0;
 };
 
 class GeoProjectionParametersOS : public GeoProjectionParameters
@@ -462,7 +473,7 @@ private:
   void compute_lcc_parameters(bool source);
   void compute_tm_parameters(bool source);
   void compute_aeac_parameters(bool source);
-//  void compute_hom_parameters(bool source);
+  void compute_hom_parameters(bool source);
   void compute_os_parameters(bool source);
 };
 
