@@ -54,6 +54,7 @@ static const double PI = 3.141592653589793238462643383279502884197169;
 static const double TWO_PI = PI * 2;
 static const double PI_OVER_2 = PI / 2;
 static const double PI_OVER_4 = PI / 4;
+static const double EPSILON = 0.0000000001;
 static const double deg2rad = PI / 180.0;
 static const double rad2deg = 180.0 / PI;
 
@@ -823,8 +824,12 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
   int offsetProjNatOriginLongGeoKey = -1;
   int offsetProjFalseEastingGeoKey = -1;
   int offsetProjFalseNorthingGeoKey = -1;
+  int offsetProjCenterLatGeoKey = -1;
   int offsetProjCenterLongGeoKey = -1;
   int offsetProjScaleAtNatOriginGeoKey = -1;
+  int offsetProjScaleAtCenterGeoKey = -1;
+  int offsetProjAzimuthAngleGeoKey = -1;
+  int offsetProjRectifiedGridAngleGeoKey = -1;
   bool has_projection = false;
   int ellipsoid = -1;
   int datum_code = -1;
@@ -1097,7 +1102,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         fprintf(stderr, "ProjCoordTransGeoKey: CT_TransvMercator_Modified_Alaska not implemented\n");
         break;
       case 3: // CT_ObliqueMercator
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator not implemented\n");
+        user_defined_projection = 3;
         break;
       case 4: // CT_ObliqueMercator_Laborde
         fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Laborde not implemented\n");
@@ -1187,8 +1192,20 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
     case 3088: // ProjCenterLongGeoKey
       offsetProjCenterLongGeoKey = geo_keys[i].value_offset;
       break;
+    case 3089: // ProjCenterLatGeoKey
+      offsetProjCenterLatGeoKey = geo_keys[i].value_offset;
+      break;
     case 3092: // ProjScaleAtNatOriginGeoKey
       offsetProjScaleAtNatOriginGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3093: // ProjScaleAtCenterGeoKey
+      offsetProjScaleAtCenterGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3094: // ProjAzimuthAngleGeoKey
+      offsetProjAzimuthAngleGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3096: // ProjRectifiedGridAngleGeoKey
+      offsetProjRectifiedGridAngleGeoKey = geo_keys[i].value_offset;
       break;
     }
   }
@@ -1291,6 +1308,30 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
         if (description)
         {
           sprintf(description, "generic oblique stereographic");
+        }
+        has_projection = true;
+      }
+    }
+    else if (user_defined_projection == 3)
+    {
+      if ((offsetProjFalseEastingGeoKey >= 0) &&
+          (offsetProjFalseNorthingGeoKey >= 0) &&
+          (offsetProjCenterLatGeoKey >= 0) &&
+          (offsetProjCenterLongGeoKey >= 0) &&
+          (offsetProjAzimuthAngleGeoKey >= 0) &&
+          (offsetProjScaleAtCenterGeoKey >= 0))
+      {
+        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
+        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
+        double latCenterDeg = geo_double_params[offsetProjCenterLatGeoKey];
+        double longCenterDeg = geo_double_params[offsetProjCenterLongGeoKey];
+        double azimuthDeg = geo_double_params[offsetProjAzimuthAngleGeoKey];
+        double rectifiedGridAngleDeg = (offsetProjRectifiedGridAngleGeoKey >= 0 ? geo_double_params[offsetProjRectifiedGridAngleGeoKey] : azimuthDeg);
+        double scaleFactor = geo_double_params[offsetProjScaleAtCenterGeoKey];
+        set_hotine_oblique_mercator_projection(falseEastingMeter, falseNorthingMeter, latCenterDeg, longCenterDeg, azimuthDeg, rectifiedGridAngleDeg, scaleFactor);
+        if (description)
+        {
+          sprintf(description, "generic hotine oblique mercator");
         }
         has_projection = true;
       }
@@ -1648,7 +1689,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
 
         num_geo_keys = 13 + (vertical_geokey ? 1 : 0);
         (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys)*num_geo_keys);
-        num_geo_double_params = 6;
+        num_geo_double_params = 7;
         (*geo_double_params) = (double*)malloc(sizeof(double)*num_geo_double_params);
 
         // projected coordinates
@@ -1657,7 +1698,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[0].count = 1;
         (*geo_keys)[0].value_offset = 1; // ModelTypeProjected
 
-        // user-defined custom LCC projection
+        // user-defined custom HOM projection
         (*geo_keys)[1].key_id = 3072; // ProjectedCSTypeGeoKey
         (*geo_keys)[1].tiff_tag_location = 0;
         (*geo_keys)[1].count = 1;
@@ -1667,7 +1708,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[2].key_id = 3075; // ProjCoordTransGeoKey
         (*geo_keys)[2].tiff_tag_location = 0;
         (*geo_keys)[2].count = 1;
-        (*geo_keys)[2].value_offset = 11; // CT_AlbersEqualArea
+        (*geo_keys)[2].value_offset = 3; // CT_ObliqueMercator
 
         // which units do we use
         (*geo_keys)[3].key_id = 3076; // ProjCoordTransGeoKey
@@ -1675,76 +1716,81 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
         (*geo_keys)[3].count = 1;
         (*geo_keys)[3].value_offset = get_ProjLinearUnitsGeoKey(source);
 
-        // here come the 6 double parameters
-/*
-        (*geo_keys)[4].key_id = 3078; // ProjStdParallel1GeoKey
+        // here come the 7 double parameters
+
+        (*geo_keys)[4].key_id = 3088; // ProjCenterLongGeoKey
         (*geo_keys)[4].tiff_tag_location = 34736;
         (*geo_keys)[4].count = 1;
         (*geo_keys)[4].value_offset = 0;
-        (*geo_double_params)[0] = hom->hom_first_std_parallel_degree;
+        (*geo_double_params)[0] = hom->hom_longitude_of_center_degree;
 
-        (*geo_keys)[5].key_id = 3079; // ProjStdParallel2GeoKey
+        (*geo_keys)[5].key_id = 3089; // ProjCenterLatGeoKey
         (*geo_keys)[5].tiff_tag_location = 34736;
         (*geo_keys)[5].count = 1;
         (*geo_keys)[5].value_offset = 1;
-        (*geo_double_params)[1] = hom->hom_second_std_parallel_degree;
+        (*geo_double_params)[1] = hom->hom_latitude_of_center_degree;
 
-        (*geo_keys)[6].key_id = 3088; // ProjCenterLongGeoKey
+        (*geo_keys)[6].key_id = 3094; // ProjAzimuthAngleGeoKey
         (*geo_keys)[6].tiff_tag_location = 34736;
         (*geo_keys)[6].count = 1;
         (*geo_keys)[6].value_offset = 2;
-        (*geo_double_params)[2] = hom->hom_long_meridian_degree;
+        (*geo_double_params)[2] = hom->hom_azimuth_degree;
 
-        (*geo_keys)[7].key_id = 3081; // ProjNatOriginLatGeoKey
+        (*geo_keys)[7].key_id = 3096; // ProjRectifiedGridAngleGeoKey
         (*geo_keys)[7].tiff_tag_location = 34736;
         (*geo_keys)[7].count = 1;
         (*geo_keys)[7].value_offset = 3;
-        (*geo_double_params)[3] = hom->hom_lat_origin_degree;
+        (*geo_double_params)[3] = hom->hom_rectified_grid_angle_degree;
 
-        (*geo_keys)[8].key_id = 3082; // ProjFalseEastingGeoKey
+        (*geo_keys)[8].key_id = 3093; // ProjScaleAtCenterGeoKey
         (*geo_keys)[8].tiff_tag_location = 34736;
         (*geo_keys)[8].count = 1;
         (*geo_keys)[8].value_offset = 4;
-        if (source)
-          (*geo_double_params)[4] = hom->hom_false_easting_meter / coordinates2meter;
-        else
-          (*geo_double_params)[4] = hom->hom_false_easting_meter * meter2coordinates;
+        (*geo_double_params)[4] = hom->hom_scale_factor;
 
-        (*geo_keys)[9].key_id = 3083; // ProjFalseNorthingGeoKey
+        (*geo_keys)[9].key_id = 3082; // ProjFalseEastingGeoKey
         (*geo_keys)[9].tiff_tag_location = 34736;
         (*geo_keys)[9].count = 1;
         (*geo_keys)[9].value_offset = 5;
         if (source)
-          (*geo_double_params)[5] = hom->hom_false_northing_meter / coordinates2meter;
+          (*geo_double_params)[5] = hom->hom_false_easting_meter / coordinates2meter;
         else
-          (*geo_double_params)[5] = hom->hom_false_northing_meter * meter2coordinates;
+          (*geo_double_params)[5] = hom->hom_false_easting_meter * meter2coordinates;
 
-*/
-        // GCS used with custom HOM projection
-        (*geo_keys)[10].key_id = 2048; // GeographicTypeGeoKey
-        (*geo_keys)[10].tiff_tag_location = 0;
+        (*geo_keys)[10].key_id = 3083; // ProjFalseNorthingGeoKey
+        (*geo_keys)[10].tiff_tag_location = 34736;
         (*geo_keys)[10].count = 1;
-        (*geo_keys)[10].value_offset = get_GeographicTypeGeoKey();
+        (*geo_keys)[10].value_offset = 6;
+        if (source)
+          (*geo_double_params)[6] = hom->hom_false_northing_meter / coordinates2meter;
+        else
+          (*geo_double_params)[6] = hom->hom_false_northing_meter * meter2coordinates;
 
-        // vertical units
-        (*geo_keys)[11].key_id = 4099; // VerticalUnitsGeoKey
+        // GCS used with custom HOM projection
+        (*geo_keys)[11].key_id = 2048; // GeographicTypeGeoKey
         (*geo_keys)[11].tiff_tag_location = 0;
         (*geo_keys)[11].count = 1;
-        (*geo_keys)[11].value_offset = get_VerticalUnitsGeoKey(source);
+        (*geo_keys)[11].value_offset = get_GeographicTypeGeoKey();
+
+        // vertical units
+        (*geo_keys)[12].key_id = 4099; // VerticalUnitsGeoKey
+        (*geo_keys)[12].tiff_tag_location = 0;
+        (*geo_keys)[12].count = 1;
+        (*geo_keys)[12].value_offset = get_VerticalUnitsGeoKey(source);
 
         if (vertical_geokey)
         {
           // vertical datum
-          (*geo_keys)[12].key_id = 4096; // VerticalCSTypeGeoKey
-          (*geo_keys)[12].tiff_tag_location = 0;
-          (*geo_keys)[12].count = 1;
-          (*geo_keys)[12].value_offset = vertical_geokey;
+          (*geo_keys)[13].key_id = 4096; // VerticalCSTypeGeoKey
+          (*geo_keys)[13].tiff_tag_location = 0;
+          (*geo_keys)[13].count = 1;
+          (*geo_keys)[13].value_offset = vertical_geokey;
         }
         return true;
       }
       else
       {
-        fprintf(stderr, "get_geo_keys_from_projection for generic UTM not implemented\n");
+        fprintf(stderr, "get_geo_keys_from_projection for generic projection not implemented\n");
       }
     }
     else if (projection->type == GEO_PROJECTION_LAT_LONG || projection->type == GEO_PROJECTION_LONG_LAT)
@@ -4185,6 +4231,14 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
     sprintf(datum_name, "CH1903");
     spheroid_code = GEO_SPHEROID_BESSEL1841;
   }
+  else if (code == GEO_GCS_OSGB1936)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_AIRY);
+    sprintf(gcs_name, "OSGB1936");
+    datum_code = gcs_code + 2000;
+    sprintf(datum_name, "OSGB1936");
+    spheroid_code = GEO_ELLIPSOID_AIRY;
+  }
   else
   {
     // try to look it up in 'gcs.csv' file
@@ -4701,8 +4755,12 @@ void GeoProjectionConverter::set_hotine_oblique_mercator_projection(double false
   hom->hom_azimuth_degree = azimuthDegree;
   hom->hom_rectified_grid_angle_degree = rectifiedGridAngleDegree;
   hom->hom_scale_factor = scaleFactor;
+  hom->hom_latitude_of_center_radian = deg2rad*hom->hom_latitude_of_center_degree;
+  hom->hom_longitude_of_center_radian = deg2rad*hom->hom_longitude_of_center_degree;
+  hom->hom_azimuth_radian = deg2rad*hom->hom_azimuth_degree;
+  hom->hom_rectified_grid_angle_radian = deg2rad*hom->hom_rectified_grid_angle_degree;
   set_projection(hom, source);
-//  compute_hom_parameters(source);
+  compute_hom_parameters(source);
   if (description)
   {
     sprintf(description, "false east/north: %g/%g [m], center lat/long: %g/%g, azimuth: %g angle: %g scale: %g", hom->hom_false_easting_meter, hom->hom_false_northing_meter, hom->hom_latitude_of_center_degree, hom->hom_longitude_of_center_degree, hom->hom_azimuth_degree, hom->hom_rectified_grid_angle_degree, hom->hom_scale_factor);
@@ -5476,6 +5534,47 @@ void GeoProjectionConverter::compute_aeac_parameters(bool source)
     aeac->aeac_rho0 = 0;
   else
     aeac->aeac_rho0 = aeac->aeac_Albers_a_OVER_n * sqrt(aeac->aeac_C - nq0);
+}
+
+void GeoProjectionConverter::compute_hom_parameters(bool source)
+{
+  GeoProjectionParametersHOM* hom = (GeoProjectionParametersHOM*)(source ? source_projection : target_projection);
+
+  if (!hom || hom->type != GEO_PROJECTION_HOM) return;
+
+	double esp = ellipsoid->eccentricity * sin(hom->hom_latitude_of_center_radian);
+	double esp2 = esp * esp;
+	hom->hom_B = sqrt(1.0 + ellipsoid->eccentricity_squared * pow(cos(hom->hom_latitude_of_center_radian), 4) / (1.0 - ellipsoid->eccentricity_squared));
+	hom->hom_A = ellipsoid->equatorial_radius * hom->hom_B * hom->hom_scale_factor * sqrt(1.0 - ellipsoid->eccentricity_squared) / (1.0 - esp2);
+  double t = tan(PI/4 - hom->hom_latitude_of_center_radian/2) / pow((1.0 - esp) / (1.0 + esp), ellipsoid->eccentricity/2);
+  double t0 = (t < 0 ? 0 : t);
+	double D = hom->hom_B * sqrt(1.0 - ellipsoid->eccentricity_squared) / cos(hom->hom_latitude_of_center_radian) / sqrt(1.0 - esp2);
+  double F, D2;
+	if (D < 1.0)
+  {
+    D2 = 1.0;
+    F = D;
+  }
+	else
+  {
+    D2 = D * D;
+    if (hom->hom_latitude_of_center_radian < 0.0)
+    {
+      F = D - sqrt(D2 - 1.0);
+    }
+    else
+    {
+      F = D + sqrt(D2 - 1.0);
+    }
+  }
+	hom->hom_H = F * pow(t0, hom->hom_B);
+	hom->hom_g0 = asin(sin(hom->hom_azimuth_radian) / D);
+	hom->hom_l0 = (F - (1.0 / F)) / 2.0 * tan(hom->hom_g0);
+	if (fabs(hom->hom_l0 - 1.0) < EPSILON)
+  {
+    hom->hom_l0 = 1.0;
+  }
+	hom->hom_l0 = hom->hom_longitude_of_center_radian - (asin(hom->hom_l0) / hom->hom_B);
 }
 
 static double srat(double esinp, double exp)
@@ -6575,10 +6674,27 @@ bool GeoProjectionConverter::LLtoAEAC(const double LatDegree, const double LongD
   *   LatDegree         : output Latitude in decimal degrees
   *   LongDegree        : output Longitude in decimal degrees
   *
+  * Formulas: OGP 373-7-2 Geomatics Guidance Note 7, part 2, July 2012
 */
-bool GeoProjectionConverter::HOMtoLL(const double OMEastingMeter, const double OMNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* om) const
+bool GeoProjectionConverter::HOMtoLL(const double HOMEastingMeter, const double HOMNorthingMeter, double& LatDegree, double& LongDegree, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* hom) const
 {
-  return false;
+	double v = (HOMEastingMeter - hom->hom_false_easting_meter) * cos(hom->hom_rectified_grid_angle_radian) - (HOMNorthingMeter - hom->hom_false_northing_meter) * sin(hom->hom_rectified_grid_angle_radian);
+	double u = (HOMNorthingMeter - hom->hom_false_northing_meter) * cos(hom->hom_rectified_grid_angle_radian) + (HOMEastingMeter - hom->hom_false_easting_meter) * sin(hom->hom_rectified_grid_angle_radian);
+  double Qp = exp(-hom->hom_B * v/hom->hom_A);
+	double Sp = (Qp - (1.0 / Qp)) / 2.0;
+	double Vp = sin(hom->hom_B * u / hom->hom_A);
+	double Up = (Vp * cos(hom->hom_g0) + Sp * sin(hom->hom_g0)) / (Qp + (1.0 / Qp)) * 2.0;
+	double tp = pow(hom->hom_H / sqrt((1.0 + Up) / (1.0 - Up)), 1.0/hom->hom_B);
+	double x = PI / 2.0 - 2.0 * atan(tp);
+	double e2 = ellipsoid->eccentricity_squared;
+	double e4 = e2 * e2;
+	double e6 = e4 * e2;
+	double e8 = e4 * e4;
+	double LatRadian = x+sin(2*x)*(e2/2+5*e4/24+e6/12+13*e8/360)+sin(4*x)*(7*e4/48+29*e6/240+811*e8/11520)+sin(6*x)*(7*e6/120+81*e8/1120)+sin(8*x)*(4279*e8/161280);
+	double LongRadian = hom->hom_l0 - atan2(Sp * cos(hom->hom_g0) - Vp * sin(hom->hom_g0), cos(hom->hom_B * u / hom->hom_A)) / hom->hom_B;
+	LatDegree = rad2deg * LatRadian;
+	LongDegree = rad2deg * LongRadian;
+  return true;
 }
 
 /*
@@ -6592,10 +6708,71 @@ bool GeoProjectionConverter::HOMtoLL(const double OMEastingMeter, const double O
   *   HOMEastingMeter    : output Easting/X in meters
   *   HOMNorthingMeter   : output Northing/Y in meters
   *
+  * Formulas: OGP 373-7-2 Geomatics Guidance Note 7, part 2, July 2012
 */
-bool GeoProjectionConverter::LLtoHOM(const double LatDegree, const double LongDegree, double &OMEastingMeter, double &OMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* om) const
+bool GeoProjectionConverter::LLtoHOM(const double LatDegree, const double LongDegree, double &OMEastingMeter, double &OMNorthingMeter, const GeoProjectionEllipsoid* ellipsoid, const GeoProjectionParametersHOM* hom) const
 {
-  return false;
+  double lat = LatDegree * deg2rad;
+  double lon = LongDegree * deg2rad;
+
+/*
+  double e = ellipsoid->eccentricity;
+  double esq = ellipsoid->eccentricity_squared;
+  double latc = hom->hom_latitude_of_center_radian;
+  double a = ellipsoid->equatorial_radius;
+  double kc = hom->hom_scale_factor;
+  double alphac = hom->hom_azimuth_radian;
+  double lonc = hom->hom_longitude_of_center_radian;
+  double gammac = hom->hom_rectified_grid_angle_radian;
+  double FE = hom->hom_false_easting_meter;
+  double FN = hom->hom_false_northing_meter;
+
+  // constants for the projection
+
+  double B = sqrt(1.0 + (esq * pow(cos(latc),4) / (1 - esq )));
+  double A = a * B * kc * sqrt(1.0 - esq) / ( 1.0 - esq * pow(sin(latc),2));
+  double to = tan(PI/4.0 - (latc/2)) / pow(((1.0 - e*sin(latc)) / (1.0 + e*sin(latc))),e/2);
+  double D = B * sqrt(1.0 - esq) / (cos(latc) * sqrt( 1 - esq * pow(sin(latc),2)));
+  double D2;
+  if (D < 1) 
+    D2 = 1;
+  else
+    D2 = D*D; 
+  double F;
+  if (latc < 0.0)
+    F = D - sqrt(D2 - 1.0);
+  else
+    F = D + sqrt(D2 - 1.0);
+  double H = F*pow(to,B);
+  double G = (F - (1.0/F)) / 2;
+  double gammao = asin(sin(alphac) / D);
+  double lonO = lonc - (asin(G*tan(gammao))) / B;
+
+  // forward: compute (E,N) from a given (lat,lon) :
+
+  double t = tan(PI/4 - lat/2) / pow((1.0 - e * sin(lat)) / (1 + e * sin(lat)),e/2);
+  double Q = H / pow(t,B);
+  double S = (Q - 1.0 / Q) / 2;
+  double T = (Q + 1.0 / Q) / 2;
+  double V = sin(B * (lon - lonO));
+  double U = (-V * cos(gammao) + S * sin(gammao)) / T;
+  double v = A * log((1.0 - U) / (1.0 + U)) / (2 * B);
+  double u = A * atan((S * cos(gammao) + V * sin(gammao)) / cos(B * (lon - lonO))) / B;
+  OMEastingMeter = v * cos(gammac) + u * sin(gammac) + FE;
+  OMNorthingMeter = u * cos(gammac) - v * sin(gammac) + FN;
+*/
+
+  double t = tan(PI/4 - lat/2) / pow((1.0 - ellipsoid->eccentricity * sin(lat)) / (1 + ellipsoid->eccentricity * sin(lat)), ellipsoid->eccentricity/2);
+  double Q = hom->hom_H / pow(t,hom->hom_B);
+  double S = (Q - 1.0 / Q) / 2;
+  double T = (Q + 1.0 / Q) / 2;
+  double V = sin(hom->hom_B * (lon - hom->hom_l0));
+  double U = (-V * cos(hom->hom_g0) + S * sin(hom->hom_g0)) / T;
+  double v = hom->hom_A * log((1.0 - U) / (1.0 + U)) / (2 * hom->hom_B);
+  double u = hom->hom_A * atan((S * cos(hom->hom_g0) + V * sin(hom->hom_g0)) / cos(hom->hom_B * (lon - hom->hom_l0))) / hom->hom_B;
+  OMEastingMeter = v * cos(hom->hom_rectified_grid_angle_radian) + u * sin(hom->hom_rectified_grid_angle_radian) + hom->hom_false_easting_meter;
+  OMNorthingMeter = u * cos(hom->hom_rectified_grid_angle_radian) - v * sin(hom->hom_rectified_grid_angle_radian) + hom->hom_false_northing_meter;
+  return true;
 }
 
 /*
@@ -6843,6 +7020,12 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     else if (strcmp(argv[i],"-etrs89") == 0)
     {
       set_gcs(GEO_GCS_ETRS89, tmp);
+      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      *argv[i]='\0';
+    }
+    else if (strcmp(argv[i],"-osgb1936") == 0)
+    {
+      set_gcs(GEO_GCS_OSGB1936, tmp);
       if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
@@ -7304,6 +7487,10 @@ int GeoProjectionConverter::unparse(char* string) const
         {
           n += sprintf(&string[n], "-nad27 ");
         }
+        else if (gcs_code == GEO_GCS_OSGB1936)
+        {
+          n += sprintf(&string[n], "-osgb1936 ");
+        }
         else if (ellipsoid)
         {
           n += sprintf(&string[n], "-ellipsoid %d ", ellipsoid->id);
@@ -7658,7 +7845,11 @@ bool GeoProjectionConverter::to_lon_lat_ele(const double* point, double& longitu
     case GEO_PROJECTION_OS:
       OStoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersOS*)source_projection);
       break;
+    case GEO_PROJECTION_HOM:
+      HOMtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersHOM*)source_projection);
+      break;
     }
+
     elevation_in_meter = elevation2meter*point[2] + elevation_offset_in_meter;
     return true;
   }
@@ -7708,6 +7899,9 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
     case GEO_PROJECTION_OS:
       OStoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersOS*)source_projection);
       break;
+    case GEO_PROJECTION_HOM:
+      HOMtoLL(coordinates2meter*point[0], coordinates2meter*point[1], latitude, longitude, ellipsoid, (const GeoProjectionParametersHOM*)source_projection);
+      break;
     }
 
     switch (target_projection->type)
@@ -7749,6 +7943,11 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
       break;
     case GEO_PROJECTION_OS:
       LLtoOS(latitude, longitude, x, y, ellipsoid, (const GeoProjectionParametersOS*)target_projection);
+      x = meter2coordinates * x;
+      y = meter2coordinates * y;
+      break;
+    case GEO_PROJECTION_HOM:
+      LLtoHOM(latitude, longitude, x, y, ellipsoid, (const GeoProjectionParametersHOM*)target_projection);
       x = meter2coordinates * x;
       y = meter2coordinates * y;
       break;
@@ -8506,917 +8705,3 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
 
   return true;
 }
-
-#ifdef NOT
-
- /***************************************************************************/
- /* RSC IDENTIFIER: OBLIQUE MERCATOR
-  *
-  * ABSTRACT
-  *
-  *    This component provides conversions between Geodetic coordinates
-  *    (latitude and longitude in radians) and Oblique Mercator
-  *    projection coordinates (easting and northing in meters).
-  *
-  * ERROR HANDLING
-  *
-  *    This component checks parameters for valid values.  If an invalid value
-  *    is found the error code is combined with the current error code using
-  *    the bitwise or.  This combining allows multiple error codes to be
-  *    returned. The possible error codes are:
-  *
-  *       OMERC_NO_ERROR           : No errors occurred in function
-  *       OMERC_LAT_ERROR          : Latitude outside of valid range
-  *                                     (-90 to 90 degrees)
-  *       OMERC_LON_ERROR          : Longitude outside of valid range
-  *                                     (-180 to 360 degrees)
-  *       OMERC_ORIGIN_LAT_ERROR   : Origin latitude outside of valid range
-  *                                     (-89 to 89 degrees)
-  *       OMERC_LAT1_ERROR         : First latitude outside of valid range
-  *                                     (-89 to 89 degrees, excluding 0)
-  *       OMERC_LAT2_ERROR         : First latitude outside of valid range
-  *                                     (-89 to 89 degrees)
-  *       OMERC_LON1_ERROR         : First longitude outside of valid range
-  *                                     (-180 to 360 degrees)
-  *       OMERC_LON2_ERROR         : Second longitude outside of valid range
-  *                                     (-180 to 360 degrees)
-  *       OMERC_LAT1_LAT2_ERROR    : First and second latitudes can not be equal
-  *       OMERC_DIFF_HEMISPHERE_ERROR: First and second latitudes can not be
-  *                                     in different hemispheres
-  *       OMERC_EASTING_ERROR      : Easting outside of valid range
-  *                                     (depends on ellipsoid and projection
-  *                                     parameters)
-  *       OMERC_NORTHING_ERROR     : Northing outside of valid range
-  *                                     (depends on ellipsoid and projection
-  *                                     parameters)
-  *       OMERC_A_ERROR            : Semi-major axis less than or equal to zero
-  *       OMERC_INV_F_ERROR        : Inverse flattening outside of valid range
-  *                                     (250 to 350)
-  *       OMERC_SCALE_FACTOR_ERROR : Scale factor outside of valid
-  *                                     range (0.3 to 3.0)
-  *       OMERC_LON_WARNING        : Distortion will result if longitude is 90 degrees or more
-  *                                     from the Central Meridian
-  *
-  * REUSE NOTES
-  *
-  *    OBLIQUE MERCATOR is intended for reuse by any application that
-  *    performs an Oblique Mercator projection or its inverse.
-  *
-  * REFERENCES
-  *
-  *    Further information on OBLIQUE MERCATOR can be found in the Reuse Manual.
-  *
-  *    OBLIQUE MERCATOR originated from:     U.S. Army Topographic Engineering Center
-  *                                          Geospatial Information Division
-  *                                          7701 Telegraph Road
-  *                                          Alexandria, VA  22310-3864
-  *
-  * LICENSES
-  *
-  *    None apply to this component.
-  *
-  * RESTRICTIONS
-  *
-  *    OBLIQUE MERCATOR has no restrictions.
-  *
-  * ENVIRONMENT
-  *
-  *    OBLIQUE MERCATOR was tested and certified in the following environments:
-  *
-  *    1. Solaris 2.5 with GCC, version 2.8.1
-  *    2. MSDOS with MS Visual C++, version 6
-  *
-  * MODIFICATIONS
-  *
-  *    Date              Description
-  *    ----              -----------
-  *    06-07-00          Original Code
-  *    03-02-07          Original C++ Code
-  *
-  *
-  */
-
-
- #include "CoordinateSystem.h"
-
-
- namespace MSP
- {
-   namespace CCS
-   {
-     class ObliqueMercatorParameters;
-     class MapProjectionCoordinates;
-     class GeodeticCoordinates;
-
-
-     /***************************************************************************/
-     /*
-      *                              DEFINES
-      */
-
-     class ObliqueMercator : public CoordinateSystem
-     {
-     public:
-
-       /*
-        * The constructor receives the ellipsoid parameters and
-        * projection parameters as inputs, and sets the corresponding state
-        * variables.  If any errors occur, an exception is thrown with a description
-        * of the error.
-        *
-        *    ellipsoidSemiMajorAxis   : Semi-major axis of ellipsoid, in meters  (input)
-        *    ellipsoidFlattening      : Flattening of ellipsoid                  (input)
-        *    originLatitude           : Latitude, in radians, at which the       (input)
-        *                               point scale factor is 1.0
-        *    longitude1               : Longitude, in radians, of first point lying on
-        *                               central line                             (input)
-        *    latitude1                : Latitude, in radians, of first point lying on
-        *                               central line                             (input)
-        *    longitude2               : Longitude, in radians, of second point lying on
-        *                               central line                             (input)
-        *    latitude2                : Latitude, in radians, of second point lying on
-        *                               central line                             (input)
-        *    falseEasting             : A coordinate value, in meters, assigned to the
-        *                               central meridian of the projection       (input)
-        *    falseNorthing            : A coordinate value, in meters, assigned to the
-        *                               origin latitude of the projection        (input)
-        *    scaleFactor              : Multiplier which reduces distances in the
-        *                               projection to the actual distance on the
-        *                               ellipsoid                                (input)
-        *    errorStatus              : Error status                             (output)
-        */
-
-         ObliqueMercator( double ellipsoidSemiMajorAxis, double ellipsoidFlattening, double originLatitude, double longitude1, double latitude1, double longitude2, double latitude2, double falseEasting, double falseNorthing, double scaleFactor );
-
-
-       ObliqueMercator( const ObliqueMercator &om );
-
-
-         ~ObliqueMercator( void );
-
-
-       ObliqueMercator& operator=( const ObliqueMercator &om );
-
-
-       /*
-        * The function getParameters returns the current ellipsoid
-        * parameters and Oblique Mercator projection parameters.
-        *
-        *    ellipsoidSemiMajorAxis  : Semi-major axis of ellipsoid, in meters  (output)
-        *    ellipsoidFlattening     : Flattening of ellipsoid                  (output)
-        *    originLatitude          : Latitude, in radians, at which the       (output)
-        *                              point scale factor is 1.0
-        *    longitude1              : Longitude, in radians, of first point lying on
-        *                              central line                           (output)
-        *    latitude1               : Latitude, in radians, of first point lying on
-        *                              central line                           (output)
-        *    longitude2              : Longitude, in radians, of second point lying on
-        *                              central line                           (output)
-        *    latitude2               : Latitude, in radians, of second point lying on
-        *                              central line                           (output)
-        *    falseEasting            : A coordinate value, in meters, assigned to the
-        *                              central meridian of the projection     (output)
-        *    falseNorthing           : A coordinate value, in meters, assigned to the
-        *                              origin latitude of the projection      (output)
-        *    scaleFactor             : Multiplier which reduces distances in the
-        *                              projection to the actual distance on the
-        *                              ellipsoid                              (output)
-        */
-
-       ObliqueMercatorParameters* getParameters() const;
-
-
-       /*
-        * The function convertFromGeodetic converts geodetic (latitude and
-        * longitude) coordinates to Oblique Mercator projection (easting and
-        * northing) coordinates, according to the current ellipsoid and Oblique Mercator
-        * projection parameters.  If any errors occur, an exception is thrown with a description
-        * of the error.
-        *
-        *    longitude         : Longitude (lambda), in radians       (input)
-        *    latitude          : Latitude (phi), in radians           (input)
-        *    easting           : Easting (X), in meters               (output)
-        *    northing          : Northing (Y), in meters              (output)
-        */
-
-       MSP::CCS::MapProjectionCoordinates* convertFromGeodetic( MSP::CCS::GeodeticCoordinates* geodeticCoordinates );
-
-
-       /*
-        * The function convertToGeodetic converts Oblique Mercator projection
-        * (easting and northing) coordinates to geodetic (latitude and longitude)
-        * coordinates, according to the current ellipsoid and Oblique Mercator projection
-        * coordinates.  If any errors occur, an exception is thrown with a description
-        * of the error.
-        *
-        *    easting           : Easting (X), in meters                  (input)
-        *    northing          : Northing (Y), in meters                 (input)
-        *    longitude         : Longitude (lambda), in radians          (output)
-        *    latitude          : Latitude (phi), in radians              (output)
-        */
-
-       MSP::CCS::GeodeticCoordinates* convertToGeodetic( MSP::CCS::MapProjectionCoordinates* mapProjectionCoordinates );
-
-     private:
-
-       /* Ellipsoid Parameters, default to WGS 84 */
-       double es;
-       double es_OVER_2;
-       double OMerc_A;
-       double OMerc_B;
-       double OMerc_E;
-       double OMerc_gamma;
-       double OMerc_azimuth;                     /* Azimuth of central line as it crosses origin lat */
-       double OMerc_Origin_Long;                 /* Longitude at center of projection */
-       double cos_gamma;
-       double sin_gamma;
-       double sin_azimuth;
-       double cos_azimuth;
-       double A_over_B;
-       double B_over_A;
-       double OMerc_u;                           /* Coordinates for center point (uc , vc), vc = 0 */
-                                                 /* at center lat and lon */
-       /* Oblique Mercator projection Parameters */
-       double OMerc_Origin_Lat;                  /* Latitude of projection center, in radians */
-       double OMerc_Lat_1;                       /* Latitude of first point lying on central line */
-       double OMerc_Lon_1;                       /* Longitude of first point lying on central line */
-       double OMerc_Lat_2;                       /* Latitude of second point lying on central line */
-       double OMerc_Lon_2;                       /* Longitude of second point lying on central line */
-       double OMerc_Scale_Factor;                /* Scale factor at projection center */
-       double OMerc_False_Northing;              /* False northing, in meters, at projection center */
-       double OMerc_False_Easting;               /* False easting, in meters, at projection center */
-
-       double OMerc_Delta_Northing;
-       double OMerc_Delta_Easting;
-
-
-       double omercT( double lat, double e_sinlat, double e_over_2 );
-
-     };
-   }
- }
-
-
-
- /***************************************************************************/
- /* RSC IDENTIFIER: OBLIQUE MERCATOR
-  *
-  * ABSTRACT
-  *
-  *    This component provides conversions between Geodetic coordinates
-  *    (latitude and longitude in radians) and Oblique Mercator
-  *    projection coordinates (easting and northing in meters).
-  *
-  * ERROR HANDLING
-  *
-  *    This component checks parameters for valid values.  If an invalid value
-  *    is found the error code is combined with the current error code using
-  *    the bitwise or.  This combining allows multiple error codes to be
-  *    returned. The possible error codes are:
-  *
-  *       OMERC_NO_ERROR           : No errors occurred in function
-  *       OMERC_LAT_ERROR          : Latitude outside of valid range
-  *                                     (-90 to 90 degrees)
-  *       OMERC_LON_ERROR          : Longitude outside of valid range
-  *                                     (-180 to 360 degrees)
-  *       OMERC_ORIGIN_LAT_ERROR   : Origin latitude outside of valid range
-  *                                     (-89 to 89 degrees)
-  *       OMERC_LAT1_ERROR         : First latitude outside of valid range
-  *                                     (-89 to 89 degrees, excluding 0)
-  *       OMERC_LAT2_ERROR         : First latitude outside of valid range
-  *                                     (-89 to 89 degrees)
-  *       OMERC_LON1_ERROR         : First longitude outside of valid range
-  *                                     (-180 to 360 degrees)
-  *       OMERC_LON2_ERROR         : Second longitude outside of valid range
-  *                                     (-180 to 360 degrees)
-  *       OMERC_LAT1_LAT2_ERROR    : First and second latitudes can not be equal
-  *       OMERC_DIFF_HEMISPHERE_ERROR: First and second latitudes can not be
-  *                                     in different hemispheres
-  *       OMERC_EASTING_ERROR      : Easting outside of valid range
-  *                                     (depends on ellipsoid and projection
-  *                                     parameters)
-  *       OMERC_NORTHING_ERROR     : Northing outside of valid range
-  *                                     (depends on ellipsoid and projection
-  *                                     parameters)
-  *       OMERC_A_ERROR            : Semi-major axis less than or equal to zero
-  *       OMERC_INV_F_ERROR        : Inverse flattening outside of valid range
-  *                                     (250 to 350)
-  *       OMERC_SCALE_FACTOR_ERROR : Scale factor outside of valid
-  *                                     range (0.3 to 3.0)
-  *       OMERC_LON_WARNING        : Distortion will result if longitude is 90 degrees or more
-  *                                     from the Central Meridian
-  *
-  * REUSE NOTES
-  *
-  *    OBLIQUE MERCATOR is intended for reuse by any application that
-  *    performs an Oblique Mercator projection or its inverse.
-  *
-  * REFERENCES
-  *
-  *    Further information on OBLIQUE MERCATOR can be found in the Reuse Manual.
-  *
-  *    OBLIQUE MERCATOR originated from:     U.S. Army Topographic Engineering Center
-  *                                          Geospatial Information Division
-  *                                          7701 Telegraph Road
-  *                                          Alexandria, VA  22310-3864
-  *
-  * LICENSES
-  *
-  *    None apply to this component.
-  *
-  * RESTRICTIONS
-  *
-  *    OBLIQUE MERCATOR has no restrictions.
-  *
-  * ENVIRONMENT
-  *
-  *    OBLIQUE MERCATOR was tested and certified in the following environments:
-  *
-  *    1. Solaris 2.5 with GCC, version 2.8.1
-  *    2. MSDOS with MS Visual C++, version 6
-  *
-  * MODIFICATIONS
-  *
-  *    Date              Description
-  *    ----              -----------
-  *    06-07-00          Original Code
-  *    03-02-07          Original C++ Code
-  *    05-11-11          BAEts28017 - Fix Oblique Mercator near poles
-  *
-  */
-
-
- /***************************************************************************/
- /*
-  *                               INCLUDES
-  */
-
- #include <math.h>
- #include "ObliqueMercator.h"
- #include "ObliqueMercatorParameters.h"
- #include "MapProjectionCoordinates.h"
- #include "GeodeticCoordinates.h"
- #include "CoordinateConversionException.h"
- #include "ErrorMessages.h"
- #include "WarningMessages.h"
-
- /*
-  *    math.h     - Standard C math library
-  *    ObliqueMercator.h   - Is for prototype error checking
-  *    MapProjectionCoordinates.h   - defines map projection coordinates
-  *    GeodeticCoordinates.h   - defines geodetic coordinates
-  *    CoordinateConversionException.h - Exception handler
-  *    ErrorMessages.h  - Contains exception messages
-  *    WarningMessages.h  - Contains warning messages
-  */
-
-
- using namespace MSP::CCS;
-
-
- /***************************************************************************/
- /*                               DEFINES
-  *
-  */
-
- const double PI = 3.14159265358979323e0;  /* PI                            */
- const double PI_OVER_2 = ( PI / 2.0);
- const double PI_OVER_4 = ( PI / 4.0);
- const double TWO_PI = ( 2.0 * PI);
- const double MIN_SCALE_FACTOR = 0.3;
- const double MAX_SCALE_FACTOR = 3.0;
-
-
- /************************************************************************/
- /*                              FUNCTIONS
-  *
-  */
-
- ObliqueMercator::ObliqueMercator( double ellipsoidSemiMajorAxis, double ellipsoidFlattening, double originLatitude, double longitude1, double latitude1, double longitude2, double latitude2, double falseEasting, double falseNorthing, double scaleFactor ) :
-   CoordinateSystem(),
-   es( 0.08181919084262188000 ),
-   es_OVER_2( .040909595421311 ),
-   OMerc_A( 6383471.9177251 ),
-   OMerc_B( 1.0008420825413 ),
-   OMerc_E( 1.0028158089754 ),
-   OMerc_gamma( .41705894983580 ),
-   OMerc_azimuth( .60940407333533 ),
-   OMerc_Origin_Long( -.46732023406900 ),
-   cos_gamma( .91428423352628 ),
-   sin_gamma( .40507325303611 ),
-   sin_azimuth( .57237890829911 ),
-   cos_azimuth( .81998925927985 ),
-   A_over_B( 6378101.0302010 ),
-   B_over_A( 1.5678647849335e-7 ),
-   OMerc_u( 5632885.2272051 ),
-   OMerc_Origin_Lat( ((45.0 * PI) / 180.0) ),
-   OMerc_Lon_1( ((-5.0 * PI) / 180.0) ),
-   OMerc_Lat_1( ((40.0 * PI) / 180.0) ),
-   OMerc_Lon_2( ((5.0 * PI) / 180.0) ),
-   OMerc_Lat_2( ((50.0 * PI) / 180.0) ),
-   OMerc_False_Easting( 0.0 ),
-   OMerc_False_Northing( 0.0 ),
-   OMerc_Scale_Factor( 1.0 ),
-   OMerc_Delta_Northing( 40000000.0 ),
-   OMerc_Delta_Easting(  40000000.0 )
- {
- /*
-  * The constructor receives the ellipsoid parameters and
-  * projection parameters as inputs, and sets the corresponding state
-  * variables.  If any errors occur, an exception is thrown with a description
-  * of the error.
-  *
-  *    ellipsoidSemiMajorAxis   : Semi-major axis of ellipsoid, in meters  (input)
-  *    ellipsoidFlattening      : Flattening of ellipsoid                  (input)
-  *    originLatitude           : Latitude, in radians, at which the       (input)
-  *                               point scale factor is 1.0
-  *    longitude1               : Longitude, in radians, of first point lying on
-  *                               central line                             (input)
-  *    latitude1                : Latitude, in radians, of first point lying on
-  *                               central line                             (input)
-  *    longitude2               : Longitude, in radians, of second point lying on
-  *                               central line                             (input)
-  *    latitude2                : Latitude, in radians, of second point lying on
-  *                               central line                             (input)
-  *    falseEasting             : A coordinate value, in meters, assigned to the
-  *                               central meridian of the projection       (input)
-  *    falseNorthing            : A coordinate value, in meters, assigned to the
-  *                               origin latitude of the projection        (input)
-  *    scaleFactor              : Multiplier which reduces distances in the
-  *                               projection to the actual distance on the
-  *                               ellipsoid                                (input)
-  */
-
-   double inv_f = 1 / ellipsoidFlattening;
-   double es2, one_MINUS_es2;
-   double cos_olat, cos_olat2;
-   double sin_olat, sin_olat2, es2_sin_olat2;
-   double t0, t1, t2;
-   double D, D2, D2_MINUS_1, sqrt_D2_MINUS_1;
-   double H, L, LH;
-   double E2;
-   double F, G, J, P;
-   double dlon;
-
-   if (ellipsoidSemiMajorAxis <= 0.0)
-   { /* Semi-major axis must be greater than zero */
-     throw CoordinateConversionException( ErrorMessages::semiMajorAxis );
-   }
-   if ((inv_f < 250) || (inv_f > 350))
-   { /* Inverse flattening must be between 250 and 350 */
-     throw CoordinateConversionException( ErrorMessages::ellipsoidFlattening );
-   }
-   if ((originLatitude <= -PI_OVER_2) || (originLatitude >= PI_OVER_2))
-   { /* origin latitude out of range -  can not be at a pole */
-     throw CoordinateConversionException( ErrorMessages::originLatitude );
-   }
-   if ((latitude1 <= -PI_OVER_2) || (latitude1 >= PI_OVER_2))
-   { /* first latitude out of range -  can not be at a pole */
-     throw CoordinateConversionException( ErrorMessages::latitude1 );
-   }
-   if ((latitude2 <= -PI_OVER_2) || (latitude2 >= PI_OVER_2))
-   { /* second latitude out of range -  can not be at a pole */
-     throw CoordinateConversionException( ErrorMessages::latitude2 );
-   }
-   if (latitude1 == 0.0)
-   { /* first latitude can not be at the equator */
-     throw CoordinateConversionException( ErrorMessages::latitude1 );
-   }
-   if (latitude1 == latitude2)
-   { /* first and second latitudes can not be equal */
-     throw CoordinateConversionException( ErrorMessages::latitude2 );
-   }
-   if (((latitude1 < 0.0) && (latitude2 > 0.0)) ||
-       ((latitude1 > 0.0) && (latitude2 < 0.0)))
-   { /*first and second points can not be in different hemispheres */
-     throw CoordinateConversionException( ErrorMessages::omercHemisphere );
-   }
-   if ((longitude1 < -PI) || (longitude1 > TWO_PI))
-   { /* first longitude out of range */
-     throw CoordinateConversionException( ErrorMessages::longitude1 );
-   }
-   if ((longitude2 < -PI) || (longitude2 > TWO_PI))
-   { /* first longitude out of range */
-     throw CoordinateConversionException( ErrorMessages::longitude2 );
-   }
-   if ((scaleFactor < MIN_SCALE_FACTOR) || (scaleFactor > MAX_SCALE_FACTOR))
-   { /* scale factor out of range */
-     throw CoordinateConversionException( ErrorMessages::scaleFactor );
-   }
-
-   semiMajorAxis = ellipsoidSemiMajorAxis;
-   flattening = ellipsoidFlattening;
-
-   OMerc_Origin_Lat = originLatitude;
-   OMerc_Lon_1 = longitude1;
-   OMerc_Lat_1 = latitude1;
-   OMerc_Lon_2 = longitude2;
-   OMerc_Lat_2 = latitude2;
-   OMerc_False_Northing = falseNorthing;
-   OMerc_False_Easting = falseEasting;
-   OMerc_Scale_Factor = scaleFactor;
-
-   es2 = 2 * flattening - flattening * flattening;
-   es = sqrt(es2);
-   one_MINUS_es2 = 1 - es2;
-   es_OVER_2 = es / 2.0;
-
-   cos_olat = cos(OMerc_Origin_Lat);
-   cos_olat2 = cos_olat * cos_olat;
-   sin_olat = sin(OMerc_Origin_Lat);
-   sin_olat2 = sin_olat * sin_olat;
-   es2_sin_olat2 = es2 * sin_olat2;
-
-   OMerc_B = sqrt(1 + (es2 * cos_olat2 * cos_olat2) / one_MINUS_es2);
-   OMerc_A = (semiMajorAxis * OMerc_B * OMerc_Scale_Factor * sqrt(one_MINUS_es2)) / (1.0 - es2_sin_olat2);
-   A_over_B = OMerc_A / OMerc_B;
-   B_over_A = OMerc_B / OMerc_A;
-
-   t0 = omercT(OMerc_Origin_Lat, es * sin_olat, es_OVER_2);
-   t1 = omercT(OMerc_Lat_1, es * sin(OMerc_Lat_1), es_OVER_2);
-   t2 = omercT(OMerc_Lat_2, es * sin(OMerc_Lat_2), es_OVER_2);
-
-   D = (OMerc_B * sqrt(one_MINUS_es2)) / (cos_olat * sqrt(1.0 - es2_sin_olat2));
-   D2 = D * D;
-   if (D2 < 1.0)
-     D2 = 1.0;
-   D2_MINUS_1 = D2 - 1.0;
-   sqrt_D2_MINUS_1 = sqrt(D2_MINUS_1);
-   if (D2_MINUS_1 > 1.0e-10)
-   {
-     if (OMerc_Origin_Lat >= 0.0)
-       OMerc_E = (D + sqrt_D2_MINUS_1) * pow(t0, OMerc_B);
-     else
-       OMerc_E = (D - sqrt_D2_MINUS_1) * pow(t0, OMerc_B);
-   }
-   else
-     OMerc_E = D * pow(t0, OMerc_B);
-   H = pow(t1, OMerc_B);
-   L = pow(t2, OMerc_B);
-   F = OMerc_E / H;
-   G = (F - 1.0 / F) / 2.0;
-   E2 = OMerc_E * OMerc_E;
-   LH = L * H;
-   J = (E2 - LH) / (E2 + LH);
-   P = (L - H) / (L + H);
-
-   dlon = OMerc_Lon_1 - OMerc_Lon_2;
-   if (dlon < -PI )
-     OMerc_Lon_2 -= TWO_PI;
-   if (dlon > PI)
-     OMerc_Lon_2 += TWO_PI;
-   dlon = OMerc_Lon_1 - OMerc_Lon_2;
-   OMerc_Origin_Long = (OMerc_Lon_1 + OMerc_Lon_2) / 2.0 - (atan(J * tan(OMerc_B * dlon / 2.0) / P)) / OMerc_B;
-
-   dlon = OMerc_Lon_1 - OMerc_Origin_Long;
-   if (dlon < -PI )
-     OMerc_Origin_Long -= TWO_PI;
-   if (dlon > PI)
-     OMerc_Origin_Long += TWO_PI;
-
-   dlon = OMerc_Lon_1 - OMerc_Origin_Long;
-   OMerc_gamma = atan(sin(OMerc_B * dlon) / G);
-   cos_gamma = cos(OMerc_gamma);
-   sin_gamma = sin(OMerc_gamma);
-
-   OMerc_azimuth = asin(D * sin_gamma);
-   cos_azimuth = cos(OMerc_azimuth);
-   sin_azimuth = sin(OMerc_azimuth);
-
-   if (OMerc_Origin_Lat >= 0)
-     OMerc_u =  A_over_B * atan(sqrt_D2_MINUS_1/cos_azimuth);
-   else
-     OMerc_u = -A_over_B * atan(sqrt_D2_MINUS_1/cos_azimuth);
- }
-
-
- ObliqueMercator::ObliqueMercator( const ObliqueMercator &om )
- {
-   semiMajorAxis = om.semiMajorAxis;
-   flattening = om.flattening;
-   es = om.es;
-   es_OVER_2 = om.es_OVER_2;
-   OMerc_A = om.OMerc_A;
-   OMerc_B = om.OMerc_B;
-   OMerc_E = om.OMerc_E;
-   OMerc_gamma = om.OMerc_gamma;
-   OMerc_azimuth = om.OMerc_azimuth;
-   OMerc_Origin_Long = om.OMerc_Origin_Long;
-   cos_gamma = om.cos_gamma;
-   sin_gamma = om.sin_gamma;
-   sin_azimuth = om.sin_azimuth;
-   cos_azimuth = om.cos_azimuth;
-   A_over_B = om.A_over_B;
-   B_over_A = om.B_over_A;
-   OMerc_u = om.OMerc_u;
-   OMerc_Origin_Lat = om.OMerc_Origin_Lat;
-   OMerc_Lon_1 = om.OMerc_Lon_1;
-   OMerc_Lat_1 = om.OMerc_Lat_1;
-   OMerc_Lon_2 = om.OMerc_Lon_2;
-   OMerc_Lat_2 = om.OMerc_Lat_2;
-   OMerc_False_Easting = om.OMerc_False_Easting;
-   OMerc_False_Northing = om.OMerc_False_Northing;
-   OMerc_Scale_Factor = om.OMerc_Scale_Factor;
-   OMerc_Delta_Northing = om.OMerc_Delta_Northing;
-   OMerc_Delta_Easting = om.OMerc_Delta_Easting;
- }
-
-
- ObliqueMercator::~ObliqueMercator()
- {
- }
-
-
- ObliqueMercator& ObliqueMercator::operator=( const ObliqueMercator &om )
- {
-   if( this != &om )
-   {
-     semiMajorAxis = om.semiMajorAxis;
-     flattening = om.flattening;
-     es = om.es;
-     es_OVER_2 = om.es_OVER_2;
-     OMerc_A = om.OMerc_A;
-     OMerc_B = om.OMerc_B;
-     OMerc_E = om.OMerc_E;
-     OMerc_gamma = om.OMerc_gamma;
-     OMerc_azimuth = om.OMerc_azimuth;
-     OMerc_Origin_Long = om.OMerc_Origin_Long;
-     cos_gamma = om.cos_gamma;
-     sin_gamma = om.sin_gamma;
-     sin_azimuth = om.sin_azimuth;
-     cos_azimuth = om.cos_azimuth;
-     A_over_B = om.A_over_B;
-     B_over_A = om.B_over_A;
-     OMerc_u = om.OMerc_u;
-     OMerc_Origin_Lat = om.OMerc_Origin_Lat;
-     OMerc_Lon_1 = om.OMerc_Lon_1;
-     OMerc_Lat_1 = om.OMerc_Lat_1;
-     OMerc_Lon_2 = om.OMerc_Lon_2;
-     OMerc_Lat_2 = om.OMerc_Lat_2;
-     OMerc_False_Easting = om.OMerc_False_Easting;
-     OMerc_False_Northing = om.OMerc_False_Northing;
-     OMerc_Scale_Factor = om.OMerc_Scale_Factor;
-     OMerc_Delta_Northing = om.OMerc_Delta_Northing;
-     OMerc_Delta_Easting = om.OMerc_Delta_Easting;
-   }
-
-   return *this;
- }
-
-
- ObliqueMercatorParameters* ObliqueMercator::getParameters() const
- {
- /*
-  * The function getParameters returns the current ellipsoid
-  * parameters and Oblique Mercator projection parameters.
-  *
-  *    ellipsoidSemiMajorAxis  : Semi-major axis of ellipsoid, in meters  (output)
-  *    ellipsoidFlattening     : Flattening of ellipsoid                  (output)
-  *    originLatitude          : Latitude, in radians, at which the       (output)
-  *                              point scale factor is 1.0
-  *    longitude1              : Longitude, in radians, of first point lying on
-  *                              central line                           (output)
-  *    latitude1               : Latitude, in radians, of first point lying on
-  *                              central line                           (output)
-  *    longitude2              : Longitude, in radians, of second point lying on
-  *                              central line                           (output)
-  *    latitude2               : Latitude, in radians, of second point lying on
-  *                              central line                           (output)
-  *    falseEasting            : A coordinate value, in meters, assigned to the
-  *                              central meridian of the projection     (output)
-  *    falseNorthing           : A coordinate value, in meters, assigned to the
-  *                              origin latitude of the projection      (output)
-  *    scaleFactor             : Multiplier which reduces distances in the
-  *                              projection to the actual distance on the
-  *                              ellipsoid                              (output)
-  */
-
-   return new ObliqueMercatorParameters( CoordinateType::obliqueMercator, OMerc_Origin_Lat, OMerc_Lon_1, OMerc_Lat_1, OMerc_Lon_2, OMerc_Lat_2, OMerc_False_Easting, OMerc_False_Northing, OMerc_Scale_Factor );
- }
-
-
- MSP::CCS::MapProjectionCoordinates* ObliqueMercator::convertFromGeodetic( MSP::CCS::GeodeticCoordinates* geodeticCoordinates )
- {
- /*
-  * The function convertFromGeodetic converts geodetic (latitude and
-  * longitude) coordinates to Oblique Mercator projection (easting and
-  * northing) coordinates, according to the current ellipsoid and Oblique Mercator
-  * projection parameters.  If any errors occur, an exception is thrown with a description
-  * of the error.
-  *
-  *    longitude         : Longitude (lambda), in radians       (input)
-  *    latitude          : Latitude (phi), in radians           (input)
-  *    easting           : Easting (X), in meters               (output)
-  *    northing          : Northing (Y), in meters              (output)
-  */
-
-   double dlam, B_dlam, cos_B_dlam;
-   double t, S, T, V, U;
-   double Q, Q_inv;
-   /* Coordinate axes defined with respect to the azimuth of the center line */
-   /* Natural origin*/
-   double v = 0;
-   double u = 0;
-
-   double longitude = geodeticCoordinates->longitude();
-   double latitude = geodeticCoordinates->latitude();
-
-   if ((latitude < -PI_OVER_2) || (latitude > PI_OVER_2))
-   { /* Latitude out of range */
-     throw CoordinateConversionException( ErrorMessages::latitude );
-   }
-   if ((longitude < -PI) || (longitude > TWO_PI))
-   { /* Longitude out of range */
-     throw CoordinateConversionException( ErrorMessages::longitude );
-   }
-
-   dlam = longitude - OMerc_Origin_Long;
-
-   char warning[256];
-   warning[0] = '\0';
-   if (fabs(dlam) >= PI_OVER_2)
-   { /* Distortion will result if Longitude is 90 degrees or more from the Central Meridian */
-     strcat( warning, MSP::CCS::WarningMessages::longitude );
-   }
-
-   if (dlam > PI)
-   {
-     dlam -= TWO_PI;
-   }
-   if (dlam < -PI)
-   {
-     dlam += TWO_PI;
-   }
-
-   if (fabs(fabs(latitude) - PI_OVER_2) > 1.0e-10)
-   {
-     t = omercT(latitude, es * sin(latitude), es_OVER_2);
-     Q = OMerc_E / pow(t, OMerc_B);
-     Q_inv = 1.0 / Q;
-     S = (Q - Q_inv) / 2.0;
-     T = (Q + Q_inv) / 2.0;
-     B_dlam = OMerc_B * dlam;
-     V = sin(B_dlam);
-     U = ((-1.0 * V * cos_gamma) + (S * sin_gamma)) / T;
-     if (fabs(fabs(U) - 1.0) < 1.0e-10)
-     { /* Point projects into infinity */
-       throw CoordinateConversionException( ErrorMessages::longitude );
-     }
-     else
-     {
-       v = A_over_B * log((1.0 - U) / (1.0 + U)) / 2.0;
-       cos_B_dlam = cos(B_dlam);
-       if (fabs(cos_B_dlam) < 1.0e-10)
-         u = OMerc_A * B_dlam;
-       // Check for longitude span > 90 degrees
-       else if (fabs(B_dlam) > PI_OVER_2)
-       {
-         double temp = atan(((S * cos_gamma) + (V * sin_gamma)) / cos_B_dlam);
-         if (temp < 0.0)
-           u = A_over_B * (temp + PI);
-         else
-           u = A_over_B * (temp - PI);
-       }
-       else
-         u = A_over_B * atan(((S * cos_gamma) + (V * sin_gamma)) / cos_B_dlam);
-     }
-   }
-   else
-   {
-     if (latitude > 0.0)
-       v = A_over_B * log(tan(PI_OVER_4 - (OMerc_gamma / 2.0)));
-     else
-       v = A_over_B * log(tan(PI_OVER_4 + (OMerc_gamma / 2.0)));
-     u = A_over_B * latitude;
-   }
-
-
-   u = u - OMerc_u;
-
-   double easting = OMerc_False_Easting + v * cos_azimuth + u * sin_azimuth;
-   double northing = OMerc_False_Northing + u * cos_azimuth - v * sin_azimuth;
-
-   return new MapProjectionCoordinates(
-      CoordinateType::obliqueMercator, warning, easting, northing );
- }
-
-
- MSP::CCS::GeodeticCoordinates* ObliqueMercator::convertToGeodetic( MSP::CCS::MapProjectionCoordinates* mapProjectionCoordinates )
- {
- /*
-  * The function convertToGeodetic converts Oblique Mercator projection
-  * (easting and northing) coordinates to geodetic (latitude and longitude)
-  * coordinates, according to the current ellipsoid and Oblique Mercator projection
-  * coordinates.  If any errors occur, an exception is thrown with a description
-  * of the error.
-  *
-  *    easting           : Easting (X), in meters                  (input)
-  *    northing          : Northing (Y), in meters                 (input)
-  *    longitude         : Longitude (lambda), in radians          (output)
-  *    latitude          : Latitude (phi), in radians              (output)
-  */
-
-   double dx, dy;
-   /* Coordinate axes defined with respect to the azimuth of the center line */
-   /* Natural origin*/
-   double u, v;
-   double Q_prime, Q_prime_inv;
-   double S_prime, T_prime, V_prime, U_prime;
-   double t;
-   double es_sin;
-   double u_B_over_A;
-   double phi;
-   double temp_phi = 0.0;
-   int count = 60;
-   double longitude, latitude;
-
-   double easting  = mapProjectionCoordinates->easting();
-   double northing = mapProjectionCoordinates->northing();
-
-   if ((easting < (OMerc_False_Easting - OMerc_Delta_Easting))
-       || (easting > (OMerc_False_Easting + OMerc_Delta_Easting)))
-   { /* Easting out of range  */
-     throw CoordinateConversionException( ErrorMessages::easting );
-   }
-   if ((northing < (OMerc_False_Northing - OMerc_Delta_Northing))
-       || (northing > (OMerc_False_Northing + OMerc_Delta_Northing)))
-   { /* Northing out of range */
-     throw CoordinateConversionException( ErrorMessages::northing );
-   }
-
-   dy = northing - OMerc_False_Northing;
-   dx = easting - OMerc_False_Easting;
-   v = dx * cos_azimuth - dy * sin_azimuth;
-   u = dy * cos_azimuth + dx * sin_azimuth;
-   u = u + OMerc_u;
-   Q_prime = exp(-1.0 * (v * B_over_A ));
-   Q_prime_inv = 1.0 / Q_prime;
-   S_prime = (Q_prime - Q_prime_inv) / 2.0;
-   T_prime = (Q_prime + Q_prime_inv) / 2.0;
-   u_B_over_A = u * B_over_A;
-   V_prime = sin(u_B_over_A);
-   U_prime = (V_prime * cos_gamma + S_prime * sin_gamma) / T_prime;
-   if (fabs(fabs(U_prime) - 1.0) < 1.0e-10)
-   {
-     if (U_prime > 0)
-       latitude = PI_OVER_2;
-     else
-       latitude = -PI_OVER_2;
-     longitude = OMerc_Origin_Long;
-   }
-   else
-   {
-     t = pow(OMerc_E / sqrt((1.0 + U_prime) / (1.0 - U_prime)), 1.0 / OMerc_B);
-     phi = PI_OVER_2 - 2.0 * atan(t);
-     while (fabs(phi - temp_phi) > 1.0e-10 && count)
-     {
-       temp_phi = phi;
-       es_sin = es * sin(phi);
-       phi = PI_OVER_2 - 2.0 * atan(t * pow((1.0 - es_sin) / (1.0 + es_sin), es_OVER_2));
-       count --;
-     }
-
-     if(!count)
-       throw CoordinateConversionException( ErrorMessages::northing );
-
-     latitude = phi;
-     longitude = OMerc_Origin_Long - atan2((S_prime * cos_gamma - V_prime * sin_gamma), cos(u_B_over_A)) / OMerc_B;
-   }
-
-   if (fabs(latitude) < 2.0e-7)  /* force lat to 0 to avoid -0 degrees */
-     latitude = 0.0;
-   if (latitude > PI_OVER_2)  /* force distorted values to 90, -90 degrees */
-     latitude = PI_OVER_2;
-   else if (latitude < -PI_OVER_2)
-     latitude = -PI_OVER_2;
-
-   if (longitude > PI)
-     longitude -= TWO_PI;
-   if (longitude < -PI)
-     longitude += TWO_PI;
-
-   if (fabs(longitude) < 2.0e-7)  /* force lon to 0 to avoid -0 degrees */
-     longitude = 0.0;
-   if (longitude > PI)  /* force distorted values to 180, -180 degrees */
-     longitude = PI;
-   else if (longitude < -PI)
-     longitude = -PI;
-
-   char warning[256];
-   warning[0] = '\0';
-   if (fabs(longitude - OMerc_Origin_Long) >= PI_OVER_2)
-   { /* Distortion results if Longitude > 90 degrees from the Central Meridian */
-     strcat( warning, MSP::CCS::WarningMessages::longitude );
-   }
-
-   return new GeodeticCoordinates(
-      CoordinateType::geodetic, warning, longitude, latitude );
- }
-
-
- double ObliqueMercator::omercT( double lat, double e_sinlat, double e_over_2 )
- {
-   return (tan(PI_OVER_4 - lat / 2.0)) / (pow((1 - e_sinlat) / (1 + e_sinlat), e_over_2));
- }
-
-#endif // NOT
