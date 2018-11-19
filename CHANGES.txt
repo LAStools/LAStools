@@ -1,3 +1,7 @@
+19 November 2018 -- all LAStools: support for "Hotine Oblique Mercator" (needed for Malaysia, Alaska Zone 1, Madagascar)
+18 November 2018 -- lascanopy64: fixed division by zero bug in 'bincentiles', 'kurtosis, and 'skewness' of 64 bit version
+12 November 2018 -- las2las: new option '-save_vlrs' and '-load_vlrs' to copy VLRs from one LAS file to (a set of) another
+10 November 2018 -- lasground, lasground_new: fixed rare memory bug for spikes along egde of initial ground estimate
 7 November 2018 -- LASzip DLL: assure that legacy and extended flags are identical to prevent corrupt LAZ files
 6 November 2018 -- all LAStools: fix for '-cpu64' and '-cores 2' on single input files that started 32 bit exes
 5 November 2018 -- lasthin: bug fix when using option '-central' for '-step 200' sizes larger than 50
