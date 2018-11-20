@@ -455,11 +455,11 @@ BOOL LASindex::append(const char* file_name) const
   lax_evlr.record_id = 30;
   sprintf(lax_evlr.description, "LAX spatial indexing (LASindex)");
 
-  bytestreamout->put16bitsLE((U8*)&(lax_evlr.reserved));
-  bytestreamout->putBytes((U8*)lax_evlr.user_id, 16);
-  bytestreamout->put16bitsLE((U8*)&(lax_evlr.record_id));
-  bytestreamout->put64bitsLE((U8*)&(lax_evlr.record_length_after_header));
-  bytestreamout->putBytes((U8*)lax_evlr.description, 32);
+  bytestreamout->put16bitsLE((const U8*)&(lax_evlr.reserved));
+  bytestreamout->putBytes((const U8*)lax_evlr.user_id, 16);
+  bytestreamout->put16bitsLE((const U8*)&(lax_evlr.record_id));
+  bytestreamout->put64bitsLE((const U8*)&(lax_evlr.record_length_after_header));
+  bytestreamout->putBytes((const U8*)lax_evlr.description, 32);
 
   if (!write(bytestreamout))
   {
@@ -474,15 +474,15 @@ BOOL LASindex::append(const char* file_name) const
 
   lax_evlr.record_length_after_header = bytestreamout->tell() - offset_to_special_evlrs - 60;
   bytestreamout->seek(offset_to_special_evlrs + 20);
-  bytestreamout->put64bitsLE((U8*)&(lax_evlr.record_length_after_header));
+  bytestreamout->put64bitsLE((const U8*)&(lax_evlr.record_length_after_header));
 
   // maybe update LASzip VLR
 
   if (number_of_special_evlrs != -1)
   {
     bytestreamout->seek(offset_laz_vlr + 54 + 16);
-    bytestreamout->put64bitsLE((U8*)&number_of_special_evlrs);
-    bytestreamout->put64bitsLE((U8*)&offset_to_special_evlrs);
+    bytestreamout->put64bitsLE((const U8*)&number_of_special_evlrs);
+    bytestreamout->put64bitsLE((const U8*)&offset_to_special_evlrs);
   }
 
   // close writer
@@ -590,13 +590,13 @@ BOOL LASindex::read(ByteStreamIn* stream)
 
 BOOL LASindex::write(ByteStreamOut* stream) const
 {
-  if (!stream->putBytes((U8*)"LASX", 4))
+  if (!stream->putBytes((const U8*)"LASX", 4))
   {
     fprintf(stderr,"ERROR (LASindex): writing signature\n");
     return FALSE;
   }
   U32 version = 0;
-  if (!stream->put32bitsLE((U8*)&version))
+  if (!stream->put32bitsLE((const U8*)&version))
   {
     fprintf(stderr,"ERROR (LASindex): writing version\n");
     return FALSE;
