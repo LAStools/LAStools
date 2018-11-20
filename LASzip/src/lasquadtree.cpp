@@ -405,7 +405,7 @@ U32 LASquadtree::get_cell_index(const F64 x, const F64 y) const
 }
 
 // returns the indices of parent and siblings for the specified cell index
-BOOL LASquadtree::coarsen(const I32 cell_index, I32* coarser_cell_index, U32* num_cell_indices, I32** cell_indices) const
+BOOL LASquadtree::coarsen(const I32 cell_index, I32* coarser_cell_index, U32* num_cell_indices, I32** cell_indices)
 {
   if (cell_index < 0) return FALSE;
   U32 level = get_level((U32)cell_index);
@@ -680,7 +680,7 @@ BOOL LASquadtree::write(ByteStreamOut* stream) const
   //     F32  max_y           4 bytes 
   // which totals 28 bytes
 
-  if (!stream->putBytes((U8*)"LASS", 4))
+  if (!stream->putBytes((const U8*)"LASS", 4))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing LASspatial signature\n");
     return FALSE;
@@ -693,52 +693,52 @@ BOOL LASquadtree::write(ByteStreamOut* stream) const
     return FALSE;
   }
 
-  if (!stream->putBytes((U8*)"LASQ", 4))
+  if (!stream->putBytes((const U8*)"LASQ", 4))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing signature\n");
     return FALSE;
   }
 
   U32 version = 0;
-  if (!stream->put32bitsLE((U8*)&version))
+  if (!stream->put32bitsLE((const U8*)&version))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing version\n");
     return FALSE;
   }
 
-  if (!stream->put32bitsLE((U8*)&levels))
+  if (!stream->put32bitsLE((const U8*)&levels))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing levels %u\n", levels);
     return FALSE;
   }
   U32 level_index = 0;
-  if (!stream->put32bitsLE((U8*)&level_index))
+  if (!stream->put32bitsLE((const U8*)&level_index))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing level_index %u\n", level_index);
     return FALSE;
   }
   U32 implicit_levels = 0;
-  if (!stream->put32bitsLE((U8*)&implicit_levels))
+  if (!stream->put32bitsLE((const U8*)&implicit_levels))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing implicit_levels %u\n", implicit_levels);
     return FALSE;
   }
-  if (!stream->put32bitsLE((U8*)&min_x))
+  if (!stream->put32bitsLE((const U8*)&min_x))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing min_x %g\n", min_x);
     return FALSE;
   }
-  if (!stream->put32bitsLE((U8*)&max_x))
+  if (!stream->put32bitsLE((const U8*)&max_x))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing max_x %g\n", max_x);
     return FALSE;
   }
-  if (!stream->put32bitsLE((U8*)&min_y))
+  if (!stream->put32bitsLE((const U8*)&min_y))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing min_y %g\n", min_y);
     return FALSE;
   }
-  if (!stream->put32bitsLE((U8*)&max_y))
+  if (!stream->put32bitsLE((const U8*)&max_y))
   {
     fprintf(stderr,"ERROR (LASquadtree): writing max_y %g\n", max_y);
     return FALSE;

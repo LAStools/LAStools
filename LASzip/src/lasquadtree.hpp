@@ -60,7 +60,7 @@ public:
   U32 get_cell_index(const F64 x, const F64 y) const;
 
   // map cells to coarser cells
-  BOOL coarsen(const I32 cell_index, I32* coarser_cell_index, U32* num_cell_indices, I32** cell_indices) const;
+  BOOL coarsen(const I32 cell_index, I32* coarser_cell_index, U32* num_cell_indices, I32** cell_indices);
 
   // describe cells
   void get_cell_bounding_box(const I32 cell_index, F32* min, F32* max) const;

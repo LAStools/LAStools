@@ -172,7 +172,7 @@ typedef union I64U32I32F32 { I64 i64; U32 u32[2]; I32 i32[2]; F32 f32[2]; } I64U
 inline BOOL IS_LITTLE_ENDIAN()
 {
   const U32 i = 1;
-  return (*((U8*)&i) == 1);
+  return (*((const U8*)&i) == 1);
 }
 
 #define ENDIANSWAP16(n) \
