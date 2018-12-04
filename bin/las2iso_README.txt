@@ -28,6 +28,10 @@
   is needed. If it is not provided in the LAS header then it can
   be specified in the command line (-utm 14T or -sp83 OH_S).
 
+  For SHP file output the z coordinates are by default not stored
+  as an attribute but as the PolylineZ value within the SHP file.
+  To create explicit attributes in a DBF file use '-odbf'.
+
   Optionally the contours can also be simplified, cleaned, and
   smoothed before output.
  
@@ -71,10 +75,16 @@
 
 example usage:
 
->> las2iso -i *.las -oshp -iso_every 2
+>> las2iso -i *.las -iso_every 2 -oshp 
 
 extracts 2 unit contours from all files that match *.las and stores
 the result in ESRI's Shapefile format.
+
+>> las2iso -i *.laz -iso_every 2 -oshp -odbf
+
+extracts 2 unit contours from all files that match *.laz and stores
+the result in ESRI's Shapefile format with the elevations of the
+contour line being an explicit attribues in the DBF file.
 
 >> las2iso -i *.txt -iparse ssxyz -oshp -iso_number 20
 

@@ -47,7 +47,11 @@
   the cutoff that by default is breast height of 1.37. It can be
   changed with the option '-height_cutoff 2.0'. Also the skewness
   with '-ske', the kurtosis with '-kur', and the average square
-  height '-qav' can be computed.
+  height '-qav' can be computed. All these statistical metrics
+  only consider the points above the height cutoff. You can compute
+  the number of points that actually are above the cutoff and are
+  participating in the computation with '-abv' and the total number
+  of points (including those that are below the cutoff) with '-all'.
 
   There is also the concept of height "bincentiles" where '-b 90'
   would deliver the percentage or fraction of points between the

@@ -26,7 +26,7 @@
   files) into one output file per polygon. If your SHP file has an
   associated DBF file then you can use '-split 0' to give output
   files the name or number stored in attribute with index 0. Or
-  you can use '-split IDX' with 'IDX being the attribute's name.
+  you can use '-split IDX' with IDX being the attribute's name.
 
   You can exclude certain point classes from the clipping or the
   reclassifying with option '-ignore_class 2' or '-ignore_class
