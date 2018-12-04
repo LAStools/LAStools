@@ -435,6 +435,10 @@ I32 LASreadOpener::unparse(CHAR* string) const
   {
     n += sprintf(string + n, "-stored ");
   }
+  if (merged)
+  {
+    n += sprintf(string + n, "-merged ");
+  }
   if (files_are_flightlines)
   {
     if (files_are_flightlines == 1)
