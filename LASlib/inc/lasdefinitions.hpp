@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 181119
+#define LAS_TOOLS_VERSION 181204
 
 #include <stdio.h>
 #include <string.h>
@@ -491,7 +491,10 @@ public:
     }
     if (max_x < min_x || max_y < min_y || max_z < min_z)
     {
-      fprintf(stderr,"WARNING: invalid bounding box [ %g %g %g / %g %g %g ]\n", min_x, min_y, min_z, max_x, max_y, max_z);
+      if (number_of_point_records || extended_number_of_point_records)
+      {
+        fprintf(stderr,"WARNING: invalid bounding box [ %g %g %g / %g %g %g ]\n", min_x, min_y, min_z, max_x, max_y, max_z);
+      }
     }
     return TRUE;
   };
