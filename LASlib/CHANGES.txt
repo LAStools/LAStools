@@ -1,3 +1,4 @@
+ 5 December 2018 -- LASlib: new '-transform_affine 0.9999652,0.903571,171.67,736.26' with paramters scale,angledeg,tx,tz
 19 November 2018 -- all LAStools: support for "Hotine Oblique Mercator" (needed for Malaysia, Alaska Zone 1, Madagascar)
 12 November 2018 -- las2las: new option '-save_vlrs' and '-load_vlrs' to copy VLRs from one LAS file to (a set of) another
 7 November 2018 -- LASzip DLL: assure that legacy and extended flags are identical to prevent corrupt LAZ files
