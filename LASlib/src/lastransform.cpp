@@ -248,6 +248,23 @@ private:
   F64 dx, dy, dz, rx, ry, rz, m, rx_rad, ry_rad, rz_rad, scale;
 };
 
+class LASoperationTransformAffine : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "transform_affine"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf,%lf,%lf,%lf ", name(), r, w, tx, ty); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
+  inline void transform(LASpoint* point) {
+    F64 x = r * ((cosw * point->get_x()) + (sinw * point->get_y())) + tx;
+    F64 y = r * ((cosw * point->get_y()) - (sinw * point->get_x())) + ty;
+    point->set_x(x);
+    point->set_y(y);
+  };
+  LASoperationTransformAffine(F64 r, F64 w, F64 tx, F64 ty) { this->r = r; this->w = w; this->cosw = cos(4.84813681109536e-6*w); this->sinw = sin(4.84813681109536e-6*w); this->tx = tx; this->ty = ty; };
+private:
+  F64 r, w, cosw, sinw, tx, ty;
+};
+
 class LASoperationClampZ : public LASoperation
 {
 public:
@@ -1521,6 +1538,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -translate_then_scale_y -0.5 1.001\n");
   fprintf(stderr,"  -transform_helmert -199.87,74.79,246.62\n");
   fprintf(stderr,"  -transform_helmert 598.1,73.7,418.2,0.202,0.045,-2.455,6.7\n");
+  fprintf(stderr,"  -transform_affine 0.9999652,0.903571,171.67,736.26\n");
   fprintf(stderr,"  -switch_x_y -switch_x_z -switch_y_z\n");
   fprintf(stderr,"  -clamp_z_below 70.5\n");
   fprintf(stderr,"  -clamp_z 70.5 72.5\n");
@@ -3559,29 +3577,52 @@ BOOL LAStransform::parse(int argc, char* argv[])
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
     }
-    else if (strcmp(argv[i],"-transform_helmert") == 0)
+    else if (strncmp(argv[i], "-transform_", 11) == 0)
     {
-      if ((i+1) >= argc)
+      if (strcmp(argv[i], "-transform_helmert") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: 3 or 7 comma separated parameters\n", argv[i]);
-        return FALSE;
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: 3 or 7 comma separated parameters\n", argv[i]);
+          return FALSE;
+        }
+        F64 dx, dy, dz, rx, ry, rz, m, dummy;
+        I32 num = sscanf(argv[i+1], "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &dx, &dy, &dz, &rx, &ry, &rz, &m, &dummy);
+        if (num == 7)
+        {
+          add_operation(new LASoperationTransformHelmert(dx, dy, dz, rx, ry, rz, m));
+        }
+        else if (num == 3)
+        {
+          add_operation(new LASoperationTranslateXYZ(dx, dy, dz));
+        }
+        else
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 or 7 comma separated parameters as argument\n", argv[i]);
+          return FALSE;
+        }
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
-      F64 dx, dy, dz, rx, ry, rz, m, dummy;
-      I32 num = sscanf(argv[i+1], "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &dx, &dy, &dz, &rx, &ry, &rz, &m, &dummy);
-      if (num == 7)
+      else if (strcmp(argv[i], "-transform_affine") == 0)
       {
-        add_operation(new LASoperationTransformHelmert(dx, dy, dz, rx, ry, rz, m));
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: 4 comma separated parameters\n", argv[i]);
+          return FALSE;
+        }
+        F64 k, w, tx, ty, dummy;
+        I32 num = sscanf(argv[i+1], "%lf,%lf,%lf,%lf,%lf", &k, &w, &tx, &ty, &dummy);
+        if (num == 4)
+        {
+          add_operation(new LASoperationTransformAffine(k, w, tx, ty));
+        }
+        else
+        {
+          fprintf(stderr,"ERROR: '%s' needs 4 comma separated parameters as argument\n", argv[i]);
+          return FALSE;
+        }
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
-      else if (num == 3)
-      {
-        add_operation(new LASoperationTranslateXYZ(dx, dy, dz));
-      }
-      else
-      {
-        fprintf(stderr,"ERROR: '%s' needs 3 or 7 comma separated parameters as argument\n", argv[i]);
-        return FALSE;
-      }
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
     }
     else if (strcmp(argv[i],"-merge_scanner_channel_into_point_source") == 0)
     {
