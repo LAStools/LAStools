@@ -136,6 +136,20 @@ int main(int argc, char *argv[])
   lasheader.point_data_format = 1;
   lasheader.point_data_record_length = 28;
 
+  // add a VLR with an empty payload that has only meaning to you and your users
+
+  lasheader.add_vlr("my_one_VLR", 12345, 0, 0, FALSE, "this has no payload");
+
+  // add a VLR with a small payload that has only meaning to you and your users
+
+  U8* payload = new U8[64];
+  memset(payload, 0, 64);
+  strcpy((char*)payload, "this is a small payload followed by zeros");
+
+  // note that LASheader takes over the memory control / deallocation for payload
+
+  lasheader.add_vlr("my_other_VLR", 23456, 64, payload, FALSE, "this has a small payload");
+
   // init point 
 
   LASpoint laspoint;
