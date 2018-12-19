@@ -1,4 +1,6 @@
- 4 December 2018 -- las2dem: bug fix for '-spike_free' algorithm crash when there are extremely few points in input file 
+18 December 2018 -- lasboundary: bug fix for 64 bit executable called via '-cpu64' with '-overview' by 32 bit executable
+ 5 December 2018 -- LASlib: new '-transform_affine 0.9999652,0.903571,171.67,736.26' with paramters scale,angledeg,tx,tz
+ 4 December 2018 -- las2dem: bug fix for '-spike_free' algorithm crash when there are extremely few points in input file
 29 November 2018 -- all 64 bit executables: bug fix for ignored '-merged' when called via '-cpu64' by 32 bit executable
 28 November 2018 -- e572las: bug fix for E57 files when applying translation vector with *huge* translation
 21 November 2018 -- lascanopy: new forestry metric Vertical Complexity Index (VCI) available via '-vci 0.5 1.0 2.0' 
