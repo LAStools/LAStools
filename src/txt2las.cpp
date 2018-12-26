@@ -586,12 +586,6 @@ int main(int argc, char *argv[])
 
   while (lasreadopener.active())
   {
-    if (verbose)
-    {
-      full_start_time = start_time = taketime();
-      fprintf(stderr, "reading from '%s' and writing to '%s'\n", (lasreadopener.is_piped() ? "stdin" : lasreadopener.get_file_name()), (laswriteopener.is_piped() ? "stdout" : laswriteopener.get_file_name()));
-    }
-
     // open lasreader
 
     LASreader* lasreader = lasreadopener.open();
@@ -614,6 +608,12 @@ int main(int argc, char *argv[])
     {
       // create name from input name
       laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
+    }
+
+    if (verbose)
+    {
+      full_start_time = start_time = taketime();
+      fprintf(stderr, "reading from '%s' and writing to '%s'\n", (lasreadopener.is_piped() ? "stdin" : lasreadopener.get_file_name()), (laswriteopener.is_piped() ? "stdout" : laswriteopener.get_file_name()));
     }
 
     // populate header
