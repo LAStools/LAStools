@@ -25,6 +25,7 @@
 
   CHANGE HISTORY:
 
+    27 December 2018 -- upped to 3.2 r9 for bug fix in multi-channel NIR decompression
      7 November 2018 -- upped to 3.2 r8 for identical legacy and extended flags check
     20 October 2018 -- upped to 3.2 r7 for rare bug in LASinterval::merge_intervals()
      5 October 2018 -- upped to 3.2 r6 for corrected 'is_empty' return value
@@ -70,8 +71,8 @@ typedef long long SIGNED_INT64;
 
 #define LASZIP_VERSION_MAJOR                3
 #define LASZIP_VERSION_MINOR                2
-#define LASZIP_VERSION_REVISION             8
-#define LASZIP_VERSION_BUILD_DATE      181107
+#define LASZIP_VERSION_REVISION             9
+#define LASZIP_VERSION_BUILD_DATE      181227
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1

@@ -1697,7 +1697,7 @@ inline void LASreadItemCompressed_RGBNIR14_v3::read(U8* item, U32& context)
     }
   }
 
-  // dempress
+  // decompress
 
   ////////////////////////////////////////
   // decompress RGB layer 
@@ -1807,11 +1807,11 @@ inline void LASreadItemCompressed_RGBNIR14_v3::read(U8* item, U32& context)
     {
       ((U16*)item)[3] |= (last_item[3]&0xFF00);
     }
-    contexts[current_context].last_item[3] = ((U16*)item)[3];
+    last_item[3] = ((U16*)item)[3];
   }
   else
   {
-    ((U16*)item)[3] = contexts[current_context].last_item[3];
+    ((U16*)item)[3] = last_item[3];
   }
 }
 
