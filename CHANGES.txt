@@ -1,3 +1,4 @@
+27 December 2018 -- LASzip and LASlib and all LAStools: upped to 3.2 r9 for bug fix in multi-channel NIR decompression
 18 December 2018 -- lasboundary: bug fix for 64 bit executable called via '-cpu64' with '-overview' by 32 bit executable
  5 December 2018 -- LASlib: new '-transform_affine 0.9999652,0.903571,171.67,736.26' with paramters scale,angledeg,tx,tz
  4 December 2018 -- las2dem: bug fix for '-spike_free' algorithm crash when there are extremely few points in input file
