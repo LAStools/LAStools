@@ -1,3 +1,4 @@
+28 December 2018 -- fix for LASzip v4 decompression of WavePacket part of PRDF 9 and 10
 27 December 2018 -- upped to 3.2 r9 for bug fix in multi-channel NIR decompression
 7 November 2018 -- laszip DLL: upped to 3.2 r8 for identical legacy and extended flags check
 20 October 2018 -- fixed rare bug in LASinterval::merge_intervals()
