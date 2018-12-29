@@ -1,3 +1,4 @@
+29 December 2018 -- lasclip: new option '-ignore_extended_class 43 43 44 67' for LAS 1.4 classifications larger than 31
 28 December 2018 -- LASzip, LASlib and all LAStools: fix for LASzip v4 decompression of WavePacket part of PRDF 9 and 10
 27 December 2018 -- LASzip, LASlib and all LAStools: upped to 3.2 r9 for bug fix in multi-channel NIR decompression
 18 December 2018 -- lasboundary: bug fix for 64 bit executable called via '-cpu64' with '-overview' by 32 bit executable
