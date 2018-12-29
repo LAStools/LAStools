@@ -119,6 +119,7 @@ overview of all tool-specific switches:
 -gui                                 : start with files loaded into GUI
 -cores 4                             : process multiple inputs on 4 cores in parallel
 -ignore_class 0 1 3 5 6 7 9          : ignores points with specified classification codes
+-ignore_extended_class 42 43 45 67   : ignores points with specified extended classification codes
 
 ... more to come ...
 
