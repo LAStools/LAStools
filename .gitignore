@@ -1,8 +1,14 @@
 src_full
 Release
 Debug
+ArcGIS_toolbox
+QGIS_toolbox
+IMAGINE_toolbox
 lastools.ncb
 lastools.opt
+bin/serf/blast
+bin/serf/potree16
+bin/*.exe
 *~
 .vs
 *.pdb
