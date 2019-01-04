@@ -1605,8 +1605,9 @@ void LAStransform::usage() const
   fprintf(stderr,"  -switch_x_y -switch_x_z -switch_y_z\n");
   fprintf(stderr,"  -clamp_z_below 70.5\n");
   fprintf(stderr,"  -clamp_z 70.5 72.5\n");
-  fprintf(stderr,"  -copy_attribute_to_z 0\n");
-  fprintf(stderr,"  -add_attribute_into_z 1\n");
+  fprintf(stderr,"  -copy_attribute_into_z 0\n");
+  fprintf(stderr,"  -add_attribute_to_z 1\n");
+  fprintf(stderr,"  -add_scaled_attribute_to_z 1 -1.2\n");
   fprintf(stderr,"  -copy_intensity_into_z\n");
   fprintf(stderr,"Transform raw xyz integers.\n");
   fprintf(stderr,"  -translate_raw_z 20\n");
@@ -3826,7 +3827,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
         }
         change_coordinates = TRUE;
         add_operation(new LASoperationAddScaledAttributeToZ(index, scale));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        *argv[i]='\0'; *argv[i+2]='\0';  *argv[i+1]='\0'; i+=2; 
       }
     }
   }
