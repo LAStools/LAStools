@@ -315,7 +315,7 @@ class LASoperationCopyAttributeIntoZ : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_attribute_into_z"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     F64 z = point->get_attribute_as_float(index);
@@ -576,7 +576,7 @@ class LASoperationCopyAttributeIntoIntensity : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_attribute_into_intensity"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     F64 intensity = point->get_attribute_as_float(index);
@@ -1016,7 +1016,7 @@ class LASoperationCopyAttributeIntoUserData : public LASoperation
 {
 public:
   inline const CHAR* name() const { return "copy_attribute_into_user_data"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), index); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     F64 user_data = point->get_attribute_as_float(index);
@@ -1507,6 +1507,37 @@ public:
   LASoperationBinAbsScanAngleIntoPointSource(F32 bin_size=1.0f) { this->bin_size = bin_size; };
 private:
   F32 bin_size;
+};
+
+class LASoperationAddAttributeToZ : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "add_attribute_to_z"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
+  inline void transform(LASpoint* point) {
+    F64 z = point->get_z() + point->get_attribute_as_float(index);
+    point->set_z(z);
+  };
+  LASoperationAddAttributeToZ(U32 index) { this->index = index; };
+private:
+  U32 index;
+};
+
+class LASoperationScaleAttribute : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "scale_attribute"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %g ", name(), index, scale); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
+  inline void transform(LASpoint* point) {
+    F64 attribute = scale*point->get_attribute_as_float(index);
+    point->set_attribute_as_float(index, attribute);
+  };
+  LASoperationScaleAttribute(U32 index, F32 scale) { this->index = index; this->scale = scale; };
+private:
+  U32 index;
+  F32 scale;
 };
 
 void LAStransform::clean()
@@ -3393,6 +3424,28 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationScaleRGBup());
         *argv[i]='\0'; 
       }
+      else if (strcmp(argv[i],"-scale_attribute") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index scale\n", argv[i]);
+          return FALSE;
+        }
+        U32 index;
+        if (sscanf(argv[i+1], "%u", &index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index scale but '%s' is no valid index\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F32 scale;
+        if (sscanf(argv[i+2], "%f", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index scale but '%s' is no valid scale\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        add_operation(new LASoperationScaleAttribute(index, scale));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+      }
     }
     else if (strncmp(argv[i],"-switch_", 8) == 0)
     {
@@ -3674,6 +3727,26 @@ BOOL LAStransform::parse(int argc, char* argv[])
     {
       is_filtered = TRUE;
       *argv[i]='\0'; 
+    }
+    else if (strncmp(argv[i],"-add_", 5) == 0)
+    {
+      if (strcmp(argv[i], "-add_attribute_to_z") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
+          return FALSE;
+        }
+        U32 index;
+        if (sscanf(argv[i+1], "%u", &index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute but '%s' is no valid index\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        change_coordinates = TRUE;
+        add_operation(new LASoperationAddAttributeToZ(index));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
     }
   }
   return TRUE;
