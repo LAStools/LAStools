@@ -1514,7 +1514,7 @@ class LASoperationAddAttributeToZ : public LASoperation
 public:
   inline const CHAR* name() const { return "add_attribute_to_z"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z | LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) {
     F64 z = point->get_z() + point->get_attribute_as_float(index);
     point->set_z(z);
@@ -1522,6 +1522,22 @@ public:
   LASoperationAddAttributeToZ(U32 index) { this->index = index; };
 private:
   U32 index;
+};
+
+class LASoperationAddScaledAttributeToZ : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "add_scaled_attribute_to_z"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %f ", name(), index, scale); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z | LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
+  inline void transform(LASpoint* point) {
+    F64 z = point->get_z() + point->get_attribute_as_float(index) * scale;
+    point->set_z(z);
+  };
+  LASoperationAddScaledAttributeToZ(U32 index, F32 scale) { this->index = index; this->scale = scale; };
+private:
+  U32 index;
+  F32 scale;
 };
 
 class LASoperationScaleAttribute : public LASoperation
@@ -3787,6 +3803,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
         }
         change_coordinates = TRUE;
         add_operation(new LASoperationAddAttributeToZ(index));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i], "-add_scaled_attribute_to_z") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index scale\n", argv[i]);
+          return FALSE;
+        }
+        U32 index;
+        if (sscanf(argv[i+1], "%u", &index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index scale but '%s' is no valid index\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F32 scale;
+        if (sscanf(argv[i+2], "%f", &scale) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index scale but '%s' is no valid scale\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        change_coordinates = TRUE;
+        add_operation(new LASoperationAddScaledAttributeToZ(index, scale));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
     }
