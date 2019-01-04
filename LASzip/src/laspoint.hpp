@@ -694,6 +694,14 @@ public:
     return 0.0;
   };
 
+  inline void set_attribute_as_float(U32 index, F64 value) const
+  {
+    if (has_attribute(index))
+    {
+      attributer->attributes[index].set_value_as_float(extra_bytes + attributer->attribute_starts[index], value);
+    }
+  };
+
   // typed and offset functions for attributes in extra bytes (more efficient)
 
   inline void get_attribute(I32 start, U8 &data) const { data = extra_bytes[start]; };
