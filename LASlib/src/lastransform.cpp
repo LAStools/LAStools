@@ -1540,6 +1540,22 @@ private:
   F32 scale;
 };
 
+class LASoperationTranslateAttribute : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "translate_attribute"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %lf ", name(), index, offset); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
+  inline void transform(LASpoint* point) {
+    F64 attribute = offset + point->get_attribute_as_float(index);
+    point->set_attribute_as_float(index, attribute);
+  };
+  LASoperationTranslateAttribute(U32 index, F64 offset) { this->index = index; this->offset = offset; };
+private:
+  U32 index;
+  F64 offset;
+};
+
 void LAStransform::clean()
 {
   U32 i;
@@ -1573,7 +1589,8 @@ void LAStransform::usage() const
   fprintf(stderr,"  -switch_x_y -switch_x_z -switch_y_z\n");
   fprintf(stderr,"  -clamp_z_below 70.5\n");
   fprintf(stderr,"  -clamp_z 70.5 72.5\n");
-  fprintf(stderr,"  -copy_attribute_into_z 0\n");
+  fprintf(stderr,"  -copy_attribute_to_z 0\n");
+  fprintf(stderr,"  -add_attribute_into_z 1\n");
   fprintf(stderr,"  -copy_intensity_into_z\n");
   fprintf(stderr,"Transform raw xyz integers.\n");
   fprintf(stderr,"  -translate_raw_z 20\n");
@@ -1657,6 +1674,9 @@ void LAStransform::usage() const
   fprintf(stderr,"  -copy_G_into_NIR -copy_G_into_intensity\n");
   fprintf(stderr,"  -copy_B_into_NIR -copy_B_into_intensity\n");
   fprintf(stderr,"  -copy_intensity_into_NIR\n");
+  fprintf(stderr,"Transform attributes in \"Extra Bytes\".\n");
+  fprintf(stderr,"  -scale_attribute 0 1.5\n");
+  fprintf(stderr,"  -translate_attribute 1 0.2\n");
 }
 
 BOOL LAStransform::parse(int argc, char* argv[])
@@ -2022,6 +2042,28 @@ BOOL LAStransform::parse(int argc, char* argv[])
         }
         add_operation(new LASoperationTranslateGpsTime(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i],"-translate_attribute") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index offset\n", argv[i]);
+          return FALSE;
+        }
+        U32 index;
+        if (sscanf(argv[i+1], "%u", &index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index offset but '%s' is no valid index\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 offset;
+        if (sscanf(argv[i+2], "%lf", &offset) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index offset but '%s' is no valid offset\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        add_operation(new LASoperationTranslateAttribute(index, offset));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
     }
     else if (strncmp(argv[i],"-rotate_", 8) == 0)
