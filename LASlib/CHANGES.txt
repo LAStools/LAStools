@@ -1,3 +1,5 @@
+ 4 January 2019 -- LASlib: new "Extra Bytes" transform '-add_attribute_to_z 0' & '-add_scaled_attribute_to_z 1 -1.5'
+ 3 January 2019 -- LASlib: new "Extra Bytes" transform '-scale_attribute 0 1.1' & '-translate_attribute 1 10.25'
 28 December 2018 -- LASzip and LASlib: fix for LASzip v4 decompression of WavePacket part of PRDF 9 and 10
 27 December 2018 -- LASzip and LASlib: upped to 3.2 r9 for bug fix in multi-channel NIR decompression
  5 December 2018 -- LASlib: new '-transform_affine 0.9999652,0.903571,171.67,736.26' with paramters scale,angledeg,tx,tz

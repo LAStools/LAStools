@@ -1,3 +1,6 @@
+ 5 January 2019 -- lasground & lasground_new: do not zero 'user_data' in unlicensed version when using '-compute_height'
+ 4 January 2019 -- all LAStools: new "Extra Bytes" transform '-add_attribute_to_z 0' & '-add_scaled_attribute_to_z 1 -1.5'
+ 3 January 2019 -- all LAStools: new "Extra Bytes" transform '-scale_attribute 0 1.1' & '-translate_attribute 1 10.25'
 29 December 2018 -- lasclip: new option '-ignore_extended_class 43 43 44 67' for LAS 1.4 classifications larger than 31
 28 December 2018 -- LASzip, LASlib and all LAStools: fix for LASzip v4 decompression of WavePacket part of PRDF 9 and 10
 27 December 2018 -- LASzip, LASlib and all LAStools: upped to 3.2 r9 for bug fix in multi-channel NIR decompression
