@@ -83,11 +83,18 @@ static double taketime()
 extern int lasmerge_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 #endif
 
+#ifdef COMPILE_WITH_MULTI_CORE
+extern int lasmerge_multi_core(int argc, char *argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, BOOL cpu64);
+#endif
+
 int main(int argc, char *argv[])
 {
   int i;
 #ifdef COMPILE_WITH_GUI
   bool gui = false;
+#endif
+#ifdef COMPILE_WITH_MULTI_CORE
+  BOOL cpu64 = FALSE;
 #endif
   bool verbose = false;
   bool keep_lastiling = false;
@@ -156,6 +163,15 @@ int main(int argc, char *argv[])
       fprintf(stderr, "WARNING: not compiled with GUI support. ignoring '-gui' ...\n");
 #endif
     }
+    else if (strcmp(argv[i],"-cpu64") == 0)
+    {
+#ifdef COMPILE_WITH_MULTI_CORE
+      cpu64 = TRUE;
+#else
+      fprintf(stderr, "WARNING: not compiled with 64 bit support. ignoring '-cpu64' ...\n");
+#endif
+      argv[i][0] = '\0';
+    }
     else if (strcmp(argv[i],"-split") == 0)
     {
       if ((i+1) >= argc)
@@ -192,6 +208,13 @@ int main(int argc, char *argv[])
   // read all the input files merged
 
   lasreadopener.set_merged(TRUE);
+
+#ifdef COMPILE_WITH_MULTI_CORE
+  if (cpu64)
+  {
+    return lasmerge_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, TRUE);
+  }
+#endif
 
   // maybe we want to keep the lastiling 
 

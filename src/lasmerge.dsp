@@ -101,7 +101,7 @@ PostBuild_Cmds=copy Debug_without_GUI\lasmerge-cli.exe ..\bin\lasmerge-cli.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /w /W0 /GX /O2 /I "..\laslib\inc" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /W3 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /I "..\src_full\png_api" /I "..\src_full\zlib_api" /I "..\src_full\geotiff_api" /I "..\src_full\tiff_api" /D "NDEBUG" /D "COMPILE_WITH_GUI" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /W3 /GX /O2 /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /I "..\src_full\png_api" /I "..\src_full\zlib_api" /I "..\src_full\geotiff_api" /I "..\src_full\tiff_api" /D "NDEBUG" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x409 /i "../src" /d "NDEBUG"
 # ADD RSC /l 0x409 /i "../src" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -130,7 +130,7 @@ PostBuild_Cmds=copy Release\lasmerge.exe ..\bin\lasmerge.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laslib\inc" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /I "..\src_full\png_api" /I "..\src_full\zlib_api" /I "..\src_full\geotiff_api" /I "..\src_full\tiff_api" /D "_DEBUG" /D "COMPILE_WITH_GUI" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /w /W0 /Gm /GX /ZI /Od /I "..\laszip\src" /I "..\laslib\inc" /I "..\src" /I "..\src_full\glui_api" /I "..\src_full\glut_api" /I "..\src_full\png_api" /I "..\src_full\zlib_api" /I "..\src_full\geotiff_api" /I "..\src_full\tiff_api" /D "_DEBUG" /D "COMPILE_WITH_GUI" /D "COMPILE_WITH_MULTI_CORE" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
 # ADD RSC /l 0x409 /i "..\..\src" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -207,6 +207,10 @@ SOURCE=..\src_full\lasmerge_gui.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src_full\lasmerge_multi_core.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src_full\lasoccupancy.cpp
 
 !IF  "$(CFG)" == "lasmerge - Win32 Release without GUI"
@@ -242,6 +246,10 @@ SOURCE=..\src_full\lastools_gui.cpp
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=..\src_full\lastools_multi_core.cpp
 # End Source File
 # Begin Source File
 
