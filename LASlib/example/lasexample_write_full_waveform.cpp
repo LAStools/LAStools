@@ -74,7 +74,7 @@ static double taketime()
 
 int main(int argc, char *argv[])
 {
-  int i, j, idx;
+  int i, j;
   bool verbose = false;
   bool very_verbose = false;
   bool waveform = true;
@@ -212,35 +212,59 @@ int main(int argc, char *argv[])
   U64 offset;
   U32 size;
 
+  I32 idx = 1;
+
   if (waveform)
   {
-    // create an array of 256 descriptors
+    // create an array of 256 wave packet descriptors (we only store two and use one)
     lasheader.vlr_wave_packet_descr = new LASvlr_wave_packet_descr*[256];
     for (j = 0; j < 256; j++) lasheader.vlr_wave_packet_descr[j] = 0;
 
-    // create another VLR for our one and only wave packet descriptor and hook it up
-    idx = 1;
-    U16 record_length_after_header = 26;
-    U8* data = new U8[record_length_after_header];
-    char description[50];
-    sprintf(description, "Wave Packet Descriptor %d", idx);
-    lasheader.add_vlr("LASF_Spec", 99+idx, record_length_after_header, data, FALSE, description, FALSE);
-    lasheader.vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)lasheader.vlrs[1].data;
+    // create first wave packet descriptor (the one we use)
+    lasheader.vlr_wave_packet_descr[0] = new LASvlr_wave_packet_descr();
 
-    // initialize first descriptor only (as per ASPRSorg Wiki example)
+    // initialize first descriptor as per ASPRSorg Wiki example
+    if (lasheader.vlr_wave_packet_descr[0])
+    {
+      U8 nbits = 8;
+      U8 compression = 0;
+      U32 nsamples = 88;
+      U32 temporalSpacing = 1000;  // ps
+      F64 digitizerGain   = 0.0086453;
+      F64 digitizerOffset = -0.1326341;
+      lasheader.vlr_wave_packet_descr[0]->setBitsPerSample(nbits) ;
+      lasheader.vlr_wave_packet_descr[0]->setCompressionType(compression);
+      lasheader.vlr_wave_packet_descr[0]->setNumberOfSamples(nsamples);
+      lasheader.vlr_wave_packet_descr[0]->setTemporalSpacing(temporalSpacing);
+      lasheader.vlr_wave_packet_descr[0]->setDigitizerGain(digitizerGain);
+      lasheader.vlr_wave_packet_descr[0]->setDigitizerOffset(digitizerOffset);
 
-    U8 nbits = 8;
-    U8 compression = 0;
-    U32 nsamples = 88;
-    U32 temporalSpacing = 1000;  // ps
-    F64 digitizerGain   = 0.0086453;
-    F64 digitizerOffset = -0.1326341;
-    lasheader.vlr_wave_packet_descr[idx]->setBitsPerSample(nbits) ;
-    lasheader.vlr_wave_packet_descr[idx]->setCompressionType(compression);
-    lasheader.vlr_wave_packet_descr[idx]->setNumberOfSamples(nsamples);
-    lasheader.vlr_wave_packet_descr[idx]->setTemporalSpacing(temporalSpacing);
-    lasheader.vlr_wave_packet_descr[idx]->setDigitizerGain(digitizerGain);
-    lasheader.vlr_wave_packet_descr[idx]->setDigitizerOffset(digitizerOffset);
+      // create a VLR for the first wave packet descriptor
+      lasheader.add_vlr("LASF_Spec", 99+1, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[0]), FALSE, "Wave Packet Descriptor 1", FALSE);
+    }
+
+    // create second wave packet descriptor (the one we do *not* use)
+    lasheader.vlr_wave_packet_descr[1] = new LASvlr_wave_packet_descr();
+
+    // initialize first descriptor as per ASPRSorg Wiki example
+    if (lasheader.vlr_wave_packet_descr[1])
+    {
+      U8 nbits = 8;
+      U8 compression = 0;
+      U32 nsamples = 120;
+      U32 temporalSpacing = 1000;  // ps
+      F64 digitizerGain   = 0.0086453;
+      F64 digitizerOffset = -0.1326341;
+      lasheader.vlr_wave_packet_descr[1]->setBitsPerSample(nbits) ;
+      lasheader.vlr_wave_packet_descr[1]->setCompressionType(compression);
+      lasheader.vlr_wave_packet_descr[1]->setNumberOfSamples(nsamples);
+      lasheader.vlr_wave_packet_descr[1]->setTemporalSpacing(temporalSpacing);
+      lasheader.vlr_wave_packet_descr[1]->setDigitizerGain(digitizerGain);
+      lasheader.vlr_wave_packet_descr[1]->setDigitizerOffset(digitizerOffset);
+
+      // create a VLR for the second wave packet descriptor
+      lasheader.add_vlr("LASF_Spec", 99+2, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[1]), FALSE, "Wave Packet Descriptor 2 (unused)", FALSE);
+    }
 
     // find start of first return: S0 = R0 + L1 * V
     //    where S0 = {sx, sy, sz}
@@ -265,7 +289,7 @@ int main(int argc, char *argv[])
 
     // allocate waveform data storage
     if (samples) delete [] samples;
-    size = (nbits/8) * nsamples;
+    size = (lasheader.vlr_wave_packet_descr[0]->getBitsPerSample()/8) * lasheader.vlr_wave_packet_descr[0]->getNumberOfSamples();
     samples = new U8[size];
     memset(samples, 0, size);
     
@@ -273,7 +297,7 @@ int main(int argc, char *argv[])
     I32 ireturn;
     for (j = 0; j < num_returns; j++)
     {
-      ireturn = I32_QUANTIZE((F32)location[j] / (F32)temporalSpacing);
+      ireturn = I32_QUANTIZE((F32)location[j] / (F32)lasheader.vlr_wave_packet_descr[0]->getTemporalSpacing());
       samples[ireturn] = (1<<6) * (num_returns - j);  // Fake
       printf("samples[%d] = %x\n", ireturn, samples[ireturn]);
     }
