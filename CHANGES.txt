@@ -1,3 +1,9 @@
+14 January 2019 -- lasgrid64, las2dem64, lascanopy64, lasoverlap64: also support PNG, JPG, and TIF raster output
+13 January 2019 -- lasoverlap: create 64 bit version and add missing '-cpu64' switch
+11 January 2019 -- all LAStools: exit with ERROR when '-cpu64' switch is used but 64 bit executable cannot be found
+11 January 2019 -- lasmerge: add missing '-cpu64' switch
+11 January 2019 -- lasboundary: if '-overview -oshp' is selected but no output file given, then use '-o overview.shp'
+10 January 2019 -- lasthin: bug fix for crash when inputting LAS or LAZ that was output from unlicensed LAStools module
  5 January 2019 -- lasground & lasground_new: do not zero 'user_data' in unlicensed version when using '-compute_height'
  4 January 2019 -- all LAStools: new "Extra Bytes" transform '-add_attribute_to_z 0' & '-add_scaled_attribute_to_z 1 -1.5'
  3 January 2019 -- all LAStools: new "Extra Bytes" transform '-scale_attribute 0 1.1' & '-translate_attribute 1 10.25'
