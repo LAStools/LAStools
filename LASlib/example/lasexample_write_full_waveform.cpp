@@ -214,6 +214,74 @@ int main(int argc, char *argv[])
   // update header with waveform information based on example from ASPRS wiki at:
   // http://github.com/ASPRSorg/LAS/wiki/Waveform-Data-Packet-Descriptors-Explained
     
+  I32 idx;
+
+  if (waveform)
+  {
+    // create an array of 256 wave packet descriptors (we only store two and use one)
+    lasheader.vlr_wave_packet_descr = new LASvlr_wave_packet_descr*[256];
+    for (j = 0; j < 256; j++) lasheader.vlr_wave_packet_descr[j] = (LASvlr_wave_packet_descr*)NULL;
+
+    // no wave packet descriptor with index 0 is allowed to exist. always points to NULL. 
+    idx = 0;
+    lasheader.vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)NULL;
+
+    // create first wave packet descriptor (the one we use)
+    idx = 1;
+    lasheader.vlr_wave_packet_descr[idx] = new LASvlr_wave_packet_descr;
+
+    // initialize first descriptor as per ASPRSorg Wiki example
+    if (lasheader.vlr_wave_packet_descr[idx])
+    {
+      U8 nbits = 8;
+      U8 compression = 0;
+      U32 nsamples = 88;
+      U32 temporalSpacing = 1000;  // ps
+      F64 digitizerGain   = 0.0086453;
+      F64 digitizerOffset = -0.1326341;
+      lasheader.vlr_wave_packet_descr[idx]->setBitsPerSample(nbits) ;
+      lasheader.vlr_wave_packet_descr[idx]->setCompressionType(compression);
+      lasheader.vlr_wave_packet_descr[idx]->setNumberOfSamples(nsamples);
+      lasheader.vlr_wave_packet_descr[idx]->setTemporalSpacing(temporalSpacing);
+      lasheader.vlr_wave_packet_descr[idx]->setDigitizerGain(digitizerGain);
+      lasheader.vlr_wave_packet_descr[idx]->setDigitizerOffset(digitizerOffset);
+
+      // create a VLR for the first wave packet descriptor
+      lasheader.add_vlr("LASF_Spec", 99+idx, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[idx]), FALSE, "Wave Packet Descr. 1", FALSE);
+    }
+
+    // create second wave packet descriptor (the one we do *not* use)
+    idx = 2;
+    lasheader.vlr_wave_packet_descr[idx] = new LASvlr_wave_packet_descr;
+
+    // initialize first descriptor as per ASPRSorg Wiki example
+    if (lasheader.vlr_wave_packet_descr[idx])
+    {
+      U8 nbits = 8;
+      U8 compression = 0;
+      U32 nsamples = 96;
+      U32 temporalSpacing = 1000;  // ps
+      F64 digitizerGain   = 0.0086453;
+      F64 digitizerOffset = -0.1326341;
+      lasheader.vlr_wave_packet_descr[idx]->setBitsPerSample(nbits) ;
+      lasheader.vlr_wave_packet_descr[idx]->setCompressionType(compression);
+      lasheader.vlr_wave_packet_descr[idx]->setNumberOfSamples(nsamples);
+      lasheader.vlr_wave_packet_descr[idx]->setTemporalSpacing(temporalSpacing);
+      lasheader.vlr_wave_packet_descr[idx]->setDigitizerGain(digitizerGain);
+      lasheader.vlr_wave_packet_descr[idx]->setDigitizerOffset(digitizerOffset);
+
+      // create a VLR for the second wave packet descriptor
+      lasheader.add_vlr("LASF_Spec", 99+2, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[idx]), FALSE, "Wave Packet Descr. 2 (unused)", FALSE);
+    }
+
+    // in the following we use only the first wave packet descriptor
+
+    idx = 1;
+  }
+
+  // update wave packets and waveform information based on example from ASPRS wiki at:
+  // http://github.com/ASPRSorg/LAS/wiki/Waveform-Data-Packet-Descriptors-Explained
+
   F32 location[] = {23355.3f, 49297.5f, 78432.8f};           // ps
   F32 XYZt[3] =  {-4.9922e-5f, 5.89773e-6f, 0.000141175f};   // (m/ps) No refraction
   F64 XYZreturn[3];                                          // location of returns
@@ -222,60 +290,8 @@ int main(int argc, char *argv[])
   U64 offset;
   U32 size;
 
-  I32 idx = 1;
-
   if (waveform)
   {
-    // create an array of 256 wave packet descriptors (we only store two and use one)
-    lasheader.vlr_wave_packet_descr = new LASvlr_wave_packet_descr*[256];
-    for (j = 0; j < 256; j++) lasheader.vlr_wave_packet_descr[j] = 0;
-
-    // create first wave packet descriptor (the one we use)
-    lasheader.vlr_wave_packet_descr[0] = new LASvlr_wave_packet_descr;
-
-    // initialize first descriptor as per ASPRSorg Wiki example
-    if (lasheader.vlr_wave_packet_descr[0])
-    {
-      U8 nbits = 8;
-      U8 compression = 0;
-      U32 nsamples = 88;
-      U32 temporalSpacing = 1000;  // ps
-      F64 digitizerGain   = 0.0086453;
-      F64 digitizerOffset = -0.1326341;
-      lasheader.vlr_wave_packet_descr[0]->setBitsPerSample(nbits) ;
-      lasheader.vlr_wave_packet_descr[0]->setCompressionType(compression);
-      lasheader.vlr_wave_packet_descr[0]->setNumberOfSamples(nsamples);
-      lasheader.vlr_wave_packet_descr[0]->setTemporalSpacing(temporalSpacing);
-      lasheader.vlr_wave_packet_descr[0]->setDigitizerGain(digitizerGain);
-      lasheader.vlr_wave_packet_descr[0]->setDigitizerOffset(digitizerOffset);
-
-      // create a VLR for the first wave packet descriptor
-      lasheader.add_vlr("LASF_Spec", 99+1, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[0]), FALSE, "Wave Packet Descr. 1", FALSE);
-    }
-
-    // create second wave packet descriptor (the one we do *not* use)
-    lasheader.vlr_wave_packet_descr[1] = new LASvlr_wave_packet_descr;
-
-    // initialize first descriptor as per ASPRSorg Wiki example
-    if (lasheader.vlr_wave_packet_descr[1])
-    {
-      U8 nbits = 8;
-      U8 compression = 0;
-      U32 nsamples = 96;
-      U32 temporalSpacing = 1000;  // ps
-      F64 digitizerGain   = 0.0086453;
-      F64 digitizerOffset = -0.1326341;
-      lasheader.vlr_wave_packet_descr[1]->setBitsPerSample(nbits) ;
-      lasheader.vlr_wave_packet_descr[1]->setCompressionType(compression);
-      lasheader.vlr_wave_packet_descr[1]->setNumberOfSamples(nsamples);
-      lasheader.vlr_wave_packet_descr[1]->setTemporalSpacing(temporalSpacing);
-      lasheader.vlr_wave_packet_descr[1]->setDigitizerGain(digitizerGain);
-      lasheader.vlr_wave_packet_descr[1]->setDigitizerOffset(digitizerOffset);
-
-      // create a VLR for the second wave packet descriptor
-      lasheader.add_vlr("LASF_Spec", 99+2, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[1]), FALSE, "Wave Packet Descr. 2 (unused)", FALSE);
-    }
-
     // find start of first return: S0 = R0 + L1 * V
     //    where S0 = {sx, sy, sz}
     //          R0 = {px, py, pz}
@@ -299,15 +315,14 @@ int main(int argc, char *argv[])
 
     // allocate waveform data storage
     if (samples) delete [] samples;
-    size = (lasheader.vlr_wave_packet_descr[0]->getBitsPerSample()/8) * lasheader.vlr_wave_packet_descr[0]->getNumberOfSamples();
+    size = (lasheader.vlr_wave_packet_descr[idx]->getBitsPerSample()/8) * lasheader.vlr_wave_packet_descr[idx]->getNumberOfSamples();
     samples = new U8[size];
     memset(samples, 0, size);
     
     // create a fake spike sample at time / location of each return
-    I32 ireturn;
     for (j = 0; j < num_returns; j++)
     {
-      ireturn = I32_QUANTIZE((F32)location[j] / (F32)lasheader.vlr_wave_packet_descr[0]->getTemporalSpacing());
+      I32 ireturn = I32_QUANTIZE((F32)location[j] / (F32)lasheader.vlr_wave_packet_descr[idx]->getTemporalSpacing());
       samples[ireturn] = (1<<6) * (num_returns - j);  // Fake
       printf("samples[%d] = %x\n", ireturn, samples[ireturn]);
     }
@@ -356,14 +371,14 @@ int main(int argc, char *argv[])
       {
         // add waveform attributes
 
-        XYZreturn[0] = XYZS0[0] - location[j]*XYZt[0];   // Notice minus sign
-        XYZreturn[1] = XYZS0[1] - location[j]*XYZt[1];   // Notice minus sign
-        XYZreturn[2] = XYZS0[2] - location[j]*XYZt[2];   // Notice minus sign
+        XYZreturn[0] = XYZS0[0] - location[j]*XYZt[0];   // notice minus sign
+        XYZreturn[1] = XYZS0[1] - location[j]*XYZt[1];   // notice minus sign
+        XYZreturn[2] = XYZS0[2] - location[j]*XYZt[2];   // notice minus sign
         laspoint.set_x(XYZreturn[0]);
         laspoint.set_y(XYZreturn[1]);
         laspoint.set_z(XYZreturn[2]);
-        laspoint.set_return_number((U8) j+1);
-        laspoint.set_number_of_returns((U8) num_returns);
+        laspoint.set_return_number((U8)j+1);
+        laspoint.set_number_of_returns((U8)num_returns);
         
         laspoint.wavepacket.setIndex((U8) idx);
         // laspoint.wavepacket.setOffset(offset) // Set by LASwaveform13writer::write_waveform
