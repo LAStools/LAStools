@@ -323,8 +323,16 @@ int main(int argc, char *argv[])
     for (j = 0; j < num_returns; j++)
     {
       I32 ireturn = I32_QUANTIZE((F32)location[j] / (F32)lasheader.vlr_wave_packet_descr[idx]->getTemporalSpacing());
+      samples[ireturn-4] = (1<<4) * (num_returns - j);  // Fake
+      samples[ireturn-3] = (1<<5) * (num_returns - j);  // Fake
+      samples[ireturn-2] = (1<<5) * (num_returns - j);  // Fake
+      samples[ireturn-1] = (1<<6) * (num_returns - j);  // Fake
       samples[ireturn] = (1<<6) * (num_returns - j);  // Fake
-      printf("samples[%d] = %x\n", ireturn, samples[ireturn]);
+      samples[ireturn+1] = (1<<6) * (num_returns - j);  // Fake
+      samples[ireturn+2] = (1<<5) * (num_returns - j);  // Fake
+      samples[ireturn+3] = (1<<5) * (num_returns - j);  // Fake
+      samples[ireturn+4] = (1<<4) * (num_returns - j);  // Fake
+      if (very_verbose) fprintf(stderr, "samples[%d] = %x\n", ireturn, samples[ireturn]);
     }
   }
 
@@ -410,7 +418,7 @@ int main(int argc, char *argv[])
       offset = laspoint.wavepacket.getOffset();
       size = laspoint.wavepacket.getSize();
 
-      if (very_verbose) fprintf(stderr, "offset: %lld, size: %d\n", offset, size);
+      if (very_verbose) fprintf(stderr, "offset: %u, size: %d\n", (U32)offset, size);
 
       // write the point
       
@@ -436,9 +444,9 @@ int main(int argc, char *argv[])
   }  
 
 #ifdef _WIN32
-  if (verbose) fprintf(stderr,"total time: %g sec %I64d bytes for %I64d points\n", taketime()-start_time, total_bytes, laswriter->p_count);
+  if (verbose) fprintf(stderr,"total time: %g sec %I64d bytes for %I64d points\n", taketime()-start_time, total_bytes, laswriter->npoints);
 #else
-  if (verbose) fprintf(stderr,"total time: %g sec %lld bytes for %lld points\n", taketime()-start_time, total_bytes, laswriter->p_count);
+  if (verbose) fprintf(stderr,"total time: %g sec %lld bytes for %lld points\n", taketime()-start_time, total_bytes, laswriter->npoints);
 #endif
 
   delete laswriter;
