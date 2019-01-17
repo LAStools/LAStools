@@ -183,6 +183,8 @@ int main(int argc, char *argv[])
   LASheader lasheader;
   lasheader.version_major = 1;
   lasheader.version_minor = 3;
+  lasheader.header_size = 235;
+  lasheader.offset_to_point_data = 235;
   lasheader.global_encoding = 1;
   lasheader.x_scale_factor = 0.01;
   lasheader.y_scale_factor = 0.01;
@@ -192,11 +194,19 @@ int main(int argc, char *argv[])
   lasheader.z_offset = 0.0;
   if (waveform)
   {
+    lasheader.version_major = 1;
+    lasheader.version_minor = 3;
+    lasheader.header_size = 235; // 8 more bytes to specify start of waveform packet data
+    lasheader.offset_to_point_data = 235;
     lasheader.point_data_format = 4; // essentially like format 1 but with wave packets
     lasheader.point_data_record_length = 28 + 29;
   }
   else
   {
+    lasheader.version_major = 1;
+    lasheader.version_minor = 2;
+    lasheader.header_size = 227;
+    lasheader.offset_to_point_data = 227;
     lasheader.point_data_format = 1;
     lasheader.point_data_record_length = 28;
   }
@@ -221,7 +231,7 @@ int main(int argc, char *argv[])
     for (j = 0; j < 256; j++) lasheader.vlr_wave_packet_descr[j] = 0;
 
     // create first wave packet descriptor (the one we use)
-    lasheader.vlr_wave_packet_descr[0] = new LASvlr_wave_packet_descr();
+    lasheader.vlr_wave_packet_descr[0] = new LASvlr_wave_packet_descr;
 
     // initialize first descriptor as per ASPRSorg Wiki example
     if (lasheader.vlr_wave_packet_descr[0])
@@ -240,18 +250,18 @@ int main(int argc, char *argv[])
       lasheader.vlr_wave_packet_descr[0]->setDigitizerOffset(digitizerOffset);
 
       // create a VLR for the first wave packet descriptor
-      lasheader.add_vlr("LASF_Spec", 99+1, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[0]), FALSE, "Wave Packet Descriptor 1", FALSE);
+      lasheader.add_vlr("LASF_Spec", 99+1, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[0]), FALSE, "Wave Packet Descr. 1", FALSE);
     }
 
     // create second wave packet descriptor (the one we do *not* use)
-    lasheader.vlr_wave_packet_descr[1] = new LASvlr_wave_packet_descr();
+    lasheader.vlr_wave_packet_descr[1] = new LASvlr_wave_packet_descr;
 
     // initialize first descriptor as per ASPRSorg Wiki example
     if (lasheader.vlr_wave_packet_descr[1])
     {
       U8 nbits = 8;
       U8 compression = 0;
-      U32 nsamples = 120;
+      U32 nsamples = 96;
       U32 temporalSpacing = 1000;  // ps
       F64 digitizerGain   = 0.0086453;
       F64 digitizerOffset = -0.1326341;
@@ -263,7 +273,7 @@ int main(int argc, char *argv[])
       lasheader.vlr_wave_packet_descr[1]->setDigitizerOffset(digitizerOffset);
 
       // create a VLR for the second wave packet descriptor
-      lasheader.add_vlr("LASF_Spec", 99+2, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[1]), FALSE, "Wave Packet Descriptor 2 (unused)", FALSE);
+      lasheader.add_vlr("LASF_Spec", 99+2, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[1]), FALSE, "Wave Packet Descr. 2 (unused)", FALSE);
     }
 
     // find start of first return: S0 = R0 + L1 * V
