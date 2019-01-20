@@ -1,4 +1,5 @@
-20 January 2020 -- lasinfo: also report min/max values of documented additional attributes stored in 'extra bytes'
+21 January 2019 -- lasinfo: '-repair' or '-repair_counters' bug fix for repairing legacy return counters in LAS header 
+20 January 2019 -- lasinfo: also report min/max values of documented additional attributes stored in 'extra bytes'
 14 January 2019 -- lasgrid64, las2dem64, lascanopy64, lasoverlap64: also support PNG, JPG, and TIF raster output
 13 January 2019 -- lasoverlap: create 64 bit version and add missing '-cpu64' switch
 11 January 2019 -- all LAStools: exit with ERROR when '-cpu64' switch is used but 64 bit executable cannot be found
