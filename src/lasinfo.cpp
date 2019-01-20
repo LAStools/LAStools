@@ -3904,7 +3904,7 @@ int main(int argc, char *argv[])
       U32 number_of_points_by_return[5];
       for (i = 1; i < 6; i++)
       {
-        if ((lasheader->point_data_format < 6) && (lasheader->number_of_points_by_return[i-1] != lassummary.number_of_points_by_return[i]))
+        if ((lasheader->point_data_format < 6) && ((I64)(lasheader->number_of_points_by_return[i-1]) != lassummary.number_of_points_by_return[i]))
         {
           if (lassummary.number_of_points_by_return[i] <= U32_MAX)
           {
@@ -3959,6 +3959,10 @@ int main(int argc, char *argv[])
           {
             fprintf(file_out, "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s\n", lasheader->point_data_format, i, lasheader->number_of_points_by_return[i-1], (repair_counters ? "it was repaired." : ""));
           }
+        }
+        else
+        {
+          number_of_points_by_return[i-1] = (U32)lassummary.number_of_points_by_return[i];
         }
       }
 
