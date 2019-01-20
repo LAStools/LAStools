@@ -181,11 +181,10 @@ int main(int argc, char *argv[])
   // init header
 
   LASheader lasheader;
-  lasheader.version_major = 1;
-  lasheader.version_minor = 3;
-  lasheader.header_size = 235;
-  lasheader.offset_to_point_data = 235;
-  lasheader.global_encoding = 1;
+  sprintf(lasheader.generating_software, "LASlib of LAStools");
+  sprintf(lasheader.system_identifier, "simple waveform example");
+  lasheader.file_creation_day = 20;
+  lasheader.file_creation_year = 2019;
   lasheader.x_scale_factor = 0.01;
   lasheader.y_scale_factor = 0.01;
   lasheader.z_scale_factor = 0.01;
@@ -194,6 +193,7 @@ int main(int argc, char *argv[])
   lasheader.z_offset = 0.0;
   if (waveform)
   {
+    lasheader.global_encoding = 0x05; // external waveform data packets 0x04 | adjusted standard GPS time 0x01
     lasheader.version_major = 1;
     lasheader.version_minor = 3;
     lasheader.header_size = 235; // 8 more bytes to specify start of waveform packet data
@@ -203,6 +203,7 @@ int main(int argc, char *argv[])
   }
   else
   {
+    lasheader.global_encoding = 0x01; // adjusted standard GPS time 0x01
     lasheader.version_major = 1;
     lasheader.version_minor = 2;
     lasheader.header_size = 227;
@@ -214,17 +215,23 @@ int main(int argc, char *argv[])
   // update header with waveform information based on example from ASPRS wiki at:
   // http://github.com/ASPRSorg/LAS/wiki/Waveform-Data-Packet-Descriptors-Explained
     
-  I32 idx;
+  I32 idx = -1;
+  LASvlr_wave_packet_descr* wave_packet_descr = 0;
 
   if (waveform)
   {
     // create an array of 256 wave packet descriptors (we only store two and use one)
     lasheader.vlr_wave_packet_descr = new LASvlr_wave_packet_descr*[256];
+    if (lasheader.vlr_wave_packet_descr == 0)
+    {
+      fprintf(stderr, "ERROR: could not allocate LASvlr_wave_packet_descr*[256] array\n");
+      byebye(argc==1);
+    }
     for (j = 0; j < 256; j++) lasheader.vlr_wave_packet_descr[j] = (LASvlr_wave_packet_descr*)NULL;
 
-    // no wave packet descriptor with index 0 is allowed to exist. always points to NULL. 
+    // no wave packet descriptor with index 0 is allowed to exist. always zero pointer. 
     idx = 0;
-    lasheader.vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)NULL;
+    lasheader.vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)0;
 
     // create first wave packet descriptor (the one we use)
     idx = 1;
@@ -248,6 +255,11 @@ int main(int argc, char *argv[])
 
       // create a VLR for the first wave packet descriptor
       lasheader.add_vlr("LASF_Spec", 99+idx, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[idx]), FALSE, "Wave Packet Descr. 1", FALSE);
+    }
+    else
+    {
+      fprintf(stderr, "ERROR: could not allocate lasheader.vlr_wave_packet_descr[%d]\n", idx);
+      byebye(argc==1);
     }
 
     // create second wave packet descriptor (the one we do *not* use)
@@ -273,10 +285,16 @@ int main(int argc, char *argv[])
       // create a VLR for the second wave packet descriptor
       lasheader.add_vlr("LASF_Spec", 99+2, sizeof(LASvlr_wave_packet_descr), (U8*)(lasheader.vlr_wave_packet_descr[idx]), FALSE, "Wave Packet Descr. 2 (unused)", FALSE);
     }
+    else
+    {
+      fprintf(stderr, "ERROR: could not allocate lasheader.vlr_wave_packet_descr[%d]\n", idx);
+      byebye(argc==1);
+    }
 
     // in the following we use only the first wave packet descriptor
 
     idx = 1;
+    wave_packet_descr = lasheader.vlr_wave_packet_descr[idx];
   }
 
   // update wave packets and waveform information based on example from ASPRS wiki at:
@@ -315,19 +333,19 @@ int main(int argc, char *argv[])
 
     // allocate waveform data storage
     if (samples) delete [] samples;
-    size = (lasheader.vlr_wave_packet_descr[idx]->getBitsPerSample()/8) * lasheader.vlr_wave_packet_descr[idx]->getNumberOfSamples();
+    size = (wave_packet_descr->getBitsPerSample()/8) * wave_packet_descr->getNumberOfSamples();
     samples = new U8[size];
     memset(samples, 0, size);
     
     // create a fake spike sample at time / location of each return
     for (j = 0; j < num_returns; j++)
     {
-      I32 ireturn = I32_QUANTIZE((F32)location[j] / (F32)lasheader.vlr_wave_packet_descr[idx]->getTemporalSpacing());
+      I32 ireturn = I32_QUANTIZE((F32)location[j] / (F32)wave_packet_descr->getTemporalSpacing());
       samples[ireturn-4] = (1<<4) * (num_returns - j);  // Fake
       samples[ireturn-3] = (1<<5) * (num_returns - j);  // Fake
       samples[ireturn-2] = (1<<5) * (num_returns - j);  // Fake
       samples[ireturn-1] = (1<<6) * (num_returns - j);  // Fake
-      samples[ireturn] = (1<<6) * (num_returns - j);  // Fake
+      samples[ireturn] = (1<<6) * (num_returns - j);    // Fake
       samples[ireturn+1] = (1<<6) * (num_returns - j);  // Fake
       samples[ireturn+2] = (1<<5) * (num_returns - j);  // Fake
       samples[ireturn+3] = (1<<5) * (num_returns - j);  // Fake
@@ -387,10 +405,10 @@ int main(int argc, char *argv[])
         laspoint.set_z(XYZreturn[2]);
         laspoint.set_return_number((U8)j+1);
         laspoint.set_number_of_returns((U8)num_returns);
-        
+
         laspoint.wavepacket.setIndex((U8) idx);
-        // laspoint.wavepacket.setOffset(offset) // Set by LASwaveform13writer::write_waveform
-        // laspoint.wavepacket.setSize(size)     // Set by LASwaveform13writer::write_waveform
+        // laspoint.wavepacket.setOffset(offset) // set by LASwaveform13writer::write_waveform
+        // laspoint.wavepacket.setSize(size)     // set by LASwaveform13writer::write_waveform
         laspoint.wavepacket.setLocation(location[j]);
         laspoint.wavepacket.setXt(XYZt[0]);
         laspoint.wavepacket.setYt(XYZt[1]);
