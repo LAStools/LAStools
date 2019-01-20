@@ -3623,11 +3623,23 @@ int main(int argc, char *argv[])
         }
         if (lasreader->point.extended_point_type)
         {
-          fprintf(file_out, "  extended_return_number     %6d %6d\012",lassummary.min.extended_return_number, lassummary.max.extended_return_number);
-          fprintf(file_out, "  extended_number_of_returns %6d %6d\012",lassummary.min.extended_number_of_returns, lassummary.max.extended_number_of_returns);
-          fprintf(file_out, "  extended_classification    %6d %6d\012",lassummary.min.extended_classification, lassummary.max.extended_classification);
-          fprintf(file_out, "  extended_scan_angle        %6d %6d\012",lassummary.min.extended_scan_angle, lassummary.max.extended_scan_angle);
-          fprintf(file_out, "  extended_scanner_channel   %6d %6d\012",lassummary.min.extended_scanner_channel, lassummary.max.extended_scanner_channel);
+          fprintf(file_out, "  extended_return_number     %6d %6d\012", lassummary.min.extended_return_number, lassummary.max.extended_return_number);
+          fprintf(file_out, "  extended_number_of_returns %6d %6d\012", lassummary.min.extended_number_of_returns, lassummary.max.extended_number_of_returns);
+          fprintf(file_out, "  extended_classification    %6d %6d\012", lassummary.min.extended_classification, lassummary.max.extended_classification);
+          fprintf(file_out, "  extended_scan_angle        %6d %6d\012", lassummary.min.extended_scan_angle, lassummary.max.extended_scan_angle);
+          fprintf(file_out, "  extended_scanner_channel   %6d %6d\012", lassummary.min.extended_scanner_channel, lassummary.max.extended_scanner_channel);
+        }
+        if (lasreader->point.extra_bytes_number && lasreader->point.attributer)
+        {
+          lassummary.min.attributer = lasreader->point.attributer;
+          lassummary.max.attributer = lasreader->point.attributer;
+          I32 a;
+          for (a = 0; a < lasreader->point.attributer->number_attributes; a++)
+          {
+            fprintf(file_out, "  attribute%d %10g %10g  ('%s')\012", a, lassummary.min.get_attribute_as_float(a), lassummary.max.get_attribute_as_float(a), lasreader->point.attributer->get_attribute_name(a));
+          }
+          lassummary.min.attributer = 0;
+          lassummary.max.attributer = 0;
         }
         if (((number_of_point_records == 0) && (lasheader->number_of_point_records > 0)) || ((number_of_points_by_return0 == 0) && (lasheader->number_of_points_by_return[0] > 0)))
         {
