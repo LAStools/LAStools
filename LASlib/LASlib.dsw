@@ -51,7 +51,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "lasexample_write_full_waveform"=.\example\lasexample_write_full_waveform.dsp - Package Owner=<4>
+Project: "lasexample_write_only_full_waveform"=.\example\lasexample_write_only_full_waveform.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
