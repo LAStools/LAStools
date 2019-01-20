@@ -203,6 +203,14 @@ BOOL LASsummary::add(const LASpoint* point)
   if (point->get_withheld_flag()) classification_withheld++;
   if (first)
   {
+    // does the point have extra bytes
+    if (point->extra_bytes_number)
+    {
+      min.extra_bytes = new U8[point->extra_bytes_number];
+      min.extra_bytes_number = point->extra_bytes_number;
+      max.extra_bytes = new U8[point->extra_bytes_number];
+      max.extra_bytes_number = point->extra_bytes_number;
+    }
     // initialize min and max
     min = *point;
     max = *point;
@@ -295,6 +303,29 @@ BOOL LASsummary::add(const LASpoint* point)
       else if (point->wavepacket.getYt() > max.wavepacket.getYt()) max.wavepacket.setYt(point->wavepacket.getYt());
       if (point->wavepacket.getZt() < min.wavepacket.getZt()) min.wavepacket.setZt(point->wavepacket.getZt());
       else if (point->wavepacket.getZt() > max.wavepacket.getZt()) max.wavepacket.setZt(point->wavepacket.getZt());
+    }
+    if (point->extra_bytes_number)
+    {
+      if (point->attributer)
+      {
+        min.attributer = point->attributer;
+        max.attributer = point->attributer;
+        I32 a;
+        for (a = 0; a < point->attributer->number_attributes; a++)
+        {
+          F64 value = point->get_attribute_as_float(a);
+          if (value < min.get_attribute_as_float(a))
+          {
+            min.set_attribute_as_float(a, value);
+          }
+          if (value > max.get_attribute_as_float(a))
+          {
+            max.set_attribute_as_float(a, value);
+          }
+        }
+        min.attributer = 0;
+        max.attributer = 0;
+      }
     }
   }
   if (((U16)(point->get_X()%10)) == xyz_low_digits_10[0])
