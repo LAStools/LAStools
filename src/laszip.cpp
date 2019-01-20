@@ -518,7 +518,7 @@ int main(int argc, char *argv[])
         {
           // switch compression on/off
           U8 compression_type = (laswriteopener.get_format() == LAS_TOOLS_FORMAT_LAZ ? 1 : 0);
-          for (i = 0; i < 255; i++) if (lasreader->header.vlr_wave_packet_descr[i]) lasreader->header.vlr_wave_packet_descr[i]->setCompressionType(compression_type);
+          for (i = 1; i < 256; i++) if (lasreader->header.vlr_wave_packet_descr[i]) lasreader->header.vlr_wave_packet_descr[i]->setCompressionType(compression_type);
           // create laswaveform13writer
           laswaveform13writer = laswriteopener.open_waveform13(&lasreader->header);
           if (laswaveform13writer == 0)
@@ -528,7 +528,7 @@ int main(int argc, char *argv[])
             waveform = 0;
             // switch compression on/off back
             U8 compression_type = (laswriteopener.get_format() == LAS_TOOLS_FORMAT_LAZ ? 0 : 1);
-            for (i = 0; i < 255; i++) if (lasreader->header.vlr_wave_packet_descr[i]) lasreader->header.vlr_wave_packet_descr[i]->setCompressionType(compression_type);
+            for (i = 1; i < 256; i++) if (lasreader->header.vlr_wave_packet_descr[i]) lasreader->header.vlr_wave_packet_descr[i]->setCompressionType(compression_type);
           }
         }
         else
@@ -541,14 +541,14 @@ int main(int argc, char *argv[])
 
       if ((lasreader->header.version_major == 1) && (lasreader->header.version_minor >= 3))
       {
-        if (lasreader->header.global_encoding & 2) // if bit # 1 is set we have internal waveform data
+        if (lasreader->header.global_encoding & 0x0002) // if bit # 1 is set we have internal waveform data
         {
-          lasreader->header.global_encoding &= ~((U16)2); // remove internal bit
+          lasreader->header.global_encoding &= ~((U16)0x0002); // remove internal bit
           if (lasreader->header.start_of_waveform_data_packet_record) // offset to
           {
             start_of_waveform_data_packet_record = lasreader->header.start_of_waveform_data_packet_record;
             lasreader->header.start_of_waveform_data_packet_record = 0;
-            lasreader->header.global_encoding |= ((U16)4); // set external bit
+            lasreader->header.global_encoding |= ((U16)0x0004); // set external bit
           }
         }
       }
@@ -601,7 +601,7 @@ int main(int argc, char *argv[])
       if (waveform)
       {
         U8 compression_type = (laswaveform13reader->is_compressed() ? 1 : 0);
-        for (i = 0; i < 255; i++) if (lasreader->header.vlr_wave_packet_descr[i]) lasreader->header.vlr_wave_packet_descr[i]->setCompressionType(compression_type);
+        for (i = 1; i < 256; i++) if (lasreader->header.vlr_wave_packet_descr[i]) lasreader->header.vlr_wave_packet_descr[i]->setCompressionType(compression_type);
 
         U64 last_offset = 0;
         U32 last_size = 60;
