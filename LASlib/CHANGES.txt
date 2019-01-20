@@ -1,3 +1,7 @@
+20 January 2020 -- lasinfo: also report min/max values of documented additional attributes stored in 'extra bytes'
+20 January 2020 -- LASlib: also also LASsummarize additional attributes stored in 'extra bytes'
+20 January 2020 -- LASlib: laswaveform13reader.cpp and laswaveform13writer.cpp check that 'wave_packet_descr[0]' is zero
+18 January 2020 -- LASlib: new example 'lasexample_write_only_full_waveform.cpp' shows how to write LAS FWF with LASlib
  4 January 2019 -- LASlib: new "Extra Bytes" transform '-add_attribute_to_z 0' & '-add_scaled_attribute_to_z 1 -1.5'
  3 January 2019 -- LASlib: new "Extra Bytes" transform '-scale_attribute 0 1.1' & '-translate_attribute 1 10.25'
 28 December 2018 -- LASzip and LASlib: fix for LASzip v4 decompression of WavePacket part of PRDF 9 and 10
