@@ -457,6 +457,15 @@ public:
     return -1;
   }
 
+  const CHAR* get_attribute_name(I32 index) const
+  {
+    if (index < number_attributes)
+    {
+      return attributes[index].name;
+    }
+    return 0;
+  }
+
   BOOL remove_attribute(I32 index)
   {
     if (index < 0 || index >= number_attributes)
