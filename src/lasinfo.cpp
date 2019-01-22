@@ -262,8 +262,8 @@ int main(int argc, char *argv[])
   FILE* file_out = stderr;
   U32 horizontal_units = 0; 
   // extract a subsequence
-  U32 subsequence_start = 0;
-  U32 subsequence_stop = U32_MAX;
+  I64 subsequence_start = 0;
+  I64 subsequence_stop = I64_MAX;
   U32 progress = 0;
 
   LAShistogram lashistogram;
@@ -415,7 +415,51 @@ int main(int argc, char *argv[])
         fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop\n", argv[i]);
         byebye(true);
       }
-      subsequence_start = (U32)atoi(argv[i+1]); subsequence_stop = (U32)atoi(argv[i+2]);
+#ifdef _WIN32
+      if (sscanf(argv[i+1], "%I64d", &subsequence_start) != 1)
+#else
+      if (sscanf(argv[i+1], "%lld", &subsequence_start) != 1)
+#endif
+      {
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%s' is not a valid start\n", argv[i], argv[i+1]);
+        byebye(true);
+      }
+      if (subsequence_start < 0)
+      {
+#ifdef _WIN32
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%I64d' is not a valid start\n", argv[i], subsequence_start);
+#else
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%lld' is not a valid start\n", argv[i], subsequence_start);
+#endif
+        byebye(true);
+      }
+#ifdef _WIN32
+      if (sscanf(argv[i+2], "%I64d", &subsequence_stop) != 1)
+#else
+      if (sscanf(argv[i+2], "%lld", &subsequence_stop) != 1)
+#endif
+      {
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%s' is not a valid stop\n", argv[i], argv[i+2]);
+        byebye(true);
+      }
+      if (subsequence_stop < 0)
+      {
+#ifdef _WIN32
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%I64d' is not a valid stop\n", argv[i], subsequence_stop);
+#else
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%lld' is not a valid stop\n", argv[i], subsequence_stop);
+#endif
+        byebye(true);
+      }
+      if (subsequence_start >= subsequence_stop)
+      {
+#ifdef _WIN32
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%I64d' and '%I64d' are no valid start and stop combination \n", argv[i], subsequence_start, subsequence_stop);
+#else
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%lld' and '%lld' are no valid start and stop combination \n", argv[i], subsequence_start, subsequence_stop);
+#endif
+        byebye(true);
+      }
       i+=2;
     }
     else if (strcmp(argv[i],"-start_at_point") == 0)
@@ -425,7 +469,24 @@ int main(int argc, char *argv[])
         fprintf(stderr,"ERROR: '%s' needs 1 argument: start\n", argv[i]);
         byebye(true);
       }
-      subsequence_start = (unsigned int)atoi(argv[i+1]);
+#ifdef _WIN32
+      if (sscanf(argv[i+1], "%I64d", &subsequence_start) != 1)
+#else
+      if (sscanf(argv[i+1], "%lld", &subsequence_start) != 1)
+#endif
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%s' is not a valid start\n", argv[i], argv[i+1]);
+        byebye(true);
+      }
+      if (subsequence_start < 0)
+      {
+#ifdef _WIN32
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%I64d' is not a valid start\n", argv[i], subsequence_start);
+#else
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%lld' is not a valid start\n", argv[i], subsequence_start);
+#endif
+        byebye(true);
+      }
       i+=1;
     }
     else if (strcmp(argv[i],"-stop_at_point") == 0)
@@ -435,7 +496,24 @@ int main(int argc, char *argv[])
         fprintf(stderr,"ERROR: '%s' needs 1 argument: stop\n", argv[i]);
         byebye(true);
       }
-      subsequence_stop = (unsigned int)atoi(argv[i+1]);
+#ifdef _WIN32
+      if (sscanf(argv[i+1], "%I64d", &subsequence_stop) != 1)
+#else
+      if (sscanf(argv[i+1], "%lld", &subsequence_stop) != 1)
+#endif
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%s' is not a valid stop\n", argv[i], argv[i+1]);
+        byebye(true);
+      }
+      if (subsequence_stop < 0)
+      {
+#ifdef _WIN32
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%I64d' is not a valid stop\n", argv[i], subsequence_stop);
+#else
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%lld' is not a valid stop\n", argv[i], subsequence_stop);
+#endif
+        byebye(true);
+      }
       i+=1;
     }
     else if (strcmp(argv[i],"-repair") == 0)
