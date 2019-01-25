@@ -1,3 +1,5 @@
+25 January 2019 -- all LAStools: new "Extra Bytes" transform '-add_scaled_attribute_to_user_data 0 10.0'
+22 January 2019 -- lasinfo: fixed bug of tool simply stopping to read points when reaching a total of 4294967295
 21 January 2019 -- lasinfo: '-repair' or '-repair_counters' bug fix for repairing legacy return counters in LAS header 
 20 January 2019 -- lasinfo: also report min/max values of documented additional attributes stored in 'extra bytes'
 20 January 2019 -- LASlib: also also LASsummarize additional attributes stored in 'extra bytes'
