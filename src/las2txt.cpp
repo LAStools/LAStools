@@ -366,6 +366,7 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
   }
   else
   {
+    fprintf(file, "-");
     fprintf(stderr, "WARNING: data type %d of attribute %d not implemented.\n", header->attributes[index].data_type, index);
     return FALSE;
   }
