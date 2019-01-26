@@ -156,8 +156,9 @@ public:
     if (data_type)
     {
       const U32 size_table[10] = { 1, 1, 2, 2, 4, 4, 8, 8, 4, 8 };
-      U32 type = get_type();
-      return size_table[type];
+      I32 type = get_type();
+      I32 dim = get_dim();
+      return size_table[type] * dim;
     }
     else
     {
@@ -189,12 +190,55 @@ public:
       cast_value = (F64)*((F32*)pointer);
     else
       cast_value = *((F64*)pointer);
-    return offset[0]+scale[0]*cast_value;
+    if (options & 0x08)
+    {
+      if (options & 0x10)
+      {
+        return offset[0]+scale[0]*cast_value;
+      }
+      else
+      {
+        return scale[0]*cast_value;
+      }
+    }
+    else
+    {
+      if (options & 0x10)
+      {
+        return offset[0]+cast_value;
+      }
+      else
+      {
+        return cast_value;
+      }
+    }
   };
 
   inline void set_value_as_float(U8* pointer, F64 value) const
   {
-    F64 unoffset_and_unscaled_value = (value - offset[0])/scale[0];
+    F64 unoffset_and_unscaled_value;
+    if (options & 0x08)
+    {
+      if (options & 0x10)
+      {
+        unoffset_and_unscaled_value = (value - offset[0])/scale[0];
+      }
+      else
+      {
+        unoffset_and_unscaled_value = value/scale[0];
+      }
+    }
+    else
+    {
+      if (options & 0x10)
+      {
+        unoffset_and_unscaled_value = value - offset[0];
+      }
+      else
+      {
+        unoffset_and_unscaled_value = value;
+      }
+    }
     I32 type = get_type();
     if (type == 0)
       *((U8*)pointer) = U8_QUANTIZE(unoffset_and_unscaled_value);
@@ -223,9 +267,9 @@ private:
   {
     return ((I32)data_type - 1)%10;
   };
-  inline I32 get_dim() const
+  inline I32 get_dim() const // compute dimension of deprecated tuple and triple attributes 
   {
-    return 1;
+    return ((I32)data_type - 1)/10 + 1;
   };
   inline U64I64F64 cast(U8* pointer) const
   {
