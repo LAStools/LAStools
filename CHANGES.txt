@@ -1,3 +1,4 @@
+26 January 2019 -- lasinfo: fix report of min/max extra byte values when scale is not set and has value of zero 
 25 January 2019 -- all LAStools: new "Extra Bytes" transform '-add_scaled_attribute_to_user_data 0 10.0'
 22 January 2019 -- lasinfo: fixed bug of tool simply stopping to read points when reaching a total of 4294967295
 21 January 2019 -- lascolor: create 64 bit version and add missing '-cpu64' switch
