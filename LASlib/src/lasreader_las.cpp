@@ -782,6 +782,13 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
           else if (header.vlrs[i].record_id == 4) // ExtraBytes
           {
             header.init_attributes(header.vlrs[i].record_length_after_header/sizeof(LASattribute), (LASattribute*)header.vlrs[i].data);
+            for (j = 0; j < (U32)header.number_attributes; j++)
+            {
+              if (header.attributes[j].data_type > 10)
+              {
+                fprintf(stderr,"WARNING: data type %d of attribute %d ('%s') is deprecated\n", header.attributes[j].data_type, j, header.attributes[j].name);
+              }
+            }
           }
           else if ((header.vlrs[i].record_id >= 100) && (header.vlrs[i].record_id < 355)) // WavePacketDescriptor
           {
