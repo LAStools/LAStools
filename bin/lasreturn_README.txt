@@ -5,7 +5,8 @@
   Reports geometric return statistics for multi-return pulses and
   repairs the 'number of returns' field based on GPS times. Note 
   that input files need (currently) to be sorted based on their
-  GPS time stamp.
+  GPS time stamp. It can also compute the 3D distance (or gaps)
+  between subsequent returns of the same pulse.
 
   For updates check the website or join the LAStools mailing list.
 
@@ -26,6 +27,15 @@ example usage:
 the 'number of returns' field of every point is set to the highest
 return number that is found for each set of returns with the same
 unique GPS time stamp. assumes sorted input (use lassort -gps_time).
+
+>> lasreturn -i lidar.laz -compute_gap_to_next_return -odix _gaps -olaz
+
+adds an additional per point attribute called 'gap to next return [m]'
+as "extra bytes". it stores the 3D distance from the current to the
+next return of the same pulse for all pulses that have multiple return
+in the file. returns belonging to the same pulse are identified via 
+their matching GPS time stamps. the computation assumes sorted input
+and will exit if this is not the case (use lassort -gps_time).
 
 >> lasreturn -i lidar.laz -histo return_distance 0.1
 
