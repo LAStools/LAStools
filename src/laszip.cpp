@@ -90,9 +90,9 @@ void usage(bool error=false, bool wait=false)
   fprintf(stderr,"laszip -i lidar.las -stdout -olaz > lidar.laz\n");
   fprintf(stderr,"laszip -stdin -o lidar.laz < lidar.las\n");
   fprintf(stderr,"laszip -i *.txt -iparse xyztiarn\n");
-  fprintf(stderr,"laszip -i las14.las -compatible -o las14compatible.laz\n")
-  fprintf(stderr,"laszip -i las14.laz -compatible -o las14compatible.laz\n")
-  fprintf(stderr,"laszip -i las14compatible.laz -remain_compatible -o las14compatible.las\n")
+  fprintf(stderr,"laszip -i las14.las -compatible -o las14compatible.laz\n");
+  fprintf(stderr,"laszip -i las14.laz -compatible -o las14compatible.laz\n");
+  fprintf(stderr,"laszip -i las14compatible.laz -remain_compatible -o las14compatible.las\n");
   fprintf(stderr,"laszip -h\n");
   if (wait)
   {
