@@ -1,3 +1,5 @@
+27 January 2019 -- laszip: fix for '-no_native' or '-compatible' when LAS 1.4 input is already 'native' compressed
+27 January 2019 -- lasreturn: compute 3D distance between subsequent returns (aka gaps) and store as extra bytes 
 26 January 2019 -- lasinfo: fix report of min/max extra byte values when scale is not set and has value of zero 
 25 January 2019 -- all LAStools: new "Extra Bytes" transform '-add_scaled_attribute_to_user_data 0 10.0'
 22 January 2019 -- lasinfo: fixed bug of tool simply stopping to read points when reaching a total of 4294967295

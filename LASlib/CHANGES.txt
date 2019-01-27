@@ -1,3 +1,4 @@
+27 January 2019 -- laszip: fix for '-no_native' or '-compatible' when LAS 1.4 input is already 'native' compressed
 26 January 2019 -- LASlib: bug fix in LASattributer for deprecated tuples and triples and unset scale value of zero
 26 January 2019 -- lasinfo: fix report of min/max extra byte values when scale is not set and has value of zero 
 25 January 2019 -- all LAStools: new "Extra Bytes" transform '-add_scaled_attribute_to_user_data 0 10.0'
