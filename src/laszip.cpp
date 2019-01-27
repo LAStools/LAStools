@@ -72,15 +72,27 @@ typedef map<U64, OffsetSize> my_offset_size_map;
 void usage(bool error=false, bool wait=false)
 {
   fprintf(stderr,"usage:\n");
-  fprintf(stderr,"laszip *.las\n");
-  fprintf(stderr,"laszip *.laz\n");
-  fprintf(stderr,"laszip *.txt -iparse xyztiarn\n");
-  fprintf(stderr,"laszip lidar.las\n");
-  fprintf(stderr,"laszip lidar.laz -v\n");
+  fprintf(stderr,"laszip -i lidar.las\n");
+  fprintf(stderr,"laszip -i lidar.laz\n");
+  fprintf(stderr,"laszip -i lidar.las -nil\n");
+  fprintf(stderr,"laszip -i lidar.laz -size\n");
+  fprintf(stderr,"laszip -i lidar.laz -check\n");
+  fprintf(stderr,"laszip -i *.las\n");
+  fprintf(stderr,"laszip -i *.laz\n");
+  fprintf(stderr,"laszip -i *.las -odir compressed\n");
+  fprintf(stderr,"laszip -i *.laz -odir uncompressed\n");
+#ifdef COMPILE_WITH_MULTI_CORE
+  fprintf(stderr,"laszip -i *.las -odir compressed -cores 4\n");
+  fprintf(stderr,"laszip -i *.laz -odir uncompressed -cores 4\n");
+#endif
   fprintf(stderr,"laszip -i lidar.las -o lidar_zipped.laz\n");
   fprintf(stderr,"laszip -i lidar.laz -o lidar_unzipped.las\n");
   fprintf(stderr,"laszip -i lidar.las -stdout -olaz > lidar.laz\n");
   fprintf(stderr,"laszip -stdin -o lidar.laz < lidar.las\n");
+  fprintf(stderr,"laszip -i *.txt -iparse xyztiarn\n");
+  fprintf(stderr,"laszip -i las14.las -compatible -o las14compatible.laz\n")
+  fprintf(stderr,"laszip -i las14.laz -compatible -o las14compatible.laz\n")
+  fprintf(stderr,"laszip -i las14compatible.laz -remain_compatible -o las14compatible.las\n")
   fprintf(stderr,"laszip -h\n");
   if (wait)
   {
