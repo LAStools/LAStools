@@ -276,6 +276,13 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
     }
   }
 
+  // remove the old LASzip (in case it exists)
+
+  if (header->laszip)
+  {
+    header->clean_laszip();
+  }
+  
   writer = laswriteopener->open(header);
 
   if (writer == 0)

@@ -303,7 +303,7 @@ BOOL LASwriteOpener::parse(int argc, char* argv[])
       set_native(TRUE);
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-no_native") == 0)
+    else if (strcmp(argv[i],"-compatible") == 0)
     {
       set_native(FALSE);
       *argv[i]='\0';
