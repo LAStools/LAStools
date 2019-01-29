@@ -210,158 +210,338 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
   {
     U8 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value;
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
-      fprintf(file, "%d", (I32)value);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + value;
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        fprintf(file, "%d", (I32)value);
+      }
     }
   }
   else if (header->attributes[index].data_type == 2)
   {
     I8 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value;
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
-      fprintf(file, "%d", (I32)value);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + value;
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        fprintf(file, "%d", (I32)value);
+      }
     }
   }
   else if (header->attributes[index].data_type == 3)
   {
     U16 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value;
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
-      fprintf(file, "%d", (I32)value);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + value;
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        fprintf(file, "%d", (I32)value);
+      }
     }
   }
   else if (header->attributes[index].data_type == 4)
   {
     I16 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value;
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
-      fprintf(file, "%d", (I32)value);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + value;
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        fprintf(file, "%d", (I32)value);
+      }
     }
   }
   else if (header->attributes[index].data_type == 5)
   {
     U32 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value;
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
-      fprintf(file, "%d", (I32)value);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + value;
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        fprintf(file, "%u", value);
+      }
     }
   }
   else if (header->attributes[index].data_type == 6)
   {
     I32 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value;
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
-      fprintf(file, "%d", value);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + value;
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        fprintf(file, "%d", value);
+      }
     }
   }
   else if (header->attributes[index].data_type == 7)
   {
     U64 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*((I64)value) + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*((I64)value) + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*((I64)value);
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + ((I64)value);
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
 #ifdef _WIN32
-        fprintf(file, "%I64d", (I64)value);
+        fprintf(file, "%I64u", value);
 #else
-        fprintf(file, "%lld", (I64)value);
+        fprintf(file, "%llu", value);
 #endif
+      }
     }
   }
   else if (header->attributes[index].data_type == 8)
   {
     I64 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value;
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + value;
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
 #ifdef _WIN32
         fprintf(file, "%I64d", value);
 #else
         fprintf(file, "%lld", value);
 #endif
+      }
     }
   }
   else if (header->attributes[index].data_type == 9)
   {
     F32 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value;
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
-      fprintf(file, "%g", value);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + value;
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        fprintf(file, "%g", value);
+      }
     }
   }
   else if (header->attributes[index].data_type == 10)
   {
     F64 value;
     point->get_attribute(attribute_starts[index], value);
-    if (header->attributes[index].has_scale() || header->attributes[index].has_offset())
+    if (header->attributes[index].has_scale())
     {
-      F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
-      lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
-      fprintf(file, "%s", printstring);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        F64 temp_d = header->attributes[index].scale[0]*value;
+        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        fprintf(file, "%s", printstring);
+      }
     }
     else
     {
-      fprintf(file, "%g", value);
+      if (header->attributes[index].has_offset())
+      {
+        F64 temp_d = header->attributes[index].offset[0] + value;
+        lidardouble2string(printstring, temp_d);
+        fprintf(file, "%s", printstring);
+      }
+      else
+      {
+        fprintf(file, "%g", value);
+      }
     }
   }
   else
