@@ -221,6 +221,7 @@ overview of all tool-specific switches:
 -fail                                : fail if license expired or invalid
 -gui                                 : start with files loaded into GUI
 -cores 4                             : process multiple inputs on 4 cores in parallel
+-rename lala                         : renames input file 'fusa.laz' to 'lala_277750_6122250.laz'
 -nh or -no_header                    : don't output LAS header information
 -nv or -no_vlrs                      : don't output VLR information
 -nr or -no_returns                   : don't output return information
@@ -257,6 +258,7 @@ overview of all tool-specific switches:
 -set_point_data_format
 -set_point_data_record_length
 -set_start_of_waveform_data_packet_record
+-set_geotiff_epsg 32755              : adds EPSG code in-place when other GeoTIFF tags present
 -suppress_z                          : do not decompress z for native LAS 1.4 point types 6 to 10
 -suppress_classification             : do not decompress classification for native LAS 1.4 point types 6 to 10
 -suppress_flags                      : do not decompress flags for native LAS 1.4 point types 6 to 10
@@ -266,7 +268,7 @@ overview of all tool-specific switches:
 -suppress_scan_angle                 : do not decompress scan angle for native LAS 1.4 point types 6 to 10
 -suppress_RGB                        : do not decompress RGB for native LAS 1.4 point types 6 to 10
 -suppress_extra_bytes                : do not decompress "extra bytes" for native LAS 1.4 point types 6 to 10
--progress
+-progress 10000000                   : report progress every 10 million points
 
 ****************************************************************
 

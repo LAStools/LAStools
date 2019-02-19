@@ -125,6 +125,7 @@ overview of all tool-specific switches:
 -set_system_identifier "Riegl Q680i"    : set system identifier to specified 31 character string
 -set_generating_software "LAStools"     : set generating software to specified 31 character string
 -set_global_encoding 1                  : set global encoding in LAS header to 1
+-progress 10000000                      : report progress every 10 million points
 
 ****************************************************************
 

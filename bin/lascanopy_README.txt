@@ -53,6 +53,10 @@
   participating in the computation with '-abv' and the total number
   of points (including those that are below the cutoff) with '-all'.
 
+  With the command '-s_upper 95' you can limit the computation of
+  these statistics -qav -avg -ske -kur -std to use only the highest
+  95 percent of the points above the height cutoff.
+  
   There is also the concept of height "bincentiles" where '-b 90'
   would deliver the percentage or fraction of points between the
   height cutoff (aka breast height) and the maximum height. Hence

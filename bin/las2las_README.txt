@@ -220,6 +220,8 @@ other commandline arguments are
 -set_global_encoding_gps_bit 1 : sets bit in global encoding field specifying Adjusted GPS Standard time stamps
 -set_attribute_scale 0 0.1     : sets the scale of the *first* attribute in the extra bytes to 0.1 
 -set_attribute_offset 1 10.0   : sets the offset of the *second* attribute in the extra bytes to 10.0 
+-unset_attribute_scale 0       : unsets the scale of the *first* attribute in the extra bytes
+-unset_attribute_offset 1      : unsets the offset of the *second* attribute in the extra bytes
 -set_lastiling_buffer_flag 0   : sets buffer flag in LAStiling VLR (if it exists) to zero
 -dont_remove_empty_files       : does not remove files that have zero points remaining from disk
 -wgs84                         : use datum WGS-84
