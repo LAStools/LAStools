@@ -1,6 +1,6 @@
-bin/serf/blast
-bin/serf/potree16
-bin/*.exe
+serf/blast
+serf/potree16
+*.exe
 *.las
 *.laz
 *~
