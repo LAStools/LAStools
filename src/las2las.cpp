@@ -776,6 +776,64 @@ int main(int argc, char *argv[])
         usage(true);
       }
     }
+    else if (strncmp(argv[i],"-add_", 5) == 0)
+    {
+      if (strcmp(argv[i],"-add_attribute") == 0)
+      {
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs at least 3 arguments: data_type name description\n", argv[i]);
+          usage(true);
+        }
+        if (((i+4) < argc) && (atof(argv[i+4]) != 0.0))
+        {
+          if (((i+5) < argc) && ((atof(argv[i+5]) != 0.0) || (strcmp(argv[i+5], "0") == 0) || (strcmp(argv[i+5], "0.0") == 0)))
+          {
+            if (((i+6) < argc) && ((atof(argv[i+6]) != 0.0) || (strcmp(argv[i+6], "0") == 0) || (strcmp(argv[i+6], "0.0") == 0)))
+            {
+              if (((i+7) < argc) && ((atof(argv[i+7]) != 0.0) || (strcmp(argv[i+7], "0") == 0) || (strcmp(argv[i+7], "0.0") == 0)))
+              {
+                if (((i+8) < argc) && ((atof(argv[i+8]) != 0.0) || (strcmp(argv[i+8], "0") == 0) || (strcmp(argv[i+8], "0.0") == 0)))
+                {
+                  lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]), atof(argv[i+8]));
+                  i+=8;
+                }
+                else
+                {
+                  lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]));
+                  i+=7;
+                }
+              }
+              else
+              { 
+                lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]));
+                i+=6;
+              }
+            }
+            else
+            { 
+              lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]));
+              i+=5;
+            }
+          }
+          else
+          {
+            lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]));
+            i+=4;
+          }
+        }
+        else
+        {
+          lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3]);
+          i+=3;
+        }
+      }
+      else
+      {
+        fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+        usage(true);
+      }
+    }
     else if (strcmp(argv[i],"-move_evlrs_to_vlrs") == 0)
     {
       move_evlrs_to_vlrs = true;
