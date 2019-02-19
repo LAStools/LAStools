@@ -145,6 +145,9 @@ public:
   inline BOOL set_scale(F64 scale) { if (data_type) { this->scale[0] = scale; options |= 0x08; return TRUE; } return FALSE; };
   inline BOOL set_offset(F64 offset) { if (data_type) { this->offset[0] = offset; options |= 0x10; return TRUE; } return FALSE; };
 
+  inline BOOL unset_scale() { if (data_type) { options &= (~0x08); return TRUE; } return FALSE; };
+  inline BOOL unset_offset() { if (data_type) { options &= (~0x10); return TRUE; } return FALSE; };
+
   inline BOOL has_no_data() const { return options & 0x01; };
   inline BOOL has_min() const { return options & 0x02; };
   inline BOOL has_max() const { return options & 0x04; };
