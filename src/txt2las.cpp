@@ -167,6 +167,7 @@ int main(int argc, char *argv[])
   char* set_system_identifier = 0;
   char* set_generating_software = 0;
   bool set_ogc_wkt = false;
+  U32 progress = 0;
   double full_start_time = 0.0;
   double start_time = 0.0;
 
@@ -498,6 +499,25 @@ int main(int argc, char *argv[])
         usage(true);
       }
     }
+    else if (strcmp(argv[i],"-progress") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: every\n", argv[i]);
+        byebye(true);
+      }
+      if (sscanf(argv[i+1], "%u", &progress) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: every but '%s' is no valid number\n", argv[i], argv[i+1]);
+        byebye(true);
+      }
+      if (progress == 0)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: every but '%u' is no valid number\n", argv[i], progress);
+        byebye(true);
+      }
+			i++;
+    }
     else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))
     {
       lasreadopener.add_file_name(argv[i]);
@@ -783,6 +803,14 @@ int main(int argc, char *argv[])
     {
       // write the point
       laswriter->write_point(&lasreader->point);
+      if (progress && ((lasreader->p_count % progress) == 0))
+      {
+#ifdef _WIN32
+        fprintf(stderr, " ... processed %I64d points ...\012", lasreader->p_count);
+#else
+        fprintf(stderr, " ... processed %lld points ...\012", lasreader->p_count);
+#endif
+      }
     }
     lasreader->close();
 
