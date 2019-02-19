@@ -1,0 +1,9 @@
+bin/serf/blast
+bin/serf/potree16
+bin/*.exe
+*.las
+*.laz
+*~
+.vs
+*.pdb
+*.ilk
