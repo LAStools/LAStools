@@ -14,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -25,6 +25,7 @@
 
   CHANGE HISTORY:
 
+    21 February 2019 -- bug fix when writing 4294967295+ points uncompressed to LAS
     28 December 2018 -- fix for v4 decompression of WavePacket part of PRDF 9 and 10
     27 December 2018 -- upped to 3.2 r9 for bug fix in multi-channel NIR decompression
      7 November 2018 -- upped to 3.2 r8 for identical legacy and extended flags check
@@ -73,7 +74,7 @@ typedef long long SIGNED_INT64;
 #define LASZIP_VERSION_MAJOR                3
 #define LASZIP_VERSION_MINOR                2
 #define LASZIP_VERSION_REVISION             9
-#define LASZIP_VERSION_BUILD_DATE      190127
+#define LASZIP_VERSION_BUILD_DATE      190221
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1
