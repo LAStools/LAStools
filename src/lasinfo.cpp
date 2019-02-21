@@ -1326,15 +1326,24 @@ int main(int argc, char *argv[])
 
     if (base_name && lasreadopener.get_file_name())
     {
-#ifdef _WIN32
-      if (verbose) fprintf(stderr, "%s '%s' with %I64d points\n", (repair_bb || repair_counters ? "repairing" : "reading"), (lasreadopener.get_file_name() ? lasreadopener.get_file_name() : "stdin"), lasreader->npoints);
-#else
-      if (verbose) fprintf(stderr, "%s '%s' with %lld points\n", (repair_bb || repair_counters ? "repairing" : "reading"), (lasreadopener.get_file_name() ? lasreadopener.get_file_name() : "stdin"), lasreader->npoints);
-#endif
       lasreader->close();
 
+#ifdef _WIN32
+      if (verbose) fprintf(stderr, "renaming '%s' with %I64d points\n", lasreadopener.get_file_name(), lasreader->npoints);
+#else
+      fprintf(stderr, "ERROR: renaming implemented ...\n");
+      byebye(true, argc==1);
+#endif
+
       char command[2048];
-      sprintf(command, "rename \"%s\" \"%s_%d_%d.xxx\"", lasreadopener.get_file_name(), base_name, I32_QUANTIZE(lasheader->min_x), I32_QUANTIZE(lasheader->min_y));
+      if (strlen(base_name))
+      {
+        sprintf(command, "rename \"%s\" \"%s_%d_%d.xxx\"", lasreadopener.get_file_name(), base_name, I32_QUANTIZE(lasheader->min_x), I32_QUANTIZE(lasheader->min_y));
+      }
+      else
+      {
+        sprintf(command, "rename \"%s\" \"%d_%d.xxx\"", lasreadopener.get_file_name(), I32_QUANTIZE(lasheader->min_x), I32_QUANTIZE(lasheader->min_y));
+      }
       int len1 = (int)strlen(lasreadopener.get_file_name());
       int len2 = (int)strlen(command);
       command[len2-4] = lasreadopener.get_file_name()[len1-3];
@@ -1342,11 +1351,11 @@ int main(int argc, char *argv[])
       command[len2-2] = lasreadopener.get_file_name()[len1-1];
       delete lasreader;
       
-      if (verbose) fprintf(stderr, "executing: %s\n", command);
+      if (verbose) fprintf(stderr, "executing '%s'\n", command);
 
       if (system(command) != 0)
       {
-        fprintf(stderr, "ERROR: failed to execute %s\n", command);
+        fprintf(stderr, "ERROR: failed to execute '%s'\n", command);
         byebye(true);
       }
       continue;
