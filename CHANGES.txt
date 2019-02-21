@@ -1,3 +1,14 @@
+21 February 2019 -- LASlib, LASzip, LAStools: bug fix when writing 4,294,967,296 or more points uncompressed to LAS
+20 February 2019 -- lasheight: bug fix when '-store_height_as_extra_bytes' if extra bytes already exist in input file
+19 February 2019 -- las2las: fix '-set_attribute_offset 0 1.5'. new '-unset_attribute_scale 1' '-unset_attribute_offset 0'
+18 February 2019 -- lasinfo: do not expect zero terminated strings for 'user ID' and 'description' of VLRs and EVLRs
+17 February 2019 -- lasinfo: new '-set_geotiff_epsg 32755' adds EPSG code in-place when other GeoTIFF tags present
+16 February 2019 -- lasinfo: option '-rename lala' rename files (tiles) from 'fusa.laz' to 'lala_277750_6122250.laz'
+ 6 February 2019 -- lasoptimize64: bug fix in 64 bit version of lasoptimize for input files exceeding a certain size
+ 5 February 2019 -- lassort64: bug fix in 64 bit version of lassort for input files exceeding a certain file size
+ 1 February 2019 -- lasground: fix of bug occuring for tiny input files that have no ground that should just be copied
+31 January 2019 -- lascanopy: new '-s_upper 95' to use only 95 percent highest heights for: -avg -qav -std -ske -kur
+29 January 2019 -- las2txt: fix when outputting scaled or offset "extra bytes" with '-parse xyz012'
 27 January 2019 -- laszip: fix for '-no_native' or '-compatible' when LAS 1.4 input is already 'native' compressed
 27 January 2019 -- lasreturn: compute 3D distance between subsequent returns (aka gaps) and store as extra bytes 
 26 January 2019 -- lasinfo: fix report of min/max extra byte values when scale is not set and has value of zero 

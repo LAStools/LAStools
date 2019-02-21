@@ -1,3 +1,9 @@
+21 February 2019 -- LASlib, LASzip, LAStools: bug fix when writing 4,294,967,296 or more points uncompressed to LAS
+19 February 2019 -- las2las: fix '-set_attribute_offset 0 1.5'. new '-unset_attribute_scale 1' '-unset_attribute_offset 0'
+18 February 2019 -- lasinfo: do not expect zero terminated strings for 'user ID' and 'description' of VLRs and EVLRs
+17 February 2019 -- lasinfo: new '-set_geotiff_epsg 32755' adds EPSG code in-place when other GeoTIFF tags present
+16 February 2019 -- lasinfo: option '-rename lala' rename files (tiles) from 'fusa.laz' to 'lala_277750_6122250.laz'
+29 January 2019 -- las2txt: fix when outputting scaled or offset "extra bytes" with '-parse xyz012'
 27 January 2019 -- laszip: fix for '-no_native' or '-compatible' when LAS 1.4 input is already 'native' compressed
 26 January 2019 -- LASlib: bug fix in LASattributer for deprecated tuples and triples and unset scale value of zero
 26 January 2019 -- lasinfo: fix report of min/max extra byte values when scale is not set and has value of zero 
