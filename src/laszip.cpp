@@ -439,6 +439,30 @@ int main(int argc, char *argv[])
       usage(true, argc==1);
     }
 
+    // check correctness of file extension
+
+    if (lasreadopener.get_file_name())
+    {
+      const CHAR* file_name = lasreadopener.get_file_name();
+      I32 len = (I32)strlen(file_name);
+      while ((len >= 0) && (file_name[len] != '.')) len--;
+
+      if (lasreader->get_format() == LAS_TOOLS_FORMAT_LAZ)
+      {
+        if ((strncmp(file_name + len, ".laz", 4) != 0) && (strncmp(file_name + len, ".LAZ", 4) != 0))
+        {
+          fprintf(stderr, "WARNING: input LAZ file has wrong extension: '%s'\n", file_name);
+        }
+      }
+      else
+      {
+        if ((strncmp(file_name + len, ".las", 4) != 0) && (strncmp(file_name + len, ".LAS", 4) != 0))
+        {
+          fprintf(stderr, "WARNING: input LAS file has wrong extension: '%s'\n", file_name);
+        }
+      }
+    }
+
     // switch
 
     if (report_file_size)
@@ -500,6 +524,14 @@ int main(int argc, char *argv[])
           }
         }
         laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
+      }
+
+      // make sure input and output filenames are not identical
+
+      if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
+      {
+        fprintf(stderr, "ERROR: input and output file name are identical: '%s'\n", lasreadopener.get_file_name());
+        usage(true);
       }
 
       // maybe set projection
