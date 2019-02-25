@@ -1012,6 +1012,15 @@ public:
   inline void transform(LASpoint* point) { point->set_user_data(point->get_classification() ? point->get_classification() : point->get_extended_classification()); };
 };
 
+class LASoperationCopyClassificationIntoPointSource : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_classification_into_point_source"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
+  inline void transform(LASpoint* point) { point->set_point_source_ID(point->get_classification() ? point->get_classification() : point->get_extended_classification()); };
+};
+
 class LASoperationCopyAttributeIntoUserData : public LASoperation
 {
 public:
@@ -2453,11 +2462,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
           *argv[i]='\0'; 
         }
       }
-      else if (strcmp(argv[i],"-copy_classification_into_user_data") == 0)
+      else if (strncmp(argv[i],"-copy_classification_", 21) == 0)
       {
-        add_operation(new LASoperationCopyClassificationIntoUserData());
-        *argv[i]='\0'; 
-      } 
+        if (strcmp(argv[i],"-copy_classification_into_user_data") == 0)
+        {
+          add_operation(new LASoperationCopyClassificationIntoUserData());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_classification_into_point_source") == 0)
+        {
+          add_operation(new LASoperationCopyClassificationIntoPointSource());
+          *argv[i]='\0'; 
+        }
+      }
     }
     else if (strncmp(argv[i],"-set_", 5) == 0)
     {
