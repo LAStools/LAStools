@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 190221
+#define LAS_TOOLS_VERSION 190307
 
 #include <stdio.h>
 #include <string.h>
@@ -511,11 +511,16 @@ public:
     return FALSE;
   };
 
-  BOOL is_lonlat() const
+  BOOL is_lonlat(const F32 extend = 1.0f) const
   {
     if ((-360.0 <= min_x) && (-90.0 <= min_y) && (max_x <= 360.0) && (max_y <= 90.0))
     {
-      return TRUE;
+      // the x and y coordinates are within the longitude/latitude range
+      if (((max_x - min_x) <= extend) && ((max_y - min_y) <= extend))
+      {
+        // the x and y coordinate ranges are within the maximal extend
+        return TRUE;
+      }
     }
     return FALSE;
   };
