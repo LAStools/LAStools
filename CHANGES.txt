@@ -1,3 +1,9 @@
+ 6 March 2019 -- lasvoxel: new option '-step_z_infinite' for a 2D voxelization with infinitely extending z cells
+ 5 March 2019 -- all LAStools: support GeoTIFF keys 3084 through 3087 used by RIEGL in generic LambertConfConic_2SP
+26 February 2019 -- las2dem, lasgrid, lasoverlap: disable 'nodata' for TIF when writing 8 bit / 3 band RGB images
+26 February 2019 -- lastile: fixed bug for '-reverse_tiling' that was introduced with release of 64 bit executables
+25 February 2019 -- lascanopy: new height/intensity metric "Height of Median Energy or HOME" via switch '-hom' 
+22 February 2019 -- laszip: warn if uncompressed LAS file has *.laz extension and vice-versa but don't override file.
 21 February 2019 -- LASlib, LASzip, LAStools: bug fix when writing 4,294,967,296 or more points uncompressed to LAS
 20 February 2019 -- lasheight: bug fix when '-store_height_as_extra_bytes' if extra bytes already exist in input file
 19 February 2019 -- las2las: fix '-set_attribute_offset 0 1.5'. new '-unset_attribute_scale 1' '-unset_attribute_offset 0'
