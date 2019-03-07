@@ -826,6 +826,10 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
   int offsetProjFalseNorthingGeoKey = -1;
   int offsetProjCenterLatGeoKey = -1;
   int offsetProjCenterLongGeoKey = -1;
+  int offsetProjFalseOriginLongGeoKey = -1;
+  int offsetProjFalseOriginLatGeoKey = -1;
+  int offsetProjFalseOriginEastingGeoKey = -1;
+  int offsetProjFalseOriginNorthingGeoKey = -1;
   int offsetProjScaleAtNatOriginGeoKey = -1;
   int offsetProjScaleAtCenterGeoKey = -1;
   int offsetProjAzimuthAngleGeoKey = -1;
@@ -1189,6 +1193,18 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
     case 3083: // ProjFalseNorthingGeoKey
       offsetProjFalseNorthingGeoKey = geo_keys[i].value_offset;
       break;
+    case 3084: // ProjFalseOriginLongGeoKey
+      offsetProjFalseOriginLongGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3085: // ProjFalseOriginLatGeoKey
+      offsetProjFalseOriginLatGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3086: // ProjFalseOriginEastingGeoKey
+      offsetProjFalseOriginEastingGeoKey = geo_keys[i].value_offset;
+      break;
+    case 3087: // ProjFalseOriginNorthingGeoKey
+      offsetProjFalseOriginNorthingGeoKey = geo_keys[i].value_offset;
+      break;
     case 3088: // ProjCenterLongGeoKey
       offsetProjCenterLongGeoKey = geo_keys[i].value_offset;
       break;
@@ -1244,18 +1260,17 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
     }
     else if (user_defined_projection == 8)
     {
-      if ((offsetProjFalseEastingGeoKey >= 0) &&
-          (offsetProjFalseNorthingGeoKey >= 0) &&
-          (offsetProjNatOriginLatGeoKey >= 0) &&
-          ((offsetProjCenterLongGeoKey >= 0) || (offsetProjNatOriginLongGeoKey >= 0)) &&
-          (offsetProjStdParallel1GeoKey >= 0) &&
+      if (((offsetProjFalseEastingGeoKey >= 0) || (offsetProjFalseOriginEastingGeoKey >= 0)) &&
+          ((offsetProjFalseNorthingGeoKey >= 0) || (offsetProjFalseOriginNorthingGeoKey >= 0)) &&
+          ((offsetProjNatOriginLatGeoKey >= 0) || (offsetProjFalseOriginLatGeoKey >= 0)) &&
+          ((offsetProjCenterLongGeoKey >= 0) || (offsetProjNatOriginLongGeoKey >= 0) || (offsetProjFalseOriginLongGeoKey >= 0)) &&
           (offsetProjStdParallel1GeoKey >= 0) &&
           (offsetProjStdParallel2GeoKey >= 0))
       {
-        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
-        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
-        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
-        double longOriginDeg = ((offsetProjCenterLongGeoKey >= 0) ? geo_double_params[offsetProjCenterLongGeoKey] : geo_double_params[offsetProjNatOriginLongGeoKey]);
+        double falseEastingMeter = ((offsetProjFalseEastingGeoKey >= 0) ? geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter : geo_double_params[offsetProjFalseOriginEastingGeoKey] * coordinates2meter);
+        double falseNorthingMeter = ((offsetProjFalseNorthingGeoKey >= 0) ? geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter : geo_double_params[offsetProjFalseOriginNorthingGeoKey] * coordinates2meter);
+        double latOriginDeg = ((offsetProjNatOriginLatGeoKey >= 0) ? geo_double_params[offsetProjNatOriginLatGeoKey] : geo_double_params[offsetProjFalseOriginLatGeoKey]);
+        double longOriginDeg = ((offsetProjCenterLongGeoKey >= 0) ? geo_double_params[offsetProjCenterLongGeoKey] : ((offsetProjNatOriginLongGeoKey >= 0) ? geo_double_params[offsetProjNatOriginLongGeoKey] : geo_double_params[offsetProjFalseOriginLongGeoKey]));
         if ((longOriginDeg == 0.0) && (offsetProjNatOriginLongGeoKey >= 0)) longOriginDeg = geo_double_params[offsetProjNatOriginLongGeoKey];
         double firstStdParallelDeg = geo_double_params[offsetProjStdParallel1GeoKey];
         double secondStdParallelDeg = geo_double_params[offsetProjStdParallel2GeoKey];
