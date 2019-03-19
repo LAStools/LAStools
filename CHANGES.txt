@@ -1,3 +1,5 @@
+19 March 2019 -- LASlib, LASzip, LAStools: bug fix in "legacy class" decompressing new point types with "class > 31"
+10 March 2019 -- lastrack: bug fix when '-store_height_as_extra_bytes' if extra bytes already exist in input file
  6 March 2019 -- lasvoxel: new option '-step_z_infinite' for a 2D voxelization with infinitely extending z cells
  5 March 2019 -- all LAStools: support GeoTIFF keys 3084 through 3087 used by RIEGL in generic LambertConfConic_2SP
 26 February 2019 -- las2dem, lasgrid, lasoverlap: disable 'nodata' for TIF when writing 8 bit / 3 band RGB images
