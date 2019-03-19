@@ -1,3 +1,4 @@
+19 March 2019 -- LASlib, LASzip, LAStools: bug fix in "legacy class" decompressing new point types with "class > 31"
  5 March 2019 -- all LAStools: support GeoTIFF keys 3084 through 3087 used by RIEGL in generic LambertConfConic_2SP
 22 February 2019 -- laszip: warn if uncompressed LAS file has *.laz extension and vice-versa but don't override file.
 21 February 2019 -- LASlib, LASzip, LAStools: bug fix when writing 4,294,967,296 or more points uncompressed to LAS
