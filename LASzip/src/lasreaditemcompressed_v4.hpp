@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    19 March 2019 -- set "legacy classification" to zero if "classification > 31"  
     28 December 2017 -- fix incorrect 'context switch' reported by Wanwannodao 
     28 August 2017 -- moving 'context' from global development hack to interface  
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 
