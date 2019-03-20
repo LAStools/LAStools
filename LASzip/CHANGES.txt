@@ -1,3 +1,4 @@
+20 March 2019 -- upped to 3.3 r1 for checking consistent legacy and extended classification for new point types
 19 March 2019 -- bug fix when decompressing new point types: zero "legacy classification" if "classification" > 31
  7 March 2019 -- upped to 3.3 r0 because hobu was suggesting it for the next release
 21 February 2019 -- bug fix when writing 4,294,967,296 or more points uncompressed to LAS

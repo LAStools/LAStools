@@ -25,6 +25,7 @@
 
   CHANGE HISTORY:
 
+    20 March 2019 -- upped to 3.3 r1 for consistent legacy and extended class check 
     21 February 2019 -- bug fix when writing 4294967295+ points uncompressed to LAS
     28 December 2018 -- fix for v4 decompression of WavePacket part of PRDF 9 and 10
     27 December 2018 -- upped to 3.2 r9 for bug fix in multi-channel NIR decompression
