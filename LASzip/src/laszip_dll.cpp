@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    20 March 2019 -- check consistent legacy and extended classification in laszip_write_point()
      7 November 2018 -- assure identical legacy and extended flags in laszip_write_point()
     20 October 2018 -- changed (U8*) to (const U8*) for all out->put___() calls
      5 October 2018 -- corrected 'is_empty' return value in laszip_inside_rectangle()
@@ -3026,6 +3027,16 @@ laszip_write_point(
       {
         sprintf(laszip_dll->error, "legacy flags and extended flags are not identical");
         return 1;
+      }
+
+      // make sure legacy classification is zero or identical to extended classification
+      if (laszip_dll->point.classification != 0)
+      {
+        if (laszip_dll->point.classification != laszip_dll->point.extended_classification)
+        {
+          sprintf(laszip_dll->error, "legacy classification %d and extended classification %d are not consistent", laszip_dll->point.classification, laszip_dll->point.extended_classification);
+          return 1;
+        }
       }
     }
 
