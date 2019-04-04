@@ -5,9 +5,12 @@
   This tool computes a voxelization of points. You can specify the
   xy and the z size of the voxel cells separately with '-step_xy 2'
   and '-step_z 0.3' which would create cells of size 2 by 2 by 0.3
-  units or use uniform sized cells of '-step 0.5'.
-
-  This is just a prototype for the moment.
+  units or use uniform sized cells of '-step 0.5'. For voxels that
+  are infinite in z direction use option '-step_z_infinite'.
+  
+  By adding '-compute_mean_xyz' to the command line lasvoxel uses
+  the average x, y, z coordinate of all points falling into a voxel
+  instead of the center of the voxel.
 
   Please license from martin@rapidlasso.com before using lasvoxel
   commercially. Please note that the unlicensed version will set
@@ -73,6 +76,9 @@ overview of all tool-specific switches:
 -step 1.0                            : use 1 x 1 x 1 uniform grid for finding isolated points
 -step_xy 2.0                         : set the horizontal x and y spacing of the grid to 2
 -step_z 0.5                          : set the vertical z spacing of the grid to 0.5
+-step_z_infinite                     : sets the vertical z spacing to infinite (-> one layer of voxels)
+-compute_mean_xyz                    : compute averaged coordinate for output voxels
+-compute_IDs_and_voxel_table         : https://groups.google.com/d/topic/lastools/Nc-rN5OuxY8/discussion
 -ilay                                : apply all LASlayers found in corresponding *.lay file on read
 -ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
 -ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers

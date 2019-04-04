@@ -36,8 +36,13 @@
   By default the tool will set the classification of the overage
   points to 12. However, instead you can also choose to use the
   '-flag_as_withheld' or '-flag_as_overlap' (new LAS 1.4 point
-  types only) flags or '-remove_overage' points from the output.
+  types only) flags, '-remove_overage' points from the output,
+  or '-classify_as 18' to a different classification.
   
+  Rather than classifying/flagging/deleting the overage you can
+  also determine the '-entire_overlap' in the file and classify,
+  flag, or delete it with the options described above.
+
   Below an explaination based on what Karl Heidemann of the USGS
   once told me regarding "overlap" versus "overage" points:
 

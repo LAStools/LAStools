@@ -36,9 +36,11 @@
   VIEWING AND TRAVERSING CROSS SECTIONS 
 
   For quality checking and detail views you can press <x> and
-  select a cross section or smaller area of interest. Move it
-  around with the arrow key. Holding down <SHIFT> or <ALT> is
-  taking larger or smaller steps. Press <x> again and you see
+  select a cross section or smaller area of interest. By default
+  you will draw a profile rectangle. Holding down <SHIFT> draws
+  a profile line. Its width can be chosen in the pop-up menu. Move
+  either around with the arrow key. Holding down <SHIFT> or <ALT>
+  is taking larger or smaller steps. Press <x> again and you see
   only the selected area. Again, traverse the LiDAR my moving
   around with the arrow keys. You can do your edits in this
   cross section view. Jumping back between cross section view
@@ -130,10 +132,11 @@ interactive options:
 <CTRL-f> force LAY file overwrite
 <CTRL-a> apply LASlayers to create new LAS/LAZ file
 
-<i>      pick a point
-<I>      pick a point and draw line to last picked point <SHIFT>+<i>
-<x>      toggle between cross-section and overview
-<CTRL-x> turn cross-section view on / off
+<i>       pick a point
+<I>       pick a point and draw line to last picked point <SHIFT>+<i>
+<x>       turn on and toggle between overview and rectangle / line cross-section 
+<SHIFT>   hold down to pick line instead of rectangle cross-section when in overview 
+<CTRL-x>  overview and rectangle / line cross-section view on / off
 
 <SHIFT> translate mode
 <CTRL>  zoom mode
