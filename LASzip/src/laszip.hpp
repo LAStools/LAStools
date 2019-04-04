@@ -25,14 +25,14 @@
 
   CHANGE HISTORY:
 
-    20 March 2019 -- upped to 3.3 r1 for consistent legacy and extended class check 
+    20 March 2019 -- upped to 3.3 r1 for consistent legacy and extended class check
     21 February 2019 -- bug fix when writing 4294967295+ points uncompressed to LAS
     28 December 2018 -- fix for v4 decompression of WavePacket part of PRDF 9 and 10
     27 December 2018 -- upped to 3.2 r9 for bug fix in multi-channel NIR decompression
      7 November 2018 -- upped to 3.2 r8 for identical legacy and extended flags check
     20 October 2018 -- upped to 3.2 r7 for rare bug in LASinterval::merge_intervals()
      5 October 2018 -- upped to 3.2 r6 for corrected 'is_empty' return value
-    28 September 2018 -- upped to 3.2 r5 for fix in extended classification writing 
+    28 September 2018 -- upped to 3.2 r5 for fix in extended classification writing
      9 February 2018 -- minor version increment as it can read v4 compressed items
     28 December 2017 -- fix incorrect 'context switch' reported by Wanwannodao
     23 August 2017 -- minor version increment for C++ stream-based read/write API
@@ -73,9 +73,9 @@ typedef long long SIGNED_INT64;
 #endif
 
 #define LASZIP_VERSION_MAJOR                3
-#define LASZIP_VERSION_MINOR                3
-#define LASZIP_VERSION_REVISION             1
-#define LASZIP_VERSION_BUILD_DATE      190319
+#define LASZIP_VERSION_MINOR                4
+#define LASZIP_VERSION_REVISION             0
+#define LASZIP_VERSION_BUILD_DATE      190401
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1
