@@ -1,3 +1,4 @@
+31 March 2019 -- better license terms for core arithmetic coder thanks to Amir Said. upgrade to version 3.4 rev 0
 20 March 2019 -- upped to 3.3 r1 for checking consistent legacy and extended classification for new point types
 19 March 2019 -- bug fix when decompressing new point types: zero "legacy classification" if "classification" > 31
  7 March 2019 -- upped to 3.3 r0 because hobu was suggesting it for the next release

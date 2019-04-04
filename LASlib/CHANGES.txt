@@ -1,3 +1,4 @@
+31 March 2019 -- LASzip, LASlib, LAStools: better LASzip license thanks to Amir Said. upgrade to version 3.4 revision 0
 19 March 2019 -- LASlib, LASzip, LAStools: bug fix in "legacy class" decompressing new point types with "class > 31"
  5 March 2019 -- all LAStools: support GeoTIFF keys 3084 through 3087 used by RIEGL in generic LambertConfConic_2SP
 22 February 2019 -- laszip: warn if uncompressed LAS file has *.laz extension and vice-versa but don't override file.

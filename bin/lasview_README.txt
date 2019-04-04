@@ -183,6 +183,7 @@ overview of all tool-specific switches:
 -holes 10  (or -kill 10)             : remove any triangle from TIN that has an edge length bigger than 10
 -grid 5                              : set raster spacing for visualization of rasterization with <R>
                                        default is 1
+-load_gps_time or -load_gps_second   : also loads GPS time stamps from file and displays them when pressing <i>
 -circles 0.1                         : define structural elements as circles of radius 0.1
 -cones 0.2 0.5                       : define structural elements as cones of radius 0.2 and height 0.5
 -flats 0.1 0.3 0.2                   : define structural elements as flats of small radius 0.1, height 0.3, and large radius 0.2
