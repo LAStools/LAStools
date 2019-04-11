@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -2794,7 +2794,13 @@ setup_laszip_items(
 
   // compute offsets (or points item pointers) for data transfer from the point items
 
+  if (laszip_dll->point_items)
+  {
+    delete [] laszip_dll->point_items;
+  }
+
   laszip_dll->point_items = new U8*[laszip->num_items];
+
   if (laszip_dll->point_items == 0)
   {
     sprintf(laszip_dll->error, "could not alloc point_items");
@@ -3971,6 +3977,11 @@ laszip_read_header(
   }
 
   // create point's item pointers
+  
+  if (laszip_dll->point_items)
+  {
+    delete [] laszip_dll->point_items;
+  }
 
   laszip_dll->point_items = new U8*[laszip->num_items];
 
