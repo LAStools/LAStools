@@ -599,6 +599,19 @@ private:
   F64 bin_size;
 };
 
+class LASoperationSetScanAngle : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_scan_angle"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), scan_angle); };
+  inline void transform(LASpoint* point) {
+    point->set_scan_angle(scan_angle);
+  };
+  LASoperationSetScanAngle(F32 scan_angle) { this->scan_angle = scan_angle; };
+private:
+  F32 scan_angle;
+};
+
 class LASoperationScaleScanAngle : public LASoperation
 {
 public:
@@ -1651,6 +1664,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -copy_attribute_into_intensity 0\n");
   fprintf(stderr,"  -bin_gps_time_into_intensity 0.5\n");
   fprintf(stderr,"Transform scan_angle.\n");
+  fprintf(stderr,"  -set_scan_angle 0.0\n");
   fprintf(stderr,"  -scale_scan_angle 1.944445\n");
   fprintf(stderr,"  -translate_scan_angle -5\n");
   fprintf(stderr,"  -translate_then_scale_scan_angle -0.5 2.1\n");
@@ -2644,6 +2658,33 @@ BOOL LAStransform::parse(int argc, char* argv[])
           return FALSE;
         }
         add_operation(new LASoperationSetUserData((U8)value));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i],"-set_scan_angle") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
+          return FALSE;
+        }
+        F32 value;
+        if (sscanf(argv[i+1], "%g", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value < -180.0f)
+        {
+          fprintf(stderr,"ERROR: cannot set scan angle because value %g is smaller than -180\n", value);
+          return FALSE;
+        }
+        else if (value > 180.0f)
+        {
+          fprintf(stderr,"ERROR: cannot set scan angle rank because value %g is larger than 180\n", value);
+          return FALSE;
+        }
+
+        add_operation(new LASoperationSetScanAngle(value));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
       else if (strncmp(argv[i],"-set_point_source", 17) == 0)
