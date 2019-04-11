@@ -1,3 +1,5 @@
+11 April 2019 -- increase AC_BUFFER_SIZE from 1024 to 4096 to lower chance of ultra-rare propagate_carry() overflow
+10 April 2019 -- fix potential memory leaks found by Connor Manning using valgrind
 31 March 2019 -- better license terms for core arithmetic coder thanks to Amir Said. upgrade to version 3.4 rev 0
 20 March 2019 -- upped to 3.3 r1 for checking consistent legacy and extended classification for new point types
 19 March 2019 -- bug fix when decompressing new point types: zero "legacy classification" if "classification" > 31
