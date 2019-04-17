@@ -1,3 +1,6 @@
+17 April 2019 -- lastile: added missing support for parallel tiling with 64 bit executable (i.e. '-cores 4 -cpu64')
+16 April 2019 -- LASlib, LAStools: fixed '-keep_extended_classification 41' for multi-core mode of 64 bit executables
+11 April 2019 -- LASzip: increase AC_BUFFER_SIZE from 1024 to 4096 to lower chance of ultra-rare propagate_carry() issue
  4 April 2019 -- e572las: read spherical coordinates and populate VLRs with name, guid, description, sensorModel, ...
  3 April 2019 -- lasview: pick profile line: press 'x', hold <SHIFT>, draw line, press 'x', adjust width in pop-up menu
  1 April 2019 -- lasview: new options '-load_gps_time' and '-load_gps_second' to display time stamp when p<i>cking point
