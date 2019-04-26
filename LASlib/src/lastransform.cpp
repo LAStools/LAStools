@@ -860,7 +860,7 @@ public:
       point->set_extended_classification(class_to);
     }
   };
-  LASoperationClassifyAttributeBetweenAs(U32 index, F64 z_below, F64 z_above, U8 class_to) { this->index = index; this->below = below; this->above = above; this->class_to = class_to; };
+  LASoperationClassifyAttributeBetweenAs(U32 index, F64 z_below, F64 z_above, U8 class_to) { this->index = index; this->below = z_below; this->above = z_above; this->class_to = class_to; };
 private:
   U32 index;
   F64 below;
