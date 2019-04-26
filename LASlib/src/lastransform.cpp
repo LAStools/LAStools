@@ -229,6 +229,25 @@ private:
   F64 cos_angle, sin_angle;
 };
 
+class LASoperationRotateYZ : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "rotate_yz"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), angle, y_offset, z_offset); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
+  inline void transform(LASpoint* point) {
+    F64 y = point->get_y() - y_offset;
+    F64 z = point->get_z() - z_offset;
+    point->set_y(cos_angle*y - sin_angle*z + y_offset);
+    point->set_z(cos_angle*z + sin_angle*y + z_offset);
+  };
+  LASoperationRotateYZ(F64 angle, F64 y_offset, F64 z_offset) { this->angle = angle; this->y_offset = y_offset; this->z_offset = z_offset; cos_angle = cos(3.141592653589793238462643383279502884197169/180*angle); sin_angle = sin(3.141592653589793238462643383279502884197169/180*angle); };
+private:
+  F64 angle;
+  F64 y_offset, z_offset;
+  F64 cos_angle, sin_angle;
+};
+
 class LASoperationTransformHelmert : public LASoperation
 {
 public:
@@ -2181,6 +2200,35 @@ BOOL LAStransform::parse(int argc, char* argv[])
         }
         change_coordinates = TRUE;
         add_operation(new LASoperationRotateXZ(angle, rot_center_x, rot_center_z));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+      }
+      else if (strcmp(argv[i],"-rotate_yz") == 0)
+      {
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_y rot_center_z\n", argv[i]);
+          return FALSE;
+        }
+        F64 angle;
+        if (sscanf(argv[i+1], "%lf", &angle) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid angle\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 rot_center_y;
+        if (sscanf(argv[i+2], "%lf", &rot_center_y) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid rot_center_y\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        F64 rot_center_z;
+        if (sscanf(argv[i+3], "%lf", &rot_center_z) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid rot_center_z\n", argv[i], argv[i+3]);
+          return FALSE;
+        }
+        change_coordinates = TRUE;
+        add_operation(new LASoperationRotateYZ(angle, rot_center_y, rot_center_z));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
     }
