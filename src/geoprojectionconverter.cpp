@@ -7589,15 +7589,18 @@ int GeoProjectionConverter::unparse(char* string) const
       }
     }
   }
-  if (elevation2meter != 1.0)
+  if (has_elevation_units(true))
   {
-    if (elevation2meter == 0.3048)
+    if (elevation2meter != 1.0)
     {
-      n += sprintf(&string[n], "-elevation_feet ");
-    }
-    else
-    {
-      n += sprintf(&string[n], "-elevation_surveyfeet ");
+      if (elevation2meter == 0.3048)
+      {
+        n += sprintf(&string[n], "-elevation_feet ");
+      }
+      else
+      {
+        n += sprintf(&string[n], "-elevation_surveyfeet ");
+      }
     }
   }
   if (vertical_geokey)
