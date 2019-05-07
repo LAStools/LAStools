@@ -1,3 +1,5 @@
+ 7 May 2019 -- lasgrid, las2dem, lascanopy, lasoverlap: new option '-no_world_file' for PNG, JPG, TIF, and BIL output
+ 3 May 2019 -- txt2las: correctly parse extended classifications larger than 31 by adding '-set_point_type 6' or higher
 17 April 2019 -- lastile: added missing support for parallel tiling with 64 bit executable (i.e. '-cores 4 -cpu64')
 16 April 2019 -- LASlib, LAStools: fixed '-keep_extended_classification 41' for multi-core mode of 64 bit executables
 11 April 2019 -- LASzip: increase AC_BUFFER_SIZE from 1024 to 4096 to lower chance of ultra-rare propagate_carry() issue
