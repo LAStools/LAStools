@@ -1734,6 +1734,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -split_scanner_channel_from_point_source\n");
   fprintf(stderr,"  -bin_Z_into_point_source 200\n");
   fprintf(stderr,"  -bin_abs_scan_angle_into_point_source 2\n");
+  fprintf(stderr,"  -bin_gps_time_into_point_source 5.0\n");
   fprintf(stderr,"Transform gps_time.\n");
   fprintf(stderr,"  -set_gps_time 113556962.005715\n");
   fprintf(stderr,"  -translate_gps_time 40.50\n");
