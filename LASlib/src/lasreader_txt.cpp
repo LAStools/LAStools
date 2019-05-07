@@ -1715,14 +1715,35 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
       if (l[0] == 0) return FALSE;
       if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
-      if (temp_i < 0 || temp_i > 255)
+      if (temp_i < 0)
       {
-        fprintf(stderr, "WARNING: classification %d is out of range of unsigned char\n", temp_i);
-        point.set_classification(U8_CLAMP(temp_i));
+        fprintf(stderr, "WARNING: classification %d is negative. zeroing ...\n", temp_i);
+        point.set_classification(0);
+        point.set_extended_classification(0);
+      }
+      else if (point.extended_point_type)
+      {
+        if (temp_i > 255)
+        {
+          fprintf(stderr, "WARNING: extended classification %d is larger than 255. clamping ...\n", temp_i);
+          point.set_extended_classification(255);
+        }
+        else
+        {
+          point.set_extended_classification((U8)temp_i);
+        }
       }
       else
       {
-        point.set_classification((U8)temp_i);
+        if (temp_i > 31)
+        {
+          fprintf(stderr, "WARNING: classification %d is larger than 31. clamping ...\n", temp_i);
+          point.set_classification(31);
+        }
+        else
+        {
+          point.set_classification((U8)temp_i);
+        }
       }
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
     }
