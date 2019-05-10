@@ -54,12 +54,12 @@ BOOL LASinventory::init(const LASheader* header)
     extended_number_of_points_by_return[0] = 0;
     for (i = 0; i < 5; i++) extended_number_of_points_by_return[i+1] = (header->number_of_points_by_return[i] ? header->number_of_points_by_return[i] : header->extended_number_of_points_by_return[i]);
     for (i = 5; i < 15; i++) extended_number_of_points_by_return[i+1] = header->extended_number_of_points_by_return[i];
-    max_X = header->get_X(header->max_x);
-    min_X = header->get_X(header->min_x);
-    max_Y = header->get_Y(header->max_y);
-    min_Y = header->get_Y(header->min_y);
-    max_Z = header->get_Z(header->max_z);
-    min_Z = header->get_Z(header->min_z);
+    max_X = (I32)header->get_X(header->max_x);
+    min_X = (I32)header->get_X(header->min_x);
+    max_Y = (I32)header->get_Y(header->max_y);
+    min_Y = (I32)header->get_Y(header->min_y);
+    max_Z = (I32)header->get_Z(header->max_z);
+    min_Z = (I32)header->get_Z(header->min_z);
     first = FALSE;
     return TRUE;
   }

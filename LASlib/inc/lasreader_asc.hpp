@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    10 May 2019 -- checking for overflows in X, Y, Z 32 bit integers of fixed-point LAS
     06 December 2013 -- option to deal with European '-comma_not_dot' numbers
     26 March 2012 -- created after forgetting my laptop adaptor in the pre-fab
   
@@ -72,6 +73,9 @@ private:
   F64 xllcenter, yllcenter;
   F32 cellsize;
   F32 nodata;
+  I64 overflow_I32_x;
+  I64 overflow_I32_y;
+  I64 overflow_I32_z;
 
   void clean();
   void populate_scale_and_offset();

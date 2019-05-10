@@ -83,6 +83,7 @@ LASreader::LASreader()
 LASreader::~LASreader()
 {
   if (index) delete index;
+  if (transform) transform->check_for_overflow();
 }
 
 void LASreader::set_index(LASindex* index)

@@ -403,9 +403,18 @@ BOOL LASreaderASC::read_point_default()
     if (elevation != nodata)
     {
       // compute the quantized x, y, and z values
-      point.set_x(xllcenter + col*cellsize);
-      point.set_y(yllcenter + (nrows - row - 1) * cellsize);
-      point.set_z(elevation);
+      if (!point.set_x(xllcenter + col*cellsize))
+      {
+        overflow_I32_x++;
+      }
+      if (!point.set_y(yllcenter + (nrows - row - 1) * cellsize))
+      {
+        overflow_I32_y++;
+      }
+      if (!point.set_z(elevation))
+      {
+        overflow_I32_z++;
+      }
       p_count++;
       col++;
       return TRUE;
@@ -425,6 +434,33 @@ ByteStreamIn* LASreaderASC::get_stream() const
 
 void LASreaderASC::close(BOOL close_stream)
 {
+  if (overflow_I32_x)
+  {
+#ifdef _WIN32
+    fprintf(stderr, "WARNING: total of %I64d integer overflows in x\n", overflow_I32_x);
+#else
+    fprintf(stderr, "WARNING: total of %lld integer overflows in x\n", overflow_I32_x);
+#endif
+    overflow_I32_x = 0;
+  }
+  if (overflow_I32_y)
+  {
+#ifdef _WIN32
+    fprintf(stderr, "WARNING: total of %I64d integer overflows in y\n", overflow_I32_y);
+#else
+    fprintf(stderr, "WARNING: total of %lld integer overflows in y\n", overflow_I32_y);
+#endif
+    overflow_I32_y = 0;
+  }
+  if (overflow_I32_z)
+  {
+#ifdef _WIN32
+    fprintf(stderr, "WARNING: total of %I64d integer overflows in z\n", overflow_I32_z);
+#else
+    fprintf(stderr, "WARNING: total of %lld integer overflows in z\n", overflow_I32_z);
+#endif
+    overflow_I32_z = 0;
+  }
   if (file)
   {
     if (piped) while(fgets(line, line_size, file));
@@ -507,6 +543,9 @@ void LASreaderASC::clean()
   yllcenter = F64_MAX;
   cellsize = 0;
   nodata = -9999;
+  overflow_I32_x = 0;
+  overflow_I32_y = 0;
+  overflow_I32_z = 0;
 }
 
 LASreaderASC::LASreaderASC()
@@ -587,12 +626,12 @@ void LASreaderASC::populate_bounding_box()
 {
   // compute quantized and then unquantized bounding box
 
-  F64 dequant_min_x = header.get_x(header.get_X(header.min_x));
-  F64 dequant_max_x = header.get_x(header.get_X(header.max_x));
-  F64 dequant_min_y = header.get_y(header.get_Y(header.min_y));
-  F64 dequant_max_y = header.get_y(header.get_Y(header.max_y));
-  F64 dequant_min_z = header.get_z(header.get_Z(header.min_z));
-  F64 dequant_max_z = header.get_z(header.get_Z(header.max_z));
+  F64 dequant_min_x = header.get_x((I32)(header.get_X(header.min_x)));
+  F64 dequant_max_x = header.get_x((I32)(header.get_X(header.max_x)));
+  F64 dequant_min_y = header.get_y((I32)(header.get_Y(header.min_y)));
+  F64 dequant_max_y = header.get_y((I32)(header.get_Y(header.max_y)));
+  F64 dequant_min_z = header.get_z((I32)(header.get_Z(header.min_z)));
+  F64 dequant_max_z = header.get_z((I32)(header.get_Z(header.max_z)));
 
   // make sure there is not sign flip
 

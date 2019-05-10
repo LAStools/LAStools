@@ -678,9 +678,9 @@ BOOL LASreaderPLY::read_point_default()
     }
     
     // compute the quantized x, y, and z values
-    point.set_X(header.get_X(point.coordinates[0]));
-    point.set_Y(header.get_Y(point.coordinates[1]));
-    point.set_Z(header.get_Z(point.coordinates[2]));
+    point.set_X((I32)header.get_X(point.coordinates[0]));
+    point.set_Y((I32)header.get_Y(point.coordinates[1]));
+    point.set_Z((I32)header.get_Z(point.coordinates[2]));
     p_count++;
     if (!populated_header)
     {
@@ -1855,12 +1855,12 @@ void LASreaderPLY::populate_bounding_box()
 {
   // compute quantized and then unquantized bounding box
 
-  F64 dequant_min_x = header.get_x(header.get_X(header.min_x));
-  F64 dequant_max_x = header.get_x(header.get_X(header.max_x));
-  F64 dequant_min_y = header.get_y(header.get_Y(header.min_y));
-  F64 dequant_max_y = header.get_y(header.get_Y(header.max_y));
-  F64 dequant_min_z = header.get_z(header.get_Z(header.min_z));
-  F64 dequant_max_z = header.get_z(header.get_Z(header.max_z));
+  F64 dequant_min_x = header.get_x((I32)header.get_X(header.min_x));
+  F64 dequant_max_x = header.get_x((I32)header.get_X(header.max_x));
+  F64 dequant_min_y = header.get_y((I32)header.get_Y(header.min_y));
+  F64 dequant_max_y = header.get_y((I32)header.get_Y(header.max_y));
+  F64 dequant_min_z = header.get_z((I32)header.get_Z(header.min_z));
+  F64 dequant_max_z = header.get_z((I32)header.get_Z(header.max_z));
 
   // make sure there is not sign flip
 

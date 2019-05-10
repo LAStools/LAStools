@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    10 May 2019 -- checking for overflows in X, Y, Z 32 bit integers of fixed-point LAS
      7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     20 June 2017 -- fixed reading of signed versus unsigned 16 and 8 bit intergers
      3 April 2012 -- created after joining the Spar Europe 2012 Advisory Board
@@ -69,6 +70,9 @@ private:
   F32 nodata;
   BOOL floatpixels;
   BOOL signedpixels;
+  I64 overflow_I32_x;
+  I64 overflow_I32_y;
+  I64 overflow_I32_z;
 
   void clean();
   BOOL read_hdr_file(const CHAR* file_name);
