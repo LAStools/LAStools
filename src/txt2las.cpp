@@ -356,11 +356,23 @@ int main(int argc, char *argv[])
       }
       F64 scale_factor[3];
       i++;
-      sscanf(argv[i], "%lf", &(scale_factor[0]));
+      if (sscanf(argv[i], "%lf", &(scale_factor[0])) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i-1]);
+        usage(true);
+      }
       i++;
-      sscanf(argv[i], "%lf", &(scale_factor[1]));
+      if (sscanf(argv[i], "%lf", &(scale_factor[1])) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i-2]);
+        usage(true);
+      }
       i++;
-      sscanf(argv[i], "%lf", &(scale_factor[2]));
+      if (sscanf(argv[i], "%lf", &(scale_factor[2])) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i-3]);
+        usage(true);
+      }
       lasreadopener.set_scale_factor(scale_factor);
     }
     else if (strcmp(argv[i],"-set_offset") == 0)
@@ -372,11 +384,23 @@ int main(int argc, char *argv[])
       }
       F64 offset[3];
       i++;
-      sscanf(argv[i], "%lf", &(offset[0]));
+      if (sscanf(argv[i], "%lf", &(offset[0])) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i-1]);
+        usage(true);
+      }
       i++;
-      sscanf(argv[i], "%lf", &(offset[1]));
+      if (sscanf(argv[i], "%lf", &(offset[1])) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i-2]);
+        usage(true);
+      }
       i++;
-      sscanf(argv[i], "%lf", &(offset[2]));
+      if (sscanf(argv[i], "%lf", &(offset[2])) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i-3]);
+        usage(true);
+      }
       lasreadopener.set_offset(offset);
     }
     else if (strcmp(argv[i],"-add_extra") == 0 || strcmp(argv[i],"-add_attribute") == 0)
@@ -437,9 +461,17 @@ int main(int argc, char *argv[])
         usage(true);
       }
       i++;
-      sscanf(argv[i], "%d", &file_creation_day);
+      if (sscanf(argv[i], "%d", &file_creation_day) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: day year\n", argv[i-1]);
+        usage(true);
+      }
       i++;
-      sscanf(argv[i], "%d", &file_creation_year);
+      if (sscanf(argv[i], "%d", &file_creation_year) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 2 arguments: day year\n", argv[i-2]);
+        usage(true);
+      }
     }
     else if (strcmp(argv[i],"-set_global_encoding") == 0)
     {
@@ -449,7 +481,11 @@ int main(int argc, char *argv[])
         usage(true);
       }
       i++;
-      set_global_encoding = atoi(argv[i]);
+      if (sscanf(argv[i], "%d", &set_global_encoding) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i-1]);
+        usage(true);
+      }
     }
     else if (strcmp(argv[i],"-set_system_identifier") == 0)
     {
