@@ -14,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2015, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -25,6 +25,7 @@
 
   CHANGE HISTORY:
 
+    21 Juni 2019 -- allows compressing Trimble waveforms where first WDP offset is 0
     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     29 March 2015 -- using LASwriterCompatible for LAS 1.4 compatibility mode
     9 September 2014 -- prototyping forward-compatible coding of LAS 1.4 points
@@ -674,12 +675,12 @@ int main(int argc, char *argv[])
           if (lasreader->point.wavepacket.getIndex()) // if point is attached to a waveform
           {
             waves_referenced++;
-            if (lasreader->point.wavepacket.getOffset() == last_offset)
+            if ((lasreader->point.wavepacket.getOffset() == last_offset) && (waves_written))
             {
               lasreader->point.wavepacket.setOffset(new_offset);
               lasreader->point.wavepacket.setSize(new_size);
             }
-            else if (lasreader->point.wavepacket.getOffset() > last_offset)
+            else if ((lasreader->point.wavepacket.getOffset() > last_offset) || (!waves_written))
             {
               if (lasreader->point.wavepacket.getOffset() > (last_offset + last_size))
               {
