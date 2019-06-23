@@ -120,6 +120,14 @@ overview of all tool-specific switches:
 -cores 4                             : process multiple inputs on 4 cores in parallel
 -ignore_class 0 1 3 5 6 7 9          : ignores points with specified classification codes
 -ignore_extended_class 42 43 45 67   : ignores points with specified extended classification codes
+-ignore_single                       : ignores single returns
+-ignore_first                        : ignores first returns
+-ignore_last                         : ignores last returns
+-ignore_first_of_many                : ignores first returns (but only those of multi-returns)
+-ignore_intermediate                 : ignores intermediate returns
+-ignore_last_of_many                 : ignores last returns (but only those of multi-returns)
+
+
 
 ... more to come ...
 

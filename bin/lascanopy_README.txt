@@ -40,6 +40,13 @@
   You can also load more general polygonal plots from a shapefile with
 
   lascanopy -i forest\*.laz -lop polygons.shp -int_p 25 50 75 -centroids -o results.csv
+  
+  If the SHP file with plots has a DBF file with  that contain either an
+  integer number or a string attributes for each plot you can add the name
+  or the index of the field to the argument as shown below:
+  
+  -lop polygons.shp plot_ID
+  -lop polygons.shp 3
 
   The tool can concurrently compute a number height percentiles
   ('-p 5 10 25 50 75 90'), the '-min', the '-max', the average
@@ -92,7 +99,17 @@
   [10, 50). In the same manner the option '-d 0.5 2 4 10 50' will
   produce a relative height density raster in which the counts are
   divided by the total number of points and scaled to a percentage.
-
+  
+  The Vertical Complexity Index (VCI) is also implemented and can
+  be computed for different vertical bin sizes with '-vc 1 2 4' or
+  '-vci 2.5 5.0'.
+  
+  The height & intensity metric known as "Height of Median Energy"
+  or "HOME" can be computed via the switch '-hom'. All points above
+  the height cutoff are ordered by their elevation. Then the height
+  is computed at which the sum of intensities of points below and
+  the sum of intensities of points above is identical.
+  
   Metrics also exist for intensities and '-int_min' and '-int_max'
   do the obvious, just like '-int_avg', '-int_qav', '-int_std',
   '-int_ske' or '-int_kur'. Similarly you can produce intensity
@@ -152,7 +169,12 @@ and stores the resulting rasters in BIL format using the endings
 
 other commandline arguments are
 
-
+-loc
+-lor
+-files_are_plots
+-use_bb                : raster area specified by bounding box in LAS header
+-use_tile_bb           : raster tile without buffer added by lastile
+-use_orig_bb           : raster tile without buffer added by on-the-fly buffering
 -step 10               : raster with stepsize 10 [default: 20]
 -nrows 512             : raster at most 512 rows
 -ncols 512             : raster at most 512 columns

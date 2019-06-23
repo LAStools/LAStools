@@ -1,56 +1,14 @@
 ****************************************************************
 
-  lascolor:
+  lasdistance:
 
-  This tool colors LiDAR points based on imagery that is usually
-  an ortho-photo. The tool computes into which pixel a LAS point
-  is falling and then sets the RGB values accordingly. Currently
-  only the TIF format is supported. The world coordinates need
-  to be either in GeoTIFF tags or in an accompanying *.tfw file.
+  This tool classifies, flags, or removes LiDAR points based on
+  their approximate xy distance from polygonal segments. This 
+  distance is calculated on a grid with a spacing of 0.5 meters
+  by default. With '-step_xy 1.0' the granularity of this grid
+  can be adjusted up or down.
 
-  By default the 8 bit RGB colors of the TIF file will be scaled
-  up to 16 bits in order to comform the LAS specification. Use the
-  option '-dont_scale_rgb_up' to avoid this automatic up-scaling.
-
-  By default the LiDAR points falling outside of the image or that
-  fall into a no-data area of the image will not be colored. Use
-  option '-zero_rgb' to set their color to (0/0/0) instead.
-
-  It is also possible to only copy a '-grey' band into all three
-  RGB channels or a single color '-red', '-green' or '-blue' into
-  the corresponding channel. If the input image has more than one
-  band use '-band 2' to specify which one to copy from. By default
-  this will be band 0.
-
-  It is also possible to copy '-nir' either from a single band
-  image or from a multi-band image and then '-band 3' or else is
-  needed. Instead of copying into the NIR band of point types 8
-  or 10 the NIR value can also be stored as '-intensity'.
-
-  With '-rgbnir' and a 4-band RGBNIR input image it is possible
-  to copy all 4 bands at once into either RGB and the NIR channel
-  or into the RGB and the intensity fields by adding '-intensity'  
-
-  For storing to the NIR channel the input LAS file already needs
-  to be LAS 1.4. If needed use las2las to upgraded to a LAS 1.4
-  file prior to running lascolor.
-
-  You can run lascolor on an entire folder of LAS/LAZ files with
-  corresponding (identical file name but different file extension) 
-  image files by using the '-imagedir ortho' switch *instead* of
-  the '-image some_file.tif'. If corresponding TIF files are in the
-  same folder as the LAS/LAZ files then you can simply omit both.
-  Here running on multiple '-cores 4' tends to give you a nice
-  speed-up. 
-
-  Instead of coloring points it is also possible to classify them
-  based on the pixel they fall into. Use '-classify_as 10' to give
-  all points that fall into a black pixel of a gray or a color image
-  the classification code 10. Alternatively use one of the options
-  '-classify_not_black', '-classify_white', or '-classify_not_white'
-  to color pixels that are not black, white, or not white.
-  
-  Please license from martin@rapidlasso.com before using lascolor
+  Please license from martin@rapidlasso.com before using lasdistance
   commercially. Please note that the unlicensed version will set
   intensity, gps_time, user data, and point source ID to zero,
   slightly change the LAS point order, and randomly add a tiny
@@ -72,147 +30,26 @@
 
 example usage:
 
->> lascolor -i LAS_18910_2010_25.laz ^
-            -image cir_18910_2010_tiled_16bit.tif ^
-            -odix _rgb -olaz
+>> lasdistance -i ..\data\lake.laz ^
+               -poly ..\data\lake_breakline.shp ^
+               -o lake.laz
 
->> lascolor -i LAS_18910_2010_25.laz ^
-            -image cir_18910_2010_2_scanline_8bit.tif ^
-            -odix _rgb1 -olaz
+>> lasdistance -i ..\data\lake.laz ^
+               -poly ..\data\lake_breakline.shp ^
+               -distance_xy 10.0 -step_xy 1.0 ^
+               -o lake.laz
 
->> lascolor -i LAS_18910_2010_25.laz ^
-            -image cir_18910_2010_2_tiled_8bit.tif ^
-            -odix _rgb2 -olaz
+>> lasdistance -i ..\data\lake.laz ^
+               -poly ..\data\lake_breakline.shp ^
+               -distance_xy 5.0 ^
+               -flag_as_withheld ^
+               -o lake.laz
 
->> lascolor -i point_clouds\*.laz ^
-            -imagedir ortho_photos ^
-            -odir colored_point_clouds -olaz ^
-            -cores 4
-
-Below you see the resulting changes in point type and RGB colors:
-
->> lasinfo LAS_18910_2010_25.laz  (original)
-reporting all LAS header entries:
-  file signature:             'LASF'
-  file source ID:             18910
-  global_encoding:            0
-  project ID GUID data 1-4:   00000000-0000-0000-0000-000000000000
-  version major.minor:        1.2
-  system identifier:          'LAStools (c) by Martin Isenburg'
-  generating software:        'lasduplicate (130506) commercia'
-  file creation day/year:     276/2013
-  header size:                227
-  offset to point data:       227
-  number var. length records: 0
-  point data format:          0
-  point data record length:   20
-  number of point records:    486674
-  number of points by return: 486674 0 0 0 0
-  scale factor x y z:         0.01 0.01 0.01
-  offset x y z:               700000 200000 0
-  min x y z:                  703149.14 248150.21 647.87
-  max x y z:                  703849.14 248850.21 798.71
-LASzip compression (version 2.1r0 c2 50000): POINT10 2
-reporting minimum and maximum for all LAS point record entries ...
-  X     314914     384914
-  Y    4815021    4885021
-  Z      64787      79871
-  intensity 45 99
-  edge_of_flight_line 0 0
-  scan_direction_flag 0 0
-  number_of_returns_of_given_pulse 1 1
-  return_number                    1 1
-  classification      0     0
-  scan_angle_rank     0     0
-  user_data           0     0
-  point_source_ID    11    22
-overview over number of returns of given pulse: 486674 0 0 0 0 0 0
-histogram of classification of points:
-          486674  Created, never classified (0)
-
->> lasinfo -i LAS_18910_2010_25_rgb.laz    (colored with 16 bit image)
-reporting all LAS header entries:
-  file signature:             'LASF'
-  file source ID:             18910
-  global_encoding:            0
-  project ID GUID data 1-4:   00000000-0000-0000-0000-000000000000
-  version major.minor:        1.2
-  system identifier:          'LAStools (c) by Martin Isenburg'
-  generating software:        'lascolor (131214) academic'
-  file creation day/year:     276/2013
-  header size:                227
-  offset to point data:       227
-  number var. length records: 0
-  point data format:          2
-  point data record length:   26
-  number of point records:    486674
-  number of points by return: 486674 0 0 0 0
-  scale factor x y z:         0.01 0.01 0.01
-  offset x y z:               700000 200000 0
-  min x y z:                  703149.14 248150.21 647.87
-  max x y z:                  703849.14 248850.21 798.71
-LASzip compression (version 2.2r0 c2 50000): POINT10 2 RGB12 2
-reporting minimum and maximum for all LAS point record entries ...
-  X     314914     384914
-  Y    4815021    4885021
-  Z      64787      79871
-  intensity 45 99
-  edge_of_flight_line 0 0
-  scan_direction_flag 0 0
-  number_of_returns_of_given_pulse 1 1
-  return_number                    1 1
-  classification      0     0
-  scan_angle_rank     0     0
-  user_data           0     0
-  point_source_ID    11    22
-  Color R 0 19603
-        G 0 27297
-        B 0 31113
-overview over number of returns of given pulse: 486674 0 0 0 0 0 0
-histogram of classification of points:
-          486674  Created, never classified (0)
-
->> lasinfo -i LAS_18910_2010_25_rgb1.laz    (colored with 8 bit image)
-reporting all LAS header entries:
-  file signature:             'LASF'
-  file source ID:             18910
-  global_encoding:            0
-  project ID GUID data 1-4:   00000000-0000-0000-0000-000000000000
-  version major.minor:        1.2
-  system identifier:          'LAStools (c) by Martin Isenburg'
-  generating software:        'lascolor (131214) academic'
-  file creation day/year:     276/2013
-  header size:                227
-  offset to point data:       227
-  number var. length records: 0
-  point data format:          2
-  point data record length:   26
-  number of point records:    486674
-  number of points by return: 486674 0 0 0 0
-  scale factor x y z:         0.01 0.01 0.01
-  offset x y z:               700000 200000 0
-  min x y z:                  703149.14 248150.21 647.87
-  max x y z:                  703849.14 248850.21 798.71
-LASzip compression (version 2.2r0 c2 50000): POINT10 2 RGB12 2
-reporting minimum and maximum for all LAS point record entries ...
-  X     314914     384914
-  Y    4815021    4885021
-  Z      64787      79871
-  intensity 45 99
-  edge_of_flight_line 0 0
-  scan_direction_flag 0 0
-  number_of_returns_of_given_pulse 1 1
-  return_number                    1 1
-  classification      0     0
-  scan_angle_rank     0     0
-  user_data           0     0
-  point_source_ID    11    22
-  Color R 0 65280
-        G 0 65280
-        B 0 65280
-overview over number of returns of given pulse: 486674 0 0 0 0 0 0
-histogram of classification of points:
-          486674  Created, never classified (0)
+>> lasdistance -i ..\data\lake.laz ^
+               -poly ..\data\lake_breakline.shp ^
+               -distance_xy 20.0 -step_xy 2.0 ^
+               -remove_points ^
+               -o lake.laz
 
 ****************************************************************
 
@@ -225,6 +62,7 @@ overview of all tool-specific switches:
 -fail                                : fail if license expired or invalid
 -gui                                 : start with files loaded into GUI
 -cores 4                             : process multiple inputs on 4 cores in parallel
+-cpu64                               : start 64 bit executable (instead of default 32 bit executable)
 -ignore_class 0 1 3 5 6 7 9          : ignores points with specified classification codes
 -ignore_extended_class 42 43 45 67   : ignores points with specified extended classification codes
 -ignore_single                       : ignores single returns
@@ -233,24 +71,17 @@ overview of all tool-specific switches:
 -ignore_first_of_many                : ignores first returns (but only those of multi-returns)
 -ignore_intermediate                 : ignores intermediate returns
 -ignore_last_of_many                 : ignores last returns (but only those of multi-returns)
--image ortophoto.tif                 : specifies *single* image file to be used for coloring (all) input file(s)
--imagedir ortophotos                 : specifies directory where correspondingly named image files are located
--dont_scale_rgb_up                   : copy RGBI values as they are (don't default upscale from 8 to 16 bit)
--zero_rgb                            : any LiDAR points not covered by the image receive the color black
--rgb                                 : default setting. copies the first three bands from image to LiDAR points
--band 2                              : specifies which band to copy for single band operations
--red                                 : copies the specified '-band 2' into the red (R) channels
--green                               : copies the specified '-band 0' into the green (G) channels
--blue                                : copies the specified '-band 2' into the blue (B) channels
--nir                                 : copies the specified '-band 1' into the NIR channel
--rgbnir                              : copies the first four bands of the image into the RGBNIR fields of the LAS file
--gray or -grey                       : copies the specified '-band 2' into all three RGB channels
--intensity                           : copies the specified '-band 1' into the intensity field
--classify_as 10                      : classifies all points falling into a black pixel as 10
--classify_black                      :            all points falling into a black pixels [default]
--classify_non_black                  :            all points falling into a non-black pixels
--classify_white                      :            all points falling into a white pixels
--classify_non_white                  :            all points falling into a non-white pixels
+-poly breaklines.shp                 : specifies the name of the file containing the polygonal segments
+-distance_xy 5.0                     : distance from polygons where points are classified, flagged, or removed 
+                                       [default is 4.0]
+-step_xy 1.0                         : granularity with which the approximated distances are computed
+                                       [default is 0.5]
+-classify_as 11                      : classification code for the points close enough to the polygons 
+                                       [default is 20]
+-flag_as_withheld                    : flag points with the withheld flag (instead of classifying them)
+-flag_as_keypoint                    : flag points with the keypoint flag (instead of classifying them)
+-flag_as_synthetic                   : flag points with the synthetic flag (instead of classifying them)
+-remove_points                       : remove points from output file (instead of classifying them)
 -ilay                                : apply all LASlayers found in corresponding *.lay file on read
 -ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
 -ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
