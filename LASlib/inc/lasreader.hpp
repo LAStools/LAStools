@@ -223,6 +223,13 @@ public:
   LASreader* open(const CHAR* other_file_name=0, BOOL reset_after_other=TRUE);
   BOOL reopen(LASreader* lasreader, BOOL remain_buffered=TRUE);
   LASwaveform13reader* open_waveform13(const LASheader* lasheader);
+  I32 get_number_attributes() const { return number_attributes; };
+  I32 get_attribute_data_type(U32 index) const { return attribute_data_types[index]; }; 
+  const CHAR* get_attribute_name(U32 index) const { return attribute_names[index]; };
+  const CHAR* get_attribute_description(U32 index) const { return attribute_descriptions[index]; };
+  F64 get_attribute_scale(U32 index) const { return attribute_scales[index]; };
+  F64 get_attribute_offset(U32 index) const { return attribute_offsets[index]; };
+  F64 get_attribute_no_data(U32 index) const { return attribute_no_datas[index]; };
   LASreadOpener();
   ~LASreadOpener();
 private:
