@@ -465,6 +465,21 @@ public:
   };
 };
 
+class LASoperationCopyUserDataIntoZ : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_user_data_into_z"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
+  inline void transform(LASpoint* point) {
+    F64 user_data = point->get_user_data();
+    if (!point->set_z(user_data))
+    {
+      overflow++;
+    }
+  };
+};
+
 class LASoperationTranslateRawX : public LASoperation
 {
 public:
@@ -1179,6 +1194,21 @@ private:
   U32 index;
 };
 
+class LASoperationCopyUserDataIntoAttribute : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_user_data_into_attribute"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
+  inline void transform(LASpoint* point) {
+    F64 user_data = point->get_user_data();
+    point->set_attribute_as_float(index, user_data);
+  };
+  LASoperationCopyUserDataIntoAttribute(U32 index) { this->index = index; };
+private:
+  U32 index;
+};
+
 class LASoperationSetPointSource : public LASoperation
 {
 public:
@@ -1262,7 +1292,7 @@ class LASoperationRepairZeroReturns : public LASoperation
 public:
   inline const CHAR* name() const { return "repair_zero_returns"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline void transform(LASpoint* point) { if (point->number_of_returns == 0) point->number_of_returns = 1; if (point->return_number == 0) point->return_number = 1; };
+  inline void transform(LASpoint* point) { if (point->get_number_of_returns() == 0) point->set_number_of_returns(1); if (point->get_return_number() == 0) point->set_return_number(1); };
 };
 
 class LASoperationSetReturnNumber : public LASoperation
@@ -1270,7 +1300,7 @@ class LASoperationSetReturnNumber : public LASoperation
 public:
   inline const CHAR* name() const { return "set_return_number"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), return_number); };
-  inline void transform(LASpoint* point) { point->return_number = return_number; };
+  inline void transform(LASpoint* point) { point->set_return_number(return_number); };
   LASoperationSetReturnNumber(U8 return_number) { this->return_number = return_number; };
 private:
   U8 return_number;
@@ -1281,7 +1311,7 @@ class LASoperationSetExtendedReturnNumber : public LASoperation
 public:
   inline const CHAR* name() const { return "set_extended_return_number"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), extended_return_number); };
-  inline void transform(LASpoint* point) { point->extended_return_number = extended_return_number; };
+  inline void transform(LASpoint* point) { point->set_extended_return_number(extended_return_number); };
   LASoperationSetExtendedReturnNumber(U8 extended_return_number) { this->extended_return_number = extended_return_number; };
 private:
   U8 extended_return_number;
@@ -1292,11 +1322,23 @@ class LASoperationChangeReturnNumberFromTo : public LASoperation
 public:
   inline const CHAR* name() const { return "change_return_number_from_to"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), return_number_from, return_number_to); };
-  inline void transform(LASpoint* point) { if (point->return_number == return_number_from) point->return_number = return_number_to; };
+  inline void transform(LASpoint* point) { if (point->get_return_number() == return_number_from) point->set_return_number(return_number_to); };
   LASoperationChangeReturnNumberFromTo(U8 return_number_from, U8 return_number_to) { this->return_number_from = return_number_from; this->return_number_to = return_number_to; };
 private:
   U8 return_number_from;
   U8 return_number_to;
+};
+
+class LASoperationChangeExtendedReturnNumberFromTo : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "change_extended_return_number_from_to"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), extended_return_number_from, extended_return_number_to); };
+  inline void transform(LASpoint* point) { if (point->get_extended_return_number() == extended_return_number_from) point->set_extended_return_number(extended_return_number_to); };
+  LASoperationChangeExtendedReturnNumberFromTo(U8 extended_return_number_from, U8 extended_return_number_to) { this->extended_return_number_from = extended_return_number_from; this->extended_return_number_to = extended_return_number_to; };
+private:
+  U8 extended_return_number_from;
+  U8 extended_return_number_to;
 };
 
 class LASoperationSetNumberOfReturns : public LASoperation
@@ -1304,7 +1346,7 @@ class LASoperationSetNumberOfReturns : public LASoperation
 public:
   inline const CHAR* name() const { return "set_number_of_returns"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), number_of_returns); };
-  inline void transform(LASpoint* point) { point->number_of_returns = number_of_returns; };
+  inline void transform(LASpoint* point) { point->set_number_of_returns(number_of_returns); };
   LASoperationSetNumberOfReturns(U8 number_of_returns) { this->number_of_returns = number_of_returns; };
 private:
   U8 number_of_returns;
@@ -1315,7 +1357,7 @@ class LASoperationSetExtendedNumberOfReturns : public LASoperation
 public:
   inline const CHAR* name() const { return "set_extended_number_of_returns"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), extended_number_of_returns); };
-  inline void transform(LASpoint* point) { point->extended_number_of_returns = extended_number_of_returns; };
+  inline void transform(LASpoint* point) { point->set_extended_number_of_returns(extended_number_of_returns); };
   LASoperationSetExtendedNumberOfReturns(U8 extended_number_of_returns) { this->extended_number_of_returns = extended_number_of_returns; };
 private:
   U8 extended_number_of_returns;
@@ -1326,11 +1368,23 @@ class LASoperationChangeNumberOfReturnsFromTo : public LASoperation
 public:
   inline const CHAR* name() const { return "change_number_of_returns_from_to"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), number_of_returns_from, number_of_returns_to); };
-  inline void transform(LASpoint* point) { if (point->number_of_returns == number_of_returns_from) point->number_of_returns = number_of_returns_to; };
+  inline void transform(LASpoint* point) { if (point->get_number_of_returns() == number_of_returns_from) point->set_number_of_returns(number_of_returns_to); };
   LASoperationChangeNumberOfReturnsFromTo(U8 number_of_returns_from, U8 number_of_returns_to) { this->number_of_returns_from = number_of_returns_from; this->number_of_returns_to = number_of_returns_to; };
 private:
   U8 number_of_returns_from;
   U8 number_of_returns_to;
+};
+
+class LASoperationChangeExtendedNumberOfReturnsFromTo : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "change_extended_number_of_returns_from_to"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), extended_number_of_returns_from, extended_number_of_returns_to); };
+  inline void transform(LASpoint* point) { if (point->get_extended_number_of_returns() == extended_number_of_returns_from) point->set_extended_number_of_returns(extended_number_of_returns_to); };
+  LASoperationChangeExtendedNumberOfReturnsFromTo(U8 extended_number_of_returns_from, U8 extended_number_of_returns_to) { this->extended_number_of_returns_from = extended_number_of_returns_from; this->extended_number_of_returns_to = extended_number_of_returns_to; };
+private:
+  U8 extended_number_of_returns_from;
+  U8 extended_number_of_returns_to;
 };
 
 class LASoperationSetGpsTime : public LASoperation
@@ -1752,7 +1806,7 @@ void LAStransform::check_for_overflow() const
 #ifdef _WIN32
       fprintf(stderr, "WARNING: total of %I64d overflows caused by '%s'\n", operations[i]->get_overflow(), command);
 #else
-      fprintf(stderr, "WARNING: total of  %I64d overflows caused by '%s'\n", operations[i]->get_overflow(), command);
+      fprintf(stderr, "WARNING: total of  %lld overflows caused by '%s'\n", operations[i]->get_overflow(), command);
 #endif
     }
   }
@@ -1795,6 +1849,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -add_attribute_to_z 1\n");
   fprintf(stderr,"  -add_scaled_attribute_to_z 1 -1.2\n");
   fprintf(stderr,"  -copy_intensity_into_z\n");
+  fprintf(stderr,"  -copy_user_data_into_z\n");
   fprintf(stderr,"Transform raw xyz integers.\n");
   fprintf(stderr,"  -translate_raw_z 20\n");
   fprintf(stderr,"  -translate_raw_xyz 1 1 0\n");
@@ -1821,9 +1876,11 @@ void LAStransform::usage() const
   fprintf(stderr,"  -set_return_number 1\n");
   fprintf(stderr,"  -set_extended_return_number 10\n");
   fprintf(stderr,"  -change_return_number_from_to 2 1\n");
+  fprintf(stderr,"  -change_extended_return_number_from_to 2 8\n");
   fprintf(stderr,"  -set_number_of_returns 2\n");
-  fprintf(stderr,"  -set_number_of_returns 15\n");
+  fprintf(stderr,"  -set_extended_number_of_returns 15\n");
   fprintf(stderr,"  -change_number_of_returns_from_to 0 2\n");
+  fprintf(stderr,"  -change_extended_number_of_returns_from_to 8 10\n");
   fprintf(stderr,"Modify the classification.\n");
   fprintf(stderr,"  -set_classification 2\n");
   fprintf(stderr,"  -set_extended_classification 41\n");
@@ -1883,6 +1940,7 @@ void LAStransform::usage() const
   fprintf(stderr,"Transform attributes in \"Extra Bytes\".\n");
   fprintf(stderr,"  -scale_attribute 0 1.5\n");
   fprintf(stderr,"  -translate_attribute 1 0.2\n");
+  fprintf(stderr,"  -copy_user_data_into_attribute 0\n");
 }
 
 BOOL LAStransform::parse(int argc, char* argv[])
@@ -2585,6 +2643,27 @@ BOOL LAStransform::parse(int argc, char* argv[])
           add_operation(new LASoperationCopyUserDataIntoScannerChannel());
           *argv[i]='\0'; 
         }
+        else if (strcmp(argv[i],"-copy_user_data_into_z") == 0)
+        {
+          add_operation(new LASoperationCopyUserDataIntoZ());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_user_data_into_attribute") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
+            return FALSE;
+          }
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index but '%s' is no valid index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_operation(new LASoperationCopyUserDataIntoAttribute(index));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        }
       }
       else if (strcmp(argv[i],"-copy_scanner_channel_into_point_source") == 0)
       {
@@ -3205,9 +3284,9 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        if (from_value > U8_MAX)
+        if (from_value > 7)
         {
-          fprintf(stderr,"ERROR: cannot change return_number because from_value %u is larger than %u\n", from_value, U8_MAX);
+          fprintf(stderr,"ERROR: cannot change return_number because from_value %u is larger than %u\n", from_value, 7);
           return FALSE;
         }
         U32 to_value;
@@ -3216,9 +3295,9 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value\n", argv[i], argv[i+2]);
           return FALSE;
         }
-        if (to_value > U8_MAX)
+        if (to_value > 7)
         {
-          fprintf(stderr,"ERROR: cannot change return_number because to_value %u is larger than %u\n", to_value, U8_MAX);
+          fprintf(stderr,"ERROR: cannot change return_number because to_value %u is larger than %u\n", to_value, 7);
           return FALSE;
         }
         add_operation(new LASoperationChangeReturnNumberFromTo((U8)from_value, (U8)to_value));
@@ -3237,9 +3316,9 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        if (from_value > U8_MAX)
+        if (from_value > 7)
         {
-          fprintf(stderr,"ERROR: cannot change return_number because from_value %u is larger than %u\n", from_value, U8_MAX);
+          fprintf(stderr,"ERROR: cannot change number_of_returns because from_value %u is larger than %u\n", from_value, 7);
           return FALSE;
         }
         U32 to_value;
@@ -3248,12 +3327,76 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value\n", argv[i], argv[i+2]);
           return FALSE;
         }
-        if (to_value > U8_MAX)
+        if (to_value > 7)
         {
-          fprintf(stderr,"ERROR: cannot change return_number because to_value %u is larger than %u\n", to_value, U8_MAX);
+          fprintf(stderr,"ERROR: cannot change number_of_returns because to_value %u is larger than %u\n", to_value, 7);
           return FALSE;
         }
         add_operation(new LASoperationChangeNumberOfReturnsFromTo((U8)from_value, (U8)to_value));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+      }
+      else if (strcmp(argv[i],"-change_extended_return_number_from_to") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value\n", argv[i]);
+          return FALSE;
+        }
+        U32 from_value;
+        if (sscanf(argv[i+1], "%u", &from_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (from_value > 15)
+        {
+          fprintf(stderr,"ERROR: cannot change extended_return_number because from_value %u is larger than %u\n", from_value, 15);
+          return FALSE;
+        }
+        U32 to_value;
+        if (sscanf(argv[i+2], "%u", &to_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (to_value > 15)
+        {
+          fprintf(stderr,"ERROR: cannot change extended_return_number because to_value %u is larger than %u\n", to_value, 15);
+          return FALSE;
+        }
+        add_operation(new LASoperationChangeExtendedReturnNumberFromTo((U8)from_value, (U8)to_value));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+      }
+      else if (strcmp(argv[i],"-change_extended_number_of_returns_from_to") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value\n", argv[i]);
+          return FALSE;
+        }
+        U32 from_value;
+        if (sscanf(argv[i+1], "%u", &from_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (from_value > 15)
+        {
+          fprintf(stderr,"ERROR: cannot change extended_number_of_returns because from_value %u is larger than %u\n", from_value, 15);
+          return FALSE;
+        }
+        U32 to_value;
+        if (sscanf(argv[i+2], "%u", &to_value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (to_value > 15)
+        {
+          fprintf(stderr,"ERROR: cannot change extended_number_of_returns because to_value %u is larger than %u\n", to_value, 15);
+          return FALSE;
+        }
+        add_operation(new LASoperationChangeExtendedNumberOfReturnsFromTo((U8)from_value, (U8)to_value));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
     }
