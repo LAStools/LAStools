@@ -795,27 +795,11 @@ int main(int argc, char *argv[])
           {
             if (((i+6) < argc) && ((atof(argv[i+6]) != 0.0) || (strcmp(argv[i+6], "0") == 0) || (strcmp(argv[i+6], "0.0") == 0)))
             {
-              if (((i+7) < argc) && ((atof(argv[i+7]) != 0.0) || (strcmp(argv[i+7], "0") == 0) || (strcmp(argv[i+7], "0.0") == 0)))
-              {
-                if (((i+8) < argc) && ((atof(argv[i+8]) != 0.0) || (strcmp(argv[i+8], "0") == 0) || (strcmp(argv[i+8], "0.0") == 0)))
-                {
-                  lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]), atof(argv[i+8]));
-                  i+=8;
-                }
-                else
-                {
-                  lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]));
-                  i+=7;
-                }
-              }
-              else
-              { 
-                lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]));
-                i+=6;
-              }
+              lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), 1.0, 0.0, atof(argv[i+6]));
+              i+=6;
             }
             else
-            { 
+            {
               lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]));
               i+=5;
             }
@@ -1409,6 +1393,42 @@ int main(int argc, char *argv[])
         if (!point) point = new LASpoint;
       }
       lasreader->header.point_data_record_length = (U16)set_point_data_record_length;
+      lasreader->header.clean_laszip();
+    }
+
+    // are we supposed to add attributes
+
+    if (lasreadopener.get_number_attributes())
+    {
+      I32 attibutes_before_size = lasreader->header.get_attributes_size();
+      for (i = 0; i < lasreadopener.get_number_attributes(); i++)
+      {
+        I32 type = (lasreadopener.get_attribute_data_type(i)-1)%10;
+        try {
+          LASattribute attribute(type, lasreadopener.get_attribute_name(i), lasreadopener.get_attribute_description(i));
+          if (lasreadopener.get_attribute_scale(i) != 1.0 || lasreadopener.get_attribute_offset(i) != 0.0)
+          {
+            attribute.set_scale(lasreadopener.get_attribute_scale(i));
+          }
+          if (lasreadopener.get_attribute_offset(i) != 0.0)
+          {
+            attribute.set_offset(lasreadopener.get_attribute_offset(i));
+          }
+          if (lasreadopener.get_attribute_no_data(i) != F64_MAX)
+          {
+            attribute.set_no_data(lasreadopener.get_attribute_no_data(i));
+          }
+          lasreader->header.add_attribute(attribute);
+        }
+        catch(...) {
+          fprintf(stderr, "ERROR: initializing attribute %s\n", lasreadopener.get_attribute_name(i));
+          byebye(true);
+        }
+      }
+      I32 attibutes_after_size = lasreader->header.get_attributes_size();
+      if (!point) point = new LASpoint;
+      lasreader->header.update_extra_bytes_vlr();
+      lasreader->header.point_data_record_length += (attibutes_after_size-attibutes_before_size);
       lasreader->header.clean_laszip();
     }
 
