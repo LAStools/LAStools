@@ -2073,13 +2073,24 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
   }
   if (!transform->active())
   {
+    if (transform->filtered())
+    {
+      fprintf(stderr, "WARNING: no LAStransform specified. '-filtered_transform' has no effect.\n");
+    }
     delete transform;
     transform = 0;
   }
   else if (transform->filtered())
   {
-    transform->setFilter(filter);
-    filter = 0;
+    if (filter == 0)
+    {
+      fprintf(stderr, "WARNING: no LASfilter specified. '-filtered_transform' has no effect.\n");
+    }
+    else
+    {
+      transform->setFilter(filter);
+      filter = 0;
+    }
   }
 
   if (files_are_flightlines || apply_file_source_ID)
