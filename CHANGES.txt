@@ -1,3 +1,20 @@
+23 June 2019 -- NEW: lasdistance classifies or flags points within a certain xy-distance to a polygon or a polyline 
+21 June 2019 -- lascolor: new '-classify_as 8', '-classify_zero', '-classify_non_zero', as well as '-ignore_class 5 6'
+20 Juni 2019 -- laszip: also compress Trimble '-waveforms' or '-waveforms_with_map' when very first WDP offset is 0
+19 June 2019 -- lascolor: support PNG input in addition to TIF
+18 June 2019 -- lasoverage: added missing '-ignore_class 7' selection options to the GUI 
+11 June 2019 -- lascanopy: string or integer from DBF to name polygons '-lop plots.shp plotID' or '-lop plots.shp 3' 
+10 June 2019 -- lasground, lasground_new, lasheight, lasclip, lasnoise, ...: also have '-ignore_class_mask 0xFFFFFFFE'
+ 9 June 2019 -- lasthin: option '-ignore_class_mask 0xFFFFFFFE' ignores bit-mask of classes. here all except class 0.
+ 8 June 2019 -- las2dem: bug fix in option '-float_precision 0.01' 
+ 4 June 2019 -- lastrack: bug fix in option '-classify_xy_range_and_height_between xy_min xy_max h_min h_max class'
+ 3 June 2019 -- LASlib: new transform '-copy_user_data_into_z'
+ 1 June 2019 -- lasgrid: also support 'average' and 'stddev' computation for 'user_data' field
+29 May 2019 -- lasoverage: new options '-ignore_class 7' and '-ignore_withheld' and '-ignore_overlap'
+25 May 2019 -- las2tin: repair broken combination of output folder '-odir meshes' and multi-core processing '-cores 4'
+24 May 2019 -- las2las: '-add_attribute data_type name description [scale offset no_data]' adds "extra bytes" attribute
+20 May 2019 -- LASlib: warn if '-filtered_transform' is used but no LAStransform or no LASfilter was specified
+10 May 2019 -- LASlib: check for integer overflow during scaling, translating, rotating, and other LAStransforms
  7 May 2019 -- lasgrid, las2dem, lascanopy, lasoverlap: new option '-no_world_file' for PNG, JPG, TIF, and BIL output
  3 May 2019 -- txt2las: correctly parse extended classifications larger than 31 by adding '-set_point_type 6' or higher
 17 April 2019 -- lastile: added missing support for parallel tiling with 64 bit executable (i.e. '-cores 4 -cpu64')
