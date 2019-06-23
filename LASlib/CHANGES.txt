@@ -1,3 +1,10 @@
+ 3 June 2019 -- LASlib: new transform '-copy_user_data_into_z'
+24 May 2019 -- las2las: '-add_attribute data_type name description [scale offset no_data]' adds "extra bytes" attribute
+20 May 2019 -- LASlib: warn if '-filtered_transform' is used but no LAStransform or no LASfilter was specified
+10 May 2019 -- LASlib: check for integer overflow during scaling, translating, rotating, and other LAStransforms
+ 3 May 2019 -- txt2las: correctly parse extended classifications larger than 31 by adding '-set_point_type 6' or higher
+16 April 2019 -- LASlib, LAStools: fixed '-keep_extended_classification 41' for multi-core mode of 64 bit executables
+11 April 2019 -- LASzip: increase AC_BUFFER_SIZE from 1024 to 4096 to lower chance of ultra-rare propagate_carry() issue
 31 March 2019 -- LASzip, LASlib, LAStools: better LASzip license thanks to Amir Said. upgrade to version 3.4 revision 0
 19 March 2019 -- LASlib, LASzip, LAStools: bug fix in "legacy class" decompressing new point types with "class > 31"
  5 March 2019 -- all LAStools: support GeoTIFF keys 3084 through 3087 used by RIEGL in generic LambertConfConic_2SP
