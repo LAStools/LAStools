@@ -1638,6 +1638,42 @@ public:
   inline void transform(LASpoint* point) { point->set_NIR(point->get_intensity()); };
 };
 
+class LASoperationSwitchRGBItoCIR : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "switch_RGBI_into_CIR"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB | LASZIP_DECOMPRESS_SELECTIVE_NIR; };
+  inline void transform(LASpoint* point) { 
+    U16 R = point->get_R();
+    U16 G = point->get_G();
+    U16 B = point->get_B();
+    U16 I = point->get_NIR();
+    point->set_R(I);
+    point->set_G(R);
+    point->set_B(G);
+//    point->set_NIR(B);
+  };
+};
+
+class LASoperationSwitchRGBIntensitytoCIR : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "switch_RGB_intensity_into_CIR"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB | LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
+  inline void transform(LASpoint* point) { 
+    U16 R = point->get_R();
+    U16 G = point->get_G();
+    U16 B = point->get_B();
+    U16 intensity = point->get_intensity();
+    point->set_R(intensity);
+    point->set_G(R);
+    point->set_B(G);
+//    point->set_intensity(B);
+  };
+};
+
 class LASoperationFlipWaveformDirection : public LASoperation
 {
 public:
@@ -1937,6 +1973,8 @@ void LAStransform::usage() const
   fprintf(stderr,"  -copy_G_into_NIR -copy_G_into_intensity\n");
   fprintf(stderr,"  -copy_B_into_NIR -copy_B_into_intensity\n");
   fprintf(stderr,"  -copy_intensity_into_NIR\n");
+  fprintf(stderr,"  -switch_RGBI_into_CIR\n");
+  fprintf(stderr,"  -switch_RGB_intensity_into_CIR\n");
   fprintf(stderr,"Transform attributes in \"Extra Bytes\".\n");
   fprintf(stderr,"  -scale_attribute 0 1.5\n");
   fprintf(stderr,"  -translate_attribute 1 0.2\n");
@@ -3932,6 +3970,16 @@ BOOL LAStransform::parse(int argc, char* argv[])
       else if (strcmp(argv[i],"-switch_G_B") == 0)
       {
         add_operation(new LASoperationSwitchGB());
+        *argv[i]='\0'; 
+      }
+      else if (strcmp(argv[i],"-switch_RGBI_into_CIR") == 0)
+      {
+        add_operation(new LASoperationSwitchRGBItoCIR());
+        *argv[i]='\0'; 
+      }
+      else if (strcmp(argv[i],"-switch_RGB_intensity_into_CIR") == 0)
+      {
+        add_operation(new LASoperationSwitchRGBIntensitytoCIR());
         *argv[i]='\0'; 
       }
     }
