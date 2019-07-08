@@ -65,9 +65,8 @@ file(GLOB_RECURSE LAS_INCLUDES
 
 add_library(LASlib STATIC ${LAS_SRC} ${LAZ_SRC_FULL})
 target_include_directories(LASlib PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASlib/inc>
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASzip/src>
-  $<INSTALL_INTERFACE:include/LASlib>
+  ${CMAKE_SOURCE_DIR}/LASlib/inc>
+  ${CMAKE_SOURCE_DIR}/LASzip/src>
 )
 set_target_properties(LASlib PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../lib
