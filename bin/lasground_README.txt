@@ -148,6 +148,13 @@ overview of all tool-specific switches:
 -gui                                 : start with files loaded into GUI
 -cores 4                             : process multiple inputs on 4 cores in parallel
 -ignore_class 1 3 4 5 6 7 9          : ignores points with specified classification codes
+-ignore_extended_class 42 43 45 67   : ignores points with specified extended classification codes
+-ignore_single                       : ignores single returns
+-ignore_first                        : ignores first returns
+-ignore_last                         : ignores last returns
+-ignore_first_of_many                : ignores first returns (but only those of multi-returns)
+-ignore_intermediate                 : ignores intermediate returns
+-ignore_last_of_many                 : ignores last returns (but only those of multi-returns)
 -ignore_withheld                     : ignores points flagged withheld
 -ignore_overlap                      : ignores points flagged overlap (new LAS 1.4 point types only)
 -step 8.0                            : set resolution of grid used for initial ground to 8.0 [default is 5.0]
@@ -161,7 +168,7 @@ overview of all tool-specific switches:
 -no_stddev                           : sets stddev to zero 
 -not_airborne                        : same as setting these three: '-no_bulge', '-all_returns', and '-stddev 0' 
 -pertube                             :
--by_flightline
+-by_flightline                       : ground classfies each flightline separately (needs populated point source IDs)
 -iterate 1                           :
 -no_iterate                          : sets max number of refinement loops to zero 
 -refine 3                            :
