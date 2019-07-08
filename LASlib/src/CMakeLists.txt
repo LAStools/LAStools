@@ -3,6 +3,9 @@ if (!MSVC)
 endif()
 add_definitions(-DNDEBUG -DUNORDERED -DHAVE_UNORDERED_MAP)
 
+include_directories(../../LASzip/src)
+include_directories(../inc)
+
 set(LAS_SRC
 	lasreader.cpp
 	laswriter.cpp
@@ -58,22 +61,13 @@ foreach(file ${LAZ_SRC})
 	list(APPEND LAZ_SRC_FULL ../../LASzip/src/${file})
 endforeach(file)
 
-file(GLOB_RECURSE LAS_INCLUDES
-	${CMAKE_SOURCE_DIR}/LASzip/src/*.hpp 
-	${CMAKE_SOURCE_DIR}/LASlib/inc/*.hpp
-)
-
 add_library(LASlib STATIC ${LAS_SRC} ${LAZ_SRC_FULL})
-target_include_directories(LASlib PUBLIC
-  ${CMAKE_SOURCE_DIR}/LASlib/inc>
-  ${CMAKE_SOURCE_DIR}/LASzip/src>
-)
 set_target_properties(LASlib PROPERTIES
-	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../lib
-)
+	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../lib)
 
-install(TARGETS LASlib EXPORT LASlib-targets
-	ARCHIVE DESTINATION lib/LASlib)
-install(FILES ${LAS_INCLUDES} DESTINATION include/LASlib)
-install(EXPORT LASlib-targets DESTINATION lib/cmake/LASlib)
-install(FILES ${CMAKE_SOURCE_DIR}/LASlib/src/LASlib-config.cmake DESTINATION lib/cmake/LASlib)
+
+install(TARGETS LASlib DESTINATION lib/LASlib)
+install(DIRECTORY ../inc/ DESTINATION include/LASlib
+        FILES_MATCHING PATTERN "*.hpp")
+install(DIRECTORY ../../LASzip/src/ DESTINATION include/LASlib
+        FILES_MATCHING PATTERN "*.hpp")
