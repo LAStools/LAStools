@@ -234,7 +234,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
 
   // init the bounding box z and count the rasters
 
-  F32 elevation = 0;
+  F64 elevation = 0;
   npoints = 0;
   header.min_z = F64_MAX;
   header.max_z = F64_MIN;
@@ -274,7 +274,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
         while ((line[line_curr] != '\0') && (line[line_curr] <= ' ')) line_curr++;
       }
       // get elevation value
-      sscanf(&(line[line_curr]), "%f", &elevation);
+      sscanf(&(line[line_curr]), "%lf", &elevation);
       // skip parsed number
       while ((line[line_curr] != '\0') && (line[line_curr] > ' ')) line_curr++;
       // skip following spaces
@@ -358,7 +358,7 @@ BOOL LASreaderASC::seek(const I64 p_index)
 
 BOOL LASreaderASC::read_point_default()
 {
-  F32 elevation;
+  F64 elevation;
   while (p_count < npoints)
   {
     if (line[line_curr] == '\0')
@@ -394,7 +394,7 @@ BOOL LASreaderASC::read_point_default()
       row++;
     }
     // get elevation value
-    sscanf(&(line[line_curr]), "%f", &elevation);
+    sscanf(&(line[line_curr]), "%lf", &elevation);
     // skip parsed number
     while ((line[line_curr] != '\0') && (line[line_curr] > ' ')) line_curr++;
     // skip following spaces
