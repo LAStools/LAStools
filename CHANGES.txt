@@ -1,5 +1,10 @@
+ 7 July 2019 -- lasnoise, lasground, lasground_new: new '-ignore_extended_class 33', '-ignore_first_of_many', ...
+ 3 July 2019 -- lasnoise: new option '-by_flightline'
+29 June 2019 -- lascolor: bug fix for copying '-gray' image into '-intensity' field introduced in version 190623
+26 June 2019 -- lascolor: small bug fix for '-classify_as 8' when input TIF or PNG is RGB color instead of gray
+25 June 2019 -- las2dem, las2iso, las2tin: bug fix for breaklines with repeated vertices and many open breaklines
 23 June 2019 -- NEW: lasdistance classifies or flags points within a certain xy-distance to a polygon or a polyline 
-21 June 2019 -- lascolor: new '-classify_as 8', '-classify_zero', '-classify_non_zero', as well as '-ignore_class 5 6'
+21 June 2019 -- lascolor: new '-classify_as 8', '-classify_black', '-classify_non_black', as well as '-ignore_class 5 6'
 20 Juni 2019 -- laszip: also compress Trimble '-waveforms' or '-waveforms_with_map' when very first WDP offset is 0
 19 June 2019 -- lascolor: support PNG input in addition to TIF
 18 June 2019 -- lasoverage: added missing '-ignore_class 7' selection options to the GUI 
