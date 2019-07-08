@@ -76,6 +76,8 @@
     * lasplanes
     * lascolor
     * lasclip
+	* lasvoxel
+	* lasdistance
     * las2shp & shp2las.
 
 --------------------------------------------------------------------------
