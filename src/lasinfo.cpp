@@ -56,6 +56,7 @@
 #include "laszip_decompress_selective_v3.hpp"
 #include "lasutility.hpp"
 #include "laswriter.hpp"
+#include "lasvlrpayload.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -175,6 +176,12 @@ static I32 lidardouble2string(char* string, double value, double precision)
     sprintf(string, "%.7f", value);
   else if (precision == 0.00000001)
     sprintf(string, "%.8f", value);
+  else if (precision == 0.5)
+    sprintf(string, "%.1f", value);
+  else if (precision == 0.25)
+    sprintf(string, "%.2f", value);
+  else if (precision == 0.125)
+    sprintf(string, "%.3f", value);
   else
     return lidardouble2string(string, value);
   return (I32)strlen(string)-1;
@@ -3460,6 +3467,9 @@ int main(int argc, char *argv[])
                   case 6647: // Norway Normal Null 2000
                     fprintf(file_out, "VerticalCSTypeGeoKey: Canadian Geodetic Vertical Datum of 2013\012");
                     break;
+                  case 7837: // Deutches Haupthohennetz 2016
+                    fprintf(file_out, "VerticalCSTypeGeoKey: Deutsches Haupthoehennetz 2016\012");
+                    break;
                   default:
                     fprintf(file_out, "VerticalCSTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
                   }
@@ -3691,6 +3701,31 @@ int main(int argc, char *argv[])
           {
             LASvlr_wave_packet_descr* vlr_wave_packet_descr = (LASvlr_wave_packet_descr*)lasheader->vlrs[i].data;
             fprintf(file_out, "  index %d bits/sample %d compression %d samples %u temporal %u gain %lg, offset %lg\012", lasheader->vlrs[i].record_id-99, vlr_wave_packet_descr->getBitsPerSample(), vlr_wave_packet_descr->getCompressionType(), vlr_wave_packet_descr->getNumberOfSamples(), vlr_wave_packet_descr->getTemporalSpacing(), vlr_wave_packet_descr->getDigitizerGain(), vlr_wave_packet_descr->getDigitizerOffset());
+          }
+        }
+        else if ((strcmp(lasheader->vlrs[i].user_id, "Raster LAZ") == 0) && (lasheader->vlrs[i].record_id == 7113))
+        {
+          LASvlrRasterLAZ vlrRasterLAZ;
+          if (vlrRasterLAZ.set_payload(lasheader->vlrs[i].data, lasheader->vlrs[i].record_length_after_header))
+          {
+            fprintf(file_out, "    ncols %6d\012", vlrRasterLAZ.ncols);
+            fprintf(file_out, "    nrows %6d\012", vlrRasterLAZ.nrows);
+            fprintf(file_out, "    llx   %g\012", vlrRasterLAZ.llx);
+            fprintf(file_out, "    lly   %g\012", vlrRasterLAZ.lly);
+            fprintf(file_out, "    stepx    %g\012", vlrRasterLAZ.stepx);
+            fprintf(file_out, "    stepy    %g\012", vlrRasterLAZ.stepy);
+            if (vlrRasterLAZ.sigmaxy)
+            {
+              fprintf(file_out, "    sigmaxy %g\012", vlrRasterLAZ.sigmaxy);
+            }
+            else
+            {
+              fprintf(file_out, "    sigmaxy <not set>\012");
+            }
+          }
+          else
+          {
+            fprintf(file_out,"WARNING: corrupt RasterLAZ VLR\n");
           }
         }
       }
