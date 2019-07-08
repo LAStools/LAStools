@@ -77,3 +77,4 @@ install(TARGETS LASlib EXPORT LASlib-targets
 	ARCHIVE DESTINATION lib/LASlib)
 install(FILES ${LAS_INCLUDES} DESTINATION include/LASlib)
 install(EXPORT LASlib-targets DESTINATION lib/cmake/LASlib)
+install(FILES ${CMAKE_SOURCE_DIR}/LASlib/src/LASlib-config.cmake DESTINATION lib/cmake/LASlib)
