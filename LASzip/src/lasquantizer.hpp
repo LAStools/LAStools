@@ -51,9 +51,9 @@ public:
   inline F64 get_y(const I32 Y) const { return y_scale_factor*Y+y_offset; };
   inline F64 get_z(const I32 Z) const { return z_scale_factor*Z+z_offset; };
 
-  inline I64 get_X(const F64 x) const { if (x >= x_offset) return (I64)((x-x_offset)/x_scale_factor+0.5); else return (I64)((x-x_offset)/x_scale_factor-0.5); };
-  inline I64 get_Y(const F64 y) const { if (y >= y_offset) return (I64)((y-y_offset)/y_scale_factor+0.5); else return (I64)((y-y_offset)/y_scale_factor-0.5); };
-  inline I64 get_Z(const F64 z) const { if (z >= z_offset) return (I64)((z-z_offset)/z_scale_factor+0.5); else return (I64)((z-z_offset)/z_scale_factor-0.5); };
+  inline I64 get_X(const F64 x) const { if (x >= x_offset) return (I64)(((x-x_offset)/x_scale_factor)+0.5); else return (I64)(((x-x_offset)/x_scale_factor)-0.5); };
+  inline I64 get_Y(const F64 y) const { if (y >= y_offset) return (I64)(((y-y_offset)/y_scale_factor)+0.5); else return (I64)(((y-y_offset)/y_scale_factor)-0.5); };
+  inline I64 get_Z(const F64 z) const { if (z >= z_offset) return (I64)(((z-z_offset)/z_scale_factor)+0.5); else return (I64)(((z-z_offset)/z_scale_factor)-0.5); };
 
   LASquantizer()
   {

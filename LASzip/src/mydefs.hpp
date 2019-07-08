@@ -124,17 +124,17 @@ typedef union I64U32I32F32 { I64 i64; U32 u32[2]; I32 i32[2]; F32 f32[2]; } I64U
 #define I32_CLAMP(n)    (((n) <= I32_MIN) ? I32_MIN : (((n) >= I32_MAX) ? I32_MAX : ((I32)(n))))
 #define U32_CLAMP(n)    (((n) <= U32_MIN) ? U32_MIN : (((n) >= U32_MAX) ? U32_MAX : ((U32)(n))))
 
-#define I8_QUANTIZE(n) (((n) >= 0) ? (I8)((n)+0.5f) : (I8)((n)-0.5f))
-#define U8_QUANTIZE(n) (((n) >= 0) ? (U8)((n)+0.5f) : (U8)(0))
+#define I8_QUANTIZE(n) (((n) >= 0) ? (I8)((n)+0.5) : (I8)((n)-0.5))
+#define U8_QUANTIZE(n) (((n) >= 0) ? (U8)((n)+0.5) : (U8)(0))
 
-#define I16_QUANTIZE(n) (((n) >= 0) ? (I16)((n)+0.5f) : (I16)((n)-0.5f))
-#define U16_QUANTIZE(n) (((n) >= 0) ? (U16)((n)+0.5f) : (U16)(0))
+#define I16_QUANTIZE(n) (((n) >= 0) ? (I16)((n)+0.5) : (I16)((n)-0.5))
+#define U16_QUANTIZE(n) (((n) >= 0) ? (U16)((n)+0.5) : (U16)(0))
 
-#define I32_QUANTIZE(n) (((n) >= 0) ? (I32)((n)+0.5f) : (I32)((n)-0.5f))
-#define U32_QUANTIZE(n) (((n) >= 0) ? (U32)((n)+0.5f) : (U32)(0))
+#define I32_QUANTIZE(n) (((n) >= 0) ? (I32)((n)+0.5) : (I32)((n)-0.5))
+#define U32_QUANTIZE(n) (((n) >= 0) ? (U32)((n)+0.5) : (U32)(0))
 
-#define I64_QUANTIZE(n) (((n) >= 0) ? (I64)((n)+0.5f) : (I64)((n)-0.5f))
-#define U64_QUANTIZE(n) (((n) >= 0) ? (U64)((n)+0.5f) : (U64)(0))
+#define I64_QUANTIZE(n) (((n) >= 0) ? (I64)((n)+0.5) : (I64)((n)-0.5))
+#define U64_QUANTIZE(n) (((n) >= 0) ? (U64)((n)+0.5) : (U64)(0))
 
 #define I16_FLOOR(n) ((((I16)(n)) > (n)) ? (((I16)(n))-1) : ((I16)(n)))
 #define I32_FLOOR(n) ((((I32)(n)) > (n)) ? (((I32)(n))-1) : ((I32)(n)))
