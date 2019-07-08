@@ -1,3 +1,4 @@
+20 Juni 2019 -- laszip: also compress Trimble '-waveforms' or '-waveforms_with_map' when very first WDP offset is 0
  3 June 2019 -- LASlib: new transform '-copy_user_data_into_z'
 24 May 2019 -- las2las: '-add_attribute data_type name description [scale offset no_data]' adds "extra bytes" attribute
 20 May 2019 -- LASlib: warn if '-filtered_transform' is used but no LAStransform or no LASfilter was specified
