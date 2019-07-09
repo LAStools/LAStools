@@ -367,6 +367,10 @@ SOURCE=..\laslib\inc\lasutility.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASlib\inc\lasvlrpayload.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\laslib\inc\laswaveform13reader.hpp
 # End Source File
 # Begin Source File
