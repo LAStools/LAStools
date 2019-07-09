@@ -849,18 +849,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
     switch (geo_keys[i].key_id)
     {
     case 1024: // GTModelTypeGeoKey
-      if (geo_keys[i].value_offset == 2) // ModelTypeGeographic
-      {
-        has_projection = set_longlat_projection(description);
-      }
-      else if (geo_keys[i].value_offset == 3) // ModelTypeGeocentric
-      {
-        has_projection = set_ecef_projection(description);
-      }
-      else if (geo_keys[i].value_offset == 0) // ModelTypeUndefined
-      {
-        has_projection = set_no_projection(description);
-      }
+      has_projection = set_GTModelTypeGeoKey(geo_keys[i].value_offset, description);
       break;
     case 3072: // ProjectedCSTypeGeoKey
       has_projection = set_ProjectedCSTypeGeoKey(geo_keys[i].value_offset, description);
@@ -3235,6 +3224,23 @@ bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** p
   return false;
 }
 
+bool GeoProjectionConverter::set_GTModelTypeGeoKey(short value, char* description)
+{
+  if (value == 2) // ModelTypeGeographic
+  {
+    return set_longlat_projection(description);
+  }
+  else if (value == 3) // ModelTypeGeocentric
+  {
+    return set_ecef_projection(description);
+  }
+  else if (value == 0) // ModelTypeUndefined
+  {
+    return set_no_projection(description);
+  }
+  return false;
+}
+
 short GeoProjectionConverter::get_GTModelTypeGeoKey() const
 {
   if (num_geo_keys)
@@ -3247,7 +3253,7 @@ short GeoProjectionConverter::get_GTModelTypeGeoKey() const
       }
     }
   }
-  return 0;
+  return 0; // assume // ModelTypeUndefined
 //  return 2; // assume ModelTypeGeographic
 }
 

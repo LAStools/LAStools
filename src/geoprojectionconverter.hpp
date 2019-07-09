@@ -288,7 +288,6 @@ public:
   bool get_prj_from_projection(int& len, char** prj, bool source=true);
   bool get_proj4_string_from_projection(int& len, char** proj4, bool source=true);
 
-  short get_GTModelTypeGeoKey() const;
   short get_GTRasterTypeGeoKey() const;
   short get_GeographicTypeGeoKey() const;
   short get_GeogGeodeticDatumGeoKey() const;
@@ -302,6 +301,9 @@ public:
   double get_GeogInvFlatteningGeoKey() const;
   short get_GeogAzimuthUnitsGeoKey() const;
   double get_GeogPrimeMeridianLongGeoKey() const;
+
+  bool set_GTModelTypeGeoKey(short value, char* description=0);
+  short get_GTModelTypeGeoKey() const;
 
   bool set_ProjectedCSTypeGeoKey(short value, char* description=0);
   short get_ProjectedCSTypeGeoKey(bool source=true) const;
