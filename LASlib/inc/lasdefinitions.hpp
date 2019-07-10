@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 190706
+#define LAS_TOOLS_VERSION 190710
 
 #include <stdio.h>
 #include <string.h>
@@ -893,9 +893,9 @@ public:
 
   void del_geo_double_params()
   {
+    remove_vlr("LASF_Projection", 34736);
     if (vlr_geo_double_params)
     {
-      remove_vlr("LASF_Projection", 34736);
       vlr_geo_double_params = 0;
     }
   }
@@ -913,9 +913,9 @@ public:
 
   void del_geo_ascii_params()
   {
+    remove_vlr("LASF_Projection", 34737);
     if (vlr_geo_ascii_params)
     {
-      remove_vlr("LASF_Projection", 34737);
       vlr_geo_ascii_params = 0;
     }
   }
