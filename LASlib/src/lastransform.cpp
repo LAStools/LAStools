@@ -1070,6 +1070,28 @@ private:
   U8 flag;
 };
 
+class LASoperationSetScanDirectionFlag : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_scan_direction_flag"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
+  inline void transform(LASpoint* point) { point->set_scan_direction_flag(flag); };
+  LASoperationSetScanDirectionFlag(U8 flag) { this->flag = (flag ? 1 : 0); };
+private:
+  U8 flag;
+};
+
+class LASoperationSetEdgeOfFlightLine : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_edge_of_flight_line"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), flag); };
+  inline void transform(LASpoint* point) { point->set_edge_of_flight_line(flag); };
+  LASoperationSetEdgeOfFlightLine(U8 flag) { this->flag = (flag ? 1 : 0); };
+private:
+  U8 flag;
+};
+
 class LASoperationSetExtendedScannerChannel : public LASoperation
 {
 public:
@@ -3209,6 +3231,48 @@ BOOL LAStransform::parse(int argc, char* argv[])
           }
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4;
         }
+      }
+      else if (strcmp(argv[i],"-set_scan_direction_flag") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
+          return FALSE;
+        }
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid flag\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > 1)
+        {
+          fprintf(stderr,"ERROR: cannot set scan direction flag because value %u is larger than 1\n", value);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetScanDirectionFlag((U8)value));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-set_edge_of_flight_line") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' need 1 argument: value\n", argv[i]);
+          return FALSE;
+        }
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is no valid flag\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > 1)
+        {
+          fprintf(stderr,"ERROR: cannot set edge of flight line because value %u is larger than 1\n", value);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetEdgeOfFlightLine((U8)value));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
     }
     else if (strncmp(argv[i],"-change_",8) == 0)
