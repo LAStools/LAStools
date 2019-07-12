@@ -198,8 +198,8 @@ other commandline arguments are
 -start_at_point 100            : skips all points until point number 100
 -start_at_point 900            : omits all points after point number 900
 -subseq 20 100                 : extract a subsequence of 100 points starting from point 20
--point_type 0                  : force point type to be 0
--point_size 26                 : force point size to be 26
+-set_point_type 0              : force point type to be 0
+-set_point_size 26             : force point size to be 26
 -set_classification 0          : sets all classifications fields to zero
 -set_user_data 0               : sets all user_data fields to zero
 -remove_all_vlrs               : remove all VLRs
@@ -385,11 +385,15 @@ Transform coordinates.
   -translate_then_scale_y -0.5 1.001
   -transform_helmert -199.87,74.79,246.62
   -transform_helmert 598.1,73.7,418.2,0.202,0.045,-2.455,6.7
+  -transform_affine 0.9999652,0.903571,171.67,736.26
   -switch_x_y -switch_x_z -switch_y_z
   -clamp_z_below 70.5
   -clamp_z 70.5 72.5
   -copy_attribute_into_z 0
+  -add_attribute_to_z 1
+  -add_scaled_attribute_to_z 1 -1.2
   -copy_intensity_into_z
+  -copy_user_data_into_z
 Transform raw xyz integers.
   -translate_raw_z 20
   -translate_raw_xyz 1 1 0
@@ -407,6 +411,7 @@ Transform intensity.
   -copy_attribute_into_intensity 0
   -bin_gps_time_into_intensity 0.5
 Transform scan_angle.
+  -set_scan_angle 0.0
   -scale_scan_angle 1.944445
   -translate_scan_angle -5
   -translate_then_scale_scan_angle -0.5 2.1
@@ -415,9 +420,11 @@ Change the return number or return count of points.
   -set_return_number 1
   -set_extended_return_number 10
   -change_return_number_from_to 2 1
+  -change_extended_return_number_from_to 2 8
   -set_number_of_returns 2
-  -set_number_of_returns 15
+  -set_extended_number_of_returns 15
   -change_number_of_returns_from_to 0 2
+  -change_extended_number_of_returns_from_to 8 10
 Modify the classification.
   -set_classification 2
   -set_extended_classification 41
@@ -447,6 +454,7 @@ Modify the user data.
   -change_user_data_from_to 23 26
   -change_user_data_from_to 23 26
   -copy_attribute_into_user_data 1
+  -add_scaled_attribute_to_user_data 0 10.0
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
@@ -456,6 +464,7 @@ Modify the point source ID.
   -split_scanner_channel_from_point_source
   -bin_Z_into_point_source 200
   -bin_abs_scan_angle_into_point_source 2
+  -bin_gps_time_into_point_source 5.0
 Transform gps_time.
   -set_gps_time 113556962.005715
   -translate_gps_time 40.50
@@ -472,6 +481,12 @@ Transform RGB/NIR colors.
   -copy_G_into_NIR -copy_G_into_intensity
   -copy_B_into_NIR -copy_B_into_intensity
   -copy_intensity_into_NIR
+  -switch_RGBI_into_CIR
+  -switch_RGB_intensity_into_CIR
+Transform attributes in "Extra Bytes".
+  -scale_attribute 0 1.5
+  -translate_attribute 1 0.2
+  -copy_user_data_into_attribute 0
 Supported LAS Inputs
   -i lidar.las
   -i lidar.laz
@@ -505,14 +520,14 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 181109
+LAStools (by martin@rapidlasso.com) version 190711
 usage:
 las2las -i *.las -utm 13N
 las2las -i *.laz -first_only -olaz
 las2las -i *.las -drop_return 4 5 -olaz
 las2las -latlong -target_utm 12T -i in.las -o out.las
 las2las -i in.laz -target_epsg 2972 -o out.laz
-las2las -point_type 0 -lof file_list.txt -merged -o out.las
+las2las -set_point_type 0 -lof file_list.txt -merged -o out.las
 las2las -remove_vlr 2 -scale_rgb_up -i in.las -o out.las
 las2las -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las
 las2las -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt

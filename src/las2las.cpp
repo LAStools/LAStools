@@ -39,7 +39,7 @@
     23 October 2016 -- OGC WKT string stores COMPD_CS for projection + vertical
     22 October 2016 -- new '-set_ogc_wkt_in_evlr' store to EVLR instead of VLR
      1 January 2016 -- option '-set_ogc_wkt' to store CRS as OGC WKT string
-     3 May 2015 -- improved up-conversion via '-set_version 1.4 -point_type 6'
+     3 May 2015 -- improved up-conversion via '-set_version 1.4 -set_point_type 6'
      5 July 2012 -- added option to '-remove_original_vlr' 
      6 May 2012 -- added option to '-remove_tiling_vlr' 
      5 January 2012 -- added option to clip points to the bounding box
@@ -79,7 +79,7 @@ static void usage(bool error=false, bool wait=false)
   fprintf(stderr,"las2las -i *.las -drop_return 4 5 -olaz\n");
   fprintf(stderr,"las2las -latlong -target_utm 12T -i in.las -o out.las\n");
   fprintf(stderr,"las2las -i in.laz -target_epsg 2972 -o out.laz\n");
-  fprintf(stderr,"las2las -point_type 0 -lof file_list.txt -merged -o out.las\n");
+  fprintf(stderr,"las2las -set_point_type 0 -lof file_list.txt -merged -o out.las\n");
   fprintf(stderr,"las2las -remove_vlr 2 -scale_rgb_up -i in.las -o out.las\n");
   fprintf(stderr,"las2las -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las\n");
   fprintf(stderr,"las2las -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt\n");
