@@ -82,6 +82,7 @@ protected:
 
 private:
   FILE* file;
+  CHAR* file_name;
   ByteStreamIn* stream;
   BOOL delete_stream;
   LASreadPoint* reader;

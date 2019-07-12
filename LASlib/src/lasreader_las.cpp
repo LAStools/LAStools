@@ -59,6 +59,15 @@ BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_onl
     return FALSE;
   }
 
+  // save file name for better ERROR message
+
+  if (this->file_name)
+  {
+    free(this->file_name);
+    this->file_name = 0;
+  }
+  this->file_name = LASCopyString(file_name);
+
   if (setvbuf(file, NULL, _IOFBF, io_buffer_size) != 0)
   {
     fprintf(stderr, "WARNING: setvbuf() failed with buffer size %d\n", io_buffer_size);
@@ -1348,11 +1357,11 @@ BOOL LASreaderLAS::read_point_default()
     {
       if (reader->error())
       {
-        fprintf(stderr,"ERROR: '%s' after %u of %u points\n", reader->error(), (U32)p_count, (U32)npoints);
+        fprintf(stderr,"ERROR: '%s' after %u of %u points for '%s'\n", reader->error(), (U32)p_count, (U32)npoints, file_name);
       }
       else
       {
-        fprintf(stderr,"WARNING: end-of-file after %u of %u points\n", (U32)p_count, (U32)npoints);
+        fprintf(stderr,"WARNING: end-of-file after %u of %u points for '%s'\n", (U32)p_count, (U32)npoints, file_name);
       }
       return FALSE;
     }
@@ -1429,12 +1438,18 @@ void LASreaderLAS::close(BOOL close_stream)
       fclose(file);
       file = 0;
     }
+    if (file_name)
+    {
+      free(file_name);
+      file_name = 0;
+    }
   }
 }
 
 LASreaderLAS::LASreaderLAS()
 {
   file = 0;
+  file_name = 0;
   stream = 0;
   delete_stream = TRUE;
   reader = 0;
