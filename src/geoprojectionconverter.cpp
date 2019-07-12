@@ -3285,6 +3285,11 @@ short GeoProjectionConverter::get_GeographicTypeGeoKey() const
       }
     }
   }
+  // if not in geo keys maybe GCS code was set
+  if (gcs_code != -1)
+  {
+    return gcs_code;
+  }
   switch (ellipsoid->id)
   {
   case GEO_ELLIPSOID_AIRY: // GCSE_Airy1830
