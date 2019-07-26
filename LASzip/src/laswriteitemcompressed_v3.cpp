@@ -206,6 +206,8 @@ LASwriteItemCompressed_POINT14_v3::~LASwriteItemCompressed_POINT14_v3()
     delete outstream_point_source;
     delete outstream_gps_time;
   }
+
+//  fprintf(stderr, "%u %u %u %u %u %u %u %u %u\n", num_bytes_channel_returns_XY, num_bytes_Z, num_bytes_classification, num_bytes_flags, num_bytes_intensity, num_bytes_scan_angle, num_bytes_user_data, num_bytes_point_source, num_bytes_gps_time);
 }
 
 inline BOOL LASwriteItemCompressed_POINT14_v3::createAndInitModelsAndCompressors(U32 context, const U8* item)
