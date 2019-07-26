@@ -231,11 +231,10 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 
   this->point_type = header.point_data_format;
 
-  // maybe attributes in extra bytes
+  // maybe update point size with extra bytes
 
   if (header.number_attributes)
   {
-    header.update_extra_bytes_vlr();
     header.point_data_record_length += header.get_attributes_size();
   }
 
@@ -591,6 +590,9 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
       header.extended_number_of_points_by_return[3] = 0;
       header.extended_number_of_points_by_return[4] = 0;
     }
+  
+    // free the parse less string
+
     free(parse_less);
 
     // close the input file
@@ -917,6 +919,13 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
       header.header_size = 227;
       header.offset_to_point_data = 227;
     }
+  }
+
+  // maybe attributes in extra bytes
+
+  if (header.number_attributes)
+  {
+    header.update_extra_bytes_vlr();
   }
 
   // read the first line with full parse_string
