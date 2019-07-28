@@ -814,7 +814,7 @@ static const StatePlaneTM state_plane_tm_nad83_list[] =
 static const short EPSG_CH1903_LV03 = 21781;
 static const short EPSG_EOV_HD72 = 23700;
 
-bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description)
+bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, const GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description)
 {
   bool user_defined_ellipsoid = false;
   int user_defined_projection = 0;
@@ -840,7 +840,16 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, GeoP
   int gcs_code = -1;
 
   this->num_geo_keys = num_geo_keys;
-  this->geo_keys = geo_keys;
+  if (this->geo_keys) delete [] this->geo_keys;
+  if (num_geo_keys)
+  {
+    this->geo_keys = new GeoProjectionGeoKeys[num_geo_keys];
+    memcpy(this->geo_keys, geo_keys, sizeof(GeoProjectionGeoKeys)*num_geo_keys);
+  }
+  else
+  {
+    this->geo_keys = 0;
+  }
   this->geo_ascii_params = geo_ascii_params;
   this->geo_double_params = geo_double_params;
 
@@ -3253,8 +3262,18 @@ short GeoProjectionConverter::get_GTModelTypeGeoKey() const
       }
     }
   }
-  return 0; // assume // ModelTypeUndefined
-//  return 2; // assume ModelTypeGeographic
+  if (source_projection)
+  {
+    if ((source_projection->type == GEO_PROJECTION_LONG_LAT) || (source_projection->type == GEO_PROJECTION_LAT_LONG))
+    {
+      return 2; // ModelTypeGeographic
+    }
+    if ((source_projection->type == GEO_PROJECTION_LCC) || (source_projection->type == GEO_PROJECTION_TM) || (source_projection->type == GEO_PROJECTION_AEAC) || (source_projection->type == GEO_PROJECTION_HOM) || (source_projection->type == GEO_PROJECTION_OS))
+    {
+      return 1; // ModelTypeProjected
+    }
+  }
+  return 0; // ModelTypeUndefined
 }
 
 short GeoProjectionConverter::get_GTRasterTypeGeoKey() const
@@ -6949,6 +6968,7 @@ GeoProjectionConverter::GeoProjectionConverter()
 GeoProjectionConverter::~GeoProjectionConverter()
 {
   if (argv_zero) free(argv_zero);
+  if (geo_keys) delete [] geo_keys;
   delete ellipsoid;
   if (source_projection) delete source_projection;
   if (target_projection) delete target_projection;

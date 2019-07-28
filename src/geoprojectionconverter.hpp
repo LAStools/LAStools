@@ -281,7 +281,7 @@ public:
 
   // set & get current projection
 
-  bool set_projection_from_geo_keys(int num_geo_keys, GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description=0);
+  bool set_projection_from_geo_keys(int num_geo_keys, const GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description=0);
   bool get_geo_keys_from_projection(int& num_geo_keys, GeoProjectionGeoKeys** geo_keys, int& num_geo_double_params, double** geo_double_params, bool source=true);
   bool set_projection_from_ogc_wkt(const char* ogc_wkt, char* description=0);
   bool get_ogc_wkt_from_projection(int& len, char** ogc_wkt, bool source=true);
