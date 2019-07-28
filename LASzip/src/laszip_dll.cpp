@@ -2775,7 +2775,7 @@ setup_laszip_items(
   laszip_U8 point_type = laszip_dll->header.point_data_format;
   laszip_U16 point_size = laszip_dll->header.point_data_record_length;
 
-  if (compress && (point_type > 5) && laszip_dll->request_compatibility_mode)
+  if ((point_type > 5) && laszip_dll->request_compatibility_mode)
   {
     if (!laszip->request_compatibility_mode(1))
     {
