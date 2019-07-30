@@ -4107,9 +4107,9 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value)
   {
     vertical_geokey = value;
   }
-  else if (value == 6647)
+  else if ((value == 6647) || (value == 1127)) // CGVD2013
   {
-    vertical_geokey = value;
+    vertical_geokey = GEO_VERTICAL_CGVD2013;
   }
   else
   {
