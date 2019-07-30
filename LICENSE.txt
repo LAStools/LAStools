@@ -38,8 +38,9 @@
     * LASzip (with static linking exception)
     * LASlib (with LASzip) - the API used by LAStools.
 
-  These two are also "free" to use but not available in open source.
+  These are also "free" to use but not (yet) available in open source.
 
+    * demzip  
     * lasview
     * laspublish
     * lasoptimize
@@ -76,8 +77,8 @@
     * lasplanes
     * lascolor
     * lasclip
-	* lasvoxel
-	* lasdistance
+    * lasvoxel
+    * lasdistance
     * las2shp & shp2las.
 
 --------------------------------------------------------------------------
@@ -94,6 +95,6 @@
 
   COPYRIGHT:
   
-  (c) 2007-2017, rapidlasso GmbH, GERMANY - fast tools to catch reality
+  (c) 2007-2019, rapidlasso GmbH, GERMANY - fast tools to catch reality
 
 --------------------------------------------------------------------------

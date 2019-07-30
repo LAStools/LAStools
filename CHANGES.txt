@@ -1,6 +1,11 @@
-18 July 2019 -- txt2las -- bug fix in functionality for adding '-add_attribute' in extra bytes introduced in late 2018
+30 July 2019 -- lasgrid: increase default memory max to 1.75 GB. lasgrid64: increase default memory max to 6 GB.
+28 July 2019 -- NEW: demzip compresses DTM, DSM, CHM, metrics, and GEOID rasters from ASC, BIL, TIF to RasterLAZ 
+18 July 2019 -- txt2las: bug fix in functionality for adding '-add_attribute' in extra bytes introduced in late 2018
+11 July 2019 -- LASlib, LAStools: report file name when LASreader has 'ERROR: 'end-of-file during chunk with index 3254'
  7 July 2019 -- lasnoise, lasground, lasground_new: new '-ignore_extended_class 33', '-ignore_first_of_many', ...
+ 4 July 2019 -- LASlib: two new LAStransforms '-switch_RGBI_into_CIR' and '-switch_RGB_intensity_into_CIR'
  3 July 2019 -- lasnoise: new option '-by_flightline'
+ 2 July 2019 -- lasinfo: report missing VerticalCSTypeGeoKey 7837 as DHHN2016
 29 June 2019 -- lascolor: bug fix for copying '-gray' image into '-intensity' field introduced in version 190623
 26 June 2019 -- lascolor: small bug fix for '-classify_as 8' when input TIF or PNG is RGB color instead of gray
 25 June 2019 -- las2dem, las2iso, las2tin: bug fix for breaklines with repeated vertices and many open breaklines

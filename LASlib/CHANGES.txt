@@ -1,3 +1,7 @@
+18 July 2019 -- txt2las: bug fix in functionality for adding '-add_attribute' in extra bytes introduced in late 2018
+11 July 2019 -- LASlib, LAStools: report file name when LASreader has 'ERROR: 'end-of-file during chunk with index 3254'
+ 4 July 2019 -- LASlib: two new LAStransforms '-switch_RGBI_into_CIR' and '-switch_RGB_intensity_into_CIR'
+ 2 July 2019 -- lasinfo: report missing VerticalCSTypeGeoKey 7837 as DHHN2016
 20 Juni 2019 -- laszip: also compress Trimble '-waveforms' or '-waveforms_with_map' when very first WDP offset is 0
  3 June 2019 -- LASlib: new transform '-copy_user_data_into_z'
 24 May 2019 -- las2las: '-add_attribute data_type name description [scale offset no_data]' adds "extra bytes" attribute
