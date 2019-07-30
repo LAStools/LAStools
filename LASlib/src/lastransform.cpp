@@ -1920,6 +1920,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -translate_then_scale_intensity 0.5 3.1\n");
   fprintf(stderr,"  -clamp_intensity 0 255\n");
   fprintf(stderr,"  -clamp_intensity_above 255\n");
+  fprintf(stderr,"  -map_intensity map_file.txt\n")
   fprintf(stderr,"  -copy_RGB_into_intensity\n");
   fprintf(stderr,"  -copy_NIR_into_intensity\n");
   fprintf(stderr,"  -copy_attribute_into_intensity 0\n");
@@ -1967,11 +1968,13 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_user_data 1.5\n");
   fprintf(stderr,"  -change_user_data_from_to 23 26\n");
   fprintf(stderr,"  -change_user_data_from_to 23 26\n");
+  fprintf(stderr,"  -map_user_data map_file.txt\n")
   fprintf(stderr,"  -copy_attribute_into_user_data 1\n");
   fprintf(stderr,"  -add_scaled_attribute_to_user_data 0 10.0\n");
   fprintf(stderr,"Modify the point source ID.\n");
   fprintf(stderr,"  -set_point_source 500\n");
   fprintf(stderr,"  -change_point_source_from_to 1023 1024\n");
+  fprintf(stderr,"  -map_point_source map_file.txt\n")
   fprintf(stderr,"  -copy_user_data_into_point_source\n");
   fprintf(stderr,"  -copy_scanner_channel_into_point_source\n");
   fprintf(stderr,"  -merge_scanner_channel_into_point_source\n");
