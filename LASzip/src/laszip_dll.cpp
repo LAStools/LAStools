@@ -1200,7 +1200,7 @@ laszip_set_geokeys(
 
     // add the VLR
 
-    if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34735, 8 + number*8, 0, (laszip_U8*)key_entries_plus_one))
+    if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34735, (laszip_U16)(8 + number*8), 0, (laszip_U8*)key_entries_plus_one))
     {
       sprintf(laszip_dll->error, "setting %u geodouble_params", number);
       return 1;
@@ -1255,7 +1255,7 @@ laszip_set_geodouble_params(
 
     // add the VLR
 
-    if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34736, number*8, 0, (laszip_U8*)geodouble_params))
+    if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34736, (laszip_U16)(number*8), 0, (laszip_U8*)geodouble_params))
     {
       sprintf(laszip_dll->error, "setting %u geodouble_params", number);
       return 1;
@@ -1310,7 +1310,7 @@ laszip_set_geoascii_params(
 
     // add the VLR
 
-    if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34737, number, 0, (laszip_U8*)geoascii_params))
+    if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34737, (laszip_U16)(number), 0, (laszip_U8*)geoascii_params))
     {
       sprintf(laszip_dll->error, "setting %u geoascii_params", number);
       return 1;
@@ -1386,7 +1386,7 @@ laszip_add_attribute(
       return 1;
     }
 
-    if (laszip_add_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4, laszip_dll->attributer->number_attributes*sizeof(LASattribute), 0, (laszip_U8*)laszip_dll->attributer->attributes))
+    if (laszip_add_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4, (laszip_U16)(laszip_dll->attributer->number_attributes*sizeof(LASattribute)), 0, (laszip_U8*)laszip_dll->attributer->attributes))
     {
       sprintf(laszip_dll->error, "adding the new extra bytes VLR with the additional attribute '%s'", name);
       return 1;
@@ -2045,7 +2045,7 @@ laszip_prepare_point_for_write(
 
       // add the compatibility VLR
 
-      if (laszip_add_vlr(laszip_dll, "lascompatible\0\0", 22204, 2+2+4+148, 0, (laszip_U8*)out->takeData()))
+      if (laszip_add_vlr(laszip_dll, "lascompatible\0\0", 22204, (laszip_U16)(2+2+4+148), 0, (laszip_U8*)out->takeData()))
       {
         sprintf(laszip_dll->error, "adding the compatibility VLR");
         return 1;
@@ -2139,7 +2139,7 @@ laszip_prepare_point_for_write(
 
       // add the extra bytes VLR with the additional attributes
 
-      if (laszip_add_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4, laszip_dll->attributer->number_attributes*sizeof(LASattribute), 0, (laszip_U8*)laszip_dll->attributer->attributes))
+      if (laszip_add_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4, (laszip_U16)(laszip_dll->attributer->number_attributes*sizeof(LASattribute)), 0, (laszip_U8*)laszip_dll->attributer->attributes))
       {
         sprintf(laszip_dll->error, "adding the extra bytes VLR with the additional attributes");
         return 1;
@@ -4164,7 +4164,7 @@ laszip_read_header(
 
           if (attributer.number_attributes)
           {
-            if (laszip_add_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4, attributer.number_attributes*sizeof(LASattribute), 0, (laszip_U8*)attributer.attributes))
+            if (laszip_add_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4, (laszip_U16)(attributer.number_attributes*sizeof(LASattribute)), 0, (laszip_U8*)attributer.attributes))
             {
               sprintf(laszip_dll->error, "rewriting the extra bytes VLR without 'LAS 1.4 compatibility mode' attributes");
               return 1;
