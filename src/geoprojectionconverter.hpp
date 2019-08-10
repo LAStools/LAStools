@@ -122,13 +122,13 @@ struct GeoProjectionGeoKeys
 #define GEO_VERTICAL_WGS84         5030
 #define GEO_VERTICAL_NGVD29        5102
 #define GEO_VERTICAL_NAVD88        5103
-#define GEO_VERTICAL_CGVD2013      1127
-#define GEO_VERTICAL_EVRF2007      5215
 #define GEO_VERTICAL_CGVD28        5114
 #define GEO_VERTICAL_DVR90         5206
+#define GEO_VERTICAL_EVRF2007      5215
 #define GEO_VERTICAL_NN54          5776
 #define GEO_VERTICAL_DHHN92        5783
 #define GEO_VERTICAL_NN2000        5941
+#define GEO_VERTICAL_CGVD2013      6647 
 #define GEO_VERTICAL_DHHN2016      7837
 
 #define GEO_VERTICAL_NAVD88_GEOID96   965103
@@ -317,7 +317,7 @@ public:
   bool set_VerticalUnitsGeoKey(short value);
   short get_VerticalUnitsGeoKey(bool source=true) const;
 
-  bool set_VerticalCSTypeGeoKey(short value);
+  bool set_VerticalCSTypeGeoKey(short value, char* description=0);
   short get_VerticalCSTypeGeoKey();
 
   bool set_reference_ellipsoid(int id, char* description=0);

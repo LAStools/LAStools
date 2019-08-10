@@ -56,6 +56,7 @@
 #include "laszip_decompress_selective_v3.hpp"
 #include "lasutility.hpp"
 #include "laswriter.hpp"
+#include "lasquadtree.hpp"
 #include "lasvlrpayload.hpp"
 
 #include <stdio.h>
@@ -3471,7 +3472,14 @@ int main(int argc, char *argv[])
                     fprintf(file_out, "VerticalCSTypeGeoKey: Deutsches Haupthoehennetz 2016\012");
                     break;
                   default:
-                    fprintf(file_out, "VerticalCSTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                    if (geoprojectionconverter.set_VerticalCSTypeGeoKey(lasreader->header.vlr_geo_key_entries[j].value_offset, printstring))
+                    {
+                      fprintf(file_out, "VerticalCSTypeGeoKey: %s\012", printstring);
+                    }
+                    else
+                    {
+                      fprintf(file_out, "VerticalCSTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                    }
                   }
                   break;
                 case 4097: // VerticalCitationGeoKey
@@ -3775,7 +3783,19 @@ int main(int argc, char *argv[])
       }
       if (lasheader->vlr_lastiling)
       {
-        fprintf(file_out, "LAStiling (idx %d, lvl %d, sub %d, bbox %g %g %g %g%s%s)\n", 
+        LASquadtree lasquadtree;
+        lasquadtree.subtiling_setup(lasheader->vlr_lastiling->min_x, lasheader->vlr_lastiling->max_x, lasheader->vlr_lastiling->min_y, lasheader->vlr_lastiling->max_y, lasheader->vlr_lastiling->level, lasheader->vlr_lastiling->level_index, 0);
+        F32 min[2], max[2];
+        lasquadtree.get_cell_bounding_box(lasheader->vlr_lastiling->level_index, min, max);
+        F32 buffer = 0.0f;
+        if (lasheader->vlr_lastiling->buffer)
+        {
+          buffer = (F32)(min[0] - lasheader->min_x);
+          if ((F32)(min[1] - lasheader->min_y) > buffer) buffer = (F32)(min[1] - lasheader->min_y);
+          if ((F32)(lasheader->max_x - max[0]) > buffer) buffer = (F32)(lasheader->max_x - max[0]);
+          if ((F32)(lasheader->max_y - max[1]) > buffer) buffer = (F32)(lasheader->max_y - max[1]);
+        }
+        fprintf(file_out, "LAStiling (idx %d, lvl %d, sub %d, bbox %.10g %.10g %.10g %.10g%s%s) (size %g x %g, buffer %g)\n", 
           lasheader->vlr_lastiling->level_index, 
           lasheader->vlr_lastiling->level,
           lasheader->vlr_lastiling->implicit_levels,
@@ -3784,7 +3804,10 @@ int main(int argc, char *argv[])
           lasheader->vlr_lastiling->max_x,
           lasheader->vlr_lastiling->max_y,
           (lasheader->vlr_lastiling->buffer ? ", buffer" : ""),
-          (lasheader->vlr_lastiling->reversible ? ", reversible" : ""));
+          (lasheader->vlr_lastiling->reversible ? ", reversible" : ""),
+          max[0]-min[0],
+          max[1]-min[1],
+          buffer);
       }
       if (lasheader->vlr_lasoriginal)
       {

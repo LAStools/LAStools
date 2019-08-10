@@ -1863,11 +1863,11 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
   return false;
 }
 
-static FILE* open_geo_file(const char* program_name, bool pcs=true)
+static FILE* open_geo_file(const char* program_name, bool pcs=true, bool vertical=false)
 {
   FILE* file = 0;
 
-  // create path to 'pcs.csv' file
+  // create path to 'pcs.csv', 'gcs.csv', or 'vertcs.csv' file
 
   #define MAX_GEO_PATH_LENGTH 4096
   int path_len = 0;
@@ -1899,9 +1899,21 @@ static FILE* open_geo_file(const char* program_name, bool pcs=true)
   path[path_len] = 'e'; path_len++;
   path[path_len] = 'o'; path_len++;
   path[path_len] = '/'; path_len++;
-  path[path_len] = (pcs ? 'p' : 'g'); path_len++;
-  path[path_len] = 'c'; path_len++;
-  path[path_len] = 's'; path_len++;
+  if (vertical)
+  {
+    path[path_len] = 'v'; path_len++;
+    path[path_len] = 'e'; path_len++;
+    path[path_len] = 'r'; path_len++;
+    path[path_len] = 't'; path_len++;
+    path[path_len] = 'c'; path_len++;
+    path[path_len] = 's'; path_len++;
+  }
+  else
+  {
+    path[path_len] = (pcs ? 'p' : 'g'); path_len++;
+    path[path_len] = 'c'; path_len++;
+    path[path_len] = 's'; path_len++;
+  }
   path[path_len] = '.'; path_len++;
   path[path_len] = 'c'; path_len++;
   path[path_len] = 's'; path_len++;
@@ -4093,30 +4105,160 @@ short GeoProjectionConverter::get_VerticalUnitsGeoKey(bool source) const
   }
 }
 
-bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value)
+bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* description)
 {
-  if ((5000 <= value) && (value <= 5099))      // [5000, 5099] = EPSG Ellipsoid Vertical CS Codes
+  if (value == GEO_VERTICAL_WGS84)
   {
-    vertical_geokey = value;
+    vertical_geokey = GEO_VERTICAL_WGS84;
+    if (description) sprintf(description, "WGS 84 Ellipsoid");
+    return true;
   }
-  else if ((5101 <= value) && (value <= 5199)) // [5100, 5199] = EPSG Orthometric Vertical CS Codes
+  else if (value == GEO_VERTICAL_NAVD88)
   {
-    vertical_geokey = value;
+    vertical_geokey = GEO_VERTICAL_NAVD88;
+    if (description) sprintf(description, "North American Vertical Datum 1988");
+    return true;
   }
-  else if ((5200 <= value) && (value <= 5999)) // [5200, 5999] = Reserved EPSG
+  else if (value == GEO_VERTICAL_DHHN2016)
   {
-    vertical_geokey = value;
+    vertical_geokey = GEO_VERTICAL_DHHN2016;
+    if (description) sprintf(description, "Deutsches Haupthoehennetz 2016");
+    return true;
   }
-  else if ((value == 6647) || (value == 1127)) // CGVD2013
+  else if (value == GEO_VERTICAL_DHHN92)
+  {
+    vertical_geokey = GEO_VERTICAL_DHHN92;
+    if (description) sprintf(description, "Deutsches Haupthoehennetz 1992");
+    return true;
+  }
+  else if (value == GEO_VERTICAL_CGVD2013)
   {
     vertical_geokey = GEO_VERTICAL_CGVD2013;
+    if (description) sprintf(description, "Canadian Geodetic Vertical Datum of 2013");
+    return true;
+  }
+  else if (value == GEO_VERTICAL_NN2000)
+  {
+    vertical_geokey = GEO_VERTICAL_NN2000;
+    if (description) sprintf(description, "Norway Normal Null 2000");
+    return true;
+  }
+  else if (value == GEO_VERTICAL_NN54)
+  {
+    vertical_geokey = GEO_VERTICAL_NN54;
+    if (description) sprintf(description, "Norway Normal Null 1954");
+    return true;
+  }
+  else if (value == GEO_VERTICAL_EVRF2007)
+  {
+    vertical_geokey = GEO_VERTICAL_EVRF2007;
+    if (description) sprintf(description, "European Vertical Reference Frame 2007");
+    return true;
+  }
+  else if (value == GEO_VERTICAL_DVR90)
+  {
+    vertical_geokey = GEO_VERTICAL_DVR90;
+    if (description) sprintf(description, "Dansk Vertikal Reference 1990");
+    return true;
+  }
+  else if (value == GEO_VERTICAL_NGVD29)
+  {
+    vertical_geokey = GEO_VERTICAL_NGVD29;
+    if (description) sprintf(description, "National Geodetic Vertical Datum 1929");
+    return true;
+  }
+  else if (value == GEO_VERTICAL_CGVD28)
+  {
+    vertical_geokey = GEO_VERTICAL_CGVD28;
+    if (description) sprintf(description, "Canadian Geodetic Vertical Datum of 1928");
+    return true;
+  }
+  else if ((5000 <= value) && (value <= 5099)) // [5000, 5099] = EPSG Ellipsoid Vertical CS Codes
+  {
+    vertical_geokey = value;    
+    if (description) sprintf(description, "Some Ellipsoid Vertical Datum");
+    return true;
   }
   else
   {
-    fprintf(stderr, "set_VerticalCSTypeGeoKey: look-up for %d not implemented\012", value);
-    return false;
+    // try to look it up in 'vertcs.csv' file
+    FILE* file = open_geo_file(argv_zero, true, true);
+    if (file == 0)
+    {
+      fprintf(stderr, "ERROR: cannot open 'vertcs.csv' file. maybe your LAStools distribution\n");
+      fprintf(stderr, "       has no .\\LAStools\\bin\\serf\\geo\\vertcs.csv file. download the\n");
+      fprintf(stderr, "       latest version at http://lastools.org/download/LAStools.zip\n");
+      return false;
+    }
+    int epsg_code = 0;
+    char line[2048];
+    while (fgets(line, 2048, file))
+    {
+      if (sscanf(line, "%d,", &epsg_code) == 1)
+      {
+        if (epsg_code == value)
+        {
+          // no need to read this file any further
+          fclose(file);
+          file = 0;
+          // parse the current line
+          char* name;
+          int dummy, units, run = 0;;
+          // skip until first comma
+          while (line[run] != ',') run++;
+          run++;
+          // maybe name is in parentheses
+          if (line[run] == '\"')
+          {
+            // remove opening parentheses
+            run++;
+            // this is where the name starts
+            name = &line[run];
+            run++;
+            // skip until closing parentheses
+            while (line[run] != '\"') run++;
+            // this is where the name ends
+            line[run] = '\0';
+            run++;
+          }
+          else
+          {
+            // this is where the name starts
+            name = &line[run];
+            // skip until second comma
+            while (line[run] != ',') run++;
+            // this is where the name ends
+            line[run] = '\0';
+          }
+          if (description) sprintf(description, name);
+          run++;
+          // skip two commas
+          while (line[run] != ',') run++;
+          run++;
+          while (line[run] != ',') run++;
+          run++;
+          // scan
+          if (sscanf(&line[run], "%d,%d", &units, &dummy) != 2)
+          {
+            fprintf(stderr, "failed to scan units from '%s'", line);
+            return false;
+          }
+          if (!set_VerticalUnitsGeoKey(units))
+          {
+            fprintf(stderr, "units %d of EPSG code %d not implemented.\n", units, value);
+            return false;
+          }
+          vertical_geokey = value;
+          return true;
+        }
+      }
+    }
+    fprintf(stderr, "EPSG code %d not found in 'vertcs.csv' file\n", value);
+    fclose(file);
+    file = 0;
   }
-  return true;
+  fprintf(stderr, "set_VerticalCSTypeGeoKey: look-up for %d not implemented\012", value);
+  return false;
 }
 
 short GeoProjectionConverter::get_VerticalCSTypeGeoKey()
@@ -5040,6 +5182,10 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       {
         if (epsg_code == value)
         {
+          // found the code. no need to read file any further
+          fclose(file);
+          file = 0;
+          // parse the current line
           char* name;
           int dummy, units, gcs, transform, run = 0;;
           // skip until first comma
@@ -5287,6 +5433,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
       }
     }
     fprintf(stderr, "EPSG code %d not found in 'pcs.csv' file\n", value);
+    fclose(file);
+    file = 0;
     return false;
   }
 
@@ -7192,6 +7340,35 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         vertical_geokey = GEO_VERTICAL_DHHN2016;
         *argv[i]='\0';
       }
+      else if (strcmp(argv[i],"-vertical_epsg") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code\n", argv[i]);
+          return false;
+        }
+        unsigned int code = 0;
+        if (sscanf(argv[i+1], "%u", &code) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code but '%s' is not a valid code\n", argv[i], argv[i+1]);
+          return false;
+        }
+        if (code > 32767)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code but %u is not a valid code\n", argv[i], code);
+          return false;
+        }
+        if (!set_VerticalCSTypeGeoKey(code))
+        {
+          fprintf(stderr, "ERROR: unknown vertical EPSG code in '%s %s'.\n", argv[i], argv[i+1]);
+          return false;
+        }
+        else
+        {
+          if (verbose) fprintf(stderr, "using vertical EPSG code %d\n", code);
+        }
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
     }
     else if (strcmp(argv[i],"-latlong") == 0 || strcmp(argv[i],"-target_latlong") == 0)
     {
@@ -7259,15 +7436,25 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     else if (strcmp(argv[i],"-epsg") == 0 || strcmp(argv[i],"-target_epsg") == 0)
     {
       bool source = (strcmp(argv[i],"-epsg") == 0);
-      short value = (short)atoi(argv[i+1]);
-      if (!set_epsg_code(value, 0, source))
+      unsigned int code = 0;
+      if (sscanf(argv[i+1], "%u", &code) != 1)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code but '%s' is not a valid code\n", argv[i], argv[i+1]);
+        return false;
+      }
+      if (code > 32767)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code but %u is not a valid code\n", argv[i], code);
+        return false;
+      }
+      if (!set_epsg_code((short)code, 0, source))
       {
         fprintf(stderr, "ERROR: unknown EPSG code in '%s %s'.\n", argv[i], argv[i+1]);
         return false;
       }
       else
       {
-        if (verbose) fprintf(stderr, "using %s EPSG %d\n", (source ? "projection" : "target projection"), value);
+        if (verbose) fprintf(stderr, "using %s EPSG code %d\n", (source ? "projection" : "target projection"), code);
       }
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
