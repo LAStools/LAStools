@@ -660,7 +660,11 @@ int main(int argc, char *argv[])
       memset(lasreader1->header.system_identifier, 0, 32);
       memset(lasreader1->header.generating_software, 0, 32);
       sprintf(lasreader1->header.system_identifier, "LAStools (c) by rapidlasso GmbH");
+#ifdef _WIN64
+      sprintf(lasreader1->header.generating_software, "lasdiff64 (version %d)", LAS_TOOLS_VERSION);
+#else // _WIN64
       sprintf(lasreader1->header.generating_software, "lasdiff (version %d)", LAS_TOOLS_VERSION);
+#endif // _WIN64
       laswriter = laswriteopener.open(&lasreader1->header);
       if (laswriter == 0)
       {

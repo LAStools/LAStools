@@ -281,7 +281,12 @@ int main(int argc, char *argv[])
   strncpy(lasreader->header.system_identifier, "LAStools (c) by rapidlasso GmbH", 32);
   lasreader->header.system_identifier[31] = '\0';
   char temp[64];
+#ifdef _WIN64
+  sprintf(temp, "lasmerge64 (version %d)", LAS_TOOLS_VERSION);
+#else // _WIN64
   sprintf(temp, "lasmerge (version %d)", LAS_TOOLS_VERSION);
+#endif // _WIN64
+  memset(lasreader->header.generating_software, 0, 32);
   strncpy(lasreader->header.generating_software, temp, 32);
   lasreader->header.generating_software[31] = '\0';
 
