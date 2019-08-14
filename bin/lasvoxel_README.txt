@@ -6,11 +6,17 @@
   xy and the z size of the voxel cells separately with '-step_xy 2'
   and '-step_z 0.3' which would create cells of size 2 by 2 by 0.3
   units or use uniform sized cells of '-step 0.5'. For voxels that
-  are infinite in z direction use option '-step_z_infinite'.
-  
+  are infinite in z direction use option '-step_z_infinite'. The
+  number of returns falling into a voxel is stored as the intensity
+  value of the points in the resulting LAS/LAZ file.
+
   By adding '-compute_mean_xyz' to the command line lasvoxel uses
   the average x, y, z coordinate of all points falling into a voxel
   instead of the center of the voxel.
+
+  By adding '-empty_voxels' to the command line lasvoxel will also
+  report all empty voxels that fall within the 3D bounding box but
+  give them an intensity value of zero.
 
   Please license from martin@rapidlasso.com before using lasvoxel
   commercially. Please note that the unlicensed version will set
@@ -78,6 +84,7 @@ overview of all tool-specific switches:
 -step_z 0.5                          : set the vertical z spacing of the grid to 0.5
 -step_z_infinite                     : sets the vertical z spacing to infinite (-> one layer of voxels)
 -compute_mean_xyz                    : compute averaged coordinate for output voxels
+-empty_voxels                        : also output voxels without returns but give them intensity of zero
 -compute_IDs_and_voxel_table         : https://groups.google.com/d/topic/lastools/Nc-rN5OuxY8/discussion
 -ilay                                : apply all LASlayers found in corresponding *.lay file on read
 -ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
@@ -89,7 +96,7 @@ overview of all tool-specific switches:
 
 for more info:
 
-E:\LAStools\bin>lasvoxel -h
+C:\software\LAStools\bin>lasvoxel -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -172,7 +179,9 @@ Filter points based on their gps time.
   -drop_gps_time_between 22.0 48.0
 Filter points based on their RGB/CIR/NIR channels.
   -keep_RGB_red 1 1
+  -drop_RGB_red 5000 20000
   -keep_RGB_green 30 100
+  -drop_RGB_green 2000 10000
   -keep_RGB_blue 0 0
   -keep_RGB_nir 64 127
   -keep_NDVI 0.2 0.7 -keep_NDVI_from_CIR -0.1 0.5
@@ -200,11 +209,15 @@ Transform coordinates.
   -translate_then_scale_y -0.5 1.001
   -transform_helmert -199.87,74.79,246.62
   -transform_helmert 598.1,73.7,418.2,0.202,0.045,-2.455,6.7
+  -transform_affine 0.9999652,0.903571,171.67,736.26
   -switch_x_y -switch_x_z -switch_y_z
   -clamp_z_below 70.5
   -clamp_z 70.5 72.5
   -copy_attribute_into_z 0
+  -add_attribute_to_z 1
+  -add_scaled_attribute_to_z 1 -1.2
   -copy_intensity_into_z
+  -copy_user_data_into_z
 Transform raw xyz integers.
   -translate_raw_z 20
   -translate_raw_xyz 1 1 0
@@ -217,10 +230,13 @@ Transform intensity.
   -translate_then_scale_intensity 0.5 3.1
   -clamp_intensity 0 255
   -clamp_intensity_above 255
+  -map_intensity map_file.txt
   -copy_RGB_into_intensity
   -copy_NIR_into_intensity
   -copy_attribute_into_intensity 0
+  -bin_gps_time_into_intensity 0.5
 Transform scan_angle.
+  -set_scan_angle 0.0
   -scale_scan_angle 1.944445
   -translate_scan_angle -5
   -translate_then_scale_scan_angle -0.5 2.1
@@ -229,12 +245,14 @@ Change the return number or return count of points.
   -set_return_number 1
   -set_extended_return_number 10
   -change_return_number_from_to 2 1
+  -change_extended_return_number_from_to 2 8
   -set_number_of_returns 2
-  -set_number_of_returns 15
+  -set_extended_number_of_returns 15
   -change_number_of_returns_from_to 0 2
+  -change_extended_number_of_returns_from_to 8 10
 Modify the classification.
   -set_classification 2
-  -set_extended_classification 0
+  -set_extended_classification 41
   -change_classification_from_to 2 4
   -classify_z_below_as -5.0 7
   -classify_z_above_as 70.0 7
@@ -242,6 +260,9 @@ Modify the classification.
   -classify_intensity_above_as 200 9
   -classify_intensity_below_as 30 11
   -classify_intensity_between_as 500 900 15
+  -classify_attribute_below_as 0 -5.0 7
+  -classify_attribute_above_as 1 70.0 7
+  -classify_attribute_between_as 1 2.0 5.0 4
   -change_extended_classification_from_to 6 46
   -move_ancient_to_extended_classification
 Change the flags.
@@ -257,16 +278,20 @@ Modify the user data.
   -scale_user_data 1.5
   -change_user_data_from_to 23 26
   -change_user_data_from_to 23 26
+  -map_user_data map_file.txt
   -copy_attribute_into_user_data 1
+  -add_scaled_attribute_to_user_data 0 10.0
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
+  -map_point_source map_file.txt
   -copy_user_data_into_point_source
   -copy_scanner_channel_into_point_source
   -merge_scanner_channel_into_point_source
   -split_scanner_channel_from_point_source
   -bin_Z_into_point_source 200
   -bin_abs_scan_angle_into_point_source 2
+  -bin_gps_time_into_point_source 5.0
 Transform gps_time.
   -set_gps_time 113556962.005715
   -translate_gps_time 40.50
@@ -283,6 +308,12 @@ Transform RGB/NIR colors.
   -copy_G_into_NIR -copy_G_into_intensity
   -copy_B_into_NIR -copy_B_into_intensity
   -copy_intensity_into_NIR
+  -switch_RGBI_into_CIR
+  -switch_RGB_intensity_into_CIR
+Transform attributes in "Extra Bytes".
+  -scale_attribute 0 1.5
+  -translate_attribute 1 0.2
+  -copy_user_data_into_attribute 0
 Supported LAS Inputs
   -i lidar.las
   -i lidar.laz
@@ -316,12 +347,13 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 180322 (commercial)
+LAStools (by martin@rapidlasso.com) version 190812 (commercial)
 usage:
 lasvoxel -i in.laz -o out.laz
 lasvoxel -i in.laz -step 2 -o out.laz
 lasvoxel -i in.laz -step_xy 2 -step_z 1 -o out.laz
 lasvoxel -i in.laz -step_xy 4 -step_z 2 -max_count 65535 -o out.laz
+lasvoxel -i in.laz -step_xy 1 -step_z_infinite -o out.laz
 lasvoxel -i in.laz -step 2.5 -compute_IDs_and_voxel_table -o out.laz
 lasvoxel -i in.laz -step 2.5 -compute_IDs_and_voxel_table -store_IDs_in_intensity -o out.laz
 lasvoxel -h

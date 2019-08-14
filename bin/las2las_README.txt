@@ -202,6 +202,8 @@ other commandline arguments are
 -set_point_size 26             : force point size to be 26
 -set_classification 0          : sets all classifications fields to zero
 -set_user_data 0               : sets all user_data fields to zero
+-set_ogc_wkt                   : translate GeoTIFF keys into CRS string in OGC WKT format and add it as VLR
+-set_ogc_wkt_in_evlr           : same as above but adds it as LAS 1.4 EVLR instead. really not recommended!!!
 -remove_all_vlrs               : remove all VLRs
 -remove_vlr 2                  : remove VLR number 2 (couting starts at 0)
 -remove_vlrs_from_to 0 2       : remove the first three VLRs
@@ -263,7 +265,6 @@ other commandline arguments are
 -target_elevation_meter          : output uses meter for elevation
 -target_precision 0.001          : output uses one millimeter resolution for x and y
 -target_elevation_precision 0.02 : output uses two centimeter resolution for z
-
 -tm 609601.22 0.0 meter 33.75 -79 0.99996                 : specifies a transverse mercator projection
 -tm 1804461.942257 0.0 feet 0.8203047 -2.1089395 0.99996
 -lcc 609601.22 0.0 meter 33.75 -79 34.33333 36.16666      : specifies a lambertian conic confomal projection

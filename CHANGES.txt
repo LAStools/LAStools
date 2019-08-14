@@ -1,3 +1,9 @@
+11 August 2019 -- lasoptimize64: also support optimizing very large files (if over 4GB as uncompressed LAS)
+11 August 2019 -- lascopy64: serious bug fix for copying very large files (if over 4GB as uncompressed LAS)
+11 August 2019 -- lassort64: serious bug fix for sorting very large files (if over 4GB as uncompressed LAS)
+10 August 2019 -- las2las: set exotic vertical datums via '-vertical_epsg 5607' (= "Bora Bora SAU 2001 height")
+ 8 August 2019 -- lasinfo: improved reporting of bounding box, size, and buffer for tiles created by lastile
+ 2 August 2019 -- lasnoise64, lasduplicate64, lasdistance64, lascanopy64, lasvoxel64: increase default max '-mem'
 30 July 2019 -- lasgrid: increase default memory max to 1.75 GB. lasgrid64: increase default memory max to 6 GB.
 28 July 2019 -- NEW: demzip compresses DTM, DSM, CHM, metrics, and GEOID rasters from ASC, BIL, TIF to RasterLAZ 
 18 July 2019 -- txt2las: bug fix in functionality for adding '-add_attribute' in extra bytes introduced in late 2018

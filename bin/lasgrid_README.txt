@@ -186,13 +186,24 @@ you can look at in Google Earth by double clicking the generated KML file
 >> lasgrid -i ..\data\TO_core_last_zoom.las -gray -o toronto.png -utm 17T
 >> lasgrid -i ..\data\SerpentMound.las -false -o SerpentMound.png
 
-other commandline arguments are
+overview of all tool-specific switches:
 
--mem                   : amount of main memory to use in MB (500 - 2000) [default: 500]
+-v                                   : more info reported in console
+-vv                                  : even more info reported in console
+-quiet                               : nothing reported in console
+-wait                                : wait for <ENTER> in the console at end of process
+-version                             : reports this tool's version number
+-fail                                : fail if license expired or invalid
+-gui                                 : start with files loaded into GUI
+-cores 4                             : process multiple inputs on 4 cores in parallel
+-mem                   : amount of main memory to use in MB (500 - 2000) [default: 1500]
 -temp_files            : base file name for temp files (example: E:\tmp)
 -step 2                : raster with stepsize 2 [default: 1]
 -fill 5                : fills voids in the grid with a square search radius of 5 
 -subcircle 0.2         : each point is "splatted" with a circle of extra 8 points at radius 0.2
+-use_bb                : raster full extend of bounding box
+-use_tile_bb           : only raster extend of tile bounding box (for tiles generated with lastile)
+-use_orig_bb           : only raster extend of original bounding box (for tiles generated with '-buffered 30')
 -nbits 16              : use 16 bits to represent the elevation (mainly used with BIL format)
 -nrows 256             : raster at most 256 rows (starting from the lower left)
 -ncols 512             : raster at most 512 columns (starting from the lower left)
@@ -244,6 +255,9 @@ other commandline arguments are
 -lcc 609601.22 0.0 meter 33.75 -79 34.33333 36.16666
 -lambert_conic_conformal 1640416.666667 0.0 surveyfeet 47.000000 -120.833333 47.50 48.733333
 -ellipsoid 23          : use the WGS-84 ellipsoid (do -ellipsoid -1 for a list)
+-ilay                                : apply all LASlayers found in corresponding *.lay file on read
+-ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
+-ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
 
 for more info:
 

@@ -1,3 +1,4 @@
+10 August 2019 -- las2las: set exotic vertical datums via '-vertical_epsg 5607' (= "Bora Bora SAU 2001 height")
 18 July 2019 -- txt2las: bug fix in functionality for adding '-add_attribute' in extra bytes introduced in late 2018
 11 July 2019 -- LASlib, LAStools: report file name when LASreader has 'ERROR: 'end-of-file during chunk with index 3254'
  4 July 2019 -- LASlib: two new LAStransforms '-switch_RGBI_into_CIR' and '-switch_RGB_intensity_into_CIR'

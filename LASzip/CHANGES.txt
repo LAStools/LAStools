@@ -1,3 +1,4 @@
+11 August 2019 -- added CMake for DLL build and minor fixes to allow 64 bit Windows compile of LASzip.dll
 11 April 2019 -- increase AC_BUFFER_SIZE from 1024 to 4096 to lower chance of ultra-rare propagate_carry() overflow
 10 April 2019 -- fix potential memory leaks found by Connor Manning using valgrind
 31 March 2019 -- better license terms for core arithmetic coder thanks to Amir Said. upgrade to version 3.4 rev 0
