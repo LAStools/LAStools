@@ -117,6 +117,10 @@ SOURCE=.\src\lasfilter.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\lasignore.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\lasindex.cpp
 # End Source File
 # Begin Source File
@@ -338,6 +342,10 @@ SOURCE=.\inc\lasdefinitions.hpp
 # Begin Source File
 
 SOURCE=.\inc\lasfilter.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\inc\lasignore.hpp
 # End Source File
 # Begin Source File
 

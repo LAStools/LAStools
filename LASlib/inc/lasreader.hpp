@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    19 August 2019 -- unify '-ignore_class 7', '-ignore_withheld', etc ... in LASignore
      7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
      8 February 2018 -- new LASreaderStored via '-stored' option to allow piped operation
     15 December 2017 -- optional '-files_are_flightline 101' start number like '-faf 101'
@@ -49,6 +50,7 @@
 #define LAS_READER_HPP
 
 #include "lasdefinitions.hpp"
+#include "lasignore.hpp"
 
 class LASindex;
 class LASfilter;
@@ -73,6 +75,8 @@ public:
   inline LASfilter* get_filter() const { return filter; };
   virtual void set_transform(LAStransform* transform);
   inline LAStransform* get_transform() const { return transform; };
+  void set_ignore(LASignore* ignore);
+  inline LASignore* get_ignore() const { return ignore; };
 
   inline U32 get_inside() const { return inside; };
   virtual BOOL inside_none();
@@ -92,6 +96,8 @@ public:
 
   virtual BOOL seek(const I64 p_index) = 0;
   BOOL read_point() { return (this->*read_simple)(); };
+
+  inline BOOL ignore_point() { return (ignore ? ignore->ignore(&point) : FALSE); };
 
   inline void compute_coordinates() { point.compute_coordinates(); };
 
@@ -127,6 +133,7 @@ protected:
   LASindex* index;
   LASfilter* filter;
   LAStransform* transform;
+  LASignore* ignore;
 
   U32 inside;
   F32 t_ll_x, t_ll_y, t_size, t_ur_x, t_ur_y;
@@ -209,7 +216,7 @@ public:
   void set_inside_tile(const F32 ll_x, const F32 ll_y, const F32 size);
   void set_inside_circle(const F64 center_x, const F64 center_y, const F64 radius);
   void set_inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
-  BOOL parse(int argc, char* argv[]);
+  BOOL parse(int argc, char* argv[], BOOL parse_ignore=FALSE);
   BOOL is_piped() const;
   BOOL is_buffered() const;
   BOOL is_header_populated() const;
@@ -217,9 +224,11 @@ public:
   BOOL is_inside() const;
   I32 unparse(CHAR* string) const;
   void set_filter(LASfilter* filter);
-  LASfilter* get_filter() { return filter; };
+  inline LASfilter* get_filter() { return filter; };
   void set_transform(LAStransform* transform);
-  LAStransform* get_transform() { return transform; };
+  inline LAStransform* get_transform() { return transform; };
+  void set_ignore(LASignore* ignore);
+  inline LASignore* get_ignore() { return ignore; };
   void reset();
   const CHAR* get_temp_file_base() const { return temp_file_base; };
   LASreader* open(const CHAR* other_file_name=0, BOOL reset_after_other=TRUE);
@@ -288,6 +297,7 @@ private:
   LASindex* index;
   LASfilter* filter;
   LAStransform* transform;
+  LASignore* ignore;
 
   // optional selective decompression (compressed new LAS 1.4 point types only)
   U32 decompress_selective;

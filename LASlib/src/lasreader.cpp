@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2005-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2005-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -60,6 +60,7 @@ LASreader::LASreader()
   index = 0;
   filter = 0;
   transform = 0;
+  ignore = 0;
   inside = 0;
   t_ll_x = 0;
   t_ll_y = 0;
@@ -134,6 +135,11 @@ void LASreader::set_transform(LAStransform* transform)
     read_simple = &LASreader::read_point_default;
   }
   read_complex = &LASreader::read_point_default;
+}
+
+void LASreader::set_ignore(LASignore* ignore)
+{
+  this->ignore = ignore;
 }
 
 BOOL LASreader::inside_none()
@@ -1612,7 +1618,7 @@ void LASreadOpener::usage() const
   fprintf(stderr,"  -inside_circle center_x center_y radius\n");
 }
 
-BOOL LASreadOpener::parse(int argc, char* argv[])
+BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 {
   int i;
   for (i = 1; i < argc; i++)
@@ -1625,78 +1631,307 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
     {
       LASfilter().usage();
       LAStransform().usage();
+      LASignore().usage();
       usage();
       return TRUE;
     }
-    else if (strcmp(argv[i],"-i") == 0)
+    else if (strncmp(argv[i], "-i", 2) == 0)
     {
-      if ((i+1) >= argc)
+      if (strcmp(argv[i],"-i") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs at least 1 argument: file_name or wild_card\n", argv[i]);
-        return FALSE;
-      }
-      *argv[i]='\0';
-      i+=1;
-      do
-      {
-        add_file_name(argv[i], unique);
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs at least 1 argument: file_name or wild_card\n", argv[i]);
+          return FALSE;
+        }
         *argv[i]='\0';
         i+=1;
-      } while ((i < argc) && (*argv[i] != '-') && (*argv[i] != '\0'));
-      i-=1;
+        do
+        {
+          add_file_name(argv[i], unique);
+          *argv[i]='\0';
+          i+=1;
+        } while ((i < argc) && (*argv[i] != '-') && (*argv[i] != '\0'));
+        i-=1;
+      }
+      else if (strncmp(argv[i],"-ignore_", 8) == 0)
+      {
+        if (parse_ignore)
+        {
+          if (ignore == 0)
+          {
+            ignore = new LASignore();
+          }
+          if (!ignore->parse(i, argc, argv))
+          {
+            delete ignore;
+            ignore = 0;
+            return FALSE;
+          }
+        }
+        else
+        {
+          fprintf(stderr,"ERROR: this tool does not process '-ignore_xxxx' options\n");
+          return FALSE;
+        }
+      }
+      else if (strncmp(argv[i],"-inside", 7) == 0)
+      {
+        if (strcmp(argv[i],"-inside_tile") == 0)
+        {
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: ll_x, ll_y, size\n", argv[i]);
+            return FALSE;
+          }
+          set_inside_tile((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3]));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+        }
+        else if (strcmp(argv[i],"-inside_circle") == 0)
+        {
+          if ((i+3) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: center_x, center_y, radius\n", argv[i]);
+            return FALSE;
+          }
+          set_inside_circle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+        }
+        else if (strcmp(argv[i],"-inside") == 0 || strcmp(argv[i],"-inside_rectangle") == 0)
+        {
+          if ((i+4) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_x, min_y, max_x, max_y\n", argv[i]);
+            return FALSE;
+          }
+          set_inside_rectangle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
+        }
+        else
+        {
+          fprintf(stderr,"ERROR: unknown '-inside' option '%s'\n", argv[i]);
+          return FALSE;
+        }
+      }
+      else if (strcmp(argv[i],"-iadd_extra") == 0 || strcmp(argv[i],"-iadd_attribute") == 0)
+      {
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: data_type name description\n", argv[i]);
+          return FALSE;
+        }
+        if (((i+4) < argc) && (atof(argv[i+4]) != 0.0))
+        {
+          if (((i+5) < argc) && ((atof(argv[i+5]) != 0.0) || (strcmp(argv[i+5], "0") == 0) || (strcmp(argv[i+5], "0.0") == 0)))
+          {
+            if (((i+6) < argc) && (atof(argv[i+6]) != 0.0))
+            {
+              if (((i+7) < argc) && ((atof(argv[i+7]) != 0.0) || (strcmp(argv[i+7], "0") == 0) || (strcmp(argv[i+7], "0.0") == 0)))
+              {
+                if (((i+8) < argc) && ((atof(argv[i+8]) != 0.0) || (strcmp(argv[i+8], "0") == 0) || (strcmp(argv[i+8], "0.0") == 0)))
+                {
+                  add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]), atof(argv[i+8]));
+                  *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; *argv[i+8]='\0'; i+=8;
+                }
+                else
+                {
+                  add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]));
+                  *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; i+=7;
+                }
+              }
+              else
+              {
+                add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]));
+                *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; i+=6;
+              }
+            }
+            else
+            {
+              add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]));
+              *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; i+=5;
+            }
+          }
+          else
+          {
+            add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]));
+            *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4;
+          }
+        }
+        else
+        {
+          add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3]);
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+        }
+      }
+      else if (strcmp(argv[i],"-iparse") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: string\n", argv[i]);
+          return FALSE;
+        }
+        set_parse_string(argv[i+1]);
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-iskip") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: number_of_lines\n", argv[i]);
+          return FALSE;
+        }
+        set_skip_lines(atoi(argv[i+1]));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-io_ibuffer") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
+          return FALSE;
+        }
+        set_io_ibuffer_size((I32)atoi(argv[i+1]));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-itranslate_intensity") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
+          return FALSE;
+        }
+        set_translate_intensity((F32)atof(argv[i+1]));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-iscale_intensity") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
+          return FALSE;
+        }
+        set_scale_intensity((F32)atof(argv[i+1]));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-itranslate_scan_angle") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
+          return FALSE;
+        }
+        set_translate_scan_angle((F32)atof(argv[i+1]));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-iscale_scan_angle") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
+          return FALSE;
+        }
+        set_scale_scan_angle((F32)atof(argv[i+1]));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-ipts") == 0)
+      {
+        itxt = TRUE;
+        ipts = TRUE;
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-iptx") == 0)
+      {
+        itxt = TRUE;
+        iptx = TRUE;
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-itxt") == 0)
+      {
+        itxt = TRUE;
+        *argv[i]='\0';
+      }
+    }
+    else if (strncmp(argv[i], "-r", 2) == 0)
+    {
+      if (strcmp(argv[i],"-rescale") == 0)
+      {
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z\n", argv[i]);
+          return FALSE;
+        }
+        F64 scale_factor[3];
+        scale_factor[0] = atof(argv[i+1]);
+        scale_factor[1] = atof(argv[i+2]);
+        scale_factor[2] = atof(argv[i+3]);
+        set_scale_factor(scale_factor);
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+      }
+      else if (strcmp(argv[i],"-rescale_xy") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 argument: rescale_x rescale_y\n", argv[i]);
+          return FALSE;
+        }
+        F64 scale_factor[3];
+        scale_factor[0] = atof(argv[i+1]);
+        scale_factor[1] = atof(argv[i+2]);
+        scale_factor[2] = 0;
+        set_scale_factor(scale_factor);
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+      }
+      else if (strcmp(argv[i],"-rescale_z") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
+          return FALSE;
+        }
+        F64 scale_factor[3];
+        scale_factor[0] = 0;
+        scale_factor[1] = 0;
+        scale_factor[2] = atof(argv[i+1]);
+        set_scale_factor(scale_factor);
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+      }
+      else if (strcmp(argv[i],"-reoffset") == 0)
+      {
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z\n", argv[i]);
+          return FALSE;
+        }
+        F64 offset[3];
+			  offset[0] = atof(argv[i+1]);
+			  offset[1] = atof(argv[i+2]);
+			  offset[2] = atof(argv[i+3]);
+        set_offset(offset);
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+      }
     }
     else if (strcmp(argv[i],"-unique") == 0)
     {
       unique = TRUE;
       *argv[i]='\0';
     }
-    else if (strncmp(argv[i],"-inside", 7) == 0)
-    {
-      if (strcmp(argv[i],"-inside_tile") == 0)
-      {
-        if ((i+3) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 3 arguments: ll_x, ll_y, size\n", argv[i]);
-          return FALSE;
-        }
-        set_inside_tile((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3]));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
-      }
-      else if (strcmp(argv[i],"-inside_circle") == 0)
-      {
-        if ((i+3) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 3 arguments: center_x, center_y, radius\n", argv[i]);
-          return FALSE;
-        }
-        set_inside_circle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
-      }
-      else if (strcmp(argv[i],"-inside") == 0 || strcmp(argv[i],"-inside_rectangle") == 0)
-      {
-        if ((i+4) >= argc)
-        {
-          fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_x, min_y, max_x, max_y\n", argv[i]);
-          return FALSE;
-        }
-        set_inside_rectangle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
-      }
-      else
-      {
-        fprintf(stderr,"ERROR: unknown '-inside' option '%s'\n", argv[i]);
-        return FALSE;
-      }
-    }
     else if (strcmp(argv[i],"-comma_not_point") == 0)
     {
       comma_not_point = TRUE;
       *argv[i]='\0';
     }
-    else if (strcmp(argv[i],"-stdin") == 0)
+    else if (strncmp(argv[i], "-s", 2) == 0)
     {
-      use_stdin = TRUE;
-      *argv[i]='\0';
+      if (strcmp(argv[i],"-stdin") == 0)
+      {
+        use_stdin = TRUE;
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-stored") == 0)
+      {
+        set_stored(TRUE);
+        *argv[i]='\0';
+      }
     }
     else if (strcmp(argv[i],"-lof") == 0)
     {
@@ -1712,213 +1947,48 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       }
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-rescale") == 0)
+    else if (strncmp(argv[i], "-a", 2) == 0)
     {
-      if ((i+3) >= argc)
+      if (strcmp(argv[i],"-auto_reoffset") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z\n", argv[i]);
-        return FALSE;
+        set_auto_reoffset(TRUE);
+        *argv[i]='\0';
       }
-      F64 scale_factor[3];
-      scale_factor[0] = atof(argv[i+1]);
-      scale_factor[1] = atof(argv[i+2]);
-      scale_factor[2] = atof(argv[i+3]);
-      set_scale_factor(scale_factor);
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
-    }
-    else if (strcmp(argv[i],"-rescale_xy") == 0)
-    {
-      if ((i+2) >= argc)
+      else if (strcmp(argv[i],"-apply_file_source_ID") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 2 argument: rescale_x rescale_y\n", argv[i]);
-        return FALSE;
-      }
-      F64 scale_factor[3];
-      scale_factor[0] = atof(argv[i+1]);
-      scale_factor[1] = atof(argv[i+2]);
-      scale_factor[2] = 0;
-      set_scale_factor(scale_factor);
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
-    }
-    else if (strcmp(argv[i],"-rescale_z") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
-        return FALSE;
-      }
-      F64 scale_factor[3];
-      scale_factor[0] = 0;
-      scale_factor[1] = 0;
-      scale_factor[2] = atof(argv[i+1]);
-      set_scale_factor(scale_factor);
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-reoffset") == 0)
-    {
-      if ((i+3) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z\n", argv[i]);
-        return FALSE;
-      }
-      F64 offset[3];
-			offset[0] = atof(argv[i+1]);
-			offset[1] = atof(argv[i+2]);
-			offset[2] = atof(argv[i+3]);
-      set_offset(offset);
-      *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
-    }
-    else if (strcmp(argv[i],"-auto_reoffset") == 0)
-    {
-      set_auto_reoffset(TRUE);
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-files_are_flightlines") == 0 || strcmp(argv[i],"-faf") == 0)
-    {
-      if (((i+1) < argc) && ('1' <= argv[i+1][0]) && (argv[i+1][0] <= '9'))
-      {
-        set_files_are_flightlines(atoi(argv[i+1]));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-      }
-      else
-      {
-        set_files_are_flightlines(1);
+        set_apply_file_source_ID(TRUE);
         *argv[i]='\0';
       }
     }
-    else if (strcmp(argv[i],"-faf_index") == 0)
+    else if (strncmp(argv[i], "-f", 2) == 0)
     {
-      if ((i+1) >= argc)
+      if (strcmp(argv[i],"-files_are_flightlines") == 0 || strcmp(argv[i],"-faf") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
-        return FALSE;
-      }
-      set_files_are_flightlines_index(atoi(argv[i+1]));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-apply_file_source_ID") == 0)
-    {
-      set_apply_file_source_ID(TRUE);
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-itranslate_intensity") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
-        return FALSE;
-      }
-      set_translate_intensity((F32)atof(argv[i+1]));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-iscale_intensity") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
-        return FALSE;
-      }
-      set_scale_intensity((F32)atof(argv[i+1]));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-itranslate_scan_angle") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
-        return FALSE;
-      }
-      set_translate_scan_angle((F32)atof(argv[i+1]));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-iscale_scan_angle") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
-        return FALSE;
-      }
-      set_scale_scan_angle((F32)atof(argv[i+1]));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-iadd_extra") == 0 || strcmp(argv[i],"-iadd_attribute") == 0)
-    {
-      if ((i+3) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 3 arguments: data_type name description\n", argv[i]);
-        return FALSE;
-      }
-      if (((i+4) < argc) && (atof(argv[i+4]) != 0.0))
-      {
-        if (((i+5) < argc) && ((atof(argv[i+5]) != 0.0) || (strcmp(argv[i+5], "0") == 0) || (strcmp(argv[i+5], "0.0") == 0)))
+        if (((i+1) < argc) && ('1' <= argv[i+1][0]) && (argv[i+1][0] <= '9'))
         {
-          if (((i+6) < argc) && (atof(argv[i+6]) != 0.0))
-          {
-            if (((i+7) < argc) && ((atof(argv[i+7]) != 0.0) || (strcmp(argv[i+7], "0") == 0) || (strcmp(argv[i+7], "0.0") == 0)))
-            {
-              if (((i+8) < argc) && ((atof(argv[i+8]) != 0.0) || (strcmp(argv[i+8], "0") == 0) || (strcmp(argv[i+8], "0.0") == 0)))
-              {
-                add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]), atof(argv[i+8]));
-                *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; *argv[i+8]='\0'; i+=8;
-              }
-              else
-              {
-                add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]), atof(argv[i+7]));
-                *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; i+=7;
-              }
-            }
-            else
-            {
-              add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]), atof(argv[i+6]));
-              *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; i+=6;
-            }
-          }
-          else
-          {
-            add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]), atof(argv[i+5]));
-            *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; i+=5;
-          }
+          set_files_are_flightlines(atoi(argv[i+1]));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
         else
         {
-          add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3], atof(argv[i+4]));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4;
+          set_files_are_flightlines(1);
+          *argv[i]='\0';
         }
       }
-      else
+      else if (strcmp(argv[i],"-faf_index") == 0)
       {
-        add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3]);
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
+          return FALSE;
+        }
+        set_files_are_flightlines_index(atoi(argv[i+1]));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
-    }
-    else if (strcmp(argv[i],"-iparse") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: string\n", argv[i]);
-        return FALSE;
-      }
-      set_parse_string(argv[i+1]);
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-iskip") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number_of_lines\n", argv[i]);
-        return FALSE;
-      }
-      set_skip_lines(atoi(argv[i+1]));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
     else if (strcmp(argv[i],"-merged") == 0)
     {
       set_merged(TRUE);
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-stored") == 0)
-    {
-      set_stored(TRUE);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-buffered") == 0)
@@ -1941,96 +2011,75 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
       temp_file_base = LASCopyString(argv[i+1]);
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
-    else if (strcmp(argv[i],"-neighbors") == 0)
+    else if (strncmp(argv[i], "-n", 2) == 0)
     {
-      if ((i+1) >= argc)
+      if (strcmp(argv[i],"-neighbors") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs at least 1 argument: file_name or wild_card\n", argv[i]);
-        return FALSE;
-      }
-      *argv[i]='\0';
-      i+=1;
-      do
-      {
-        add_neighbor_file_name(argv[i]);
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs at least 1 argument: file_name or wild_card\n", argv[i]);
+          return FALSE;
+        }
         *argv[i]='\0';
         i+=1;
-      } while ((i < argc) && (*argv[i] != '-') && (*argv[i] != '\0'));
-      i-=1;
-    }
-    else if (strcmp(argv[i],"-neighbors_lof") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        fprintf(stderr,"ERROR: '%s' needs at least 1 argument: file_name\n", argv[i]);
-        return FALSE;
-      }
-      FILE* file = fopen(argv[i+1], "r");
-      if (file == 0)
-      {
-        fprintf(stderr, "ERROR: cannot open '%s'\n", argv[i+1]);
-        return FALSE;
-      }
-      CHAR line[1024];
-      while (fgets(line, 1024, file))
-      {
-        // find end of line
-        I32 len = (I32)strlen(line) - 1;
-        // remove extra white spaces and line return at the end 
-        while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
+        do
         {
-          line[len] = '\0';
-          len--;
-        }
-#ifdef _WIN32
-        add_neighbor_file_name_single(line);
-#else
-        add_neighbor_file_name(line);
-#endif
+          add_neighbor_file_name(argv[i]);
+          *argv[i]='\0';
+          i+=1;
+        } while ((i < argc) && (*argv[i] != '-') && (*argv[i] != '\0'));
+        i-=1;
       }
-      fclose(file);
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-    }
-    else if (strcmp(argv[i],"-pipe_on") == 0)
-    {
-      set_pipe_on(TRUE);
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-populate") == 0)
-    {
-      set_populate_header(TRUE);
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-io_ibuffer") == 0)
-    {
-      if ((i+1) >= argc)
+      else if (strcmp(argv[i],"-neighbors_lof") == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
-        return FALSE;
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs at least 1 argument: file_name\n", argv[i]);
+          return FALSE;
+        }
+        FILE* file = fopen(argv[i+1], "r");
+        if (file == 0)
+        {
+          fprintf(stderr, "ERROR: cannot open '%s'\n", argv[i+1]);
+          return FALSE;
+        }
+        CHAR line[1024];
+        while (fgets(line, 1024, file))
+        {
+          // find end of line
+          I32 len = (I32)strlen(line) - 1;
+          // remove extra white spaces and line return at the end 
+          while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
+          {
+            line[len] = '\0';
+            len--;
+          }
+#ifdef _WIN32
+          add_neighbor_file_name_single(line);
+#else
+          add_neighbor_file_name(line);
+#endif
+        }
+        fclose(file);
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
-      set_io_ibuffer_size((I32)atoi(argv[i+1]));
-      *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+    }
+    else if (strncmp(argv[i], "-p", 2) == 0)
+    {
+      if (strcmp(argv[i],"-pipe_on") == 0)
+      {
+        set_pipe_on(TRUE);
+        *argv[i]='\0';
+      }
+      else if (strcmp(argv[i],"-populate") == 0)
+      {
+        set_populate_header(TRUE);
+        *argv[i]='\0';
+      }
     }
     else if (strcmp(argv[i],"-do_not_populate") == 0)
     {
       set_populate_header(FALSE);
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-ipts") == 0)
-    {
-      itxt = TRUE;
-      ipts = TRUE;
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-iptx") == 0)
-    {
-      itxt = TRUE;
-      iptx = TRUE;
-      *argv[i]='\0';
-    }
-    else if (strcmp(argv[i],"-itxt") == 0)
-    {
-      itxt = TRUE;
       *argv[i]='\0';
     }
   }
@@ -2056,6 +2105,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
   if (!filter->parse(argc, argv))
   {
     delete filter;
+    filter = 0;
     return FALSE;
   }
   if (!filter->active())
@@ -2069,6 +2119,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[])
   if (!transform->parse(argc, argv))
   {
     delete transform;
+    transform = 0;
     return FALSE;
   }
   if (!transform->active())
