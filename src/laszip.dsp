@@ -346,6 +346,10 @@ SOURCE=..\laslib\inc\lasfilter.hpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\LASlib\inc\lasignore.hpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\lasindex.hpp
 # End Source File
 # Begin Source File
@@ -407,6 +411,10 @@ SOURCE=..\laslib\inc\laswritercompatible.hpp
 # Begin Source File
 
 SOURCE=..\LASzip\src\laszip.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\laszip_decompress_selective_v3.hpp
 # End Source File
 # Begin Source File
 
