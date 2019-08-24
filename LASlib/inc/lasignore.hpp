@@ -56,7 +56,7 @@ public:
   void dont_ignore_class(U8 classification);
 
   BOOL parse(int& i, int argc, char *argv[]);
-  BOOL unparse(CHAR* string) const;
+  I32 unparse(CHAR* string) const;
 
   BOOL parse(U32 curr_parameter, const U32 num_parameters, const F64* parameters);
   void unparse(U32& num_parameters, F64* parameters) const;
