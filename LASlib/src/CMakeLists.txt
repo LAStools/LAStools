@@ -5,6 +5,7 @@ add_definitions(-DNDEBUG -DUNORDERED -DHAVE_UNORDERED_MAP)
 
 set(LAS_SRC
 	lasreader.cpp
+	lasignore.cpp
 	laswriter.cpp
 	lasreader_las.cpp
 	lasreader_bin.cpp
