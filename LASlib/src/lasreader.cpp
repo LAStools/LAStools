@@ -2785,6 +2785,7 @@ LASreadOpener::LASreadOpener()
   inside_rectangle = 0;
   filter = 0;
   transform = 0;
+  ignore = 0;
   temp_file_base = 0;
 }
 
