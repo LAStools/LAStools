@@ -10,3 +10,4 @@ endif()
 
 add_subdirectory(LASlib/src)
 add_subdirectory(src)
+add_subdirectory(src_full)
