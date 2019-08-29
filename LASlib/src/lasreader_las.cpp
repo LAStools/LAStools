@@ -1355,6 +1355,10 @@ BOOL LASreaderLAS::read_point_default()
   {
     if (reader->read(point.point) == FALSE)
     {
+      if (reader->warning())
+      {
+        fprintf(stderr,"WARNING: '%s' for '%s'\n", reader->warning(), file_name);
+      }
       if (reader->error())
       {
         fprintf(stderr,"ERROR: '%s' after %u of %u points for '%s'\n", reader->error(), (U32)p_count, (U32)npoints, file_name);
