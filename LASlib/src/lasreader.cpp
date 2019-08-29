@@ -1940,7 +1940,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
         fprintf(stderr,"ERROR: '%s' needs 1 argument: list_of_files\n", argv[i]);
         return FALSE;
       }
-      if (!add_list_of_files(argv[i+1]), unique)
+      if (!add_list_of_files(argv[i+1], unique))
       {
         fprintf(stderr, "ERROR: cannot load list of files '%s'\n", argv[i+1]);
         return FALSE;
