@@ -3718,8 +3718,8 @@ int main(int argc, char *argv[])
           {
             fprintf(file_out, "    ncols %6d\012", vlrRasterLAZ.ncols);
             fprintf(file_out, "    nrows %6d\012", vlrRasterLAZ.nrows);
-            fprintf(file_out, "    llx   %g\012", vlrRasterLAZ.llx);
-            fprintf(file_out, "    lly   %g\012", vlrRasterLAZ.lly);
+            fprintf(file_out, "    llx   %.10g\012", vlrRasterLAZ.llx);
+            fprintf(file_out, "    lly   %.10g\012", vlrRasterLAZ.lly);
             fprintf(file_out, "    stepx    %g\012", vlrRasterLAZ.stepx);
             fprintf(file_out, "    stepy    %g\012", vlrRasterLAZ.stepy);
             if (vlrRasterLAZ.sigmaxy)
