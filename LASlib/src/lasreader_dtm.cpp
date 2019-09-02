@@ -30,6 +30,8 @@
 */
 #include "lasreader_dtm.hpp"
 
+#include "lasvlrpayload.hpp"
+
 // used to map GeoTIFF codes to GCTP codes
 
 static const unsigned short PCS_NAD83_Alabama_East = 26929;
@@ -1158,6 +1160,25 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
     header.min_z = 0;
     header.max_z = 0;
   }
+
+  // add the VLR for Raster LAZ 
+
+  LASvlrRasterLAZ vlrRasterLAZ;
+  vlrRasterLAZ.nbands = 1;
+  vlrRasterLAZ.nbits = 32;
+  vlrRasterLAZ.ncols = ncols;
+  vlrRasterLAZ.nrows = nrows;
+  vlrRasterLAZ.reserved1 = 0;
+  vlrRasterLAZ.reserved2 = 0;
+  vlrRasterLAZ.stepx = xdim;
+  vlrRasterLAZ.stepx_y = 0.0;
+  vlrRasterLAZ.stepy = ydim;
+  vlrRasterLAZ.stepy_x = 0.0;
+  vlrRasterLAZ.llx = ll_x;
+  vlrRasterLAZ.lly = ll_y;
+  vlrRasterLAZ.sigmaxy = 0.0;
+
+  header.add_vlr("Raster LAZ", 7113, (U16)vlrRasterLAZ.get_payload_size(), vlrRasterLAZ.get_payload(), FALSE, "by LAStools of rapidlasso GmbH", FALSE);
 
   // reopen
 

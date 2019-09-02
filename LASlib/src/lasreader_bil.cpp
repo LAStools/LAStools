@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -29,6 +29,8 @@
 ===============================================================================
 */
 #include "lasreader_bil.hpp"
+
+#include "lasvlrpayload.hpp"
 
 #include <stdlib.h>
 #include <string.h>
@@ -123,7 +125,7 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
   if ((((creation.wYear)%4) == 0) && (creation.wMonth > 2)) header.file_creation_day++;
 #else
   header.file_creation_day = 333;
-  header.file_creation_year = 2012;
+  header.file_creation_year = 2019;
 #endif
 
   // initialize point format in header
@@ -331,6 +333,25 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
     header.min_z = 0;
     header.max_z = 0;
   }
+
+  // add the VLR for Raster LAZ 
+
+  LASvlrRasterLAZ vlrRasterLAZ;
+  vlrRasterLAZ.nbands = 1;
+  vlrRasterLAZ.nbits = 32;
+  vlrRasterLAZ.ncols = ncols;
+  vlrRasterLAZ.nrows = nrows;
+  vlrRasterLAZ.reserved1 = 0;
+  vlrRasterLAZ.reserved2 = 0;
+  vlrRasterLAZ.stepx = xdim;
+  vlrRasterLAZ.stepx_y = 0.0;
+  vlrRasterLAZ.stepy = ydim;
+  vlrRasterLAZ.stepy_x = 0.0;
+  vlrRasterLAZ.llx = ulxcenter - 0.5*xdim;
+  vlrRasterLAZ.lly = ulycenter + (0.5 - nrows)*ydim;
+  vlrRasterLAZ.sigmaxy = 0.0;
+
+  header.add_vlr("Raster LAZ", 7113, (U16)vlrRasterLAZ.get_payload_size(), vlrRasterLAZ.get_payload(), FALSE, "by LAStools of rapidlasso GmbH", FALSE);
 
   // reopen
 

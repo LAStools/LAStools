@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    31 August 2019 -- add RasterLAZ during code sprint after FOSS4G 2019 in Bucharest 
     10 May 2019 -- checking for overflows in X, Y, Z 32 bit integers of fixed-point LAS
     10 October 2013 -- created after returning from INTERGEO 2013 in Essen
   

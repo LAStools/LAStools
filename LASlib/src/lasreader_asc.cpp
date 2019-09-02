@@ -30,6 +30,8 @@
 */
 #include "lasreader_asc.hpp"
 
+#include "lasvlrpayload.hpp"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -313,6 +315,25 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
     header.min_z = 0;
     header.max_z = 0;
   }
+
+  // add the VLR for Raster LAZ 
+
+  LASvlrRasterLAZ vlrRasterLAZ;
+  vlrRasterLAZ.nbands = 1;
+  vlrRasterLAZ.nbits = 32;
+  vlrRasterLAZ.ncols = ncols;
+  vlrRasterLAZ.nrows = nrows;
+  vlrRasterLAZ.reserved1 = 0;
+  vlrRasterLAZ.reserved2 = 0;
+  vlrRasterLAZ.stepx = cellsize;
+  vlrRasterLAZ.stepx_y = 0.0;
+  vlrRasterLAZ.stepy = cellsize;
+  vlrRasterLAZ.stepy_x = 0.0;
+  vlrRasterLAZ.llx = xllcenter - 0.5*cellsize;
+  vlrRasterLAZ.lly = yllcenter - 0.5*cellsize;
+  vlrRasterLAZ.sigmaxy = 0.0;
+
+  header.add_vlr("Raster LAZ", 7113, (U16)vlrRasterLAZ.get_payload_size(), vlrRasterLAZ.get_payload(), FALSE, "by LAStools of rapidlasso GmbH", FALSE);
 
   // reopen
 
