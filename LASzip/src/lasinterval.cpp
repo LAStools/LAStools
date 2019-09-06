@@ -301,7 +301,7 @@ void LASinterval::merge_intervals(U32 maximum_intervals, const BOOL verbose)
     }
     map_element++;
   }
-  fprintf(stderr,"largest interval gap increased to %u\n", diff);
+  if (verbose) fprintf(stderr,"largest interval gap increased to %u\n", diff);
 
   // update totals
 
