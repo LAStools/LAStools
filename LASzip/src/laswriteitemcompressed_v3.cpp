@@ -52,9 +52,7 @@ typedef struct LASpoint14
   U8 scan_direction_flag : 1;
   U8 edge_of_flight_line : 1;
   U8 legacy_classification : 5;
-  U8 legacy_synthetic_flag : 1;
-  U8 legacy_keypoint_flag  : 1;
-  U8 legacy_withheld_flag  : 1;
+  U8 legacy_flags : 3;
   I8 legacy_scan_angle_rank;
   U8 user_data;
   U16 point_source_ID;
