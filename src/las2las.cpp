@@ -951,7 +951,7 @@ int main(int argc, char *argv[])
 
   if (extra_pass)
   {
-    if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || (lasreadopener.get_transform()->change_coordinates == FALSE)) && lasreadopener.get_filter() == 0)
+    if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
     {
       extra_pass = FALSE;
     }
@@ -1725,7 +1725,7 @@ int main(int argc, char *argv[])
 
     if (extra_pass)
     {
-      if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || (lasreadopener.get_transform()->change_coordinates == FALSE)) && lasreadopener.get_filter() == 0)
+      if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
       {
         extra_pass = FALSE;
       }
