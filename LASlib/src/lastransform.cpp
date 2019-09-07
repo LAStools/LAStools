@@ -1878,7 +1878,7 @@ void LAStransform::clean()
     delete operations[i];
   }
   if (operations) delete [] operations;
-  change_coordinates = FALSE;
+  transformed_fields = 0;
   alloc_operations = 0;
   num_operations = 0;
   operations = 0;
@@ -2036,7 +2036,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: offset but '%s' is no valid number\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_X_COORDINATE;
         add_operation(new LASoperationTranslateX(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -2053,7 +2053,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: offset but '%s' is no valid number\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Y_COORDINATE;
         add_operation(new LASoperationTranslateY(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -2070,7 +2070,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: offset but '%s' is no valid number\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationTranslateZ(offset));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -2099,7 +2099,9 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number\n", argv[i], argv[i+3]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        if (offset_x) transformed_fields |= LASTRANSFORM_X_COORDINATE;
+        if (offset_y) transformed_fields |= LASTRANSFORM_Y_COORDINATE;
+        if (offset_z) transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationTranslateXYZ(offset_x, offset_y, offset_z));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
@@ -2122,7 +2124,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid number\n", argv[i], argv[i+2]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_X_COORDINATE;
         add_operation(new LASoperationTranslateThenScaleX(offset, scale));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
@@ -2145,7 +2147,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid number\n", argv[i], argv[i+2]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Y_COORDINATE;
         add_operation(new LASoperationTranslateThenScaleY(offset, scale));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
@@ -2168,7 +2170,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: offset scale but '%s' is no valid number\n", argv[i], argv[i+2]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationTranslateThenScaleZ(offset, scale));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
@@ -2187,7 +2189,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset\n", argv[i], argv[i+1]);
             return FALSE;
           }
-          change_coordinates = TRUE;
+          transformed_fields |= LASTRANSFORM_X_COORDINATE;
           add_operation(new LASoperationTranslateRawX(raw_offset));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
@@ -2204,7 +2206,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset\n", argv[i], argv[i+1]);
             return FALSE;
           }
-          change_coordinates = TRUE;
+          transformed_fields |= LASTRANSFORM_Y_COORDINATE;
           add_operation(new LASoperationTranslateRawY(raw_offset));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
@@ -2221,7 +2223,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset\n", argv[i], argv[i+1]);
             return FALSE;
           }
-          change_coordinates = TRUE;
+          transformed_fields |= LASTRANSFORM_Z_COORDINATE;
           add_operation(new LASoperationTranslateRawZ(raw_offset));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
@@ -2250,7 +2252,9 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_z\n", argv[i], argv[i+3]);
             return FALSE;
           }
-          change_coordinates = TRUE;
+          if (raw_offset_x) transformed_fields |= LASTRANSFORM_X_COORDINATE;
+          if (raw_offset_y) transformed_fields |= LASTRANSFORM_Y_COORDINATE;
+          if (raw_offset_z) transformed_fields |= LASTRANSFORM_Z_COORDINATE;
           add_operation(new LASoperationTranslateRawXYZ(raw_offset_x, raw_offset_y, raw_offset_z));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
         }
@@ -2273,7 +2277,8 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y but '%s' is no valid max_raw_offset_y\n", argv[i], argv[i+2]);
             return FALSE;
           }
-          change_coordinates = TRUE;
+          if (max_raw_offset_x) transformed_fields |= LASTRANSFORM_X_COORDINATE;
+          if (max_raw_offset_y) transformed_fields |= LASTRANSFORM_Y_COORDINATE;
           add_operation(new LASoperationTranslateRawXYatRandom(max_raw_offset_x, max_raw_offset_y));
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
         }
@@ -2408,6 +2413,11 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid angle\n", argv[i], argv[i+1]);
           return FALSE;
         }
+        if (angle == 0.0)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_y but %g is no valid angle\n", argv[i], angle);
+          return FALSE;
+        }
         F64 rot_center_x;
         if (sscanf(argv[i+2], "%lf", &rot_center_x) != 1)
         {
@@ -2420,7 +2430,8 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid rot_center_y\n", argv[i], argv[i+3]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_X_COORDINATE;
+        transformed_fields |= LASTRANSFORM_Y_COORDINATE;
         add_operation(new LASoperationRotateXY(angle, rot_center_x, rot_center_y));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
@@ -2437,6 +2448,11 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid angle\n", argv[i], argv[i+1]);
           return FALSE;
         }
+        if (angle == 0.0)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_y but %g is no valid angle\n", argv[i], angle);
+          return FALSE;
+        }
         F64 rot_center_x;
         if (sscanf(argv[i+2], "%lf", &rot_center_x) != 1)
         {
@@ -2449,7 +2465,8 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid rot_center_z\n", argv[i], argv[i+3]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_X_COORDINATE;
+        transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationRotateXZ(angle, rot_center_x, rot_center_z));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
@@ -2466,6 +2483,11 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid angle\n", argv[i], argv[i+1]);
           return FALSE;
         }
+        if (angle == 0.0)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_x rot_center_y but %g is no valid angle\n", argv[i], angle);
+          return FALSE;
+        }
         F64 rot_center_y;
         if (sscanf(argv[i+2], "%lf", &rot_center_y) != 1)
         {
@@ -2478,7 +2500,8 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid rot_center_z\n", argv[i], argv[i+3]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Y_COORDINATE;
+        transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationRotateYZ(angle, rot_center_y, rot_center_z));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
@@ -2504,7 +2527,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above but '%s' is no valid above value\n", argv[i], argv[i+2]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationClampZ(below, above));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
@@ -2521,7 +2544,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: below but '%s' is no valid below value\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationClampZbelow(below));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -2538,7 +2561,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: above but '%s' is no valid above value\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationClampZabove(above));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -2635,7 +2658,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 2 arguments: below above but '%s' is no valid above value\n", argv[i], argv[i+2]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationClampRawZ(below, above));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
@@ -2657,7 +2680,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute but '%s' is no valid index\n", argv[i], argv[i+1]);
             return FALSE;
           }
-          change_coordinates = TRUE;
+          transformed_fields |= LASTRANSFORM_Z_COORDINATE;
           add_operation(new LASoperationCopyAttributeIntoZ(index));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
@@ -2786,7 +2809,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
       {
         if (strcmp(argv[i],"-copy_intensity_into_z") == 0)
         {
-          change_coordinates = TRUE;
+          transformed_fields |= LASTRANSFORM_Z_COORDINATE;
           add_operation(new LASoperationCopyIntensityIntoZ());
           *argv[i]='\0'; 
         } 
@@ -3831,7 +3854,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale_x but '%s' is no valid number\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        if (scale_x != 1.0) transformed_fields |= LASTRANSFORM_X_COORDINATE;
         add_operation(new LASoperationScaleX(scale_x));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -3848,7 +3871,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale_y but '%s' is no valid number\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        if (scale_y != 1.0) transformed_fields |= LASTRANSFORM_Y_COORDINATE;
         add_operation(new LASoperationScaleY(scale_y));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -3865,7 +3888,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale_z but '%s' is no valid number\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        if (scale_z != 1.0) transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationScaleZ(scale_z));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -3894,7 +3917,9 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number\n", argv[i], argv[i+3]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        if (scale_x != 1.0) transformed_fields |= LASTRANSFORM_X_COORDINATE;
+        if (scale_y != 1.0) transformed_fields |= LASTRANSFORM_Y_COORDINATE;
+        if (scale_z != 1.0) transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationScaleXYZ(scale_x, scale_y, scale_z));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
@@ -4321,7 +4346,12 @@ BOOL LAStransform::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs 2 arguments: index scale but '%s' is no valid scale\n", argv[i], argv[i+2]);
             return FALSE;
           }
-          change_coordinates = TRUE;
+          if (scale == 0.0f)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 2 arguments: index scale but '%g' is no valid scale\n", argv[i], scale);
+            return FALSE;
+          }
+          transformed_fields |= LASTRANSFORM_Z_COORDINATE;
           add_operation(new LASoperationAddScaledAttributeToZ(index, scale));
           *argv[i]='\0'; *argv[i+2]='\0';  *argv[i+1]='\0'; i+=2; 
         }
@@ -4361,7 +4391,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute but '%s' is no valid index\n", argv[i], argv[i+1]);
           return FALSE;
         }
-        change_coordinates = TRUE;
+        transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationAddAttributeToZ(index));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
@@ -4444,7 +4474,7 @@ void LAStransform::reset()
 
 LAStransform::LAStransform()
 {
-  change_coordinates = FALSE;
+  transformed_fields = 0;
   alloc_operations = 0;
   num_operations = 0;
   operations = 0;
