@@ -131,6 +131,11 @@
   corresponds to the height above ground and not the elevation of
   the point. With 'lasheight -i in.laz -replace_z -o out.laz' you
   can height-normalize a ground-classified LiDAR file.
+  
+  Depending on the height cutoff or the input file it is possible
+  that generated rasters contain only 'no data' values but not a
+  single real value. Adding option '-remove_empty_rasters' to the
+  command line will delete those files from disk.
 
   Let me know which other metrics you would like to see ...
 
@@ -178,6 +183,7 @@ other commandline arguments are
 -step 10               : raster with stepsize 10 [default: 20]
 -nrows 512             : raster at most 512 rows
 -ncols 512             : raster at most 512 columns
+-remove_empty_rasters  : remove raster files containing only 'nodata' values
 -ll 300000 600000      : start rastering at these lower left x and y coordinates
 -nodata 9999           : use 9999 as the nodata value in the BIL / ASC format
 -max                   : for each grid cell keep highest value
