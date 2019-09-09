@@ -61,6 +61,8 @@ public:
   BOOL parse(U32 curr_parameter, const U32 num_parameters, const F64* parameters);
   void unparse(U32& num_parameters, F64* parameters) const;
 
+  U32 get_decompress_selective() const;
+
   BOOL ignore(const LASpoint* point) const;
 
   LASignore();

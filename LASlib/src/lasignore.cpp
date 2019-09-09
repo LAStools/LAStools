@@ -30,6 +30,8 @@
 */
 #include "lasignore.hpp"
 
+#include "laszip_decompress_selective_v3.hpp"
+
 void LASignore::usage() const
 {
   fprintf(stderr,"Ignore points based on classifications.\n");
@@ -74,6 +76,7 @@ BOOL LASignore::parse(int& i, int argc, char *argv[])
       return FALSE;
     }
     int i_in = i;
+    *argv[i]='\0';
     i+=1;
     do
     {
@@ -90,6 +93,7 @@ BOOL LASignore::parse(int& i, int argc, char *argv[])
       }
       ignore_mask |= (1u << (classification >> 5));
       ignore_classification_mask[(classification >> 5)] |= (1u << (classification & 31));
+      *argv[i]='\0';
       i+=1;
     } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
     i-=1;
@@ -119,49 +123,59 @@ BOOL LASignore::parse(int& i, int argc, char *argv[])
     }
     ignore_mask |= 1;
     ignore_classification_mask[0] = classification_mask;
-    i+=1;
+    *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
   }
   else if (strcmp(argv[i],"-ignore_first_of_many") == 0)
   {
     ignore_mask |= LASIGNORE_FIRST_OF_MANY;
+    *argv[i]='\0';
   }
   else if (strcmp(argv[i],"-ignore_last_of_many") == 0)
   {
     ignore_mask |= LASIGNORE_LAST_OF_MANY;
+    *argv[i]='\0';
   }
   else if (strcmp(argv[i],"-ignore_intermediate") == 0)
   {
     ignore_mask |= LASIGNORE_INTERMEDIATE;
+    *argv[i]='\0';
   }
   else if (strcmp(argv[i],"-ignore_single") == 0)
   {
     ignore_mask |= LASIGNORE_SINGLE;
+    *argv[i]='\0';
   }
   else if (strcmp(argv[i],"-ignore_first") == 0)
   {
     ignore_mask |= LASIGNORE_FIRST_OF_MANY;
     ignore_mask |= LASIGNORE_SINGLE;
+    *argv[i]='\0';
   }
   else if (strcmp(argv[i],"-ignore_last") == 0)
   {
     ignore_mask |= LASIGNORE_LAST_OF_MANY;
     ignore_mask |= LASIGNORE_SINGLE;
+    *argv[i]='\0';
   }
   else if (strcmp(argv[i],"-ignore_synthetic") == 0)
   {
     ignore_mask |= LASIGNORE_SYNTHETIC;
+    *argv[i]='\0';
   }
   else if (strcmp(argv[i],"-ignore_keypoint") == 0)
   {
     ignore_mask |= LASIGNORE_KEYPOINT;
+    *argv[i]='\0';
   }
   else if (strcmp(argv[i],"-ignore_withheld") == 0)
   {
     ignore_mask |= LASIGNORE_WITHHELD;
+    *argv[i]='\0';
   }
   else if (strcmp(argv[i],"-ignore_overlap") == 0)
   {
     ignore_mask |= LASIGNORE_OVERLAP;
+    *argv[i]='\0';
   }
   else
   {
@@ -250,6 +264,20 @@ I32 LASignore::unparse(CHAR* string) const
     }
   }
   return n;
+}
+
+U32 LASignore::get_decompress_selective() const
+{
+  U32 decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;
+  if (ignore_mask & LASIGNORE_CLASSIFICATIONS)
+  {
+    decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
+  }
+  if (ignore_mask & LASIGNORE_FLAGS)
+  {
+    decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_FLAGS;
+  }
+  return decompress_selective;
 }
 
 BOOL LASignore::parse(U32 curr_parameter, const U32 num_parameters, const F64* parameters)

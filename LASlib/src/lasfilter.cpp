@@ -1779,6 +1779,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs at least 1 argument: classification\n", argv[i]);
             return FALSE;
           }
+          int i_in = i;
           *argv[i]='\0';
           i+=1;
           U32 classification;
@@ -1787,12 +1788,12 @@ BOOL LASfilter::parse(int argc, char* argv[])
           {
             if (sscanf(argv[i], "%u", &classification) != 1)
             {
-              fprintf(stderr,"ERROR: '-keep_classification' needs at least 1 argument: classification but '%s' is no valid classification\n", argv[i]);
+              fprintf(stderr,"ERROR: '%s' needs at least 1 argument: classification but '%s' is no valid classification\n", argv[i_in], argv[i]);
               return FALSE;
             }
             if (classification > 31)
             {
-              fprintf(stderr,"ERROR: cannot keep classification %u because it is larger than 31\n", classification);
+              fprintf(stderr,"ERROR: '%s' needs arguments between 0 and 31 but '%u' is out of range\n", argv[i_in], classification);
               return FALSE;
             }
             keep_classification_mask |= (1u << classification);
