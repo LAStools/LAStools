@@ -22,7 +22,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -33,6 +33,7 @@
   
   CHANGE HISTORY:
   
+     9 September 2019 -- warn if modifying x or y coordinates for tiles with VLR
     30 November 2017 -- set OGC WKT with '-set_ogc_wkt "PROJCS[\"WGS84\",GEOGCS[\"GCS_ ..."
     10 October 2017 -- allow piped input *and* output if no filter or coordinate change 
     14 July 2017 -- fixed missing 'comma' in compound (COMPD_CS) OGC WKT string
@@ -1704,6 +1705,21 @@ int main(int argc, char *argv[])
     if (remove_original_vlr)
     {
       lasreader->header.clean_lasoriginal();
+    }
+
+    if (lasreader->header.vlr_lastiling || lasreader->header.vlr_lasoriginal)
+    {
+      if (lasreader->get_transform()) 
+      {
+        if (lasreader->get_transform()->transformed_fields & (LASTRANSFORM_X_COORDINATE | LASTRANSFORM_Y_COORDINATE))
+        {
+          fprintf(stderr, "WARNING: transforming x or y coordinates of file with %s VLR invalidates this VLR\n", (lasreader->header.vlr_lastiling ? "lastiling" : "lasoriginal"));
+        }
+      }
+      if (reproject_quantizer) 
+      {
+        fprintf(stderr, "WARNING: reprojecting file with %s VLR invalidates this VLR\n", (lasreader->header.vlr_lastiling ? "lastiling" : "lasoriginal"));
+      }
     }
 
     if (save_vlrs)
