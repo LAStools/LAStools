@@ -561,7 +561,9 @@ public:
   inline U16 get_point_source_ID() const { return point_source_ID; };
   inline U8 get_deleted_flag() const { return deleted_flag; };
   inline F64 get_gps_time() const { return gps_time; };
-  inline const U16* get_rgb() const { return rgb; };
+  inline const U16* get_RGB() const { return rgb; };
+  inline const U16* get_RGBI() const { return rgb; };
+  inline U16 get_RGBI(const U32 band) const { return rgb[band]; };
   inline U16 get_R() const { return rgb[0]; };
   inline U16 get_G() const { return rgb[1]; };
   inline U16 get_B() const { return rgb[2]; };
