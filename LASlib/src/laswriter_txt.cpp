@@ -501,21 +501,21 @@ BOOL LASwriterTXT::write_point(const LASpoint* point)
       break;
     case 'R': // the red channel of the RGB field
       if (scale_rgb != 1.0f)
-        fprintf(file, "%.2f", scale_rgb*point->get_rgb()[0]);
+        fprintf(file, "%.2f", scale_rgb*point->get_R());
       else
-        fprintf(file, "%d", point->get_rgb()[0]);
+        fprintf(file, "%d", point->get_R());
       break;
     case 'G': // the green channel of the RGB field
       if (scale_rgb != 1.0f)
-        fprintf(file, "%.2f", scale_rgb*point->get_rgb()[1]);
+        fprintf(file, "%.2f", scale_rgb*point->get_G());
       else
-        fprintf(file, "%d", point->get_rgb()[1]);
+        fprintf(file, "%d", point->get_G());
       break;
     case 'B': // the blue channel of the RGB field
       if (scale_rgb != 1.0f)
-        fprintf(file, "%.2f", scale_rgb*point->get_rgb()[2]);
+        fprintf(file, "%.2f", scale_rgb*point->get_B());
       else
-        fprintf(file, "%d", point->get_rgb()[2]);
+        fprintf(file, "%d", point->get_B());
       break;
     case 'm': // the index of the point (count starts at 0)
 #ifdef _WIN32
