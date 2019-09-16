@@ -109,11 +109,14 @@ int main(int argc, char *argv[])
   I32 cores = 1;
   BOOL cpu64 = FALSE;
 #endif
-  bool verbose = false;
+  BOOL quiet = FALSE;
+  BOOL verbose = FALSE;
+  BOOL very_verbose = FALSE;
   F32 tile_size = 0.0f;
   U32 threshold = 1000;
   U32 minimum_points = 100000;
   I32 maximum_intervals = -20;
+  BOOL dont_reindex = FALSE;
   BOOL append = FALSE;
   F64 start_time = 0.0;
   F64 total_start_time = 0.0;
@@ -154,7 +157,16 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
     {
-      verbose = true;
+      verbose = TRUE;
+    }
+    else if (strcmp(argv[i],"-vv") == 0 || strcmp(argv[i],"-very_verbose") == 0)
+    {
+      verbose = TRUE;
+      very_verbose = TRUE;
+    }
+    else if (strcmp(argv[i],"-quiet") == 0)
+    {
+      quiet = TRUE;
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
@@ -234,6 +246,10 @@ int main(int argc, char *argv[])
       }
       i++;
       threshold = atoi(argv[i]);
+    }
+    else if (strcmp(argv[i],"-dont_reindex") == 0)
+    {
+      dont_reindex = TRUE;
     }
     else if (strcmp(argv[i],"-append") == 0)
     {
@@ -326,6 +342,9 @@ int main(int argc, char *argv[])
     total_start_time = taketime();
   }
 
+  U32 skipped = 0;
+  U32 indexed = 0;
+
   while (lasreadopener.active())
   {
     if (verbose) start_time = taketime();
@@ -337,6 +356,17 @@ int main(int argc, char *argv[])
     {
       fprintf(stderr, "ERROR: could not open lasreader\n");
       byebye(true, argc==1);
+    }
+
+    if (dont_reindex)
+    {
+      if (lasreader->get_index())
+      {
+        if (!quiet) fprintf(stderr, "skipping already indexed file '%s'\n", lasreadopener.get_file_name());
+        delete lasreader;
+        skipped++;
+        continue;
+      }
     }
 
     // setup the quadtree
@@ -386,7 +416,7 @@ int main(int argc, char *argv[])
 
     // adaptive coarsening
 
-    lasindex.complete(minimum_points, maximum_intervals);
+    lasindex.complete(minimum_points, maximum_intervals, very_verbose);
 
     // write to file
 
@@ -399,12 +429,21 @@ int main(int argc, char *argv[])
       lasindex.write(lasreadopener.get_file_name());
     }
 
-    if (verbose) fprintf(stderr,"done with '%s'. took %g sec.\n", lasreadopener.get_file_name(), taketime()-start_time);
+    indexed++;
+
+    if (!quiet) fprintf(stderr,"done with '%s'. took %g sec.\n", lasreadopener.get_file_name(), taketime()-start_time);
   }
   
-  if (verbose && lasreadopener.get_file_name_number() > 1)
+  if (!quiet && lasreadopener.get_file_name_number() > 1)
   {
-    fprintf(stderr,"done with %u files. total time %g sec.\n", lasreadopener.get_file_name_number(), taketime()-total_start_time);
+    if (dont_reindex)
+    {
+      fprintf(stderr,"done with %u files. skipped %u. indexed %u. total time %g sec.\n", lasreadopener.get_file_name_number(), skipped, indexed, taketime()-total_start_time);
+    }
+    else
+    {
+      fprintf(stderr,"done with %u files. total time %g sec.\n", lasreadopener.get_file_name_number(), taketime()-total_start_time);
+    }
   }
 
   byebye(false, argc==1);
