@@ -58,6 +58,7 @@
 #include "laswriter.hpp"
 #include "lasquadtree.hpp"
 #include "lasvlrpayload.hpp"
+#include "lasindex.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -3769,6 +3770,15 @@ int main(int argc, char *argv[])
       }
     }
 
+    if (file_out && !no_variable_header)
+    {
+      const LASindex* index = lasreader->get_index();
+      if (index)
+      {
+        fprintf(file_out, "has spatial indexing LAX file\012"); // index->start, index->end, index->full, index->total, index->cells);
+      }
+    }
+
     if (file_out && !no_header)
     {
       if (lasheader->user_data_after_header_size) fprintf(file_out, "the header is followed by %u user-defined bytes\012", lasheader->user_data_after_header_size);
@@ -3811,7 +3821,7 @@ int main(int argc, char *argv[])
       }
       if (lasheader->vlr_lasoriginal)
       {
-        fprintf(file_out, "LASoriginal (npoints %u, bbox %g %g %g %g %g %g)\n", 
+        fprintf(file_out, "LASoriginal (npoints %u, bbox %.10g %.10g %.10g %.10g %.10g %.10g)\n", 
           (U32)lasheader->vlr_lasoriginal->number_of_point_records, 
           lasheader->vlr_lasoriginal->min_x,
           lasheader->vlr_lasoriginal->min_y,
