@@ -589,6 +589,7 @@ public:
   inline void set_gps_time(const F64 gps_time) { this->gps_time = gps_time; };
   inline void set_RGB(const U16* rgb) { memcpy(this->rgb, rgb, sizeof(U16) * 3); };
   inline void set_RGBI(const U16* rgb) { memcpy(this->rgb, rgb, sizeof(U16) * 4); };
+  inline void set_RGBI(const U32 band, const U16 value) { rgb[band] = value; };
   inline void set_R(const U16 R) { this->rgb[0] = R; };
   inline void set_G(const U16 G) { this->rgb[1] = G; };
   inline void set_B(const U16 B) { this->rgb[2] = B; };
