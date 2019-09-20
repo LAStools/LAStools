@@ -1,3 +1,8 @@
+16 September 2019 -- lasindex: new option '-dont_reindex' to prevent recreating of already existing LAX files
+12 September 2019 -- demzip: also support IMG format and 64 bit TIF elevation / height rasters
+10 September 2019 -- lascanopy: option '-remove_empty_rasters' deletes raster files containing only 'no data' values 
+ 8 September 2019 -- lascolor: restrictive parsing of input combinations (only allow valid, don't ignore invalid)
+28 August 2019 -- several LAStools (lascolor, lasthin, ...): complete overhaul of '-ignore_xxxxx' functionality
 11 August 2019 -- lasoptimize64: also support optimizing very large files (if over 4GB as uncompressed LAS)
 11 August 2019 -- lascopy64: serious bug fix for copying very large files (if over 4GB as uncompressed LAS)
 11 August 2019 -- lassort64: serious bug fix for sorting very large files (if over 4GB as uncompressed LAS)
