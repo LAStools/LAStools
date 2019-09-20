@@ -1,0 +1,509 @@
+
+::======lasclassify======lasclassify====lasclassify=====
+
+lasclassify -quiet -i unit\fusa.laz -o unit\fusa_c.laz
+lasclassify -quiet -i unit\fusa.laz -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+:::::::::::::::::: with ignore
+
+lasclassify -quiet -i unit\fusa.laz -ignore_class 8 9 -o unit\fusa_c.laz
+lasclassify -quiet -i unit\fusa.laz -ignore_class 8 9 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lasclassify -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -o unit\fusa_c.laz
+lasclassify -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lasclassify -quiet -i unit\fusa.laz -ignore_last_of_many -ignore_intermediate -o unit\fusa_c.laz
+lasclassify -quiet -i unit\fusa.laz -ignore_last_of_many -ignore_intermediate -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lasclassify -quiet -i unit\fusa.laz -ignore_first_of_many -ignore_class 8 -o unit\fusa_c.laz
+lasclassify -quiet -i unit\fusa.laz -ignore_first_of_many -ignore_class 8 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+::========lasclip=========lasclip========lasclip=======
+
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -interior -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -interior -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -classify_as 12 -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -classify_as 12 -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -interior -classify_as 12 -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -interior -classify_as 12 -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -flag_as_withheld -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -flag_as_withheld -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -interior -flag_as_withheld -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -interior -flag_as_withheld -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+:::::::::::::::::: with ignore
+
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -interior -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -interior -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -classify_as 12 -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -classify_as 12 -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -interior -classify_as 12 -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -interior -classify_as 12 -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -flag_as_withheld -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -flag_as_withheld -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -interior -flag_as_withheld -o unit\lake_c.laz
+lasclip -quiet -i unit\lake.laz -ignore_class 7 -ignore_intermediate -ignore_last_of_many -poly unit\lake_breakline.shp -interior -flag_as_withheld -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+::========lascolor=========lascolor=======lascolor=====
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 0 -intensity -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 0 -intensity -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 1 -intensity -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 1 -intensity -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 2 -intensity -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 2 -intensity -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 0 -red -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 0 -red -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 1 -green -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 1 -green -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 2 -blue -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 2 -blue -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 0 -gray -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -band 0 -gray -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -classify_black -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -classify_black -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -classify_non_black -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -classify_non_black -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -classify_white -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -classify_white -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -classify_non_white -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -classify_non_white -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_black -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_black -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_non_black -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_non_black -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_white -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_white -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_non_white -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_non_white -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+:::::::::::::::::: with ignore
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -band 1 -intensity -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -band 1 -intensity -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -band 2 -blue -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -band 2 -blue -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -band 0 -gray -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -band 0 -gray -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -classify_black -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -classify_black -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -classify_non_black -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -classify_non_black -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -classify_white -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -classify_white -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -classify_non_white -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -classify_non_white -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_black -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_black -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_non_black -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_non_black -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_white -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_white -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_non_white -o unit\fusa_c.laz
+lascolor -quiet -i unit\fusa.laz -ignore_class 8 9 12 -ignore_withheld -image unit\fusa_ortho.tif -classify_as 7 -band 0 -classify_non_white -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_c_lay.laz
+lasdiff -i unit\fusa_c.laz unit\fusa_c_lay.laz
+
+::========lascopy=========lascopy========lascopy=======
+
+
+
+::====lasdistance=====lasdistance=====lasdistance======
+
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -flag_as_withheld -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -flag_as_withheld -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -distance_xy 8.0 -remove_points -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -distance_xy 8.0 -remove_points -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -distance_xy 7.0 -flag_as_keypoint -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -distance_xy 7.0 -flag_as_keypoint -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -distance_xy 9.0 -flag_as_synthetic -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -poly unit\lake_breakline.shp -distance_xy 9.0 -flag_as_synthetic -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+:::::::::::::::::: with ignore
+
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -flag_as_withheld -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -flag_as_withheld -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -distance_xy 8.0 -remove_points -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -distance_xy 8.0 -remove_points -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -distance_xy 7.0 -flag_as_keypoint -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -distance_xy 7.0 -flag_as_keypoint -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -distance_xy 9.0 -flag_as_synthetic -o unit\lake_c.laz
+lasdistance -quiet -i unit\lake.laz -ignore_class 2 9 -ignore_last_of_many -poly unit\lake_breakline.shp -distance_xy 9.0 -flag_as_synthetic -olay
+laslayers -quiet -i unit\lake.laz -ilay -o unit\lake_c_lay.laz
+lasdiff -i unit\lake_c.laz unit\lake_c_lay.laz
+
+::======lasground======lasground=======lasground=======
+
+lasground -quiet -i unit\fusa.laz -city -o unit\fusa_g.laz 
+lasground -quiet -i unit\fusa.laz -city -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+lasground -quiet -i unit\fusa.laz -town -compute_height -o unit\fusa_g.laz 
+lasground -quiet -i unit\fusa.laz -town -compute_height -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+lasground -quiet -i unit\fusa.laz -replace_z -o unit\fusa_g.laz 
+lasground -quiet -i unit\fusa.laz -replace_z -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+:::::::::::::::::: with ignore
+
+lasground -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -city -o unit\fusa_g.laz 
+lasground -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -city -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+lasground -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -town -compute_height -o unit\fusa_g.laz 
+lasground -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -town -compute_height -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+lasground -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -replace_z -o unit\fusa_g.laz 
+lasground -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -replace_z -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+::====lasground_new==lasground_new===lasground_new=====
+
+lasground_new -quiet -i unit\fusa.laz -city -o unit\fusa_g.laz 
+lasground_new -quiet -i unit\fusa.laz -city -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+lasground_new -quiet -i unit\fusa.laz -town -compute_height -o unit\fusa_g.laz 
+lasground_new -quiet -i unit\fusa.laz -town -compute_height -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+lasground_new -quiet -i unit\fusa.laz -replace_z -o unit\fusa_g.laz 
+lasground_new -quiet -i unit\fusa.laz -replace_z -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+:::::::::::::::::: with ignore
+
+lasground_new -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -city -o unit\fusa_g.laz 
+lasground_new -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -city -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+lasground_new -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -town -compute_height -o unit\fusa_g.laz 
+lasground_new -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -town -compute_height -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+lasground_new -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -replace_z -o unit\fusa_g.laz 
+lasground_new -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -replace_z -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_g_lay.laz
+lasdiff -i unit\fusa_g.laz unit\fusa_g_lay.laz
+
+::======lasheight======lasheight=======lasheight=======
+
+lasheight -quiet -i unit\fusa.laz -o unit\fusa_h.laz 
+lasheight -quiet -i unit\fusa.laz -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_h_lay.laz
+lasdiff -i unit\fusa_h.laz unit\fusa_h_lay.laz
+
+lasheight -quiet -i unit\fusa.laz -replace_z -o unit\fusa_h.laz 
+lasheight -quiet -i unit\fusa.laz -replace_z -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_h_lay.laz
+lasdiff -i unit\fusa_h.laz unit\fusa_h_lay.laz
+
+lasheight -quiet -i unit\fusa.laz -drop_below -0.1 -drop_above 7.5 -o unit\fusa_h.laz 
+lasheight -quiet -i unit\fusa.laz -drop_below -0.1 -drop_above 7.5 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_h_lay.laz
+lasdiff -i unit\fusa_h.laz unit\fusa_h_lay.laz
+
+lasheight -quiet -i unit\fusa.laz -drop_below -0.1 -classify_between 0.5 1.0 3 -classify_between 1.0 2.0 4 -classify_above 12.0 7 -o unit\fusa_h.laz 
+lasheight -quiet -i unit\fusa.laz -drop_below -0.1 -classify_between 0.5 1.0 3 -classify_between 1.0 2.0 4 -classify_above 12.0 7 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_h_lay.laz
+lasdiff -i unit\fusa_h.laz unit\fusa_h_lay.laz
+
+:::::::::::::::::: with ignore
+
+lasheight -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -o unit\fusa_h.laz 
+lasheight -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_h_lay.laz
+lasdiff -i unit\fusa_h.laz unit\fusa_h_lay.laz
+
+lasheight -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -replace_z -o unit\fusa_h.laz 
+lasheight -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -replace_z -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_h_lay.laz
+lasdiff -i unit\fusa_h.laz unit\fusa_h_lay.laz
+
+lasheight -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -drop_below -0.1 -drop_above 7.5 -o unit\fusa_h.laz 
+lasheight -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -drop_below -0.1 -drop_above 7.5 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_h_lay.laz
+lasdiff -i unit\fusa_h.laz unit\fusa_h_lay.laz
+
+lasheight -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -drop_below -0.1 -classify_between 0.5 1.0 3 -classify_between 1.0 2.0 4 -classify_above 12.0 7 -o unit\fusa_h.laz 
+lasheight -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 12 -drop_below -0.1 -classify_between 0.5 1.0 3 -classify_between 1.0 2.0 4 -classify_above 12.0 7 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_h_lay.laz
+lasdiff -i unit\fusa_h.laz unit\fusa_h_lay.laz
+
+::=======lasnoise=======lasnoise========lasnoise=======
+
+lasnoise -quiet -i unit\fusa.laz -o unit\fusa_n.laz 
+lasnoise -quiet -i unit\fusa.laz -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_n_lay.laz
+lasdiff -i unit\fusa_n.laz unit\fusa_n_lay.laz
+
+lasnoise -quiet -i unit\fusa.laz -step 1 -isolated 10 -o unit\fusa_n.laz 
+lasnoise -quiet -i unit\fusa.laz -step 1 -isolated 10 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_n_lay.laz
+lasdiff -i unit\fusa_n.laz unit\fusa_n_lay.laz
+
+lasnoise -quiet -i unit\fusa.laz -step 1 -isolated 10 -remove_noise -o unit\fusa_n.laz 
+lasnoise -quiet -i unit\fusa.laz -step 1 -isolated 10 -remove_noise -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_n_lay.laz
+lasdiff -i unit\fusa_n.laz unit\fusa_n_lay.laz
+
+lasnoise -quiet -i unit\fusa.laz -step 1 -isolated 10 -flag_as_withheld -o unit\fusa_n.laz 
+lasnoise -quiet -i unit\fusa.laz -step 1 -isolated 10 -flag_as_withheld -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_n_lay.laz
+lasdiff -i unit\fusa_n.laz unit\fusa_n_lay.laz
+
+:::::::::::::::::: with ignore
+
+lasnoise -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 8 12 -ignore_first_of_many -o unit\fusa_n.laz 
+lasnoise -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 8 12 -ignore_first_of_many -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_n_lay.laz
+lasdiff -i unit\fusa_n.laz unit\fusa_n_lay.laz
+
+lasnoise -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 8 12 -ignore_first_of_many -step 1 -isolated 10 -o unit\fusa_n.laz 
+lasnoise -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 8 12 -ignore_first_of_many -step 1 -isolated 10 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_n_lay.laz
+lasdiff -i unit\fusa_n.laz unit\fusa_n_lay.laz
+
+lasnoise -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 8 12 -ignore_first_of_many -step 1 -isolated 10 -remove_noise -o unit\fusa_n.laz 
+lasnoise -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 8 12 -ignore_first_of_many -step 1 -isolated 10 -remove_noise -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_n_lay.laz
+lasdiff -i unit\fusa_n.laz unit\fusa_n_lay.laz
+
+lasnoise -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 8 12 -ignore_first_of_many -step 1 -isolated 10 -flag_as_withheld -o unit\fusa_n.laz 
+lasnoise -quiet -i unit\fusa.laz -ignore_withheld -ignore_class 8 12 -ignore_first_of_many -step 1 -isolated 10 -flag_as_withheld -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_n_lay.laz
+lasdiff -i unit\fusa_n.laz unit\fusa_n_lay.laz
+
+::=======lasthin========lasthin=========lasthin========
+
+lasthin -quiet -i unit\fusa.laz -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+lasthin -quiet -i unit\fusa.laz -classify_as 7 -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -classify_as 7 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+lasthin -quiet -i unit\fusa.laz -flag_as_withheld -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -flag_as_withheld -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+lasthin -quiet -i unit\fusa.laz -flag_as_keypoint -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -flag_as_keypoint -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+lasthin -quiet -i unit\fusa.laz -step 5 -adaptive 0.2 -classify_as 7 -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -step 5 -adaptive 0.2 -classify_as 7 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+:::::::::::::::::: with ignore
+
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -classify_as 7 -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -classify_as 7 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -flag_as_withheld -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -flag_as_withheld -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -flag_as_keypoint -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -flag_as_keypoint -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -step 5 -adaptive 0.2 -classify_as 7 -o unit\fusa_t.laz 
+lasthin -quiet -i unit\fusa.laz -ignore_class 1 9 12 -ignore_withheld -step 5 -adaptive 0.2 -classify_as 7 -olay
+laslayers -quiet -i unit\fusa.laz -ilay -o unit\fusa_t_lay.laz
+lasdiff -i unit\fusa_t.laz unit\fusa_t_lay.laz
+
+::=======lasnoise=======lasnoise========lasnoise=======
+
+lasnoise -quiet -i unit\fusa.laz -o unit\fusa_n.laz 
