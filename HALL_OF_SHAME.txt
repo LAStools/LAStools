@@ -9,10 +9,10 @@ a catalog of GIS data available in the Commonwealth. VGIN is nominated for provi
 state-wide LiDAR collected as part of 3DEP as "open data" solely in the closed
 and proprietary vendor format with the file extension *.zlas ...
    
-2) Tennessee Geographic Information Council (TNGIS) self-declared goals set at
+2) Tennessee Geographic Information Council (TNGIC) self-declared goals set at
 their first user forum held at the Garden Plaza in Murfreesboro in late 1993 are
 to "promote and facilitate data sharing", to "promote data standardization", as
-well as to "avoid duplication of effort". TNGIS was nominated for providing their
+well as to "avoid duplication of effort". TNGIC was nominated for providing their
 state-wide open LiDAR data solely in the closed and proprietary vendor format with
 the file extension *.zlas despite being repeatedly asked to offer this data (also)
 in a vendor-agnostic open format ...
