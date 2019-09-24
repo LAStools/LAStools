@@ -2,7 +2,7 @@
 
   demzip:
 
-  Compresses and uncompresses raster data from ASC, BIL, and TIF
+  Compresses and uncompresses raster data from ASC, BIL, TIF, IMG
   format to the compressed RasterLAZ format. The expected inputs
   are rasters containing elevation data such as DTM, DSM, or CHM
   rasters, or GEOID difference grids, or forestry metrics. These
@@ -31,16 +31,20 @@ C:\software\LAStools\bin>demzip -h
 usage:
 demzip -i dem.tif -o dem.laz
 demzip -i dem.laz -o dem.tif
-demzip -i dem.bil -o dem.laz
-demzip -i dem.laz -o dem.bil
 demzip -i dem.asc -o dem.laz
 demzip -i dem.laz -o dem.asc
+demzip -i dem.img -o dem.laz
+demzip -i dem.laz -o dem.img
+demzip -i dem.bil -o dem.laz
+demzip -i dem.laz -o dem.bil
 demzip -i dem\*.tif -olaz -cores 3
-demzip -i dem\*.bil -olaz -cores 3
 demzip -i dem\*.asc -olaz -cores 3
+demzip -i dem\*.img -olaz -cores 3
+demzip -i dem\*.bil -olaz -cores 3
 demzip -i dem\*.laz -otif -cores 3
-demzip -i dem\*.laz -obil -cores 3
 demzip -i dem\*.laz -oasc -cores 3
+demzip -i dem\*.laz -oimg -cores 3
+demzip -i dem\*.laz -obil -cores 3
 demzip -i dem\*.asc -odir compressed_dem -olaz -cores 2
 demzip -i compressed_dem\*.laz -odir dem -oasc -cores 2
 demzip -h

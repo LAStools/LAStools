@@ -1,4 +1,6 @@
+24 September 2019 -- lasclip, lasthin, lasclassify, lascolor, ...: new '-ignore_withheld' and more exposed via GUI
 16 September 2019 -- lasindex: new option '-dont_reindex' to prevent recreating of already existing LAX files
+15 September 2019 -- NEW: demdiff compares whether rasters in ASC, BIL, TIF, IMG and RasterLAZ are identical
 12 September 2019 -- demzip: also support IMG format and 64 bit TIF elevation / height rasters
 10 September 2019 -- lascanopy: option '-remove_empty_rasters' deletes raster files containing only 'no data' values 
  8 September 2019 -- lascolor: restrictive parsing of input combinations (only allow valid, don't ignore invalid)
