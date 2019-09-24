@@ -42,7 +42,7 @@ class ByteStreamOut;
 
 #define LAS_SPATIAL_QUAD_TREE 0
 
-class LASquadtree
+class LASLIB_DLL LASquadtree
 {
 public:
   LASquadtree();

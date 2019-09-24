@@ -127,6 +127,8 @@ public:
   LASreader();
   virtual ~LASreader();
 
+  void dealloc();
+
 protected:
   virtual BOOL read_point_default() = 0;
 

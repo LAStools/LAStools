@@ -63,6 +63,8 @@ public:
   virtual BOOL update_header(const LASheader* header, BOOL use_inventory=FALSE, BOOL update_extra_bytes=FALSE) = 0;
   virtual I64 close(BOOL update_npoints=TRUE) = 0;
 
+  void dealloc();
+
   LASwriter() { npoints = 0; p_count = 0; };
   virtual ~LASwriter() {};
 };

@@ -40,7 +40,7 @@ class LASwaveformDescription;
 class ArithmeticDecoder;
 class IntegerCompressor;
 
-class LASwaveform13reader
+class LASLIB_DLL LASwaveform13reader
 {
 public:
   U32 nbits;

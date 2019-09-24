@@ -64,7 +64,12 @@ file(GLOB_RECURSE LAS_INCLUDES
 	${CMAKE_SOURCE_DIR}/LASlib/inc/*.hpp
 )
 
-add_library(LASlib STATIC ${LAS_SRC} ${LAZ_SRC_FULL})
+add_library(LASlib ${LAS_SRC} ${LAZ_SRC_FULL})
+
+if (BUILD_SHARED_LIBS)
+	target_compile_definitions(LASlib PRIVATE "COMPILE_AS_DLL")
+endif()
+
 target_include_directories(LASlib PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASlib/inc>
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASzip/src>
@@ -75,7 +80,9 @@ set_target_properties(LASlib PROPERTIES
 )
 
 install(TARGETS LASlib EXPORT LASlib-targets
-	ARCHIVE DESTINATION lib/LASlib)
+	ARCHIVE DESTINATION lib/LASlib 
+	LIBRARY DESTINATION lib/LASlib 
+	RUNTIME DESTINATION lib/LASlib)
 install(FILES ${LAS_INCLUDES} DESTINATION include/LASlib)
 install(EXPORT LASlib-targets DESTINATION lib/cmake/LASlib)
 install(FILES ${CMAKE_SOURCE_DIR}/LASlib/src/LASlib-config.cmake DESTINATION lib/cmake/LASlib)
