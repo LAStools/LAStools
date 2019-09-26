@@ -12,4 +12,6 @@ option(BUILD_SHARED_LIBS "Build LASlib as DLL" OFF)
 
 add_subdirectory(LASlib/src)
 add_subdirectory(src)
-#add_subdirectory(src_full)
+if (EXISTS src_full)
+	add_subdirectory(src_full)
+endif()
