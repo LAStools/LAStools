@@ -337,6 +337,9 @@ int main(int argc, char *argv[])
     {
       wait = true;
     }
+    else if (strcmp(argv[i],"-fail") == 0)
+    {
+    }
     else if (strcmp(argv[i],"-gui") == 0)
     {
 #ifdef COMPILE_WITH_GUI

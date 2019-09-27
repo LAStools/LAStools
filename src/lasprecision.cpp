@@ -259,6 +259,9 @@ int main(int argc, char *argv[])
       fprintf(stderr, "LAStools (by martin@rapidlasso.com) version %d\n", LAS_TOOLS_VERSION);
       byebye();
     }
+    else if (strcmp(argv[i],"-fail") == 0)
+    {
+    }
     else if (strcmp(argv[i],"-gui") == 0)
     {
 #ifdef COMPILE_WITH_GUI
