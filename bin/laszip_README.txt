@@ -95,7 +95,7 @@ file.
 
 for more info:
 
-E:\LAStools\bin>laszip -h
+D:\software\LAStools\bin>laszip -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -178,7 +178,9 @@ Filter points based on their gps time.
   -drop_gps_time_between 22.0 48.0
 Filter points based on their RGB/CIR/NIR channels.
   -keep_RGB_red 1 1
+  -drop_RGB_red 5000 20000
   -keep_RGB_green 30 100
+  -drop_RGB_green 2000 10000
   -keep_RGB_blue 0 0
   -keep_RGB_nir 64 127
   -keep_NDVI 0.2 0.7 -keep_NDVI_from_CIR -0.1 0.5
@@ -192,6 +194,7 @@ Filter points based on extra attributes.
 Filter points with simple thinning.
   -keep_every_nth 2 -drop_every_nth 3
   -keep_random_fraction 0.1
+  -keep_random_fraction 0.1 4711
   -thin_with_grid 1.0
   -thin_pulses_with_time 0.0001
   -thin_points_with_time 0.000001
@@ -203,11 +206,17 @@ Transform coordinates.
   -rotate_xy 15.0 620000 4100000 (angle + origin)
   -translate_xyz 0.5 0.5 0
   -translate_then_scale_y -0.5 1.001
+  -transform_helmert -199.87,74.79,246.62
+  -transform_helmert 598.1,73.7,418.2,0.202,0.045,-2.455,6.7
+  -transform_affine 0.9999652,0.903571,171.67,736.26
   -switch_x_y -switch_x_z -switch_y_z
   -clamp_z_below 70.5
   -clamp_z 70.5 72.5
   -copy_attribute_into_z 0
+  -add_attribute_to_z 1
+  -add_scaled_attribute_to_z 1 -1.2
   -copy_intensity_into_z
+  -copy_user_data_into_z
 Transform raw xyz integers.
   -translate_raw_z 20
   -translate_raw_xyz 1 1 0
@@ -220,8 +229,13 @@ Transform intensity.
   -translate_then_scale_intensity 0.5 3.1
   -clamp_intensity 0 255
   -clamp_intensity_above 255
+  -map_intensity map_file.txt
+  -copy_RGB_into_intensity
   -copy_NIR_into_intensity
+  -copy_attribute_into_intensity 0
+  -bin_gps_time_into_intensity 0.5
 Transform scan_angle.
+  -set_scan_angle 0.0
   -scale_scan_angle 1.944445
   -translate_scan_angle -5
   -translate_then_scale_scan_angle -0.5 2.1
@@ -230,12 +244,14 @@ Change the return number or return count of points.
   -set_return_number 1
   -set_extended_return_number 10
   -change_return_number_from_to 2 1
+  -change_extended_return_number_from_to 2 8
   -set_number_of_returns 2
-  -set_number_of_returns 15
+  -set_extended_number_of_returns 15
   -change_number_of_returns_from_to 0 2
+  -change_extended_number_of_returns_from_to 8 10
 Modify the classification.
   -set_classification 2
-  -set_extended_classification 0
+  -set_extended_classification 41
   -change_classification_from_to 2 4
   -classify_z_below_as -5.0 7
   -classify_z_above_as 70.0 7
@@ -243,6 +259,9 @@ Modify the classification.
   -classify_intensity_above_as 200 9
   -classify_intensity_below_as 30 11
   -classify_intensity_between_as 500 900 15
+  -classify_attribute_below_as 0 -5.0 7
+  -classify_attribute_above_as 1 70.0 7
+  -classify_attribute_between_as 1 2.0 5.0 4
   -change_extended_classification_from_to 6 46
   -move_ancient_to_extended_classification
 Change the flags.
@@ -258,16 +277,20 @@ Modify the user data.
   -scale_user_data 1.5
   -change_user_data_from_to 23 26
   -change_user_data_from_to 23 26
+  -map_user_data map_file.txt
   -copy_attribute_into_user_data 1
+  -add_scaled_attribute_to_user_data 0 10.0
 Modify the point source ID.
   -set_point_source 500
   -change_point_source_from_to 1023 1024
+  -map_point_source map_file.txt
   -copy_user_data_into_point_source
   -copy_scanner_channel_into_point_source
   -merge_scanner_channel_into_point_source
   -split_scanner_channel_from_point_source
   -bin_Z_into_point_source 200
   -bin_abs_scan_angle_into_point_source 2
+  -bin_gps_time_into_point_source 5.0
 Transform gps_time.
   -set_gps_time 113556962.005715
   -translate_gps_time 40.50
@@ -280,10 +303,27 @@ Transform RGB/NIR colors.
   -scale_RGB_down (by 256)
   -scale_RGB_up (by 256)
   -switch_R_G -switch_R_B -switch_B_G
-  -copy_RGB_into_intensity
   -copy_R_into_NIR -copy_R_into_intensity
   -copy_G_into_NIR -copy_G_into_intensity
   -copy_B_into_NIR -copy_B_into_intensity
+  -copy_intensity_into_NIR
+  -switch_RGBI_into_CIR
+  -switch_RGB_intensity_into_CIR
+Transform attributes in "Extra Bytes".
+  -scale_attribute 0 1.5
+  -translate_attribute 1 0.2
+  -copy_user_data_into_attribute 0
+Ignore points based on classifications.
+  -ignore_class 7
+  -ignore_class 0 1 7 33
+Ignore points based on return type.
+  -ignore_first -ignore_first_of_many
+  -ignore_last -ignore_last_of_many
+  -ignore_intermediate
+  -ignore_single
+Ignore points based on flags.
+  -ignore_synthetic -ignore_keypoint
+  -ignore_withheld -ignore_overlap
 Supported LAS Inputs
   -i lidar.las
   -i lidar.laz
@@ -317,17 +357,27 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 170805
+LAStools (by martin@rapidlasso.com) version 190927
 usage:
-laszip *.las
-laszip *.laz
-laszip *.txt -iparse xyztiarn
-laszip lidar.las
-laszip lidar.laz -v
+laszip -i lidar.las
+laszip -i lidar.laz
+laszip -i lidar.las -nil
+laszip -i lidar.laz -size
+laszip -i lidar.laz -check
+laszip -i *.las
+laszip -i *.laz
+laszip -i *.las -odir compressed
+laszip -i *.laz -odir uncompressed
+laszip -i *.las -odir compressed -cores 4
+laszip -i *.laz -odir uncompressed -cores 4
 laszip -i lidar.las -o lidar_zipped.laz
 laszip -i lidar.laz -o lidar_unzipped.las
 laszip -i lidar.las -stdout -olaz > lidar.laz
 laszip -stdin -o lidar.laz < lidar.las
+laszip -i *.txt -iparse xyztiarn
+laszip -i las14.las -compatible -o las14compatible.laz
+laszip -i las14.laz -compatible -o las14compatible.laz
+laszip -i las14compatible.laz -remain_compatible -o las14compatible.las
 laszip -h
 
 ---------------
