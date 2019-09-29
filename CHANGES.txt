@@ -1,3 +1,4 @@
+26 September 2019 -- open source tools ignore '-fail' which makes closed source tools fail if license expired / not found
 24 September 2019 -- lasclip, lasthin, lasclassify, lascolor, ...: new '-ignore_withheld' and more exposed via GUI
 16 September 2019 -- lasindex: new option '-dont_reindex' to prevent recreating of already existing LAX files
 15 September 2019 -- NEW: demdiff compares whether rasters in ASC, BIL, TIF, IMG and RasterLAZ are identical
