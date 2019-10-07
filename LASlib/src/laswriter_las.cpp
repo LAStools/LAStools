@@ -64,7 +64,12 @@ BOOL LASwriterLAS::open(const char* file_name, const LASheader* header, U32 comp
     return FALSE;
   }
 
+#ifdef _MSC_VER
+  file = _wfopen(toUtf16(std::string{file_name}).c_str(), L"wb");
+#else
   file = fopen(file_name, "wb");
+#endif
+
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
