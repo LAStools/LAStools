@@ -157,4 +157,11 @@ private:
   char* error_string;
 };
 
+#ifdef _MSC_VER
+
+#include <windows.h>
+wchar_t* UTF8toUTF16(const CHAR* utf8);
+
+#endif // _MSC_VER
+
 #endif

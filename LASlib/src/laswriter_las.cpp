@@ -65,7 +65,9 @@ BOOL LASwriterLAS::open(const char* file_name, const LASheader* header, U32 comp
   }
 
 #ifdef _MSC_VER
-  file = _wfopen(toUtf16(std::string{file_name}).c_str(), L"wb");
+  wchar_t* utf16_file_name = UTF8toUTF16(file_name);
+  file = _wfopen(utf16_file_name, L"wb");
+  delete [] utf16_file_name;
 #else
   file = fopen(file_name, "wb");
 #endif

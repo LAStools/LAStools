@@ -53,7 +53,9 @@ BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_onl
   }
 
 #ifdef _MSC_VER
-  file = _wfopen(toUtf16(std::string{file_name}).c_str(), L"rb");
+  wchar_t* utf16_file_name = UTF8toUTF16(file_name);
+  file = _wfopen(utf16_file_name, L"rb");
+  delete [] utf16_file_name;
 #else
   file = fopen(file_name, "rb");
 #endif
