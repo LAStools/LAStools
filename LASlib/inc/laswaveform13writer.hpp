@@ -40,7 +40,7 @@ class LASwaveformDescription;
 class ArithmeticEncoder;
 class IntegerCompressor;
 
-class LASwaveform13writer
+class LASLIB_DLL LASwaveform13writer
 {
 public:
   BOOL open(const char* file_name, const LASvlr_wave_packet_descr * const * wave_packet_descr);

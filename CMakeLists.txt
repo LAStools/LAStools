@@ -8,6 +8,8 @@ else()
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
+option(BUILD_SHARED_LIBS "Build LASlib as DLL" OFF)
+
 add_subdirectory(LASlib/src)
 add_subdirectory(src)
 if (EXISTS src_full)

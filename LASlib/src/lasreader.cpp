@@ -87,6 +87,11 @@ LASreader::~LASreader()
   if (transform) transform->check_for_overflow();
 }
 
+void LASreader::dealloc()
+{
+  delete this;
+}
+
 void LASreader::set_index(LASindex* index)
 {
   if (this->index) delete this->index;

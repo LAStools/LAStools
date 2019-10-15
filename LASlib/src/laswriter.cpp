@@ -47,6 +47,11 @@
 #define DIRECTORY_SLASH '/'
 #endif
 
+void LASwriter::dealloc()
+{
+  delete this;
+}
+
 BOOL LASwriteOpener::is_piped() const
 {
   return ((file_name == 0) && use_stdout);

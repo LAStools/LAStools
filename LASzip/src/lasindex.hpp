@@ -53,7 +53,7 @@ class LASreader;
 class ByteStreamIn;
 class ByteStreamOut;
 
-class LASindex
+class LASLIB_DLL LASindex
 {
 public:
   LASindex();
