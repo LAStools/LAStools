@@ -1005,4 +1005,27 @@ public:
   };
 };
 
+#ifdef _MSC_VER
+
+#include <windows.h>
+#include <string>
+
+namespace {
+
+std::wstring toUtf16(std::string const& str)
+{
+  std::wstring ret;
+  int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), NULL, 0);
+  if (len > 0)
+  {
+    ret.resize(len);
+    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), &ret[0], len);
+  }
+  return ret;
+}
+
+}
+
+#endif
+
 #endif

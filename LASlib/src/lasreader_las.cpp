@@ -52,7 +52,12 @@ BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_onl
     return FALSE;
   }
 
+#ifdef _MSC_VER
+  file = _wfopen(toUtf16(std::string{file_name}).c_str(), L"rb");
+#else
   file = fopen(file_name, "rb");
+#endif
+
   if (file == 0)
   {
     fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
