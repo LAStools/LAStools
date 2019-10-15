@@ -2914,7 +2914,13 @@ laszip_open_writer(
 
     // open the file
 
-    laszip_dll->file = fopen(file_name, "wb");
+#ifdef _MSC_VER
+    wchar_t* utf16_file_name = UTF8toUTF16(file_name);
+    laszip_dll->file = _wfopen(utf16_file_name, L"wb");
+    delete [] utf16_file_name;
+#else
+	laszip_dll->file = fopen(file_name, "wb");
+#endif
 
     if (laszip_dll->file == 0)
     {
@@ -4323,7 +4329,13 @@ laszip_open_reader(
 
     // open the file
 
-    laszip_dll->file = fopen(file_name, "rb");
+#ifdef _MSC_VER
+    wchar_t* utf16_file_name = UTF8toUTF16(file_name);
+    laszip_dll->file = _wfopen(utf16_file_name, L"rb");
+    delete [] utf16_file_name;
+#else
+	laszip_dll->file = fopen(file_name, "rb");
+#endif
 
     if (laszip_dll->file == 0)
     {
