@@ -2298,7 +2298,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
           epsg_name = get_epsg_name_from_pcs_file(argv_zero, projection->geokey);
         }
         // maybe output a compound CRS
-        if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_EVRF2007) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) || (vertical_geokey == GEO_VERTICAL_DHHN2016) )
+        if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_EVRF2007) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) || (vertical_geokey == GEO_VERTICAL_DHHN2016) || (vertical_geokey == GEO_VERTICAL_NZVD2016) )
         {
           n += sprintf(&string[n], "COMPD_CS[\"%s + ", (epsg_name ? epsg_name : projection->name));
 
@@ -2376,6 +2376,10 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
           else if (vertical_geokey == GEO_VERTICAL_DHHN2016)
           {
             n += sprintf(&string[n], "DHHN2016");
+          }
+          else if (vertical_geokey == GEO_VERTICAL_NZVD2016)
+          {
+            n += sprintf(&string[n], "NZVD2016");
           }
 
           if (source)
@@ -2567,7 +2571,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
           n += sprintf(&string[n], "]");
         }
       }
-      if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_EVRF2007) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) || (vertical_geokey == GEO_VERTICAL_DHHN2016) )
+      if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_EVRF2007) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) || (vertical_geokey == GEO_VERTICAL_DHHN2016) || (vertical_geokey == GEO_VERTICAL_NZVD2016))
       {
         // comma for compound CRS
         n += sprintf(&string[n], ",");
@@ -2648,6 +2652,10 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
         {
           n += sprintf(&string[n], "VERT_CS[\"DHHN2016\",VERT_DATUM[\"Deutsches Haupthoehennetz 2016\",2005,AUTHORITY[\"EPSG\",\"7837\"]],");
         }
+        else if (vertical_geokey == GEO_VERTICAL_NZVD2016)
+        {
+          n += sprintf(&string[n], "VERT_CS[\"NZVD2016\",VERT_DATUM[\"New Zealand Vertical Datum 2016\",2005,AUTHORITY[\"EPSG\",\"7839\"]],");
+        }
         if (source)
         {
           if (elevation2meter == 1.0)
@@ -2717,6 +2725,10 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
         else if (vertical_geokey == GEO_VERTICAL_DHHN2016)
         {
           n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"7837\"]]");
+        }
+        else if (vertical_geokey == GEO_VERTICAL_NZVD2016)
+        {
+          n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"7839\"]]");
         }
         // close bracket for compound CRS
         n += sprintf(&string[n], "]");
@@ -2987,7 +2999,7 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
         n += sprintf(&string[n], "]");
       }
     }
-    if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_EVRF2007) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) || (vertical_geokey == GEO_VERTICAL_DHHN2016) )
+    if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_EVRF2007) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) || (vertical_geokey == GEO_VERTICAL_DHHN2016) || (vertical_geokey == GEO_VERTICAL_NZVD2016))
     {
       if (vertical_geokey == GEO_VERTICAL_NAVD88)
       {
@@ -3028,6 +3040,10 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
       else if (vertical_geokey == GEO_VERTICAL_DHHN2016)
       {
         n += sprintf(&string[n], "VERT_CS[\"DHHN2016\",VERT_DATUM[\"Deutsches Haupthoehennetz 2016\",2005,AUTHORITY[\"EPSG\",\"7837\"]],");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_NZVD2016)
+      {
+        n += sprintf(&string[n], "VERT_CS[\"NZVD2016\",VERT_DATUM[\"New Zealand Vertical Datum 2016\",2005,AUTHORITY[\"EPSG\",\"7839\"]],");
       }
       if (source)
       {
@@ -3096,6 +3112,10 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
         n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"5783\"]]");
       }
       else if (vertical_geokey == GEO_VERTICAL_DHHN2016)
+      {
+        n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"7837\"]]");
+      }
+      else if (vertical_geokey == GEO_VERTICAL_NZVD2016)
       {
         n += sprintf(&string[n], "AXIS[\"Gravity-related height\",UP],AUTHORITY[\"EPSG\",\"7837\"]]");
       }
@@ -4123,6 +4143,12 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
   {
     vertical_geokey = GEO_VERTICAL_DHHN2016;
     if (description) sprintf(description, "Deutsches Haupthoehennetz 2016");
+    return true;
+  }
+  else if (value == GEO_VERTICAL_NZVD2016)
+  {
+    vertical_geokey = GEO_VERTICAL_NZVD2016;
+    if (description) sprintf(description, "New Zealand Vertical Datum 2016");
     return true;
   }
   else if (value == GEO_VERTICAL_DHHN92)
@@ -7340,6 +7366,11 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         vertical_geokey = GEO_VERTICAL_DHHN2016;
         *argv[i]='\0';
       }
+      else if (strcmp(argv[i],"-vertical_nzvd2016") == 0)
+      {
+        vertical_geokey = GEO_VERTICAL_NZVD2016;
+        *argv[i]='\0';
+      }
       else if (strcmp(argv[i],"-vertical_epsg") == 0)
       {
         if ((i+1) >= argc)
@@ -7866,6 +7897,14 @@ int GeoProjectionConverter::unparse(char* string) const
     else if (vertical_geokey == GEO_VERTICAL_DHHN2016)
     {
       n += sprintf(&string[n], "-vertical_dhhn2016 ");
+    }
+    else if (vertical_geokey == GEO_VERTICAL_NZVD2016)
+    {
+      n += sprintf(&string[n], "-vertical_nzvd2016 ");
+    }
+    else
+    {
+      n += sprintf(&string[n], "-vertical_epsg %d ", vertical_geokey);
     }
   }
   if (target_projection != 0)
