@@ -40,11 +40,11 @@
 wchar_t* UTF8toUTF16(const char* utf8)
 {
   wchar_t* utf16 = 0;
-  int len = (int)strlen(utf8);
+  int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, 0, 0);
   if (len > 0)
   {
     utf16 = new wchar_t[len];
-    MultiByteToWideChar(CP_UTF8, 0, utf8, len, utf16, len);
+    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, utf16, len);
   }
   return utf16;
 }
