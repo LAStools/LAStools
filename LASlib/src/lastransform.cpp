@@ -1236,7 +1236,7 @@ class LASoperationSetPointSource : public LASoperation
 public:
   inline const CHAR* name() const { return "set_point_source"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), psid); };
-  inline void transform(LASpoint* point) { point->point_source_ID = psid; };
+  inline void transform(LASpoint* point) { point->set_point_source_ID(psid); };
   LASoperationSetPointSource(U16 psid) { this->psid = psid; };
 private:
   U16 psid;
@@ -1248,7 +1248,7 @@ public:
   inline const CHAR* name() const { return "change_point_source_from_to"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), psid_from, psid_to); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
-  inline void transform(LASpoint* point) { if (point->point_source_ID == psid_from) point->point_source_ID = psid_to; };
+  inline void transform(LASpoint* point) { if (point->get_point_source_ID() == psid_from) point->set_point_source_ID(psid_to); };
   LASoperationChangePointSourceFromTo(U16 psid_from, U16 psid_to) { this->psid_from = psid_from; this->psid_to = psid_to; };
 private:
   U16 psid_from;
@@ -1579,6 +1579,101 @@ public:
   inline void transform(LASpoint* point) { I16 temp = point->get_G(); point->set_G(point->get_B()); point->set_B(temp); };
 };
 
+class LASoperationMapAttributeIntoRGB : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "map_attribute_into_RGB"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u \"%s\" ", name(), index, map_file_name); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
+  inline void transform(LASpoint* point)
+  {
+    if (size)
+    {
+      F64 value = point->get_attribute_as_float(index);
+      if (value <= values[0])
+      {
+        point->set_R(Rs[0]);
+        point->set_G(Gs[0]);
+        point->set_B(Bs[0]);
+      }
+      else if (value >= values[size-1])
+      {
+        point->set_R(Rs[size-1]);
+        point->set_G(Gs[size-1]);
+        point->set_B(Bs[size-1]);
+      }
+      else
+      {
+        U32 min_pos = 0;
+        F64 min_abs_dist = (value < values[0] ? values[0] - value : value - values[0]);
+        U32 pos;
+        F64 abs_dist;
+        for (pos = 1; pos < size; pos++)
+        {
+          abs_dist = (value < values[0] ? values[0] - value : value - values[0]);
+        }
+      }
+    }
+  };
+  LASoperationMapAttributeIntoRGB(const U32 index, const CHAR* file_name)
+  {
+    F64 value;
+    U32 R, G, B; 
+    CHAR line[256];
+    FILE* file = fopen(file_name, "r");
+    size = 0;
+    if (file)
+    {
+      while (fgets(line, 256, file))
+      {
+        if (sscanf(line, "%lf %u %u %u", &value, &R, &G, &B) == 4)
+        {
+          if ((R <= 255) && (G <= 255) && (B <= 255))
+          {
+            size++;
+          }
+        }
+      }
+      fclose(file);
+    }
+    if (size)
+    {
+      U32 count = 0; 
+      values = new F64[size];
+      Rs = new U8[size];
+      Gs = new U8[size];
+      Bs = new U8[size];
+      file = fopen(file_name, "r");
+      while (fgets(line, 256, file))
+      {
+        if (sscanf(line, "%lf %u %u %u", &value, &R, &G, &B) == 4)
+        {
+          if ((R <= 255) && (G <= 255) && (B <= 255))
+          {
+            values[count] = value;
+            Rs[count] = R;
+            Gs[count] = G;
+            Bs[count] = B;
+            count++;
+          }
+        }
+      }
+      fclose(file);
+    }
+    this->index = index;
+    map_file_name = LASCopyString(file_name);
+  };
+  ~LASoperationMapAttributeIntoRGB() { if (size) { delete [] values; delete [] Rs; delete [] Gs; delete [] Bs; } free(map_file_name); };
+private:
+  U32 index;
+  U32 size;
+  F64* values;
+  U8* Rs;
+  U8* Gs;
+  U8* Bs;
+  CHAR* map_file_name;
+};
+
 class LASoperationCopyRGBintoIntensity : public LASoperation
 {
 public:
@@ -1669,12 +1764,10 @@ public:
   inline void transform(LASpoint* point) { 
     U16 R = point->get_R();
     U16 G = point->get_G();
-    U16 B = point->get_B();
     U16 I = point->get_NIR();
     point->set_R(I);
     point->set_G(R);
     point->set_B(G);
-//    point->set_NIR(B);
   };
 };
 
@@ -1687,12 +1780,10 @@ public:
   inline void transform(LASpoint* point) { 
     U16 R = point->get_R();
     U16 G = point->get_G();
-    U16 B = point->get_B();
     U16 intensity = point->get_intensity();
     point->set_R(intensity);
     point->set_G(R);
     point->set_B(G);
-//    point->set_intensity(B);
   };
 };
 
@@ -1711,7 +1802,7 @@ public:
   inline const CHAR* name() const { return "copy_user_data_into_point_source"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
-  inline void transform(LASpoint* point) { point->point_source_ID = point->get_user_data(); };
+  inline void transform(LASpoint* point) { point->set_point_source_ID(point->get_user_data()); };
 };
 
 class LASoperationCopyUserDataIntoScannerChannel : public LASoperation
@@ -1720,7 +1811,15 @@ public:
   inline const CHAR* name() const { return "copy_user_data_into_scanner_channel"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
-  inline void transform(LASpoint* point) { point->extended_scanner_channel = (point->get_user_data() & 0x0003); };
+  inline void transform(LASpoint* point) { point->set_extended_scanner_channel(point->get_user_data() & 0x0003); };
+};
+
+class LASoperationCopyScannerChannelIntoUserData : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_scanner_channel_into_user_data"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->set_user_data(point->get_extended_scanner_channel()); };
 };
 
 class LASoperationCopyScannerChannelIntoPointSource : public LASoperation
@@ -1728,7 +1827,7 @@ class LASoperationCopyScannerChannelIntoPointSource : public LASoperation
 public:
   inline const CHAR* name() const { return "copy_scanner_channel_into_point_source"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline void transform(LASpoint* point) { point->point_source_ID = point->get_extended_scanner_channel(); };
+  inline void transform(LASpoint* point) { point->set_point_source_ID(point->get_extended_scanner_channel()); };
 };
 
 class LASoperationMergeScannerChannelIntoPointSource : public LASoperation
@@ -1737,7 +1836,7 @@ public:
   inline const CHAR* name() const { return "merge_scanner_channel_into_point_source"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
-  inline void transform(LASpoint* point) { point->point_source_ID = (point->get_point_source_ID() << 2) | point->get_extended_scanner_channel(); };
+  inline void transform(LASpoint* point) { point->set_point_source_ID((point->get_point_source_ID() << 2) | point->get_extended_scanner_channel()); };
 };
 
 class LASoperationSplitScannerChannelFromPointSource : public LASoperation
@@ -1746,7 +1845,7 @@ public:
   inline const CHAR* name() const { return "split_scanner_channel_from_point_source"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
-  inline void transform(LASpoint* point) { point->extended_scanner_channel = (point->get_point_source_ID() & 0x0003); point->point_source_ID = (point->get_point_source_ID() >> 2); };
+  inline void transform(LASpoint* point) { point->set_extended_scanner_channel(point->get_point_source_ID() & 0x0003); point->set_point_source_ID(point->get_point_source_ID() >> 2); };
 };
 
 class LASoperationBinZintoPointSource : public LASoperation
@@ -1755,7 +1854,7 @@ public:
   inline const CHAR* name() const { return "bin_Z_into_point_source"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d", name(), bin_size); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
-  inline void transform(LASpoint* point) { point->point_source_ID = U16_CLAMP(point->get_Z()/bin_size); };
+  inline void transform(LASpoint* point) { point->set_point_source_ID(U16_CLAMP(point->get_Z()/bin_size)); };
   LASoperationBinZintoPointSource(I32 bin_size=1) { this->bin_size = bin_size; };
 private:
   I32 bin_size;
@@ -1767,7 +1866,7 @@ public:
   inline const CHAR* name() const { return "bin_abs_scan_angle_into_point_source"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g", name(), bin_size); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE; };
-  inline void transform(LASpoint* point) { point->point_source_ID = U16_CLAMP(point->get_abs_scan_angle()/bin_size); };
+  inline void transform(LASpoint* point) { point->set_point_source_ID(U16_CLAMP(point->get_abs_scan_angle()/bin_size)); };
   LASoperationBinAbsScanAngleIntoPointSource(F32 bin_size=1.0f) { this->bin_size = bin_size; };
 private:
   F32 bin_size;
@@ -1969,6 +2068,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -change_user_data_from_to 23 26\n");
   fprintf(stderr,"  -change_user_data_from_to 23 26\n");
   fprintf(stderr,"  -map_user_data map_file.txt\n");
+  fprintf(stderr,"  -copy_scanner_channel_into_user_data\n");
   fprintf(stderr,"  -copy_attribute_into_user_data 1\n");
   fprintf(stderr,"  -add_scaled_attribute_to_user_data 0 10.0\n");
   fprintf(stderr,"Modify the point source ID.\n");
@@ -2004,6 +2104,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_attribute 0 1.5\n");
   fprintf(stderr,"  -translate_attribute 1 0.2\n");
   fprintf(stderr,"  -copy_user_data_into_attribute 0\n");
+  fprintf(stderr,"  -map_attribute_into_RGB 0 map_height_to_RGB.txt\n");
 }
 
 BOOL LAStransform::parse(int argc, char* argv[])
@@ -2751,11 +2852,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
       }
-      else if (strcmp(argv[i],"-copy_scanner_channel_into_point_source") == 0)
+      else if (strncmp(argv[i],"-copy_scanner_channel_", 19) == 0)
       {
-        add_operation(new LASoperationCopyScannerChannelIntoPointSource());
-        *argv[i]='\0'; 
-      }
+		    if (strcmp(argv[i],"-copy_scanner_channel_into_point_source") == 0)
+		    {
+			    add_operation(new LASoperationCopyScannerChannelIntoPointSource());
+			    *argv[i]='\0'; 
+		    }
+        else if (strcmp(argv[i],"-copy_scanner_channel_into_user_data") == 0)
+		    {
+			    add_operation(new LASoperationCopyScannerChannelIntoUserData());
+			    *argv[i]='\0'; 
+		    }
+	    }
       else if (strncmp(argv[i],"-copy_R", 7) == 0)
       {
         if (strcmp(argv[i],"-copy_RGB_into_intensity") == 0)
@@ -4223,6 +4332,32 @@ BOOL LAStransform::parse(int argc, char* argv[])
         }
         add_operation(new LASoperationMapIntensity(argv[i+1]));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i],"-map_attribute_into_RGB") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: attribute_index map_file_name.txt\n", argv[i]);
+          return FALSE;
+        }
+        U32 index;
+        if (sscanf(argv[i+1], "%u", &index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: attribute_index map_file_name.txt but '%s' is no valid attribute_index\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        FILE* file = fopen(argv[i+2], "r");
+        if (file == 0)
+        {
+          fprintf(stderr,"ERROR: cannot '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        else
+        {
+          fclose(file);
+        }
+        add_operation(new LASoperationMapAttributeIntoRGB(index, argv[i+2]));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
     }
     else if (strncmp(argv[i], "-transform_", 11) == 0)
