@@ -1,3 +1,5 @@
+18 October 2019 -- demzip, lascanopy: fix for bug in version 190927: TIF was missing CRS on one core and multiple inputs
+18 October 2019 -- lasgrid, las2dem: fix for bug in version 190927: TIF was missing CRS on one core and multiple inputs
 17 October 2019 -- lasinfo, las2las: support horizontal datum NAD83(PA11) and vertical datum NZVD2016
 16 October 2019 -- LASlib: new option '-copy_scanner_channel_into_user_data' for new LAS 1.4 point types 6 or higher
 13 October 2019 -- lasgrid: selective decompression bug fix for '-classification' when input are compressed LAS 1.4 points
