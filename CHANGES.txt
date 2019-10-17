@@ -1,3 +1,5 @@
+17 October 2019 -- lasinfo, las2las: support horizontal datum NAD83(PA11) and vertical datum NZVD2016
+16 October 2019 -- LASlib: new option '-copy_scanner_channel_into_user_data' for new LAS 1.4 point types 6 or higher
 13 October 2019 -- lasgrid: selective decompression bug fix for '-classification' when input are compressed LAS 1.4 points
 26 September 2019 -- open source tools ignore '-fail' which makes closed source tools fail if license expired / not found
 24 September 2019 -- lasclip, lasthin, lasclassify, lascolor, ...: new '-ignore_withheld' and more exposed via GUI

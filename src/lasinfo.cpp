@@ -1703,6 +1703,12 @@ int main(int argc, char *argv[])
                   case 4619: // GCS_SWEREF99
                     fprintf(file_out, "GeographicTypeGeoKey: GCS_SWEREF99\012");
                     break;
+                  case 6318: // GCS_NAD83_2011
+                    fprintf(file_out, "GeographicTypeGeoKey: GCS_NAD83_2011\012");
+                    break;
+                  case 6322: // GCS_NAD83_PA11
+                    fprintf(file_out, "GeographicTypeGeoKey: GCS_NAD83_PA11\012");
+                    break;
                   default:
                     fprintf(file_out, "GeographicTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
                   }

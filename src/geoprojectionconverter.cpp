@@ -913,6 +913,9 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
       case 6319: // NAD83_2011_3D
         gcs_code = GEO_GCS_NAD83_2011;
         break;
+      case 6322: // NAD83_PA11
+        gcs_code = GEO_GCS_NAD83_PA11;
+        break;
       case 4030: // GCSE_WGS84 (unknown datum based on WGS 84 ellipsoid)
         ellipsoid = GEO_ELLIPSOID_WGS84;
         break;
@@ -2849,7 +2852,7 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
       {
         n += sprintf(&string[n], "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],");
       }
-      else if ((gcs_code == GEO_GCS_NAD83) || (gcs_code == GEO_GCS_NAD83_HARN) || (gcs_code == GEO_GCS_NAD83_CSRS) || (gcs_code == GEO_GCS_NAD83_2011))
+      else if ((gcs_code == GEO_GCS_NAD83) || (gcs_code == GEO_GCS_NAD83_HARN) || (gcs_code == GEO_GCS_NAD83_CSRS) || (gcs_code == GEO_GCS_NAD83_PA11) || (gcs_code == GEO_GCS_NAD83_2011))
       {
         if (gcs_code == GEO_GCS_NAD83)
         {
@@ -2862,6 +2865,10 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
         else if (gcs_code == GEO_GCS_NAD83_CSRS)
         {
           n += sprintf(&string[n], "GEOGCS[\"NAD83(CSRS)\",DATUM[\"D_NAD83_Canadian_Spatial_Reference_System\",");
+        }
+        else if (gcs_code == GEO_GCS_NAD83_PA11)
+        {
+          n += sprintf(&string[n], "GEOGCS[\"NAD83(PA11)\",DATUM[\"D_North_American_1983_PA11\",");
         }
         else
         {
@@ -3191,7 +3198,7 @@ bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** p
     {
       n += sprintf(&string[n], "+datum=WGS84 ");
     }
-    else if ((gcs_code == GEO_GCS_NAD83) || (gcs_code == GEO_GCS_NAD83_HARN) || (gcs_code == GEO_GCS_NAD83_CSRS) || (gcs_code == GEO_GCS_NAD83_2011) || (gcs_code == GEO_GCS_NAD83_NSRS2007))
+    else if ((gcs_code == GEO_GCS_NAD83) || (gcs_code == GEO_GCS_NAD83_HARN) || (gcs_code == GEO_GCS_NAD83_CSRS)|| (gcs_code == GEO_GCS_NAD83_PA11) || (gcs_code == GEO_GCS_NAD83_2011) || (gcs_code == GEO_GCS_NAD83_NSRS2007))
     {
       n += sprintf(&string[n], "+datum=NAD83 ");
     }
@@ -4402,6 +4409,11 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
     datum_code = 6140;
     sprintf(datum_name, "NAD83_Canadian_Spatial_Reference_System");
     spheroid_code = GEO_SPHEROID_GRS80;
+  }
+  else if (code == GEO_GCS_NAD83_PA11)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    sprintf(gcs_name, "NAD83(PA11)");
   }
   else if (code == GEO_GCS_NAD83_2011)
   {
@@ -7245,6 +7257,12 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
+      else if (strcmp(argv[i],"-nad83_pa11") == 0)
+      {
+        set_gcs(GEO_GCS_NAD83_PA11, tmp);
+        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        *argv[i]='\0';
+      }
       else
       {
         fprintf(stderr,"ERROR: unknown datum '%s'.\n", argv[i]);
@@ -7759,6 +7777,10 @@ int GeoProjectionConverter::unparse(char* string) const
         else if (gcs_code == GEO_GCS_NAD83_CSRS)
         {
           n += sprintf(&string[n], "-nad83_csrs ");
+        }
+        else if (gcs_code == GEO_GCS_NAD83_PA11)
+        {
+          n += sprintf(&string[n], "-nad83_pa11 ");
         }
         else if (gcs_code == GEO_GCS_ETRS89)
         {
@@ -8907,7 +8929,7 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(short* horizontal_uni
   {
     *horizontal_datum = 1;
   }
-  else if ((gcs_code == GEO_GCS_NAD83) || (gcs_code == GEO_GCS_NAD83_HARN) || (gcs_code == GEO_GCS_NAD83_CSRS) || (gcs_code == GEO_GCS_NAD83_2011) || (gcs_code == GEO_GCS_NAD83_NSRS2007))
+  else if ((gcs_code == GEO_GCS_NAD83) || (gcs_code == GEO_GCS_NAD83_HARN) || (gcs_code == GEO_GCS_NAD83_CSRS) || (gcs_code == GEO_GCS_NAD83_PA11) || (gcs_code == GEO_GCS_NAD83_2011) || (gcs_code == GEO_GCS_NAD83_NSRS2007))
   {
     *horizontal_datum = 2;
   }
