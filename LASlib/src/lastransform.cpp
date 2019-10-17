@@ -1026,6 +1026,15 @@ private:
   U8 class_to;
 };
 
+class LASoperationCopyIntensityIntoClassification : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_intensity_into_classification"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
+  inline void transform(LASpoint* point) { point->set_classification((U8)point->get_intensity()); };
+};
+
 class LASoperationSetWithheldFlag : public LASoperation
 {
 public:
@@ -2925,6 +2934,11 @@ BOOL LAStransform::parse(int argc, char* argv[])
         else if (strcmp(argv[i],"-copy_intensity_into_NIR") == 0)
         {
           add_operation(new LASoperationCopyIntensityIntoNIR());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_intensity_into_classification") == 0)
+        {
+          add_operation(new LASoperationCopyIntensityIntoClassification());
           *argv[i]='\0'; 
         }
       }
