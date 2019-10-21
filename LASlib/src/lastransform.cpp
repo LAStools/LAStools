@@ -1619,8 +1619,16 @@ public:
         F64 abs_dist;
         for (pos = 1; pos < size; pos++)
         {
-          abs_dist = (value < values[0] ? values[0] - value : value - values[0]);
+          abs_dist = (value < values[pos] ? values[pos] - value : value - values[pos]);
+          if (abs_dist < min_abs_dist)
+          {
+            min_abs_dist = abs_dist;
+            min_pos = pos;
+          }
         }
+        point->set_R(Rs[min_pos]);
+        point->set_G(Gs[min_pos]);
+        point->set_B(Bs[min_pos]);
       }
     }
   };
