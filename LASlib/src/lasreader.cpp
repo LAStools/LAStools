@@ -535,7 +535,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
   {
     use_stdin = FALSE;
     if (file_name_current == file_name_number && other_file_name == 0) return 0;
-    if ((file_name_number > 1) && merged)
+    if ((other_file_name == 0) && (file_name_number > 1) && merged)
     {
       LASreaderMerged* lasreadermerged = new LASreaderMerged();
       lasreadermerged->set_scale_factor(scale_factor);
