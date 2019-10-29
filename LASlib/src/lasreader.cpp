@@ -2315,6 +2315,25 @@ I32 LASreadOpener::get_file_format(U32 number) const
   }
 }
 
+CHAR* LASreadOpener::get_file_name_base() const
+{
+  CHAR* file_name_base = 0;
+
+  if (file_name)
+  {
+    file_name_base = LASCopyString(file_name);
+    // remove extension
+    I32 len = (I32)strlen(file_name_base);
+    while ((len > 0) && (file_name_base[len] != '.') && (file_name_base[len] != '\\') && (file_name_base[len] != '/') && (file_name_base[len] != ':')) len--;
+    if (file_name_base[len] == '.')
+    {
+      file_name_base[len] = '\0';
+    }
+  }
+
+  return file_name_base;
+}
+
 void LASreadOpener::set_merged(const BOOL merged)
 {
   this->merged = merged;

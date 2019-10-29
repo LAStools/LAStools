@@ -175,6 +175,7 @@ public:
   const CHAR* get_file_name(U32 number) const;
   const CHAR* get_file_name_only(U32 number) const;
   const CHAR* get_file_extension_only(U32 number) const;
+  CHAR* get_file_name_base() const;
   void set_file_name(const CHAR* file_name, BOOL unique=FALSE);
   BOOL add_file_name(const CHAR* file_name, BOOL unique=FALSE);
   BOOL add_list_of_files(const CHAR* list_of_files, BOOL unique=FALSE);
