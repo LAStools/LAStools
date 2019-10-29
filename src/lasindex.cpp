@@ -265,6 +265,12 @@ int main(int argc, char *argv[])
     }
   }
 
+  if (lasreadopener.is_merged())
+  {
+    fprintf(stderr,"ERROR: on-the-fly merged input files merged not supported by lasindex\n");
+    byebye(true);
+  }
+
 #ifdef COMPILE_WITH_GUI
   if (gui)
   {
@@ -278,10 +284,6 @@ int main(int argc, char *argv[])
     if (lasreadopener.get_file_name_number() < 2)
     {
       fprintf(stderr,"WARNING: only %u input files. ignoring '-cores %d' ...\n", lasreadopener.get_file_name_number(), cores);
-    }
-    else if (lasreadopener.is_merged())
-    {
-      fprintf(stderr,"WARNING: input files merged on-the-fly. ignoring '-cores %d' ...\n", cores);
     }
     else
     {
