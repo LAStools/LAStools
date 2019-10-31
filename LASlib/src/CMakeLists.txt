@@ -31,6 +31,7 @@ set(LAS_SRC
 	lasutility.cpp
 	lasfilter.cpp
 	lastransform.cpp
+	laskdtree.cpp
 	fopen_compressed.cpp
 )
 

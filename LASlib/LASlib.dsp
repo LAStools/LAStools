@@ -129,6 +129,10 @@ SOURCE=..\LASzip\src\lasinterval.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\laskdtree.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\LASzip\src\lasquadtree.cpp
 # End Source File
 # Begin Source File
@@ -354,6 +358,10 @@ SOURCE=..\LASzip\src\lasindex.hpp
 # Begin Source File
 
 SOURCE=..\LASzip\src\lasinterval.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\inc\laskdtree.hpp
 # End Source File
 # Begin Source File
 

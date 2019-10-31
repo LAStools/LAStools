@@ -34,6 +34,8 @@
 #include "lasfilter.hpp"
 #include "lastransform.hpp"
 
+#include "laskdtree.hpp"
+
 #include "lasreader_las.hpp"
 #include "lasreader_bin.hpp"
 #include "lasreader_shp.hpp"
@@ -599,19 +601,6 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
     else if ((buffer_size > 0) && ((file_name_number > 1) || (neighbor_file_name_number > 0)))
     {
       U32 i;
-      if (other_file_name)
-      {
-        file_name = other_file_name;
-        if (reset_after_other)
-        {
-          file_name_current = 0;
-        }
-      }
-      else
-      {
-        file_name = file_names[file_name_current];
-        file_name_current++;
-      }
       LASreaderBuffered* lasreaderbuffered = new LASreaderBuffered();
       lasreaderbuffered->set_buffer_size(buffer_size);
       lasreaderbuffered->set_scale_factor(scale_factor);
@@ -623,13 +612,59 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       lasreaderbuffered->set_scale_intensity(scale_intensity);
       lasreaderbuffered->set_translate_scan_angle(translate_scan_angle);
       lasreaderbuffered->set_scale_scan_angle(scale_scan_angle);
-      lasreaderbuffered->set_file_name(file_name);
-      for (i = 0; i < file_name_number; i++)
+      if (other_file_name)
       {
-        if (file_name != file_names[i])
+        file_name = other_file_name;
+        lasreaderbuffered->set_file_name(other_file_name);
+        if (reset_after_other)
         {
-          lasreaderbuffered->add_neighbor_file_name(file_names[i]);
+          file_name_current = 0;
         }
+        for (i = 0; i < file_name_number; i++)
+        {
+          if (strcmp(other_file_name, file_names[i]))
+          {
+            lasreaderbuffered->add_neighbor_file_name(file_names[i]);
+          }
+        }
+        for (i = 0; i < neighbor_file_name_number; i++)
+        {
+          if (strcmp(other_file_name, neighbor_file_names[i]))
+          {
+            lasreaderbuffered->add_neighbor_file_name(neighbor_file_names[i]);
+          }
+        }
+      }
+      else
+      {
+        file_name = file_names[file_name_current];
+        lasreaderbuffered->set_file_name(file_name);
+        if (kdtree_rectangles)
+        {
+          kdtree_rectangles->overlap(file_names_min_x[file_name_current]-buffer_size, file_names_min_y[file_name_current]-buffer_size, file_names_max_x[file_name_current]+buffer_size, file_names_max_y[file_name_current]+buffer_size);
+          if (kdtree_rectangles->has_overlaps())
+          {
+            U32 index;
+            while (kdtree_rectangles->get_overlap(index))
+            {
+              if (file_name != file_names[index])
+              {
+                lasreaderbuffered->add_neighbor_file_name(file_names[index]);
+              }
+            }
+          }
+        }
+        else
+        {
+          for (i = 0; i < file_name_number; i++)
+          {
+            if (file_name != file_names[i])
+            {
+              lasreaderbuffered->add_neighbor_file_name(file_names[i]);
+            }
+          }
+        }
+        file_name_current++;
       }
       for (i = 0; i < neighbor_file_name_number; i++)
       {
@@ -2324,11 +2359,24 @@ CHAR* LASreadOpener::get_file_name_base() const
     file_name_base = LASCopyString(file_name);
     // remove extension
     I32 len = (I32)strlen(file_name_base);
-    while ((len > 0) && (file_name_base[len] != '.') && (file_name_base[len] != '\\') && (file_name_base[len] != '/') && (file_name_base[len] != ':')) len--;
-    if (file_name_base[len] == '.')
-    {
-      file_name_base[len] = '\0';
-    }
+    while ((len > 0) && (file_name_base[len] != '\\') && (file_name_base[len] != '/') && (file_name_base[len] != ':')) len--;
+    file_name_base[len] = '\0';
+  }
+
+  return file_name_base;
+}
+
+CHAR* LASreadOpener::get_file_name_base(U32 number) const
+{
+  CHAR* file_name_base = 0;
+
+  if (get_file_name(number))
+  {
+    file_name_base = LASCopyString(get_file_name(number));
+    // remove extension
+    I32 len = (I32)strlen(file_name_base);
+    while ((len > 0) && (file_name_base[len] != '\\') && (file_name_base[len] != '/') && (file_name_base[len] != ':')) len--;
+    file_name_base[len] = '\0';
   }
 
   return file_name_base;
@@ -2486,6 +2534,88 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
   return TRUE;
 }
 
+BOOL LASreadOpener::add_file_name(const CHAR* file_name, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique)
+{
+  if (unique)
+  {
+    U32 i;
+    for (i = 0; i < file_name_number; i++)
+    {
+      if (strcmp(file_names[i], file_name) == 0)
+      {
+        return FALSE;
+      }
+    }
+  }
+  if (file_name_number == file_name_allocated)
+  {
+    if (file_names)
+    {
+      file_name_allocated *= 2;
+      file_names = (CHAR**)realloc(file_names, sizeof(CHAR*)*file_name_allocated);
+      file_names_npoints = (I64*)realloc(file_names_npoints, sizeof(I64)*file_name_allocated);
+      file_names_min_x = (F64*)realloc(file_names_min_x, sizeof(F64)*file_name_allocated);
+      file_names_min_y = (F64*)realloc(file_names_min_y, sizeof(F64)*file_name_allocated);
+      file_names_max_x = (F64*)realloc(file_names_max_x, sizeof(F64)*file_name_allocated);
+      file_names_max_y = (F64*)realloc(file_names_max_y, sizeof(F64)*file_name_allocated);
+    }
+    else
+    {
+      file_name_allocated = 16;
+      file_names = (CHAR**)malloc(sizeof(CHAR*)*file_name_allocated);
+      file_names_npoints = (I64*)malloc(sizeof(I64)*file_name_allocated);
+      file_names_min_x = (F64*)malloc(sizeof(F64)*file_name_allocated);
+      file_names_min_y = (F64*)malloc(sizeof(F64)*file_name_allocated);
+      file_names_max_x = (F64*)malloc(sizeof(F64)*file_name_allocated);
+      file_names_max_y = (F64*)malloc(sizeof(F64)*file_name_allocated);
+      if (kdtree_rectangles == 0)
+      {
+        kdtree_rectangles = new LASkdtreeRectangles();
+        if (kdtree_rectangles == 0)
+        {
+          fprintf(stderr, "ERROR: alloc for LASkdtreeRectangles failed\n");
+          return FALSE;
+        }
+      }
+      kdtree_rectangles->init();
+    }
+    if (file_names == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for file_names pointer array failed at %d\n", file_name_allocated);
+      return FALSE;
+    }
+    if (file_names_min_x == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for file_names_min_x array failed at %d\n", file_name_allocated);
+      return FALSE;
+    }
+    if (file_names_min_y == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for file_names_min_y array failed at %d\n", file_name_allocated);
+      return FALSE;
+    }
+    if (file_names_max_x == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for file_names_max_x array failed at %d\n", file_name_allocated);
+      return FALSE;
+    }
+    if (file_names_max_y == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for file_names_max_y array failed at %d\n", file_name_allocated);
+      return FALSE;
+    }
+  }
+  file_names[file_name_number] = LASCopyString(file_name);
+  file_names_npoints[file_name_number] = npoints;
+  file_names_min_x[file_name_number] = min_x;
+  file_names_min_y[file_name_number] = min_y;
+  file_names_max_x[file_name_number] = max_x;
+  file_names_max_y[file_name_number] = max_y;
+  kdtree_rectangles->add(min_x, min_y, max_x, max_y);
+  file_name_number++;
+  return TRUE;
+}
+
 BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
 {
   FILE* file = fopen(list_of_files, "r");
@@ -2494,18 +2624,47 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
     fprintf(stderr, "ERROR: cannot open '%s'\n", list_of_files);
     return FALSE;
   }
-  CHAR line[1024];
-  while (fgets(line, 1024, file))
+  CHAR line[2048];
+  I64 npoints;
+  F64 min_x;
+  F64 min_y;
+  F64 max_x;
+  F64 max_y;
+  int num;
+  while (fgets(line, 2048, file))
   {
     // find end of line
     I32 len = (I32)strlen(line) - 1;
     // remove extra white spaces and line return at the end 
-    while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
+    while ((len > 0) && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
     {
       line[len] = '\0';
       len--;
     }
-    add_file_name(line, unique);
+    // try to parse number of points and xy bounds
+    num = sscanf(line, "%I64d,%lf,%lf,%lf,%lf,", &npoints, &min_x, &min_y, &max_x, &max_y);
+    if (num == 5)
+    {
+      // skip number of points and xy bounds
+      num = 0;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      // remove extra white spaces at the beginning 
+      while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
+      add_file_name(&line[num], npoints, min_x, min_y, max_x, max_y, unique);
+    }
+    else
+    {
+      add_file_name(line, unique);
+    }
   }
   fclose(file);
   return TRUE;
@@ -2775,9 +2934,21 @@ BOOL LASreadOpener::active() const
 LASreadOpener::LASreadOpener()
 {
   io_ibuffer_size = LAS_TOOLS_IO_IBUFFER_SIZE;
-  file_names = 0;
   file_name = 0;
+  file_names = 0;
+  file_names_npoints = 0;
+  file_names_min_x = 0;
+  file_names_min_y = 0;
+  file_names_max_x = 0;
+  file_names_max_y = 0;
+  kdtree_rectangles = 0;
   neighbor_file_names = 0;
+  neighbor_file_names_npoints = 0;
+  neighbor_file_names_min_x = 0;
+  neighbor_file_names_min_y = 0;
+  neighbor_file_names_max_x = 0;
+  neighbor_file_names_max_y = 0;
+  neighbor_kdtree_rectangles = 0;
   merged = FALSE;
   stored = FALSE;
   use_stdin = FALSE;
@@ -2837,12 +3008,29 @@ LASreadOpener::~LASreadOpener()
     U32 i;
     for (i = 0; i < file_name_number; i++) free(file_names[i]);
     free(file_names);
+    if (file_names_npoints)
+    {
+      free(file_names_npoints);
+      free(file_names_min_x);
+      free(file_names_min_y);
+      free(file_names_max_x);
+      free(file_names_max_y);
+    }
   }
+  if (kdtree_rectangles) delete kdtree_rectangles;
   if (neighbor_file_names)
   {
     U32 i;
     for (i = 0; i < neighbor_file_name_number; i++) free(neighbor_file_names[i]);
     free(neighbor_file_names);
+    if (neighbor_file_names_npoints)
+    {
+      free(neighbor_file_names_npoints);
+      free(neighbor_file_names_min_x);
+      free(neighbor_file_names_min_y);
+      free(neighbor_file_names_max_x);
+      free(neighbor_file_names_max_y);
+    }
   }
   if (parse_string) free(parse_string);
   if (scale_factor) delete [] scale_factor;

@@ -14,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    31 October 2019 -- adding kdtree of bounding boxes for large number of LAS/LAZ files
     19 August 2019 -- unify '-ignore_class 7', '-ignore_withheld', etc ... in LASignore
      7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
      8 February 2018 -- new LASreaderStored via '-stored' option to allow piped operation
@@ -56,6 +57,7 @@ class LASindex;
 class LASfilter;
 class LAStransform;
 class ByteStreamIn;
+class LASkdtreeRectangles;
 
 class LASLIB_DLL LASreader
 {
@@ -176,8 +178,10 @@ public:
   const CHAR* get_file_name_only(U32 number) const;
   const CHAR* get_file_extension_only(U32 number) const;
   CHAR* get_file_name_base() const;
+  CHAR* get_file_name_base(U32 number) const;
   void set_file_name(const CHAR* file_name, BOOL unique=FALSE);
   BOOL add_file_name(const CHAR* file_name, BOOL unique=FALSE);
+  BOOL add_file_name(const CHAR* file_name, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique=FALSE);
   BOOL add_list_of_files(const CHAR* list_of_files, BOOL unique=FALSE);
   void delete_file_name(U32 file_name_id);
   BOOL set_file_name_current(U32 file_name_id);
@@ -252,18 +256,30 @@ private:
   BOOL add_neighbor_file_name_single(const CHAR* neighbor_file_name, BOOL unique=FALSE);
 #endif
   I32 io_ibuffer_size;
-  CHAR** file_names;
   const CHAR* file_name;
   BOOL merged;
   BOOL stored;
+  U32 file_name_current;
+  CHAR** file_names;
   U32 file_name_number;
   U32 file_name_allocated;
-  U32 file_name_current;
+  I64* file_names_npoints;
+  F64* file_names_min_x;
+  F64* file_names_min_y;
+  F64* file_names_max_x;
+  F64* file_names_max_y;
+  LASkdtreeRectangles* kdtree_rectangles;
   F32 buffer_size;
   CHAR* temp_file_base;
   CHAR** neighbor_file_names;
   U32 neighbor_file_name_number;
   U32 neighbor_file_name_allocated;
+  I64* neighbor_file_names_npoints;
+  F64* neighbor_file_names_min_x;
+  F64* neighbor_file_names_min_y;
+  F64* neighbor_file_names_max_x;
+  F64* neighbor_file_names_max_y;
+  LASkdtreeRectangles* neighbor_kdtree_rectangles;
   BOOL comma_not_point;
   F64* scale_factor;
   F64* offset;
