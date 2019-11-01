@@ -140,6 +140,18 @@ BOOL LASkdtreeRectangles::build()
   return TRUE;
 }
 
+BOOL LASkdtreeRectangles::was_built() const
+{
+  if (root && overlap_set)
+  {
+    return TRUE;
+  }
+  else
+  {
+    return FALSE;
+  }
+}
+
 BOOL LASkdtreeRectangles::overlap(F64 min_x, F64 min_y, F64 max_x, F64 max_y)
 {
   if (overlap_set == 0)

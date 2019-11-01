@@ -76,6 +76,7 @@ public:
   BOOL init();
   void add(F64 min_x, F64 min_y, F64 max_x, F64 max_y);
   BOOL build();
+  BOOL was_built() const;
   BOOL overlap(F64 min_x, F64 min_y, F64 max_x, F64 max_y);
   void print_overlap();
   BOOL has_overlaps();

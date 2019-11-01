@@ -612,7 +612,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       lasreaderbuffered->set_scale_intensity(scale_intensity);
       lasreaderbuffered->set_translate_scan_angle(translate_scan_angle);
       lasreaderbuffered->set_scale_scan_angle(scale_scan_angle);
-      if (other_file_name)
+      if (other_file_name) // special case when other file name was specified
       {
         file_name = other_file_name;
         lasreaderbuffered->set_file_name(other_file_name);
@@ -627,20 +627,27 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             lasreaderbuffered->add_neighbor_file_name(file_names[i]);
           }
         }
-        for (i = 0; i < neighbor_file_name_number; i++)
+        if (neighbor_file_name_number)
         {
-          if (strcmp(other_file_name, neighbor_file_names[i]))
+          for (i = 0; i < neighbor_file_name_number; i++)
           {
-            lasreaderbuffered->add_neighbor_file_name(neighbor_file_names[i]);
+            if (strcmp(other_file_name, neighbor_file_names[i]))
+            {
+              lasreaderbuffered->add_neighbor_file_name(neighbor_file_names[i]);
+            }
           }
         }
       }
-      else
+      else // usual case for processing on-the-fly buffered files
       {
         file_name = file_names[file_name_current];
         lasreaderbuffered->set_file_name(file_name);
         if (kdtree_rectangles)
         {
+          if (!kdtree_rectangles->was_built())
+          {
+            kdtree_rectangles->build();
+          }
           kdtree_rectangles->overlap(file_names_min_x[file_name_current]-buffer_size, file_names_min_y[file_name_current]-buffer_size, file_names_max_x[file_name_current]+buffer_size, file_names_max_y[file_name_current]+buffer_size);
           if (kdtree_rectangles->has_overlaps())
           {
@@ -664,14 +671,39 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             }
           }
         }
-        file_name_current++;
-      }
-      for (i = 0; i < neighbor_file_name_number; i++)
-      {
-        if (strcmp(file_name, neighbor_file_names[i]))
+        if (neighbor_file_name_number)
         {
-          lasreaderbuffered->add_neighbor_file_name(neighbor_file_names[i]);
+          if (neighbor_kdtree_rectangles)
+          {
+            if (!neighbor_kdtree_rectangles->was_built())
+            {
+              neighbor_kdtree_rectangles->build();
+            }
+            neighbor_kdtree_rectangles->overlap(file_names_min_x[file_name_current]-buffer_size, file_names_min_y[file_name_current]-buffer_size, file_names_max_x[file_name_current]+buffer_size, file_names_max_y[file_name_current]+buffer_size);
+            if (neighbor_kdtree_rectangles->has_overlaps())
+            {
+              U32 index;
+              while (neighbor_kdtree_rectangles->get_overlap(index))
+              {
+                if (strcmp(file_name, neighbor_file_names[index]))
+                {
+                  lasreaderbuffered->add_neighbor_file_name(neighbor_file_names[index]);
+                }
+              }
+            }
+          }
+          else
+          {
+            for (i = 0; i < neighbor_file_name_number; i++)
+            {
+              if (strcmp(file_name, neighbor_file_names[i]))
+              {
+                lasreaderbuffered->add_neighbor_file_name(neighbor_file_names[i]);
+              }
+            }
+          }
         }
+        file_name_current++;
       }
       if (filter) lasreaderbuffered->set_filter(filter);
       if (transform) lasreaderbuffered->set_transform(transform);
@@ -2090,30 +2122,11 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           fprintf(stderr,"ERROR: '%s' needs at least 1 argument: file_name\n", argv[i]);
           return FALSE;
         }
-        FILE* file = fopen(argv[i+1], "r");
-        if (file == 0)
+        if (!add_neighbor_list_of_files(argv[i+1], unique))
         {
-          fprintf(stderr, "ERROR: cannot open '%s'\n", argv[i+1]);
+          fprintf(stderr, "ERROR: cannot load neighbor list of files '%s'\n", argv[i+1]);
           return FALSE;
         }
-        CHAR line[1024];
-        while (fgets(line, 1024, file))
-        {
-          // find end of line
-          I32 len = (I32)strlen(line) - 1;
-          // remove extra white spaces and line return at the end 
-          while (len > 0 && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
-          {
-            line[len] = '\0';
-            len--;
-          }
-#ifdef _WIN32
-          add_neighbor_file_name_single(line);
-#else
-          add_neighbor_file_name(line);
-#endif
-        }
-        fclose(file);
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
     }
@@ -2625,6 +2638,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
     return FALSE;
   }
   CHAR line[2048];
+  U32 ID;
   I64 npoints;
   F64 min_x;
   F64 min_y;
@@ -2642,11 +2656,13 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
       len--;
     }
     // try to parse number of points and xy bounds
-    num = sscanf(line, "%I64d,%lf,%lf,%lf,%lf,", &npoints, &min_x, &min_y, &max_x, &max_y);
-    if (num == 5)
+    num = sscanf(line, "%u,%I64d,%lf,%lf,%lf,%lf,", &ID, &npoints, &min_x, &min_y, &max_x, &max_y);
+    if (num == 6)
     {
       // skip number of points and xy bounds
       num = 0;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
       while ((num < len) && (line[num] != ',')) num++;
       num++;
       while ((num < len) && (line[num] != ',')) num++;
@@ -2664,6 +2680,149 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
     else
     {
       add_file_name(line, unique);
+    }
+  }
+  fclose(file);
+  return TRUE;
+}
+
+BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique)
+{
+  if (unique)
+  {
+    U32 i;
+    for (i = 0; i < neighbor_file_name_number; i++)
+    {
+      if (strcmp(neighbor_file_names[i], neighbor_file_name) == 0)
+      {
+        return FALSE;
+      }
+    }
+  }
+  if (neighbor_file_name_number == neighbor_file_name_allocated)
+  {
+    if (neighbor_file_names)
+    {
+      neighbor_file_name_allocated *= 2;
+      neighbor_file_names = (CHAR**)realloc(neighbor_file_names, sizeof(CHAR*)*neighbor_file_name_allocated);
+      neighbor_file_names_npoints = (I64*)realloc(neighbor_file_names_npoints, sizeof(I64)*neighbor_file_name_allocated);
+      neighbor_file_names_min_x = (F64*)realloc(neighbor_file_names_min_x, sizeof(F64)*neighbor_file_name_allocated);
+      neighbor_file_names_min_y = (F64*)realloc(neighbor_file_names_min_y, sizeof(F64)*neighbor_file_name_allocated);
+      neighbor_file_names_max_x = (F64*)realloc(neighbor_file_names_max_x, sizeof(F64)*neighbor_file_name_allocated);
+      neighbor_file_names_max_y = (F64*)realloc(neighbor_file_names_max_y, sizeof(F64)*neighbor_file_name_allocated);
+    }
+    else
+    {
+      neighbor_file_name_allocated = 16;
+      neighbor_file_names = (CHAR**)malloc(sizeof(CHAR*)*neighbor_file_name_allocated);
+      neighbor_file_names_npoints = (I64*)malloc(sizeof(I64)*neighbor_file_name_allocated);
+      neighbor_file_names_min_x = (F64*)malloc(sizeof(F64)*neighbor_file_name_allocated);
+      neighbor_file_names_min_y = (F64*)malloc(sizeof(F64)*neighbor_file_name_allocated);
+      neighbor_file_names_max_x = (F64*)malloc(sizeof(F64)*neighbor_file_name_allocated);
+      neighbor_file_names_max_y = (F64*)malloc(sizeof(F64)*neighbor_file_name_allocated);
+      if (neighbor_kdtree_rectangles == 0)
+      {
+        neighbor_kdtree_rectangles = new LASkdtreeRectangles();
+        if (neighbor_kdtree_rectangles == 0)
+        {
+          fprintf(stderr, "ERROR: alloc for neighbor LASkdtreeRectangles failed\n");
+          return FALSE;
+        }
+      }
+      kdtree_rectangles->init();
+    }
+    if (neighbor_file_names == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for neighbor_file_names pointer array failed at %d\n", neighbor_file_name_allocated);
+      return FALSE;
+    }
+    if (neighbor_file_names_min_x == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for neighbor_file_names_min_x array failed at %d\n", neighbor_file_name_allocated);
+      return FALSE;
+    }
+    if (neighbor_file_names_min_y == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for neighbor_file_names_min_y array failed at %d\n", neighbor_file_name_allocated);
+      return FALSE;
+    }
+    if (neighbor_file_names_max_x == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for neighbor_file_names_max_x array failed at %d\n", neighbor_file_name_allocated);
+      return FALSE;
+    }
+    if (neighbor_file_names_max_y == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for neighbor_file_names_max_y array failed at %d\n", neighbor_file_name_allocated);
+      return FALSE;
+    }
+  }
+  neighbor_file_names[neighbor_file_name_number] = LASCopyString(neighbor_file_name);
+  neighbor_file_names_npoints[neighbor_file_name_number] = npoints;
+  neighbor_file_names_min_x[neighbor_file_name_number] = min_x;
+  neighbor_file_names_min_y[neighbor_file_name_number] = min_y;
+  neighbor_file_names_max_x[neighbor_file_name_number] = max_x;
+  neighbor_file_names_max_y[neighbor_file_name_number] = max_y;
+  neighbor_kdtree_rectangles->add(min_x, min_y, max_x, max_y);
+  neighbor_file_name_number++;
+  return TRUE;
+}
+
+BOOL LASreadOpener::add_neighbor_list_of_files(const CHAR* neighbor_list_of_files, BOOL unique)
+{
+  FILE* file = fopen(neighbor_list_of_files, "r");
+  if (file == 0)
+  {
+    fprintf(stderr, "ERROR: cannot open '%s'\n", neighbor_list_of_files);
+    return FALSE;
+  }
+  CHAR line[2048];
+  I64 ID;
+  I64 npoints;
+  F64 min_x;
+  F64 min_y;
+  F64 max_x;
+  F64 max_y;
+  int num;
+  while (fgets(line, 2048, file))
+  {
+    // find end of line
+    I32 len = (I32)strlen(line) - 1;
+    // remove extra white spaces and line return at the end 
+    while ((len > 0) && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
+    {
+      line[len] = '\0';
+      len--;
+    }
+    // try to parse number of points and xy bounds
+    num = sscanf(line, "%u,%I64d,%lf,%lf,%lf,%lf,", &ID, &npoints, &min_x, &min_y, &max_x, &max_y);
+    if (num == 6)
+    {
+      // skip number of points and xy bounds
+      num = 0;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      // remove extra white spaces at the beginning 
+      while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
+      add_neighbor_file_name(&line[num], npoints, min_x, min_y, max_x, max_y, unique);
+    }
+    else
+    {
+#ifdef _WIN32
+      add_neighbor_file_name_single(line);
+#else
+      add_neighbor_file_name(line);
+#endif
     }
   }
   fclose(file);
