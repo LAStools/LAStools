@@ -1,5 +1,7 @@
-18 October 2019 -- demzip, lascanopy: fix for bug in version 190927: TIF was missing CRS on one core and multiple inputs
-18 October 2019 -- lasgrid, las2dem: fix for bug in version 190927: TIF was missing CRS on one core and multiple inputs
+ 4 November 2019 -- lasdiff: new option '-wildcards folder1/ayu*.laz folder2/ayu*.laz' compares folder of LAS/LAZ files 
+25 October 2019 -- lastile: exit with PERFORMANCE error when tiling non-indexed tiles on mutliple cores
+24 October 2019 -- lastile: allow multi-core tiling with rescale, reoffset, and auto_reoffset
+21 October 2019 -- lasreturn: mark returns with reused GPS time '-classify_violation_as 7' and '-classify_duplicate_as 9'
 17 October 2019 -- lasinfo, las2las: support horizontal datum NAD83(PA11) and vertical datum NZVD2016
 16 October 2019 -- LASlib: new option '-copy_scanner_channel_into_user_data' for new LAS 1.4 point types 6 or higher
 13 October 2019 -- lasgrid: selective decompression bug fix for '-classification' when input are compressed LAS 1.4 points
@@ -10,6 +12,7 @@
 12 September 2019 -- demzip: also support IMG format and 64 bit TIF elevation / height rasters
 10 September 2019 -- lascanopy: option '-remove_empty_rasters' deletes raster files containing only 'no data' values 
  8 September 2019 -- lascolor: restrictive parsing of input combinations (only allow valid, don't ignore invalid)
+ 8 September 2019 -- lastile: allow multi-core tiling with filters and transforms
 28 August 2019 -- several LAStools (lascolor, lasthin, ...): complete overhaul of '-ignore_xxxxx' functionality
 11 August 2019 -- lasoptimize64: also support optimizing very large files (if over 4GB as uncompressed LAS)
 11 August 2019 -- lascopy64: serious bug fix for copying very large files (if over 4GB as uncompressed LAS)
