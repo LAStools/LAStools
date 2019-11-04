@@ -2547,7 +2547,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
   return TRUE;
 }
 
-BOOL LASreadOpener::add_file_name(const CHAR* file_name, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique)
+BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, BOOL unique)
 {
   if (unique)
   {
@@ -2566,6 +2566,51 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, I64 npoints, F64 min_x,
     {
       file_name_allocated *= 2;
       file_names = (CHAR**)realloc(file_names, sizeof(CHAR*)*file_name_allocated);
+      file_names_ID = (U32*)realloc(file_names_ID, sizeof(U32)*file_name_allocated);
+    }
+    else
+    {
+      file_name_allocated = 16;
+      file_names = (CHAR**)malloc(sizeof(CHAR*)*file_name_allocated);
+      file_names_ID = (U32*)malloc(sizeof(U32)*file_name_allocated);
+    }
+    if (file_names == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for file_names pointer array failed at %d\n", file_name_allocated);
+      return FALSE;
+    }
+    if (file_names_ID == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for file_names_ID array failed at %d\n", file_name_allocated);
+      return FALSE;
+    }
+  }
+  file_names[file_name_number] = LASCopyString(file_name);
+  file_names_ID[file_name_number] = ID;
+  file_name_number++;
+  return TRUE;
+}
+
+BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique)
+{
+  if (unique)
+  {
+    U32 i;
+    for (i = 0; i < file_name_number; i++)
+    {
+      if (strcmp(file_names[i], file_name) == 0)
+      {
+        return FALSE;
+      }
+    }
+  }
+  if (file_name_number == file_name_allocated)
+  {
+    if (file_names)
+    {
+      file_name_allocated *= 2;
+      file_names = (CHAR**)realloc(file_names, sizeof(CHAR*)*file_name_allocated);
+      file_names_ID = (U32*)realloc(file_names_ID, sizeof(U32)*file_name_allocated);
       file_names_npoints = (I64*)realloc(file_names_npoints, sizeof(I64)*file_name_allocated);
       file_names_min_x = (F64*)realloc(file_names_min_x, sizeof(F64)*file_name_allocated);
       file_names_min_y = (F64*)realloc(file_names_min_y, sizeof(F64)*file_name_allocated);
@@ -2576,6 +2621,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, I64 npoints, F64 min_x,
     {
       file_name_allocated = 16;
       file_names = (CHAR**)malloc(sizeof(CHAR*)*file_name_allocated);
+      file_names_ID = (U32*)malloc(sizeof(U32)*file_name_allocated);
       file_names_npoints = (I64*)malloc(sizeof(I64)*file_name_allocated);
       file_names_min_x = (F64*)malloc(sizeof(F64)*file_name_allocated);
       file_names_min_y = (F64*)malloc(sizeof(F64)*file_name_allocated);
@@ -2595,6 +2641,16 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, I64 npoints, F64 min_x,
     if (file_names == 0)
     {
       fprintf(stderr, "ERROR: alloc for file_names pointer array failed at %d\n", file_name_allocated);
+      return FALSE;
+    }
+    if (file_names_ID == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for file_names_ID array failed at %d\n", file_name_allocated);
+      return FALSE;
+    }
+    if (file_names_npoints == 0)
+    {
+      fprintf(stderr, "ERROR: alloc for file_names_npoints array failed at %d\n", file_name_allocated);
       return FALSE;
     }
     if (file_names_min_x == 0)
@@ -2619,6 +2675,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, I64 npoints, F64 min_x,
     }
   }
   file_names[file_name_number] = LASCopyString(file_name);
+  file_names_ID[file_name_number] = ID;
   file_names_npoints[file_name_number] = npoints;
   file_names_min_x[file_name_number] = min_x;
   file_names_min_y[file_name_number] = min_y;
@@ -2638,6 +2695,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
     return FALSE;
   }
   CHAR line[2048];
+  CHAR name[2048];
   U32 ID;
   I64 npoints;
   F64 min_x;
@@ -2659,7 +2717,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
     num = sscanf(line, "%u,%I64d,%lf,%lf,%lf,%lf,", &ID, &npoints, &min_x, &min_y, &max_x, &max_y);
     if (num == 6)
     {
-      // skip number of points and xy bounds
+      // skip ID, number of points, and xy bounds
       num = 0;
       while ((num < len) && (line[num] != ',')) num++;
       num++;
@@ -2675,11 +2733,26 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
       num++;
       // remove extra white spaces at the beginning 
       while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
-      add_file_name(&line[num], npoints, min_x, min_y, max_x, max_y, unique);
+      add_file_name(&line[num], ID, npoints, min_x, min_y, max_x, max_y, unique);
     }
     else
     {
-      add_file_name(line, unique);
+      num = sscanf(line, "%u,%s", &ID, &npoints, name);
+
+      if (num == 2)
+      {
+        // skip ID
+        num = 0;
+        while ((num < len) && (line[num] != ',')) num++;
+        num++;
+        // remove extra white spaces at the beginning 
+        while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
+        add_file_name(&line[num], ID, unique);
+      }
+      else
+      {
+        add_file_name(line, unique);
+      }
     }
   }
   fclose(file);
@@ -3095,6 +3168,7 @@ LASreadOpener::LASreadOpener()
   io_ibuffer_size = LAS_TOOLS_IO_IBUFFER_SIZE;
   file_name = 0;
   file_names = 0;
+  file_names_ID = 0;
   file_names_npoints = 0;
   file_names_min_x = 0;
   file_names_min_y = 0;
@@ -3167,13 +3241,17 @@ LASreadOpener::~LASreadOpener()
     U32 i;
     for (i = 0; i < file_name_number; i++) free(file_names[i]);
     free(file_names);
-    if (file_names_npoints)
+    if (file_names_ID)
     {
-      free(file_names_npoints);
-      free(file_names_min_x);
-      free(file_names_min_y);
-      free(file_names_max_x);
-      free(file_names_max_y);
+      free(file_names_ID);
+      if (file_names_npoints)
+      {
+        free(file_names_npoints);
+        free(file_names_min_x);
+        free(file_names_min_y);
+        free(file_names_max_x);
+        free(file_names_max_y);
+      }
     }
   }
   if (kdtree_rectangles) delete kdtree_rectangles;

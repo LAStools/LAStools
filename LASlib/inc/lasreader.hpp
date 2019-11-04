@@ -181,7 +181,6 @@ public:
   CHAR* get_file_name_base(U32 number) const;
   void set_file_name(const CHAR* file_name, BOOL unique=FALSE);
   BOOL add_file_name(const CHAR* file_name, BOOL unique=FALSE);
-  BOOL add_file_name(const CHAR* file_name, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique=FALSE);
   BOOL add_list_of_files(const CHAR* list_of_files, BOOL unique=FALSE);
   void delete_file_name(U32 file_name_id);
   BOOL set_file_name_current(U32 file_name_id);
@@ -257,6 +256,8 @@ private:
   BOOL add_file_name_single(const CHAR* file_name, BOOL unique=FALSE);
   BOOL add_neighbor_file_name_single(const CHAR* neighbor_file_name, BOOL unique=FALSE);
 #endif
+  BOOL add_file_name(const CHAR* file_name, U32 ID, BOOL unique);
+  BOOL add_file_name(const CHAR* file_name, U32 ID, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique=FALSE);
   I32 io_ibuffer_size;
   const CHAR* file_name;
   BOOL merged;
@@ -265,6 +266,7 @@ private:
   CHAR** file_names;
   U32 file_name_number;
   U32 file_name_allocated;
+  U32* file_names_ID;
   I64* file_names_npoints;
   F64* file_names_min_x;
   F64* file_names_min_y;
