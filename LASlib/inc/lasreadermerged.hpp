@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     4 November 2019 -- add ID to files for subsets of merged '-faf' files
      5 September 2018 -- support for reading points from the PLY format
      1 December 2017 -- support extra bytes during '-merged' operations
      3 May 2015 -- header sets file source ID to 0 when merging flightlines 
@@ -51,6 +52,7 @@ public:
   void set_io_ibuffer_size(I32 io_ibuffer_size);
   inline I32 get_io_ibuffer_size() const { return io_ibuffer_size; };
   BOOL add_file_name(const CHAR* file_name);
+  BOOL add_file_name(const CHAR* file_name, U32 ID);
   void set_scale_factor(const F64* scale_factor);
   void set_offset(const F64* offset);
   void set_files_are_flightlines(const I32 files_are_flightlines);
@@ -122,6 +124,7 @@ private:
   U32 file_name_allocated;
   I32 io_ibuffer_size;
   CHAR** file_names;
+  U32* file_names_ID;
   F64* bounding_boxes;
 };
 

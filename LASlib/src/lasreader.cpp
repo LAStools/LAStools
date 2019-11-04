@@ -551,7 +551,14 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       lasreadermerged->set_translate_scan_angle(translate_scan_angle);
       lasreadermerged->set_scale_scan_angle(scale_scan_angle);
       lasreadermerged->set_io_ibuffer_size(io_ibuffer_size);
-      for (file_name_current = 0; file_name_current < file_name_number; file_name_current++) lasreadermerged->add_file_name(file_names[file_name_current]);
+      if (file_names_ID)
+      {
+        for (file_name_current = 0; file_name_current < file_name_number; file_name_current++) lasreadermerged->add_file_name(file_names[file_name_current], file_names_ID[file_name_current]);
+      }
+      else
+      {
+        for (file_name_current = 0; file_name_current < file_name_number; file_name_current++) lasreadermerged->add_file_name(file_names[file_name_current]);
+      }
       if (!lasreadermerged->open())
       {
         fprintf(stderr,"ERROR: cannot open lasreadermerged with %d file names\n", file_name_number);
@@ -2735,24 +2742,19 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
       while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
       add_file_name(&line[num], ID, npoints, min_x, min_y, max_x, max_y, unique);
     }
+    else if (num == 2)
+    {
+      // skip ID
+      num = 0;
+      while ((num < len) && (line[num] != ',')) num++;
+      num++;
+      // remove extra white spaces at the beginning 
+      while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
+      add_file_name(&line[num], ID, unique);
+    }
     else
     {
-      num = sscanf(line, "%u,%s", &ID, &npoints, name);
-
-      if (num == 2)
-      {
-        // skip ID
-        num = 0;
-        while ((num < len) && (line[num] != ',')) num++;
-        num++;
-        // remove extra white spaces at the beginning 
-        while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
-        add_file_name(&line[num], ID, unique);
-      }
-      else
-      {
-        add_file_name(line, unique);
-      }
+      add_file_name(line, unique);
     }
   }
   fclose(file);

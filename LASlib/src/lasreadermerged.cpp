@@ -13,7 +13,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2012, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -42,7 +42,7 @@ void LASreaderMerged::set_io_ibuffer_size(I32 io_ibuffer_size)
   this->io_ibuffer_size = io_ibuffer_size;
 }
 
-BOOL LASreaderMerged::add_file_name(const char* file_name)
+BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
 {
   // do we have a file name
   if (file_name == 0)
@@ -488,11 +488,20 @@ BOOL LASreaderMerged::add_file_name(const char* file_name)
     file_name_allocated += 1024;
     if (file_names)
     {
-      file_names = (char**)realloc(file_names, sizeof(char*)*file_name_allocated);
+      file_names = (CHAR**)realloc(file_names, sizeof(CHAR*)*file_name_allocated);
+      if (file_names_ID)
+      {
+        file_names_ID = (U32*)realloc(file_names_ID, sizeof(U32)*file_name_allocated);
+        if (file_names_ID == 0)
+        {
+          fprintf(stderr, "ERROR: alloc for file_names_ID array failed at %d\n", file_name_allocated);
+          return FALSE;
+        }
+      }
     }
     else
     {
-      file_names = (char**)malloc(sizeof(char*)*file_name_allocated);
+      file_names = (CHAR**)malloc(sizeof(CHAR*)*file_name_allocated);
     }
     if (file_names == 0)
     {
@@ -503,6 +512,25 @@ BOOL LASreaderMerged::add_file_name(const char* file_name)
   file_names[file_name_number] = LASCopyString(file_name);
   file_name_number++;
   return TRUE;
+}
+
+BOOL LASreaderMerged::add_file_name(const CHAR* file_name, U32 ID)
+{
+  if (add_file_name(file_name))
+  {
+    if (file_names_ID == 0)
+    {
+      file_names_ID = (U32*)malloc(sizeof(U32)*file_name_allocated);
+      if (file_names_ID == 0)
+      {
+        fprintf(stderr, "ERROR: alloc for file_names_ID array failed at %d\n", file_name_allocated);
+        return FALSE;
+      }
+    }
+    file_names_ID[file_name_number-1] = ID;
+    return TRUE;
+  }
+  return FALSE;
 }
 
 void LASreaderMerged::set_scale_factor(const F64* scale_factor)
@@ -577,7 +605,7 @@ void LASreaderMerged::set_scale_scan_angle(F32 scale_scan_angle)
   this->scale_scan_angle = scale_scan_angle;
 }
 
-void LASreaderMerged::set_parse_string(const char* parse_string)
+void LASreaderMerged::set_parse_string(const CHAR* parse_string)
 {
   if (this->parse_string) free(this->parse_string);
   if (parse_string)
@@ -1370,6 +1398,11 @@ void LASreaderMerged::clean()
     }
     free(file_names);
     file_names = 0;
+    if (file_names_ID)
+    {
+      free(file_names_ID);
+      file_names_ID = 0;
+    }
   }
   if (bounding_boxes)
   {
@@ -1401,6 +1434,7 @@ LASreaderMerged::LASreaderMerged()
   parse_string = 0;
   io_ibuffer_size = LAS_TOOLS_IO_IBUFFER_SIZE;
   file_names = 0;
+  file_names_ID = 0;
   bounding_boxes = 0;
   clean();
 }
@@ -1558,15 +1592,22 @@ BOOL LASreaderMerged::open_next_file()
         return FALSE;
       }
     }
-    file_name_current++;
     if (files_are_flightlines)
     {
-      transform->setPointSource(file_name_current + files_are_flightlines - 1);
+      if (file_names_ID)
+      {
+        transform->setPointSource(file_names_ID[file_name_current] + 1);
+      }
+      else
+      {
+        transform->setPointSource(file_name_current + files_are_flightlines);
+      }
     }
     else if (apply_file_source_ID)
     {
       transform->setPointSource(lasreader->header.file_source_ID);
     }
+    file_name_current++;
     if (filter) lasreader->set_filter(filter);
     if (transform) lasreader->set_transform(transform);
     if (inside)
