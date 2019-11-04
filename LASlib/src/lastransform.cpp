@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -4665,6 +4665,27 @@ void LAStransform::add_operation(LASoperation* transform_operation)
   num_operations++;
 }
 
+void LAStransform::delete_operation(const CHAR* name)
+{
+  if (operations)
+  {
+    U32 i;
+    for (i = 0; i < num_operations; i++)
+    {
+      if (strcmp(operations[i]->name(), name) == 0)
+      {
+        delete operations[i];
+        for (i = i+1; i < num_operations; i++)
+        {
+          operations[i-1] = operations[i];
+        }
+        num_operations--;
+        return;
+      }
+    }
+  }
+}
+
 void LAStransform::setFilter(LASfilter* filter)
 {
   if (this->filter) delete this->filter;
@@ -4674,18 +4695,11 @@ void LAStransform::setFilter(LASfilter* filter)
 
 void LAStransform::setPointSource(U16 value)
 {
-  if (operations)
-  {
-    U32 i;
-    for (i = 0; i < num_operations; i++)
-    {
-      if (strcmp(operations[i]->name(), "set_point_source") == 0)
-      {
-        delete operations[i];
-        operations[i] = new LASoperationSetPointSource(value);
-        return;
-      }
-    }
-  }
+  delete_operation("set_point_source");
   add_operation(new LASoperationSetPointSource(value));
+}
+
+void LAStransform::unsetPointSource()
+{
+  delete_operation("set_point_source");
 }
