@@ -87,6 +87,7 @@ public:
   void setFilter(LASfilter* filter);
 
   void setPointSource(U16 value);
+  void unsetPointSource();
 
   void transform(LASpoint* point);
 
@@ -100,6 +101,7 @@ public:
 private:
 
   void add_operation(LASoperation* operation);
+  void delete_operation(const CHAR* name);
   U32 num_operations;
   U32 alloc_operations;
   LASoperation** operations;
