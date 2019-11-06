@@ -537,7 +537,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
   {
     use_stdin = FALSE;
     if (file_name_current == file_name_number && other_file_name == 0) return 0;
-    if ((other_file_name == 0) && (file_name_number > 1) && merged)
+    if ((other_file_name == 0) && ((file_name_number > 1) || (file_names_ID)) && merged)
     {
       LASreaderMerged* lasreadermerged = new LASreaderMerged();
       lasreadermerged->set_scale_factor(scale_factor);
@@ -1953,9 +1953,36 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           return FALSE;
         }
         F64 scale_factor[3];
-        scale_factor[0] = atof(argv[i+1]);
-        scale_factor[1] = atof(argv[i+2]);
-        scale_factor[2] = atof(argv[i+3]);
+        if (sscanf(argv[i+1],"%lf",&(scale_factor[0])) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_x", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (scale_factor[0] == 0.0)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_x", argv[i], scale_factor[0]);
+          return FALSE;
+        }
+        if (sscanf(argv[i+2],"%lf",&(scale_factor[1])) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_y", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (scale_factor[1] == 0.0)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_y", argv[i], scale_factor[1]);
+          return FALSE;
+        }
+        if (sscanf(argv[i+3],"%lf",&(scale_factor[2])) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_z", argv[i], argv[i+3]);
+          return FALSE;
+        }
+        if (scale_factor[2] == 0.0)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_z", argv[i], scale_factor[2]);
+          return FALSE;
+        }
         set_scale_factor(scale_factor);
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
       }
@@ -1967,9 +1994,27 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           return FALSE;
         }
         F64 scale_factor[3];
-        scale_factor[0] = atof(argv[i+1]);
-        scale_factor[1] = atof(argv[i+2]);
-        scale_factor[2] = 0;
+        if (sscanf(argv[i+1],"%lf",&(scale_factor[0])) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y, but '%s' is not a valid rescale_x", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (scale_factor[0] == 0.0)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y, but %lf is not a valid rescale_x", argv[i], scale_factor[0]);
+          return FALSE;
+        }
+        if (sscanf(argv[i+2],"%lf",&(scale_factor[1])) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y, but '%s' is not a valid rescale_y", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (scale_factor[1] == 0.0)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y, but %lf is not a valid rescale_y", argv[i], scale_factor[1]);
+          return FALSE;
+        }
+        scale_factor[2] = 0.0;
         set_scale_factor(scale_factor);
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
       }
@@ -1977,13 +2022,22 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: rescale_z\n", argv[i]);
           return FALSE;
         }
         F64 scale_factor[3];
-        scale_factor[0] = 0;
-        scale_factor[1] = 0;
-        scale_factor[2] = atof(argv[i+1]);
+        scale_factor[0] = 0.0;
+        scale_factor[1] = 0.0;
+        if (sscanf(argv[i+1],"%lf",&(scale_factor[2])) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: rescale_z, but '%s' is not a valid rescale_z", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (scale_factor[2] == 0.0)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: rescale_z, but %lf is not a valid rescale_z", argv[i], scale_factor[2]);
+          return FALSE;
+        }
         set_scale_factor(scale_factor);
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
@@ -1995,9 +2049,21 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           return FALSE;
         }
         F64 offset[3];
-			  offset[0] = atof(argv[i+1]);
-			  offset[1] = atof(argv[i+2]);
-			  offset[2] = atof(argv[i+3]);
+        if (sscanf(argv[i+1],"%lf",&(offset[0])) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_x", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (sscanf(argv[i+2],"%lf",&(offset[1])) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_y", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (sscanf(argv[i+3],"%lf",&(offset[2])) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_z", argv[i], argv[i+3]);
+          return FALSE;
+        }
         set_offset(offset);
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
       }
@@ -2702,7 +2768,6 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
     return FALSE;
   }
   CHAR line[2048];
-  CHAR name[2048];
   U32 ID;
   I64 npoints;
   F64 min_x;
