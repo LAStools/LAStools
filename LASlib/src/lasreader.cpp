@@ -2768,6 +2768,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
     return FALSE;
   }
   CHAR line[2048];
+  CHAR name[2048];
   U32 ID;
   I64 npoints;
   F64 min_x;
@@ -2807,19 +2808,24 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
       while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
       add_file_name(&line[num], ID, npoints, min_x, min_y, max_x, max_y, unique);
     }
-    else if (num == 2)
-    {
-      // skip ID
-      num = 0;
-      while ((num < len) && (line[num] != ',')) num++;
-      num++;
-      // remove extra white spaces at the beginning 
-      while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
-      add_file_name(&line[num], ID, unique);
-    }
     else
     {
-      add_file_name(line, unique);
+      // try to parse number and file name
+      num = sscanf(line, "%u,%s", &ID, name);
+      if (num == 2)
+      {
+        // skip ID
+        num = 0;
+        while ((num < len) && (line[num] != ',')) num++;
+        num++;
+        // remove extra white spaces at the beginning 
+        while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++; 
+        add_file_name(&line[num], ID, unique);
+      }
+      else
+      {
+        add_file_name(line, unique);
+      }
     }
   }
   fclose(file);
