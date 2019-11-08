@@ -503,7 +503,7 @@ I32 LASreadOpener::unparse(CHAR* string) const
   }
   if (io_ibuffer_size != LAS_TOOLS_IO_IBUFFER_SIZE)
   {
-    n += sprintf(string + n, "-io_ibuffer %d ", io_ibuffer_size);
+    n += sprintf(string + n, "-io_ibuffer %u ", io_ibuffer_size);
   }
   if (temp_file_base)
   {
@@ -1773,31 +1773,111 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
         {
           if ((i+3) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 3 arguments: ll_x, ll_y, size\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: ll_x ll_y size\n", argv[i]);
             return FALSE;
           }
-          set_inside_tile((F32)atof(argv[i+1]), (F32)atof(argv[i+2]), (F32)atof(argv[i+3]));
+          F32 ll_x;
+          if (sscanf(argv[i+1], "%f", &ll_x) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 3 arguments: ll_x ll_y size, but '%s' is not a valid ll_x.\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F32 ll_y;
+          if (sscanf(argv[i+2], "%f", &ll_y) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 3 arguments: ll_x ll_y size, but '%s' is not a valid ll_y.\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          F32 size;
+          if (sscanf(argv[i+3], "%f", &size) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 3 arguments: ll_x ll_y size, but '%s' is not a valid size.\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          if (size <= 0.0f)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 3 arguments: ll_x ll_y size, but %f is not valid a size.\n", argv[i], size);
+            return FALSE;
+          }
+          set_inside_tile(ll_x, ll_y, size);
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
         }
         else if (strcmp(argv[i],"-inside_circle") == 0)
         {
           if ((i+3) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 3 arguments: center_x, center_y, radius\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 3 arguments: center_x center_y radius\n", argv[i]);
             return FALSE;
           }
-          set_inside_circle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]));
+          F64 center_x;
+          if (sscanf(argv[i+1], "%lf", &center_x) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 3 arguments: center_x center_y radius, but '%s' is not a valid center_x.\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F64 center_y;
+          if (sscanf(argv[i+2], "%lf", &center_y) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 3 arguments: center_x center_y radius, but '%s' is not a valid center_y.\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          F64 radius;
+          if (sscanf(argv[i+3], "%lf", &radius) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 3 arguments: center_x center_y radius, but '%s' is not a valid radius.\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          if (radius <= 0.0f)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 3 arguments: center_x center_y radius, but %lf is not valid a radius.\n", argv[i], radius);
+            return FALSE;
+          }
+          set_inside_circle(center_x, center_y, radius);
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
         }
         else if (strcmp(argv[i],"-inside") == 0 || strcmp(argv[i],"-inside_rectangle") == 0)
         {
           if ((i+4) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_x, min_y, max_x, max_y\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y\n", argv[i]);
             return FALSE;
           }
-          set_inside_rectangle(atof(argv[i+1]), atof(argv[i+2]), atof(argv[i+3]), atof(argv[i+4]));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
+          F64 min_x;
+          if (sscanf(argv[i+1], "%lf", &min_x) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid min_x.\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          F64 min_y;
+          if (sscanf(argv[i+2], "%lf", &min_y) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid min_y.\n", argv[i], argv[i+2]);
+            return FALSE;
+          }
+          F64 max_x;
+          if (sscanf(argv[i+3], "%lf", &max_x) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid max_x.\n", argv[i], argv[i+3]);
+            return FALSE;
+          }
+          F64 max_y;
+          if (sscanf(argv[i+4], "%lf", &max_y) != 1)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid max_y.\n", argv[i], argv[i+4]);
+            return FALSE;
+          }
+          if (min_x >= max_x)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y, but %lf / %lf are not a valid min_x / max_x pair.\n", argv[i], min_x, max_x);
+            return FALSE;
+          }
+          if (min_y >= max_y)
+          {
+            fprintf(stderr, "ERROR: '%s' needs 4 arguments: min_x min_y max_x max_y, but %lf / %lf are not a valid min_y / max_y pair.\n", argv[i], min_y, max_y);
+            return FALSE;
+          }
+          set_inside_rectangle(min_x, min_y, max_x, max_y);
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; i+=5; 
         }
         else
         {
@@ -1872,7 +1952,18 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           fprintf(stderr,"ERROR: '%s' needs 1 argument: number_of_lines\n", argv[i]);
           return FALSE;
         }
-        set_skip_lines(atoi(argv[i+1]));
+        U32 number_of_lines;
+        if (sscanf(argv[i+1], "%u", &number_of_lines) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: number_of_lines but '%s' is not a valid number.\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (number_of_lines == 0)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: number_of_lines but %u is not valid.\n", argv[i], number_of_lines);
+          return FALSE;
+        }
+        set_skip_lines(number_of_lines);
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
       else if (strcmp(argv[i],"-io_ibuffer") == 0)
@@ -1882,17 +1973,39 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
           return FALSE;
         }
-        set_io_ibuffer_size((I32)atoi(argv[i+1]));
+        U32 buffer_size;
+        if (sscanf(argv[i+1], "%u", &buffer_size) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: size but '%s' is not a valid size.\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (buffer_size == 0)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: size but %u is not valid.\n", argv[i], buffer_size);
+          return FALSE;
+        }
+        set_io_ibuffer_size(buffer_size);
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
       else if (strcmp(argv[i],"-itranslate_intensity") == 0)
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: translation\n", argv[i]);
           return FALSE;
         }
-        set_translate_intensity((F32)atof(argv[i+1]));
+        F32 translation;
+        if (sscanf(argv[i+1], "%f", &translation) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: translation but '%s' is not valid.\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (translation == 0.0f)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: translation but %f is not valid.\n", argv[i], translation);
+          return FALSE;
+        }
+        set_translate_intensity(translation);
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
       else if (strcmp(argv[i],"-iscale_intensity") == 0)
@@ -1902,17 +2015,39 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
           return FALSE;
         }
-        set_scale_intensity((F32)atof(argv[i+1]));
+        F32 scale;
+        if (sscanf(argv[i+1], "%f", &scale) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: scale but '%s' is not valid.\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (scale == 0.0f)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: scale but %f is not valid.\n", argv[i], scale);
+          return FALSE;
+        }
+        set_scale_intensity(scale);
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
       else if (strcmp(argv[i],"-itranslate_scan_angle") == 0)
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: translation\n", argv[i]);
           return FALSE;
         }
-        set_translate_scan_angle((F32)atof(argv[i+1]));
+        F32 translation;
+        if (sscanf(argv[i+1], "%f", &translation) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: translation but '%s' is not valid.\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (translation == 0.0f)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: translation but %f is not valid.\n", argv[i], translation);
+          return FALSE;
+        }
+        set_translate_scan_angle(translation);
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
       else if (strcmp(argv[i],"-iscale_scan_angle") == 0)
@@ -1922,7 +2057,18 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           fprintf(stderr,"ERROR: '%s' needs 1 argument: scale\n", argv[i]);
           return FALSE;
         }
-        set_scale_scan_angle((F32)atof(argv[i+1]));
+        F32 scale;
+        if (sscanf(argv[i+1], "%f", &scale) != 1)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: scale but '%s' is not valid.\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (scale == 0.0f)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 1 argument: scale but %f is not valid.\n", argv[i], scale);
+          return FALSE;
+        }
+        set_scale_scan_angle(scale);
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
       else if (strcmp(argv[i],"-ipts") == 0)
@@ -1953,7 +2099,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           return FALSE;
         }
         F64 scale_factor[3];
-        if (sscanf(argv[i+1],"%lf",&(scale_factor[0])) != 1)
+        if (sscanf(argv[i+1], "%lf", &(scale_factor[0])) != 1)
         {
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_x", argv[i], argv[i+1]);
           return FALSE;
@@ -1963,7 +2109,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_x", argv[i], scale_factor[0]);
           return FALSE;
         }
-        if (sscanf(argv[i+2],"%lf",&(scale_factor[1])) != 1)
+        if (sscanf(argv[i+2], "%lf", &(scale_factor[1])) != 1)
         {
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_y", argv[i], argv[i+2]);
           return FALSE;
@@ -1973,7 +2119,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_y", argv[i], scale_factor[1]);
           return FALSE;
         }
-        if (sscanf(argv[i+3],"%lf",&(scale_factor[2])) != 1)
+        if (sscanf(argv[i+3], "%lf", &(scale_factor[2])) != 1)
         {
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_z", argv[i], argv[i+3]);
           return FALSE;
@@ -1994,7 +2140,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           return FALSE;
         }
         F64 scale_factor[3];
-        if (sscanf(argv[i+1],"%lf",&(scale_factor[0])) != 1)
+        if (sscanf(argv[i+1], "%lf", &(scale_factor[0])) != 1)
         {
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y, but '%s' is not a valid rescale_x", argv[i], argv[i+1]);
           return FALSE;
@@ -2004,7 +2150,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y, but %lf is not a valid rescale_x", argv[i], scale_factor[0]);
           return FALSE;
         }
-        if (sscanf(argv[i+2],"%lf",&(scale_factor[1])) != 1)
+        if (sscanf(argv[i+2], "%lf", &(scale_factor[1])) != 1)
         {
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: rescale_x rescale_y, but '%s' is not a valid rescale_y", argv[i], argv[i+2]);
           return FALSE;
@@ -2028,7 +2174,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
         F64 scale_factor[3];
         scale_factor[0] = 0.0;
         scale_factor[1] = 0.0;
-        if (sscanf(argv[i+1],"%lf",&(scale_factor[2])) != 1)
+        if (sscanf(argv[i+1], "%lf", &(scale_factor[2])) != 1)
         {
           fprintf(stderr, "ERROR: '%s' needs 1 argument: rescale_z, but '%s' is not a valid rescale_z", argv[i], argv[i+1]);
           return FALSE;
@@ -2049,17 +2195,17 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
           return FALSE;
         }
         F64 offset[3];
-        if (sscanf(argv[i+1],"%lf",&(offset[0])) != 1)
+        if (sscanf(argv[i+1], "%lf", &(offset[0])) != 1)
         {
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_x", argv[i], argv[i+1]);
           return FALSE;
         }
-        if (sscanf(argv[i+2],"%lf",&(offset[1])) != 1)
+        if (sscanf(argv[i+2], "%lf", &(offset[1])) != 1)
         {
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_y", argv[i], argv[i+2]);
           return FALSE;
         }
-        if (sscanf(argv[i+3],"%lf",&(offset[2])) != 1)
+        if (sscanf(argv[i+3], "%lf", &(offset[2])) != 1)
         {
           fprintf(stderr, "ERROR: '%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_z", argv[i], argv[i+3]);
           return FALSE;
@@ -2153,10 +2299,21 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: buffer_size\n", argv[i]);
         return FALSE;
       }
-      set_buffer_size((F32)atof(argv[i+1]));
+      F32 buffer_size;
+      if (sscanf(argv[i+1], "%f", &buffer_size) != 1)
+      {
+        fprintf(stderr, "ERROR: '%s' needs 1 argument: buffer_size. but '%s' is not a valid buffer_size", argv[i], argv[i+1]);
+        return FALSE;
+      }
+      if (buffer_size <= 0.0f)
+      {
+        fprintf(stderr, "ERROR: '%s' needs 1 argument: buffer_size, but %f is not valid", argv[i], buffer_size);
+        return FALSE;
+      }
+      set_buffer_size(buffer_size);
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
     else if (strcmp(argv[i],"-temp_files") == 0)
@@ -2534,9 +2691,9 @@ void LASreadOpener::set_apply_file_source_ID(const BOOL apply_file_source_ID)
   this->apply_file_source_ID = apply_file_source_ID;
 }
 
-void LASreadOpener::set_io_ibuffer_size(I32 io_ibuffer_size)
+void LASreadOpener::set_io_ibuffer_size(const U32 buffer_size)
 {
-  this->io_ibuffer_size = io_ibuffer_size;
+  this->io_ibuffer_size = buffer_size;
 }
 
 void LASreadOpener::set_file_name(const CHAR* file_name, BOOL unique)
@@ -3136,24 +3293,24 @@ void LASreadOpener::set_offset(const F64* offset)
   }
 }
 
-void LASreadOpener::set_translate_intensity(F32 translate_intensity)
+void LASreadOpener::set_translate_intensity(const F32 translation)
 {
-  this->translate_intensity = translate_intensity;
+  this->translate_intensity = translation;
 }
 
-void LASreadOpener::set_scale_intensity(F32 scale_intensity)
+void LASreadOpener::set_scale_intensity(const F32 scale)
 {
-  this->scale_intensity = scale_intensity;
+  this->scale_intensity = scale;
 }
 
-void LASreadOpener::set_translate_scan_angle(F32 translate_scan_angle)
+void LASreadOpener::set_translate_scan_angle(const F32 translation)
 {
-  this->translate_scan_angle = translate_scan_angle;
+  this->translate_scan_angle = translation;
 }
 
-void LASreadOpener::set_scale_scan_angle(F32 scale_scan_angle)
+void LASreadOpener::set_scale_scan_angle(const F32 scale)
 {
-  this->scale_scan_angle = scale_scan_angle;
+  this->scale_scan_angle = scale;
 }
 
 void LASreadOpener::add_attribute(I32 data_type, const CHAR* name, const CHAR* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset, F64 no_data)
@@ -3169,9 +3326,9 @@ void LASreadOpener::add_attribute(I32 data_type, const CHAR* name, const CHAR* d
   number_attributes++;
 }
 
-void LASreadOpener::set_skip_lines(I32 skip_lines)
+void LASreadOpener::set_skip_lines(const U32 number_of_lines)
 {
-  this->skip_lines = skip_lines;
+  this->skip_lines = number_of_lines;
 }
 
 void LASreadOpener::set_populate_header(BOOL populate_header)

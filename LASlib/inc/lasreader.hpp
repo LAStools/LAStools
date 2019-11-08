@@ -167,8 +167,8 @@ private:
 class LASLIB_DLL LASreadOpener
 {
 public:
-  void set_io_ibuffer_size(I32 io_ibuffer_size);
-  inline I32 get_io_ibuffer_size() const { return io_ibuffer_size; };
+  void set_io_ibuffer_size(const U32 buffer_size);
+  inline U32 get_io_ibuffer_size() const { return io_ibuffer_size; };
   U32 get_file_name_number() const;
   U32 get_file_name_current() const;
   const CHAR* get_file_name() const;
@@ -207,14 +207,14 @@ public:
   inline const F64* get_scale_factor() const { return scale_factor; };
   void set_offset(const F64* offset);
   inline const F64* get_offset() const { return offset; };
-  void set_translate_intensity(F32 translate_intensity);
-  void set_scale_intensity(F32 scale_intensity);
-  void set_translate_scan_angle(F32 translate_scan_angle);
-  void set_scale_scan_angle(F32 scale_scan_angle);
+  void set_translate_intensity(const F32 translation);
+  void set_scale_intensity(const F32 scale);
+  void set_translate_scan_angle(const F32 translate_scan_angle);
+  void set_scale_scan_angle(const F32 scale_scan_angle);
   void add_attribute(I32 data_type, const CHAR* name, const CHAR* description=0, F64 scale=1.0, F64 offset=0.0, F64 pre_scale=1.0, F64 pre_offset=0.0, F64 no_data=F64_MAX);
   BOOL set_point_type(U8 point_type);
   void set_parse_string(const CHAR* parse_string);
-  void set_skip_lines(I32 skip_lines);
+  void set_skip_lines(const U32 number_of_lines);
   void set_populate_header(BOOL populate_header);
   void set_keep_lastiling(BOOL keep_lastiling);
   void set_pipe_on(BOOL pipe_on);
@@ -258,7 +258,7 @@ private:
 #endif
   BOOL add_file_name(const CHAR* file_name, U32 ID, BOOL unique);
   BOOL add_file_name(const CHAR* file_name, U32 ID, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique=FALSE);
-  I32 io_ibuffer_size;
+  U32 io_ibuffer_size;
   const CHAR* file_name;
   BOOL merged;
   BOOL stored;
@@ -309,7 +309,7 @@ private:
   F64 attribute_no_datas[32];
   U8 point_type;
   CHAR* parse_string;
-  I32 skip_lines;
+  U32 skip_lines;
   BOOL populate_header;
   BOOL keep_lastiling;
   BOOL pipe_on;
