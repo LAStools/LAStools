@@ -2133,7 +2133,14 @@ LASreadItemCompressed_BYTE14_v4::LASreadItemCompressed_BYTE14_v4(ArithmeticDecod
 
     changed_Bytes[i] = FALSE;
 
-    requested_Bytes[i] = (decompress_selective & (LASZIP_DECOMPRESS_SELECTIVE_BYTE0 << i) ? TRUE : FALSE);
+    if (i > 15) // currently only the first 16 extra bytes can be selectively decompressed
+    {
+      requested_Bytes[i] = TRUE;
+    }
+    else
+    {
+      requested_Bytes[i] = (decompress_selective & (LASZIP_DECOMPRESS_SELECTIVE_BYTE0 << i) ? TRUE : FALSE);
+    }
   }
 
   /* init the bytes buffer to zero */
