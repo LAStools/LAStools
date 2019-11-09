@@ -3085,7 +3085,7 @@ BOOL LASreadOpener::add_neighbor_list_of_files(const CHAR* neighbor_list_of_file
     return FALSE;
   }
   CHAR line[2048];
-  I64 ID;
+  U32 ID;
   I64 npoints;
   F64 min_x;
   F64 min_y;
