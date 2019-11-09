@@ -36,7 +36,6 @@ set(LAS_SRC
 )
 
 set(LAZ_SRC
-	laszip.cpp
 	lasreadpoint.cpp
 	lasreaditemcompressed_v1.cpp
 	lasreaditemcompressed_v2.cpp
@@ -54,6 +53,8 @@ set(LAZ_SRC
 	lasindex.cpp
 	lasquadtree.cpp
 	lasinterval.cpp
+	laszip.cpp
+	mydefs.cpp
 )
 
 foreach(file ${LAZ_SRC})
