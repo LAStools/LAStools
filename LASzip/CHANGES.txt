@@ -1,3 +1,7 @@
+ 9 November 2019 -- upped version to 3.4 revision 3 for selective decompression extra bytes fix
+ 9 November 2019 -- fix for selective decompression of more than 16 extra bytes in new point types 6 or higher
+ 9 November 2019 -- moved UTF8toUTF16() function from laszip.hpp to mydefs.hpp and added new mydefs.cpp
+16 October 2019 -- unicode support added for Windows LASzip.dll via in new UTF8toUTF16() function
 11 August 2019 -- added CMake for DLL build and minor fixes to allow 64 bit Windows compile of LASzip.dll
 11 April 2019 -- increase AC_BUFFER_SIZE from 1024 to 4096 to lower chance of ultra-rare propagate_carry() overflow
 10 April 2019 -- fix potential memory leaks found by Connor Manning using valgrind
