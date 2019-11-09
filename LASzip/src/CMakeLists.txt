@@ -25,6 +25,7 @@ set(LASZIP_SOURCES
     laswritepoint.cpp
     laszip.cpp
     laszip_dll.cpp
+    mydefs.cpp
 )
 
 add_definitions(-DLASZIPDLL_EXPORTS)
