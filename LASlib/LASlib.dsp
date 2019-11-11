@@ -279,6 +279,10 @@ SOURCE=.\src\laswritercompatible.cpp
 
 SOURCE=..\LASzip\src\laszip.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=..\LASzip\src\mydefs.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 

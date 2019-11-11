@@ -1,3 +1,10 @@
+ 9 November 2019 -- laszip: fix for selective decompression of more than 16 extra bytes in new point types 6 or higher
+ 4 November 2019 -- lasdiff: new option '-wildcards folder1/ayu*.laz folder2/ayu*.laz' compares folder of LAS/LAZ files 
+ 3 November 2019 -- lasindex: new option '-meta' produces ASCII file list with number of points, bounding box, file name 
+17 October 2019 -- lasinfo, las2las: support horizontal datum NAD83(PA11) and vertical datum NZVD2016
+16 October 2019 -- LASlib: new option '-copy_scanner_channel_into_user_data' for new LAS 1.4 point types 6 or higher
+26 September 2019 -- open source tools ignore '-fail' which makes closed source tools fail if license expired / not found
+16 September 2019 -- lasindex: new option '-dont_reindex' to prevent recreating of already existing LAX files
 10 August 2019 -- las2las: set exotic vertical datums via '-vertical_epsg 5607' (= "Bora Bora SAU 2001 height")
 18 July 2019 -- txt2las: bug fix in functionality for adding '-add_attribute' in extra bytes introduced in late 2018
 11 July 2019 -- LASlib, LAStools: report file name when LASreader has 'ERROR: 'end-of-file during chunk with index 3254'
