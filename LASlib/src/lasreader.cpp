@@ -1877,7 +1877,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
             return FALSE;
           }
           set_inside_rectangle(min_x, min_y, max_x, max_y);
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; i+=5; 
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=5; 
         }
         else
         {
