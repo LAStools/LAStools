@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 191116
+#define LAS_TOOLS_VERSION 191127
 
 #include <stdio.h>
 #include <string.h>
@@ -178,6 +178,26 @@ public:
   F64 min_y;
   F64 max_z;
   F64 min_z;
+
+  LASvlr_lasoriginal()
+  {
+    number_of_point_records = 0;
+    number_of_points_by_return[0] = 0;
+    number_of_points_by_return[1] = 0;
+    number_of_points_by_return[2] = 0;
+    number_of_points_by_return[3] = 0;
+    number_of_points_by_return[4] = 0;
+    number_of_points_by_return[5] = 0;
+    number_of_points_by_return[6] = 0;
+    number_of_points_by_return[7] = 0;
+    number_of_points_by_return[8] = 0;
+    number_of_points_by_return[9] = 0;
+    number_of_points_by_return[10] = 0;
+    number_of_points_by_return[11] = 0;
+    number_of_points_by_return[12] = 0;
+    number_of_points_by_return[13] = 0;
+    number_of_points_by_return[14] = 0;
+  }
 };
 
 class LASheader : public LASquantizer, public LASattributer
