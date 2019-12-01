@@ -13,7 +13,7 @@
 
   (b) it can (potentially) be exploited by our "streaming TIN"
       code for seamless & memory-efficient Delaunay triangulation
-	  of large amounts of tiles.
+      of large amounts of tiles.
 
   A small VLR added to the header of each generated LAS/LAZ tile
   stores the tile index in the square quad-tree from which its
@@ -104,6 +104,11 @@
   or things will slow down a lot (as each tile requires reading
   the entire input). Make sure you run lasindex to create a LAX
   file for each input file before lastiling on mutiple cores.
+
+  For those who have user-defined tilings to deliver there is also
+  the option '-external_tiling tiles_utm_600m.shp TNAME' that expects
+  a SHP files with rectangular tiles with a corresponding string
+  attribute called TNAME in the DBF file. 
 
   Please license from martin.isenburg@rapidlasso.com to use LAStools
   commercially.
