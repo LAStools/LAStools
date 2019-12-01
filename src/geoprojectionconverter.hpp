@@ -110,6 +110,7 @@ struct GeoProjectionGeoKeys
 #define GEO_GCS_NAD83_2011         6318
 #define GEO_GCS_NAD83_PA11         6322
 #define GEO_GCS_NAD83_CORS96       6783
+#define GEO_GCS_GDA2020            7844
 
 #define GEO_SPHEROID_AIRY          7001
 #define GEO_SPHEROID_BESSEL1841    7004

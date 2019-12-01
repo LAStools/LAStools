@@ -893,6 +893,9 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
       case 4283: // GCS_GDA94
         gcs_code = GEO_GCS_GDA94;
         break;
+      case 7844: // GCS_GDA2020
+        gcs_code = GEO_GCS_GDA2020;
+        break;
       case 4140: // Datum_NAD83_CSRS
       case 4617: // Datum_NAD83_CSRS
         datum_code = GEO_GCS_NAD83_CSRS;
@@ -997,6 +1000,9 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         datum_code = GEO_GCS_NAD27;
         break;
       case 6283: // Datum_Geocentric_Datum_of_Australia_1994
+        datum_code = GEO_GCS_GDA94;
+        break;
+      case 9844: // Datum_Geocentric_Datum_of_Australia_2020
         datum_code = GEO_GCS_GDA94;
         break;
       case 6140: // Datum_NAD83_CSRS
@@ -3734,6 +3740,17 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
                 fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern MGA zone %d for GDA94 does not exist\n", utm->utm_zone_number);
               }
             }
+            else if (gcs_code == GEO_GCS_GDA2020)
+            {
+              if ((46 <= utm->utm_zone_number) && (utm->utm_zone_number <= 59))
+              {
+                return utm->utm_zone_number + 7800;
+              }
+              else
+              {
+                fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern MGA zone %d for GDA2020 does not exist\n", utm->utm_zone_number);
+              }
+            }
             else
             {
               fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD83 does not exist\n", utm->utm_zone_number);
@@ -4384,6 +4401,14 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
     sprintf(gcs_name, "GDA94");
     datum_code = gcs_code + 2000;
     sprintf(datum_name, "Geocentric_Datum_of_Australia_1994");
+    spheroid_code = GEO_SPHEROID_GRS80;
+  }
+  else if (code == GEO_GCS_GDA2020)
+  {
+    set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980);
+    sprintf(gcs_name, "GDA2020");
+    datum_code = gcs_code + 2000;
+    sprintf(datum_name, "Geocentric_Datum_of_Australia_2020");
     spheroid_code = GEO_SPHEROID_GRS80;
   }
   else if (code == GEO_GCS_WGS72)
@@ -5133,6 +5158,31 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     utm_northern = true; utm_zone = value-26900;
     gcs = GEO_GCS_NAD83;
   }
+  else if ((value >= 3154) && (value <= 3160)) // NAD83(CSRS) / UTM zone 7N - NAD83(CSRS) / UTM zone 16N
+  {
+    utm_northern = true; utm_zone = (value < 3158 ? value - 3154 + 7 : value - 3158 + 14);
+    gcs = GEO_GCS_NAD83_CSRS;
+  }
+  else if ((value >= 7846) && (value <= 7859)) // PCS_GDA2020_MGA_zone_46S - PCS_GDA2020_MGA_zone_49S
+  {
+    utm_northern = false; utm_zone = value-7800; is_mga = true;
+    gcs = GEO_GCS_GDA2020;
+  } 
+  else if ((value >= 28348) && (value <= 28358)) // PCS_GDA94_MGA_zone_48 - PCS_GDA94_MGA_zone_58
+  {
+    utm_northern = false; utm_zone = value-28300; is_mga = true;
+    gcs = GEO_GCS_GDA94;
+  }
+  else if ((value >= 29118) && (value <= 29122)) // PCS_SAD69_UTM_zone_18N - PCS_SAD69_UTM_zone_22N
+  {
+    utm_northern = true; utm_zone = value-29100;
+    gcs = GEO_GCS_SAD69;
+  }
+  else if ((value >= 29177) && (value <= 29185)) // PCS_SAD69_UTM_zone_17S - PCS_SAD69_UTM_zone_25S
+  {
+    utm_northern = false; utm_zone = value-29160;
+    gcs = GEO_GCS_SAD69;
+  }
   else if ((value >= 32201) && (value <= 32260)) // PCS_WGS72_UTM_zone_1N - PCS_WGS72_UTM_zone_60N
   {
     utm_northern = true; utm_zone = value-32200;
@@ -5142,11 +5192,6 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   {
     utm_northern = false; utm_zone = value-32300;
     gcs = GEO_GCS_WGS72;
-  }
-  else if ((value >= 26703) && (value <= 26723)) // PCS_NAD27_UTM_zone_3N - PCS_NAD27_UTM_zone_23N
-  {
-    utm_northern = true; utm_zone = value-26700;
-    gcs = GEO_GCS_NAD27;
   }
   else if ((value >= 32401) && (value <= 32460)) // PCS_WGS72BE_UTM_zone_1N - PCS_WGS72BE_UTM_zone_60N
   {
@@ -5158,25 +5203,10 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     utm_northern = false; utm_zone = value-32500;
     gcs = GEO_GCS_WGS72BE;
   }
-  else if ((value >= 28348) && (value <= 28358)) // PCS_GDA94_MGA_zone_48 - PCS_GDA94_MGA_zone_58
+  else if ((value >= 26703) && (value <= 26723)) // PCS_NAD27_UTM_zone_3N - PCS_NAD27_UTM_zone_23N
   {
-    utm_northern = false; utm_zone = value-28300; is_mga = true;
-    gcs = GEO_GCS_GDA94;
-  }
-  else if ((value >= 3154) && (value <= 3160)) // NAD83(CSRS) / UTM zone 7N - NAD83(CSRS) / UTM zone 16N
-  {
-    utm_northern = true; utm_zone = (value < 3158 ? value - 3154 + 7 : value - 3158 + 14);
-    gcs = GEO_GCS_NAD83_CSRS;
-  }
-  else if ((value >= 29118) && (value <= 29122)) // PCS_SAD69_UTM_zone_18N - PCS_SAD69_UTM_zone_22N
-  {
-    utm_northern = true; utm_zone = value-29100;
-    gcs = GEO_GCS_SAD69;
-  }
-  else if ((value >= 29177) && (value <= 29185)) // PCS_SAD69_UTM_zone_17S - PCS_SAD69_UTM_zone_25S
-  {
-    utm_northern = false; utm_zone = value-29160;
-    gcs = GEO_GCS_SAD69;
+    utm_northern = true; utm_zone = value-26700;
+    gcs = GEO_GCS_NAD27;
   }
   else switch (value)
   {
@@ -7275,6 +7305,12 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
+    else if (strcmp(argv[i],"-gda2020") == 0)
+    {
+      set_gcs(GEO_GCS_GDA2020, tmp);
+      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      *argv[i]='\0';
+    }
     else if (strcmp(argv[i],"-etrs89") == 0)
     {
       set_gcs(GEO_GCS_ETRS89, tmp);
@@ -7789,6 +7825,10 @@ int GeoProjectionConverter::unparse(char* string) const
         else if (gcs_code == GEO_GCS_GDA94)
         {
           n += sprintf(&string[n], "-gda94 ");
+        }
+        else if (gcs_code == GEO_GCS_GDA2020)
+        {
+          n += sprintf(&string[n], "-gda2020 ");
         }
         else if (gcs_code == GEO_GCS_WGS72)
         {
