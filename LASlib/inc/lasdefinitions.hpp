@@ -57,6 +57,7 @@
 #include <assert.h>
 
 #include "mydefs.hpp"
+#include "lasvlr.hpp"
 #include "laszip.hpp"
 #include "laspoint.hpp"
 
@@ -151,53 +152,6 @@ public:
   inline void setDigitizerOffset(F64 offset) {((F64*)&(data[18]))[0] = offset;};
 private:
   U8 data[26];
-};
-
-class LASvlr_lastiling
-{
-public:
-  U32 level;
-  U32 level_index;
-  U32 implicit_levels : 30;
-  U32 buffer : 1;
-  U32 reversible : 1;
-  F32 min_x;
-  F32 max_x;
-  F32 min_y;
-  F32 max_y;
-};
-
-class LASvlr_lasoriginal
-{
-public:
-  I64 number_of_point_records;
-  I64 number_of_points_by_return[15];
-  F64 max_x;
-  F64 min_x;
-  F64 max_y;
-  F64 min_y;
-  F64 max_z;
-  F64 min_z;
-
-  LASvlr_lasoriginal()
-  {
-    number_of_point_records = 0;
-    number_of_points_by_return[0] = 0;
-    number_of_points_by_return[1] = 0;
-    number_of_points_by_return[2] = 0;
-    number_of_points_by_return[3] = 0;
-    number_of_points_by_return[4] = 0;
-    number_of_points_by_return[5] = 0;
-    number_of_points_by_return[6] = 0;
-    number_of_points_by_return[7] = 0;
-    number_of_points_by_return[8] = 0;
-    number_of_points_by_return[9] = 0;
-    number_of_points_by_return[10] = 0;
-    number_of_points_by_return[11] = 0;
-    number_of_points_by_return[12] = 0;
-    number_of_points_by_return[13] = 0;
-    number_of_points_by_return[14] = 0;
-  }
 };
 
 class LASheader : public LASquantizer, public LASattributer
