@@ -1,9 +1,12 @@
+26 November 2019 -- lastile: option '-external_tiling tiles_utm_600m.shp NAME' creates tiles from SHP file with names
+23 November 2019 -- demzip: bug fix for '-nodata ....' command line switches and out-of-core handling for large raster
+16 November 2019 -- LASlib: bug fix in command line parsing of '-inside ... ... ... ...' followed by other commands
 10 November 2019 -- lasgrid, las2dem: fix for x/y coordinates in XYZ raster writer when step is smaller than 1 meter
  9 November 2019 -- laszip: fix for selective decompression of more than 16 extra bytes in new point types 6 or higher
  5 November 2019 -- lastile: new (experimental) option '-kdtree' speeds up retiling tons of tiles on multiple cores
  4 November 2019 -- lasdiff: new option '-wildcards folder1/ayu*.laz folder2/ayu*.laz' compares folder of LAS/LAZ files 
  3 November 2019 -- lasindex: new option '-meta' produces ASCII file list with number of points, bounding box, file name 
-25 October 2019 -- lastile: exit with PERFORMANCE error when tiling non-indexed tiles on mutliple cores
+25 October 2019 -- lastile: exit with PERFORMANCE error when tiling non-indexed tiles on multiple cores
 24 October 2019 -- lastile: allow multi-core tiling with rescale, reoffset, and auto_reoffset
 23 October 2019 -- fix in LASlayers: broken interplay between '-ilay' and '-ignore_xxxxx' switches fixed
 21 October 2019 -- lasreturn: mark returns with reused GPS time '-classify_violation_as 7' and '-classify_duplicate_as 9'

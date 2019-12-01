@@ -221,10 +221,6 @@ SOURCE=.\src\lasutility.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\lasvlr.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\laswaveform13reader.cpp
 # End Source File
 # Begin Source File
@@ -474,6 +470,14 @@ SOURCE=.\inc\lastransform.hpp
 # Begin Source File
 
 SOURCE=.\inc\lasutility.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\inc\lasvlr.hpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\inc\lasvlrpayload.hpp
 # End Source File
 # Begin Source File
 
