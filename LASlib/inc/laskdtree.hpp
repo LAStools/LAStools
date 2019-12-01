@@ -91,7 +91,7 @@ private:
   my_index_set* overlap_set;
   my_index_set::iterator set_element;
 
-  void build_recursive(LASkdtreeRectanglesNode* node, I32 plane, LASkdtreeRectangle bb, my_rectangle_list* insertion_list);
+  void build_recursive(LASkdtreeRectanglesNode* node, I32 plane, LASkdtreeRectangle bb, my_rectangle_list* insertion_list, I32 unchanged);
   void overlap_rectangles(LASkdtreeRectanglesNode* node, I32 plane, LASkdtreeRectangle rectangle, my_index_set* overlap_set);
 };
 

@@ -129,7 +129,7 @@ BOOL LASkdtreeRectangles::build()
     return FALSE;
   }
   
-  build_recursive(root, 0, bb, rectangle_list);
+  build_recursive(root, 0, bb, rectangle_list, 0);
   rectangle_list = 0;
 
   overlap_set = new my_index_set;
@@ -189,9 +189,17 @@ BOOL LASkdtreeRectangles::get_overlap(U32& index)
   return FALSE;
 }
 
-void LASkdtreeRectangles::build_recursive(LASkdtreeRectanglesNode* node, I32 plane, LASkdtreeRectangle curr_bb, my_rectangle_list* insertion_list)
+void LASkdtreeRectangles::build_recursive(LASkdtreeRectanglesNode* node, I32 plane, LASkdtreeRectangle curr_bb, my_rectangle_list* insertion_list, I32 unchanged)
 {
+  // is list small enough? 
   if (insertion_list->size() <= 4)
+  {
+    node->list = insertion_list;
+    return;
+  }
+
+  // did last 4 recursions not make list smaller?
+  if (unchanged >= 4)
   {
     node->list = insertion_list;
     return;
@@ -204,6 +212,10 @@ void LASkdtreeRectangles::build_recursive(LASkdtreeRectanglesNode* node, I32 pla
 
   my_rectangle_list::iterator list_element = insertion_list->begin();
 
+  U32 total = 0;
+  U32 total_left = 0;
+  U32 total_right = 0;
+
   while (TRUE)
   {
     if (list_element == insertion_list->end())
@@ -213,13 +225,17 @@ void LASkdtreeRectangles::build_recursive(LASkdtreeRectanglesNode* node, I32 pla
 
     LASkdtreeRectangle rectangle = (*list_element);
 
+    total++;
+
     if (rectangle.min[plane] < split)
     {
       list_left->push_back(rectangle);
+      total_left++;
     }
     if (split <= rectangle.max[plane])
     {
       list_right->push_back(rectangle);
+      total_right++;
     }
 
     list_element++;
@@ -244,8 +260,23 @@ void LASkdtreeRectangles::build_recursive(LASkdtreeRectanglesNode* node, I32 pla
 
   // start recursive calls
 
-  build_recursive(left, (plane + 1) % 2, bb_left, list_left);
-  build_recursive(right, (plane + 1) % 2, bb_right, list_right);
+  if (total_left < total)
+  {
+    build_recursive(left, (plane + 1) % 2, bb_left, list_left, 0);
+  }
+  else
+  {
+    build_recursive(left, (plane + 1) % 2, bb_left, list_left, unchanged+1);
+  }
+
+  if (total_right < total)
+  {
+    build_recursive(right, (plane + 1) % 2, bb_right, list_right, 0);
+  }
+  else
+  {
+    build_recursive(right, (plane + 1) % 2, bb_right, list_right, unchanged+1);
+  }
 
   // attach children to their parent
 
