@@ -816,6 +816,10 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
       return FALSE;
     }
 
+    // save the position in the stream at which the payload of this VLR was written
+
+    header->vlr_lasoriginal->position = stream->tell();
+
     // write the payload of this VLR which contains 176 bytes
 
     if (!stream->put64bitsLE((U8*)&(header->vlr_lasoriginal->number_of_point_records)))
