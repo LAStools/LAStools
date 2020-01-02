@@ -1,3 +1,4 @@
+24 December 2019 -- bug fix for file names with special characters like 'Töögrupid.laz'
  9 November 2019 -- upped version to 3.4 revision 3 for selective decompression extra bytes fix
  9 November 2019 -- fix for selective decompression of more than 16 extra bytes in new point types 6 or higher
  9 November 2019 -- moved UTF8toUTF16() function from laszip.hpp to mydefs.hpp and added new mydefs.cpp
