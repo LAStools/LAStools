@@ -53,16 +53,24 @@ BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_onl
   }
 
 #ifdef _MSC_VER
-  wchar_t* utf16_file_name = UTF8toUTF16(file_name);
-  file = _wfopen(utf16_file_name, L"rb");
-  delete [] utf16_file_name;
+  file = fopen(file_name, "rb");
+  if (file == 0)
+  {
+    wchar_t* utf16_file_name = UTF8toUTF16(file_name);
+    file = _wfopen(utf16_file_name, L"rb");
+    if (file == 0)
+    {
+      fprintf(stderr, "ERROR: cannot open file '%ws' for read\n", utf16_file_name);
+    }
+    delete [] utf16_file_name;
+  }
 #else
   file = fopen(file_name, "rb");
 #endif
 
   if (file == 0)
   {
-    fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
+    fprintf(stderr, "ERROR: cannot open file '%s' for read\n", file_name);
     return FALSE;
   }
 

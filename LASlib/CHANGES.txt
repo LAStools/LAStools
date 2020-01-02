@@ -1,3 +1,4 @@
+24 December 2019 -- LASzip, LASlib, all LAStools: bug fix for file names with special characters like 'Töögrupid.laz'
 16 November 2019 -- LASlib: bug fix in command line parsing of '-inside ... ... ... ...' followed by other commands
  9 November 2019 -- laszip: fix for selective decompression of more than 16 extra bytes in new point types 6 or higher
  4 November 2019 -- lasdiff: new option '-wildcards folder1/ayu*.laz folder2/ayu*.laz' compares folder of LAS/LAZ files 
