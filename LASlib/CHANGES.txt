@@ -1,3 +1,4 @@
+ 6 January 2020 -- lasvalidate: fix for LAS 1.4 files with extra bytes and new option '-tile_size 1000' to check tile extend
 24 December 2019 -- LASzip, LASlib, all LAStools: bug fix for file names with special characters like 'Töögrupid.laz'
 16 November 2019 -- LASlib: bug fix in command line parsing of '-inside ... ... ... ...' followed by other commands
  9 November 2019 -- laszip: fix for selective decompression of more than 16 extra bytes in new point types 6 or higher
