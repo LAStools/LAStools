@@ -14,7 +14,7 @@
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
   http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
+  https://www.linkedin.com/groups/4408378/
 
   Martin @lastools
 
@@ -41,12 +41,12 @@ git clone https://github.com/LASvalidator/lasvalidate.git
 cd lasvalidate 
 make 
 cd bin 
-lasvalidate -h
-
-This is version 130916 of the LAS validator. Please contact
+E:\software\LAStools\bin>lasvalidate -h
+This is version 200104 of the LAS validator. Please contact
 me at 'martin.isenburg@rapidlasso.com' if you disagree with
-validation reports, want additional checks, or find bugs.
-
+validation reports, want additional checks, or find bugs as
+the software is still under development. Your feedback will
+help to finish it sooner.
 Supported Inputs:
   -i lidar.las
   -i lidar1.las lidar2.las lidar3.las
@@ -55,13 +55,14 @@ Supported Inputs:
   -lof file_list.txt
 Usage:
 lasvalidate -i lidar.las
-lasvalidate -i lidar.laz
+lasvalidate -i lidar.laz -no_CRS_fail
 lasvalidate -v -i lidar.las -o report.xml
 lasvalidate -v -i lidar.laz -oxml
 lasvalidate -vv -i tile1.las tile2.las tile3.las -oxml
-lasvalidate -i tile1.laz tile2.laz tile3.laz -o summary.kml
-lasvalidate -vv -i *.las
+lasvalidate -i tile1.laz tile2.laz tile3.laz -o summary.xml
+lasvalidate -i *.las -no_CRS_fail -o report.xml
 lasvalidate -i *.laz -o summary.xml
+lasvalidate -i *.laz -tile_size 1000 -o summary.xml
 lasvalidate -i *.las -oxml
 lasvalidate -i c:\data\lidar.las -oxml
 lasvalidate -i ..\subfolder\*.las -o summary.xml
@@ -74,22 +75,23 @@ Below is a test run on the unit tests.
 
 C:\LASvalidator\lasvalidate\bin> lasvalidate -i ..\unit\*.las -o ..\unit\validate.xml
 
-This is version 130916 of the LAS validator. Please contact
+This is version 200104 of the LAS validator. Please contact
 me at 'martin.isenburg@rapidlasso.com' if you disagree with
-validation reports, want additional checks, or find bugs.
-
-needed 0.05 sec for 'las12.las'
-needed 0.01 sec for 'las12_bounding_box.las'
-needed 0.01 sec for 'las12_creation_date.las'
-needed 0.02 sec for 'las12_global_encoding.las'
-needed 0.01 sec for 'las12_header_size.las'
-needed 0.10 sec for 'las12_number_of_points_by_return.las'
+validation reports, want additional checks, or find bugs as
+the software is still under development. Your feedback will
+help to finish it sooner.
+needed 0.01 sec for 'las12.las' warning
+needed 0.00 sec for 'las12_bounding_box.las' fail
+needed 0.00 sec for 'las12_creation_date.las' fail
+needed 0.00 sec for 'las12_global_encoding.las' fail
+needed 0.00 sec for 'las12_header_size.las' fail
+needed 0.00 sec for 'las12_number_of_points_by_return.las' fail
 WARNING: end-of-file after 8144 of 8150 points
-needed 0.02 sec for 'las12_number_of_point_records.las'
-needed 0.01 sec for 'las12_offset_to_point_data.las'
-needed 0.02 sec for 'las12_point_data_format.las'
-needed 0.01 sec for 'las12_scale_factor.las'
-done. total time 0.30 sec.
+needed 0.01 sec for 'las12_number_of_point_records.las' fail
+needed 0.00 sec for 'las12_offset_to_point_data.las' fail
+needed 0.00 sec for 'las12_point_data_format.las' fail
+needed 0.00 sec for 'las12_scale_factor.las' warning
+done. total time 0.07 sec. total fail (pass=0,warning=2,fail=8)
 
 C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -132,6 +134,10 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       fail
     </summary>
     <details>
+      <fail>
+        <variable>bounding box</variable>
+        <note>there are 1003 points outside of the bounding box specified in the LAS file header</note>
+      </fail>
       <fail>
         <variable>min x</variable>
         <note>should be 309240.00 and not 309240.15</note>
@@ -289,20 +295,20 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
     </summary>
     <details>
       <fail>
-        <variable>number of point by return</variable>
-        <note>the number of 1st return(s) is 4405 and not 4400</note>
+        <variable>number of points by return[0]</variable>
+        <note>the number of 1st returns is 4405 and not 4400</note>
       </fail>
       <fail>
-        <variable>number of point by return</variable>
-        <note>the number of 3rd return(s) is 1031 and not 1030</note>
+        <variable>number of points by return[2]</variable>
+        <note>the number of 3rd returns is 1031 and not 1030</note>
       </fail>
       <fail>
-        <variable>number of point by return</variable>
-        <note>the number of 4th return(s) is 201 and not 200</note>
+        <variable>number of points by return[3]</variable>
+        <note>the number of 4th returns is 201 and not 200</note>
       </fail>
       <fail>
-        <variable>number of point by return</variable>
-        <note>the number of 5th return(s) is 26 and not 30</note>
+        <variable>number of points by return[4]</variable>
+        <note>the number of 5th returns is 26 and not 30</note>
       </fail>
       <warning>
         <variable>return number</variable>
@@ -397,15 +403,15 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
     <details>
       <warning>
         <variable>x scale factor</variable>
-        <note>should be factor ten of 0.1 or 0.25 and not 0.003333</note>
+        <note>should be factor ten of 0.1 or 0.5 or 0.25 and not 0.003333</note>
       </warning>
       <warning>
         <variable>y scale factor</variable>
-        <note>should be factor ten of 0.1 or 0.25 and not 0.0123457</note>
+        <note>should be factor ten of 0.1 or 0.5 or 0.25 and not 0.0123456789</note>
       </warning>
       <warning>
         <variable>z scale factor</variable>
-        <note>should be factor ten of 0.1 or 0.25 and not 0.00987654</note>
+        <note>should be factor ten of 0.1 or 0.5 or 0.25 and not 0.00987654321</note>
       </warning>
       <warning>
         <variable>return number</variable>
@@ -425,4 +431,10 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <fail>8</fail>
     </details>
   </total>
+  <version>
+    200104 built with LASread version 1.1 (200104)
+  </version>
+  <command_line>
+    lasvalidate -i ..\unit\*.las -o ..\unit\validate.xml
+  </command_line>
 </LASvalidator>
