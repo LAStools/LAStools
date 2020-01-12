@@ -113,7 +113,7 @@ void LASkdtreeRectangles::add(F64 min_x, F64 min_y, F64 max_x, F64 max_y)
   
   // create rectangle
 
-  LASkdtreeRectangle rectangle(min_x, min_y, max_x, max_y, rectangle_list->size());
+  LASkdtreeRectangle rectangle(min_x, min_y, max_x, max_y, (U32)rectangle_list->size());
 
   // add rectangle to list
 
