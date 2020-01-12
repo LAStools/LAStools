@@ -97,6 +97,6 @@
 
   COPYRIGHT:
   
-  (c) 2007-2019, rapidlasso GmbH, GERMANY - fast tools to catch reality
+  (c) 2007-2020, rapidlasso GmbH, GERMANY - fast tools to catch reality
 
 --------------------------------------------------------------------------
