@@ -1,6 +1,7 @@
 12 January 2020 -- lastile: bug fix when doing '-remove_buffer' for on-the-fly buffered tiles that had points deleted
 10 January 2020 -- lastile: also supports an appendix at the end of the file name via '-odix _abcde' 
  8 January 2020 -- lasgrid: options '-subsquare 0.25 -average -use_tile_size 2000' convert from corner grids to area grids
+ 6 January 2020 -- lasvalidate: fix for LAS 1.4 files with extra bytes and new option '-tile_size 1000' to check tile extend
  2 January 2020 -- lasgrid and las2dem: also support 3-band 8 bit RGB output ('-false', '-rgb') for IMG raster output 
  1 January 2020 -- lastile: fix for 64 bit combination of '-external_tiling tiles_utm_600m.shp NAME' and '-cpu64'
 24 December 2019 -- LASzip, LASlib, all LAStools: bug fix for file names with special characters like 'Töögrupid.laz'
