@@ -157,8 +157,8 @@ int main(int argc, char *argv[])
 #endif
   bool verbose = false;
   bool very_verbose = false;
-  bool projection_was_set = false;
   bool quiet = false;
+  bool projection_was_set = false;
   int file_creation_day = -1;
   int file_creation_year = -1;
   int set_version_major = -1;
@@ -263,6 +263,12 @@ int main(int argc, char *argv[])
       verbose = true;
       very_verbose = true;
     }
+    else if (strcmp(argv[i],"-quiet") == 0)
+    {
+      quiet = true;
+      verbose = false;
+      very_verbose = false;
+    }
     else if (strcmp(argv[i],"-version") == 0)
     {
       fprintf(stderr, "LAStools (by martin@rapidlasso.com) version %d\n", LAS_TOOLS_VERSION);
@@ -304,10 +310,6 @@ int main(int argc, char *argv[])
       fprintf(stderr, "WARNING: not compiled with 64 bit support. ignoring '-cpu64' ...\n");
 #endif
       argv[i][0] = '\0';
-    }
-    else if (strcmp(argv[i],"-quiet") == 0)
-    {
-      quiet = true;
     }
     else if (strcmp(argv[i],"-parse") == 0)
     {
@@ -669,10 +671,13 @@ int main(int argc, char *argv[])
       laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
     }
 
-    if (verbose)
+    if (!quiet)
     {
       full_start_time = start_time = taketime();
-      fprintf(stderr, "reading from '%s' and writing to '%s'\n", (lasreadopener.is_piped() ? "stdin" : lasreadopener.get_file_name()), (laswriteopener.is_piped() ? "stdout" : laswriteopener.get_file_name()));
+      if (verbose)
+      {
+        fprintf(stderr, "reading from '%s' and writing to '%s'\n", (lasreadopener.is_piped() ? "stdin" : lasreadopener.get_file_name()), (laswriteopener.is_piped() ? "stdout" : laswriteopener.get_file_name()));
+      }
     }
 
     // populate header
@@ -891,9 +896,11 @@ int main(int argc, char *argv[])
     delete laswriter;
     delete lasreader;
 
-    if (!quiet) fprintf(stderr, "done with '%s'. total time %g sec.\n", (laswriteopener.is_piped() ? lasreadopener.get_file_name() : laswriteopener.get_file_name()), taketime()-full_start_time);
+    if (!quiet) { fprintf(stderr, "done with '%s'. total time %g sec.\n", (laswriteopener.is_piped() ? lasreadopener.get_file_name() : laswriteopener.get_file_name()), taketime()-start_time); start_time = taketime(); }
     laswriteopener.set_file_name(0);
   }
+
+  if (!quiet && (lasreadopener.get_file_name_number() > 1)) fprintf(stderr, "done with %u files. total time %g sec.\n", lasreadopener.get_file_name_number(), taketime()-full_start_time);
 
   byebye(false, argc==1);
 
