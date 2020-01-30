@@ -432,6 +432,42 @@ private:
   F64 above;
 };
 
+class LASoperationCopyAttributeIntoX : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_attribute_into_x"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
+  inline void transform(LASpoint* point) {
+    F64 x = point->get_attribute_as_float(index);
+    if (!point->set_x(x))
+    {
+      overflow++;
+    }
+  };
+  LASoperationCopyAttributeIntoX(U32 index) { this->index = index; };
+private:
+  U32 index;
+};
+
+class LASoperationCopyAttributeIntoY : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_attribute_into_y"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
+  inline void transform(LASpoint* point) {
+    F64 y = point->get_attribute_as_float(index);
+    if (!point->set_y(y))
+    {
+      overflow++;
+    }
+  };
+  LASoperationCopyAttributeIntoY(U32 index) { this->index = index; };
+private:
+  U32 index;
+};
+
 class LASoperationCopyAttributeIntoZ : public LASoperation
 {
 public:
@@ -2785,7 +2821,41 @@ BOOL LAStransform::parse(int argc, char* argv[])
     {
       if (strncmp(argv[i],"-copy_attribute_", 16) == 0)
       {
-        if (strcmp(argv[i],"-copy_attribute_into_z") == 0)
+        if (strcmp(argv[i],"-copy_attribute_into_x") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
+            return FALSE;
+          }
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute but '%s' is no valid index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          transformed_fields |= LASTRANSFORM_X_COORDINATE;
+          add_operation(new LASoperationCopyAttributeIntoX(index));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        }
+        else if (strcmp(argv[i],"-copy_attribute_into_y") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute\n", argv[i]);
+            return FALSE;
+          }
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index of attribute but '%s' is no valid index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          transformed_fields |= LASTRANSFORM_Y_COORDINATE;
+          add_operation(new LASoperationCopyAttributeIntoY(index));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        }
+        else if (strcmp(argv[i],"-copy_attribute_into_z") == 0)
         {
           if ((i+1) >= argc)
           {
