@@ -1783,6 +1783,20 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
           items++;
         }
       }
+      else if (strncmp(&line[9], "int", 3) == 0)
+      {
+        I32 num = number_attributes;
+        CHAR name[16];
+        CHAR description[32];
+        memset(name, 0, 16);
+        memset(description, 0, 32);
+        sscanf(&line[13], "%15s", name);
+        sscanf(&line[13], "%31s", description);
+        add_attribute(LAS_ATTRIBUTE_I32, name, description);
+        parse_string[items] = '0' + num;
+        type_string[items] = 'i';
+        items++;
+      }
       else
       {     
         fprintf(stderr, "unknown property type: %snot implemented. contact martin@rapidlasso.com\n", &line[9]);
