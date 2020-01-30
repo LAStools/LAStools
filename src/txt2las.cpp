@@ -643,6 +643,11 @@ int main(int argc, char *argv[])
     projection_was_set = geoprojectionconverter.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params);
   }
 
+  if (!quiet)
+  {
+    full_start_time = taketime();
+  }
+
   // loop over multiple input files
 
   while (lasreadopener.active())
@@ -673,7 +678,7 @@ int main(int argc, char *argv[])
 
     if (!quiet)
     {
-      full_start_time = start_time = taketime();
+      start_time = taketime();
       if (verbose)
       {
         fprintf(stderr, "reading from '%s' and writing to '%s'\n", (lasreadopener.is_piped() ? "stdin" : lasreadopener.get_file_name()), (laswriteopener.is_piped() ? "stdout" : laswriteopener.get_file_name()));
