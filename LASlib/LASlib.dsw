@@ -39,6 +39,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "lasexample_recover_returns_from_trajectory_in_extra_bytes"=.\example\lasexample_recover_returns_from_trajectory_in_extra_bytes.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "lasexample_simple_classification"=.\example\lasexample_simple_classification.dsp - Package Owner=<4>
 
 Package=<5>
@@ -51,7 +63,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "lasexample_write_only_full_waveform"=.\example\lasexample_write_only_full_waveform.dsp - Package Owner=<4>
+Project: "lasexample_write_only"=.\example\lasexample_write_only.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -63,7 +75,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "lasexample_write_only"=.\example\lasexample_write_only.dsp - Package Owner=<4>
+Project: "lasexample_write_only_full_waveform"=.\example\lasexample_write_only_full_waveform.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
