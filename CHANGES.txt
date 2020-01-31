@@ -1,3 +1,7 @@
+31 January 2020 -- blast2dem, blast2iso: update forgotten handling of selected NZ and AU newer EPSG codes 
+30 January 2020 -- LASlib: new transforms to '-copy_attribute_into_x 4' and '-copy_attribute_into_y 5'
+28 January 2020 -- LASlib: PLY point cloud reader stores integer properties as "additional attributes" using "extra bytes"
+27 January 2020 -- demzip, demdiff: correct reading of non-integer 'no data' values from GeoTIFF rasters
 12 January 2020 -- lastile: bug fix when doing '-remove_buffer' for on-the-fly buffered tiles that had points deleted
 10 January 2020 -- lastile: also supports an appendix at the end of the file name via '-odix _abcde' 
  8 January 2020 -- lasgrid: options '-subsquare 0.25 -average -use_tile_size 2000' convert from corner grids to area grids
