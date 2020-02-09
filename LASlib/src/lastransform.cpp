@@ -1237,6 +1237,15 @@ public:
   inline void transform(LASpoint* point) { point->set_user_data(point->get_classification() ? point->get_classification() : point->get_extended_classification()); };
 };
 
+class LASoperationCopyUserDataIntoClassification : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_user_data_into_classification"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
+  inline void transform(LASpoint* point) { if (point->is_extended_point_type()) point->set_extended_classification(point->get_user_data()); else point->set_classification(point->get_user_data()); };
+};
+
 class LASoperationCopyClassificationIntoPointSource : public LASoperation
 {
 public:
@@ -2107,6 +2116,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -classify_attribute_between_as 1 2.0 5.0 4\n");
   fprintf(stderr,"  -change_extended_classification_from_to 6 46\n");
   fprintf(stderr,"  -move_ancient_to_extended_classification\n");
+  fprintf(stderr,"  -copy_user_data_into_classification\n");
   fprintf(stderr,"Change the flags.\n");
   fprintf(stderr,"  -set_withheld_flag 0\n");
   fprintf(stderr,"  -set_synthetic_flag 1\n");
@@ -2915,6 +2925,11 @@ BOOL LAStransform::parse(int argc, char* argv[])
         else if (strcmp(argv[i],"-copy_user_data_into_scanner_channel") == 0)
         {
           add_operation(new LASoperationCopyUserDataIntoScannerChannel());
+          *argv[i]='\0'; 
+        }
+        else if (strcmp(argv[i],"-copy_user_data_into_classification") == 0)
+        {
+          add_operation(new LASoperationCopyUserDataIntoClassification());
           *argv[i]='\0'; 
         }
         else if (strcmp(argv[i],"-copy_user_data_into_z") == 0)
