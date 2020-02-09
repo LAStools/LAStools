@@ -182,7 +182,14 @@ public:
     }
     if (other.extra_bytes && extra_bytes)
     {
-      memcpy(extra_bytes, other.extra_bytes, extra_bytes_number);
+      if (other.extra_bytes_number >= extra_bytes_number)
+      {
+        memcpy(extra_bytes, other.extra_bytes, extra_bytes_number);
+      }
+      else
+      {
+        memcpy(extra_bytes, other.extra_bytes, other.extra_bytes_number);
+      }
     }
     if (other.extended_point_type)
     {
@@ -315,6 +322,7 @@ public:
       case LASitem::BYTE14:
         extra_bytes_number = items[i].size;
         extra_bytes = new U8[extra_bytes_number];
+        memset(extra_bytes, 0, extra_bytes_number);
         this->point[i] = extra_bytes;
         break;
       default:
@@ -374,6 +382,7 @@ public:
       case LASitem::BYTE14:
         extra_bytes_number = items[i].size;
         extra_bytes = new U8[extra_bytes_number];
+        memset(extra_bytes, 0, extra_bytes_number);
         this->point[i] = extra_bytes;
         break;
       default:
@@ -547,6 +556,7 @@ public:
   inline I32 get_X() const { return X; };
   inline I32 get_Y() const { return Y; };
   inline I32 get_Z() const { return Z; };
+  inline const I32* get_XYZ() const { return &X; };
   inline U16 get_intensity() const { return intensity; };
   inline U8 get_return_number() const { return return_number; };
   inline U8 get_number_of_returns() const { return number_of_returns; };
