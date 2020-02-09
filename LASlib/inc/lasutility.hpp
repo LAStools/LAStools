@@ -81,7 +81,7 @@ public:
   I64 xyz_fluff_10000[3];
   BOOL add(const LASpoint* point);
   BOOL has_fluff() const { return has_fluff(0) || has_fluff(1) || has_fluff(2); };
-  BOOL has_fluff(U32 i) const { return (number_of_point_records && (number_of_point_records == xyz_fluff_10[i])); };
+  BOOL has_fluff(U32 i) const { return (number_of_point_records && ((min.get_XYZ())[i] != (max.get_XYZ())[i]) && (number_of_point_records == xyz_fluff_10[i])); };
   BOOL has_serious_fluff() const { return has_serious_fluff(0) || has_serious_fluff(1) || has_serious_fluff(2); };
   BOOL has_serious_fluff(U32 i) const { return (number_of_point_records && (number_of_point_records == xyz_fluff_100[i])); };
   BOOL has_very_serious_fluff() const { return has_very_serious_fluff(0) || has_very_serious_fluff(1) || has_very_serious_fluff(2); };
@@ -165,6 +165,11 @@ private:
   LASbin* attribute2_bin;
   LASbin* attribute3_bin;
   LASbin* attribute4_bin;
+  LASbin* attribute5_bin;
+  LASbin* attribute6_bin;
+  LASbin* attribute7_bin;
+  LASbin* attribute8_bin;
+  LASbin* attribute9_bin;
   LASbin* wavepacket_index_bin;
   LASbin* wavepacket_offset_bin;
   LASbin* wavepacket_size_bin;
