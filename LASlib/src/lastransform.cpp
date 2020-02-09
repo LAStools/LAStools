@@ -1981,6 +1981,19 @@ private:
   F32 scale;
 };
 
+class LASoperationSetAttribute : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_attribute"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %g ", name(), index, value); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
+  inline void transform(LASpoint* point) { point->set_attribute_as_float(index, value); };
+  LASoperationSetAttribute(U32 index, F64 value) { this->index = index; this->value = value; };
+private:
+  U32 index;
+  F64 value;
+};
+
 class LASoperationScaleAttribute : public LASoperation
 {
 public:
@@ -3366,6 +3379,28 @@ BOOL LAStransform::parse(int argc, char* argv[])
         }
         add_operation(new LASoperationSetGpsTime(gps_time));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if ((strcmp(argv[i],"-set_attribute") == 0))
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index value\n", argv[i]);
+          return FALSE;
+        }
+        U32 index;
+        if (sscanf(argv[i+1], "%u", &index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index value but '%s' is no valid index\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        F64 value;
+        if (sscanf(argv[i+2], "%lf", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index value but '%s' is no valid value\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetAttribute(index, value));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
       }
       else if (strncmp(argv[i],"-set_RGB", 8) == 0)
       {
