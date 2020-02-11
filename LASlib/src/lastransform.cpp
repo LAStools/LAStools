@@ -1736,6 +1736,43 @@ private:
   CHAR* map_file_name;
 };
 
+class LASoperationLoadAttributeFromText : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "load_attribute_from_text"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u \"%s\" ", name(), index, file_name); };
+  inline void transform(LASpoint* point)
+  {
+    if (file)
+    {
+      CHAR line[256];
+      while (fgets(line, 256, file))
+      {
+        F64 value;
+        if (sscanf(line, "%lf", &value) == 1)
+        {
+          point->set_attribute_as_float(index, value);
+          return;
+        }
+      }
+      fclose(file);
+      file = 0;
+    }
+  };
+  void reset() { if (file) fclose(file); file = fopen(file_name, "r"); };
+  LASoperationLoadAttributeFromText(const U32 index, const CHAR* file_name)
+  {
+    this->index = index;
+    this->file_name = LASCopyString(file_name);
+    file = fopen(this->file_name, "r");
+  };
+  ~LASoperationLoadAttributeFromText() { if (file) fclose(file); if (file_name) free(file_name); };
+private:
+  U32 index;
+  CHAR* file_name;
+  FILE* file;
+};
+
 class LASoperationCopyRGBintoIntensity : public LASoperation
 {
 public:
@@ -1986,7 +2023,6 @@ class LASoperationSetAttribute : public LASoperation
 public:
   inline const CHAR* name() const { return "set_attribute"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %g ", name(), index, value); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES; };
   inline void transform(LASpoint* point) { point->set_attribute_as_float(index, value); };
   LASoperationSetAttribute(U32 index, F64 value) { this->index = index; this->value = value; };
 private:
@@ -4445,7 +4481,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
         FILE* file = fopen(argv[i+1], "r");
         if (file == 0)
         {
-          fprintf(stderr,"ERROR: cannot '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+1]);
+          fprintf(stderr,"ERROR: '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+1]);
           return FALSE;
         }
         else
@@ -4465,7 +4501,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
         FILE* file = fopen(argv[i+1], "r");
         if (file == 0)
         {
-          fprintf(stderr,"ERROR: cannot '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+1]);
+          fprintf(stderr,"ERROR: '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+1]);
           return FALSE;
         }
         else
@@ -4491,7 +4527,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
         FILE* file = fopen(argv[i+2], "r");
         if (file == 0)
         {
-          fprintf(stderr,"ERROR: cannot '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+2]);
+          fprintf(stderr,"ERROR: '%s' needs text file with map but '%s' cannot be opened\n", argv[i], argv[i+2]);
           return FALSE;
         }
         else
@@ -4499,6 +4535,35 @@ BOOL LAStransform::parse(int argc, char* argv[])
           fclose(file);
         }
         add_operation(new LASoperationMapAttributeIntoRGB(index, argv[i+2]));
+        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+      }
+    }
+    else if (strncmp(argv[i],"-load_", 6) == 0)
+    {
+      if (strcmp(argv[i],"-load_attribute_from_text") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: attribute_index attribute_file_name.txt\n", argv[i]);
+          return FALSE;
+        }
+        U32 index;
+        if (sscanf(argv[i+1], "%u", &index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: attribute_index attribute_file_name.txt but '%s' is no valid attribute_index\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        FILE* file = fopen(argv[i+2], "r");
+        if (file == 0)
+        {
+          fprintf(stderr,"ERROR: '%s' needs text file with attribute values but '%s' cannot be opened\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        else
+        {
+          fclose(file);
+        }
+        add_operation(new LASoperationLoadAttributeFromText(index, argv[i+2]));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
       }
     }
