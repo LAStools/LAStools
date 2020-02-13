@@ -1306,42 +1306,85 @@ int main(int argc, char *argv[])
       {
         if (point == 0) point = new LASpoint;
       }
+      // were there extra bytes before
+      I32 num_extra_bytes = 0;
+      switch (lasreader->header.point_data_format)
+      {
+      case 0:
+        num_extra_bytes = lasreader->header.point_data_record_length - 20;
+        break;
+      case 1:
+        num_extra_bytes = lasreader->header.point_data_record_length - 28;
+        break;
+      case 2:
+        num_extra_bytes = lasreader->header.point_data_record_length - 26;
+        break;
+      case 3:
+        num_extra_bytes = lasreader->header.point_data_record_length - 34;
+        break;
+      case 4:
+        num_extra_bytes = lasreader->header.point_data_record_length - 57;
+        break;
+      case 5:
+        num_extra_bytes = lasreader->header.point_data_record_length - 63;
+        break;
+      case 6:
+        num_extra_bytes = lasreader->header.point_data_record_length - 30;
+        break;
+      case 7:
+        num_extra_bytes = lasreader->header.point_data_record_length - 36;
+        break;
+      case 8:
+        num_extra_bytes = lasreader->header.point_data_record_length - 38;
+        break;
+      case 9:
+        num_extra_bytes = lasreader->header.point_data_record_length - 59;
+        break;
+      case 10:
+        num_extra_bytes = lasreader->header.point_data_record_length - 67;
+        break;
+      }
+      if (num_extra_bytes < 0)
+      {
+        fprintf(stderr, "ERROR: point record length has %d fewer bytes than needed\n", -num_extra_bytes);
+        byebye(true);
+      }
       lasreader->header.point_data_format = (U8)set_point_data_format;
       lasreader->header.clean_laszip();
       switch (lasreader->header.point_data_format)
       {
       case 0:
-        lasreader->header.point_data_record_length = 20;
+        lasreader->header.point_data_record_length = 20 + num_extra_bytes;
         break;
       case 1:
-        lasreader->header.point_data_record_length = 28;
+        lasreader->header.point_data_record_length = 28 + num_extra_bytes;
         break;
       case 2:
-        lasreader->header.point_data_record_length = 26;
+        lasreader->header.point_data_record_length = 26 + num_extra_bytes;
         break;
       case 3:
-        lasreader->header.point_data_record_length = 34;
+        lasreader->header.point_data_record_length = 34 + num_extra_bytes;
         break;
       case 4:
-        lasreader->header.point_data_record_length = 57;
+        lasreader->header.point_data_record_length = 57 + num_extra_bytes;
         break;
       case 5:
-        lasreader->header.point_data_record_length = 63;
+        lasreader->header.point_data_record_length = 63 + num_extra_bytes;
         break;
       case 6:
-        lasreader->header.point_data_record_length = 30;
+        lasreader->header.point_data_record_length = 30 + num_extra_bytes;
         break;
       case 7:
-        lasreader->header.point_data_record_length = 36;
+        lasreader->header.point_data_record_length = 36 + num_extra_bytes;
         break;
       case 8:
-        lasreader->header.point_data_record_length = 38;
+        lasreader->header.point_data_record_length = 38 + num_extra_bytes;
         break;
       case 9:
-        lasreader->header.point_data_record_length = 59;
+        lasreader->header.point_data_record_length = 59 + num_extra_bytes;
         break;
       case 10:
-        lasreader->header.point_data_record_length = 67;
+        lasreader->header.point_data_record_length = 67 + num_extra_bytes;
         break;
       }
     }
