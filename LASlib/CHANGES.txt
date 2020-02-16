@@ -1,3 +1,10 @@
+15 February 2020 -- LASlib: new transforms '-scale_RGB_to_8bit' and '-scale_RGB_to_16bit' only scale RGB values if needed
+14 February 2020 -- LASlib: new '-multiply_divided_intensity_into_RGB_green 255' '-multiply_scaled_intensity_into_RGB_red 0.4'
+14 February 2020 -- LASlib: new filter '-keep_RGB_greenness 10 65535' keep points if 2G-R-B falls into specified interval
+10 February 2020 -- lasinfo: handle up to 10 attributes with '-histo attribute0 1.0' through '-histo attribute9 0.1'
+10 February 2020 -- LASlib: new transform '-load_attribute_from_text 0 new_attribute.txt'
+ 9 February 2020 -- las2las: add "additional attributes" with '-add_attribute data_type name description [scale offset no_data]'
+ 8 February 2020 -- LASlib: new transforms '-copy_user_data_into_classification' and '-set_attribute 0 1.5'
 30 January 2020 -- LASlib: new transforms to '-copy_attribute_into_x 4' and '-copy_attribute_into_y 5'
 28 January 2020 -- LASlib: PLY point cloud reader stores integer properties as "additional attributes" using "extra bytes"
  6 January 2020 -- lasvalidate: fix for LAS 1.4 files with extra bytes and new option '-tile_size 1000' to check tile extend
