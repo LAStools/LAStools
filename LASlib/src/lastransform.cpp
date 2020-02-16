@@ -1580,6 +1580,24 @@ public:
   inline void transform(LASpoint* point) { point->rgb[0] = point->rgb[0]*256; point->rgb[1] = point->rgb[1]*256; point->rgb[2] = point->rgb[2]*256; };
 };
 
+class LASoperationScaleRGBto8bit : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "scale_RGB_to_8bit"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline void transform(LASpoint* point) { if ((point->get_R() > 255) || (point->get_G() > 255) || (point->get_B() > 255)) { point->rgb[0] = point->rgb[0]/256; point->rgb[1] = point->rgb[1]/256; point->rgb[2] = point->rgb[2]/256; } };
+};
+
+class LASoperationScaleRGBto16bit : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "scale_RGB_to_16bit"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline void transform(LASpoint* point) { if ((point->get_R() < 256) && (point->get_G() < 256) && (point->get_B() < 256)) { point->rgb[0] = point->rgb[0]*256; point->rgb[1] = point->rgb[1]*256; point->rgb[2] = point->rgb[2]*256; } };
+};
+
 class LASoperationSwitchXY : public LASoperation
 {
 public:
@@ -2221,6 +2239,8 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_RGB 2 4 2\n");
   fprintf(stderr,"  -scale_RGB_down (by 256)\n");
   fprintf(stderr,"  -scale_RGB_up (by 256)\n");
+  fprintf(stderr,"  -scale_RGB_to_8bit (only scales down 16 bit values)\n");
+  fprintf(stderr,"  -scale_RGB_to_16bit (only scales up 8 bit values)\n");
   fprintf(stderr,"  -switch_R_G -switch_R_B -switch_B_G\n");
   fprintf(stderr,"  -copy_R_into_NIR -copy_R_into_intensity\n");
   fprintf(stderr,"  -copy_G_into_NIR -copy_G_into_intensity\n");
@@ -4302,15 +4322,28 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationScaleUserData(scale));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
       }
-      else if (strcmp(argv[i],"-scale_RGB_down") == 0 || strcmp(argv[i],"-scale_rgb_down") == 0)
+      else if (strncmp(argv[i],"-scale_RGB_", 11) == 0)
       {
-        add_operation(new LASoperationScaleRGBdown());
-        *argv[i]='\0'; 
-      }
-      else if (strcmp(argv[i],"-scale_RGB_up") == 0 || strcmp(argv[i],"-scale_rgb_up") == 0)
-      {
-        add_operation(new LASoperationScaleRGBup());
-        *argv[i]='\0'; 
+        if ((strcmp(argv[i],"-scale_RGB_down") == 0) || (strcmp(argv[i],"-scale_rgb_down") == 0))
+        {
+          add_operation(new LASoperationScaleRGBdown());
+          *argv[i]='\0';
+        }
+        else if ((strcmp(argv[i],"-scale_RGB_up") == 0) || (strcmp(argv[i],"-scale_rgb_up") == 0))
+        {
+          add_operation(new LASoperationScaleRGBup());
+          *argv[i]='\0';
+        }
+        else if ((strcmp(argv[i],"-scale_RGB_to_8bit") == 0) || (strcmp(argv[i],"-scale_rgb_to_8bit") == 0))
+        {
+          add_operation(new LASoperationScaleRGBto8bit());
+          *argv[i]='\0';
+        }
+        else if ((strcmp(argv[i],"-scale_RGB_to_16bit") == 0) || (strcmp(argv[i],"-scale_rgb_to_16bit") == 0))
+        {
+          add_operation(new LASoperationScaleRGBto16bit());
+          *argv[i]='\0';
+        }
       }
       else if (strcmp(argv[i],"-scale_attribute") == 0)
       {
