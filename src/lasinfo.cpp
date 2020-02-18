@@ -4455,30 +4455,70 @@ int main(int argc, char *argv[])
       {
         wrong_entry = false;
         for (i = 0; i < 32; i++) if (lassummary.classification[i]) wrong_entry = true;
-        if (lassummary.classification_synthetic || lassummary.classification_keypoint ||  lassummary.classification_withheld) wrong_entry = true;
+        if (lassummary.flagged_synthetic || lassummary.flagged_keypoint || lassummary.flagged_withheld) wrong_entry = true;
 
         if (wrong_entry)
         {
           fprintf(file_out, "histogram of classification of points:\n"); 
 #ifdef _WIN32
           for (i = 0; i < 32; i++) if (lassummary.classification[i]) fprintf(file_out, " %15I64d  %s (%u)\n", lassummary.classification[i], LASpointClassification[i], i);
-          if (lassummary.classification_synthetic) fprintf(file_out, " +-> flagged as synthetic: %I64d\n", lassummary.classification_synthetic);
-          if (lassummary.classification_keypoint) fprintf(file_out,  " +-> flagged as keypoints: %I64d\n", lassummary.classification_keypoint);
-          if (lassummary.classification_withheld) fprintf(file_out,  " +-> flagged as withheld:  %I64d\n", lassummary.classification_withheld);
+          if (lassummary.flagged_synthetic)
+          {
+            fprintf(file_out, " +-> flagged as synthetic: %I64d\n", lassummary.flagged_synthetic);
+            for (i = 0; i < 32; i++) if (lassummary.flagged_synthetic_classification[i]) fprintf(file_out, "  +---> %15I64d of those are %s (%u)\n", lassummary.flagged_synthetic_classification[i], LASpointClassification[i], i);
+            for (i = 32; i < 256; i++) if (lassummary.flagged_synthetic_classification[i]) fprintf(file_out, "  +---> %15I64d  of those are classification (%u)\n", lassummary.flagged_synthetic_classification[i], i);
+          }
+          if (lassummary.flagged_keypoint)
+          {
+            fprintf(file_out,  " +-> flagged as keypoints: %I64d\n", lassummary.flagged_keypoint);
+            for (i = 0; i < 32; i++) if (lassummary.flagged_keypoint_classification[i]) fprintf(file_out, "  +---> %15I64d of those are %s (%u)\n", lassummary.flagged_keypoint_classification[i], LASpointClassification[i], i);
+            for (i = 32; i < 256; i++) if (lassummary.flagged_keypoint_classification[i]) fprintf(file_out, "  +---> %15I64d  of those are classification (%u)\n", lassummary.flagged_keypoint_classification[i], i);
+          }
+          if (lassummary.flagged_withheld)
+          {
+            fprintf(file_out,  " +-> flagged as withheld:  %I64d\n", lassummary.flagged_withheld);
+            for (i = 0; i < 32; i++) if (lassummary.flagged_withheld_classification[i]) fprintf(file_out, "  +---> %15I64d of those are %s (%u)\n", lassummary.flagged_withheld_classification[i], LASpointClassification[i], i);
+            for (i = 32; i < 256; i++) if (lassummary.flagged_withheld_classification[i]) fprintf(file_out, "  +---> %15I64d  of those are classification (%u)\n", lassummary.flagged_withheld_classification[i], i);
+          }
 #else
           for (i = 0; i < 32; i++) if (lassummary.classification[i]) fprintf(file_out, " %15lld  %s (%u)\n", lassummary.classification[i], LASpointClassification[i], i);
-          if (lassummary.classification_synthetic) fprintf(file_out, " +-> flagged as synthetic: %lld\n", lassummary.classification_synthetic);
-          if (lassummary.classification_keypoint) fprintf(file_out,  " +-> flagged as keypoints: %lld\n", lassummary.classification_keypoint);
-          if (lassummary.classification_withheld) fprintf(file_out,  " +-> flagged as withheld:  %lld\n", lassummary.classification_withheld);
+          if (lassummary.flagged_synthetic)
+          {
+            fprintf(file_out, " +-> flagged as synthetic: %lld\n", lassummary.flagged_synthetic);
+            for (i = 0; i < 32; i++) if (lassummary.flagged_synthetic_classification[i]) fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_synthetic_classification[i], LASpointClassification[i], i);
+            for (i = 32; i < 256; i++) if (lassummary.flagged_synthetic_classification[i]) fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.lassummary.classification[i], i);
+          }
+          if (lassummary.flagged_keypoint)
+          {
+            fprintf(file_out,  " +-> flagged as keypoints: %lld\n", lassummary.flagged_keypoint);
+            for (i = 0; i < 32; i++) if (lassummary.flagged_keypoint_classification[i]) fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_keypoint_classification[i], LASpointClassification[i], i);
+            for (i = 32; i < 256; i++) if (lassummary.flagged_keypoint_classification[i]) fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_keypoint_classification[i], i);
+          }
+          if (lassummary.flagged_withheld)
+          {
+            fprintf(file_out,  " +-> flagged as withheld:  %lld\n", lassummary.flagged_withheld);
+            for (i = 0; i < 32; i++) if (lassummary.flagged_withheld_classification[i]) fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_withheld_classification[i], LASpointClassification[i], i);
+            for (i = 32; i < 256; i++) if (lassummary.flagged_withheld_classification[i]) fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_withheld_classification[i], i);
+          }
 #endif
         }
 
         if (lasreader->point.extended_point_type)
         {
 #ifdef _WIN32
-          if (lassummary.classification_extended_overlap) fprintf(file_out, " +-> flagged as extended overlap: %I64d\n", lassummary.classification_extended_overlap);
+          if (lassummary.flagged_extended_overlap)
+          {
+            fprintf(file_out, " +-> flagged as extended overlap: %I64d\n", lassummary.flagged_extended_overlap);
+            for (i = 0; i < 32; i++) if (lassummary.flagged_extended_overlap_classification[i]) fprintf(file_out, "  +---> %15I64d of those are %s (%u)\n", lassummary.flagged_extended_overlap_classification[i], LASpointClassification[i], i);
+            for (i = 32; i < 256; i++) if (lassummary.flagged_extended_overlap_classification[i]) fprintf(file_out, "  +---> %15I64d  of those are classification (%u)\n", lassummary.flagged_extended_overlap_classification[i], i);
+          }
 #else
-          if (lassummary.classification_extended_overlap) fprintf(file_out, " +-> flagged as extended overlap: %lld\n", lassummary.classification_extended_overlap);
+          if (lassummary.flagged_extended_overlap)
+          {
+            fprintf(file_out, " +-> flagged as extended overlap: %lld\n", lassummary.flagged_extended_overlap);
+            for (i = 0; i < 32; i++) if (lassummary.flagged_extended_overlap_classification[i]) fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_extended_overlap_classification[i], LASpointClassification[i], i);
+            for (i = 32; i < 256; i++) if (lassummary.flagged_extended_overlap_classification[i]) fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_extended_overlap_classification[i], i);
+          }
 #endif
 
           wrong_entry = false;
