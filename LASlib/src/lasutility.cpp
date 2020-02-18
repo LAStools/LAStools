@@ -25,7 +25,7 @@
   CHANGE HISTORY:
   
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasutility.hpp"
@@ -160,7 +160,14 @@ LASsummary::LASsummary()
   for (i = 0; i < 16; i++) number_of_points_by_return[i] = 0;
   for (i = 0; i < 16; i++) number_of_returns[i] = 0;
   for (i = 0; i < 32; i++) classification[i] = 0;
-  for (i = 0; i < 256; i++) extended_classification[i] = 0;
+  for (i = 0; i < 256; i++)
+  {
+    extended_classification[i] = 0;
+    flagged_synthetic_classification[i] = 0;
+    flagged_keypoint_classification[i] = 0;
+    flagged_withheld_classification[i] = 0;
+    flagged_extended_overlap_classification[i] = 0;
+  }
   for (i = 0; i < 3; i++)
   {
     xyz_fluff_10[i] = 0;
@@ -168,10 +175,10 @@ LASsummary::LASsummary()
     xyz_fluff_1000[i] = 0;
     xyz_fluff_10000[i] = 0;
   }
-  classification_synthetic = 0;
-  classification_keypoint = 0;
-  classification_withheld = 0;
-  classification_extended_overlap = 0;
+  flagged_synthetic = 0;
+  flagged_keypoint = 0;
+  flagged_withheld = 0;
+  flagged_extended_overlap = 0;
   first = TRUE;
 }
 
@@ -190,7 +197,7 @@ BOOL LASsummary::add(const LASpoint* point)
     {
       classification[point->get_classification()]++;
     }
-    if (point->get_extended_overlap_flag()) classification_extended_overlap++;
+    if (point->get_extended_overlap_flag()) { flagged_extended_overlap++; flagged_extended_overlap_classification[(point->get_classification() ? point->get_classification() : point->get_extended_classification())]++; }
   }
   else
   {
@@ -198,9 +205,9 @@ BOOL LASsummary::add(const LASpoint* point)
     classification[point->get_classification()]++;
     number_of_returns[point->get_number_of_returns()]++;
   }
-  if (point->get_synthetic_flag()) classification_synthetic++;
-  if (point->get_keypoint_flag()) classification_keypoint++;
-  if (point->get_withheld_flag()) classification_withheld++;
+  if (point->get_synthetic_flag()) { flagged_synthetic++; flagged_synthetic_classification[(point->get_classification() ? point->get_classification() : point->get_extended_classification())]++; }
+  if (point->get_keypoint_flag()) { flagged_keypoint++;  flagged_keypoint_classification[(point->get_classification() ? point->get_classification() : point->get_extended_classification())]++; }
+  if (point->get_withheld_flag()) { flagged_withheld++;  flagged_withheld_classification[(point->get_classification() ? point->get_classification() : point->get_extended_classification())]++; }
   if (first)
   {
     // does the point have extra bytes

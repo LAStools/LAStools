@@ -65,10 +65,14 @@ public:
   I64 number_of_returns[16];
   I64 classification[32];
   I64 extended_classification[256];
-  I64 classification_synthetic;
-  I64 classification_keypoint;
-  I64 classification_withheld;
-  I64 classification_extended_overlap;
+  I64 flagged_synthetic;
+  I64 flagged_synthetic_classification[256];
+  I64 flagged_keypoint;
+  I64 flagged_keypoint_classification[256];
+  I64 flagged_withheld;
+  I64 flagged_withheld_classification[256];
+  I64 flagged_extended_overlap;
+  I64 flagged_extended_overlap_classification[256];
   LASpoint min;
   LASpoint max;
   U16 xyz_low_digits_10[3];
