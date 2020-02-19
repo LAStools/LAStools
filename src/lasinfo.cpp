@@ -4486,7 +4486,7 @@ int main(int argc, char *argv[])
           {
             fprintf(file_out, " +-> flagged as synthetic: %lld\n", lassummary.flagged_synthetic);
             for (i = 0; i < 32; i++) if (lassummary.flagged_synthetic_classification[i]) fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_synthetic_classification[i], LASpointClassification[i], i);
-            for (i = 32; i < 256; i++) if (lassummary.flagged_synthetic_classification[i]) fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.lassummary.classification[i], i);
+            for (i = 32; i < 256; i++) if (lassummary.flagged_synthetic_classification[i]) fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_synthetic_classification[i], i);
           }
           if (lassummary.flagged_keypoint)
           {
