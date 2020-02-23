@@ -445,36 +445,6 @@ public:
     return TRUE;
   }
 
-  BOOL is_zero() const
-  {
-    if (((U32*)&(this->X))[0] || ((U32*)&(this->X))[1] || ((U32*)&(this->X))[2] || ((U32*)&(this->X))[3] || ((U32*)&(this->X))[4])
-    {
-      return FALSE;
-    }
-    if (have_gps_time)
-    {
-      if (this->gps_time)
-      {
-        return FALSE;
-      }
-    }
-    if (have_rgb)
-    {
-      if (this->rgb[0] || this->rgb[1] || this->rgb[2])
-      {
-        return FALSE;
-      }
-      if (have_nir)
-      {
-        if (this->rgb[3])
-        {
-          return FALSE;
-        }
-      }
-    }
-    return TRUE;
-  }
-
   void zero()
   {
     X = 0;
