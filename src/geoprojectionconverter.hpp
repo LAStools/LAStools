@@ -161,9 +161,10 @@ class GeoProjectionParameters
 {
 public:
   int type;
-  char name[256];
   short geokey;
-  GeoProjectionParameters() { type = -1; geokey = 0; };
+  short datum;
+  char name[256];
+  GeoProjectionParameters() { type = -1; geokey = 0; datum = 0; name[0] = '\0'; };
 };
 
 class GeoProjectionParametersUTM : public GeoProjectionParameters
@@ -409,6 +410,10 @@ public:
 
   GeoProjectionConverter();
   ~GeoProjectionConverter();
+
+  // check before any reprojection
+
+  bool check_horizontal_datum_before_reprojection();
 
   // from current projection to longitude/latitude/elevation_in_meter
 
