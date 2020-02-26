@@ -1709,6 +1709,9 @@ int main(int argc, char *argv[])
                   case 6322: // GCS_NAD83_PA11
                     fprintf(file_out, "GeographicTypeGeoKey: GCS_NAD83_PA11\012");
                     break;
+                  case 7844: // GCS_GDA2020
+                    fprintf(file_out, "GeographicTypeGeoKey: GCS_GDA2020\012");
+                    break;
                   default:
                     fprintf(file_out, "GeographicTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
                   }
