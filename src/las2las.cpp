@@ -1560,6 +1560,8 @@ int main(int argc, char *argv[])
       }
       else
       {
+        geoprojectionconverter.check_horizontal_datum_before_reprojection();
+
         reproject_quantizer = new LASquantizer();
         double point[3];
         point[0] = (lasreader->header.min_x+lasreader->header.max_x)/2;
@@ -1605,7 +1607,7 @@ int main(int argc, char *argv[])
         lasreader->header.del_geo_ogc_wkt();
       }
 
-      if (set_ogc_wkt) // maybe also set the OCG WKT 
+      if (set_ogc_wkt || (lasreader->header.point_data_format >= 6)) // maybe also set the OCG WKT
       {
         CHAR* ogc_wkt = set_ogc_wkt_string;
         I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
