@@ -219,6 +219,18 @@ Package=<4>
 
 ###############################################################################
 
+Project: "lasdatum"=.\src_full\lasdatum.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "lasdiff"=.\src\lasdiff.dsp - Package Owner=<4>
 
 Package=<5>
@@ -340,6 +352,18 @@ Package=<4>
 ###############################################################################
 
 Project: "lasmerge"=.\src\lasmerge.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "lasmulticlip"=.\src_full\lasmulticlip.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
