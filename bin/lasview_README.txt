@@ -229,6 +229,7 @@ overview of all tool-specific switches:
 -background_red                      : start viewer with a red background
 -background_green                    : start viewer with a green background
 -background_blue                     : start viewer with a blue background
+-no_bounding_box                     : do not render the green bounding box
 -ilay                                : apply all LASlayers found in corresponding *.lay file on read
 -ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
 -ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
