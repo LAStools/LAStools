@@ -147,7 +147,7 @@ class GeoProjectionEllipsoid
 {
 public:
   int id;
-  char* name;
+  char const* name;
   double equatorial_radius;
   double polar_radius;
   double eccentricity_squared;
