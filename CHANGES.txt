@@ -1,3 +1,7 @@
+24 February 2020 -- las2las: check horizontal datum when reprojecting and also set OCG WKT when point type >= 6
+22 February 2020 -- lasclassify: do not fail when all of the input points are ignored, but simply copy the unmodified file
+19 February 2020 -- lasclip: bug fix for '-split 0' when DBF attribute is unique number and not unique string as file name 
+18 February 2020 -- lasinfo: report classification histogram for 'withhelp', 'keypoint', 'synthetic', 'overlap' flagged points 
 16 February 2020 -- las2dem, lasgrid, lasoverlap: new '-osep space', '-osep tab' or '-osep semicolon' specifies XYZ seperator 
 15 February 2020 -- LASlib: new transforms '-scale_RGB_to_8bit' and '-scale_RGB_to_16bit' only scale RGB values if needed
 14 February 2020 -- LASlib: new '-multiply_divided_intensity_into_RGB_green 255' '-multiply_scaled_intensity_into_RGB_red 0.4'
