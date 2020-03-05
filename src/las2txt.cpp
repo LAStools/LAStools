@@ -586,7 +586,7 @@ int main(int argc, char *argv[])
   bool diff = false;
   bool verbose = false;
   CHAR separator_sign = ' ';
-  CHAR* separator = "space";
+  CHAR const* separator = "space";
   bool opts = false;
   bool optx = false;
   CHAR header_comment_sign = '\0';
