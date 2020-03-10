@@ -1015,7 +1015,7 @@ F64 LASreaderPLY::read_binary_value(CHAR type)
   }
   else if (type == 'd')
   {
-    streamin->get32bitsLE((U8*)&value);
+    streamin->get64bitsLE((U8*)&value);
   }
   else if (type == 'C')
   {
@@ -1688,19 +1688,19 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
         if (strncmp(&line[offset], "x", 1) == 0)
         {
           parse_string[items] = 'x';
-          type_string[items] = 'f';
+          type_string[items] = 'd';
           items++;
         }
         else if (strncmp(&line[offset], "y", 1) == 0)
         {
           parse_string[items] = 'y';
-          type_string[items] = 'f';
+          type_string[items] = 'd';
           items++;
         }
         else if (strncmp(&line[offset], "z", 1) == 0)
         {
           parse_string[items] = 'z';
-          type_string[items] = 'f';
+          type_string[items] = 'd';
           items++;
         }
         else if (strncmp(&line[offset], "nx", 2) == 0)
@@ -1708,7 +1708,7 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
           I32 num = number_attributes;
           add_attribute(LAS_ATTRIBUTE_I16, "nx", "normal x coordinate", 0.00005);
           parse_string[items] = '0' + num;
-          type_string[items] = 'f';
+          type_string[items] = 'd';
           items++;
         }
         else if (strncmp(&line[offset], "ny", 2) == 0)
@@ -1716,7 +1716,7 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
           I32 num = number_attributes;
           add_attribute(LAS_ATTRIBUTE_I16, "ny", "normal y coordinate", 0.00005);
           parse_string[items] = '0' + num;
-          type_string[items] = 'f';
+          type_string[items] = 'd';
           items++;
         }
         else if (strncmp(&line[offset], "nz", 2) == 0)
@@ -1724,7 +1724,7 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
           I32 num = number_attributes;
           add_attribute(LAS_ATTRIBUTE_I16, "nz", "normal z coordinate", 0.00005);
           parse_string[items] = '0' + num;
-          type_string[items] = 'f';
+          type_string[items] = 'd';
           items++;
         }
         else
@@ -1736,9 +1736,9 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
           memset(description, 0, 32);
           sscanf(&line[offset], "%15s", name);
           sscanf(&line[offset], "%31s", description);
-          add_attribute(LAS_ATTRIBUTE_F32, name, description);
+          add_attribute(LAS_ATTRIBUTE_F64, name, description);
           parse_string[items] = '0' + num;
-          type_string[items] = 'f';
+          type_string[items] = 'd';
           items++;
         }
       }
