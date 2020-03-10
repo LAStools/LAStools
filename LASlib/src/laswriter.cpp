@@ -1133,7 +1133,7 @@ void LASwriteOpener::cut_characters(U32 cut)
     if ((len == 0) || (file_name[len] == '\\') || (file_name[len] == '/') || (file_name[len] == ':'))
     {
       len = (I32)strlen(file_name);
-      strncpy(new_file_name, file_name, len-cut);
+      memcpy(new_file_name, file_name, len-cut);
     }
     else
     {
