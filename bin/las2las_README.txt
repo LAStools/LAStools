@@ -200,32 +200,38 @@ other commandline arguments are
 -subseq 20 100                 : extract a subsequence of 100 points starting from point 20
 -set_point_type 0              : force point type to be 0
 -set_point_size 26             : force point size to be 26
+-set_global_encoding_gps_bit 1 : sets bit in global encoding field specifying Adjusted GPS Standard time stamps
+-set_version 1.2               : set LAS version number to 1.2
+-set_version_major 1           : set LAS major version number to 1
+-set_version_minor 2           : set LAS minor version number to 2
+-set_lastiling_buffer_flag 0   : sets buffer flag in LAStiling VLR (if it exists) to zero
+-set_attribute_scale 0 0.1     : sets the scale of the *first* attribute in the extra bytes to 0.1 
+-set_attribute_offset 1 10.0   : sets the offset of the *second* attribute in the extra bytes to 10.0 
 -set_classification 0          : sets all classifications fields to zero
 -set_user_data 0               : sets all user_data fields to zero
 -set_ogc_wkt                   : translate GeoTIFF keys into CRS string in OGC WKT format and add it as VLR
 -set_ogc_wkt_in_evlr           : same as above but adds it as LAS 1.4 EVLR instead. really not recommended!!!
+-remove_padding                : remove user-defined bytes before and after the header
 -remove_all_vlrs               : remove all VLRs
--remove_vlr 2                  : remove VLR number 2 (couting starts at 0)
+-remove_vlr 2                  : remove third VLR with index 2 (counting starts at 0)
 -remove_vlrs_from_to 0 2       : remove the first three VLRs
 -remove_all_evlrs              : remove all EVLRs
--remove_evlr 2                 : remove EVLR number 2 (couting starts at 0)
+-remove_evlr 2                 : remove third EVLR with index 2 (counting starts at 0)
 -remove_evlrs_from_to 0 2      : remove the first three EVLRs
+-remove_tiling_vlr             : removes VLR containing tiling information created by lastile
+-remove_original_vlr           : removes VLR containing original header information created by on-the-fly buffering
+-add_attribute 0 "hello" "sample attribute" 1.0 0.0 : adds a new attribute of type 0 (unsigned byte) as "extra bytes"
+-unset_attribute_scale 0       : unsets the scale of the *first* attribute in the extra bytes
+-unset_attribute_offset 1      : unsets the offset of the *second* attribute in the extra bytes
 -move_evlrs_to_vlrs            : move all EVLRs with small enough payload to VLR section
 -save_vlrs                     : saves all VLRs to a file called vlrs.vlr so they can be loaded into another file
 -load_vlrs                     : loads all VLRs from a file called vlrs.vlr and adds them to each processed file
--remove_padding                : remove user-defined bytes before and after the header
+-dont_remove_empty_files       : does not remove files that have zero points remaining from disk
+-clip_to_bounding_box          : kicks out all points not inside the bounding box specified by the LAS header
 -week_to_adjusted              : converts time stamps from GPS week to Adjusted Standard GPS 
 -adjusted_to_week              : converts time stamps from Adjusted Standard GPS to GPS week
 -scale_rgb_up                  : multiplies all RGB values by 256 (to go from 8 bit to 16 bit numbers)
 -scale_rgb_down                : divides all RGB values by 256 (to go from 16 bit to 8 bit numbers)
--set_version 1.2               : set LAS version number to 1.2
--set_global_encoding_gps_bit 1 : sets bit in global encoding field specifying Adjusted GPS Standard time stamps
--set_attribute_scale 0 0.1     : sets the scale of the *first* attribute in the extra bytes to 0.1 
--set_attribute_offset 1 10.0   : sets the offset of the *second* attribute in the extra bytes to 10.0 
--unset_attribute_scale 0       : unsets the scale of the *first* attribute in the extra bytes
--unset_attribute_offset 1      : unsets the offset of the *second* attribute in the extra bytes
--set_lastiling_buffer_flag 0   : sets buffer flag in LAStiling VLR (if it exists) to zero
--dont_remove_empty_files       : does not remove files that have zero points remaining from disk
 -wgs84                         : use datum WGS-84
 -grs80                         : use datum GRS1980
 -wgs72                         : use datum WGS-72
@@ -236,6 +242,7 @@ other commandline arguments are
 -nad27                         : use datum NAD27
 -etrs89                        : use datum ETRS89
 -gda94                         : use datum GDA94
+-gda2020                       : use datum GDA2020
 -osgb1936                      : use datum OSGB 1936
 -utm 12T                       : input is UTM zone 12T 
 -epsg 2972                     : input is EPSG code 2972 (e.g. Reseau Geodesique Francais Guyane 1995)
