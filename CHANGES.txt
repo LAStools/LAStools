@@ -1,3 +1,6 @@
+10 March 2020 -- LASlib and all LAStools: enhanced PLY reader to also support "uint" attributes and properties
+ 9 March 2020 -- LASlib and all LAStools: fixed PLY reader for "double" or "float64" attributes and properties
+29 February 2020 -- lastile: exit with ERROR when '-external_tiling index.shp FNAME' does not overlap the input point cloud
 24 February 2020 -- las2las: check horizontal datum when reprojecting and also set OCG WKT when point type >= 6
 22 February 2020 -- lasclassify: do not fail when all of the input points are ignored, but simply copy the unmodified file
 19 February 2020 -- lasclip: bug fix for '-split 0' when DBF attribute is unique number and not unique string as file name 
