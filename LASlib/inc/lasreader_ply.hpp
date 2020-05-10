@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    9 May 2020 -- added silly 'obj_info' used by Cloud Compare
     4 September 2018 -- created after returning to Samara with locks changed
   
 ===============================================================================
