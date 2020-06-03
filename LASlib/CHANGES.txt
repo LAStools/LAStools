@@ -1,3 +1,7 @@
+ 9 May 2020 -- LASlib and all LAStools: fixed PLY reader for files written by Cloud Compare with odd header entry
+10 March 2020 -- LASlib and all LAStools: enhanced PLY reader to also support "uint" attributes and properties
+ 9 March 2020 -- LASlib and all LAStools: fixed PLY reader for "double" or "float64" attributes and properties24 February 2020 -- las2las: check horizontal datum when reprojecting and also set OCG WKT when point type >= 6
+18 February 2020 -- lasinfo: report classification histogram for 'withhelp', 'keypoint', 'synthetic', 'overlap' flagged points 
 15 February 2020 -- LASlib: new transforms '-scale_RGB_to_8bit' and '-scale_RGB_to_16bit' only scale RGB values if needed
 14 February 2020 -- LASlib: new '-multiply_divided_intensity_into_RGB_green 255' '-multiply_scaled_intensity_into_RGB_red 0.4'
 14 February 2020 -- LASlib: new filter '-keep_RGB_greenness 10 65535' keep points if 2G-R-B falls into specified interval

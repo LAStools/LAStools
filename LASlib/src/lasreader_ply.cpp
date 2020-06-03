@@ -66,7 +66,7 @@ BOOL LASreaderPLY::open(const CHAR* file_name, U8 point_type, BOOL populate_head
 
 BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL populate_header)
 {
-  int i;
+  int i,j;
 
   if (file == 0)
   {
@@ -383,10 +383,10 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
       // update the min and max of attributes in extra bytes
       if (number_attributes)
       {
-        for (i = 0; i < number_attributes; i++)
+        for (j = 0; j < number_attributes; j++)
         {
-          header.attributes[i].update_min(point.extra_bytes + header.attribute_starts[i]);
-          header.attributes[i].update_max(point.extra_bytes + header.attribute_starts[i]);
+          header.attributes[j].update_min(point.extra_bytes + header.attribute_starts[j]);
+          header.attributes[j].update_max(point.extra_bytes + header.attribute_starts[j]);
         }
       }
     }
@@ -1578,6 +1578,10 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
     else if (strncmp(line, "comment", 7) == 0)
     {
       // ignore comments
+    }
+    else if (strncmp(line, "obj_info", 8) == 0)
+    {
+      // ignore obj_info
     }
     else if (strncmp(line, "element", 7) == 0)
     {
