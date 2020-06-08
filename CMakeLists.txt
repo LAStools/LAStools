@@ -10,6 +10,10 @@ endif()
 
 option(BUILD_SHARED_LIBS "Build LASlib as DLL" OFF)
 
+if (BUILD_SHARED_LIBS AND UNIX AND NOT APPLE)
+	set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/LASlib")
+endif()
+
 add_subdirectory(LASlib/src)
 add_subdirectory(src)
 if (EXISTS src_full)
