@@ -1,3 +1,5 @@
+ 9 May 2020 -- LASlib and all LAStools: fixed PLY reader for files written by Cloud Compare with odd header entry
+13 March 2020 -- lastile: fixed bug in combination of '-cpu64' and 'external_tiling tiles.shp'
 10 March 2020 -- LASlib and all LAStools: enhanced PLY reader to also support "uint" attributes and properties
  9 March 2020 -- LASlib and all LAStools: fixed PLY reader for "double" or "float64" attributes and properties
 29 February 2020 -- lastile: exit with ERROR when '-external_tiling index.shp FNAME' does not overlap the input point cloud
