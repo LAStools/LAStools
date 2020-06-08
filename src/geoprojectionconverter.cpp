@@ -75,7 +75,7 @@ static const int GEO_PROJECTION_NONE     = 9;
 class ReferenceEllipsoid
 {
 public:
-  ReferenceEllipsoid(int id, char* name, double equatorialRadius, double eccentricitySquared, double inverseFlattening)
+  ReferenceEllipsoid(int id, char const* name, double equatorialRadius, double eccentricitySquared, double inverseFlattening)
   {
     this->id = id;
     this->name = name;
@@ -84,7 +84,7 @@ public:
     this->inverseFlattening = inverseFlattening;
   }
   int id;
-  char* name;
+  char const* name;
   double equatorialRadius;
   double eccentricitySquared;
   double inverseFlattening;
@@ -496,7 +496,7 @@ static const short GCTP_NAD83_Puerto_Rico = 5200;
 class StatePlaneLCC
 {
 public:
-  StatePlaneLCC(short geokey, char* zone, double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree)
+  StatePlaneLCC(short geokey, char const* zone, double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double firstStdParallelDegree, double secondStdParallelDegree)
   {
     this->geokey = geokey;
     this->zone = zone;
@@ -508,7 +508,7 @@ public:
     this->secondStdParallelDegree = secondStdParallelDegree;
   }
   short geokey;
-  char* zone;
+  char const* zone;
   double falseEastingMeter;
   double falseNorthingMeter;
   double latOriginDegree;
@@ -672,7 +672,7 @@ static const StatePlaneLCC state_plane_lcc_nad83_list[] =
 class StatePlaneTM
 {
 public:
-  StatePlaneTM(short geokey, char* zone, double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor)
+  StatePlaneTM(short geokey, char const* zone, double falseEastingMeter, double falseNorthingMeter, double latOriginDegree, double longMeridianDegree, double scaleFactor)
   {
     this->geokey = geokey;
     this->zone = zone;
@@ -683,7 +683,7 @@ public:
     this->scaleFactor = scaleFactor;
   }
   short geokey;
-  char* zone;
+  char const* zone;
   double falseEastingMeter;
   double falseNorthingMeter;
   double latOriginDegree;
