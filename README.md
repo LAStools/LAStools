@@ -1,4 +1,4 @@
-LAStools: award-winning software for efficient LiDAR processing (with LASzip)
+# LAStools: award-winning software for efficient LiDAR processing (with LASzip)
 
 You find all individual LAStools in the .\LAStools\bin directory. Start
 them by double-clicking or run them in the DOS command line. The ArcGIS
@@ -13,7 +13,7 @@ twitter feed:    http://twitter.com/LAStools
 facebook page:   http://facebook.com/LAStools
 linkedin group:  http://linkedin.com/groups?gid=4408378
 
-open source tools:
+# open source tools:
 
 * laszip.exe compresses the LAS files in a completely lossless manner
 * lasinfo.exe prints out a quick overview of the contents of a LAS file
@@ -53,7 +53,7 @@ closed source tools:
 * las2shp.exe turns binary LAS into ESRI's Shapefile format
 * shp2las.exe turns an ESRI's Shapefile into binary LAS
 
-BLAST extension
+# BLAST extension
 
 * blast2dem.exe rasters like las2dem but with streaming TINs for billions of points. 
 * blast2iso.exe contours like las2iso but with streaming TINs for billions of points. 
