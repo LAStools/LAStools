@@ -75,7 +75,8 @@ class LAStransform
 {
 public:
 
-  U32 transformed_fields; 
+  U32 transformed_fields;
+  F64 registers[16];
 
   void usage() const;
   void clean();

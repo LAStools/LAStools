@@ -1,3 +1,4 @@
+18 June 2020 -- LASlib: firt new LAStransforms that allow 16 temporary registers for intermediate computations
  9 May 2020 -- LASlib and all LAStools: fixed PLY reader for files written by Cloud Compare with odd header entry
 10 March 2020 -- LASlib and all LAStools: enhanced PLY reader to also support "uint" attributes and properties
  9 March 2020 -- LASlib and all LAStools: fixed PLY reader for "double" or "float64" attributes and properties24 February 2020 -- las2las: check horizontal datum when reprojecting and also set OCG WKT when point type >= 6
