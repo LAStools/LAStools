@@ -1,3 +1,6 @@
+13 August 2020 -- lasgrid: added vertical offset to '-subcircle 0.2 -0.1' to keep tree tops
+ 4 August 2020 -- lasthin: added vertical offset to '-subcircle 0.2 -0.1' to keep tree tops
+18 June 2020 -- LASlib: first new LAStransforms that allow 16 temporary registers for intermediate computations
  9 May 2020 -- LASlib and all LAStools: fixed PLY reader for files written by Cloud Compare with odd header entry
 13 March 2020 -- lastile: fixed bug in combination of '-cpu64' and 'external_tiling tiles.shp'
 10 March 2020 -- LASlib and all LAStools: enhanced PLY reader to also support "uint" attributes and properties

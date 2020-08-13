@@ -68,6 +68,17 @@
   '-averages', '-highest', '-lowest', and '-stddev' will have less
   aliasing
 
+  It is also possible to "thicken" your points as you thin them
+  to simulate a diameter for the laser beam. The '-subcircle 0.1'
+  option will replicate each point 8 times in a discrete circle
+  with radius 0.1 around every original input point. This makes
+  sense in combination with '-highest' in order to create a nice
+  set of points for subsequent CHM or DSM construction. By adding
+  a second value '-subcircle 0.2 -0.05' you can lower of raise the
+  z value of the 8 points on the discrete circle by the specified
+  amount, here they would be 0.05 units lower than the original,
+  which might be useful for subsequent tree top detection.
+
   Please license from martin.isenburg@rapidlasso.com to use lasgrid
   commercially.
 
@@ -201,6 +212,7 @@ overview of all tool-specific switches:
 -step 2                : raster with stepsize 2 [default: 1]
 -fill 5                : fills voids in the grid with a square search radius of 5 
 -subcircle 0.2         : each point is "splatted" with a circle of extra 8 points at radius 0.2
+-subcircle 0.2 -0.05   : each point is "splatted" with a circle of extra 8 points at radius 0.2 but 0.05 lower
 -use_bb                : raster full extend of bounding box
 -use_tile_bb           : only raster extend of tile bounding box (for tiles generated with lastile)
 -use_orig_bb           : only raster extend of original bounding box (for tiles generated with '-buffered 30')

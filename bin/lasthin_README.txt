@@ -46,7 +46,11 @@
   option will replicate each point 8 times in a discrete circle
   with radius 0.1 around every original input point. This makes
   sense in combination with '-highest' in order to create a nice
-  set of points for subsequent CHM or DSM construction.
+  set of points for subsequent CHM or DSM construction. By adding
+  a second value '-subcircle 0.2 -0.05' you can lower of raise the
+  z value of the 8 points on the discrete circle by the specified
+  amount, here they would be 0.05 units lower than the original,
+  which might be useful for subsequent tree top detection.
 
   You can exclude certain point classes from the thinning with
   option '-ignore_class 2' or '-ignore_class 3 4 5 6' and they
