@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2020, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    23 September 2020 -- rare fix for truncated LAZ files where seek does not fail
     28 August 2017 -- moving 'context' from global development hack to interface  
     18 July 2017 -- bug fix for spatial-indexed reading of native compressed LAS 1.4 
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 

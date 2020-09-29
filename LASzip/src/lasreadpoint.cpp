@@ -432,7 +432,7 @@ BOOL LASreadPoint::read(U8* const * point)
         init_dec();
         if (current_chunk == tabled_chunks) // no or incomplete chunk table?
         {
-          if (current_chunk == number_chunks)
+          if (current_chunk >= number_chunks)
           {
             number_chunks += 256;
             chunk_starts = (I64*)realloc(chunk_starts, sizeof(I64)*(number_chunks+1));
@@ -655,9 +655,17 @@ BOOL LASreadPoint::read_chunk_table()
   // read the chunk table
   try
   {
+    // seek to where the chunk table
     instream->seek(chunk_table_start_position);
+    // fail if we did not manage to seek there
+    I64 where_are_we_now = instream->tell();
+    if (where_are_we_now != chunk_table_start_position)
+    {
+      throw 1;
+    }
     U32 version;
     instream->get32bitsLE((U8*)&version);
+    // fail if the version is wrong
     if (version != 0)
     {
       throw 1;
