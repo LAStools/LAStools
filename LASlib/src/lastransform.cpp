@@ -804,11 +804,26 @@ class LASoperationCopyUserDataIntoRegister : public LASoperation
 public:
   inline const CHAR* name() const { return "copy_user_data_into_register"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
   inline void transform(LASpoint* point) {
     registers[index] = point->get_user_data();
   };
   LASoperationCopyUserDataIntoRegister(F64* registers, U32 index) { this->registers = registers; this->index = index; };
+private:
+  F64* registers;
+  U32 index;
+};
+
+class LASoperationCopyPointSourceIntoRegister : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_point_source_into_register"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
+  inline void transform(LASpoint* point) {
+    registers[index] = point->get_point_source_ID();
+  };
+  LASoperationCopyPointSourceIntoRegister(F64* registers, U32 index) { this->registers = registers; this->index = index; };
 private:
   F64* registers;
   U32 index;
@@ -1507,6 +1522,21 @@ public:
     point->set_attribute_as_float(index, user_data);
   };
   LASoperationCopyIntensityIntoAttribute(U32 index) { this->index = index; };
+private:
+  U32 index;
+};
+
+class LASoperationCopyZIntoAttribute : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "copy_z_into_attribute"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u ", name(), index); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_Z; };
+  inline void transform(LASpoint* point) {
+    F64 user_data = point->get_z();
+    point->set_attribute_as_float(index, user_data);
+  };
+  LASoperationCopyZIntoAttribute(U32 index) { this->index = index; };
 private:
   U32 index;
 };
@@ -2481,6 +2511,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_attribute 0 1.5\n");
   fprintf(stderr,"  -translate_attribute 1 0.2\n");
   fprintf(stderr,"  -copy_user_data_into_attribute 0\n");
+  fprintf(stderr,"  -copy_z_into_attribute 0\n");
   fprintf(stderr,"  -map_attribute_into_RGB 0 map_height_to_RGB.txt\n");
 }
 
@@ -3624,6 +3655,30 @@ BOOL LAStransform::parse(int argc, char* argv[])
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
       }
+      else if (strncmp(argv[i],"-copy_point_source_", 19) == 0)
+      {
+        if (strcmp(argv[i],"-copy_point_source_into_register") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
+            return FALSE;
+          }
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index but '%s' is no valid index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          if (index >= 16)
+          {
+            fprintf(stderr,"ERROR: '%s' index of register %u is out of valid [0,15] range\n", argv[i], index);
+            return FALSE;
+          }
+          add_operation(new LASoperationCopyPointSourceIntoRegister(registers, index));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+        }
+      }
       else if (strncmp(argv[i],"-copy_scanner_channel_", 19) == 0)
       {
 		    if (strcmp(argv[i],"-copy_scanner_channel_into_point_source") == 0)
@@ -3753,6 +3808,25 @@ BOOL LAStransform::parse(int argc, char* argv[])
         {
           add_operation(new LASoperationCopyClassificationIntoPointSource());
           *argv[i]='\0'; 
+        }
+      }
+      else if (strncmp(argv[i],"-copy_z_", 8) == 0)
+      {
+        if (strcmp(argv[i],"-copy_z_into_attribute") == 0)
+        {
+          if ((i+1) >= argc)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
+            return FALSE;
+          }
+          U32 index;
+          if (sscanf(argv[i+1], "%u", &index) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 1 argument: index but '%s' is no valid index\n", argv[i], argv[i+1]);
+            return FALSE;
+          }
+          add_operation(new LASoperationCopyZIntoAttribute(index));
+          *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
         }
       }
     }
