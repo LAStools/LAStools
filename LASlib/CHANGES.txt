@@ -1,4 +1,8 @@
-23 September 2020 -- LASlib: reader fix for rare bug in truncated LAZ files where seek to end of file does not fail
+10 October 2020 -- LASlib: new '-copy_register_into_R 0', '-copy_register_into_G 1', '-copy_register_into_B 2', '-copy_register_into_NIR 3'
+ 5 October 2020 -- LASlib: new '-scale_NIR 2', '-scale_NIR_down', '-scale_NIR_up', '-scale_NIR_to_8bit', '-scale_NIR_to_16bit'
+ 3 October 2020 -- LASlib: new LAStransforms '-add_registers 0 1 2', '-multiply_registers 0 1 2' and '-translate_register 1 10.7'
+30 September 2020 -- LASlib: new LAStransforms '-copy_register_into_point_source 1' and 'copy_attribute_into_point_source 0'
+23 September 2020 -- LASzip and LASlib: rare fix for reading bit-corrupted LAZ files where chunk table is zeroed
 18 June 2020 -- LASlib: new LAStransforms that allow 16 temporary registers for intermediate computations
  9 May 2020 -- LASlib and all LAStools: fixed PLY reader for files written by Cloud Compare with odd header entry
 10 March 2020 -- LASlib and all LAStools: enhanced PLY reader to also support "uint" attributes and properties
