@@ -1,4 +1,4 @@
-23 September 2020 -- reader fix for rare bug in truncated LAZ files where seek to end of file does not fail
+23 September 2020 -- LASzip and LASlib: rare fix for reading bit-corrupted LAZ files where chunk table is zeroed
 24 December 2019 -- bug fix for file names with special characters like 'Töögrupid.laz'
  9 November 2019 -- upped version to 3.4 revision 3 for selective decompression extra bytes fix
  9 November 2019 -- fix for selective decompression of more than 16 extra bytes in new point types 6 or higher

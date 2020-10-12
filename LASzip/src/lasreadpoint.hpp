@@ -24,7 +24,7 @@
   
   CHANGE HISTORY:
   
-    23 September 2020 -- rare fix for truncated LAZ files where seek does not fail
+    23 September 2020 -- rare fix for bit-corrupted LAZ files where chunk table is zeroed
     28 August 2017 -- moving 'context' from global development hack to interface  
     18 July 2017 -- bug fix for spatial-indexed reading of native compressed LAS 1.4 
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 
