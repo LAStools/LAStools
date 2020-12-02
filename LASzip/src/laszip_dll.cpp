@@ -1204,8 +1204,10 @@ laszip_set_geokeys(
     if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34735, (laszip_U16)(8 + number*8), 0, (laszip_U8*)key_entries_plus_one))
     {
       sprintf(laszip_dll->error, "setting %u geodouble_params", number);
+      delete[] key_entries_plus_one;
       return 1;
     }
+    delete[] key_entries_plus_one;
   }
   catch (...)
   {
