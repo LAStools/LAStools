@@ -19,7 +19,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-13, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2020, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -30,6 +30,9 @@
 
   CHANGE HISTORY:
 
+    11 November 2020 -- new option '-set_vlr_record_id 2 4711'
+    11 November 2020 -- new option '-set_vlr_user_id 1 "hello martin"'
+    10 November 2020 -- new option '-set_vlr_description 0 "hello martin"'
     14 October 2017 -- WARN when bounding box miss-matches coordinate resolution
     16 May 2015 -- new option '-set_GUID F794F8A4-A23E-421E-A134-ACF7754E1C54'
      9 July 2012 -- fixed crash that occured when input had a corrupt VLRs
@@ -257,6 +260,14 @@ int main(int argc, char *argv[])
 	I8* set_generating_software = 0;
 	I32 set_creation_day = -1;
 	I32 set_creation_year = -1;
+  I32 set_vlr_user_id_index = -1;
+  const CHAR* set_vlr_user_id = 0;
+  I32 set_vlr_record_id_index = -1;
+  I32 set_vlr_record_id = 0;
+  I32 set_vlr_description_index = -1;
+  const CHAR* set_vlr_description = 0;
+//  I32 set_evlr_description_index = -1;
+//  const CHAR* set_evlr_description = 0;
   U16 set_header_size = 0;
   U32 set_offset_to_point_data = 0;
   I32 set_number_of_variable_length_records = -1;
@@ -820,6 +831,105 @@ int main(int argc, char *argv[])
         set_start_of_waveform_data_packet_record = atoi(argv[i]);
         edit_header = true;
       }
+      else if (strcmp(argv[i],"-set_vlr_user_id") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index user_id\n", argv[i]);
+          byebye(true);
+        }
+        if (sscanf(argv[i+1], "%d", &set_vlr_user_id_index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index user_ID but '%s' is no valid index\n", argv[i], argv[i+1]);
+          byebye(true);
+        }
+        if ((set_vlr_user_id_index < 0) || (set_vlr_user_id_index > U16_MAX))
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index user_ID, but index %d is out of range\n", argv[i], set_vlr_user_id_index);
+          byebye(true);
+        }
+			  i++;
+			  i++;
+        set_vlr_user_id = argv[i];
+        edit_header = true;
+		  }
+      else if (strcmp(argv[i],"-set_vlr_record_id") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID\n", argv[i]);
+          byebye(true);
+        }
+        if (sscanf(argv[i+1], "%d", &set_vlr_record_id_index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID but '%s' is no valid index\n", argv[i], argv[i+1]);
+          byebye(true);
+        }
+        if ((set_vlr_record_id_index < 0) || (set_vlr_record_id_index > U16_MAX))
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID, but index %d is out of range\n", argv[i], set_vlr_record_id_index);
+          byebye(true);
+        }
+        if (sscanf(argv[i+2], "%d", &set_vlr_record_id) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID but '%s' is no valid record ID\n", argv[i], argv[i+2]);
+          byebye(true);
+        }
+        if ((set_vlr_record_id < 0) || (set_vlr_record_id > U16_MAX))
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID, but record_ID %d is out of range\n", argv[i], set_vlr_record_id_index);
+          byebye(true);
+        }
+			  i++;
+			  i++;
+        edit_header = true;
+		  }
+      else if (strcmp(argv[i],"-set_vlr_description") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description\n", argv[i]);
+          byebye(true);
+        }
+        if (sscanf(argv[i+1], "%d", &set_vlr_description_index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description but '%s' is no valid index\n", argv[i], argv[i+1]);
+          byebye(true);
+        }
+        if ((set_vlr_description_index < 0) || (set_vlr_description_index > U16_MAX))
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description, but index %d is out of range\n", argv[i], set_vlr_description_index);
+          byebye(true);
+        }
+			  i++;
+			  i++;
+        set_vlr_description = argv[i];
+        edit_header = true;
+		  }
+/*
+      else if (strcmp(argv[i],"-set_evlr_description") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description\n", argv[i]);
+          byebye(true);
+        }
+        if (sscanf(argv[i+1], "%d", &set_evlr_description_index) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description but '%s' is no valid index\n", argv[i], argv[i+1]);
+          byebye(true);
+        }
+        if ((set_evlr_description_index < 0) || (set_evlr_description_index > U16_MAX))
+        {
+          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description, but index %d is out of range\n", argv[i], set_vlr_description_index);
+          byebye(true);
+        }
+			  i++;
+			  i++;
+        set_evlr_description = argv[i];
+        edit_header = true;
+		  }
+*/
       else if (strcmp(argv[i],"-set_geotiff_epsg") == 0)
       {
         if ((i+1) >= argc)
@@ -1065,6 +1175,84 @@ int main(int argc, char *argv[])
         lasreader->close();
         delete lasreader;
       }
+      I64 set_vlr_user_id_pos = -1;
+      if (set_vlr_user_id_index != -1)
+      {
+        LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+        if (lasreader == 0)
+        {
+          fprintf(stderr, "ERROR: cannot open lasreader for '%s'\n", file_name);
+          byebye(true, argc==1);
+        }
+        if (set_vlr_user_id_index < (I32)lasreader->header.number_of_variable_length_records)
+        {
+          I64 pos = lasreader->header.header_size;
+          for (i = 0; i < (int)set_vlr_user_id_index; i++)
+          {
+            pos += 54;
+            pos += lasreader->header.vlrs[i].record_length_after_header;
+          }
+          set_vlr_user_id_pos = pos + 2;
+        }
+        else
+        {
+          fprintf(stderr, "SKIPPING: cannot set user_ID of VLR with index %d for file '%s'\n", set_vlr_user_id_index, file_name);
+        }
+        lasreader->close();
+        delete lasreader;
+      }
+      I64 set_vlr_record_id_pos = -1;
+      if (set_vlr_record_id_index != -1)
+      {
+        LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+        if (lasreader == 0)
+        {
+          fprintf(stderr, "ERROR: cannot open lasreader for '%s'\n", file_name);
+          byebye(true, argc==1);
+        }
+        if (set_vlr_record_id_index < (I32)lasreader->header.number_of_variable_length_records)
+        {
+          I64 pos = lasreader->header.header_size;
+          for (i = 0; i < (int)set_vlr_record_id_index; i++)
+          {
+            pos += 54;
+            pos += lasreader->header.vlrs[i].record_length_after_header;
+          }
+          set_vlr_record_id_pos = pos + 18;
+        }
+        else
+        {
+          fprintf(stderr, "SKIPPING: cannot set record_ID of VLR with index %d for file '%s'\n", set_vlr_record_id_index, file_name);
+        }
+        lasreader->close();
+        delete lasreader;
+      }
+      I64 set_vlr_description_pos = -1;
+      if (set_vlr_description_index != -1)
+      {
+        LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+        if (lasreader == 0)
+        {
+          fprintf(stderr, "ERROR: cannot open lasreader for '%s'\n", file_name);
+          byebye(true, argc==1);
+        }
+        if (set_vlr_description_index < (I32)lasreader->header.number_of_variable_length_records)
+        {
+          I64 pos = lasreader->header.header_size;
+          for (i = 0; i < (int)set_vlr_description_index; i++)
+          {
+            pos += 54;
+            pos += lasreader->header.vlrs[i].record_length_after_header;
+          }
+          set_vlr_description_pos = pos + 22;
+        }
+        else
+        {
+          fprintf(stderr, "SKIPPING: cannot set desciption of VLR with index %d for file '%s'\n", set_vlr_description_index, file_name);
+        }
+        lasreader->close();
+        delete lasreader;
+      }
       I64 set_geotiff_vlr_geo_keys_pos = -1;
       U32 set_geotiff_vlr_geo_keys_length = 0;
       I64 set_geotiff_vlr_geo_double_pos = -1;
@@ -1250,6 +1438,53 @@ int main(int argc, char *argv[])
         {
           fseek(file, 227, SEEK_SET);
           fwrite(&set_start_of_waveform_data_packet_record, sizeof(I64), 1, file);
+        }
+        if (set_vlr_user_id_index != -1)
+        {
+          if (set_vlr_user_id_pos != -1)
+          {
+            fseek(file,(long)set_vlr_user_id_pos, SEEK_SET);
+            I32 len = (I32)strlen(set_vlr_user_id);
+            for (i = 0; i < 16; i++)
+            {
+              if (i < len)
+              {
+                fputc(set_vlr_user_id[i], file);
+              }
+              else
+              {
+                fputc(0, file);
+              }
+            }
+          }
+        }
+        if (set_vlr_record_id_index != -1)
+        {
+          if (set_vlr_record_id_pos != -1)
+          {
+            fseek(file,(long)set_vlr_record_id_pos, SEEK_SET);
+            U16 record_id = (U16)set_vlr_record_id;
+            fwrite(&record_id, sizeof(U16), 1, file);
+          }
+        }
+        if (set_vlr_description_index != -1)
+        {
+          if (set_vlr_description_pos != -1)
+          {
+            fseek(file,(long)set_vlr_description_pos, SEEK_SET);
+            I32 len = (I32)strlen(set_vlr_description);
+            for (i = 0; i < 32; i++)
+            {
+              if (i < len)
+              {
+                fputc(set_vlr_description[i], file);
+              }
+              else
+              {
+                fputc(0, file);
+              }
+            }
+          }
         }
         if (set_geotiff_epsg != -1)
         {
