@@ -814,7 +814,7 @@ static const StatePlaneTM state_plane_tm_nad83_list[] =
 static const short EPSG_CH1903_LV03 = 21781;
 static const short EPSG_EOV_HD72 = 23700;
 
-bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, const GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description)
+bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, const GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description, bool source)
 {
   bool user_defined_ellipsoid = false;
   int user_defined_projection = 0;
@@ -861,7 +861,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
       has_projection = set_GTModelTypeGeoKey(geo_keys[i].value_offset, description);
       break;
     case 3072: // ProjectedCSTypeGeoKey
-      has_projection = set_ProjectedCSTypeGeoKey(geo_keys[i].value_offset, description);
+      has_projection = set_ProjectedCSTypeGeoKey(geo_keys[i].value_offset, description, source);
       break;
     case 3076: // ProjLinearUnitsGeoKey
       set_ProjLinearUnitsGeoKey(geo_keys[i].value_offset);
@@ -1257,7 +1257,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
         double longMeridianDeg = geo_double_params[offsetProjCenterLongGeoKey];
         double scaleFactor = geo_double_params[offsetProjScaleAtNatOriginGeoKey];
-        set_transverse_mercator_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longMeridianDeg, scaleFactor);
+        set_transverse_mercator_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longMeridianDeg, scaleFactor, 0, source);
         if (description)
         {
           sprintf(description, "generic transverse mercator");
@@ -1281,7 +1281,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         if ((longOriginDeg == 0.0) && (offsetProjNatOriginLongGeoKey >= 0)) longOriginDeg = geo_double_params[offsetProjNatOriginLongGeoKey];
         double firstStdParallelDeg = geo_double_params[offsetProjStdParallel1GeoKey];
         double secondStdParallelDeg = geo_double_params[offsetProjStdParallel2GeoKey];
-        set_lambert_conformal_conic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg);
+        set_lambert_conformal_conic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg, 0, source);
         if (description)
         {
           sprintf(description, "generic lambert conformal conic");
@@ -1305,7 +1305,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         if ((longOriginDeg == 0.0) && (offsetProjNatOriginLongGeoKey >= 0)) longOriginDeg = geo_double_params[offsetProjNatOriginLongGeoKey];
         double firstStdParallelDeg = geo_double_params[offsetProjStdParallel1GeoKey];
         double secondStdParallelDeg = geo_double_params[offsetProjStdParallel2GeoKey];
-        set_albers_equal_area_conic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg);
+        set_albers_equal_area_conic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg, 0, source);
         if (description)
         {
           sprintf(description, "generic albers equal area");
@@ -1326,7 +1326,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
         double longMeridianDeg = ((offsetProjCenterLongGeoKey >= 0) ? geo_double_params[offsetProjCenterLongGeoKey] : geo_double_params[offsetProjNatOriginLongGeoKey]);
         double scaleFactor = geo_double_params[offsetProjScaleAtNatOriginGeoKey];
-        set_oblique_stereographic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longMeridianDeg, scaleFactor);
+        set_oblique_stereographic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longMeridianDeg, scaleFactor, 0, source);
         if (description)
         {
           sprintf(description, "generic oblique stereographic");
@@ -1350,7 +1350,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         double azimuthDeg = geo_double_params[offsetProjAzimuthAngleGeoKey];
         double rectifiedGridAngleDeg = (offsetProjRectifiedGridAngleGeoKey >= 0 ? geo_double_params[offsetProjRectifiedGridAngleGeoKey] : azimuthDeg);
         double scaleFactor = geo_double_params[offsetProjScaleAtCenterGeoKey];
-        set_hotine_oblique_mercator_projection(falseEastingMeter, falseNorthingMeter, latCenterDeg, longCenterDeg, azimuthDeg, rectifiedGridAngleDeg, scaleFactor);
+        set_hotine_oblique_mercator_projection(falseEastingMeter, falseNorthingMeter, latCenterDeg, longCenterDeg, azimuthDeg, rectifiedGridAngleDeg, scaleFactor, 0, source);
         if (description)
         {
           sprintf(description, "generic hotine oblique mercator");
@@ -3648,7 +3648,7 @@ double GeoProjectionConverter::get_GeogPrimeMeridianLongGeoKey() const
   return 0;
 }
 
-bool GeoProjectionConverter::set_ProjectedCSTypeGeoKey(short value, char* description)
+bool GeoProjectionConverter::set_ProjectedCSTypeGeoKey(short value, char* description, bool source)
 {
   if (value == 32767)
   {
@@ -3658,7 +3658,7 @@ bool GeoProjectionConverter::set_ProjectedCSTypeGeoKey(short value, char* descri
     }
     return true;
   }
-  else if (set_epsg_code(value, description))
+  else if (set_epsg_code(value, description, source))
   {
     return true;
   }
@@ -4851,6 +4851,25 @@ bool GeoProjectionConverter::set_longlat_projection(char* description, bool sour
     sprintf(description, "%s", longlat->name);
   }
   return true;
+}
+
+bool GeoProjectionConverter::is_longlat_projection(bool source) const
+{
+  if (source)
+  {
+    if (source_projection)
+    {
+      return (source_projection->type == GEO_PROJECTION_LONG_LAT);
+    }
+  }
+  else
+  {
+    if (target_projection)
+    {
+      return (target_projection->type == GEO_PROJECTION_LONG_LAT);
+    }
+  }
+  return false;
 }
 
 bool GeoProjectionConverter::set_ecef_projection(char* description, bool source, const char* name)
@@ -8449,6 +8468,11 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
   return false;
 }
 
+bool GeoProjectionConverter::has_target_precision() const
+{
+  return (target_precision ? true : false);
+}
+
 double GeoProjectionConverter::get_target_precision() const
 {
   if (target_precision)
@@ -8465,6 +8489,11 @@ double GeoProjectionConverter::get_target_precision() const
 void GeoProjectionConverter::set_target_precision(double target_precision)
 {
   this->target_precision = target_precision;
+}
+
+bool GeoProjectionConverter::has_target_elevation_precision() const
+{
+  return (target_elevation_precision ? true : false);
 }
 
 double GeoProjectionConverter::get_target_elevation_precision() const

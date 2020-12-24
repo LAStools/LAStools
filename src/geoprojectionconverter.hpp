@@ -285,7 +285,7 @@ public:
 
   // set & get current projection
 
-  bool set_projection_from_geo_keys(int num_geo_keys, const GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description=0);
+  bool set_projection_from_geo_keys(int num_geo_keys, const GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description=0, bool source=true);
   bool get_geo_keys_from_projection(int& num_geo_keys, GeoProjectionGeoKeys** geo_keys, int& num_geo_double_params, double** geo_double_params, bool source=true);
   bool set_projection_from_ogc_wkt(const char* ogc_wkt, char* description=0);
   bool get_ogc_wkt_from_projection(int& len, char** ogc_wkt, bool source=true);
@@ -309,7 +309,7 @@ public:
   bool set_GTModelTypeGeoKey(short value, char* description=0);
   short get_GTModelTypeGeoKey() const;
 
-  bool set_ProjectedCSTypeGeoKey(short value, char* description=0);
+  bool set_ProjectedCSTypeGeoKey(short value, char* description=0, bool source=true);
   short get_ProjectedCSTypeGeoKey(bool source=true) const;
 
   int set_GeogEllipsoidGeoKey(short value);
@@ -334,6 +334,7 @@ public:
   bool set_no_projection(char* description=0, bool source=true);
   bool set_latlong_projection(char* description=0, bool source=true);
   bool set_longlat_projection(char* description=0, bool source=true);
+  bool is_longlat_projection(bool source=true) const;
 
   bool set_ecef_projection(char* description, bool source=true, const char* name=0);
 
@@ -425,9 +426,11 @@ public:
   bool to_target(double* point) const;
   bool to_target(const double* point, double& x, double& y, double& elevation) const;
 
+  bool has_target_precision() const;
   double get_target_precision() const;
   void set_target_precision(double target_precision);
 
+  bool has_target_elevation_precision() const;
   double get_target_elevation_precision() const;
   void set_target_elevation_precision(double target_elevation_precision);
 
