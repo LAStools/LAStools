@@ -1923,6 +1923,9 @@ int main(int argc, char *argv[])
                   case 4283: // GCS_GDA94
                     fprintf(file_out, "GeographicTypeGeoKey: GCS_GDA94\012");
                     break;
+                  case 4312: // GCS_MGI
+                    fprintf(file_out, "GeographicTypeGeoKey: GCS_MGI\012");
+                    break;
                   case 4322: // GCS_WGS_72
                     fprintf(file_out, "GeographicTypeGeoKey: GCS_WGS_72\012");
                     break;
