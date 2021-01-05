@@ -1,3 +1,8 @@
+22 November 2020 -- las2las: when reprojecting only x and y, preserve resolution of z coordinate, if not set explicitely
+11 November 2020 -- lasinfo: new option '-set_vlr_record_id 2 4711' changes 'record ID' field of VLR with index 2
+11 November 2020 -- lasinfo: new option '-set_vlr_user_id 1 "hello martin"' changes 'user ID' field of VLR with index 1
+10 November 2020 -- lasinfo: new option '-set_vlr_description 0 "hello martin"' changes 'description' field of VLR with index 0
+30 October 2020 -- las2las: fail / exit with error code when input file is corrupt
 10 October 2020 -- LASlib: new '-copy_register_into_R 0', '-copy_register_into_G 1', '-copy_register_into_B 2', '-copy_register_into_NIR 3'
  5 October 2020 -- LASlib: new '-scale_NIR 2', '-scale_NIR_down', '-scale_NIR_up', '-scale_NIR_to_8bit', '-scale_NIR_to_16bit'
  3 October 2020 -- LASlib: new LAStransforms '-add_registers 0 1 2', '-multiply_registers 0 1 2' and '-translate_register 1 10.7'
