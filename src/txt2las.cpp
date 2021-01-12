@@ -707,19 +707,16 @@ int main(int argc, char *argv[])
     memset(lasreader->header.generating_software, 0, 32);
     if (set_generating_software)
     {
-      strncpy(lasreader->header.generating_software, set_generating_software, 32);
+      snprintf(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), "%s", set_generating_software);
     }
     else
     {
-      char temp[64];
 #ifdef _WIN64
-      sprintf(temp, "txt2las64 (version %d)", LAS_TOOLS_VERSION);
+      snprintf(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), "txt2las64 (version %d)", LAS_TOOLS_VERSION);
 #else // _WIN64
-      sprintf(temp, "txt2las (version %d)", LAS_TOOLS_VERSION);
+      snprintf(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), "txt2las (version %d)", LAS_TOOLS_VERSION);
 #endif // _WIN64
-      strncpy(lasreader->header.generating_software, temp, 32);
     }
-    lasreader->header.generating_software[31] = '\0';
 
     // maybe set global encoding
 

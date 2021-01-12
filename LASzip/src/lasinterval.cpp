@@ -208,7 +208,7 @@ BOOL LASinterval::merge_cells(const U32 num_indices, const I32* indices, const I
 // merge adjacent intervals with small gaps in cells to reduce total interval number to maximum
 void LASinterval::merge_intervals(U32 maximum_intervals, const BOOL verbose)
 {
-  U32 diff;
+  U32 diff = 0;
   LASintervalCell* cell;
   LASintervalCell* delete_cell;
 

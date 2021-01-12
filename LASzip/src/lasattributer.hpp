@@ -76,8 +76,9 @@ public:
     memset(this, 0, sizeof(LASattribute));
     scale[0] = scale[1] = scale[2] = 1.0;
     this->data_type = type+1;
-    strncpy(this->name, name, 32);
-    if (description) strncpy(this->description, description, 32);
+    snprintf(this->name, sizeof(this->name), "%s", name);
+    if (description)
+        snprintf(this->description, sizeof(this->description), "%s", description);
   };
 
   inline BOOL set_no_data(U8  no_data) { if (0 == get_type()) { this->no_data[0].u64 = no_data; options |= 0x01; return TRUE; } return FALSE; };

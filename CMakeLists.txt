@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project("LAStools")
 
 if (NOT MSVC)
-	add_compile_options(-O3 -Wall -Wextra)
+	add_compile_options(-O3 -Wall -Wextra -Wno-deprecated-copy -Wno-unused)
 else()
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()

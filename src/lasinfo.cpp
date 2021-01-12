@@ -622,7 +622,7 @@ int main(int argc, char *argv[])
 			  i++;
 			  set_system_identifier = new I8[32];
         memset(set_system_identifier, 0, 32);
-        strncpy(set_system_identifier, argv[i], 32);
+        snprintf(set_system_identifier, 32, "%s", argv[i]);
         edit_header = true;
 		  }
       else if (strcmp(argv[i],"-set_generating_software") == 0)
@@ -635,7 +635,7 @@ int main(int argc, char *argv[])
 			  i++;
 			  set_generating_software = new I8[32];
         memset(set_generating_software, 0, 32);
-        strncpy(set_generating_software, argv[i], 32);
+        snprintf(set_generating_software, 32, "%s", argv[i]);
         edit_header = true;
 		  }
       else if (strcmp(argv[i],"-set_bb") == 0 || strcmp(argv[i],"-set_bounding_box") == 0)
