@@ -36,6 +36,7 @@
 #define LAS_WRITE_ITEM_RAW_HPP
 
 #include "laswriteitem.hpp"
+#include "string.h"
 
 #include <assert.h>
 
@@ -245,11 +246,11 @@ public:
       ((LAStempWritePoint14*)buffer)->number_of_returns = ((LAStempWritePoint10*)item)->number_of_returns;
       ((LAStempWritePoint14*)buffer)->scan_angle = I16_QUANTIZE(((LAStempWritePoint10*)item)->scan_angle_rank/0.006f);
     }
-
-    *((F64*)&buffer[22]) = ((LAStempWritePoint10*)item)->gps_time;
+	memcpy(&buffer[22], &((LAStempWritePoint10*)item)->gps_time, 8);
     return outstream->putBytes(buffer, 30);
   }
 private:
+
   U8 buffer[30];
 };
 
