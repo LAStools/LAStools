@@ -317,6 +317,9 @@ int main(int argc, char *argv[])
   int remove_extended_variable_length_record = -1;
   int remove_extended_variable_length_record_from = -1;
   int remove_extended_variable_length_record_to = -1;
+  CHAR* add_empty_vlr_user_ID = 0;
+  int add_empty_vlr_record_ID = -1;
+  CHAR* add_empty_vlr_description = 0;
   bool move_evlrs_to_vlrs = false;
   bool save_vlrs = false;
   bool load_vlrs = false;
@@ -820,6 +823,22 @@ int main(int argc, char *argv[])
         {
           lasreadopener.add_attribute(atoi(argv[i+1]), argv[i+2], argv[i+3]);
           i+=3;
+        }
+      }
+      else if (strcmp(argv[i],"-add_empty_vlr") == 0)
+      {
+        if ((i+2) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs at least 2 arguments: user_ID and record_ID\n", argv[i]);
+          usage(true);
+        }
+        add_empty_vlr_user_ID = argv[i+1];
+        add_empty_vlr_record_ID = atoi(argv[i+2]);
+        i+=2;
+        if (((i+1) < argc) && (argv[i+1][0] != '-'))
+        {
+          add_empty_vlr_description = argv[i+1];
+          i+=1;
         }
       }
       else
@@ -1783,6 +1802,11 @@ int main(int argc, char *argv[])
       if (load_vlrs)
       {
         load_vlrs_from_file(&lasreader->header);
+      }
+
+      if (add_empty_vlr_user_ID != 0)
+      {
+        lasreader->header.add_vlr(add_empty_vlr_user_ID, add_empty_vlr_record_ID, 0, 0, (add_empty_vlr_description ? FALSE : TRUE) , add_empty_vlr_description);
       }
 
       // do we need an extra pass
