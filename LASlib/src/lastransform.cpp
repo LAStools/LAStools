@@ -816,6 +816,23 @@ private:
   U32 output;
 };
 
+class LASoperationSubtractRegisters : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "subtract_registers"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %u %u ", name(), input1, input2, output); };
+  inline void transform(LASpoint* point) {
+    F64 result = registers[input1] - registers[input2];  
+    registers[output] = result;
+  };
+  LASoperationSubtractRegisters(F64* registers, U32 input1, U32 input2, U32 output) { this->registers = registers; this->input1 = input1; this->input2 = input2; this->output = output; };
+private:
+  F64* registers;
+  U32 input1;
+  U32 input2;
+  U32 output;
+};
+
 class LASoperationMultiplyRegisters : public LASoperation
 {
 public:
@@ -826,6 +843,23 @@ public:
     registers[output] = result;
   };
   LASoperationMultiplyRegisters(F64* registers, U32 input1, U32 input2, U32 output) { this->registers = registers; this->input1 = input1; this->input2 = input2; this->output = output; };
+private:
+  F64* registers;
+  U32 input1;
+  U32 input2;
+  U32 output;
+};
+
+class LASoperationDivideRegisters : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "divide_registers"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %u %u %u ", name(), input1, input2, output); };
+  inline void transform(LASpoint* point) {
+    F64 result = registers[input1] / registers[input2];  
+    registers[output] = result;
+  };
+  LASoperationDivideRegisters(F64* registers, U32 input1, U32 input2, U32 output) { this->registers = registers; this->input1 = input1; this->input2 = input2; this->output = output; };
 private:
   F64* registers;
   U32 input1;
@@ -2557,12 +2591,6 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_scan_angle 1.944445\n");
   fprintf(stderr,"  -translate_scan_angle -5\n");
   fprintf(stderr,"  -translate_then_scale_scan_angle -0.5 2.1\n");
-  fprintf(stderr,"Transform register.\n");
-  fprintf(stderr,"  -copy_attribute_into_register 0 0\n");
-  fprintf(stderr,"  -scale_register 0 1.5\n");
-  fprintf(stderr,"  -translate_register 1 10.7\n");
-  fprintf(stderr,"  -add_registers 0 1 3\n");
-  fprintf(stderr,"  -multiply_registers 0 1 2\n");
   fprintf(stderr,"Change the return number or return count of points.\n");
   fprintf(stderr,"  -repair_zero_returns\n");
   fprintf(stderr,"  -set_return_number 1\n");
@@ -2650,11 +2678,17 @@ void LAStransform::usage() const
   fprintf(stderr,"  -copy_z_into_attribute 0\n");
   fprintf(stderr,"  -map_attribute_into_RGB 0 map_height_to_RGB.txt\n");
   fprintf(stderr,"Transform using \"LASregisters\".\n");
+  fprintf(stderr,"  -copy_attribute_into_register 0 0\n");
+  fprintf(stderr,"  -scale_register 0 1.5\n");
+  fprintf(stderr,"  -translate_register 1 10.7\n");
+  fprintf(stderr,"  -add_registers 0 1 3\n");
+  fprintf(stderr,"  -multiply_registers 0 1 2\n");
   fprintf(stderr,"  -copy_intensity_into_register 0\n");
   fprintf(stderr,"  -copy_R_into_register 1\n");
   fprintf(stderr,"  -copy_G_into_register 2\n");
   fprintf(stderr,"  -copy_B_into_register 3\n");
   fprintf(stderr,"  -copy_NIR_into_register 4\n");
+  fprintf(stderr,"  -copy_register_into_intensity 1\n");
 }
 
 BOOL LAStransform::parse(int argc, char* argv[])
@@ -6006,6 +6040,98 @@ BOOL LAStransform::parse(int argc, char* argv[])
           add_operation(new LASoperationMultiplyScaledIntensityIntoRGB(3, scale));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
+      }
+    }
+    else if (strncmp(argv[i],"-subtract_", 10) == 0)
+    {
+      if (strcmp(argv[i],"-subtract_registers") == 0)
+      {
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output\n", argv[i]);
+          return FALSE;
+        }
+        U32 input1;
+        if (sscanf(argv[i+1], "%u", &input1) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (input1 > 15)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1\n", argv[i], input1);
+          return FALSE;
+        }
+        U32 input2;
+        if (sscanf(argv[i+2], "%u", &input2) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (input2 > 15)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2\n", argv[i], input2);
+          return FALSE;
+        }
+        U32 output;
+        if (sscanf(argv[i+3], "%u", &output) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3\n", argv[i], argv[i+3]);
+          return FALSE;
+        }
+        if (output > 15)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output\n", argv[i], output);
+          return FALSE;
+        }
+        add_operation(new LASoperationSubtractRegisters(registers, input1, input2, output));
+        *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+      }
+    }
+    else if (strncmp(argv[i],"-divide_", 8) == 0)
+    {
+      if (strcmp(argv[i],"-divide_registers") == 0)
+      {
+        if ((i+3) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output\n", argv[i]);
+          return FALSE;
+        }
+        U32 input1;
+        if (sscanf(argv[i+1], "%u", &input1) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (input1 > 15)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1\n", argv[i], input1);
+          return FALSE;
+        }
+        U32 input2;
+        if (sscanf(argv[i+2], "%u", &input2) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2\n", argv[i], argv[i+2]);
+          return FALSE;
+        }
+        if (input2 > 15)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2\n", argv[i], input2);
+          return FALSE;
+        }
+        U32 output;
+        if (sscanf(argv[i+3], "%u", &output) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3\n", argv[i], argv[i+3]);
+          return FALSE;
+        }
+        if (output > 15)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output\n", argv[i], output);
+          return FALSE;
+        }
+        add_operation(new LASoperationDivideRegisters(registers, input1, input2, output));
+        *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
       }
     }
   }
