@@ -337,6 +337,7 @@ public:
   bool is_longlat_projection(bool source=true) const;
 
   bool set_ecef_projection(char* description, bool source=true, const char* name=0);
+  bool is_ecef_projection(bool source=true) const;
 
   bool set_target_utm_projection(char* description, const char* name=0);
   bool set_utm_projection(char* zone, char* description=0, bool source=true, const char* name=0, bool is_mga=false);

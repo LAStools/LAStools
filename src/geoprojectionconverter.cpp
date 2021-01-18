@@ -4893,6 +4893,25 @@ bool GeoProjectionConverter::set_ecef_projection(char* description, bool source,
   return true;
 }
 
+bool GeoProjectionConverter::is_ecef_projection(bool source) const
+{
+  if (source)
+  {
+    if (source_projection)
+    {
+      return (source_projection->type == GEO_PROJECTION_ECEF);
+    }
+  }
+  else
+  {
+    if (target_projection)
+    {
+      return (target_projection->type == GEO_PROJECTION_ECEF);
+    }
+  }
+  return false;
+}
+
 bool GeoProjectionConverter::set_utm_projection(char* zone, char* description, bool source, const char* name, bool is_mga)
 {
   int zone_number;
