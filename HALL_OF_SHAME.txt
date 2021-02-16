@@ -27,8 +27,8 @@ We list agencies or portals that are distributers of "locked-up LiDAR"
 and promote proprietary LiDAR formats by providing raw "pseudo-open" point
 clouds exclusively in closed formats such as *.sid, *.zlas, *.rar, ... 
 
-We are always taking new "HALL OF SHAME" nominations ... (-;
-
+Please let us know once you have corrected your course and should be removed
+from the HALL. We are always taking new "HALL OF SHAME" nominations ... (-;
 
 [1] http://rapidlasso.com/2015/04/20/new-lasliberator-frees-lidar-from-closed-format/
 [2] http://github.com/LASliberator
