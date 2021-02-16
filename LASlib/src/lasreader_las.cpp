@@ -412,6 +412,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
   // read the variable length records into the header
 
   U32 vlrs_size = 0;
+  BOOL vlrs_corrupt = FALSE;
 
   if (header.number_of_variable_length_records)
   {
@@ -425,6 +426,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
       {
         fprintf(stderr,"WARNING: only %d bytes until point block after reading %d of %d vlrs. skipping remaining vlrs ...\n", (int)header.offset_to_point_data - vlrs_size - header.header_size, i, header.number_of_variable_length_records);
         header.number_of_variable_length_records = i;
+        vlrs_corrupt = TRUE;
         break;
       }
 
@@ -1262,8 +1264,16 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
   {
     if (!header.laszip)
     {
-      fprintf(stderr,"ERROR: this file was compressed with an experimental version of laszip\n");
-      fprintf(stderr,"ERROR: please contact 'martin.isenburg@rapidlasso.com' for assistance.\n");
+      if (vlrs_corrupt)
+      {
+        fprintf(stderr,"ERROR: your LAZ file has corruptions in the LAS header resulting in\n");
+        fprintf(stderr,"ERROR: the laszip VLR being lost. maybe your download failed?\n");
+      }
+      else
+      {
+        fprintf(stderr,"ERROR: this file was compressed with an experimental version of laszip\n");
+        fprintf(stderr,"ERROR: please contact 'martin.isenburg@rapidlasso.com' for assistance.\n");
+      }
       return FALSE;
     }
     header.point_data_format &= 127;
