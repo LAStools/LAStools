@@ -1890,6 +1890,17 @@ private:
   U16 RGB[3];
 };
 
+class LASoperationSetNIR : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "set_NIR"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), value); };
+  inline void transform(LASpoint* point) { point->set_NIR(value); };
+  LASoperationSetNIR(U16 value) { this->value = value; };
+private:
+  U16 value;
+};
+
 class LASoperationSetRGBofExtendedClass : public LASoperation
 {
 public:
@@ -2659,6 +2670,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_RGB_up (by 256)\n");
   fprintf(stderr,"  -scale_RGB_to_8bit (only scales down 16 bit values)\n");
   fprintf(stderr,"  -scale_RGB_to_16bit (only scales up 8 bit values)\n");
+  fprintf(stderr,"  -set_NIR 65535\n");
   fprintf(stderr,"  -scale_NIR 2\n");
   fprintf(stderr,"  -scale_NIR_down (by 256)\n");
   fprintf(stderr,"  -scale_NIR_up (by 256)\n");
@@ -4598,6 +4610,27 @@ BOOL LAStransform::parse(int argc, char* argv[])
           }
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4;
         }
+      }
+      else if (strcmp(argv[i],"-set_NIR") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
+          return FALSE;
+        }
+        U32 value;
+        if (sscanf(argv[i+1], "%u", &value) != 1)
+        {
+          fprintf(stderr,"ERROR: '%s' needs 1 argument: value but '%s' is not valid\n", argv[i], argv[i+1]);
+          return FALSE;
+        }
+        if (value > U16_MAX)
+        {
+          fprintf(stderr,"ERROR: cannot set NIR because value is %u, which is larger than %u\n", value, U16_MAX);
+          return FALSE;
+        }
+        add_operation(new LASoperationSetNIR((U16)value));
+        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
       else if (strcmp(argv[i],"-set_scan_direction_flag") == 0)
       {
