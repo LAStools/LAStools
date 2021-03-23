@@ -3324,6 +3324,11 @@ void LASreadOpener::set_scale_scan_angle(const F32 scale)
 
 void LASreadOpener::add_attribute(I32 data_type, const CHAR* name, const CHAR* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset, F64 no_data)
 {
+  if ((data_type < 1) || (data_type > 10))
+  {
+    fprintf(stderr,"WARNING: attribute data type %d not supported. ignoring attribute '%s'.\n", data_type, name);
+    return;
+  }
   attribute_data_types[number_attributes] = data_type;
   attribute_names[number_attributes] = (name ? LASCopyString(name) : 0);
   attribute_descriptions[number_attributes] = (description ? LASCopyString(description) : 0);
