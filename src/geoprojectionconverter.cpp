@@ -5567,7 +5567,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             if (description) sprintf(description, "%s", name);
             return true;
           }
-          else if (transform == 9812) // CT_HotineObliqueMercator
+          else if (transform == 9812 || transform == 9815) // CT_HotineObliqueMercator (or CT_ObliqueMercator)
           {
             double false_easting;
             int unit_false_easting;
