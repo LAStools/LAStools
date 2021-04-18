@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2021, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include <map>
 #include <set>
@@ -99,6 +100,71 @@ public:
   LAScriterionKeepxyz(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y, F64 max_z) { this->min_x = min_x; this->min_y = min_y; this->min_z = min_z; this->max_x = max_x; this->max_y = max_y; this->max_z = max_z; };
 private:
   F64 min_x, min_y, min_z, max_x, max_y, max_z;
+};
+
+class LAScriterionKeepProfile : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_profile"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf %lf %lf ", name(), x1, y1, x2, y2, w); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    F64 x0 = point->get_x();
+    F64 y0 = point->get_y();
+
+    F64 rx = x1 - x0;
+    F64 ry = y1 - y0;
+
+    F64 divisor = ((-vy) * ry) - (rx * vx);
+          
+    F64 d = divisor / divider;
+
+    if ((d < -wm) || (wm < d))
+    {
+      return TRUE;
+    }
+    else
+    {
+      F64 rxm = xm - x0;
+      F64 rym = ym - y0;
+
+      F64 divisorm = (-vx * rym) - (rxm * (-vy));         
+      F64 dm = divisorm / divider;
+
+      if ((dm < -dividerm) || (dividerm < dm))
+      {
+        return TRUE;
+      }
+      else
+      {
+        return FALSE;
+      }
+    }
+  }
+
+  LAScriterionKeepProfile(F64 p1_x, F64 p1_y, F64 p2_x, F64 p2_y, F64 width)
+  {
+    x1 = p1_x;
+    y1 = p1_y;
+
+    x2 = p2_x;
+    y2 = p2_y;
+
+    w = width;
+    wm = w / 2.0;
+
+    xm = (p1_x + p2_x) / 2.0;
+    ym = (p1_y + p2_y) / 2.0;
+
+    vx =  (p2_y - p1_y);
+    vy = -(p2_x - p1_x);
+    
+    divider = sqrt( (vx * vx) + (vy * vy) );
+    dividerm = divider / 2.0;
+  };
+private:
+  F64 x1, y1, x2, y2, xm, ym, vx, vy, divider, dividerm, w, wm;
 };
 
 class LAScriterionDropxyz : public LAScriterion
@@ -2650,33 +2716,21 @@ BOOL LASfilter::parse(int argc, char* argv[])
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
         }
       }
-      else if (strncmp(argv[i],"-keep_point_source", 18) == 0)
+      else if (strncmp(argv[i],"-keep_p", 7) == 0)
       {
-        if (strcmp(argv[i],"-keep_point_source") == 0)
+        if (strncmp(argv[i],"-keep_point_source", 18) == 0)
         {
-          if ((i+1) >= argc)
+          if (strcmp(argv[i],"-keep_point_source") == 0)
           {
-            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: ID\n", argv[i]);
-            return FALSE;
-          }
-          U32 ID;
-          if (sscanf(argv[i+1], "%u", &ID) != 1)
-          {
-            fprintf(stderr,"ERROR: '%s' needs at least 1 argument: ID but '%s' is no valid ID\n", argv[i], argv[i+1]);
-            return FALSE;
-          }
-          if (ID > U16_MAX)
-          {
-            fprintf(stderr,"ERROR: cannot keep_point_source ID %u because it is larger than %u\n", ID, U16_MAX);
-            return FALSE;
-          }
-          add_criterion(new LAScriterionKeepPointSource(ID));
-          while (((i+2) < argc) && ('0' <= argv[i+2][0]) && (argv[i+2][0] <= '9'))
-          {
-            *argv[i]='\0';
-            if (sscanf(argv[i+2], "%d", &ID) != 1)
+            if ((i+1) >= argc)
             {
-              fprintf(stderr,"ERROR: '-keep_point_source' takes one or more IDs but '%s' is no valid ID\n", argv[i+2]);
+              fprintf(stderr,"ERROR: '%s' needs at least 1 argument: ID\n", argv[i]);
+              return FALSE;
+            }
+            U32 ID;
+            if (sscanf(argv[i+1], "%u", &ID) != 1)
+            {
+              fprintf(stderr,"ERROR: '%s' needs at least 1 argument: ID but '%s' is no valid ID\n", argv[i], argv[i+1]);
               return FALSE;
             }
             if (ID > U16_MAX)
@@ -2685,47 +2739,102 @@ BOOL LASfilter::parse(int argc, char* argv[])
               return FALSE;
             }
             add_criterion(new LAScriterionKeepPointSource(ID));
-            LAScriterion* filter_criterion = new LAScriterionAnd(criteria[num_criteria-2], criteria[num_criteria-1]);
-            num_criteria--;
-            criteria[num_criteria] = 0;
-            num_criteria--;
-            criteria[num_criteria] = 0;
-            add_criterion(filter_criterion);
-            i+=1;
-          } 
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+            while (((i+2) < argc) && ('0' <= argv[i+2][0]) && (argv[i+2][0] <= '9'))
+            {
+              *argv[i]='\0';
+              if (sscanf(argv[i+2], "%d", &ID) != 1)
+              {
+                fprintf(stderr,"ERROR: '-keep_point_source' takes one or more IDs but '%s' is no valid ID\n", argv[i+2]);
+                return FALSE;
+              }
+              if (ID > U16_MAX)
+              {
+                fprintf(stderr,"ERROR: cannot keep_point_source ID %u because it is larger than %u\n", ID, U16_MAX);
+                return FALSE;
+              }
+              add_criterion(new LAScriterionKeepPointSource(ID));
+              LAScriterion* filter_criterion = new LAScriterionAnd(criteria[num_criteria-2], criteria[num_criteria-1]);
+              num_criteria--;
+              criteria[num_criteria] = 0;
+              num_criteria--;
+              criteria[num_criteria] = 0;
+              add_criterion(filter_criterion);
+              i+=1;
+            } 
+            *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          }
+          else if (strcmp(argv[i],"-keep_point_source_between") == 0)
+          {
+            if ((i+2) >= argc)
+            {
+              fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID\n", argv[i]);
+              return FALSE;
+            }
+            U32 min_ID;
+            if (sscanf(argv[i+1], "%u", &min_ID) != 1)
+            {
+              fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID but '%s' is no valid min_ID\n", argv[i], argv[i+1]);
+              return FALSE;
+            }
+            U32 max_ID;
+            if (sscanf(argv[i+2], "%u", &max_ID) != 1)
+            {
+              fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID but '%s' is no valid max_ID\n", argv[i], argv[i+2]);
+              return FALSE;
+            }
+            if (min_ID > U16_MAX)
+            {
+              fprintf(stderr,"ERROR: cannot keep point source because min_ID of %u is larger than %u\n", min_ID, U16_MAX);
+              return FALSE;
+            }
+            if (max_ID > U16_MAX)
+            {
+              fprintf(stderr,"ERROR: cannot keep point source because max_ID of %u is larger than %u\n", max_ID, U16_MAX);
+              return FALSE;
+            }
+            add_criterion(new LAScriterionKeepPointSourceBetween((U16)min_ID, (U16)max_ID));
+            *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          }
         }
-        else if (strcmp(argv[i],"-keep_point_source_between") == 0)
+        else if (strcmp(argv[i],"-keep_profile") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i+5) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID\n", argv[i]);
+            fprintf(stderr,"ERROR: '%s' needs 5 arguments: p1_x p1_y p2_x p2_y width\n", argv[i]);
             return FALSE;
           }
-          U32 min_ID;
-          if (sscanf(argv[i+1], "%u", &min_ID) != 1)
+          F64 p1_x;
+          if (sscanf(argv[i+1], "%lf", &p1_x) != 1)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID but '%s' is no valid min_ID\n", argv[i], argv[i+1]);
+            fprintf(stderr,"ERROR: '%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p1_x\n", argv[i], argv[i+1]);
             return FALSE;
           }
-          U32 max_ID;
-          if (sscanf(argv[i+2], "%u", &max_ID) != 1)
+          F64 p1_y;
+          if (sscanf(argv[i+2], "%lf", &p1_y) != 1)
           {
-            fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID but '%s' is no valid max_ID\n", argv[i], argv[i+2]);
+            fprintf(stderr,"ERROR: '%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p1_y\n", argv[i], argv[i+2]);
             return FALSE;
           }
-          if (min_ID > U16_MAX)
+          F64 p2_x;
+          if (sscanf(argv[i+3], "%lf", &p2_x) != 1)
           {
-            fprintf(stderr,"ERROR: cannot keep point source because min_ID of %u is larger than %u\n", min_ID, U16_MAX);
+            fprintf(stderr,"ERROR: '%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p2_x\n", argv[i], argv[i+3]);
             return FALSE;
           }
-          if (max_ID > U16_MAX)
+          F64 p2_y;
+          if (sscanf(argv[i+4], "%lf", &p2_y) != 1)
           {
-            fprintf(stderr,"ERROR: cannot keep point source because max_ID of %u is larger than %u\n", max_ID, U16_MAX);
+            fprintf(stderr,"ERROR: '%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p2_y\n", argv[i], argv[i+4]);
             return FALSE;
           }
-          add_criterion(new LAScriterionKeepPointSourceBetween((U16)min_ID, (U16)max_ID));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          F64 width;
+          if (sscanf(argv[i+5], "%lf", &width) != 1)
+          {
+            fprintf(stderr,"ERROR: '%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid width\n", argv[i], argv[i+5]);
+            return FALSE;
+          }
+          add_criterion(new LAScriterionKeepProfile(p1_x, p1_y, p2_x, p2_y, width));
+          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; i+=5; 
         }
       }
       else if (strncmp(argv[i],"-keep_gps", 9) == 0)
