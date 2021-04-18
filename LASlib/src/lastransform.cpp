@@ -4677,7 +4677,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
     }
     else if (strncmp(argv[i],"-change_",8) == 0)
     {
-      if ((strcmp(argv[i],"-change_classification_from_to") == 0) || (strcmp(argv[i],"-change_extended_classification_from_to") == 0))
+      if ((strcmp(argv[i],"-change_classification_from_to") == 0) || (strcmp(argv[i],"-change_class_from_to") == 0) || (strcmp(argv[i],"-change_extended_classification_from_to") == 0) || (strcmp(argv[i],"-change_extended_class_from_to") == 0))
       {
         if ((i+2) >= argc)
         {
