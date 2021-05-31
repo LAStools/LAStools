@@ -1,15 +1,7 @@
 HALL OF SHAME
 =============
 
-1) Virginia Geographic Information Network (VGIN) purpose, powers and duties 
-are to facilitate the cost-effective development and use of spatial data, GIS,
-and related technologies throughout the Virginia Commonwealth, to foster the
-creative utilization of geographic information and oversee the development of
-a catalog of GIS data available in the Commonwealth. VGIN is nominated for providing
-state-wide LiDAR collected as part of 3DEP as "open data" solely in the closed
-and proprietary vendor format with the file extension *.zlas ...
-   
-2) Tennessee Geographic Information Council (TNGIC) self-declared goals set at
+1) Tennessee Geographic Information Council (TNGIC) self-declared goals set at
 their first user forum held at the Garden Plaza in Murfreesboro in late 1993 are
 to "promote and facilitate data sharing", to "promote data standardization", as
 well as to "avoid duplication of effort". TNGIC was nominated for providing their
@@ -17,7 +9,7 @@ state-wide open LiDAR data solely in the closed and proprietary vendor format wi
 the file extension *.zlas despite being repeatedly asked to offer this data (also)
 in a vendor-agnostic open format ...
 
-3) ...
+2) ...
 
 The "HALL OF SHAME" is our funny-provocative and dicussion-starting way to
 assure that our "open LiDAR data" is stored and distributed in our "open
