@@ -506,6 +506,7 @@ Supported raster operations
   -counter_16bit
   -counter_32bit
   -classification_variety
+  -extended_classification_variety
   -scan_angle_lowest
   -scan_angle_highest
   -scan_angle_range
