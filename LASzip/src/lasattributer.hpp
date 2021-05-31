@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    24 March 2021 -- bug fix for signed long (I32) in set_value_as_float()
     13 September 2018 -- removed tuples and triple support from attributes
     19 July 2015 -- created after FOSS4GE in the train back from Lake Como
   
@@ -254,7 +255,7 @@ public:
     else if (type == 4)
       *((U32*)pointer) = U32_QUANTIZE(unoffset_and_unscaled_value);
     else if (type == 5)
-      *((I32*)pointer) = U32_QUANTIZE(unoffset_and_unscaled_value);
+      *((I32*)pointer) = I32_QUANTIZE(unoffset_and_unscaled_value);
     else if (type == 6)
       *((U64*)pointer) = U64_QUANTIZE(unoffset_and_unscaled_value);
     else if (type == 7)
