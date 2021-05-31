@@ -17,6 +17,10 @@
   in the source file remain unchanged unless the option '-zero'
   is used that set the selected attributes to 0 instead.
 
+  A simpler copy can be activated with option '-unmatched' which
+  does not check for identical GPS-time and return number but simply
+  copies the requested attribute in the order the point are in.
+
   Please license from martin@rapidlasso.com before using lascopy
   commercially. Please note that the unlicensed version will set
   intensity, gps_time, user data, and point source ID to zero,
