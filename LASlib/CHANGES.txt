@@ -1,3 +1,7 @@
+10 April 2021 -- LASlib: new '-keep_profile p1_x p1_y p2_x p2_y width' keeps a segment of a certain width
+24 March 2021 -- LASlib: bug fix only for signed long (I32) in LASattributer.set_value_as_float()
+21 March 2021 -- LASlib: new LAStransform '-set_NIR 255'
+16 February 2021 -- LASlib: better detection and ERROR when your LAZ file has corruptions in the LAS header
 22 November 2020 -- las2las: when reprojecting only x and y, preserve resolution of z coordinate, if not set explicitely
 11 November 2020 -- lasinfo: new option '-set_vlr_record_id 2 4711' changes 'record ID' field of VLR with index 2
 11 November 2020 -- lasinfo: new option '-set_vlr_user_id 1 "hello martin"' changes 'user ID' field of VLR with index 1
