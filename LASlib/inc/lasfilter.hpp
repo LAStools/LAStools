@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+     9 June 2021 -- disallow use of '-keep_class' together with '-keep_extended_class'
      3 April 2021 -- new filter '-keep_profile p1_x p1_y p2_x p2_y width' 
      6 March 2018 -- changed '%g' to '%lf' for all sprintf() of F64 values
     14 December 2017 -- keep multiple flightlines with '-keep_point_source 2 3 4' 
