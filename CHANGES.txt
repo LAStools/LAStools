@@ -1,3 +1,7 @@
+ 9 June 2021 -- LASlib: bug fix, disallow simultanous use of '-keep_class' together with '-keep_extended_class'
+ 7 June 2021 -- lasgrid: fixed '-classification_majority_16bit' to support extended classes
+ 5 June 2021 -- lasview: option '-screenshot memoy.ppm' starts the viewer and grabs / stored the first full frame to PPM format. 
+ 3 June 2021 -- lasview: new hot-key 'D' that stores screen to 'temp.ppm'. need to let my moy go, but it breaks my heart and more. 
 31 May 2021 -- lasgrid: use '-extended_classification_variety' to compute different classifications per cell for extended point types 
 31 May 2021 -- lascopy: new option '-unmatched' activates simple copy of requested attribute in point order 
 30 May 2021 -- LASlib: bug fix when writing LAS files to ASCII text (extended classifications above 31 were always zero) 
