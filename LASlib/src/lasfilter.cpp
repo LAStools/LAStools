@@ -913,7 +913,24 @@ public:
     return n;
   };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
-  inline BOOL filter(const LASpoint* point) { return ((1u << point->classification) & drop_classification_mask); };
+  inline BOOL filter(const LASpoint* point)
+  {
+    if (point->classification == 0)
+    {
+      if (point->extended_classification == 0)
+      {
+        return ((1u) & drop_classification_mask);
+      }
+      else
+      {
+        return TRUE;
+      }
+    }
+    else
+    {
+      return ((1u << point->classification) & drop_classification_mask);
+    }
+  };
   LAScriterionKeepClassifications(U32 keep_classification_mask) { drop_classification_mask = ~keep_classification_mask; };
   inline U32 get_keep_classification_mask() const { return ~drop_classification_mask; };
 private:
@@ -931,7 +948,24 @@ public:
     return n;
   };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION; };
-  inline BOOL filter(const LASpoint* point) { return ((1 << point->classification) & drop_classification_mask); };
+  inline BOOL filter(const LASpoint* point)
+  {
+    if (point->classification == 0)
+    {
+      if (point->extended_classification == 0)
+      {
+        return ((1u) & drop_classification_mask);
+      }
+      else
+      {
+        return FALSE;
+      }
+    }
+    else
+    {
+      return ((1u << point->classification) & drop_classification_mask);
+    }
+  };
   LAScriterionDropClassifications(U32 drop_classification_mask) { this->drop_classification_mask = drop_classification_mask; };
   inline U32 get_drop_classification_mask() const { return drop_classification_mask; };
 private:
@@ -1797,6 +1831,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
 {
   int i;
 
+  BOOL using_keep_drop_class_filters = FALSE;
   U32 keep_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
   U32 drop_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -1888,6 +1923,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             keep_classification_mask |= criterion->get_keep_classification_mask();
             delete criterion;
           }
+          using_keep_drop_class_filters = TRUE;
           add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
         }
         else if (strcmp(argv[i],"-keep_classification_mask") == 0)
@@ -1903,6 +1939,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs at least 1 argument: mask but '%s' is no valid mask\n", argv[i], argv[i+1]);
             return FALSE;
           }
+          using_keep_drop_class_filters = TRUE;
           add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
@@ -3128,6 +3165,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             drop_classification_mask |= criterion->get_drop_classification_mask();
             delete criterion;
           }
+          using_keep_drop_class_filters = TRUE;
           add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
         }
         else if (strcmp(argv[i],"-drop_classification_mask") == 0)
@@ -3143,6 +3181,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs at least 1 argument: mask but '%s' is no valid mask\n", argv[i], argv[i+1]);
             return FALSE;
           }
+          using_keep_drop_class_filters = TRUE;
           add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
@@ -4536,7 +4575,16 @@ BOOL LASfilter::parse(int argc, char* argv[])
   }
   if (drop_extended_classification_mask[0] || drop_extended_classification_mask[1] || drop_extended_classification_mask[2] || drop_extended_classification_mask[3] || drop_extended_classification_mask[4] || drop_extended_classification_mask[5] || drop_extended_classification_mask[6] || drop_extended_classification_mask[7])
   {
-    add_criterion(new LAScriterionDropExtendedClassifications(drop_extended_classification_mask));
+    if (using_keep_drop_class_filters)
+    {
+      fprintf(stderr,"ERROR: cannot use '-keep_class' or '-drop_class' together with '-keep_extended_class' or '-drop_extended_class'\n");
+      fprintf(stderr,"       for filtering point types 6 or higher with classes above 31, use exclusively the 'extended' filters\n");
+      return FALSE;
+    }
+    else
+    {
+      add_criterion(new LAScriterionDropExtendedClassifications(drop_extended_classification_mask));
+    }
   }
 
   return TRUE;
