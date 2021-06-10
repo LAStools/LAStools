@@ -18,7 +18,7 @@
   Sometimes polygons describe donut-shaped objects such as lakes
   with an island. Here the winding order of the lake with be CW
   and that of the island will be CCW. In order to correcly clip
-  or classify only the lake (but now the island) the command line
+  or classify only the lake (but not the island) the command line
   option '-donuts' needs to be added.
 
   There is an option called '-split' that splits the input LiDAR
