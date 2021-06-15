@@ -1831,7 +1831,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
 {
   int i;
 
-  BOOL using_keep_drop_class_filters = FALSE;
+  BOOL using_keep_class_filter = FALSE;
   U32 keep_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
   U32 drop_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -1923,7 +1923,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             keep_classification_mask |= criterion->get_keep_classification_mask();
             delete criterion;
           }
-          using_keep_drop_class_filters = TRUE;
+          using_keep_class_filter = TRUE;
           add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
         }
         else if (strcmp(argv[i],"-keep_classification_mask") == 0)
@@ -1939,7 +1939,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs at least 1 argument: mask but '%s' is no valid mask\n", argv[i], argv[i+1]);
             return FALSE;
           }
-          using_keep_drop_class_filters = TRUE;
+          using_keep_class_filter = TRUE;
           add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
@@ -3165,7 +3165,6 @@ BOOL LASfilter::parse(int argc, char* argv[])
             drop_classification_mask |= criterion->get_drop_classification_mask();
             delete criterion;
           }
-          using_keep_drop_class_filters = TRUE;
           add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
         }
         else if (strcmp(argv[i],"-drop_classification_mask") == 0)
@@ -3181,7 +3180,6 @@ BOOL LASfilter::parse(int argc, char* argv[])
             fprintf(stderr,"ERROR: '%s' needs at least 1 argument: mask but '%s' is no valid mask\n", argv[i], argv[i+1]);
             return FALSE;
           }
-          using_keep_drop_class_filters = TRUE;
           add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
           *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
         }
@@ -4575,11 +4573,10 @@ BOOL LASfilter::parse(int argc, char* argv[])
   }
   if (drop_extended_classification_mask[0] || drop_extended_classification_mask[1] || drop_extended_classification_mask[2] || drop_extended_classification_mask[3] || drop_extended_classification_mask[4] || drop_extended_classification_mask[5] || drop_extended_classification_mask[6] || drop_extended_classification_mask[7])
   {
-    if (using_keep_drop_class_filters)
+    if (using_keep_class_filter)
     {
-      fprintf(stderr,"ERROR: cannot use '-keep_class' or '-drop_class' together with '-keep_extended_class' or '-drop_extended_class'\n");
-      fprintf(stderr,"       for filtering point types 6 or higher with classes above 31, use exclusively the 'extended' filters\n");
-      return FALSE;
+      fprintf(stderr,"WARNING: cannot combine '-keep_class' together with '-keep_extended_class'. use\n");
+      fprintf(stderr,"         exclusively 'extended' filters for filtering points with classes above 31\n");
     }
     else
     {
