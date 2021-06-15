@@ -30,6 +30,7 @@
 
   CHANGE HISTORY:
 
+    10 June 2021 -- new option '-delete_empty' for deleting LAS files with zero points
     11 November 2020 -- new option '-set_vlr_record_id 2 4711'
     11 November 2020 -- new option '-set_vlr_user_id 1 "hello martin"'
     10 November 2020 -- new option '-set_vlr_description 0 "hello martin"'
@@ -245,6 +246,7 @@ int main(int argc, char *argv[])
   bool suppress_extra_bytes = false;
   bool repair_bb = false;
   bool repair_counters = false;
+  bool delete_empty = false;
   bool edit_header = false;
   I32 set_file_source_ID = -1;
   bool set_file_source_ID_from_point_source_ID = false;
@@ -558,6 +560,10 @@ int main(int argc, char *argv[])
       {
         repair_counters = true;
       }
+    }
+    else if (strcmp(argv[i],"-delete_empty") == 0)
+    {
+      delete_empty = true;
     }
     else if (strcmp(argv[i],"-auto_date") == 0 || strcmp(argv[i],"-auto_creation_date") == 0 || strcmp(argv[i],"-auto_creation") == 0)
     {
@@ -1569,6 +1575,40 @@ int main(int argc, char *argv[])
       fprintf(stderr, "ERROR: cannot open lasreader\n");
       byebye(true, argc==1);
     }
+
+    if (delete_empty && lasreadopener.get_file_name())
+    {
+#ifdef _WIN32
+      if (verbose) fprintf(stderr, "delete check for '%s' with %I64d points\n", lasreadopener.get_file_name(), lasreader->npoints);
+#elif _WIN64
+      if (verbose) fprintf(stderr, "delete check for '%s' with %I64d points\n", lasreadopener.get_file_name(), lasreader->npoints);
+#else
+      fprintf(stderr, "ERROR: deleting not implemented ...\n");
+      byebye(true, argc==1);
+#endif
+      if (lasreader->npoints == 0)
+      {
+        lasreader->close();
+        
+        char command[2048];
+        sprintf(command, "del \"%s\"", lasreadopener.get_file_name());
+        if (verbose) fprintf(stderr, "executing '%s'\n", command);
+
+        if (system(command) != 0)
+        {
+          fprintf(stderr, "ERROR: failed to execute '%s'\n", command);
+          byebye(true);
+        }
+      }
+      else
+      {
+        lasreader->close();
+      }
+
+      delete lasreader;
+      continue;
+    }
+
     LASheader* lasheader = &lasreader->header;
 
     if (base_name && lasreadopener.get_file_name())
@@ -1578,7 +1618,7 @@ int main(int argc, char *argv[])
 #ifdef _WIN32
       if (verbose) fprintf(stderr, "renaming '%s' with %I64d points\n", lasreadopener.get_file_name(), lasreader->npoints);
 #else
-      fprintf(stderr, "ERROR: renaming implemented ...\n");
+      fprintf(stderr, "ERROR: renaming not implemented ...\n");
       byebye(true, argc==1);
 #endif
 
