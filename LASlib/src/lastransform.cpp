@@ -432,6 +432,21 @@ private:
   F64 above;
 };
 
+class LASoperationClampRGBto8Bit : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "clamp_RGB_to_8bit"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline void transform(LASpoint* point) {
+    F64 z = point->get_z();
+    if (point->get_R() > 255) point->set_R(255);
+    if (point->get_G() > 255) point->set_G(255);
+    if (point->get_B() > 255) point->set_B(255);
+  };
+  LASoperationClampRGBto8Bit(){};
+};
+
 class LASoperationCopyAttributeIntoX : public LASoperation
 {
 public:
@@ -2670,6 +2685,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -scale_RGB_up (by 256)\n");
   fprintf(stderr,"  -scale_RGB_to_8bit (only scales down 16 bit values)\n");
   fprintf(stderr,"  -scale_RGB_to_16bit (only scales up 8 bit values)\n");
+  fprintf(stderr,"  -clamp_RGB_to_8bit\n");
   fprintf(stderr,"  -set_NIR 65535\n");
   fprintf(stderr,"  -scale_NIR 2\n");
   fprintf(stderr,"  -scale_NIR_down (by 256)\n");
@@ -3283,6 +3299,12 @@ BOOL LAStransform::parse(int argc, char* argv[])
         transformed_fields |= LASTRANSFORM_Z_COORDINATE;
         add_operation(new LASoperationClampZabove(above));
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1; 
+      }
+      else if (strcmp(argv[i],"-clamp_RGB_to_8bit") == 0)
+      {
+        transformed_fields |= LASTRANSFORM_RGB;
+        add_operation(new LASoperationClampRGBto8Bit());
+        *argv[i]='\0'; 
       }
       else if (strcmp(argv[i],"-clamp_intensity") == 0)
       {

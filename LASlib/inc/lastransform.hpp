@@ -13,7 +13,7 @@
   
   COPYRIGHT:
   
-    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2021, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    15 June 2021 -- new '-clamp_RGB_to_8bit' transform useful to avoid 8 bit overflow
     10 May 2019 -- checking for overflows in X, Y, Z 32 bit integers of fixed-point LAS
      6 March 2018 -- changed '%g' to '%lf' for all sprintf() of F64 values
     28 February 2017 -- now '-set_RGB_of_class' also works for classifications > 31
