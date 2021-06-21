@@ -1657,7 +1657,7 @@ LASquadtree::LASquadtree()
   sub_level = 0;
   sub_level_index = 0;
   level_offset[0] = 0;
-  for (l = 0; l < 23; l++)
+  for (l = 0; l < 16; l++)
   {
     level_offset[l+1] = level_offset[l] + ((1<<l)*(1<<l));
   }

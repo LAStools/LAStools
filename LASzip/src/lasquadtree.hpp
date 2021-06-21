@@ -26,6 +26,7 @@
   
   CHANGE HISTORY:
   
+    21 June 2021 -- limit level_offset init loop to 16 after 'memoy' disappears  
     31 March 2015 -- remove unused LASquadtree inheritance of abstract LASspatial 
     11 May 2011 -- moved into LASlib so that LASreader supports spatial indexing
     19 January 2011 -- created after mara met with silke to talk about africa
@@ -140,7 +141,7 @@ public:
 private:
   U32 sub_level;
   U32 sub_level_index;
-  U32 level_offset[24];
+  U32 level_offset[20];
   U32 coarser_indices[4];
   U32 adaptive_alloc;
   U32* adaptive;
