@@ -5,7 +5,8 @@
   
   CONTENTS:
   
-    Tree structure for fast overlap checks of rectangles with list of rectangles 
+    Tree structure for fast overlap checks of points or rectangles with list
+    of rectangles 
 
   PROGRAMMERS:
 
@@ -13,7 +14,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2021, martin isenburg, rapidlasso - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +25,7 @@
   
   CHANGE HISTORY:
   
+    26 June 2021 -- new LASkdtreePoint after four weeks of memoy pain in Samara
     26 October 2019 -- created at LoCoworking after three days of rain in Samara
   
 ===============================================================================
@@ -56,6 +58,17 @@ public:
   LASkdtreeRectangle(F64 min_x, F64 min_y, F64 max_x, F64 max_y, U32 index);
 };
 
+class LASkdtreePoint
+{
+public:
+  F64 pos[2];
+
+  BOOL overlap(const LASkdtreeRectangle &rectangle) const;
+
+  LASkdtreePoint();
+  LASkdtreePoint(F64 x, F64 y);
+};
+
 typedef list<LASkdtreeRectangle> my_rectangle_list;
 
 class LASkdtreeRectanglesNode
@@ -77,7 +90,8 @@ public:
   void add(F64 min_x, F64 min_y, F64 max_x, F64 max_y);
   BOOL build();
   BOOL was_built() const;
-  BOOL overlap(F64 min_x, F64 min_y, F64 max_x, F64 max_y);
+  BOOL overlap(F64 min_x, F64 min_y, F64 max_x, F64 max_y); // rectangle
+  BOOL overlap(F64 x, F64 y);                               // point
   void print_overlap();
   BOOL has_overlaps();
   BOOL get_overlap(U32& index);
@@ -93,6 +107,7 @@ private:
 
   void build_recursive(LASkdtreeRectanglesNode* node, I32 plane, LASkdtreeRectangle bb, my_rectangle_list* insertion_list, I32 unchanged);
   void overlap_rectangles(LASkdtreeRectanglesNode* node, I32 plane, LASkdtreeRectangle rectangle, my_index_set* overlap_set);
+  void overlap_rectangles(LASkdtreeRectanglesNode* node, I32 plane, LASkdtreePoint point, my_index_set* overlap_set);
 };
 
 #endif

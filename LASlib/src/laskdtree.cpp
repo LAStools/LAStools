@@ -69,6 +69,27 @@ LASkdtreeRectangle::LASkdtreeRectangle()
   idx = 0;
 }
 
+BOOL LASkdtreePoint::overlap(const LASkdtreeRectangle &rectangle) const
+{
+  if (pos[0] < rectangle.min[0]) return FALSE;
+  if (pos[1] < rectangle.min[1]) return FALSE;
+  if (rectangle.max[0] < pos[0]) return FALSE;
+  if (rectangle.max[1] < pos[1]) return FALSE;
+  return TRUE;
+}
+
+LASkdtreePoint::LASkdtreePoint(F64 x, F64 y)
+{
+  pos[0] = x;
+  pos[1] = y;
+}
+
+LASkdtreePoint::LASkdtreePoint()
+{
+  pos[0] = 0;
+  pos[1] = 0;
+}
+
 LASkdtreeRectanglesNode::LASkdtreeRectanglesNode()
 {
   left = 0;
@@ -161,6 +182,18 @@ BOOL LASkdtreeRectangles::overlap(F64 min_x, F64 min_y, F64 max_x, F64 max_y)
   overlap_set->clear();
   LASkdtreeRectangle rectangle(min_x, min_y, max_x, max_y);
   overlap_rectangles(root, 0, rectangle, overlap_set);
+  return TRUE;
+}
+
+BOOL LASkdtreeRectangles::overlap(F64 x, F64 y)
+{
+  if (overlap_set == 0)
+  {
+    return FALSE;
+  }
+  overlap_set->clear();
+  LASkdtreePoint point(x, y);
+  overlap_rectangles(root, 0, point, overlap_set);
   return TRUE;
 }
 
@@ -320,6 +353,45 @@ void LASkdtreeRectangles::overlap_rectangles(LASkdtreeRectanglesNode* node, I32 
     if (node->split <= rectangle.max[plane])
     {
       overlap_rectangles(node->right, (plane + 1) % 2, rectangle, overlap_set);
+    }
+  }
+}
+
+void LASkdtreeRectangles::overlap_rectangles(LASkdtreeRectanglesNode* node, I32 plane, LASkdtreePoint point, my_index_set* overlap_set)
+{
+  if (node->list)
+  {
+    my_rectangle_list::iterator list_element = node->list->begin();
+    while (TRUE)
+    {
+      if (list_element == node->list->end())
+      {
+        break;
+      }
+
+      LASkdtreeRectangle overlap_candidate = (*list_element);
+
+      if (point.overlap(overlap_candidate))
+      {
+        overlap_set->insert(overlap_candidate.idx);
+      }
+      list_element++;
+    }
+  }
+  else
+  {
+    // maybe recurse left
+
+    if (point.pos[plane] < node->split)
+    {
+      overlap_rectangles(node->left, (plane + 1) % 2, point, overlap_set);
+    }
+
+    // maybe recurse right
+    
+    if (node->split <= point.pos[plane])
+    {
+      overlap_rectangles(node->right, (plane + 1) % 2, point, overlap_set);
     }
   }
 }
