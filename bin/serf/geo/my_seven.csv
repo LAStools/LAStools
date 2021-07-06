@@ -1,0 +1,5 @@
+region,source,target,epsg,method,trans_x,trans_y,trans_z,rot_x,rot_y,rot_z,scale 
+Styria,MGI,WGS84,1194,CFR,601.705,84.263,485.227,-4.7354,-1.3145,-5.3930,-2.388739
+Austria,MGI,WGS84,1618,PVR,577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423
+Ireland,Ireland1965,WGS84,1641,PVR,482.53,-130.596,564.557,-1.042,-0.214,-0.631,8.15
+Great Britain,OSGB36,WGS84,1314,PVR,446.448,-125.157,542.06,0.1502,0.247,0.8421,-20.4894
