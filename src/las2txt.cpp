@@ -886,6 +886,7 @@ int main(int argc, char *argv[])
         break;
       case '@': // diff of unscaled raw integer Z to prev point
         diff = true;
+        [[fallthrough]];
       case 'z': // the z coordinate
       case 'Z': // the unscaled raw integer Z coordinate
         decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_Z;
@@ -918,6 +919,7 @@ int main(int argc, char *argv[])
         break;
       case '#': // diff of gps-time to prev point
         diff = true;
+        [[fallthrough]];
       case 't': // the gps-time
         decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
         break;
@@ -928,6 +930,7 @@ int main(int argc, char *argv[])
       case '^': // the B difference to the last point
       case '+': // the byte-wise B difference to the last point
         diff = true;
+        [[fallthrough]];
       case 'R': // the red channel of the RGB field
       case 'B': // the blue channel of the RGB field
       case 'G': // the green channel of the RGB field

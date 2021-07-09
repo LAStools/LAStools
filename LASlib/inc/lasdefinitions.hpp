@@ -541,9 +541,9 @@ public:
       offset_to_point_data += 54;
       vlrs = (LASvlr*)malloc(sizeof(LASvlr));
     }
-    memset(&(vlrs[i]), 0, sizeof(LASvlr));
+    vlrs[i] = {}; // zero
     vlrs[i].reserved = 0; // used to be 0xAABB
-    strncpy(vlrs[i].user_id, user_id, 16);
+    snprintf(vlrs[i].user_id, sizeof(vlrs[i].user_id), "%s", user_id);
     vlrs[i].record_id = record_id;
     vlrs[i].record_length_after_header = record_length_after_header;
     if (keep_description && found_description)
