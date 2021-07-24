@@ -89,6 +89,7 @@ public:
   BOOL init();
   void add(F64 min_x, F64 min_y, F64 max_x, F64 max_y);
   BOOL build();
+  inline U32 size() const { return num_rectangles; };
   BOOL was_built() const;
   BOOL overlap(F64 min_x, F64 min_y, F64 max_x, F64 max_y); // rectangle
   BOOL overlap(F64 x, F64 y);                               // point
@@ -99,6 +100,7 @@ public:
   LASkdtreeRectangles();
   ~LASkdtreeRectangles();
 private:
+  U32 num_rectangles;
   LASkdtreeRectangle bb;
   my_rectangle_list* rectangle_list;
   LASkdtreeRectanglesNode* root;

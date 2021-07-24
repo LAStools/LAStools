@@ -110,6 +110,7 @@ BOOL LASkdtreeRectangles::init()
   bb.min[1] = F64_MAX;
   bb.max[0] = F64_MIN;
   bb.max[1] = F64_MIN;
+  num_rectangles = 0;
   if (rectangle_list) delete rectangle_list;
   rectangle_list = new my_rectangle_list;
   if (rectangle_list == 0)
@@ -139,6 +140,10 @@ void LASkdtreeRectangles::add(F64 min_x, F64 min_y, F64 max_x, F64 max_y)
   // add rectangle to list
 
   rectangle_list->push_back(rectangle);
+
+  // increate size meaning number of elements
+
+  num_rectangles++;
 }
 
 BOOL LASkdtreeRectangles::build()
