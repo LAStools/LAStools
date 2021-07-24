@@ -191,7 +191,6 @@ public:
   BOOL is_stored() const { return stored; };
   void set_buffer_size(const F32 buffer_size);
   F32 get_buffer_size() const;
-  void set_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique=FALSE);
   BOOL add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique=FALSE);
   BOOL add_neighbor_file_name(const CHAR* file_name, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique=FALSE);
   BOOL add_neighbor_list_of_files(const CHAR* list_of_files, BOOL unique=FALSE);
