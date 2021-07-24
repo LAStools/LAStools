@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    21 July 2021 -- fixed '-ignore_extended_class 128'. please memoy, call me!
     18 August 2019 -- created after Memoy's cousine stole USD 300 and EUR 100
   
 ===============================================================================
