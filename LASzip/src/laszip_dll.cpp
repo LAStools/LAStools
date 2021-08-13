@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    24 March 2021 -- fix small memory leak
     15 October 2019 -- support reading from and writing to unicode file names under Windows
     20 March 2019 -- check consistent legacy and extended classification in laszip_write_point()
      7 November 2018 -- assure identical legacy and extended flags in laszip_write_point()
@@ -1204,10 +1205,10 @@ laszip_set_geokeys(
     if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34735, (laszip_U16)(8 + number*8), 0, (laszip_U8*)key_entries_plus_one))
     {
       sprintf(laszip_dll->error, "setting %u geodouble_params", number);
-      delete[] key_entries_plus_one;
+      delete [] key_entries_plus_one;
       return 1;
     }
-    delete[] key_entries_plus_one;
+    delete [] key_entries_plus_one;
   }
   catch (...)
   {
