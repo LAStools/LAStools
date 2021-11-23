@@ -35,7 +35,7 @@
   For updates check the website or join the LAStools mailing list.
 
   http://lastools.org/
-  http://rapidlasso.com/LAStools
+  https://rapidlasso.de/LAStools
   http://groups.google.com/group/lastools/
   http://twitter.com/LAStools/
   http://facebook.com/LAStools/
@@ -217,4 +217,4 @@ written a total 1213990 points
 
 ---------------
 
-if you find bugs let me (martin@rapidlasso.com) know
+if you find bugs let me (info@rapidlasso.de) know

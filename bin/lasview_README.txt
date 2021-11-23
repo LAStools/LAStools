@@ -48,7 +48,7 @@
 
   With <CTRL-x> you can end the cross section view.
 
-  Please contact martin.isenburg@rapidlasso.com if you want to
+  Please contact info@rapidlasso.de if you want to
   use lasview commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -463,7 +463,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin.isenburg@rapidlasso.com) version 180209
+LAStools (by info@rapidlasso.de) version 180209
 usage:
 lasview -i terrain.las -verbose
 lasview -i flight1*.laz flight2*.laz
@@ -483,4 +483,4 @@ lasview -h
 
 ----
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know
+if you find bugs let me (info@rapidlasso.de) know

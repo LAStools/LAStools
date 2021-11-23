@@ -50,7 +50,7 @@
   '-classify_not_black', '-classify_white', or '-classify_not_white'
   to color pixels that are not black, white, or not white.
   
-  Please license from martin@rapidlasso.com before using lascolor
+  Please license from info@rapidlasso.de before using lascolor
   commercially. Please note that the unlicensed version will set
   intensity, gps_time, user data, and point source ID to zero,
   slightly change the LAS point order, and randomly add a tiny
@@ -59,7 +59,7 @@
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -98,7 +98,7 @@ reporting all LAS header entries:
   global_encoding:            0
   project ID GUID data 1-4:   00000000-0000-0000-0000-000000000000
   version major.minor:        1.2
-  system identifier:          'LAStools (c) by Martin Isenburg'
+  system identifier:          'LAStools (c) by rapidlasso GmbH'
   generating software:        'lasduplicate (130506) commercia'
   file creation day/year:     276/2013
   header size:                227
@@ -137,7 +137,7 @@ reporting all LAS header entries:
   global_encoding:            0
   project ID GUID data 1-4:   00000000-0000-0000-0000-000000000000
   version major.minor:        1.2
-  system identifier:          'LAStools (c) by Martin Isenburg'
+  system identifier:          'LAStools (c) by rapidlasso GmbH'
   generating software:        'lascolor (131214) academic'
   file creation day/year:     276/2013
   header size:                227
@@ -179,7 +179,7 @@ reporting all LAS header entries:
   global_encoding:            0
   project ID GUID data 1-4:   00000000-0000-0000-0000-000000000000
   version major.minor:        1.2
-  system identifier:          'LAStools (c) by Martin Isenburg'
+  system identifier:          'LAStools (c) by rapidlasso GmbH'
   generating software:        'lascolor (131214) academic'
   file creation day/year:     276/2013
   header size:                227
@@ -486,7 +486,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 180330 (commercial)
+LAStools (by info@rapidlasso.de) version 180330 (commercial)
 usage:
 lascolor -i in.las -image ortho.tif -o out.laz
 lascolor -i in.laz -image ortho.tif -dont_scale_rgb_up -odix _rgb -olaz
@@ -720,7 +720,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 180330 (commercial)
+LAStools (by info@rapidlasso.de) version 180330 (commercial)
 usage:
 lascolor -i in.las -image ortho.tif -o out.laz
 lascolor -i in.laz -image ortho.tif -dont_scale_rgb_up -odix _rgb -olaz
@@ -731,4 +731,4 @@ lascolor -h
 
 -------------
 
-if you find bugs let me (martin@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

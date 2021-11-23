@@ -42,12 +42,12 @@
   -polygon_name T_123_23      set polygon base name
   -polygon_digits d           set number of digits used to enumerate polygon names
 
-  Please license 'lasplanes' from martin.isenburg@rapidlasso.com
+  Please license 'lasplanes' from info@rapidlasso.de
   before using it commercially.
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/LAStools
@@ -236,7 +236,7 @@ Optional Settings
   -only_2d
   -kml_absolute
   -kml_elevation_offset 17.5
-lasplanes (by martin@rapidlasso.com) version 140916
+lasplanes (by info@rapidlasso.de) version 140916
 usage:
 lasplanes -i in.las -o planes.shp
 lasplanes -i in.las -oshp
@@ -264,4 +264,4 @@ options:
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

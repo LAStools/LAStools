@@ -9,11 +9,11 @@
   
   PROGRAMMERS:
   
-    martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
+    info@rapidlasso.de  -  https://rapidlasso.de
 
   COPYRIGHT:
 
-    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2018, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -1253,7 +1253,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
     {
       fprintf(stderr,"ERROR: %s\n", header.laszip->get_error());
       fprintf(stderr,"       please upgrade to the latest release of LAStools (with LASzip)\n");
-      fprintf(stderr,"       or contact 'martin.isenburg@rapidlasso.com' for assistance.\n");
+      fprintf(stderr,"       or contact 'info@rapidlasso.de' for assistance.\n");
       return FALSE;
     }
   }
@@ -1272,7 +1272,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
       else
       {
         fprintf(stderr,"ERROR: this file was compressed with an experimental version of laszip\n");
-        fprintf(stderr,"ERROR: please contact 'martin.isenburg@rapidlasso.com' for assistance.\n");
+        fprintf(stderr,"ERROR: please contact 'info@rapidlasso.de' for assistance.\n");
       }
       return FALSE;
     }

@@ -38,12 +38,12 @@
   The removed points can also be recorded to a LAZ file with the
   option '-record_removed'.
 
-  Please license from martin.isenburg@rapidlasso.com to use
+  Please license from info@rapidlasso.de to use
   lasduplicate commercially.
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -389,7 +389,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin.isenburg@rapidlasso.com) version 171215 (non-profit)
+LAStools (by info@rapidlasso.de) version 171215 (non-profit)
 usage:
 lasduplicate -i *.las
 lasduplicate -i tile.laz -o out.laz -flag_as_withheld
@@ -405,4 +405,4 @@ lasduplicate -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

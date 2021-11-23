@@ -38,7 +38,7 @@
                           \ /
                            X
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -233,7 +233,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-SONAR clean (by martin.isenburg@rapidlasso.com) version 140614 (unlicensed)
+SONAR clean (by info@rapidlasso.de) version 140614 (unlicensed)
 usage:
 sonarnoiseblaster -i sonar.las -o cleaned_sonar.las
 sonarnoiseblaster -i *.laz -merged -o cleaned_sonar.laz
@@ -246,4 +246,4 @@ sonarnoiseblaster -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

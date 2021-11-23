@@ -35,7 +35,7 @@
   For updates check the website or join the LAStools mailing list.
 
   http://lastools.org/
-  http://rapidlasso.com/LAStools
+  https://rapidlasso.de/LAStools
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
   http://facebook.com/lastools/
@@ -340,7 +340,7 @@ Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
   -inside min_x min_y max_x max_y
   -inside_tile ll_x ll_y size
   -inside_circle center_x center_y radius
-LAStools (by martin@rapidlasso.com) version 190909
+LAStools (by info@rapidlasso.de) version 190909
 usage:
 lasindex lidar.las
 lasindex *.las
@@ -350,4 +350,4 @@ lasindex -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

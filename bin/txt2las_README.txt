@@ -27,7 +27,7 @@
  
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/LAStools
+  https://rapidlasso.de/LAStools
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/LAStools
@@ -355,7 +355,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 180131
+LAStools (by info@rapidlasso.de) version 180131
 Supported ASCII Inputs:
   -i lidar.txt
   -i lidar.txt.gz
@@ -403,4 +403,4 @@ Other parameters are
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

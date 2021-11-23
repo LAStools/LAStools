@@ -31,12 +31,12 @@
 
   This is part of the BLAST extension pack of LAStools that is
   built on streaming TINs via spatial finalization & streaming
-  Delaunay. Please license from martin@rapidlasso.com before
+  Delaunay. Please license from info@rapidlasso.de before
   you use blast2iso commercially.
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -237,7 +237,7 @@ Optional Settings
   -only_2d
   -kml_absolute
   -kml_elevation_offset 17.5
-LAStools BLAST (by martin.isenburg@rapidlasso.com) version 140301 (unlicensed)
+LAStools BLAST (by info@rapidlasso.de) version 140301 (unlicensed)
 usage:
 blast2iso -i gigantic.laz -o contours.shp -iso_range 1510 1540 1
 blast2iso -i huge_lidar.las -o contours.shp -iso_number 20
@@ -249,4 +249,4 @@ blast2iso -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know
+if you find bugs let me (info@rapidlasso.de) know

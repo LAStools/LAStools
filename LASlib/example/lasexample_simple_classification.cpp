@@ -13,11 +13,11 @@
 
   PROGRAMMERS:
   
-    martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
+    martin.isenburg@rapidlasso.de  -  http://rapidlasso.de
   
   COPYRIGHT:
   
-    (c) 2017, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2017, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i],"-help") == 0)
     {
-      fprintf(stderr, "LAStools (by martin@rapidlasso.com) version %d\n", LAS_TOOLS_VERSION);
+      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
       usage();
     }
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
-      fprintf(stderr, "LAStools (by martin@rapidlasso.com) version %d\n", LAS_TOOLS_VERSION);
+      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
       byebye();
     }
     else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))

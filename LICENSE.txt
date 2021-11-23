@@ -9,7 +9,7 @@
 
   There are TWO parts to LAStools. One part is OPEN source (LGPL 2.1). The
   other part is CLOSED source and requires licensing for most commercial
-  or government use. If you're unsure please email 'martin@rapidlasso.com'
+  or government use. If you're unsure please email 'info@rapidlasso.de'
   before using LAStools. For education and evaluation purposes you can use
   and test LAStools as much as you need to ... (-:
 
@@ -23,7 +23,7 @@
 --------------------------------------------------------------------------
 
   This part of LAStools is "free" open-source LGPL (see COPYING.txt). To
-  purchase a different licensing model contact 'license@rapidlasso.com'.
+  purchase a different licensing model contact 'info@rapidlasso.de'.
 
     * laszip
     * lasindex

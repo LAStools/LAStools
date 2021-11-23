@@ -139,12 +139,12 @@
 
   Let me know which other metrics you would like to see ...
 
-  Please license from martin.isenburg@rapidlasso.com before you
+  Please license from info@rapidlasso.de before you
   use lascanopy commercially.
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/LAStools
+  https://rapidlasso.de/LAStools
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/LAStools
@@ -379,7 +379,7 @@ Supported Raster Outputs
   -odir C:\data\hillshade (specify output directory)
   -odix _small (specify file name appendix)
   -ocut 2 (cut the last two characters from name)
-LAStools (by martin@rapidlasso.com) version 140709 (unlicensed)
+LAStools (by info@rapidlasso.de) version 140709 (unlicensed)
 usage:
 lascanopy -i *.las -max -avg -qav -p 50 95
 lascanopy -i *.laz -p 1 5 10 25 50 75 90 95 99
@@ -396,4 +396,4 @@ lascanopy -h
 
 ---------------
 
-if you find bugs let me (martin@rapidlasso.com) know
+if you find bugs let me (info@rapidlasso.de) know

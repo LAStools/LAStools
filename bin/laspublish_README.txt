@@ -8,8 +8,8 @@
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/laspublish/
-  http://rapidlasso.com/LAStools/
+  https://rapidlasso.de/laspublish/
+  https://rapidlasso.de/LAStools/
   http://groups.google.com/group/LAStools/
   http://twitter.com/LAStools/
   http://facebook.com/LAStools/
@@ -66,4 +66,4 @@ original LAZ files
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

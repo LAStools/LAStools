@@ -66,7 +66,7 @@
   The grid spacing default is 1 unit and it can be changed, for
   example to 5 units, with '-step 5'.
  
-  Please license from martin.isenburg@rapidlasso.com to use lasthin
+  Please license from info@rapidlasso.de to use lasthin
   commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -423,7 +423,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 171215 (non-profit)
+LAStools (by info@rapidlasso.de) version 171215 (non-profit)
 usage:
 lasthin -i *.las
 lasthin -i *.laz -olaz
@@ -442,4 +442,4 @@ lasthin -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

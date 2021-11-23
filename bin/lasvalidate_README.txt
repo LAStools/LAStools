@@ -9,7 +9,7 @@
 
   http://github.com/LASvalidator/
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -43,7 +43,7 @@ make
 cd bin 
 E:\software\LAStools\bin>lasvalidate -h
 This is version 200104 of the LAS validator. Please contact
-me at 'martin.isenburg@rapidlasso.com' if you disagree with
+me at 'info@rapidlasso.de' if you disagree with
 validation reports, want additional checks, or find bugs as
 the software is still under development. Your feedback will
 help to finish it sooner.
@@ -76,7 +76,7 @@ Below is a test run on the unit tests.
 C:\LASvalidator\lasvalidate\bin> lasvalidate -i ..\unit\*.las -o ..\unit\validate.xml
 
 This is version 200104 of the LAS validator. Please contact
-me at 'martin.isenburg@rapidlasso.com' if you disagree with
+me at 'info@rapidlasso.de' if you disagree with
 validation reports, want additional checks, or find bugs as
 the software is still under development. Your feedback will
 help to finish it sooner.
@@ -101,7 +101,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12.las</name>
       <path>..\unit\las12.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130506)</generating_software>
       <point_data_format>1</point_data_format>
       <CRS>UTM 55 southern hemisphere</CRS>
@@ -125,7 +125,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12_bounding_box.las</name>
       <path>..\unit\las12_bounding_box.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130506)</generating_software>
       <point_data_format>1</point_data_format>
       <CRS>UTM 55 southern hemisphere</CRS>
@@ -177,7 +177,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12_creation_date.las</name>
       <path>..\unit\las12_creation_date.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130506)</generating_software>
       <point_data_format>1</point_data_format>
       <CRS>UTM 55 southern hemisphere</CRS>
@@ -209,7 +209,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12_global_encoding.las</name>
       <path>..\unit\las12_global_encoding.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130506)</generating_software>
       <point_data_format>1</point_data_format>
       <CRS>UTM 55 southern hemisphere</CRS>
@@ -265,7 +265,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12_header_size.las</name>
       <path>..\unit\las12_header_size.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130902)</generating_software>
       <point_data_format>0</point_data_format>
       <CRS>not valid or not specified</CRS>
@@ -285,7 +285,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12_number_of_points_by_return.las</name>
       <path>..\unit\las12_number_of_points_by_return.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130506)</generating_software>
       <point_data_format>1</point_data_format>
       <CRS>UTM 55 southern hemisphere</CRS>
@@ -325,7 +325,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12_number_of_point_records.las</name>
       <path>..\unit\las12_number_of_point_records.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130506)</generating_software>
       <point_data_format>1</point_data_format>
       <CRS>UTM 55 southern hemisphere</CRS>
@@ -353,7 +353,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12_offset_to_point_data.las</name>
       <path>..\unit\las12_offset_to_point_data.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130902)</generating_software>
       <point_data_format>0</point_data_format>
       <CRS>not valid or not specified</CRS>
@@ -373,7 +373,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12_point_data_format.las</name>
       <path>..\unit\las12_point_data_format.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130902)</generating_software>
       <point_data_format>14</point_data_format>
       <CRS>not valid or not specified</CRS>
@@ -392,7 +392,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
       <name>las12_scale_factor.las</name>
       <path>..\unit\las12_scale_factor.las</path>
       <version>1.2</version>
-      <system_identifier>LAStools (c) by Martin Isenburg</system_identifier>
+      <system_identifier>LAStools (c) by rapidlasso GmbH</system_identifier>
       <generating_software>las2las (version 130506)</generating_software>
       <point_data_format>1</point_data_format>
       <CRS>UTM 55 southern hemisphere</CRS>

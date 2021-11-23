@@ -58,7 +58,7 @@
   -store_xyz_range_as_extra_bytes
   -store_xyz_range_precise_as_extra_bytes
 
-  Please license from martin.isenburg@rapidlasso.com before using
+  Please license from info@rapidlasso.de before using
   lastrack commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -378,7 +378,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 171215 (academic)
+LAStools (by info@rapidlasso.de) version 171215 (academic)
 usage:
 lastrack -i in.laz -track tj.laz -offset -2.21 -classify_below -0.4 7 -o out.laz
 lastrack -i in.laz -track tj.laz -offset -1.87 -drop_below -2.00 -o out.laz -verbose
@@ -390,4 +390,4 @@ lastrack -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

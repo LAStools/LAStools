@@ -9,11 +9,11 @@
   
   PROGRAMMERS:
 
-    martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
+    info@rapidlasso.de  -  https://rapidlasso.de
 
   COPYRIGHT:
 
-    (c) 2007-2018, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2018, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -1571,7 +1571,7 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
       }
       else
       {
-        fprintf(stderr, "format: %snot implemented. contact martin@rapidlasso.com\n", &line[7]);
+        fprintf(stderr, "format: %snot implemented. contact info@rapidlasso.de\n", &line[7]);
         return FALSE;
       }
     }
@@ -1593,7 +1593,7 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
         if (sscanf(&line[15], "%lld", &npoints) != 1)
 #endif
         {
-          fprintf(stderr, "element vertex: %scannot parse number of points. contact martin@rapidlasso.com\n", &line[15]);
+          fprintf(stderr, "element vertex: %scannot parse number of points. contact info@rapidlasso.de\n", &line[15]);
           return FALSE;
         }
       }
@@ -1817,13 +1817,13 @@ BOOL LASreaderPLY::parse_header(BOOL quiet)
       }
       else
       {     
-        fprintf(stderr, "unknown property type: %snot implemented. contact martin@rapidlasso.com\n", &line[9]);
+        fprintf(stderr, "unknown property type: %snot implemented. contact info@rapidlasso.de\n", &line[9]);
         return FALSE;
       }
     }
     else
     {
-      fprintf(stderr, "unknown header item: %snot implemented. contact martin@rapidlasso.com", line);
+      fprintf(stderr, "unknown header item: %snot implemented. contact info@rapidlasso.de", line);
     }
 
     if (!quiet) fprintf(stderr, "parsed: %s", line);

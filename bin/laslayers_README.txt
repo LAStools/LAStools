@@ -189,7 +189,7 @@ lasdiff -i ll_modified.laz -i ll_applied.laz
 
 Now try on your own data and please report back with bugs, suggestions, and missing features.
 
-martin@rapidlasso.com
+info@rapidlasso.de
 
 --
-http://rapidlasso.com - fast tools to catch reality
+https://rapidlasso.de - fast tools to catch reality

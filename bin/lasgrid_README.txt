@@ -79,12 +79,12 @@
   amount, here they would be 0.05 units lower than the original,
   which might be useful for subsequent tree top detection.
 
-  Please license from martin.isenburg@rapidlasso.com to use lasgrid
+  Please license from info@rapidlasso.de to use lasgrid
   commercially.
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/LAStools
+  https://rapidlasso.de/LAStools
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/LAStools
@@ -483,7 +483,7 @@ Supported Raster Outputs
   -odir C:\data\hillshade (specify output directory)
   -odix _small (specify file name appendix)
   -ocut 2 (cut the last two characters from name)
-LAStools (by martin@rapidlasso.com) version 161023 (commercial)
+LAStools (by info@rapidlasso.de) version 161023 (commercial)
 Supported raster operations
   -elevation_lowest (default)
   -elevation_highest
@@ -537,4 +537,4 @@ lasgrid -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know
+if you find bugs let me (info@rapidlasso.de) know

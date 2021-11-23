@@ -38,7 +38,7 @@
   You can avoid having certain points being classified, marked
   withheld, or removed with the '-ignore_class 2' option.
 
-  Please license from martin@rapidlasso.com before using lasnoise
+  Please license from info@rapidlasso.de before using lasnoise
   commercially. Please note that the unlicensed version will set
   intensity, gps_time, user data, and point source ID to zero,
   slightly change the LAS point order, and randomly add a tiny
@@ -47,7 +47,7 @@
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -358,7 +358,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 171215 (non-profit)
+LAStools (by info@rapidlasso.de) version 171215 (non-profit)
 usage:
 lasnoise -i in.laz -o out.laz
 lasnoise -i raw\*.laz -step 2 -isolated 3 -odir D:\denoised -olaz
@@ -369,4 +369,4 @@ lasnoise -i tiles\*.laz -step 3 -isolated 3 -classify_as 31 -odir denoised -olaz
 lasnoise -h
 
 -------------
-if you find bugs let me (martin@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

@@ -7,7 +7,7 @@ in .\LAStools\QGIS_toolbox. A few example DOS batch scripts can be found
 in the .\LAStools\example_batch_scripts directory.
 
 user group:      http://groups.google.com/group/lastools
-company page:    http://rapidlasso.com
+company page:    https://rapidlasso.de
 latest updates:  http://lastools.org
 twitter feed:    http://twitter.com/LAStools
 facebook page:   http://facebook.com/LAStools
@@ -74,4 +74,4 @@ Please read the "LICENSE.txt" file for information on the legal use and licensin
 of LAStools. I would also really like it if you would send me an email and tell me
 what you use LAStools for and what features and improvements you could need. 
 
-(c) 2007-2015 martin.isenburg@rapidlasso.com - http://rapidlasso.com
+(c) 2007-2015 info@rapidlasso.de - https://rapidlasso.de

@@ -110,7 +110,7 @@
   a SHP files with rectangular tiles with a corresponding string
   attribute called TNAME in the DBF file. 
 
-  Please license from martin.isenburg@rapidlasso.com to use LAStools
+  Please license from info@rapidlasso.de to use LAStools
   commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -422,7 +422,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin.isenburg@rapidlasso.com) version 181109 (commercial)
+LAStools (by info@rapidlasso.de) version 181109 (commercial)
 usage:
 lastile -i *.las -o tile.las
 lastile -i *.las -o tiles\tile.laz
@@ -436,4 +436,4 @@ lastile -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

@@ -34,7 +34,7 @@
   it is sampled with ('-creeks roads.shp', '-creeks creeks.txt')
   and while they can be open they must also have elevations.
 
-  Please license from martin.isenburg@rapidlasso.com to use las2tin
+  Please license from info@rapidlasso.de to use las2tin
   commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -299,7 +299,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 160910 (unlicensed)
+LAStools (by info@rapidlasso.de) version 160910 (unlicensed)
 usage:
 las2tin -i *.las
 las2tin -i *.las -concavity 25 -oobj
@@ -315,4 +315,4 @@ las2tin -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

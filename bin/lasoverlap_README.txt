@@ -55,7 +55,7 @@
   (x/y+0.66*step) (x+0.33*step/y+0.66*step) (x+0.66*step/y+0.66*step)
   and thereby "washes out" hard boundaries.
 
-  Please license from martin.isenburg@rapidlasso.com to use lasoverlap
+  Please license from info@rapidlasso.de to use lasoverlap
   commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -466,7 +466,7 @@ Supported Raster Outputs
   -odir C:\data\hillshade (specify output directory)
   -odix _small (specify file name appendix)
   -ocut 2 (cut the last two characters from name)
-LAStools (by martin@rapidlasso.com) version 190812 (academic)
+LAStools (by info@rapidlasso.de) version 190812 (academic)
 usage:
 lasoverlap -i tile.laz -step 1 -max_diff 0.25
 lasoverlap -i tile.las -step 3 -values
@@ -480,4 +480,4 @@ lasoverlap -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know
+if you find bugs let me (info@rapidlasso.de) know

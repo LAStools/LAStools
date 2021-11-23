@@ -41,12 +41,12 @@
   possible to ignore control points that are too high or too low above
   the LiDAR from the calculation that also computes the average error.
 
-  Please license from martin.isenburg@rapidlasso.com to use lascontrol
+  Please license from info@rapidlasso.de to use lascontrol
   commercially.
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -256,7 +256,7 @@ Supported LAS Inputs
   -rescale_xy 0.01 0.01
   -rescale_z 0.01
   -reoffset 600000 4000000 0
-LAStools (by martin@rapidlasso.com) version 140301 (unlicensed)
+LAStools (by info@rapidlasso.de) version 140301 (unlicensed)
 usage:
 lascontrol -i lidar.las -cp cp.txt -keep_class 2
 lascontrol -i lidar.las -cp cp.csv -keep_class 2 8 -parse sxyz -step 2
@@ -268,4 +268,4 @@ lascontrol -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

@@ -9,11 +9,11 @@
 
   PROGRAMMERS:
 
-    martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
+    info@rapidlasso.de  -  https://rapidlasso.de
 
   COPYRIGHT:
 
-    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -3926,7 +3926,7 @@ demzip_read_header(
   {
     if (!laszip)
     {
-      sprintf(demzip_dll->error, "this file was compressed with an experimental version of LASzip. contact 'martin.isenburg@rapidlasso.com' for assistance");
+      sprintf(demzip_dll->error, "this file was compressed with an experimental version of LASzip. contact 'info@rapidlasso.de' for assistance");
       return 1;
     }
     demzip_dll->header.point_data_format &= 127;
@@ -3940,7 +3940,7 @@ demzip_read_header(
     *is_compressed = 1;
     if (!laszip->check(demzip_dll->header.point_data_record_length))
     {
-      sprintf(demzip_dll->error, "%s upgrade to the latest release of LASzip or contact 'martin.isenburg@rapidlasso.com' for assistance", laszip->get_error());
+      sprintf(demzip_dll->error, "%s upgrade to the latest release of LASzip or contact 'info@rapidlasso.de' for assistance", laszip->get_error());
       return 1;
     }
   }

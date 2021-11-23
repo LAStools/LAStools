@@ -394,7 +394,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 200929 (commercial)
+LAStools (by info@rapidlasso.de) version 200929 (commercial)
 usage:
 lassplit -i *.las
 lassplit -i *.laz -merged -o flightlines.las
@@ -412,4 +412,4 @@ lassplit -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

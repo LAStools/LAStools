@@ -38,7 +38,7 @@
  
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/LAStools
+  https://rapidlasso.de/LAStools
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/LAStools
@@ -232,6 +232,7 @@ other commandline arguments are
 -adjusted_to_week              : converts time stamps from Adjusted Standard GPS to GPS week
 -scale_rgb_up                  : multiplies all RGB values by 256 (to go from 8 bit to 16 bit numbers)
 -scale_rgb_down                : divides all RGB values by 256 (to go from 16 bit to 8 bit numbers)
+-force_RGB                     : force the use of the RGB value even if the point format does not support RGB
 -wgs84                         : use datum WGS-84
 -grs80                         : use datum GRS1980
 -wgs72                         : use datum WGS-72
@@ -491,6 +492,7 @@ Transform RGB/NIR colors.
   -copy_intensity_into_NIR
   -switch_RGBI_into_CIR
   -switch_RGB_intensity_into_CIR
+  -force_RGB
 Transform attributes in "Extra Bytes".
   -scale_attribute 0 1.5
   -translate_attribute 1 0.2
@@ -528,7 +530,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 190711
+LAStools (by info@rapidlasso.de) version 190711
 usage:
 las2las -i *.las -utm 13N
 las2las -i *.laz -first_only -olaz
@@ -549,4 +551,4 @@ las2las -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

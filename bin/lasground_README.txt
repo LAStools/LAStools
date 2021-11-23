@@ -85,7 +85,7 @@
   elevations are zeroed). Alternatively these files can be skipped
   with the command-line option '-skip_files'.
 
-  Please license from martin@rapidlasso.com to use lasground
+  Please license from info@rapidlasso.de to use lasground
   commercially. Please note that the unlicensed version will set
   intensity, gps_time, user data, and point source ID to zero,
   slightly change the LAS point order, and randomly add a tiny
@@ -93,7 +93,7 @@
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -364,7 +364,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 140614 (unlicensed)
+LAStools (by info@rapidlasso.de) version 140614 (unlicensed)
 usage:
 lasground -i in.las -o out.las
 lasground -i in.las -o out.las -feet -elevation_feet
@@ -379,4 +379,4 @@ lasground -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

@@ -8,7 +8,7 @@
   by default. With '-step_xy 1.0' the granularity of this grid
   can be adjusted up or down.
 
-  Please license from martin@rapidlasso.com before using lasdistance
+  Please license from info@rapidlasso.de before using lasdistance
   commercially. Please note that the unlicensed version will set
   intensity, gps_time, user data, and point source ID to zero,
   slightly change the LAS point order, and randomly add a tiny
@@ -17,7 +17,7 @@
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -336,7 +336,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 190623 (commercial)
+LAStools (by info@rapidlasso.de) version 190623 (commercial)
 usage:
 lasdistance -i in.laz -poly breaklines.shp -o out.laz
 lasdistance -i in.laz -poly breaklines.shp -distance_xy 5.0 -o out.laz
@@ -348,4 +348,4 @@ lasdistance -h
 
 -------------
 
-if you find bugs let me (martin@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

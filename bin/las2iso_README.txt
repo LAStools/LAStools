@@ -58,7 +58,7 @@
   it is sampled with ('-creeks roads.shp', '-creeks creeks.txt')
   and while they can be open they must also have elevations.
 
-  Please license from martin.isenburg@rapidlasso.com to use las2iso
+  Please license from info@rapidlasso.de to use las2iso
   commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -297,7 +297,7 @@ Optional Settings
   -only_2d
   -kml_absolute
   -kml_elevation_offset 17.5
-LAStools (by martin@rapidlasso.com) version 140301 (unlicensed)
+LAStools (by info@rapidlasso.de) version 140301 (unlicensed)
 usage:
 las2iso -i *.las -oshp
 las2iso -i flight1*.las flight2*.las -oshp -simplify 1 -clean 10
@@ -317,4 +317,4 @@ other possible transformations for KML generation:
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

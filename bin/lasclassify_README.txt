@@ -44,7 +44,7 @@
   which lasclassify is searching with '-step 4' to 4 by 4 meters,
   for example. The default is 2 meters.
 
-  Please license from martin@rapidlasso.com to use lasclassify
+  Please license from info@rapidlasso.de to use lasclassify
   commercially. Please note that the unlicensed version will set
   intensity, gps_time, user data, and point source ID to zero,
   slightly change the LAS point order, and randomly add a tiny
@@ -358,7 +358,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 171030 (academic)
+LAStools (by info@rapidlasso.de) version 171030 (academic)
 usage:
 lasclassify -i in.las -o out.laz
 lasclassify -i in.laz -o out.las -feet -elevation_feet
@@ -370,4 +370,4 @@ lasclassify -h
 
 ---------------
 
-if you find bugs let me (martin@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

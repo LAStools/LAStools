@@ -8,7 +8,7 @@
  
   Allows adding a VLR to the header with projection information.
 
-  Please license from martin.isenburg@rapidlasso.com to use shp2las
+  Please license from info@rapidlasso.de to use shp2las
   commercially.
  
   For updates check the website or join the LAStools mailing list.
@@ -74,4 +74,4 @@ Other parameters are
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

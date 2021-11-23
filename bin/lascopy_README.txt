@@ -21,7 +21,7 @@
   does not check for identical GPS-time and return number but simply
   copies the requested attribute in the order the point are in.
 
-  Please license from martin@rapidlasso.com before using lascopy
+  Please license from info@rapidlasso.de before using lascopy
   commercially. Please note that the unlicensed version will set
   intensity, gps_time, user data, and point source ID to zero,
   slightly change the LAS point order, and randomly add a tiny
@@ -30,7 +30,7 @@
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -269,7 +269,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 161113 (academic)
+LAStools (by info@rapidlasso.de) version 161113 (academic)
 usage:
 lascopy -i source.las -i target.las -o result.las
 lascopy -i source.laz -i target.laz -o result.laz
@@ -280,4 +280,4 @@ lascopy -h
 
 -------------
 
-if you find bugs let me (martin@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

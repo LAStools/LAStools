@@ -9,11 +9,11 @@
   
   PROGRAMMERS:
 
-    martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
+    info@rapidlasso.de  -  https://rapidlasso.de
 
   COPYRIGHT:
 
-    (c) 2007-2019, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2019, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -1881,6 +1881,15 @@ private:
   I64 delta_secs;
 };
 
+class LASoperationForceRGB : public LASoperation
+{
+public:
+  inline const CHAR* name() const { return "force_RGB"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
+  inline void transform(LASpoint* point) { point->have_rgb = TRUE; };
+  LASoperationForceRGB() {};
+};
+
 class LASoperationSetRGB : public LASoperation
 {
 public:
@@ -2699,6 +2708,7 @@ void LAStransform::usage() const
   fprintf(stderr,"  -copy_intensity_into_NIR\n");
   fprintf(stderr,"  -switch_RGBI_into_CIR\n");
   fprintf(stderr,"  -switch_RGB_intensity_into_CIR\n");
+  fprintf(stderr,"  -force_RGB\n");
   fprintf(stderr,"Transform attributes in \"Extra Bytes\".\n");
   fprintf(stderr,"  -scale_attribute 0 1.5\n");
   fprintf(stderr,"  -translate_attribute 1 0.2\n");
@@ -2734,6 +2744,11 @@ BOOL LAStransform::parse(int argc, char* argv[])
       usage();
       return TRUE;
     }
+		else if (strcmp(argv[i],"-force_RGB") == 0)
+		{
+			add_operation(new LASoperationForceRGB());
+			*argv[i]='\0';
+		}
     else if (strncmp(argv[i],"-translate_", 11) == 0)
     {
       if (strcmp(argv[i],"-translate_x") == 0)
@@ -4526,7 +4541,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
         add_operation(new LASoperationSetRegister(registers, index, value));
         *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
       }
-      else if (strncmp(argv[i],"-set_RGB", 8) == 0)
+		  else if (strncmp(argv[i],"-set_RGB", 8) == 0)
       {
         if (strcmp(argv[i],"-set_RGB") == 0)
         {

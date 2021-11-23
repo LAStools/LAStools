@@ -72,7 +72,7 @@
   when the 'geoid.laz' file has sparsely spaced points. Using the
   '-all_ground_points' option forces lasheight to use all points. 
  
-  Please license from martin.isenburg@rapidlasso.com before using
+  Please license from info@rapidlasso.de before using
   lasheight commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -392,7 +392,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 171215 (academic)
+LAStools (by info@rapidlasso.de) version 171215 (academic)
 usage:
 lasheight -i *.las -v
 lasheight -i *.laz -olaz -quiet
@@ -413,4 +413,4 @@ lasheight -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

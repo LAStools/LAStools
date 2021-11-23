@@ -54,7 +54,7 @@
   still run the older version of the algorithm that was limited to
   30 million points with the '-use_old' flag.
                  
-  Please license from martin.isenburg@rapidlasso.com to use lasboundary
+  Please license from info@rapidlasso.de to use lasboundary
   in production.
 
   For updates check the website or join the LAStools mailing list.
@@ -367,7 +367,7 @@ Optional Settings
   -only_2d
   -kml_absolute
   -kml_elevation_offset 17.5
-LAStools (by martin@rapidlasso.com) version 180209 (academic)
+LAStools (by info@rapidlasso.de) version 180209 (academic)
 usage:
 lasboundary -i *.las -merged -o merged.shp
 lasboundary -i *.laz -owkt -concavity 100 (default is 50)
@@ -388,4 +388,4 @@ other possible transformations for KML generation:
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

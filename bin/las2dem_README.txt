@@ -58,7 +58,7 @@
   It is also possible to provide the georeferencing information
   in the command-line.
 
-  Please license from martin.isenburg@rapidlasso.com to use las2dem
+  Please license from info@rapidlasso.de to use las2dem
   commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -369,7 +369,7 @@ Supported Raster Outputs
   -odir C:\data\hillshade (specify output directory)
   -odix _small (specify file name appendix)
   -ocut 2 (cut the last two characters from name)
-LAStools (by martin@rapidlasso.com) version 140301 (unlicensed)
+LAStools (by info@rapidlasso.de) version 140301 (unlicensed)
 usage:
 las2dem -i lidar.las -o lidar.asc
 las2dem -i lidar.las -o lidar.bil -intensity -kill 50
@@ -383,7 +383,7 @@ las2dem -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know
+if you find bugs let me (info@rapidlasso.de) know
 
 ---------------
 

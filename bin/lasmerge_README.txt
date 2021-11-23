@@ -243,7 +243,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 140301
+LAStools (by info@rapidlasso.de) version 140301
 usage:
 lasmerge -i *.las -o out.las
 lasmerge -lof lasfiles.txt -o out.las
@@ -255,4 +255,4 @@ lasmerge -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

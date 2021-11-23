@@ -449,7 +449,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 150526
+LAStools (by info@rapidlasso.de) version 150526
 usage:
 lasinfo -i lidar.las
 lasinfo -i lidar.las -compute_density -o lidar_info.txt
@@ -466,4 +466,4 @@ lasinfo -i *.laz -set_system_identifier "hello world!" -set_generating_software 
 
 ----
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

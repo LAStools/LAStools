@@ -9,11 +9,11 @@
 
   PROGRAMMERS:
   
-    martin.isenburg@rapidlasso.com  -  http://rapidlasso.com
+    info@rapidlasso.de  -  https://rapidlasso.de
   
   COPYRIGHT:
   
-    (c) 2007-2021, martin isenburg, rapidlasso - fast tools to catch reality
+    (c) 2007-2021, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the GNU Lesser General Licence as published by the Free Software
@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    18 November 2021 -- new '-forceRGB' to use RGB values also in non-RGB point versions
     15 June 2021 -- new '-clamp_RGB_to_8bit' transform useful to avoid 8 bit overflow
     10 May 2019 -- checking for overflows in X, Y, Z 32 bit integers of fixed-point LAS
      6 March 2018 -- changed '%g' to '%lf' for all sprintf() of F64 values

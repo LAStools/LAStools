@@ -19,7 +19,7 @@
 
   This is part of the BLAST extension pack of LAStools that is
   built on streaming TINs via spatial finalization & streaming
-  Delaunay. Please license from martin@rapidlasso.com before
+  Delaunay. Please license from info@rapidlasso.de before
   you use blast2dem commercially.
 
   By default the generated raster is sized based on the extend
@@ -45,7 +45,7 @@
 
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -309,7 +309,7 @@ Supported Raster Outputs
   -odir C:\data\hillshade (specify output directory)
   -odix _small (specify file name appendix)
   -ocut 2 (cut the last two characters from name)
-LAStools BLAST (by martin@rapidlasso.com) version 140301 (unlicensed)
+LAStools BLAST (by info@rapidlasso.de) version 140301 (unlicensed)
 usage:
 blast2dem -i huge_lidar.las -o dem.asc -step 2
 blast2dem -i huge_lidar.laz -o dem.bil -keep_class 2
@@ -322,4 +322,4 @@ blast2dem -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know
+if you find bugs let me (info@rapidlasso.de) know

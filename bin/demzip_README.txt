@@ -75,4 +75,4 @@ other options:
  -sigmaxy 0.5             : horizontal accuracy expected at 0.5 meters (inactive)
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

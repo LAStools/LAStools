@@ -295,11 +295,11 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 170805
+LAStools (by info@rapidlasso.de) version 170805
 usage:
 lasoptimize -i lidar.las -o lidar.laz
 lasoptimize -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

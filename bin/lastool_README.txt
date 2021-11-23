@@ -4,7 +4,7 @@
 
   One tool to rule them all - a simple GUI for LAStools.
 
-  Please license from martin.isenburg@rapidlasso.com to use lastool 
+  Please license from info@rapidlasso.de to use lastool 
   commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -41,8 +41,8 @@ for more info:
 
 C:\lastools\bin> lastool -h
 Please note that LAStools is not "free" (see http://lastools.org/LICENSE.txt)
-contact 'martin.isenburg@rapidlasso.com' to clarify licensing terms if needed.
-LAStools (by martin@rapidlasso.com) version 140615
+contact 'info@rapidlasso.de' to clarify licensing terms if needed.
+LAStools (by info@rapidlasso.de) version 140615
 usage:
 lastool
 lastool -i *.las
@@ -54,4 +54,4 @@ lastool -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know
+if you find bugs let me (info@rapidlasso.de) know

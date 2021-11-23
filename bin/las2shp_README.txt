@@ -8,7 +8,7 @@
   to use PointZ records instead you need to add '-single_points' to
   the command line
  
-  Please license from martin.isenburg@rapidlasso.com to use las2shp
+  Please license from info@rapidlasso.de to use las2shp
   commercially.
 
   For updates check the website or join the LAStools mailing list.
@@ -200,7 +200,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 140301 (unlicensed)
+LAStools (by info@rapidlasso.de) version 140301 (unlicensed)
 usage:
 las2shp -i *.las
 las2shp -i *.txt -iparse xyza -keep_scan_angle -10 10
@@ -212,4 +212,4 @@ las2shp -h
 
 ---------------
 
-if you find bugs let me (martin.isenburg@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.

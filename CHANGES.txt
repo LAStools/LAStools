@@ -1,3 +1,6 @@
+18 November 2021 -- LASlib: new LAStransform '-force_RGB' 
+12 November 2021 -- LASlib/LASzip merge, bug fix memory leak; add some x64 tool versions 
+26 October 2021 -- Test release
  9 June 2021 -- LASlib: bug fix, disallow simultanous use of '-keep_class' together with '-keep_extended_class'
  7 June 2021 -- lasgrid: fixed '-classification_majority_16bit' to support extended classes
  5 June 2021 -- lasview: option '-screenshot memoy.ppm' starts the viewer and grabs / stored the first full frame to PPM format. 

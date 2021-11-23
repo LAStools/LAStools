@@ -6,7 +6,7 @@
  
   For updates check the website or join the LAStools mailing list.
 
-  http://rapidlasso.com/
+  https://rapidlasso.de/
   http://lastools.org/
   http://groups.google.com/group/lastools/
   http://twitter.com/lastools/
@@ -257,7 +257,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by martin@rapidlasso.com) version 150526
+LAStools (by info@rapidlasso.de) version 150526
 usage:
 las2txt -i test.las -parse Mxyzrna -stdout | more
 las2txt -i *.las -parse xyzt
@@ -296,4 +296,4 @@ possible are 'percent', 'dollar', 'comma', 'star',
 
 ---------------
 
-if you find bugs let me (martin@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.
