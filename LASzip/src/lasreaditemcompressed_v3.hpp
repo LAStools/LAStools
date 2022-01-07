@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    30 December 2021 -- fix small memory leak
     19 March 2019 -- set "legacy classification" to zero if "classification > 31"  
     28 August 2017 -- moving 'context' from global development hack to interface  
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 

@@ -207,6 +207,7 @@ LASreadItemCompressed_POINT14_v3::~LASreadItemCompressed_POINT14_v3()
     delete dec_intensity;
     delete dec_scan_angle;
     delete dec_user_data;
+    delete dec_point_source;
     delete dec_gps_time;
 
     delete instream_channel_returns_XY;
@@ -216,6 +217,7 @@ LASreadItemCompressed_POINT14_v3::~LASreadItemCompressed_POINT14_v3()
     delete instream_intensity;
     delete instream_scan_angle;
     delete instream_user_data;
+    delete instream_point_source;
     delete instream_gps_time;
   }
 
