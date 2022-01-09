@@ -299,6 +299,7 @@ public:
       case LASitem::POINT14:
         have_gps_time = TRUE;
         extended_point_type = 1;
+        [[fallthrough]];
       case LASitem::POINT10:
         this->point[i] = (U8*)&(this->X);
         break;
@@ -308,6 +309,7 @@ public:
         break;
       case LASitem::RGBNIR14:
         have_nir = TRUE;
+        [[fallthrough]];
       case LASitem::RGB12:
       case LASitem::RGB14:
         have_rgb = TRUE;
@@ -359,6 +361,7 @@ public:
       case LASitem::POINT14:
         have_gps_time = TRUE;
         extended_point_type = 1;
+        [[fallthrough]];
       case LASitem::POINT10:
         this->point[i] = (U8*)&(this->X);
         break;
@@ -368,6 +371,7 @@ public:
         break;
       case LASitem::RGBNIR14:
         have_nir = TRUE;
+        [[fallthrough]];
       case LASitem::RGB12:
       case LASitem::RGB14:
         have_rgb = TRUE;
