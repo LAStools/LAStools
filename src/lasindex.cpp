@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
   BOOL append = FALSE;
   F64 start_time = 0.0;
   F64 total_start_time = 0.0;
+  char *output_file = NULL;
 
   LASreadOpener lasreadopener;
 
@@ -140,7 +141,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == '–') argv[i][0] = '-';
+      if (argv[i][0] == 'ï¿½') argv[i][0] = '-';
     }
     if (!lasreadopener.parse(argc, argv)) byebye(true);
   }
@@ -262,6 +263,16 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[i],"-append") == 0)
     {
       append = TRUE;
+    }
+    else if (strcmp(argv[i],"-o") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: file output name\n", argv[i]);
+        byebye(true);
+      }
+      output_file = argv[i+1];
+      i++;
     }
     else
     {
@@ -471,11 +482,25 @@ int main(int argc, char *argv[])
 
     if (append)
     {
-      lasindex.append(lasreadopener.get_file_name());
+      if (output_file != NULL)
+      {
+        lasindex.append(output_file);
+      }
+      else
+      {
+        lasindex.append(lasreadopener.get_file_name());
+      }
     }
     else
     {
-      lasindex.write(lasreadopener.get_file_name());
+      if (output_file != NULL)
+      {
+        lasindex.write(output_file);
+      }
+      else
+      {
+        lasindex.write(lasreadopener.get_file_name());
+      }
     }
 
     indexed++;
