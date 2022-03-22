@@ -74,4 +74,4 @@ Please read the "LICENSE.txt" file for information on the legal use and licensin
 of LAStools. I would also really like it if you would send me an email and tell me
 what you use LAStools for and what features and improvements you could need. 
 
-(c) 2007-2015 info@rapidlasso.de - https://rapidlasso.de
+(c) 2007-2022 info@rapidlasso.de - https://rapidlasso.de

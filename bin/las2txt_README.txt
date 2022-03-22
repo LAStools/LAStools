@@ -4,16 +4,12 @@
 
   Converts from binary LAS/LAZ 1.0 - 1.4 to an ASCII text format
  
-  For updates check the website or join the LAStools mailing list.
-
+  For updates check the website or join the LAStools google group.
+  
   https://rapidlasso.de/
-  http://lastools.org/
   http://groups.google.com/group/lastools/
-  http://twitter.com/lastools/
-  http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
 
-  Martin @lastools
+  Jochen @lastools
 
 ****************************************************************
 
@@ -254,7 +250,7 @@ Supported LAS Outputs
   -odir C:\data\ground (specify output directory)
   -odix _classified (specify file name appendix)
   -ocut 2 (cut the last two characters from name)
-  -olas -olaz -otxt -obin -oqfit (specify format)
+  -olas -olaz -otxt -obin -oqfit -optx -opts (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
 LAStools (by info@rapidlasso.de) version 150526

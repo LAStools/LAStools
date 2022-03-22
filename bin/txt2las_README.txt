@@ -12,12 +12,21 @@
 
   Allows adding a VLR to the header with projection information.
 
+  PTS/PTX input
   If your input text file is PTS or PTX format you can preserve
   the extra header information of these files. Simply add the
   appropriate '-ipts' or '-iptx' switch to the command line which
   will store this in a VLR. You can later reconstruct the PTS or
   PTX files with 'las2las' or 'las2txt' by adding the corresponding
   '-opts' or '-optx' option to the command line.
+  Using parameter '-iptx_transform' will use the header to 
+  transform the point data by the rotation and translation 
+  matrix in the header.
+  We support pts/ptx files with 4 or 7 columns.
+  Anyway, by default the PTX scanner just read the xyz values of the line.
+  If you want to use e.g. the intensity you have to use '-parse xyzi'
+  as parameter. Intensity input range of [0..1] will be multiplied 
+  by 4095 to get nice integer values.
 
   Also allows adding additional attributes to LAS/LAZ files using
   the "Extra Bytes" concept with '-add_attribute'.
@@ -25,16 +34,12 @@
   It is also possible to pipe the ASCII into txt2las. For this you
   will need to add both '-stdin' and '-itxt' to the command-line.
  
-  For updates check the website or join the LAStools mailing list.
-
-  https://rapidlasso.de/LAStools
-  http://lastools.org/
+  For updates check the website or join the LAStools google group.
+  
+  https://rapidlasso.de/
   http://groups.google.com/group/lastools/
-  http://twitter.com/LAStools
-  http://facebook.com/LAStools
-  http://linkedin.com/groups?gid=4408378
 
-  Martin @rapidlasso
+  Jochen @rapidlasso
 
 ****************************************************************
 
@@ -245,6 +250,9 @@ Transform coordinates.
   -clamp_z 70.5 72.5
   -copy_attribute_into_z 0
   -copy_intensity_into_z
+  -transform_helmert dx dy dz rx ry rz m
+  -transform_affine r w tx ty
+  -transform_matrix r11,r12,r13 r21,r22,r23 r31,r32,r33 tr1,tr2,tr3
 Transform raw xyz integers.
   -translate_raw_z 20
   -translate_raw_xyz 1 1 0
@@ -333,6 +341,9 @@ Supported LAS Inputs
   -i nasa.qi
   -i lidar.txt -iparse xyzti -iskip 2 (on-the-fly from ASCII)
   -i lidar.txt -iparse xyzi -itranslate_intensity 1024
+  -i lidar.pts -ipts
+  -i lidar.ptx -iptx (use VLR as header storage)
+  -i lidar.ptx -iptx_transform (use header matrix)
   -lof file_list.txt
   -stdin (pipe from stdin)
   -rescale 0.01 0.01 0.001
@@ -362,6 +373,8 @@ Supported ASCII Inputs:
   -i lidar.zip
   -i lidar.rar
   -i lidar.7z
+  -i lidar.pts -ipts
+  -i lidar.ptx -iptx -iptx_transform
   -stdin (pipe from stdin)
 usage:
 txt2las -parse tsxyz -i lidar.txt.gz
@@ -380,16 +393,35 @@ means that the first number is the gpstime, the next
 number should be skipped, the next three numbers are
 the x, y, and z coordinate, the next two should be
 skipped, and the next number is the scan angle.
-The other supported entries are i - intensity,
-n - number of returns of given pulse, r - number
-of return, c - classification, u - user data, and
-p - point source ID, e - edge of flight line flag, and
-d - direction of scan flag, R - red channel of RGB
-color, G - green channel, B - blue channel, I - NIR channel,
-l - scanner channel, o - overlap flag, h - withheld
-flag, k - keypoint flag, g - synthetic flag, 0 - first
-additional attribute specified, 1 - second additional
-attribute specified, 2 - third ...
+The other supported entries are:
+  x : <x> coordinate
+  y : <y> coordinate
+  z : <z> coordinate
+  t : gps <t>ime
+  R : RGB <R>ed channel
+  G : RGB <G>reen channel
+  B : RGB <B>lue channel
+  I : N<I>R channel of LAS 1.4 point type 8
+  s : <s>kip a string or a number that we don't care about
+  i : <i>ntensity
+  a : scan <a>ngle
+  n : <n>umber of returns of that given pulse
+  r : number of <r>eturn
+  h : with<h>eld flag
+  k : <k>eypoint flag
+  g : synthetic fla<g>
+  o : <o>verlap flag of LAS 1.4 point types 6, 7, 8
+  l : scanner channe<l> of LAS 1.4 point types 6, 7, 8
+  E : terrasolid <E>hco Encoding
+  c : <c>lassification
+  u : <u>ser data
+  p : <p>oint source ID
+  e : <e>dge of flight line flag
+  d : <d>irection of scan flag
+  0-9 : additional attributes described as extra bytes (0 through 9)
+  (13) : additional attributes described as extra bytes (10 and up)
+  H : a hexadecimal string encoding the RGB color
+  J : a hexadecimal string encoding the intensity
 ---------------------------------------------
 Other parameters are
 '-set_scale 0.05 0.05 0.001'
@@ -403,4 +435,4 @@ Other parameters are
 
 ---------------
 
-if you find bugs let me (info@rapidlasso.de) know.
+if you find bugs let us (info@rapidlasso.de) know.

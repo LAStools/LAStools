@@ -7,23 +7,17 @@
 
 --------------------------------------------------------------------------
 
-  There are TWO parts to LAStools. One part is OPEN source (LGPL 2.1). The
-  other part is CLOSED source and requires licensing for most commercial
-  or government use. If you're unsure please email 'info@rapidlasso.de'
-  before using LAStools. For education and evaluation purposes you can use
-  and test LAStools as much as you need to ... (-:
-
-  Personal note: The creator of LAStools and LASzip is currently not able
-  to attend LiDAR conferences or other scientific meetings in the US over
-  a somewhat unfortunate, kind of silly, and in many ways absurdly funny
-  incident involving "laser chickens" and a US Nuclear Weapons Lab. If you
-  have enough "pull" to rectify this ridiculous situation we would like to
-  hear from you ... (-;
-
+  There are TWO parts of LAStools. One part is OPEN source. 
+  The other part is CLOSED source and requires licensing for most 
+  commercial or government use. If you're unsure please email 
+  'info@rapidlasso.de' before using LAStools.
+  For education and evaluation purposes you can use and test LAStools 
+  for free. Some free version tools are may limited in the maximum count
+  of lidar points in one single file to avoid commercial usage.
+  
 --------------------------------------------------------------------------
 
-  This part of LAStools is "free" open-source LGPL (see COPYING.txt). To
-  purchase a different licensing model contact 'info@rapidlasso.de'.
+  This part of LAStools is "free" open-source (see COPYING.txt).
 
     * laszip
     * lasindex
@@ -35,7 +29,7 @@
     * lasmerge
     * las2txt & txt2las
     * lasprecision
-    * LASzip (with static linking exception)
+    * LASzip
     * LASlib (with LASzip) - the API used by LAStools.
 
   These are also "free" to use but not (yet) available in open source.
@@ -58,31 +52,35 @@
 
     * blast2dem
     * blast2iso
-
+    
+    * las2dem
+    * las2iso
+    * las2shp & shp2las
+    * las2tin
+    * lasboundary
+    * lasclassify
+    * lasclip
+    * lascolor
+    * lascontrol
+    * lascopy
+    * lasdatum & lasvdatum
+    * lasdistance
+    * lasduplicate
+    * lasgrid & lascanopy
     * lasground & lasground_new
     * lasheight & lastrack
-    * lasclassify
-    * lasgrid & lascanopy
-    * lasboundary
-    * lascontrol
-    * lasoverlap
+    * laslayers
     * lasoverage
-    * lasdatum
-    * lasduplicate
-    * lassplit
-    * lasreturn
-    * las2tin
-    * las2iso
-    * las2dem
-    * lasthin & lasnoise
-    * lassort
-    * lastile
+    * lasoverlap
     * lasplanes
-    * lascolor
-    * lasclip
+    * lasprobe
+    * lasreturn
+    * lassort
+    * lassplit
+    * lasthin & lasnoise
+    * lastile
+    * lastool
     * lasvoxel
-    * lasdistance
-    * las2shp & shp2las.
 
 --------------------------------------------------------------------------
 
@@ -94,10 +92,12 @@
   You can also contract with rapidlasso GmbH to create LAStools tailored
   to your particular needs.
   
+  See https://rapidlasso.de/licensing for licensing details.
+  
 --------------------------------------------------------------------------
 
   COPYRIGHT:
   
-  (c) 2007-2021, rapidlasso GmbH, GERMANY - fast tools to catch reality
+  (c) 2007-2022, rapidlasso GmbH, GERMANY - fast tools to catch reality
 
 --------------------------------------------------------------------------

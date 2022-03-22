@@ -13,10 +13,10 @@
 
   COPYRIGHT:
 
-    (c) 2007-2019, rapidlasso GmbH - fast tools to catch reality
+    (c) 2007-2022, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
-    terms of the GNU Lesser General Licence as published by the Free Software
+    terms of the Apache Public License 2.0 published by the Apache Software
     Foundation. See the COPYING file for more information.
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
@@ -49,7 +49,7 @@
 #define LASZIP_DYN_LINK
 #define LASZIP_SOURCE
 
-#include "laszip_api.h"
+#include <laszip/laszip_api.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

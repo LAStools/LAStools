@@ -1,125 +1,83 @@
 ****************************************************************
 
-  lassplit:
+  lasdatum:
 
-  Splits the input file(s) into several output files based on
-  various parameters. By default lassplit split a combined LAS
-  file into its original, individual flight lines by splitting
-  based on the point source ID of the points. Other options are
-  to split '-by_classification', '-by_gps_time_interval 100', 
-  '-by_x_interval 15.5', '-by_y_interval 2.5', '-by_z_interval 11.5',
-  '-by_intensity_interval 10', '-by_scan_angle_interval 5',  
-  '-by_user_data_interval 16', '-by_attribute_interval 0 0.5' or
-  '-by_attribute_interval 1 1.0' 
+  Transforms LiDAR from one horizontal datum to another using
+  either a NTv2 grid or a seven parameter helmert transform.
 
-  Instead of splitting LAS/LAZ/BIN/ASCII files based on these
-  listed attributes they can also be split into many numbered
-  files that each contain the same number of points (except for
-  the last one) with the '-split 100000000' option, which would
-  split each time after 100 million points were written.
+  Note that there are two ways of specifying the rotational part
+  of the Helmert transform. The Position Vector Transformation (PVR)
+  convention and the Coordinate Frame Rotation (CFR) convention.
+  The difference between them is that their rotation matrix is of
+  opposite orientation. You need to specify in the command line
+  which of the two you are using by adding either '-pvr' and '-cfr'
+  to the command line.
 
-  The header information from the first file (e.g. VLRs, scale
-  factor offset, ...) is used for each written output file while
-  these LAS header attributes are updated:
+  Please license from info@rapidlasso.de before using lasdatum
+  commercially. Please note that the unlicensed version will set
+  intensity, gps_time, user data, and point source ID to zero,
+  slightly change the LAS point order, and randomly add a tiny
+  bit of white noise to the points coordinates once you exceed a
+  certain number of points in the input file.
 
-    * number_of_point_records
-    * number_of_points_by_return[5]
-    * max_x, min_x, max_y, min_y, max_z, and min_z
+  For updates check the website or join the LAStools mailing list.
 
-  In case the '-merged' option is used, it may become necessary
-  to change the x_scale_factor, y_scale_factor, z_scale_factor
-  and/or the x_offset, y_offset, z_offset, values. In order to
-  have more control over this process the user can reset those
-  in the command line with
-
-     -rescale 0.01 0.01 0.001
-     -reoffset 600000 4000000 0
-
-  For updates check the website or join the LAStools google group.
-  
   https://rapidlasso.de/
+  http://lastools.org/
   http://groups.google.com/group/lastools/
+  http://twitter.com/lastools/
+  http://facebook.com/lastools/
+  http://linkedin.com/groups?gid=4408378
 
-****************************************************************
-see also:
-  lasmerge - Merge or split lidar data files by number of points
+  Martin @rapidlasso
+
 ****************************************************************
 
 example usage:
 
->> lassplit -i lidar.las -olaz
+:: from MGI / Austria GK East to ETRS89 / UTM zone 33N using a grid
 
-splits the file "lidar.las" based on the point source ID into
-files named "lidar.XXXXX.laz" where XXXXX corresponds to the
-point source ID.
+lasdatum ^
+-i mgi\test_tile.laz ^
+-epsg 31256 ^
+-grid AT_GIS_GRID.gsb ^
+-target_epsg 25833 ^
+-o utm33\test_tile.laz
 
->> lassplit -i *.las -olas
+:: from ETRS89 / UTM zone 33N to MGI / Austria GK East using a grid
 
-splits all files that match "*.las" based on the point source
-ID into files named "*.XXXXX.las" where XXXXX corresponds to
-the point source ID.
+lasdatum ^
+-i utm33\test_tile.laz ^
+-epsg 25833 ^
+-grid AT_GIS_GRID.gsb ^
+-backward ^
+-target_epsg 31256 ^
+-o mgi\test_tile.laz
 
->> lassplit -i *.laz -olaz -recover_flightlines
+:: from MGI / Austria GK East to ETRS89 / UTM zone 33N using a seven parameter transform in CFR convention
 
-this is a special option for the case that the LiDAR tiles do
-not have the point source ID correctly populated but have a proper
-GPS time stamp per point. here lassplit recovers the most likely
-flightlines based on conituity (or rather gaps) in the GPS times.
+lasdatum ^
+-i mgi\test_tile.laz ^
+-epsg 31256 ^
+-cvr ^
+-seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 ^
+-target_epsg 25833 ^
+-o utm33\test_tile.laz
 
->> lassplit -i *.las -merged -o flightlines.laz
+:: from ETRS89 / UTM zone 33N to MGI / Austria GK East using a seven parameter transform in CFR convention
 
-merges files that match "*.las" and splits the result based on
-the point source ID into files named "flightlines.XXXXX.laz" where
-XXXXX corresponds to the point source ID.
-
->> lassplit -i *.las -merged -o chopped.las -digits 2 -split 10000000
-
-merges all *.las files into one and then splits the result into
-several output files that contain ten million points each and that
-are called chopped.00.las, chopped.01.las, chopped.02.las, ...
-
->> lassplit -i big.txt -iparse xyztp -o split.laz -split 500000000
-
-split the ASCII file "big.txt" that could, for example, contain 25
-billion points one and then split it into several compressed
-output LAZ files that contain 500 million points each that are
-called split.00000.laz, split.00001.laz, split.00002.laz, ...
-
-****************************************************************
-
-overview of all tool-specific switches:
-
--v                                   : more info reported in console
--vv                                  : even more info reported in console
--quiet                               : nothing reported in console
--wait                                : wait for <ENTER> in the console at end of process
--version                             : reports this tool's version number
--fail                                : fail if license expired or invalid
--gui                                 : start with files loaded into GUI
--cores 4                             : process multiple inputs on 4 cores in parallel
--digits 5                            : number of digits to use for naming of split files
-                                     : default: 7
--split 20000000                      : split into containing 20 million points each
--by_classification                   : split based on the classification code
--by_gps_time_interval 2.0            : split points into intervals of 2 seconds
--by_intensity_interval 64            : split points based on intensty intervals of 64
--by_x_interval 2.0                   : split points based on x coordinate intervals of 2.0
--by_y_interval 3.0                   : split points based on y coordinate intervals of 3.0
--by_z_interval 10.0                  : split points based on z coordinate intervals of 10.0
--by_scan_angle_interval 2.5          : split points based on scan angle intervals of 2.5
--by_user_data_interval 16            : split points based on user data intervals of 16
--by_attribute_interval 0 1.0         : split points based on attribute with index in intervals of 1.0
--recover_flightlines                 : split points after recovering flight lines from 5 second GPS time interruptions
--recover_flightlines_interval 20     : split points after recovering flight lines from 20 second GPS time interruptions
--ilay                                : apply all LASlayers found in corresponding *.lay file on read
--ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
--ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
+lasdatum ^
+-i utm33\test_tile.laz ^
+-epsg 25833 ^
+-cfr ^
+-seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 ^
+-backward ^
+-target_epsg 31256 ^
+-o mgi\test_tile.laz
 
 ****************************************************************
 
-for more info:
-
-E:\LAStools\bin>lassplit -h
+E:\software\LAStools\bin>lasdatum -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -264,9 +222,6 @@ Transform scan_angle.
   -scale_scan_angle 1.944445
   -translate_scan_angle -5
   -translate_then_scale_scan_angle -0.5 2.1
-Transform register.
-  -copy_attribute_into_register 0 0
-  -scale_register 0 1.5
 Change the return number or return count of points.
   -repair_zero_returns
   -set_return_number 1
@@ -335,6 +290,12 @@ Transform RGB/NIR colors.
   -scale_RGB_up (by 256)
   -scale_RGB_to_8bit (only scales down 16 bit values)
   -scale_RGB_to_16bit (only scales up 8 bit values)
+  -set_NIR 65535
+  -scale_NIR 2
+  -scale_NIR_down (by 256)
+  -scale_NIR_up (by 256)
+  -scale_NIR_to_8bit (only scales down 16 bit values)
+  -scale_NIR_to_16bit (only scales up 8 bit values)
   -switch_R_G -switch_R_B -switch_B_G
   -copy_R_into_NIR -copy_R_into_intensity
   -copy_G_into_NIR -copy_G_into_intensity
@@ -348,6 +309,18 @@ Transform attributes in "Extra Bytes".
   -copy_user_data_into_attribute 0
   -copy_z_into_attribute 0
   -map_attribute_into_RGB 0 map_height_to_RGB.txt
+Transform using "LASregisters".
+  -copy_attribute_into_register 0 0
+  -scale_register 0 1.5
+  -translate_register 1 10.7
+  -add_registers 0 1 3
+  -multiply_registers 0 1 2
+  -copy_intensity_into_register 0
+  -copy_R_into_register 1
+  -copy_G_into_register 2
+  -copy_B_into_register 3
+  -copy_NIR_into_register 4
+  -copy_register_into_intensity 1
 Ignore points based on classifications.
   -ignore_class 7
   -ignore_class 0 1 7 33
@@ -392,22 +365,15 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by info@rapidlasso.de) version 211206 (commercial)
+LAStools (by info@rapidlasso.de) version 210323 (commercial)
 usage:
-lassplit -i *.las
-lassplit -i *.laz -merged -o flightlines.las
-lassplit -i *.laz -merged -recover_flightlines -o flightlines.las
-lassplit -i lidar.laz -by_gps_time_interval 5.0 -o segments.laz
-lassplit -i lidar.laz -by_intensity_interval 32 -o intensities.laz
-lassplit -i lidar.laz -by_classification -o slices.laz
-lassplit -i lidar.laz -by_user_data_interval 8 -o slices.laz
-lassplit -i forest.laz -by_attribute_interval 0 1.0 -o trees.laz
-lassplit -i lidar.laz -by_x_interval 5.0 -o slices_x.laz
-lassplit -i lidar.laz -by_y_interval 2.5 -o slices_y.laz
-lassplit -i lidar.laz -by_z_interval 1.0 -o slices_z.laz
-lassplit -i *.las -merged -split 100000000 -digits 2
-lassplit -h
+lasdatum -i in.laz -grid datumshift.gsb -o out.laz
+lasdatum -i in.laz -epsg 31256 -grid AT_GRID.gsb -target_epsg 25833 -o out.laz
+lasdatum -i in.laz -epsg 25833 -grid AT_GRID.gsb -backward -target_epsg 31256 -o out.laz
+lasdatum -i in.laz -epsg 31256 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 -target_epsg 25833 -o out.laz
+lasdatum -i in.laz -epsg 25833 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 -backward -target_epsg 31256 -o out.laz
+lasdatum -h
 
----------------
+-------------
 
-if you find bugs let us (support@rapidlasso.com) know.
+if you find bugs let us (info@rapidlasso.de) know.

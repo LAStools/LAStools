@@ -41,17 +41,14 @@
   Please license from info@rapidlasso.de to use
   lasduplicate commercially.
 
-  For updates check the website or join the LAStools mailing list.
-
+  For updates check the website or join the LAStools google group.
+  
   https://rapidlasso.de/
-  http://lastools.org/
   http://groups.google.com/group/lastools/
-  http://twitter.com/lastools/
-  http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
 
-  Martin @lastools
-
+****************************************************************
+see also:
+  lascopy - Copy point properties from different sources to a target
 ****************************************************************
 
 example usage:

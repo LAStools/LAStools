@@ -1,3 +1,4 @@
+22 March 2022 -- fix fseek for gcc for las/lax file > 2Gb
 30 December 2021 -- fix small memory leak in lasreaditemcompressed_v3.cpp 
  2 December 2020 -- fix memory leak in laszip_dll.cpp
 23 September 2020 -- LASzip and LASlib: rare fix for reading bit-corrupted LAZ files where chunk table is zeroed

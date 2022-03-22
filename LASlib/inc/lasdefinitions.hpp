@@ -49,7 +49,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 211112
+#define LAS_TOOLS_VERSION 220310
 
 #include <stdio.h>
 #include <string.h>
@@ -83,6 +83,10 @@
 
 #define LAS_TOOLS_IO_IBUFFER_SIZE   262144
 #define LAS_TOOLS_IO_OBUFFER_SIZE   262144
+
+#ifndef MAX_PATH // linux
+#define MAX_PATH 256
+#endif
 
 class LASvlr
 {

@@ -58,6 +58,19 @@
   -store_xyz_range_as_extra_bytes
   -store_xyz_range_precise_as_extra_bytes
 
+  Height ist stored as signed 16 Bit integer.
+    Resolution is cm, so you will have values between 
+    (-327.68 - 327.67 m).
+  Height_precise ist stored as 32 Bit integer/1000.
+    Resolution is mm, so you will have values between
+    (−2147483.648 - 2147483.647 m).
+  Range is stored as unsigned 16 Bit integer/100 (0 - 655.35 m).
+  Range_precise as unsigned 32 Bit integer/1000 (0 - 4294967.295 m).
+  
+  So if your values might get big and you dont want to risk an
+  integer overflow use the _precise version of the parameter.
+  
+  
   Please license from info@rapidlasso.de before using
   lastrack commercially.
 
@@ -65,11 +78,8 @@
 
   http://lastools.org/
   http://groups.google.com/group/lastools/
-  http://twitter.com/lastools/
-  http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
 
-  Martin @lastools
+  Jochen @lastools
 
 ****************************************************************
 

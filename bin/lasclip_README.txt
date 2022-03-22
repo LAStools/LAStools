@@ -2,7 +2,7 @@
 
   lasclip:
 
-  takes as input a LAS/LAZ/TXT file and a SHP/TXT file with one
+  Takes as input a LAS/LAZ/TXT file and a SHP/TXT file with one
   or many polygons (e.g. building footprints), clips away all the
   points that fall outside all polygons (or inside some polygons),
   and stores the surviving points to the output LAS/LAZ/TXT file.
@@ -27,6 +27,9 @@
   associated DBF file then you can use '-split 0' to give output
   files the name or number stored in attribute with index 0. Or
   you can use '-split IDX' with IDX being the attribute's name.
+  -split        one file each shape
+  -split 1      split by attrib with index 0
+  -split abc    split by attrib with name abc
 
   You can exclude certain point classes from the clipping or the
   reclassifying with option '-ignore_class 2' or '-ignore_class
@@ -42,70 +45,6 @@
   can be used together with the TO_core_last_zoom.las or the
   TO_core_last.las data set to clip away the Toronto city hall.
 
-  Please license from info@rapidlasso.de to use lasclip
-  commercially.
-
-  For updates check the website or join the LAStools mailing list.
-
-  http://lastools.org/
-  http://groups.google.com/group/lastools/
-  http://twitter.com/lastools/
-  http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
-
-  Martin @lastools
-
-****************************************************************
-
-example usage:
-
->> lasclip -i *.las -poly polygon.shp -v
-
-clips all the LAS files matching "*.las" against the polygon(s) in 
-"polygon.shp" and stores each result to a LAS file called "*_1.las".
-
->> lasclip -i *.txt -iparse xyzt -poly polygon.shp -otxt -oparse xyzt
-
-same but for ASCII input/output that gets parsed with "xyzt".
-
->> lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -interior -v
-
-clips the points falling *inside* the polygon that describes the building
-footprint of the toronto city hall from the file TO_core_last_zoom.laz
-and stores the result to output.laz.
-
->> lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -v
-
-same as above but now it clips points falling *outside* of the polygon.
-
->> lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -classify 6 -interior -v
-
-classifies the points falling *inside* the polygon as "Building".
-
->> lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -flag_as_withheld -interior
-
-flags the points falling *inside* the polygon as 'withheld'.
-
->> lasclip -i city.las -poly buildings.txt -interior -o city_without_buildings.las
-
-clips the points from the inside of the buildings footprints specified
-in 'buildings.txt' out of the LAS file 'city.las' and stores the other
-points to 'city_without_buildings.las'. The text file should have the
-following format:
-
-757600 3.6927e+006
-757432 3.69264e+006
-757400 3.69271e+006
-757541 3.69272e+006
-757600 3.6927e+006
-#
-757800 3.6917e+006
-757632 3.69164e+006
-757600 3.69171e+006
-757741 3.69172e+006
-757800 3.6917e+006
-[...]
-
 ****************************************************************
 
 overview of all tool-specific switches:
@@ -116,8 +55,11 @@ overview of all tool-specific switches:
 -wait                                : wait for <ENTER> in the console at end of process
 -version                             : reports this tool's version number
 -fail                                : fail if license expired or invalid
+-poly [filename]                     : input shape file
+-flag_as_withheld                    : just flag the point as withheld instead of removing it 
 -gui                                 : start with files loaded into GUI
--cores 4                             : process multiple inputs on 4 cores in parallel
+-cores [n]                           : process multiple inputs on n cores in parallel
+-interior                            : clip points INSIDE the polygons
 -ignore_class 0 1 3 5 6 7 9          : ignores points with specified classification codes
 -ignore_extended_class 42 43 45 67   : ignores points with specified extended classification codes
 -ignore_single                       : ignores single returns
@@ -126,8 +68,6 @@ overview of all tool-specific switches:
 -ignore_first_of_many                : ignores first returns (but only those of multi-returns)
 -ignore_intermediate                 : ignores intermediate returns
 -ignore_last_of_many                 : ignores last returns (but only those of multi-returns)
-
-
 
 ... more to come ...
 
@@ -139,11 +79,8 @@ overview of all tool-specific switches:
 -olaydir E:\my_layers                : write the output *.lay file in directory E:\my_layers
 
 ****************************************************************
+Help output of the tool: D:\LAStools\bin>lasclip -h
 
-
-for more info:
-
-D:\LAStools\bin>lasclip -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -318,7 +255,7 @@ Supported LAS Outputs
   -olas -olaz -otxt -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
-LAStools (by info@rapidlasso.de) version 150526 (commercial)
+LAStools (by info@rapidlasso.de) version YYMMDD (commercial)
 usage:
 lasclip -i *.las -poly polygon.shp -v
 lasclip -i *.txt -iparse xyzt -poly polygon.shp -otxt -oparse xyzt
@@ -329,6 +266,69 @@ lasclip -i lidar.laz -poly hydro.shp -o clean.laz -ignore_class 2
 lasclip -i lidar.laz -poly noise.shp -o lidar_clean.laz -interior -flag_as_withheld
 lasclip -i forest\*.laz -merged -poly plots.shp -split -o plots.laz
 
----------------
+****************************************************************
+examples
 
-if you find bugs let me (info@rapidlasso.de) know.
+>> lasclip -i *.las -poly polygon.shp -v
+
+clips all the LAS files matching "*.las" against the polygon(s) in 
+"polygon.shp" and stores each result to a LAS file called "*_1.las".
+
+>> lasclip -i *.txt -iparse xyzt -poly polygon.shp -otxt -oparse xyzt
+
+same but for ASCII input/output that gets parsed with "xyzt".
+
+>> lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -interior -v
+
+clips the points falling *inside* the polygon that describes the building
+footprint of the toronto city hall from the file TO_core_last_zoom.laz
+and stores the result to output.laz.
+
+>> lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -v
+
+same as above but now it clips points falling *outside* of the polygon.
+
+>> lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -classify 6 -interior -v
+
+classifies the points falling *inside* the polygon as "Building".
+
+>> lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -flag_as_withheld -interior
+
+flags the points falling *inside* the polygon as 'withheld'.
+
+>> lasclip -i city.las -poly buildings.txt -interior -o city_without_buildings.las
+
+clips the points from the inside of the buildings footprints specified
+in 'buildings.txt' out of the LAS file 'city.las' and stores the other
+points to 'city_without_buildings.las'. The text file should have the
+following format:
+
+757600 3.6927e+006
+757432 3.69264e+006
+757400 3.69271e+006
+757541 3.69272e+006
+757600 3.6927e+006
+#
+757800 3.6917e+006
+757632 3.69164e+006
+757600 3.69171e+006
+757741 3.69172e+006
+757800 3.6917e+006
+[...]
+
+****************************************************************
+Please get license from info@rapidlasso.de to use lasclip
+commercially.
+For updates check the website https://rapidlasso.de
+All mayor updates are published on 
+https://github.com/LAStools/LAStools.github.io
+If you want to get a notification on new releases you may add 
+a notifier there.
+To get help first look at
+http://groups.google.com/group/lastools/
+Your problem is may already discussed there.
+If not, just add a new entry and me or someone else will 
+help.
+If you find bugs just let us (info@rapidlasso.de) know.
+  
+Jochen @lastools

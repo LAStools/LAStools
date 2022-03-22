@@ -36,16 +36,12 @@
   of classification 2 or 3 and the option -drop_class 2 3 will drop
   only those points. For all options run 'las2las -h'.
  
-  For updates check the website or join the LAStools mailing list.
-
-  https://rapidlasso.de/LAStools
-  http://lastools.org/
+  For updates check the website or join the LAStools google group.
+  
+  https://rapidlasso.de/
   http://groups.google.com/group/lastools/
-  http://twitter.com/LAStools
-  http://facebook.com/LAStools
-  http://linkedin.com/groups?gid=4408378
 
-  Martin @rapidlasso
+  Jochen @rapidlasso
 
 ****************************************************************
 
@@ -220,6 +216,7 @@ other commandline arguments are
 -remove_evlrs_from_to 0 2      : remove the first three EVLRs
 -remove_tiling_vlr             : removes VLR containing tiling information created by lastile
 -remove_original_vlr           : removes VLR containing original header information created by on-the-fly buffering
+-add_empty_vlr uid rid desc    : add an empty VLR with given user-id(text), record-id(int) and description(text)  
 -add_attribute 0 "hello" "sample attribute" 1.0 0.0 : adds a new attribute of type 0 (unsigned byte) as "extra bytes"
 -unset_attribute_scale 0       : unsets the scale of the *first* attribute in the extra bytes
 -unset_attribute_offset 1      : unsets the offset of the *second* attribute in the extra bytes
@@ -282,8 +279,8 @@ other commandline arguments are
 for more info:
 
 C:\software\LAStools\bin>las2las -h
-Filter points based on their coordinates.
-  -keep_tile 631000 4834000 1000 (ll_x ll_y size)
+Filter points based on their *scaled* coordinates.
+  -keep_tile 631000 4834000 1000 (lowerleft_x lowerleft_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
   -keep_xy 630000 4834000 631000 4836000 (min_x min_y max_x max_y)
   -drop_xy 630000 4834000 631000 4836000 (min_x min_y max_x max_y)
@@ -527,7 +524,7 @@ Supported LAS Outputs
   -odir C:\data\ground (specify output directory)
   -odix _classified (specify file name appendix)
   -ocut 2 (cut the last two characters from name)
-  -olas -olaz -otxt -obin -oqfit (specify format)
+  -olas -olaz -otxt -obin -oqfit -optx -opts (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
 LAStools (by info@rapidlasso.de) version 190711

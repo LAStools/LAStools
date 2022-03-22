@@ -200,14 +200,14 @@ BOOL LASwriterTXT::open(FILE* file, const LASheader* header, const CHAR* parse_s
       }
       fprintf(file, "%u     \012", (U32)((I64*)payload)[4]); // ncols
       fprintf(file, "%u     \012", (U32)((I64*)payload)[5]); // nrows
-      fprintf(file, "%g %g %g\012", ((F64*)payload)[6], ((F64*)payload)[7], ((F64*)payload)[8]); // translation
-      fprintf(file, "%g %g %g\012", ((F64*)payload)[9], ((F64*)payload)[10], ((F64*)payload)[11]); // rotation_row_0
-      fprintf(file, "%g %g %g\012", ((F64*)payload)[12], ((F64*)payload)[13], ((F64*)payload)[14]); // rotation_row_1
-      fprintf(file, "%g %g %g\012", ((F64*)payload)[15], ((F64*)payload)[16], ((F64*)payload)[17]); // rotation_row_2
-      fprintf(file, "%g %g %g %g\012", ((F64*)payload)[18], ((F64*)payload)[19], ((F64*)payload)[20], ((F64*)payload)[21]); // transformation_row_0
-      fprintf(file, "%g %g %g %g\012", ((F64*)payload)[22], ((F64*)payload)[23], ((F64*)payload)[24], ((F64*)payload)[25]); // transformation_row_0
-      fprintf(file, "%g %g %g %g\012", ((F64*)payload)[26], ((F64*)payload)[27], ((F64*)payload)[28], ((F64*)payload)[29]); // transformation_row_0
-      fprintf(file, "%g %g %g %g\012", ((F64*)payload)[30], ((F64*)payload)[31], ((F64*)payload)[32], ((F64*)payload)[33]); // transformation_row_0
+      fprintf(file, "%g %g %g\012", ((F64*)payload)[6], ((F64*)payload)[7], ((F64*)payload)[8]); // scanner registered position
+	  fprintf(file, "%g %g %g\012", ((F64*)payload)[9], ((F64*)payload)[10], ((F64*)payload)[11]); // scanner registered axis 'X'
+      fprintf(file, "%g %g %g\012", ((F64*)payload)[12], ((F64*)payload)[13], ((F64*)payload)[14]); // scanner registered axis 'Y'
+      fprintf(file, "%g %g %g\012", ((F64*)payload)[15], ((F64*)payload)[16], ((F64*)payload)[17]); // scanner registered axis 'Z'
+      fprintf(file, "%g %g %g %g\012", ((F64*)payload)[18], ((F64*)payload)[19], ((F64*)payload)[20], ((F64*)payload)[21]); // r11 r12 r13 - rotation matrix
+      fprintf(file, "%g %g %g %g\012", ((F64*)payload)[22], ((F64*)payload)[23], ((F64*)payload)[24], ((F64*)payload)[25]); // r21 r22 r23
+      fprintf(file, "%g %g %g %g\012", ((F64*)payload)[26], ((F64*)payload)[27], ((F64*)payload)[28], ((F64*)payload)[29]); // r31 r32 r33
+      fprintf(file, "%g %g %g %g\012", ((F64*)payload)[30], ((F64*)payload)[31], ((F64*)payload)[32], ((F64*)payload)[33]); // tr1 tr2 tr3 - transformation 
     }
     else
     {

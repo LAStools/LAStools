@@ -1,11 +1,13 @@
 ****************************************************************
 
   lasmerge:
+  
+  Merge many files into one or split one file into many.
 
-  reads multiple LIDAR data files in LAS/LAZ/ASCII format and
-  merges them into a single LAS/LAZ/ASCII file. The filenames
-  can either be provided one by one, with one or more wildcards,
-  or in form of a text file.
+  The tool reads multiple LIDAR data files in LAS/LAZ/ASCII 
+  format and merges them into a single LAS/LAZ/ASCII file. 
+  The filenames can either be provided one by one, with one 
+  or more wildcards, or in form of a text file.
 
   Rather than merging the merged LAS/LAZ/ASCII files into a single
   LAS/LAZ/ASCII file they can also be split into many numbered
@@ -32,16 +34,14 @@
 
      -reoffset 600000 4000000 0
 
-  For updates check the website or join the LAStools mailing list.
-
-  http://lastools.org/
+  For updates check the website or join the LAStools google group.
+  
+  https://rapidlasso.de/
   http://groups.google.com/group/lastools/
-  http://twitter.com/lastools/
-  http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
 
-  Martin @lastools
-
+****************************************************************
+see also:
+  lassplit - Merge or split lidar data files by properties
 ****************************************************************
 
 example usage:

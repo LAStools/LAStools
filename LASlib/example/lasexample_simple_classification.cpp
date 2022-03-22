@@ -13,7 +13,7 @@
 
   PROGRAMMERS:
   
-    martin.isenburg@rapidlasso.de  -  http://rapidlasso.de
+    info@rapidlasso.de  -  http://rapidlasso.de
   
   COPYRIGHT:
   

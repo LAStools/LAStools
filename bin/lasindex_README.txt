@@ -34,14 +34,11 @@
 
   For updates check the website or join the LAStools mailing list.
 
-  http://lastools.org/
   https://rapidlasso.de/LAStools
   http://groups.google.com/group/lastools/
-  http://twitter.com/lastools/
-  http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
+  http://lastools.org/
 
-  Martin @rapidlasso
+  Jochen @rapidlasso
 
 ****************************************************************
 
@@ -72,19 +69,19 @@ not yet have a LAX file
 
 overview of all tool-specific switches:
 
--v                                   : more info reported in console
--vv                                  : even more info reported in console
--quiet                               : nothing reported in console
--version                             : reports this tool's version number
--gui                                 : start with files loaded into GUI
--cores 4                             : process multiple inputs on 4 cores in parallel
--cpu64                               : start 64 bit lasindex64 instead of 32 bit executable
--dont_reindex                        : skip LAS or LAZ that already have an index
--append                              : append LAX file to LAZ file (not possible for LAS)
--tile_size 50                        : set smallest spatial area indexed to 50 by 50 units
--maximum -30                         : maximum number of intervals per spatial area
--minumum 200000                      : minimum number of points forming one indexed area
--threshold 1500                      : some threshold
+-v                  : more info reported in console (verbose)
+-vv                 : even more info reported in console
+-quiet              : nothing reported in console
+-version            : reports this tool's version number
+-gui                : start with files loaded into GUI
+-cores 4            : process multiple inputs on 4 cores in parallel
+-cpu64              : start 64 bit lasindex64 instead of 32 bit executable
+-dont_reindex       : skip LAS or LAZ that already have an index
+-append             : append LAX file to LAZ file (not possible for LAS)
+-tile_size 50       : set smallest spatial area indexed to 50 by 50 units; default 10
+-maximum -30        : maximum number of intervals per spatial area
+-minumum 200000     : minimum number of points forming one indexed area
+-threshold 1500     : some threshold
 
 ****************************************************************
 
@@ -336,16 +333,18 @@ Supported LAS Inputs
   -rescale_xy 0.01 0.01
   -rescale_z 0.01
   -reoffset 600000 4000000 0
+User defined output
+  -o filename.lax
 Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
   -inside min_x min_y max_x max_y
   -inside_tile ll_x ll_y size
   -inside_circle center_x center_y radius
 LAStools (by info@rapidlasso.de) version 190909
 usage:
-lasindex lidar.las
-lasindex *.las
-lasindex flight1*.las flight2*.las -verbose
-lasindex lidar.las -tile_size 2 -maximum -50
+lasindex -i lidar.las
+lasindex -i *.las
+lasindex -i flight1*.las flight2*.las -v
+lasindex -i lidar.las -tile_size 2 -maximum -50
 lasindex -h
 
 ---------------

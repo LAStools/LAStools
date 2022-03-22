@@ -1,3 +1,5 @@
+22 March 2022 -- lasindex: added -o parameter; Fix fseek for gcc for las/lax file > 2Gb
+22 March 2022 -- LASlib: added '-iptx_transform' option; 
  7 January 2022 -- lastrack: extra_byte output bugfix
 30 December 2021 -- fix small memory leak in lasreaditemcompressed_v3.cpp
  1 December 2021 -- lasclip: merge split output with same shape names

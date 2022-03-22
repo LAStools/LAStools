@@ -1,6 +1,7 @@
 ****************************************************************
 
-  las2iso:
+las2iso:
+########
 
   reads LIDAR in LAS/LAZ/ASCII format and extracts isocontours by
   constructing and interpolating a temporary TIN. It is possible
@@ -10,16 +11,25 @@
   For example, the option '-keep_class 2 3' will triangulate only
   the points of classification 2 or 3.
 
+# Control parameters:
+
+-smooth [n]
+  Number of smooth iterations. Typical values are between [2..20]. 
+  Option operates on the TIN before extracting the contours and 
+  hence is safe. 
+-clean [n]
+  Removes entire contours with less than [n] points.
+  You can get less wiggly contours by first thinning the points 
+  with the '-contours' option available in lasthin.
+  Caution: -clean on blast2iso is different!
+  
   Note: to guarantee non-crossing iso-contours the '-simplify'
   (or '-simplify_length) and the '-simplify_area' parameters
   should not be used (or set to zero). This is because those
   two options directly try to simplify individual contours after
-  they were extracted, which can lead to crossing. However, the
-  '-smooth' option operates on the TIN before extracting the
-  contours, and hence is safe. The '-clean' option simply removes
-  entire contours that are too short. You can get less wiggly
-  contours by first thinning the points with the '-contours' 
-  option available in lasthin.
+  they were extracted, which can lead to crossing. 
+
+# Output parameters:  
 
   The resulting isocontours are stored either in ESRI's Shapefile
   format (-o contours.shp) or as a text file (-o contours.txt) 
@@ -61,15 +71,12 @@
   Please license from info@rapidlasso.de to use las2iso
   commercially.
 
-  For updates check the website or join the LAStools mailing list.
-
-  http://lastools.org/
+  For updates check the website or join the LAStools google group.
+  
+  https://rapidlasso.de/
   http://groups.google.com/group/lastools/
-  http://twitter.com/lastools/
-  http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
 
-  Martin @lastools
+  Jochen @lastools
 
 ****************************************************************
 
@@ -91,13 +98,6 @@ contour line being an explicit attribues in the DBF file.
 extracts 20 evenly spaced contours from all ASCII files *.txt that
 are parsed with "ssxyz" and stores the result in Shapefile format.
 
->> las2iso -i lidar.las -o contours.shp -iso_every 5 -simplify 1 -clean 10
- 
-extracts 5 unit contours, simplifies away all segments that are
-shorter than 1 unit, cleans out all contours whose total length
-is shorter than 10 units, and then stores the result in ESRI's
-Shapefile format.
-
 >> las2iso -i lidar.las -o contours.kml -iso_number 20 -utm 10T
 
 extracts 20 evenly spaced contours and stores the result in KML
@@ -112,12 +112,6 @@ or flight2*.laz and stores the result in ESRI's Shapefile format.
 
 extracts 50 evenly spaced contours and stores the result in KML
 format using state plane83 Iowa North as projection information.
-
->> las2iso -i lidar.las -o contours.shp -iso_every 10 -simplify 0.5
-
-extracts evenly spaced contours every 10 units, simplifies away all
-segments that are shorter than 0.5 units, and stores the result in
-ESRI's Shapefile format.
 
 >> las2iso -i lidar1.las lidar2.las -merged -o contours.wkt -iso_range 400 800 5 
 
@@ -300,9 +294,9 @@ Optional Settings
 LAStools (by info@rapidlasso.de) version 140301 (unlicensed)
 usage:
 las2iso -i *.las -oshp
-las2iso -i flight1*.las flight2*.las -oshp -simplify 1 -clean 10
+las2iso -i flight1*.las flight2*.las -oshp -smooth 3 -clean 10
 las2iso -i *.las -okml -iso_range 400 600 20 -utm 14S
-las2iso -i *.txt -iparse ssxyz -owkt -iso_every 2 -simplify 0.5 -concavity 100
+las2iso -i *.txt -iparse ssxyz -owkt -iso_every 2 -smooth 2 -concavity 100
 las2iso -i lidar.las -first_only -o contours.wkt -iso_number 20
 las2iso -i lidar.las -o contours.shp -last_only -iso_range 400 600 20
 las2iso -i lidar.las -otxt -stdout -keep_class 2 3 9 > lines.txt

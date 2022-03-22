@@ -113,16 +113,14 @@
   Please license from info@rapidlasso.de to use LAStools
   commercially.
 
-  For updates check the website or join the LAStools mailing list.
-
-  http://lastools.org/
+  For updates check the website or join the LAStools google group.
+  
+  https://rapidlasso.de/
   http://groups.google.com/group/lastools/
-  http://twitter.com/lastools/
-  http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
 
-  Martin @lastools
-
+****************************************************************
+see also:
+  lassplit - Merge or split lidar data files by number of points
 ****************************************************************
 
 example usage:

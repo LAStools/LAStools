@@ -1,125 +1,138 @@
 ****************************************************************
 
-  lassplit:
+  lasprobe:
 
-  Splits the input file(s) into several output files based on
-  various parameters. By default lassplit split a combined LAS
-  file into its original, individual flight lines by splitting
-  based on the point source ID of the points. Other options are
-  to split '-by_classification', '-by_gps_time_interval 100', 
-  '-by_x_interval 15.5', '-by_y_interval 2.5', '-by_z_interval 11.5',
-  '-by_intensity_interval 10', '-by_scan_angle_interval 5',  
-  '-by_user_data_interval 16', '-by_attribute_interval 0 0.5' or
-  '-by_attribute_interval 1 1.0' 
+  This tool probes the elevation of the LIDAR for a given x and y
+  location and reports it to a text file or to stdout.
 
-  Instead of splitting LAS/LAZ/BIN/ASCII files based on these
-  listed attributes they can also be split into many numbered
-  files that each contain the same number of points (except for
-  the last one) with the '-split 100000000' option, which would
-  split each time after 100 million points were written.
+  The tool reads LIDAR in LAS/LAZ/ASCII format, triangulates the
+  relevant points into a TIN. For classified data sets containing
+  a mix of ground and vegetation/building points it is imperative
+  to specify the points which should be used for this calclation
+  (i.e. usually '-keep_class 2' or '-keep_class 2 8').
 
-  The header information from the first file (e.g. VLRs, scale
-  factor offset, ...) is used for each written output file while
-  these LAS header attributes are updated:
+  The tool collects all LiDAR points that are within 'step' meters
+  of the probed location. This can be changed with the '-step 2'
+  parameter which would shrink this circle to a radius to 2 meters.
 
-    * number_of_point_records
-    * number_of_points_by_return[5]
-    * max_x, min_x, max_y, min_y, max_z, and min_z
+  If the LiDAR is spatially indexed (i.e. a *.lax file exists) this
+  collection of points will be accelerated significanly. For repeat
+  probing running lasindex before lasprobe is recommended.
 
-  In case the '-merged' option is used, it may become necessary
-  to change the x_scale_factor, y_scale_factor, z_scale_factor
-  and/or the x_offset, y_offset, z_offset, values. In order to
-  have more control over this process the user can reset those
-  in the command line with
+  The output report defaults to stdout unless you specify an output
+  file with '-o report.txt'. Standard output is only the elevation
+  value, unless you add '-xyz' to the command line so that the x abd
 
-     -rescale 0.01 0.01 0.001
-     -reoffset 600000 4000000 0
+  For updates check the website or join the LAStools mailing list.
 
-  For updates check the website or join the LAStools google group.
-  
   https://rapidlasso.de/
+  http://lastools.org/
   http://groups.google.com/group/lastools/
+  http://twitter.com/lastools/
+  http://facebook.com/lastools.guy/
+  http://linkedin.com/groups?gid=4408378
 
-****************************************************************
-see also:
-  lasmerge - Merge or split lidar data files by number of points
+  Martin @lastools
+
 ****************************************************************
 
 example usage:
 
->> lassplit -i lidar.las -olaz
+>> lasprobe -i ..\data\fusa.laz -probe 277760.00 6122260
+52.14
 
-splits the file "lidar.las" based on the point source ID into
-files named "lidar.XXXXX.laz" where XXXXX corresponds to the
-point source ID.
+probes all LiDAR points including buildings, wires and vegetation
+and outputs the computed elevation "52.14" to stdout
 
->> lassplit -i *.las -olas
+----------------------------------------------------------------
 
-splits all files that match "*.las" based on the point source
-ID into files named "*.XXXXX.las" where XXXXX corresponds to
-the point source ID.
+>> lasprobe -i ..\data\fusa.laz -probe 277760.00 6122260 -o mist.txt
 
->> lassplit -i *.laz -olaz -recover_flightlines
+probes all LiDAR points including buildings, wires and vegetation
+and outputs the computed elevation "52.14" to text file 'mist.txt'
 
-this is a special option for the case that the LiDAR tiles do
-not have the point source ID correctly populated but have a proper
-GPS time stamp per point. here lassplit recovers the most likely
-flightlines based on conituity (or rather gaps) in the GPS times.
+----------------------------------------------------------------
 
->> lassplit -i *.las -merged -o flightlines.laz
+>> lasprobe -i ..\data\fusa.laz -probe 277760.00 6122260 -xyz
+277760.00 6122260.00 52.14
 
-merges files that match "*.las" and splits the result based on
-the point source ID into files named "flightlines.XXXXX.laz" where
-XXXXX corresponds to the point source ID.
+probes all LiDAR points including buildings, wires and vegetation
+and outputs the input probe coordinates together with the computed
+elevation "52.14" to stdout
 
->> lassplit -i *.las -merged -o chopped.las -digits 2 -split 10000000
+----------------------------------------------------------------
 
-merges all *.las files into one and then splits the result into
-several output files that contain ten million points each and that
-are called chopped.00.las, chopped.01.las, chopped.02.las, ...
+>> lasprobe -i ..\data\fusa.laz -probe 277760.00 6122260 -xyz -o mist.txt
 
->> lassplit -i big.txt -iparse xyztp -o split.laz -split 500000000
+probes all LiDAR points including buildings, wires and vegetation
+and outputs the input probe coordinates together with the computed
+elevation "52.14" to text file 'mist.txt'
 
-split the ASCII file "big.txt" that could, for example, contain 25
-billion points one and then split it into several compressed
-output LAZ files that contain 500 million points each that are
-called split.00000.laz, split.00001.laz, split.00002.laz, ...
+----------------------------------------------------------------
 
-****************************************************************
+>> lasprobe -i ..\data\fusa.laz -keep_class 2 -probe 277760.00 6122260
+42.66
 
-overview of all tool-specific switches:
+probes only LiDAR with classification code 2 (aka ground) and
+outputs the computed elevation "42.66" to stdout
 
--v                                   : more info reported in console
--vv                                  : even more info reported in console
--quiet                               : nothing reported in console
--wait                                : wait for <ENTER> in the console at end of process
--version                             : reports this tool's version number
--fail                                : fail if license expired or invalid
--gui                                 : start with files loaded into GUI
--cores 4                             : process multiple inputs on 4 cores in parallel
--digits 5                            : number of digits to use for naming of split files
-                                     : default: 7
--split 20000000                      : split into containing 20 million points each
--by_classification                   : split based on the classification code
--by_gps_time_interval 2.0            : split points into intervals of 2 seconds
--by_intensity_interval 64            : split points based on intensty intervals of 64
--by_x_interval 2.0                   : split points based on x coordinate intervals of 2.0
--by_y_interval 3.0                   : split points based on y coordinate intervals of 3.0
--by_z_interval 10.0                  : split points based on z coordinate intervals of 10.0
--by_scan_angle_interval 2.5          : split points based on scan angle intervals of 2.5
--by_user_data_interval 16            : split points based on user data intervals of 16
--by_attribute_interval 0 1.0         : split points based on attribute with index in intervals of 1.0
--recover_flightlines                 : split points after recovering flight lines from 5 second GPS time interruptions
--recover_flightlines_interval 20     : split points after recovering flight lines from 20 second GPS time interruptions
--ilay                                : apply all LASlayers found in corresponding *.lay file on read
--ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
--ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
+----------------------------------------------------------------
 
-****************************************************************
+>> lasprobe -i ..\data\fusa.laz -keep_class 2 -probe 277760.00 6122260
+277760.00 6122260 42.66
+
+probes only LiDAR with classification code 2 (aka ground) and
+outputs the input probe coordinates together with the computed
+ elevation "42.66" to stdout
+
+----------------------------------------------------------------
+
+>> lasprobe -i ..\data\fusa.laz -probe 277760.00 6122250
+WARNING: sampling infinite TIN triangle suggests insufficient LIDAR coverage.
+52.20
+
+probes all LiDAR points but - as the WARNING tells us - at a 
+location that is (slightly) outside the LiDAR coverage. This
+suggests that the computed elevation "52.20" is not as stable
+of a value as an elevation probed more inside the LiDAR.
+
+In case your probe is well inside the LiDAR coverage you may
+need to increase your '-step 5' default to '-step 10' or more
+
+----------------------------------------------------------------
+
+>> lasprobe -i ..\data\fusa.laz -keep_class 2 -probe 277812.23 6122332.31
+WARNING: none of 277573 points covered probe. all filtered or too far.
+
+probes only the ground points at the center location of a huge building
+such that all ground points are farther away than 5 meters.
+
+----------------------------------------------------------------
+
+>> lasprobe -i ..\data\fusa.laz -keep_class 2 -probe 277812.23 6122332.31
+WARNING: none of 277573 points covered probe. all filtered or too far.
+
+>> lasprobe -i ..\data\fusa.laz -keep_class 2 -probe 277812.23 6122332.31 -step 10
+WARNING: none of 277573 points covered probe. all filtered or too far.
+
+>> lasprobe -i ..\data\fusa.laz -keep_class 2 -probe 277812.23 6122332.31 -step 20
+WARNING: sampling infinite TIN triangle suggests insufficient LIDAR coverage.
+45.26
+
+>> lasprobe -i ..\data\fusa.laz -keep_class 2 -probe 277812.23 6122332.31 -step 25
+45.28
+
+probes only the ground points at the center location of a huge building
+such that all ground points are farther away than 5 and also 10 meters. 
+At a step of 20 meters the circle of LiDAR points still does not fully
+surround the probed location. At a step of 25 meters we get a stable
+reading for the elevation, but recall that this elevation is now in the
+center of the large police station interpolated from the grounds points
+outside of of building
 
 for more info:
 
-E:\LAStools\bin>lassplit -h
+E:\software\LAStools\bin>lasprobe -h
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)
@@ -264,9 +277,6 @@ Transform scan_angle.
   -scale_scan_angle 1.944445
   -translate_scan_angle -5
   -translate_then_scale_scan_angle -0.5 2.1
-Transform register.
-  -copy_attribute_into_register 0 0
-  -scale_register 0 1.5
 Change the return number or return count of points.
   -repair_zero_returns
   -set_return_number 1
@@ -335,6 +345,13 @@ Transform RGB/NIR colors.
   -scale_RGB_up (by 256)
   -scale_RGB_to_8bit (only scales down 16 bit values)
   -scale_RGB_to_16bit (only scales up 8 bit values)
+  -clamp_RGB_to_8bit
+  -set_NIR 65535
+  -scale_NIR 2
+  -scale_NIR_down (by 256)
+  -scale_NIR_up (by 256)
+  -scale_NIR_to_8bit (only scales down 16 bit values)
+  -scale_NIR_to_16bit (only scales up 8 bit values)
   -switch_R_G -switch_R_B -switch_B_G
   -copy_R_into_NIR -copy_R_into_intensity
   -copy_G_into_NIR -copy_G_into_intensity
@@ -348,6 +365,18 @@ Transform attributes in "Extra Bytes".
   -copy_user_data_into_attribute 0
   -copy_z_into_attribute 0
   -map_attribute_into_RGB 0 map_height_to_RGB.txt
+Transform using "LASregisters".
+  -copy_attribute_into_register 0 0
+  -scale_register 0 1.5
+  -translate_register 1 10.7
+  -add_registers 0 1 3
+  -multiply_registers 0 1 2
+  -copy_intensity_into_register 0
+  -copy_R_into_register 1
+  -copy_G_into_register 2
+  -copy_B_into_register 3
+  -copy_NIR_into_register 4
+  -copy_register_into_intensity 1
 Ignore points based on classifications.
   -ignore_class 7
   -ignore_class 0 1 7 33
@@ -380,34 +409,17 @@ Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
   -inside min_x min_y max_x max_y
   -inside_tile ll_x ll_y size
   -inside_circle center_x center_y radius
-Supported LAS Outputs
-  -o lidar.las
-  -o lidar.laz
-  -o xyzta.txt -oparse xyzta (on-the-fly to ASCII)
-  -o terrasolid.bin
-  -o nasa.qi
-  -odir C:\data\ground (specify output directory)
-  -odix _classified (specify file name appendix)
-  -ocut 2 (cut the last two characters from name)
-  -olas -olaz -otxt -obin -oqfit (specify format)
-  -stdout (pipe to stdout)
-  -nil    (pipe to NULL)
-LAStools (by info@rapidlasso.de) version 211206 (commercial)
+LAStools (by info@rapidlasso.de) version 210628
 usage:
-lassplit -i *.las
-lassplit -i *.laz -merged -o flightlines.las
-lassplit -i *.laz -merged -recover_flightlines -o flightlines.las
-lassplit -i lidar.laz -by_gps_time_interval 5.0 -o segments.laz
-lassplit -i lidar.laz -by_intensity_interval 32 -o intensities.laz
-lassplit -i lidar.laz -by_classification -o slices.laz
-lassplit -i lidar.laz -by_user_data_interval 8 -o slices.laz
-lassplit -i forest.laz -by_attribute_interval 0 1.0 -o trees.laz
-lassplit -i lidar.laz -by_x_interval 5.0 -o slices_x.laz
-lassplit -i lidar.laz -by_y_interval 2.5 -o slices_y.laz
-lassplit -i lidar.laz -by_z_interval 1.0 -o slices_z.laz
-lassplit -i *.las -merged -split 100000000 -digits 2
-lassplit -h
+lasprobe -i fusa.laz -probe 277760.00 6122260
+lasprobe -i fusa.laz -keep_class 2 -probe 277760.00 6122260
+lasprobe -i fusa.laz -keep_class 2 -probe 277812.23 6122332.31 -step 10
+lasprobe -i fusa.laz -keep_class 2 -probe 277812.23 6122332.31 -step 25
+lasprobe -i fusa.laz -keep_class 2 -probe 277760.00 6122260 -xyz
+lasprobe -i fusa.laz -keep_class 2 -probe 277760.00 6122260 -o probe.txt
+lasprobe -i fusa.laz -keep_class 2 -probe 277760.00 6122260 -o probe.txt -xyz
+lasprobe -h
 
 ---------------
 
-if you find bugs let us (support@rapidlasso.com) know.
+if you find bugs let me (info@rapidlasso.de) know.
