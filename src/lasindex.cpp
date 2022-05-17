@@ -42,7 +42,9 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   
   CHANGE HISTORY:
-  
+
+
+    22 March 2022 -- Add -o parameter for user defined output file  
      1 May 2017 -- 2nd example for selective decompression for new LAS 1.4 points 
     17 May 2011 -- enabling batch processing with wildcards or multiple file names
     29 April 2011 -- created after cable outage during the royal wedding (-:
