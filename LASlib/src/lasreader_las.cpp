@@ -2,13 +2,13 @@
 ===============================================================================
 
   FILE:  lasreader_las.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
-  
+
     info@rapidlasso.de  -  https://rapidlasso.de
 
   COPYRIGHT:
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasreader_las.hpp"
@@ -53,17 +53,13 @@ BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_onl
   }
 
 #ifdef _MSC_VER
-  file = fopen(file_name, "rb");
+  wchar_t* utf16_file_name = UTF8toUTF16(file_name);
+  file = _wfopen(utf16_file_name, L"rb");
   if (file == 0)
   {
-    wchar_t* utf16_file_name = UTF8toUTF16(file_name);
-    file = _wfopen(utf16_file_name, L"rb");
-    if (file == 0)
-    {
-      fprintf(stderr, "ERROR: cannot open file '%ws' for read\n", utf16_file_name);
-    }
-    delete [] utf16_file_name;
+    fprintf(stderr, "ERROR: cannot open file '%ws' for read\n", utf16_file_name);
   }
+  delete [] utf16_file_name;
 #else
   file = fopen(file_name, "rb");
 #endif
@@ -404,7 +400,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
 
   if (peek_only)
   {
-    // at least repair point type in incomplete header (no VLRs, no LASzip, no LAStiling) 
+    // at least repair point type in incomplete header (no VLRs, no LASzip, no LAStiling)
     header.point_data_format &= 127;
     return TRUE;
   }
@@ -417,7 +413,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
   if (header.number_of_variable_length_records)
   {
     header.vlrs = (LASvlr*)malloc(sizeof(LASvlr)*header.number_of_variable_length_records);
-  
+
     for (i = 0; i < header.number_of_variable_length_records; i++)
     {
       // make sure there are enough bytes left to read a variable length record before the point block starts
@@ -489,12 +485,12 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
           header.laszip = new LASzip();
 
           // read this data following the header of the variable length record
-          //     U16  compressor                2 bytes 
-          //     U32  coder                     2 bytes 
-          //     U8   version_major             1 byte 
+          //     U16  compressor                2 bytes
+          //     U32  coder                     2 bytes
+          //     U8   version_major             1 byte
           //     U8   version_minor             1 byte
           //     U16  version_revision          2 bytes
-          //     U32  options                   4 bytes 
+          //     U32  options                   4 bytes
           //     I32  chunk_size                4 bytes
           //     I64  number_of_special_evlrs   8 bytes
           //     I64  offset_to_special_evlrs   8 bytes
@@ -584,13 +580,13 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
           header.vlr_lastiling = new LASvlr_lastiling();
 
           // read the payload of this VLR which contains 28 bytes
-          //   U32  level                                          4 bytes 
-          //   U32  level_index                                    4 bytes 
-          //   U32  implicit_levels + buffer bit + reversible bit  4 bytes 
-          //   F32  min_x                                          4 bytes 
-          //   F32  max_x                                          4 bytes 
-          //   F32  min_y                                          4 bytes 
-          //   F32  max_y                                          4 bytes 
+          //   U32  level                                          4 bytes
+          //   U32  level_index                                    4 bytes
+          //   U32  implicit_levels + buffer bit + reversible bit  4 bytes
+          //   F32  min_x                                          4 bytes
+          //   F32  max_x                                          4 bytes
+          //   F32  min_y                                          4 bytes
+          //   F32  max_y                                          4 bytes
 
           if (header.vlrs[i].record_length_after_header == 28)
           {
@@ -780,7 +776,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
           else
           {
             fprintf(stderr,"WARNING: unknown LASF_Projection VLR with record_id %d.\n", header.vlrs[i].record_id);
-          } 
+          }
         }
         else
         {
@@ -907,7 +903,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
         stream->seek(header.start_of_first_extended_variable_length_record);
 
         header.evlrs = (LASevlr*)malloc(sizeof(LASevlr)*header.number_of_extended_variable_length_records);
-  
+
         // read the extended variable length records into the header
 
         I64 evlrs_size = 0;
@@ -964,12 +960,12 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
               header.laszip = new LASzip();
 
               // read this data following the header of the variable length record
-              //     U16  compressor                2 bytes 
-              //     U32  coder                     2 bytes 
-              //     U8   version_major             1 byte 
+              //     U16  compressor                2 bytes
+              //     U32  coder                     2 bytes
+              //     U8   version_major             1 byte
               //     U8   version_minor             1 byte
               //     U16  version_revision          2 bytes
-              //     U32  options                   4 bytes 
+              //     U32  options                   4 bytes
               //     I32  chunk_size                4 bytes
               //     I64  number_of_special_evlrs   8 bytes
               //     I64  offset_to_special_evlrs   8 bytes
@@ -1059,13 +1055,13 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
               header.vlr_lastiling = new LASvlr_lastiling();
 
               // read the payload of this VLR which contains 28 bytes
-              //   U32  level                                          4 bytes 
-              //   U32  level_index                                    4 bytes 
-              //   U32  implicit_levels + buffer bit + reversible bit  4 bytes 
-              //   F32  min_x                                          4 bytes 
-              //   F32  max_x                                          4 bytes 
-              //   F32  min_y                                          4 bytes 
-              //   F32  max_y                                          4 bytes 
+              //   U32  level                                          4 bytes
+              //   U32  level_index                                    4 bytes
+              //   U32  implicit_levels + buffer bit + reversible bit  4 bytes
+              //   F32  min_x                                          4 bytes
+              //   F32  max_x                                          4 bytes
+              //   F32  min_y                                          4 bytes
+              //   F32  max_y                                          4 bytes
 
               if (header.evlrs[i].record_length_after_header == 28)
               {
@@ -1260,7 +1256,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
 
   // remove extra bits in point data type
 
-  if ((header.point_data_format & 128) || (header.point_data_format & 64)) 
+  if ((header.point_data_format & 128) || (header.point_data_format & 64))
   {
     if (!header.laszip)
     {
@@ -1309,7 +1305,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
       for (count = 0; count < number; count++)
       {
         stream->seek(offset + 2);
-        CHAR user_id[16]; 
+        CHAR user_id[16];
         stream->getBytes((U8*)user_id, 16);
         U16 record_id;
         stream->get16bitsLE((U8*)&record_id);
@@ -1400,7 +1396,7 @@ BOOL LASreaderLAS::read_point_default()
     if (point.have_wavepacket)
     {
       // distance in meters light travels in one nanoseconds divided by two divided by 1000
-      F64 round_trip_distance_in_picoseconds = 0.299792458 / 2 / 1000; 
+      F64 round_trip_distance_in_picoseconds = 0.299792458 / 2 / 1000;
       F64 x = -point.wavepacket.getXt();
       F64 y = -point.wavepacket.getYt();
       F64 z = -point.wavepacket.getZt();
@@ -1411,7 +1407,7 @@ BOOL LASreaderLAS::read_point_default()
       point.wavepacket.setXt((F32)x);
       point.wavepacket.setYt((F32)y);
       point.wavepacket.setZt((F32)z);
-//      alternative to converge on optical origin 
+//      alternative to converge on optical origin
 //      point.wavepacket.setXt(-point.wavepacket.getXt()/point.wavepacket.getLocation());
 //      point.wavepacket.setYt(-point.wavepacket.getYt()/point.wavepacket.getLocation());
 //      point.wavepacket.setZt(-point.wavepacket.getZt()/point.wavepacket.getLocation());
@@ -1446,7 +1442,7 @@ ByteStreamIn* LASreaderLAS::get_stream() const
 
 void LASreaderLAS::close(BOOL close_stream)
 {
-  if (reader) 
+  if (reader)
   {
     reader->done();
     delete reader;
