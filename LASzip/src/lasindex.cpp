@@ -343,9 +343,9 @@ BOOL LASindex::read(const char* file_name)
     name[strlen(name)-1] = 'x';
   }
 #ifdef _MSC_VER
-  wchar_t* utf16_file_name = UTF8toUTF16(file_name);
-  FILE* file = _wfopen(utf16_file_name, L"rb");
-  delete[] utf16_file_name;
+  wchar_t* utf16_name = UTF8toUTF16(name);
+  FILE* file = _wfopen(utf16_name, L"rb");
+  delete[] utf16_name;
 #else
   FILE* file = fopen(name, "rb");
 #endif
