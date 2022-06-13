@@ -35,77 +35,77 @@ stores the result in RIEGL's PEF format
 same as above but outputting the SHP format
 
 
-lasplanes -h
-lasplanes -i in.las -o planes.shp
-lasplanes -i in.las -oshp
-lasplanes -i in.las -o planes.pef
+lasplanes -h  
+lasplanes -i in.las -o planes.shp  
+lasplanes -i in.las -oshp  
+lasplanes -i in.las -o planes.pef  
 lasplanes -i in.las -opef
 
 
 ## lasplanes specific arguments
 
--cell_points [n]           : skip if less than [n] points (default=100)
--cell_size [s]             : set cell size to [s]*[s]*[s] (default=1)
--cell_size_xyz [x] [y] [z] : set cell size to [x]*[y]*[z]
--cores [n]                 : process multiple inputs on [n] cores in parallel
--eigen_ratio_largest [n]   : skip if largest eigenvalue over sum of all three eigenvalues > [n](default=0.90000)
--eigen_ratio_smallest [n]  : skip if smallest eigenvalue over sum of all three eigenvalues > [n](default=0.00010)
--ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read
--max_number                : maximal number of check points to output
--middle_eigen_min [n]      : skip if middle eigenvalue < [n](default=0(not used))
--olay                      : write or append classification changes to a LASlayers *.lay file
--oneighbors [n]            : neighborhood base filename [n]
--only_2d                   : use only 2 dimensions (xy)
--opef                      : output as RIEGL pef file
--opoly [n]                 : overlap polygon output filename [n]
--osamp [n]                 : sample point output filename [n]
--output_marked_point_cloud : default <FALSE>
--output_number [n]         : maximum number [n] of output items
--output_polygon_points     : default <FALSE>
--output_start [n]          : start output with sample [n]
--plane_exclusion [n]       : skip if more than [n]% of points had to be excluded to make plane slim (default=5.00)
--plane_points [n]          : skip if plane is formed by less than [n] points (default=100)
--plane_thickness [n]       : skip if points form plane thicker than [n](default=0.01)
--polygon_area [n]          : skip if area formed by points is less than [n](default=0.50)
--polygon_digits [n]        : set number of digits to [n] to enumerate polygon names (default=5)
--polygon_distance [n]      : skip if polygon distance to others is less than [n]
--polygon_name [n]          : set polygon base name to [n](default='patch')
--polygon_points [n]        : simplify polygon to have maximal [n] points (default=0(not used))
--polygon_stddev [n]        : skip if standard deviation of polygon points from plane > stddev [n](default=0(not used))
--small_eigen_max [n]       : skip if smallest eigenvalue > [n](default=0(not used))
--week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS
+-cell_points [n]           : skip if less than [n] points (default=100)  
+-cell_size [s]             : set cell size to [s]*[s]*[s] (default=1)  
+-cell_size_xyz [x] [y] [z] : set cell size to [x]*[y]*[z]  
+-cores [n]                 : process multiple inputs on [n] cores in parallel  
+-eigen_ratio_largest [n]   : skip if largest eigenvalue over sum of all three eigenvalues > [n](default=0.90000)  
+-eigen_ratio_smallest [n]  : skip if smallest eigenvalue over sum of all three eigenvalues > [n](default=0.00010)  
+-ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
+-max_number                : maximal number of check points to output  
+-middle_eigen_min [n]      : skip if middle eigenvalue < [n](default=0(not used))  
+-olay                      : write or append classification changes to a LASlayers *.lay file  
+-oneighbors [n]            : neighborhood base filename [n]  
+-only_2d                   : use only 2 dimensions (xy)  
+-opef                      : output as RIEGL pef file  
+-opoly [n]                 : overlap polygon output filename [n]  
+-osamp [n]                 : sample point output filename [n]  
+-output_marked_point_cloud : default <FALSE>  
+-output_number [n]         : maximum number [n] of output items  
+-output_polygon_points     : default <FALSE>  
+-output_start [n]          : start output with sample [n]  
+-plane_exclusion [n]       : skip if more than [n]% of points had to be excluded to make plane slim (default=5.00)  
+-plane_points [n]          : skip if plane is formed by less than [n] points (default=100)  
+-plane_thickness [n]       : skip if points form plane thicker than [n](default=0.01)  
+-polygon_area [n]          : skip if area formed by points is less than [n](default=0.50)  
+-polygon_digits [n]        : set number of digits to [n] to enumerate polygon names (default=5)  
+-polygon_distance [n]      : skip if polygon distance to others is less than [n]  
+-polygon_name [n]          : set polygon base name to [n](default='patch')  
+-polygon_points [n]        : simplify polygon to have maximal [n] points (default=0(not used))  
+-polygon_stddev [n]        : skip if standard deviation of polygon points from plane > stddev [n](default=0(not used))  
+-small_eigen_max [n]       : skip if smallest eigenvalue > [n](default=0(not used))  
+-week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--fail    : fail if license expired or invalid
--gui     : start with files loaded into GUI
--h       : print help output
--license : show license information
--v       : verbose output (print extra information)
--version : reports this tool's version number
--vv      : very verbose output (print even more information)
--wait    : wait for <ENTER> in the console at end of process
+-fail    : fail if license expired or invalid  
+-gui     : start with files loaded into GUI  
+-h       : print help output  
+-license : show license information  
+-v       : verbose output (print extra information)  
+-version : reports this tool's version number  
+-vv      : very verbose output (print even more information)  
+-wait    : wait for <ENTER> in the console at end of process  
 
 ## Module arguments
 
 ### General
--kml_absolute             : set kml elevation to absolute values
--kml_elevation_offset [n] : add an elevation offset of [n]
+-kml_absolute             : set kml elevation to absolute values  
+-kml_elevation_offset [n] : add an elevation offset of [n]  
 
 ### Output
--2d       : only output xy
--o [n]    : use [n] as output file
--ocut [n] : cut the last [n] characters from name
--odbf     : output as DBF (dBase IV database)
--odir [n] : set output directory to [n]
--odix [n] : set output file name suffix to [n]
--okml     : output as kml (Keyhole Markup Language XML)
--oshp     : output as SHP *.shp file
--otxt     : output as textfile
--owkt     : output as wkt (well-known-text)
--stdout   : pipe to stdout
+-2d       : only output xy  
+-o [n]    : use [n] as output file  
+-ocut [n] : cut the last [n] characters from name  
+-odbf     : output as DBF (dBase IV database)  
+-odir [n] : set output directory to [n]  
+-odix [n] : set output file name suffix to [n]  
+-okml     : output as kml (Keyhole Markup Language XML)  
+-oshp     : output as SHP *.shp file  
+-otxt     : output as textfile  
+-owkt     : output as wkt (well-known-text)  
+-stdout   : pipe to stdout  
 
 ### Basics
--help : print help output
+-help : print help output  
 
 
 ## License

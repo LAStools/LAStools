@@ -37,55 +37,55 @@ the header information found in the SHP file
 
 ## shp2las specific arguments
 
--cores [n]                      : process multiple inputs on [n] cores in parallel
--idbf                           : use DBF file of shapefile as additional input
--set_class [n]                  : set classification to [n]
--set_classification [n]         : set classification to [n]
--set_creation_date [day] [year] : set creation date to [day] [year]
--set_file_creation [day] [year] : set creation date to [day] [year]
--set_offset [x] [y]             : set offset to [x] [y]
--set_scale [x] [y] [z]          : quantize ASCII points with [x] [y] [z] (unit meters)
--set_version [m] [n]            : set version to major.minor = [m].[n]
+-cores [n]                      : process multiple inputs on [n] cores in parallel  
+-idbf                           : use DBF file of shapefile as additional input  
+-set_class [n]                  : set classification to [n]  
+-set_classification [n]         : set classification to [n]  
+-set_creation_date [day] [year] : set creation date to [day] [year]  
+-set_file_creation [day] [year] : set creation date to [day] [year]  
+-set_offset [x] [y]             : set offset to [x] [y]  
+-set_scale [x] [y] [z]          : quantize ASCII points with [x] [y] [z] (unit meters)  
+-set_version [m] [n]            : set version to major.minor = [m].[n]  
 
 ### Basics
--fail    : fail if license expired or invalid
--gui     : start with files loaded into GUI
--h       : print help output
--help    : print help output
--license : show license information
--v       : verbose output (print extra information)
--verbose : verbose output (print extra information)
--version : reports this tool's version number
+-fail    : fail if license expired or invalid  
+-gui     : start with files loaded into GUI  
+-h       : print help output  
+-help    : print help output  
+-license : show license information  
+-v       : verbose output (print extra information)  
+-verbose : verbose output (print extra information)  
+-version : reports this tool's version number  
 
 ## Module arguments
 
 ### General
--chunk_size [n] : set chunk size [n] in number of bytes
+-chunk_size [n] : set chunk size [n] in number of bytes  
 
 ### Color
--oscale_rgb [n] : scale output RGB by [n]
+-oscale_rgb [n] : scale output RGB by [n]  
 
 ### Output
--compatible     : write LAS/LAZ output in compatibility mode
--io_obuffer [n] : use write-out-buffer of size [n] bytes
--native         : write LAS/LAZ output in native/actual mode
--nil            : pipe output to NULL (suppress output)
--o [n]          : use [n] as output file
--obin           : output as BIN (terrasolid binary)
--ocut [n]       : cut the last [n] characters from name
--odir [n]       : set output directory to [n]
--odix [n]       : set output file name suffix to [n]
--oforce         : force output creation also on errors or warnings
--olas           : output as LAS file
--olaz           : output as LAZ (compressed LAS)
--oparse [xyz]   : parse on-the-fly to ASCII using fields [xyz]
--opts           : output as PTS (plain text lidar data)
--optx           : output as PTX (plain text with header)
--oqi            : output in QFIT format (.qi)(ATM project, NASA)
--oscale_rgb [n] : scale output RGB by [n]
--osep [n]       : set text output separator as char [n]
--otxt           : output as textfile
--owrl           : output as VRLM (Virtual Reality Modeling Language) text
+-compatible     : write LAS/LAZ output in compatibility mode  
+-io_obuffer [n] : use write-out-buffer of size [n] bytes  
+-native         : write LAS/LAZ output in native/actual mode  
+-nil            : pipe output to NULL (suppress output)  
+-o [n]          : use [n] as output file  
+-obin           : output as BIN (terrasolid binary)  
+-ocut [n]       : cut the last [n] characters from name  
+-odir [n]       : set output directory to [n]  
+-odix [n]       : set output file name suffix to [n]  
+-oforce         : force output creation also on errors or warnings  
+-olas           : output as LAS file  
+-olaz           : output as LAZ (compressed LAS)  
+-oparse [xyz]   : parse on-the-fly to ASCII using fields [xyz]  
+-opts           : output as PTS (plain text lidar data)  
+-optx           : output as PTX (plain text with header)  
+-oqi            : output in QFIT format (.qi)(ATM project, NASA)  
+-oscale_rgb [n] : scale output RGB by [n]  
+-osep [n]       : set text output separator as char [n]  
+-otxt           : output as textfile  
+-owrl           : output as VRLM (Virtual Reality Modeling Language) text  
 -stdout         : pipe to stdout
 
 ### parse

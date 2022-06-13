@@ -73,7 +73,7 @@ connected component reaches 5000 or higher.
 
 ## sonarnoiseblaster specific arguments
 
--week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS
+-week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 
 ## License

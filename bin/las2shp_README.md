@@ -26,63 +26,63 @@ Shapefile format 'lidar.shp' using MultiPointZ records containing 2048
 points each.
 
 
-las2shp -h
-las2shp -i *.las
-las2shp -i *.txt -iparse xyza -keep_scan_angle -10 10
-las2shp -i lidar.las -o shapefile.shp -record_size 2048
-las2shp -i lidar.laz -last_only -record_size 10000
-las2shp -i lidar.laz -keep_class 2 8
+las2shp -h  
+las2shp -i *.las  
+las2shp -i *.txt -iparse xyza -keep_scan_angle -10 10  
+las2shp -i lidar.las -o shapefile.shp -record_size 2048  
+las2shp -i lidar.laz -last_only -record_size 10000  
+las2shp -i lidar.laz -keep_class 2 8  
 las2shp -i *.laz -drop_return 1
 
 
 ## las2shp specific arguments
 
--cores [n]            : process multiple inputs on [n] cores in parallel
--parse [xyz]          : use parse string [xyz] to access point values
--record [n]           : set shp output record size to [n](default=1024)
--record_size [n]      : set shp output record size to [n](default=1024)
--single_points        : force use of SHP point type 11 instead of point type 18
--week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS
+-cores [n]            : process multiple inputs on [n] cores in parallel  
+-parse [xyz]          : use parse string [xyz] to access point values  
+-record [n]           : set shp output record size to [n](default=1024)  
+-record_size [n]      : set shp output record size to [n](default=1024)  
+-single_points        : force use of SHP point type 11 instead of point type 18  
+-week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--fail    : fail if license expired or invalid
--gui     : start with files loaded into GUI
--h       : print help output
--help    : print help output
--license : show license information
--v       : verbose output (print extra information)
--verbose : verbose output (print extra information)
--version : reports this tool's version number
+-fail    : fail if license expired or invalid  
+-gui     : start with files loaded into GUI  
+-h       : print help output  
+-help    : print help output  
+-license : show license information  
+-v       : verbose output (print extra information)  
+-verbose : verbose output (print extra information)  
+-version : reports this tool's version number  
 
 ## Module arguments
 
 ### General
--chunk_size [n] : set chunk size [n] in number of bytes
+-chunk_size [n] : set chunk size [n] in number of bytes  
 
 ### Color
--oscale_rgb [n] : scale output RGB by [n]
+-oscale_rgb [n] : scale output RGB by [n]  
 
 ### Output
--compatible     : write LAS/LAZ output in compatibility mode
--io_obuffer [n] : use write-out-buffer of size [n] bytes
--native         : write LAS/LAZ output in native/actual mode
--nil            : pipe output to NULL (suppress output)
--o [n]          : use [n] as output file
--obin           : output as BIN (terrasolid binary)
--ocut [n]       : cut the last [n] characters from name
--odir [n]       : set output directory to [n]
--odix [n]       : set output file name suffix to [n]
--oforce         : force output creation also on errors or warnings
--olas           : output as LAS file
--olaz           : output as LAZ (compressed LAS)
--oparse [xyz]   : parse on-the-fly to ASCII using fields [xyz]
--opts           : output as PTS (plain text lidar data)
--optx           : output as PTX (plain text with header)
--oqi            : output in QFIT format (.qi)(ATM project, NASA)
--oscale_rgb [n] : scale output RGB by [n]
--osep [n]       : set text output separator as char [n]
--otxt           : output as textfile
--owrl           : output as VRLM (Virtual Reality Modeling Language) text
+-compatible     : write LAS/LAZ output in compatibility mode  
+-io_obuffer [n] : use write-out-buffer of size [n] bytes  
+-native         : write LAS/LAZ output in native/actual mode  
+-nil            : pipe output to NULL (suppress output)  
+-o [n]          : use [n] as output file  
+-obin           : output as BIN (terrasolid binary)  
+-ocut [n]       : cut the last [n] characters from name  
+-odir [n]       : set output directory to [n]  
+-odix [n]       : set output file name suffix to [n]  
+-oforce         : force output creation also on errors or warnings  
+-olas           : output as LAS file  
+-olaz           : output as LAZ (compressed LAS)  
+-oparse [xyz]   : parse on-the-fly to ASCII using fields [xyz]  
+-opts           : output as PTS (plain text lidar data)  
+-optx           : output as PTX (plain text with header)  
+-oqi            : output in QFIT format (.qi)(ATM project, NASA)  
+-oscale_rgb [n] : scale output RGB by [n]  
+-osep [n]       : set text output separator as char [n]  
+-otxt           : output as textfile  
+-owrl           : output as VRLM (Virtual Reality Modeling Language) text  
 -stdout         : pipe to stdout
 
 ### parse

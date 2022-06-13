@@ -54,72 +54,72 @@ this subfolder needs to be located in this exact location
 ./aaaaa/pointclouds/bbbbb/source
 
 so that all links from the download map will correctly link to the
-original LAZ files
+original LAZ files.
 
 
 ## laspublish specific arguments
 
--classification    : use classification value as output color parameter
--copy_source_files : copy sourcefiles (LAS/LAZ) into portal subdirectory
--description [n]   : use [n] as output description
--elevation         : use elevation value as output color parameter
--intensity         : use intensity value as output color parameter
--move_source_files : move sourcefiles (LAS/LAZ) into portal subdirectory (need also "-really_move" argument)
--name [n]          : use [n] as output name
--no_edl            : do not use EDL (Eye dome lighting) at 3D output
--no_skybox         : do not add sky at 3D output
--only_2D           : only output xy
--only_2d           : use only 2 dimensions (xy)
--only_3D           : output only 3D
--overwrite         : overwrite existing target files
--point_source      : use "point source" value as output color parameter
--potree14          : deprecated: potree 14 not supported anymore. will use potree 16
--potree16          : expected protree version 16
--potree18          : expected protree version 18
--really_move       : confirmation to really move the files told by "-move_source_files" argument
--return_number     : use "return number" value as output color parameter
--rgb               : use rgb value as output color parameter
--title [n]         : use [n] as output title
+-classification    : use classification value as output color parameter  
+-copy_source_files : copy sourcefiles (LAS/LAZ) into portal subdirectory  
+-description [n]   : use [n] as output description  
+-elevation         : use elevation value as output color parameter  
+-intensity         : use intensity value as output color parameter  
+-move_source_files : move sourcefiles (LAS/LAZ) into portal subdirectory (need also "-really_move" argument)  
+-name [n]          : use [n] as output name  
+-no_edl            : do not use EDL (Eye dome lighting) at 3D output  
+-no_skybox         : do not add sky at 3D output  
+-only_2D           : only output xy  
+-only_2d           : use only 2 dimensions (xy)  
+-only_3D           : output only 3D  
+-overwrite         : overwrite existing target files  
+-point_source      : use "point source" value as output color parameter  
+-potree14          : deprecated: potree 14 not supported anymore. will use potree 16  
+-potree16          : expected protree version 16  
+-potree18          : expected protree version 18  
+-really_move       : confirmation to really move the files told by "-move_source_files" argument  
+-return_number     : use "return number" value as output color parameter  
+-rgb               : use rgb value as output color parameter  
+-title [n]         : use [n] as output title  
 
 ### Basics
--fail    : fail if license expired or invalid
--gui     : start with files loaded into GUI
--h       : print help output
--help    : print help output
--license : show license information
--v       : verbose output (print extra information)
--verbose : verbose output (print extra information)
--version : reports this tool's version number
+-fail    : fail if license expired or invalid  
+-gui     : start with files loaded into GUI  
+-h       : print help output  
+-help    : print help output  
+-license : show license information  
+-v       : verbose output (print extra information)  
+-verbose : verbose output (print extra information)  
+-version : reports this tool's version number  
 
 ## Module arguments
 
 ### General
--chunk_size [n] : set chunk size [n] in number of bytes
+-chunk_size [n] : set chunk size [n] in number of bytes  
 
 ### Color
--oscale_rgb [n] : scale output RGB by [n]
+-oscale_rgb [n] : scale output RGB by [n]  
 
 ### Output
--compatible     : write LAS/LAZ output in compatibility mode
--io_obuffer [n] : use write-out-buffer of size [n] bytes
--native         : write LAS/LAZ output in native/actual mode
--nil            : pipe output to NULL (suppress output)
--o [n]          : use [n] as output file
--obin           : output as BIN (terrasolid binary)
--ocut [n]       : cut the last [n] characters from name
--odir [n]       : set output directory to [n]
--odix [n]       : set output file name suffix to [n]
--oforce         : force output creation also on errors or warnings
--olas           : output as LAS file
--olaz           : output as LAZ (compressed LAS)
--oparse [xyz]   : parse on-the-fly to ASCII using fields [xyz]
--opts           : output as PTS (plain text lidar data)
--optx           : output as PTX (plain text with header)
--oqi            : output in QFIT format (.qi)(ATM project, NASA)
--oscale_rgb [n] : scale output RGB by [n]
--osep [n]       : set text output separator as char [n]
--otxt           : output as textfile
--owrl           : output as VRLM (Virtual Reality Modeling Language) text
+-compatible     : write LAS/LAZ output in compatibility mode  
+-io_obuffer [n] : use write-out-buffer of size [n] bytes  
+-native         : write LAS/LAZ output in native/actual mode  
+-nil            : pipe output to NULL (suppress output)  
+-o [n]          : use [n] as output file  
+-obin           : output as BIN (terrasolid binary)  
+-ocut [n]       : cut the last [n] characters from name  
+-odir [n]       : set output directory to [n]  
+-odix [n]       : set output file name suffix to [n]  
+-oforce         : force output creation also on errors or warnings  
+-olas           : output as LAS file  
+-olaz           : output as LAZ (compressed LAS)  
+-oparse [xyz]   : parse on-the-fly to ASCII using fields [xyz]  
+-opts           : output as PTS (plain text lidar data)  
+-optx           : output as PTX (plain text with header)  
+-oqi            : output in QFIT format (.qi)(ATM project, NASA)  
+-oscale_rgb [n] : scale output RGB by [n]  
+-osep [n]       : set text output separator as char [n]  
+-otxt           : output as textfile  
+-owrl           : output as VRLM (Virtual Reality Modeling Language) text  
 -stdout         : pipe to stdout
 
 ### parse

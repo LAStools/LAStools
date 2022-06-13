@@ -12,19 +12,19 @@ https://groups.google.com/d/topic/lastools/nMPU75zpqPw/discussion
 
 ## demdiff specific arguments
 
--cores [n] : process multiple inputs on [n] cores in parallel
+-cores [n] : process multiple inputs on [n] cores in parallel  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)
--fail    : fail if license expired or invalid
--gui     : start with files loaded into GUI
--h       : print help output
--help    : print help output
--quiet   : nothing reported in console
--v       : verbose output (print extra information)
--verbose : verbose output (print extra information)
--version : reports this tool's version number
--vv      : very verbose output (print even more information)
+-cpu64   : start 64 bit executable (instead of default 32 bit executable)  
+-fail    : fail if license expired or invalid  
+-gui     : start with files loaded into GUI  
+-h       : print help output  
+-help    : print help output  
+-quiet   : nothing reported in console  
+-v       : verbose output (print extra information)  
+-verbose : verbose output (print extra information)  
+-version : reports this tool's version number  
+-vv      : very verbose output (print even more information)  
 
 
 ## License
