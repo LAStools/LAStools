@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  laswriter_las.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
 
     info@rapidlasso.de  -  https://rapidlasso.de
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "laswriter_las.hpp"
@@ -65,17 +65,13 @@ BOOL LASwriterLAS::open(const char* file_name, const LASheader* header, U32 comp
   }
 
 #ifdef _MSC_VER
-  file = fopen(file_name, "wb");
+  wchar_t* utf16_file_name = UTF8toUTF16(file_name);
+  file = _wfopen(utf16_file_name, L"wb");
   if (file == 0)
   {
-    wchar_t* utf16_file_name = UTF8toUTF16(file_name);
-    file = _wfopen(utf16_file_name, L"wb");
-    if (file == 0)
-    {
-      fprintf(stderr, "ERROR: cannot open file '%ws' for write\n", utf16_file_name);
-    }
-    delete [] utf16_file_name;
+    fprintf(stderr, "ERROR: cannot open file '%ws' for write\n", utf16_file_name);
   }
+  delete[] utf16_file_name;
 #else
   file = fopen(file_name, "wb");
 #endif
@@ -187,14 +183,14 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   }
 
   // fail if we don't use the layered compressor for the new LAS 1.4 point types
-  
+
   if (compressor && (point_data_format > 5) && (compressor != LASZIP_COMPRESSOR_LAYERED_CHUNKED))
   {
     fprintf(stderr,"ERROR: point type %d requires using \"native LAS 1.4 extension\" of LASzip\n", point_data_format);
     return FALSE;
   }
 
-  // do we need a LASzip VLR (because we compress or use non-standard points?) 
+  // do we need a LASzip VLR (because we compress or use non-standard points?)
 
   LASzip* laszip = 0;
   U32 laszip_vlr_data_size = 0;
@@ -608,19 +604,19 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     }
     char description[32];
     memset(description, 0, 32);
-    sprintf(description, "by laszip of LAStools (%d)", LAS_TOOLS_VERSION);  
+    sprintf(description, "by laszip of LAStools (%d)", LAS_TOOLS_VERSION);
     if (!stream->putBytes((U8*)description, 32))
     {
       fprintf(stderr,"ERROR: writing description %s\n", description);
       return FALSE;
     }
     // write the data following the header of the variable length record
-    //     U16  compressor                2 bytes 
-    //     U32  coder                     2 bytes 
-    //     U8   version_major             1 byte 
+    //     U16  compressor                2 bytes
+    //     U32  coder                     2 bytes
+    //     U8   version_major             1 byte
     //     U8   version_minor             1 byte
     //     U16  version_revision          2 bytes
-    //     U32  options                   4 bytes 
+    //     U32  options                   4 bytes
     //     I32  chunk_size                4 bytes
     //     I64  number_of_special_evlrs   8 bytes
     //     I64  offset_to_special_evlrs   8 bytes
@@ -742,13 +738,13 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     }
 
     // write the payload of this VLR which contains 28 bytes
-    //   U32  level                                          4 bytes 
-    //   U32  level_index                                    4 bytes 
-    //   U32  implicit_levels + buffer bit + reversible bit  4 bytes 
-    //   F32  min_x                                          4 bytes 
-    //   F32  max_x                                          4 bytes 
-    //   F32  min_y                                          4 bytes 
-    //   F32  max_y                                          4 bytes 
+    //   U32  level                                          4 bytes
+    //   U32  level_index                                    4 bytes
+    //   U32  implicit_levels + buffer bit + reversible bit  4 bytes
+    //   F32  min_x                                          4 bytes
+    //   F32  max_x                                          4 bytes
+    //   F32  min_y                                          4 bytes
+    //   F32  max_y                                          4 bytes
 
     if (!stream->put32bitsLE((U8*)&(header->vlr_lastiling->level)))
     {
@@ -1235,7 +1231,7 @@ I64 LASwriterLAS::close(BOOL update_npoints)
     }
   }
 
-  if (writer) 
+  if (writer)
   {
     writer->done();
     delete writer;
