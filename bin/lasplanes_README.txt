@@ -1,4 +1,6 @@
 ****************************************************************
+this file is deprecated - see *.md version of this file
+****************************************************************
 
   lasplanes:
 
@@ -25,22 +27,24 @@
   
   Here what some of the parameters mean:
 
-  -cell_size n                sets cells to size n*n*n
-  -cell_size_xyx x y z        sets cells to size x*y*z
-  -cell_points min            skip if less than min points
-  -small_eigen_max max        skip if smallest eigenvalue > max
-  -middle_eigen_min min       skip if middle eigenvalue < min
-  -eigen_ratio_smallest r     skip if smallest eigenvalue over sum of all three eigenvalues > r
-  -eigen_ratio_largest r      skip if largest eigenvalue over sum of all three eigenvalues > r                  
-  -plane_thickness t          skip if points form plane thicker than t
-  -plane_exclusion p          skip if more than p % of points had to be excluded to make plane slim
-  -plane_points min           skip if plane is formed by less than min points
-  -polygon_distance dist      skip if polygon not sufficiently far from others
-  -polygon_area a             skip if area formed by points is less than a
-  -polygon_points max         simplify polygon to have no more than max points
-  -polygon_stddev stddev      skip if standard deviation of polygon points from plane > stddev
-  -polygon_name T_123_23      set polygon base name
-  -polygon_digits d           set number of digits used to enumerate polygon names
+  -cell_size n                : sets cells to size n*n*n [default 1.00]
+  -cell_size_xyx x y z        : sets cells to size x*y*z
+  -cell_points min            : skip if less than min points [default 100]
+  -small_eigen_max max        : skip if smallest eigenvalue > max [default=0(not used)]
+  -middle_eigen_min min       : skip if middle eigenvalue < min [default=0(not used)]
+  -eigen_ratio_smallest r     : skip if smallest eigenvalue over sum of all three eigenvalues > r [default 0.00010]
+  -eigen_ratio_largest r      : skip if largest eigenvalue over sum of all three eigenvalues > r [default 0.90000]                  
+  -plane_thickness t          : skip if points form plane thicker than t [default 0.01]
+  -plane_exclusion p          : skip if more than p % of points had to be excluded to make plane slim [default 5.00]
+  -plane_points min           : skip if plane is formed by less than min points [default 100]
+  -polygon_distance dist      : skip if polygon not sufficiently far from others
+  -polygon_area a             : skip if area formed by points is less than a [default 0.50]
+  -polygon_points max         : simplify polygon to have no more than max points [default=0(not used)]
+  -polygon_stddev stddev      : skip if standard deviation of polygon points from plane > stddev [default=0(not used)]
+  -polygon_name T_123_23      : set polygon base name [default 'patch']
+  -polygon_digits d           : set number of digits used to enumerate polygon names [default 5]
+  -output_polygon_points      : default <FALSE>        
+  -output_marked_point_cloud  : default <FALSE>
 
   Please license 'lasplanes' from info@rapidlasso.de
   before using it commercially.
@@ -243,25 +247,5 @@ lasplanes -i in.las -oshp
 lasplanes -i in.las -o planes.pef
 lasplanes -i in.las -opef
 lasplanes -h
-
-options:
-   -cell_size 0.5                [default 1.00]
-   -cell_points 80               [default 100]
-   -eigen_ratio_smallest 0.00005 [default 0.00010]
-   -eigen_ratio_largest 0.8      [default 0.90000]
-   -plane_thickness 0.02         [default 0.01]
-   -plane_exclusion 4.5          [default 5.00]
-   -plane_points 80              [default 100]
-   -polygon_area 0.8             [default 0.50]
-   -polygon_points 12            [default 0  (= not used)]
-   -polygon_stddev 0.01          [default 0  (= not used)]
-   -polygon_name T_123_23        [default 'patch']
-   -polygon_digits 6             [default 5]
-   -small_eigen_max 0.0001       [default 0 (= not used)]
-   -middle_eigen_min 0.02        [default 0 (= not used)]
-   -output_polygon_points        [default <FALSE>]
-   -output_marked_point_cloud    [default <FALSE>]
-
 ---------------
-
 if you find bugs let me (info@rapidlasso.de) know.

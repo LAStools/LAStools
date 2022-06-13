@@ -913,7 +913,7 @@ int main(int argc, char *argv[])
         edit_header = true;
 		  }
 /*
-      else if (strcmp(argv[i],"-set_evlr_description") == 0)
+      else if (strcmp(argv[i],"~set_evlr_description") == 0)
       {
         if ((i+2) >= argc)
         {

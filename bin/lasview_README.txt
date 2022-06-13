@@ -1,4 +1,6 @@
 ****************************************************************
+this file is deprecated - see *.md version of this file
+****************************************************************
 
   lasview:
 
@@ -216,7 +218,7 @@ overview of all tool-specific switches:
 -color_by_classification             : render points by classification color
 -color_by_return                     : render points by return colors (single = yellow, first of many = red, last of many = blue, intermediate = green)
 -color_by_flightline                 : render points by randomly assigning 8 different colors based on the flightline ID
--color_by_user_data                  : render points by mapping the 8-bit user data field to a color ramp (blue -> green -> red)
+-color_by_user_data                  : render points by mapping the 8-bit user data field to a color ramp (blue->green->red)
 -suppress_z                          : don't decompress z coordinates for native-compressed LAS 1.4 point types 6 or higher
 -suppress_classification             : don't decompress classification for native-compressed LAS 1.4 point types 6 or higher
 -suppress_intensity                  : don't decompress RGB for native-compressed LAS 1.4 point types 6 or higher

@@ -1,4 +1,6 @@
 ****************************************************************
+this file is deprecated - see *.md version of this file
+****************************************************************
  
   lasoverlap:
 
@@ -62,9 +64,6 @@
 
   http://lastools.org/
   http://groups.google.com/group/lastools/
-  http://twitter.com/lastools/
-  http://facebook.com/lastools/
-  http://linkedin.com/groups?gid=4408378
 
   Martin @lastools
  
@@ -165,7 +164,7 @@ overview of all tool-specific switches:
 -min_diff 0.1          : map differences between -0.1 and +0.1 to white
 -max_diff 0.2          : map differences below -0.2 or above +0.2 to saturated blue or red
 -bands 0.1 0.2 0.4     : map absolute differences up to 0.1 to white, 0.2 to blue, 0.4 to green, and above to red 
--color_bands 0.1 0x00..: see long explanation above
+-color_bands 0.1 0x00.. : see long explanation above
 -gray                  : map values to gray values instead of colors
 -false                 : map values to colors
 -values                : do not map values to gray or to color tones but output actual difference and overlap values

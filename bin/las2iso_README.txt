@@ -1,4 +1,6 @@
 ****************************************************************
+this file is deprecated - see *.md version of this file
+****************************************************************
 
 las2iso:
 ########
@@ -10,6 +12,10 @@ las2iso:
   only triangulate points that have a particular classification.
   For example, the option '-keep_class 2 3' will triangulate only
   the points of classification 2 or 3.
+  las2iso can handle files up to about 20 mio points.
+  Larger files has either to be tiled or have a look at blast2iso 
+  as our other iso product which will handle much larger files 
+  in incredible speed.
 
 # Control parameters:
 

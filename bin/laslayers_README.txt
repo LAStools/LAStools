@@ -1,28 +1,20 @@
-Get the prototype with data from
+****************************************************************
+this file is deprecated - see *.md version of this file
+****************************************************************
 
-http://lastools.org/download/ll.zip
+laslayers:
 
-This is a preview of a prototype (!!!) for LASlayers. Please be advised that the LAY format is likely to see (incompatible) changes as development progresses. We do not want to present a fait-accompli to the benefit of LAStools users alone but would like to make this an open format. Hence this is also a call for input. Ideally LASlayers can include a set of "basic enhancement layers" for LAS files that the LiDAR community can agree upon and - some far day in the future - may even see integration across different LiDAR software packages.
+WARNING: do not expect LAY files to work across different versions
+         of LAStools because the development of LASlayers is still
+         not completed. this is just an awesome prototype as proof
+         of concept. we continue to gather community input...
 
-We provide here a ready-made prototype because we want to have something to show that is more than just an idea cooked up by our scientists. We are releasing this just in time for ILMF 2014 so folks who have already seen and tested it during our (secret) pre-release can freely small-talk about it during the conference and get back to us with ideas, concerns, and bug reports.
-
-The following comes as three exercises: (1) a first look at LASlayers with 'lasview', 'las2dem', and 'laslayers', (2) work with LASlayers using various LAStools for more I/O and storage efficiency, (3) create LASlayers as difference files between an original and a modified LAS/LAZ file using 'laslayers'. To get started open a CMD shell and go to whereever you unzipped the ll directory to. You will see the following:
-
-C:\ll>dir
-02/02/2014  05:32 AM         1,478,656 las2dem.exe
-02/02/2014  05:50 AM           946,176 lasclassify.exe
-02/02/2014  06:35 AM         1,290,240 lascolor.exe
-02/02/2014  10:50 AM           802,816 lasdiff.exe
-02/02/2014  04:35 AM           991,232 lasground.exe
-02/02/2014  05:48 AM           958,464 lasheight.exe
-02/02/2014  12:04 PM           602,112 laslayers.exe
-02/02/2014  04:29 AM           937,984 lasnoise.exe
-02/02/2014  05:14 AM           905,216 lasview.exe
-02/02/2014  06:44 AM           561,774 ll.lay
-02/02/2014  03:44 AM         1,037,443 ll.laz
-02/02/2014  09:24 AM         1,025,871 ll_modified.laz
-02/02/2014  06:41 AM         1,018,380 ortho.tif
-02/02/2014  12:06 PM             5,851 README.txt
+laslayers is explained with 3 exercises: 
+(1) a first look at LASlayers with 'lasview', 'las2dem', and 'laslayers'
+(2) work with LASlayers using various LAStools for more I/O and 
+    storage efficiency, 
+(3) create LASlayers as difference files between an original and a modified
+    LAS/LAZ file using 'laslayers'. 
 
 ====================================================
 == (1) ==        first look at LASlayers          ++
@@ -187,9 +179,17 @@ lasdiff -i ll_modified.laz -i ll_applied.laz
 
 ====================================================
 
-Now try on your own data and please report back with bugs, suggestions, and missing features.
+overview of all tool-specific switches:
 
-info@rapidlasso.de
+-detach      : detach layers
+-diff        : produce diff LAY file
+-add         : create or add to LAY files with LASlayers storing filters,    
+               transforms or file modifications
+-short       : output layer information only
+-del_last n  : delete last [n] layers
+-del n       : delete layer with index [n(1..32)]
 
---
+
+if you find bugs let me (info@rapidlasso.de) know.
+
 https://rapidlasso.de - fast tools to catch reality

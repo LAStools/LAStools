@@ -1,4 +1,6 @@
 ****************************************************************
+this file is deprecated - see *.md version of this file
+****************************************************************
 
   lascopy:
 
@@ -43,27 +45,13 @@
 
 example usage:
 
->> lascopy -i source.laz ^
-           -i target.laz ^
-           -classification ^
-           -o result.laz
-
->> lascopy -i source.laz ^
-           -i target.laz ^
-           -classification ^
-           -o result.laz
-
->> lascopy -i source.laz ^
-           -i target.laz ^
-           -classification ^
-           -zero ^
-           -o result.laz
+lascopy -i source.laz -i target.laz -o result.laz
+lascopy -i source.laz -i target.laz -classification -zero -o result.laz
 
 ===================================================
-
 for more info:
-
 E:\LAStools\bin>lascopy -h
+
 Filter points based on their coordinates.
   -keep_tile 631000 4834000 1000 (ll_x ll_y size)
   -keep_circle 630250.00 4834750.00 100 (x y radius)

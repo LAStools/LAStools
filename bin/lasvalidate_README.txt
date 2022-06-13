@@ -19,7 +19,11 @@
   Martin @lastools
 
 ****************************************************************
+overview of tool-specific switches:
+-oxml             : output as xml 
 
+
+****************************************************************
 Example calls to lasvalidate:
 
 C:\lastools\bin> lasvalidate -i ..\data\*.las -oxml

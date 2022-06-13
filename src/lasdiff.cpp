@@ -52,7 +52,6 @@
 void usage(bool error=false, bool wait=false)
 {
   fprintf(stderr,"usage:\n");
-  fprintf(stderr,"lasdiff lidar.las\n");
   fprintf(stderr,"lasdiff lidar1.las lidar1.laz\n");
   fprintf(stderr,"lasdiff *.las\n");
   fprintf(stderr,"lasdiff lidar1.las lidar2.las -shutup 20\n");

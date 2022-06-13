@@ -917,7 +917,8 @@ int main(int argc, char *argv[])
     {
       remove_empty_files = false;
     }
-    else if (strcmp(argv[i],"-clip_to_bounding_box") == 0 || strcmp(argv[i],"-clip_to_bb") == 0) 
+		// lasfilter abort on -clip_... due obsolete in general. we change -clip_ to -crop
+		else if (strcmp(argv[i],"-crop_to_bounding_box") == 0 || strcmp(argv[i],"-crop_to_bb") == 0) 
     {
       clip_to_bounding_box = true;
     }

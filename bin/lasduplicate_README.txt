@@ -1,4 +1,6 @@
 ****************************************************************
+this file is deprecated - see *.md version of this file
+****************************************************************
 
   lasduplicate:
 
@@ -135,28 +137,28 @@ and marks the sole survivor as the only return of one.
 
 overview of all tool-specific switches:
 
--v                                   : more info reported in console
--vv                                  : even more info reported in console
--quiet                               : nothing reported in console
--version                             : reports this tool's version number
--fail                                : fail if license expired or invalid
--gui                                 : start with files loaded into GUI
--cores 4                             : process multiple inputs on 4 cores in parallel
--unique_xyz                          : remove only xyz-duplicates where x, y and z coordinate are identical
--nearby 0.1                          : remove all points that are "nearby" (see rules above) an earlier point
--lowest_z                            : remove those xy-duplicates that have higher z coordinates
--flag_as_withheld                    : instead of removing points set their withheld flag to true
--single_returns                      : mark single returns (used for converting first.txt and last.txt ASCII files to LAS)
--record_removed                      : record all removed points into a separate file with appendix "_removed"
--use_hash_set                        : use a different internal data structure (i.e. hash_set) for finding duplicates
--use_hash_map                        : use a different internal data structure (i.e. hash_map) for finding duplicates
--two_pass                            : find duplicates in two instead of one pass over the file
--remain_buffered                     : write buffer points to output when using '-buffered 25' on-the-fly buffering  
--ilay                                : apply all LASlayers found in corresponding *.lay file on read
--ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
--ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
--olay                                : write or append classification changes to a LASlayers *.lay file
--olaydir E:\my_layers                : write the output *.lay file in directory E:\my_layers
+-v                    : more info reported in console
+-vv                   : even more info reported in console
+-quiet                : nothing reported in console
+-version              : reports this tool's version number
+-fail                 : fail if license expired or invalid
+-gui                  : start with files loaded into GUI
+-cores 4              : process multiple inputs on 4 cores in parallel
+-unique_xyz           : remove only xyz-duplicates where x, y and z coordinate are identical
+-nearby 0.1           : remove all points that are "nearby" (see rules above) an earlier point
+-lowest_z             : remove those xy-duplicates that have higher z coordinates
+-flag_as_withheld     : instead of removing points set their withheld flag to true
+-single_returns       : mark single returns (used for converting first.txt and last.txt ASCII files to LAS)
+-record_removed       : record all removed points into a separate file with appendix "_removed"
+-hash_set             : use a different internal data structure (i.e. hash_set) for finding duplicates
+-hash_map             : use a different internal data structure (i.e. hash_map) for finding duplicates
+-two_pass             : find duplicates in two instead of one pass over the file
+-remain_buffered      : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-ilay                 : apply all LASlayers found in corresponding *.lay file on read
+-ilay 3               : apply first three LASlayers found in corresponding *.lay file on read
+-ilaydir E:\my_layers : look for corresponding *.lay file in directory E:\my_layers
+-olay                 : write or append classification changes to a LASlayers *.lay file
+-olaydir E:\my_layers : write the output *.lay file in directory E:\my_layers
 
 ****************************************************************
 

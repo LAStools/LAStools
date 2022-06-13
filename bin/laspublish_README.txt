@@ -1,4 +1,6 @@
 ****************************************************************
+this file is deprecated - see *.md version of this file
+****************************************************************
 
   laspublish:
 
@@ -11,14 +13,41 @@
   https://rapidlasso.de/laspublish/
   https://rapidlasso.de/LAStools/
   http://groups.google.com/group/LAStools/
-  http://twitter.com/LAStools/
-  http://facebook.com/LAStools/
-  http://linkedin.com/groups/4408378
 
-  Martin @LAStools
+  Jochen @LAStools
 
 ****************************************************************
+overview of all tool-specific switches:
 
+-h                         : print help output
+-v                         : more info reported in console
+-version                   : reports this tool's version number
+-fail                      : fail if license expired or invalid
+-gui                       : start with files loaded into GUI
+-rgb
+-license
+-secret
+-elevation
+-intensity
+-classification
+-point_source
+-title
+-name
+-description
+-no_edl
+-no_skybox
+-return_number
+-only_2D
+-only_3D
+-copy_source_files
+-move_source_files
+-really_move
+-overwrite
+-potree14                  : expected protree version 14
+-potree16                  : expected protree version 16 
+-potree18                  : expected protree version 18
+
+****************************************************************
 example usage:
 
 >> laspublish -i lidar.laz -odir portal_dir -o portal.html -olaz

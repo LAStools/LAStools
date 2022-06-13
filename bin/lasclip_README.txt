@@ -1,4 +1,6 @@
 ****************************************************************
+this file is deprecated - see *.md version of this file
+****************************************************************
 
   lasclip:
 
@@ -27,9 +29,9 @@
   associated DBF file then you can use '-split 0' to give output
   files the name or number stored in attribute with index 0. Or
   you can use '-split IDX' with IDX being the attribute's name.
-  -split        one file each shape
-  -split 1      split by attrib with index 0
-  -split abc    split by attrib with name abc
+  -split        : one file each shape
+  -split 1      : split by attrib with index 0
+  -split abc    : split by attrib with name abc
 
   You can exclude certain point classes from the clipping or the
   reclassifying with option '-ignore_class 2' or '-ignore_class
@@ -49,8 +51,8 @@
 
 overview of all tool-specific switches:
 
--v                                   : more info reported in console
--vv                                  : even more info reported in console
+-v                                   : verbose output (print extra information)
+-vv                                  : very verbose output (print even more information)
 -quiet                               : nothing reported in console
 -wait                                : wait for <ENTER> in the console at end of process
 -version                             : reports this tool's version number
@@ -58,7 +60,7 @@ overview of all tool-specific switches:
 -poly [filename]                     : input shape file
 -flag_as_withheld                    : just flag the point as withheld instead of removing it 
 -gui                                 : start with files loaded into GUI
--cores [n]                           : process multiple inputs on n cores in parallel
+-cores 4                           : process multiple inputs on 4 cores in parallel
 -interior                            : clip points INSIDE the polygons
 -ignore_class 0 1 3 5 6 7 9          : ignores points with specified classification codes
 -ignore_extended_class 42 43 45 67   : ignores points with specified extended classification codes
@@ -68,12 +70,9 @@ overview of all tool-specific switches:
 -ignore_first_of_many                : ignores first returns (but only those of multi-returns)
 -ignore_intermediate                 : ignores intermediate returns
 -ignore_last_of_many                 : ignores last returns (but only those of multi-returns)
-
-... more to come ...
-
+-classify_as 6                      : set classification code of points outside the shape to 6
 -dont_remove_empty_files             : do not remove files that have zero points remaining from disk
--ilay                                : apply all LASlayers found in corresponding *.lay file on read
--ilay 3                              : apply first three LASlayers found in corresponding *.lay file on read
+-ilay [n]                            : apply [n] or all LASlayers found in corresponding *.lay file on read
 -ilaydir E:\my_layers                : look for corresponding *.lay file in directory E:\my_layers
 -olay                                : write or append classification changes to a LASlayers *.lay file
 -olaydir E:\my_layers                : write the output *.lay file in directory E:\my_layers
@@ -218,7 +217,7 @@ Modify the point source ID.
 Transform gps_time.
   -translate_gps_time 40.50
   -adjusted_to_week
-  -week_to_adjusted 1671
+  -week_to_adjusted 1671 : converts time stamps from GPS week 1671 to Adjusted Standard GPS
 Transform RGB colors.
   -scale_rgb_down (by 256)
   -scale_rgb_up (by 256)
@@ -226,7 +225,7 @@ Supported LAS Inputs
   -i lidar.las
   -i lidar.laz
   -i lidar1.las lidar2.las lidar3.las -merged
-  -i *.las - merged
+  -i *.las -merged
   -i flight0??.laz flight1??.laz
   -i terrasolid.bin
   -i esri.shp
@@ -332,3 +331,12 @@ help.
 If you find bugs just let us (info@rapidlasso.de) know.
   
 Jochen @lastools
+
+
+
+-tin : write output.shp TIN
+-classify [n] : classify points as [n] instead of clip away
+-many_polys [n] : wildcard of multiple shp files
+-donuts :
+-donut
+-digits

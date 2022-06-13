@@ -1,3 +1,4 @@
+16 June 2022 -- changed reference docs from *_README.txt to *_README.md
 22 March 2022 -- lasindex: added -o parameter; Fix fseek for gcc for las/lax file > 2Gb
 22 March 2022 -- LASlib: added '-iptx_transform' option; 
  7 January 2022 -- lastrack: extra_byte output bugfix
