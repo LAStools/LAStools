@@ -642,11 +642,11 @@ public:
     {
       if (keep_existing)
       {
-        i = number_of_variable_length_records;
+        i = number_of_extended_variable_length_records;
       }
       else
       {
-        for (i = 0; i < number_of_variable_length_records; i++)
+        for (i = 0; i < number_of_extended_variable_length_records; i++)
         {
           if ((strcmp(evlrs[i].user_id, user_id) == 0) && (evlrs[i].record_id == record_id))
           {
