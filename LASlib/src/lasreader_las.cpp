@@ -871,6 +871,24 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
         i--;
         header.number_of_variable_length_records--;
       }
+      else if (strcmp(header.vlrs[i].user_id, "copc") == 0)
+      {
+        if (header.vlrs[i].data)
+        {
+          if (header.vlrs[i].record_id == 1) // COPC info
+          {
+            if (header.vlr_copc_info)
+            {
+              fprintf(stderr,"WARNING: variable length records contain more than one copc info\n");
+            }
+            header.vlr_copc_info = (LASvlr_copc_info*)header.vlrs[i].data;
+          }
+        }
+        else
+        {
+          fprintf(stderr,"WARNING: no payload for copc (not specification-conform).\n");
+        }
+      }
     }
   }
 

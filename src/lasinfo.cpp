@@ -4027,6 +4027,18 @@ int main(int argc, char *argv[])
             fprintf(file_out,"WARNING: corrupt RasterLAZ VLR\n");
           }
         }
+        else if ((strcmp(lasheader->vlrs[i].user_id, "copc") == 0) && (lasheader->vlrs[i].record_id == 1))
+        {
+            fprintf(file_out, "    center x y z: "); lidardouble2string(printstring, lasheader->vlr_copc_info->center_x, lasheader->x_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->vlr_copc_info->center_y, lasheader->y_scale_factor); fprintf(file_out, "%s ", printstring); lidardouble2string(printstring, lasheader->vlr_copc_info->center_z, lasheader->z_scale_factor); fprintf(file_out, "%s\012", printstring);
+            fprintf(file_out, "    root node halfsize: %lf\012", lasheader->vlr_copc_info->halfsize);
+            fprintf(file_out, "    root node point spacing: %lf\012", lasheader->vlr_copc_info->spacing);
+            fprintf(file_out, "    gpstime min/max: %.2lf/%.2lf\012", lasheader->vlr_copc_info->gpstime_minimum, lasheader->vlr_copc_info->gpstime_maximum);
+#ifdef _WIN32
+            fprintf(file_out, "    root hierarchy offset/size: %I64u/%I64u\012", lasheader->vlr_copc_info->root_hier_offset, lasheader->vlr_copc_info->root_hier_size);
+#else
+            fprintf(file_out, "    root hierarchy offset/size: %llu/%llu\012", lasheader->vlr_copc_info->root_hier_offset, lasheader->vlr_copc_info->root_hier_size);
+#endif
+        }
       }
     }
 

@@ -158,6 +158,21 @@ private:
   U8 data[26];
 };
 
+class LASvlr_copc_info
+{
+public:
+  F64 center_x;  // Actual (unscaled) X coordinate of center of octree
+  F64 center_y;  // Actual (unscaled) Y coordinate of center of octree
+  F64 center_z;  // Actual (unscaled) Z coordinate of center of octree
+  F64 halfsize;  // Perpendicular distance from the center to any side of the root node.
+  F64 spacing;   // Space between points at the root node. This value is halved at each octree level
+  U64 root_hier_offset; // File offset to the first hierarchy page
+  U64 root_hier_size;   // Size of the first hierarchy page in bytes
+  F64 gpstime_minimum;    // Minimum of GPSTime
+  F64 gpstime_maximum;   // Maximum of GPSTime
+  U64 reserved[11];    // Must be 0
+};
+
 class LASheader : public LASquantizer, public LASattributer
 {
 public:
@@ -204,6 +219,7 @@ public:
   LASevlr* evlrs;
   LASvlr_geo_keys* vlr_geo_keys;
   LASvlr_key_entry* vlr_geo_key_entries;
+  LASvlr_copc_info* vlr_copc_info;
   F64* vlr_geo_double_params;
   CHAR* vlr_geo_ascii_params;
   CHAR* vlr_geo_ogc_wkt_math;
