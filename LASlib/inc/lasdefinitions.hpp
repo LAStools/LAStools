@@ -173,6 +173,24 @@ public:
   U64 reserved[11];    // Must be 0
 };
 
+class LAScopc_voxelkey
+{
+public:
+  I32 depth;
+  I32 x;
+  I32 y;
+  I32 z;
+};
+
+class LASvlr_copc_entry
+{
+public:
+  LAScopc_voxelkey key;
+  U64 offset;
+  I32 byte_size;
+  I32 point_count;
+};
+
 class LASheader : public LASquantizer, public LASattributer
 {
 public:
@@ -219,13 +237,17 @@ public:
   LASevlr* evlrs;
   LASvlr_geo_keys* vlr_geo_keys;
   LASvlr_key_entry* vlr_geo_key_entries;
-  LASvlr_copc_info* vlr_copc_info;
   F64* vlr_geo_double_params;
   CHAR* vlr_geo_ascii_params;
   CHAR* vlr_geo_ogc_wkt_math;
   CHAR* vlr_geo_ogc_wkt;
   LASvlr_classification* vlr_classification;
   LASvlr_wave_packet_descr** vlr_wave_packet_descr;
+
+  // LAZ 1.4 format 6 7 8 with COPC only
+  U32 number_of_copc_entries;
+  LASvlr_copc_info* vlr_copc_info;
+  LASvlr_copc_entry* vlr_copc_entry;
 
   LASzip* laszip;
   LASvlr_lastiling* vlr_lastiling;
@@ -348,6 +370,8 @@ public:
       if (vlr_wave_packet_descr) delete [] vlr_wave_packet_descr;
       vlr_wave_packet_descr = 0;
       number_of_variable_length_records = 0;
+      if (vlr_copc_entry) delete [] vlr_copc_entry;
+      vlr_copc_entry = 0;
     }
   };
 

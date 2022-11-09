@@ -43,6 +43,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <deque>
 
 BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_only, U32 decompress_selective)
 {
@@ -1252,6 +1253,83 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             evlrs_size -= (60+header.evlrs[i].record_length_after_header);
             i--;
             header.number_of_extended_variable_length_records--;
+          }
+          else if (strcmp(header.evlrs[i].user_id, "copc") == 0)
+          {
+            if (header.evlrs[i].data)
+            {
+              if (header.evlrs[i].record_id == 1000) // COPC EPT hierarchy
+              {
+                if (header.vlr_copc_info)
+                {
+                  U32 nentry;
+                  U64 offset;
+                  U64 size;
+                  I64 offset_to_first_copc_entry;
+                  LASvlr_copc_entry* tmp_page;
+                  std::deque<LASvlr_copc_entry> page;
+                  std::deque<LASvlr_copc_entry> entries;
+                  std::deque<LASvlr_copc_entry> child_entries;
+
+                  // COPC offsets values are relative to the beginning of the file. We need to compute
+                  // an extra offset relative the beginning of this evlr payload
+                  offset_to_first_copc_entry = 60 + header.start_of_first_extended_variable_length_record;
+                  for (j = 0; j < i; j++) { offset_to_first_copc_entry += 60 + header.evlrs[j].record_length_after_header; }
+
+                  // Read the root page
+                  size = header.vlr_copc_info->root_hier_size;
+                  nentry = size/sizeof(LASvlr_copc_entry);
+                  offset = header.vlr_copc_info->root_hier_offset - offset_to_first_copc_entry;
+                  tmp_page = (LASvlr_copc_entry*)malloc(sizeof(LASvlr_copc_entry) * nentry);
+                  memcpy(tmp_page, header.evlrs[i].data + offset, sizeof(LASvlr_copc_entry) * nentry);
+                  page = std::deque<LASvlr_copc_entry>(tmp_page, tmp_page + nentry);
+                  free(tmp_page);
+
+                  for (j = 0; j < page.size(); j++)
+                  {
+                    if (page[j].point_count >= 0) entries.push_back(page[j]);
+                    else if (page[j].point_count == -1) child_entries.push_back(page[j]);
+                  }
+
+                  // Recurse the tree of entries
+                  while (child_entries.size())
+                  {
+                    LASvlr_copc_entry e = child_entries.front();
+                    child_entries.pop_front();
+
+                    size = e.byte_size;
+                    nentry = size/sizeof(LASvlr_copc_entry);
+                    offset = e.offset - offset_to_first_copc_entry;
+                    tmp_page = (LASvlr_copc_entry*)malloc(sizeof(LASvlr_copc_entry) * nentry);
+                    memcpy(tmp_page, header.evlrs[i].data + offset, sizeof(LASvlr_copc_entry) * nentry);
+                    page = std::deque<LASvlr_copc_entry>(tmp_page, tmp_page + nentry);
+                    free(tmp_page);
+
+                    for (j = 0; j < page.size(); j++)
+                    {
+                      if (page[j].point_count >= 0) entries.push_back(page[j]);
+                      else if (page[j].point_count == -1) child_entries.push_back(page[j]);
+                    }
+                  }
+
+                  header.number_of_copc_entries = entries.size();
+                  header.vlr_copc_entry = new LASvlr_copc_entry[header.number_of_copc_entries];
+                  for (j = 0; j < header.number_of_copc_entries; j++) header.vlr_copc_entry[j] = entries[j];
+                }
+                else
+                {
+                  fprintf(stderr, "WARNING: no COPC info VLR before COPC EPT hierarchy EVLR (not specification-conform).\012");
+                }
+              }
+              else
+              {
+                fprintf(stderr, "WARNING: unknown COPC EVLR (not specification-conform).\012");
+              }
+            }
+            else
+            {
+              fprintf(stderr, "WARNING: no payload for COPC EVLR (not specification-conform).\012");
+            }
           }
         }
         stream->seek(here);

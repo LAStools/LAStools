@@ -4068,6 +4068,46 @@ int main(int argc, char *argv[])
             fprintf(file_out, "    OGC COORDINATE SYSTEM WKT:\012");
             fprintf(file_out, "    %s\012", lasreader->header.evlrs[i].data);
           }
+        }  
+        else if (strcmp(lasheader->evlrs[i].user_id, "copc") == 0)
+        {
+          if (lasheader->evlrs[i].record_id == 1000) // COPC EPT hierachy
+          {
+            if (lasheader->vlr_copc_entry)
+            {
+              I32 max_octree_level = 0;
+              for (U32 j = 0 ; j < lasheader->number_of_copc_entries ; j++)
+              {
+                if (lasheader->vlr_copc_entry[j].key.depth > max_octree_level)
+                  max_octree_level = lasheader->vlr_copc_entry[j].key.depth;
+              }
+              max_octree_level++;
+
+              fprintf(file_out, "    Octree with %d levels\012", max_octree_level);
+
+              U64 total = 0;
+              U32* point_count = new U32[max_octree_level];
+              U32* voxel_count = new U32[max_octree_level];
+              memset(point_count, 0, max_octree_level*sizeof(U32));
+              memset(voxel_count, 0, max_octree_level*sizeof(U32));
+
+              for (U32 j = 0 ; j < lasheader->number_of_copc_entries ; j++)
+              {
+                total += lasheader->vlr_copc_entry[j].point_count;
+                point_count[lasheader->vlr_copc_entry[j].key.depth] += lasheader->vlr_copc_entry[j].point_count;
+                voxel_count[lasheader->vlr_copc_entry[j].key.depth]++;
+              }
+
+              for (I32 j = 0 ; j < max_octree_level ; j++)
+              {
+                if (point_count[j] > 0)
+                  fprintf(stdout, "    Level %d : %d points in %d voxels\012", j, point_count[j], voxel_count[j]);
+              }
+
+              delete[] point_count;
+              delete[] voxel_count;
+            }
+          }
         }
       }
     }
