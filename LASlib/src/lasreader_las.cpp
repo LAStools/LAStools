@@ -1266,10 +1266,10 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
                   U64 offset;
                   U64 size;
                   I64 offset_to_first_copc_entry;
-                  LASvlr_copc_entry* tmp_page;
                   std::deque<LASvlr_copc_entry> page;
                   std::deque<LASvlr_copc_entry> entries;
                   std::deque<LASvlr_copc_entry> child_entries;
+                  LASvlr_copc_entry* payload = (LASvlr_copc_entry*)header.evlrs[i].data;
 
                   // COPC offsets values are relative to the beginning of the file. We need to compute
                   // an extra offset relative the beginning of this evlr payload
@@ -1280,10 +1280,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
                   size = header.vlr_copc_info->root_hier_size;
                   nentry = size/sizeof(LASvlr_copc_entry);
                   offset = header.vlr_copc_info->root_hier_offset - offset_to_first_copc_entry;
-                  tmp_page = (LASvlr_copc_entry*)malloc(sizeof(LASvlr_copc_entry) * nentry);
-                  memcpy(tmp_page, header.evlrs[i].data + offset, sizeof(LASvlr_copc_entry) * nentry);
-                  page = std::deque<LASvlr_copc_entry>(tmp_page, tmp_page + nentry);
-                  free(tmp_page);
+                  page = std::deque<LASvlr_copc_entry>(payload + offset, payload + offset + nentry);
 
                   for (j = 0; j < page.size(); j++)
                   {
@@ -1300,10 +1297,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
                     size = e.byte_size;
                     nentry = size/sizeof(LASvlr_copc_entry);
                     offset = e.offset - offset_to_first_copc_entry;
-                    tmp_page = (LASvlr_copc_entry*)malloc(sizeof(LASvlr_copc_entry) * nentry);
-                    memcpy(tmp_page, header.evlrs[i].data + offset, sizeof(LASvlr_copc_entry) * nentry);
-                    page = std::deque<LASvlr_copc_entry>(tmp_page, tmp_page + nentry);
-                    free(tmp_page);
+                    page = std::deque<LASvlr_copc_entry>(payload + offset, payload + offset + nentry);
 
                     for (j = 0; j < page.size(); j++)
                     {
