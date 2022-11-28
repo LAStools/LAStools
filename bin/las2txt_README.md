@@ -99,7 +99,7 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 
 -cores [n]   : process multiple inputs on [n] cores in parallel  
 -extra [n]   : use [n] as value of output extra string  
--header [n]  : use header prefix [n] (percent,dollar,comma,star,colon,semicolon)  
+-header [n]  : use header prefix [n] (pound,percent,dollar,comma,star,colon,semicolon)  
 -opts        : output as PTS (plain text lidar data)  
 -optx        : output as PTX (plain text with header)  
 -parse [xyz] : use parse string [xyz] to access point values  

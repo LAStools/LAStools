@@ -913,6 +913,52 @@ int main(int argc, char *argv[])
     {
       load_vlrs = true;
     }
+    else if (strcmp(argv[i],"-load_ogc_wkt") == 0)
+    {
+      if ((i+1) >= argc)
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: file name\n", argv[i]);
+        byebye(true);
+      }
+
+      if ((argv[i+1][0] != '-') && (argv[i+1][0] != '\0'))
+      {
+        FILE* file = fopen(argv[i+1], "r");
+
+        if (file)
+        {
+          set_ogc_wkt = true;
+          set_ogc_wkt_in_evlr = false;
+          U32 buff_size = 5; I32 c = 0; U32 k = 0;
+          set_ogc_wkt_string = (CHAR*)calloc(buff_size, sizeof(CHAR));
+
+          while(c != EOF && c != '\n')
+          {
+            c = fgetc(file);
+
+            if (k == buff_size)
+              set_ogc_wkt_string = (CHAR*)realloc(set_ogc_wkt_string, (buff_size *= 2)*sizeof(CHAR));
+
+            if (c == EOF || c == '\n')
+              set_ogc_wkt_string[k] = '\0';
+            else
+              set_ogc_wkt_string[k++] = (CHAR)c;
+          }
+
+          fclose(file);
+          i++;
+        }
+        else
+        {
+          fprintf(stderr, "ERROR: cannot open file '%s' for read\n", argv[i+1]);
+        }
+      }
+      else
+      {
+        fprintf(stderr,"ERROR: '%s' needs 1 argument: file name\n", argv[i]);
+        byebye(true);
+      }
+    }
     else if (strcmp(argv[i],"-dont_remove_empty_files") == 0)
     {
       remove_empty_files = false;

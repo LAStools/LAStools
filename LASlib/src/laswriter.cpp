@@ -231,11 +231,10 @@ void LASwriteOpener::usage() const
   fprintf(stderr,"  -o lidar.laz\n");
   fprintf(stderr,"  -o xyzta.txt -oparse xyzta (on-the-fly to ASCII)\n");
   fprintf(stderr,"  -o terrasolid.bin\n");
-  fprintf(stderr,"  -o nasa.qi\n");
   fprintf(stderr,"  -odir C:%cdata%cground (specify output directory)\n", DIRECTORY_SLASH, DIRECTORY_SLASH);
   fprintf(stderr,"  -odix _classified (specify file name appendix)\n");
   fprintf(stderr,"  -ocut 2 (cut the last two characters from name)\n");
-  fprintf(stderr,"  -olas -olaz -otxt -obin -oqfit (specify format)\n");
+  fprintf(stderr,"  -olas -olaz -otxt -obin -oqi (specify format)\n");
   fprintf(stderr,"  -stdout (pipe to stdout)\n");
   fprintf(stderr,"  -nil    (pipe to NULL)\n");
 }

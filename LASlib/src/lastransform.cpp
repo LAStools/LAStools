@@ -2684,8 +2684,8 @@ void LAStransform::usage() const
 	fprintf(stderr, "Transform gps_time.\n");
 	fprintf(stderr, "  -set_gps_time 113556962.005715\n");
 	fprintf(stderr, "  -translate_gps_time 40.50\n");
-	fprintf(stderr, "  -adjusted_to_week\n");
-	fprintf(stderr, "  -week_to_adjusted 1671\n");
+	fprintf(stderr, "  -adjusted_to_week : converts time stamps from Adjusted Standard GPS to GPS week\n");
+	fprintf(stderr, "  -week_to_adjusted n : converts time stamps from GPS week [n] to Adjusted Standard GPS\n");
 	fprintf(stderr, "Transform RGB/NIR colors.\n");
 	fprintf(stderr, "  -set_RGB 255 0 127\n");
 	fprintf(stderr, "  -set_RGB_of_class 9 0 0 255\n");
@@ -2701,7 +2701,7 @@ void LAStransform::usage() const
 	fprintf(stderr, "  -scale_NIR_up (by 256)\n");
 	fprintf(stderr, "  -scale_NIR_to_8bit (only scales down 16 bit values)\n");
 	fprintf(stderr, "  -scale_NIR_to_16bit (only scales up 8 bit values)\n");
-	fprintf(stderr, "  -switch_R_G -switch_R_B -switch_B_G\n");
+	fprintf(stderr, "  -switch_R_G -switch_R_B -switch_G_B\n");
 	fprintf(stderr, "  -copy_R_into_NIR -copy_R_into_intensity\n");
 	fprintf(stderr, "  -copy_G_into_NIR -copy_G_into_intensity\n");
 	fprintf(stderr, "  -copy_B_into_NIR -copy_B_into_intensity\n");

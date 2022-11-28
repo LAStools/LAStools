@@ -1,3 +1,4 @@
+28 November 2022 -- las2las: added parameter '-load_ogc_wkt' (load string from file to OGC WKT)
 16 June 2022 -- changed reference docs from *_README.txt to *_README.md
 22 March 2022 -- lasindex: added -o parameter; Fix fseek for gcc for las/lax file > 2Gb
 22 March 2022 -- LASlib: added '-iptx_transform' option; 

@@ -618,6 +618,75 @@ option. These are unsigned integers numbers so no scale value is required.
 -flip_waveform_direction : flip the waveform direction in the waveform VLR  
 -keep_wavepacket [n]     : keep points with wavepacket value of [n]  
 
+### CRS
+-aeac [m] [n] [meter/survey_feet/feet] [o] [p] [q] [r]: Albers Equal Area Conic Projection: False Easting [m] False Northing[n] [meter/survey_feet/feet] Central Meridian [o] Standard Parallel 1 [p] Standard Parallel 2 [q] Latitude of origin [r]  
+-ecef                               : input is geocentric (Earth-centered Earth-fixed)  
+-elevation_feet                     : use feet for elevation  
+-elevation_meter                    : use meter for elevation  
+-elevation_survey_feet              : set vertical units from meters to US survey feet  
+-elevation_surveyfeet               : use survey feet for elevation  
+-ellipsoid [n]                      : use the WGS-84 ellipsoid [n](do -ellipsoid -1 for a list of ellipsoids)  
+-epsg [n]                           : set datum to EPSG [n]  
+-etrs89                             : use datum ETRS89  
+-feet                               : use feet  
+-gda2020                            : use datum GDA2020  
+-gda94                              : use datum GDA94  
+-grs80                              : use datum GRS1980  
+-latlong                            : geometric coordinates in latitude/longitude order  
+-lcc 609601.22 0.0 meter 33.75 -79 34.33333 36.16666: specifies a lambertian conic confomal projection  
+-longlat                            : geometric coordinates in longitude/latitude order  
+-meter                              : use meter  
+-nad27                              : use the NAD27 ellipsoid  
+-nad83                              : use the NAD83 ellipsoid  
+-nad83_2011                         : use datum NAD83_2011  
+-nad83_csrs                         : use datum NAD83_CSRS  
+-nad83_harn                         : use datum NAD83_HARN  
+-nad83_pa11                         : set horizontal datum to NAD83 PA11  
+-osgb1936                           : use datum OSGB 1936  
+-sp27 SC_N                          : use the NAD27 South Carolina North state plane  
+-sp83 CO_S                          : use the NAD83 Colorado South state plane for georeferencing  
+-survey_feet                        : use survey feet  
+-surveyfeet                         : use survey feet as unit of measurement  
+-target_aeac [m] [n] [meter/survey_feet/feet] [o] [p] [q] [r]: Albers Equal Area Conic Projection for target: False Easting [m] False Northing[n] [meter/survey_feet/feet] Central Meridian [o] Standard Parallel 1 [p] Standard Parallel 2 [q] Latitude of origin [r]  
+-target_ecef                        : output is geocentric (Earth-centered Earth-fixed)  
+-target_elevation_feet              : output uses feet for elevation  
+-target_elevation_meter             : output uses meter for elevation  
+-target_elevation_precision [n]     : output uses [n] (meter/feet) resolution for z  
+-target_elevation_survey_feet       : use elevation survey feet as target unit  
+-target_elevation_surveyfeet        : output uses survey feet for elevation  
+-target_epsg [n]                    : output is EPSG code [n] (e.g. 2193=NZGD2000)  
+-target_feet                        : output uses feet  
+-target_latlong                     : output is geometric coordinates in latitude/longitude  
+-target_lcc 609601.22 0.0 meter 33.75 -79 34.33333 36.16666: specifies a lambertian conic confomal projection at target  
+-target_longlat                     : output is geometric coordinates in longitude/latitude  
+-target_meter                       : output uses meter  
+-target_precision [n]               : output uses [n] (meter/feet) resolution for x and y  
+-target_sp27 SC_N                   : output is state plane NAD27 South Carolina North  
+-target_sp83 CO_S                   : output is state plane NAD83 Colorado South  
+-target_survey_feet                 : output uses survey feet  
+-target_surveyfeet                  : use survey feet as target unit  
+-target_tm                          : use transverse mercator projection for target  
+-target_utm 12T                     : output is UTM zone 12T  
+-tm 609601.22 0.0 meter 33.75 -79 0.99996: specifies a transverse mercator projection  
+-transverse_mercator                : use transverse mercator projection  
+-utm 12T                            : use UTM zone 12T  
+-vertical_cgvd2013                  : set vertical datum to CGVD2013  
+-vertical_cgvd28                    : set vertical datum to CGVD28  
+-vertical_dhhn2016                  : set vertical datum to DHHN2016  
+-vertical_dhhn92                    : set vertical datum to DHHN92  
+-vertical_dvr90                     : set vertical datum to DVR90  
+-vertical_epsg [n]                  : set vertical datum to EPSG [n]  
+-vertical_evrf2007                  : set vertical datum to EVRF2007  
+-vertical_navd29                    : set vertical datum to NAVD29  
+-vertical_navd88                    : set vertical datum to NAVD88  
+-vertical_ngvd29                    : set vertical datum to NGVD29  
+-vertical_nn2000                    : set vertical datum to NN2000  
+-vertical_nn54                      : set vertical datum to NN54  
+-vertical_nzvd2016                  : set vertical datum to NZVD2016  
+-vertical_wgs84                     : set vertical datum to WGS84  
+-wgs72                              : use the WGS-72 ellipsoid  
+-wgs84                              : use the WGS-84 ellipsoid  
+
 ### Logical
 -filter_and         : boolean AND combination of last 2 filters  
 -filter_or          : boolean OR combination of last 2 filters  
@@ -661,7 +730,8 @@ option. These are unsigned integers numbers so no scale value is required.
 -pipe_on         : write output to command pipe, see also -std_in  
 -populate        : populate header on output  
 -stdout          : pipe to stdout  
--temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)
+-target_ecef     : output is geocentric (Earth-centered Earth-fixed)  
+-temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### add_attribute
 The '-add_attribute' argument allow as first parameter the datatype

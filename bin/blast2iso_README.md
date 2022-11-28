@@ -666,7 +666,7 @@ assumption that all points are in UTM zone 17T.
 -populate        : populate header on output  
 -stdout          : pipe to stdout  
 -target_ecef     : output is geocentric (Earth-centered Earth-fixed)  
--temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)
+-temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret

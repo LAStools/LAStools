@@ -894,7 +894,104 @@ lasgrid -i in.laz -o out.asc -classification_majority -step 1
 -oxyz                    : output as xyz textfile  
 -pipe_on                 : write output to command pipe, see also -std_in  
 -populate                : populate header on output  
--target_ecef             : output is geocentric (Earth-centered Earth-fixed)
+-target_ecef             : output is geocentric (Earth-centered Earth-fixed)  
+
+### grid options
+As grid value paramter each parameter will be checked for serveral tokens.
+If a token is detected, the next level of tokens will be checked.
+The order of the tokens is not relevant.
+If a subtoken is not present and a (default) is defined, this will be used. 
+
+    counter
+      quotient
+        16bit
+        (default):8bit
+      16bit
+      32bit
+      2bit
+      4bit
+      (default):8bit
+    elevation
+      highest|max
+      average|avg
+      stddev|std
+      range
+      index
+      (default):min
+    intensity
+      lowest|min
+      average|avg
+      stddev|std
+      range
+      (default):max
+    xyz_random
+    scan_angle
+      highest_abs|abs_highest|max_abs|abs_max
+      average_abs|abs_average|avg_abs|abs_avg
+      highest|max
+      abs
+      range
+      (default):min
+    user_data
+      lowest|min
+      average|avg
+      stddev|std
+      range
+      (default):max
+    point_source    
+      lowest|min
+      range
+      (default):max
+    gps_time
+      lowest|min
+      range
+      (default):max
+    number_returns
+      lowest|min
+      highest|max
+      stddev|std
+      (default):avg
+    return_type  
+      lowest|min
+      highest|max
+    rgb
+    occupancy
+    classification
+      extended_classification
+        variety  
+        quotient
+          _1_
+          _2_
+          _3_
+          _4_
+          _5_
+          _6_
+          _7_
+          _8_
+          16bit
+          -else:8bit
+        majority
+          16bit
+          32bit
+          -else:8bit
+      variety    
+      quotient
+        _1_
+        _2_
+        _3_
+        _4_
+        _5_
+        _6_
+        _7_
+        _8_
+        16bit
+        -else:8bit
+      majority
+        16bit
+        32bit
+        -else:8bit
+    value
+    mean_xyz     
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret

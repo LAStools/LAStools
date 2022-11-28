@@ -730,7 +730,7 @@ file that georeferences the PNG file in Google Earth
 -pipe_on                 : write output to command pipe, see also -std_in  
 -populate                : populate header on output  
 -target_ecef             : output is geocentric (Earth-centered Earth-fixed)  
--temp_files [n]          : set base file name [n] for temp files (example: E:\tmp)
+-temp_files [n]          : set base file name [n] for temp files (example: E:\tmp)  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret

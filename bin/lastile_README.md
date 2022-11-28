@@ -228,6 +228,7 @@ tiles the last returns from huge.laz into compressed tiling.
 
 ### General
 -buffered [n]      : define read or write buffer of size [n](default=262144)  
+-chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
@@ -270,6 +271,7 @@ tiles the last returns from huge.laz into compressed tiling.
 -keep_RGB_nir [m] [n]               : keep points with RGB NIR values between [min] [max]  
 -keep_RGB_red [min] [max]           : keep points with red color value between [min] and [max]  
 -map_attribute_into_RGB [a] [fnm]   : map attribute [a] by table in file [fnm] to RGB values  
+-oscale_rgb [n]                     : scale output RGB by [n]  
 -scale_NIR [n]                      : scale NearInfraRed value by factor [n]  
 -scale_NIR_down                     : scale NearInfraRed value down by 256  
 -scale_NIR_to_16bit                 : scale 8 bit NearInfraRed value to 16 bit  
@@ -785,11 +787,32 @@ tiles the last returns from huge.laz into compressed tiling.
 -stdin          : pipe from stdin  
 
 ### Output
--do_not_populate : do not populate header on output  
--pipe_on         : write output to command pipe, see also -std_in  
--populate        : populate header on output  
--target_ecef     : output is geocentric (Earth-centered Earth-fixed)  
--temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)
+-compatible      : write LAS/LAZ output in compatibility mode  
+-do_not_populate : do not populate header on output    
+-io_obuffer [n]  : use write-out-buffer of size [n] bytes  
+-native          : write LAS/LAZ output in native/actual mode  
+-nil             : pipe output to NULL (suppress output)  
+-o [n]           : use [n] as output file  
+-obin            : output as BIN (terrasolid binary)  
+-ocut [n]        : cut the last [n] characters from name  
+-odir [n]        : set output directory to [n]  
+-odix [n]        : set output file name suffix to [n]  
+-oforce          : force output creation also on errors or warnings  
+-olas            : output as LAS file  
+-olaz            : output as LAZ (compressed LAS)  
+-oparse [xyz]    : parse on-the-fly to ASCII using fields [xyz]  
+-opts            : output as PTS (plain text lidar data)  
+-optx            : output as PTX (plain text with header)  
+-oqi             : output in QFIT format (.qi)(ATM project, NASA)  
+-oscale_rgb [n]  : scale output RGB by [n]  
+-osep [n]        : set text output separator as char [n]  
+-otxt            : output as textfile  
+-owrl            : output as VRLM (Virtual Reality Modeling Language) text  
+-pipe_on         : write output to command pipe, see also -std_in    
+-populate        : populate header on output    
+-stdout          : pipe to stdout  
+-target_ecef     : output is geocentric (Earth-centered Earth-fixed)    
+-temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret

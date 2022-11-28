@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    13 June 2022 -- support unicode filenames
     10 July 2018 -- user must set seek-ability of istream (hard to determine) 
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 
     1 February 2017 -- better support for OGC WKT strings in VLRs or EVLRs

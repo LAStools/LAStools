@@ -1707,7 +1707,6 @@ void LASreadOpener::usage() const
 	fprintf(stderr, "  -i flight0??.laz flight1??.laz\n");
 	fprintf(stderr, "  -i terrasolid.bin\n");
 	fprintf(stderr, "  -i esri.shp\n");
-	fprintf(stderr, "  -i nasa.qi\n");
 	fprintf(stderr, "  -i lidar.txt -iparse xyzti -iskip 2 (on-the-fly from ASCII)\n");
 	fprintf(stderr, "  -i lidar.txt -iparse xyzi -itranslate_intensity 1024\n");
 	fprintf(stderr, "  -lof file_list.txt\n");
