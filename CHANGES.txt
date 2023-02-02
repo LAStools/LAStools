@@ -1,3 +1,6 @@
+02 February 2023 -- Support of non-extended classifications in laswriter
+20 December 2022 -- ArcGIS plugin update to ArcGIS Pro
+ 6 December 2022 -- lasintensity: tool to adjust intensity by scan angle and atmosphere
 28 November 2022 -- las2las: added parameter '-load_ogc_wkt' (load string from file to OGC WKT)
 16 June 2022 -- changed reference docs from *_README.txt to *_README.md
 22 March 2022 -- lasindex: added -o parameter; Fix fseek for gcc for las/lax file > 2Gb

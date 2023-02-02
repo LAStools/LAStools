@@ -620,7 +620,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == '–') argv[i][0] = '-';
+      if (argv[i][0] == 0x96) argv[i][0] = '-';
       if (strcmp(argv[i],"-opts") == 0)
       {
         opts = TRUE;

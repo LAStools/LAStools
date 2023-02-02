@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == '–') argv[i][0] = '-';
+      if (argv[i][0] == 0x96) argv[i][0] = '-';
       if (strcmp(argv[i],"-week_to_adjusted") == 0)
       {
         set_global_encoding_gps_bit = 1;

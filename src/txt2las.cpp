@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
 		// need to get those before lastransform->parse() routine gets them 
 		for (i = 1; i < argc; i++)
 		{
-			if (argv[i][0] == '–') argv[i][0] = '-';
+			if (argv[i][0] == 0x96) argv[i][0] = '-';
 			if (strcmp(argv[i], "-scale_intensity") == 0)
 			{
 				if ((i + 1) >= argc)

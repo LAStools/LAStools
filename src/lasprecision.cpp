@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == '–') argv[i][0] = '-';
+      if (argv[i][0] == 0x96) argv[i][0] = '-';
       if (strcmp(argv[i],"-o") == 0 || strcmp(argv[i],"-olas") == 0 || strcmp(argv[i],"-olaz") == 0 || strcmp(argv[i],"-obin") == 0 || strcmp(argv[i],"-otxt") == 0 || strcmp(argv[i],"-reoffset") == 0 || strcmp(argv[i],"-rescale") == 0)
       {
         output = true;
