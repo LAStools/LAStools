@@ -179,7 +179,7 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -recover_flightlines              : try to recover missing flightline information (for tiles!!!) from GPS time stamps  
 -recover_flightlines_interval [n] : look for minimum [n] second gaps in GPS time stamp to recover flightlines  
 -scan_angle_abs                   : check difference in absolute scan angle per overlapping flightline per cell  
--step [n]                         : raster with stepsize [n](default=1)  
+-step [n]                         : raster with stepsize [n]{default=1}  
 -subsample [n]                    : see long explanation above [n]  
 -switch_G_B                       : switch green and blue value  
 -temp_files [n]                   : set base file name [n] for temp files (example: E:\tmp)  
@@ -203,7 +203,7 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n](default=262144)  
+-buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
@@ -348,7 +348,7 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 ### Simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
--keep_random_fraction [m] [n] : keep points by random fraction [m](0-1), optional seed [n]  
+-keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
 -thin_points_with_time [n]    : thin points with time, [n] = timespacing  
 -thin_pulses_with_time [n]    : thin pulses with time, [n] = timespacing  
 -thin_with_grid [n]           : thin points by min grid size of [n]  
@@ -682,7 +682,7 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -elevation_meter                    : use meter for elevation  
 -elevation_survey_feet              : set vertical units from meters to US survey feet  
 -elevation_surveyfeet               : use survey feet for elevation  
--ellipsoid [n]                      : use the WGS-84 ellipsoid [n](do -ellipsoid -1 for a list of ellipsoids)  
+-ellipsoid [n]                      : use the WGS-84 ellipsoid [n]{do -ellipsoid -1 for a list of ellipsoids}  
 -epsg [n]                           : set datum to EPSG [n]  
 -etrs89                             : use datum ETRS89  
 -gda2020                            : use datum GDA2020  
@@ -794,36 +794,35 @@ number should be skipped, the next three numbers are
 the x, y, and z coordinate, the next two should be
 skipped, and the next number is the scan angle.
 
-The other supported entries are:
-  x : <x> coordinate
-  y : <y> coordinate
-  z : <z> coordinate
-  t : gps <t>ime
-  R : RGB <R>ed channel
-  G : RGB <G>reen channel
-  B : RGB <B>lue channel
-  I : N<I>R channel of LAS 1.4 point type 8
-  s : <s>kip a string or a number that we don't care about
-  i : <i>ntensity
-  a : scan <a>ngle
-  n : <n>umber of returns of that given pulse
-  r : number of <r>eturn
-  h : with<h>eld flag
-  k : <k>eypoint flag
-  g : synthetic fla<g>
-  o : <o>verlap flag of LAS 1.4 point types 6, 7, 8
-  l : scanner channe<l> of LAS 1.4 point types 6, 7, 8
-  E : terrasolid <E>hco Encoding
-  c : <c>lassification
-  u : <u>ser data
-  p : <p>oint source ID
-  e : <e>dge of flight line flag
-  d : <d>irection of scan flag
-  0-9 : additional attributes described as extra bytes (0 through 9)
-  (13) : additional attributes described as extra bytes (10 and up)
-  H : a hexadecimal string encoding the RGB color
-  J : a hexadecimal string encoding the intensity
-
+The other supported entries are:  
+  x : [x] coordinate  
+  y : [y] coordinate  
+  z : [z] coordinate  
+  t : gps [t]ime  
+  R : RGB [R]ed channel  
+  G : RGB [G]reen channel  
+  B : RGB [B]lue channel  
+  I : N[I]R channel of LAS 1.4 point type 8  
+  s : [s]kip a string or a number that we don't care about  
+  i : [i]ntensity  
+  a : scan [a]ngle  
+  n : [n]umber of returns of that given pulse  
+  r : number of [r]eturn  
+  h : with[h]eld flag  
+  k : [k]eypoint flag  
+  g : synthetic fla[g]  
+  o : [o]verlap flag of LAS 1.4 point types 6, 7, 8  
+  l : scanner channe[l] of LAS 1.4 point types 6, 7, 8  
+  E : terrasolid [E]hco Encoding  
+  c : [c]lassification  
+  u : [u]ser data  
+  p : [p]oint source ID  
+  e : [e]dge of flight line flag  
+  d : [d]irection of scan flag  
+  0-9 : additional attributes described as extra bytes (0 through 9)  
+  (13) : additional attributes described as extra bytes (10 and up)  
+  H : a hexadecimal string encoding the RGB color  
+  J : a hexadecimal string encoding the intensity  
 
 ## License
 

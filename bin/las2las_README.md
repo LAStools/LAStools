@@ -232,27 +232,27 @@ point.Z).
 -move_evlrs_to_vlrs                 : move all EVLRs with small enough payload to VLR section  
 -remove_all_evlrs                   : remove all EVLRs  
 -remove_all_vlrs                    : remove all VLRs  
--remove_evlr [n]                    : remove EVLR with index [n](0=first)  
--remove_evlrs_from_to [m] [n]       : remove EVLRs with index [m] to [n](0=first)  
+-remove_evlr [n]                    : remove EVLR with index [n]{0=first}  
+-remove_evlrs_from_to [m] [n]       : remove EVLRs with index [m] to [n]{0=first}  
 -remove_original_vlr                : removes VLR containing original header information created by on-the-fly buffering  
 -remove_padding                     : remove user-defined bytes before and after the header  
 -remove_tiling_vlr                  : removes VLR containing tiling information created by lastile  
--remove_vlr [n]                     : remove VLR with index [n](0=first)  
--remove_vlrs_from_to [m] [n]        : remove VLRs with index [m] to [n](0=first)  
+-remove_vlr [n]                     : remove VLR with index [n]{0=first}  
+-remove_vlrs_from_to [m] [n]        : remove VLRs with index [m] to [n]{0=first}  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -save_vlrs                          : saves all VLRs to a file called vlrs.vlr so they can be loaded into another file  
--set_attribute_offset [m] [n]       : set offset of the attribute [m](0-based) in the extra bytes to [n]  
--set_attribute_scale [m] [n]        : set scale of the attribute [m](0-based) in the extra bytes to [n]  
+-set_attribute_offset [m] [n]       : set offset of the attribute [m]{0-based} in the extra bytes to [n]  
+-set_attribute_scale [m] [n]        : set scale of the attribute [m]{0-based} in the extra bytes to [n]  
 -set_classification [n]             : set classification to [n]  
 -set_global_encoding_gps_bit [n]    : sets bit in global encoding field specifying Adjusted GPS Standard time stamps  
 -set_lastiling_buffer_flag [0/1]    : sets buffer flag in LAStiling VLR (if it exists) to [0/1]  
 -set_ogc_wkt [n]                    : translate GeoTIFF keys [n] into CRS string in OGC WKT format and add it as VLR  
 -set_ogc_wkt_in_evlr [n]            : same as "set_ogc_wkt" but adds [n] as LAS 1.4 EVLR instead. really not recommended!!!  
--set_point_data_format [n]          : force point type to be [n](1-10)  
+-set_point_data_format [n]          : force point type to be [n]{1-10}  
 -set_point_data_record_length [n]   : CAREFUL! sets the point data record length field of the LAS header to size [n] without checking whether this will corrupt the file  
 -set_point_size [n]                 : force point size to be [n]  
--set_point_type [n]                 : force point type to be [n](1-10)  
+-set_point_type [n]                 : force point type to be [n]{1-10}  
 -set_version 1.2                    : set LAS version number to 1.2  
 -set_version_major 1                : set LAS major version number to 1  
 -set_version_minor 2                : set LAS minor version number to 2  
@@ -260,8 +260,8 @@ point.Z).
 -stop_at_point [n]                  : omits all points after point number [n]  
 -subseq [m] [n]                     : extract a subsequence, start from [m] using [n] points  
 -switch_G_B                         : switch green and blue value  
--unset_attribute_offset [n]         : unsets the offset of attribute [n](0=first) in the extra bytes  
--unset_attribute_scale [n]          : unsets the scale of attribute [n](0=first) in the extra bytes  
+-unset_attribute_offset [n]         : unsets the offset of attribute [n]{0=first} in the extra bytes  
+-unset_attribute_scale [n]          : unsets the scale of attribute [n]{0=first} in the extra bytes  
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
@@ -279,7 +279,7 @@ point.Z).
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n](default=262144)  
+-buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
@@ -421,7 +421,7 @@ point.Z).
 ### Simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
--keep_random_fraction [m] [n] : keep points by random fraction [m](0-1), optional seed [n]  
+-keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
 -thin_points_with_time [n]    : thin points with time, [n] = timespacing  
 -thin_pulses_with_time [n]    : thin pulses with time, [n] = timespacing  
 -thin_with_grid [n]           : thin points by min grid size of [n]  
@@ -751,7 +751,7 @@ point.Z).
 -elevation_meter                    : use meter for elevation  
 -elevation_survey_feet              : set vertical units from meters to US survey feet  
 -elevation_surveyfeet               : use survey feet for elevation  
--ellipsoid [n]                      : use the WGS-84 ellipsoid [n](do -ellipsoid -1 for a list of ellipsoids)  
+-ellipsoid [n]                      : use the WGS-84 ellipsoid [n]{do -ellipsoid -1 for a list of ellipsoids}  
 -epsg [n]                           : set datum to EPSG [n]  
 -etrs89                             : use datum ETRS89  
 -gda2020                            : use datum GDA2020  
@@ -876,42 +876,45 @@ out of this values:
   31-255 : reserved
 
 ### parse
-The '-parse [xyz]' flag specifies how to interpret
-each line of the ASCII file. For example, 'tsxyzssa'
-means that the first number is the gpstime, the next
-number should be skipped, the next three numbers are
-the x, y, and z coordinate, the next two should be
-skipped, and the next number is the scan angle.
+The '-parse [xyz]' flag specifies how to set the 
+columns in a ASCII output file. 
+For example, 'tsxyzssa' means that the first number 
+is the gpstime, the next number should be skipped, 
+the next three numbers are the x, y, and z coordinate, 
+the next two should be skipped and the next number
+is the scan angle.
 
-The other supported entries are:
-  x : <x> coordinate
-  y : <y> coordinate
-  z : <z> coordinate
-  t : gps <t>ime
-  R : RGB <R>ed channel
-  G : RGB <G>reen channel
-  B : RGB <B>lue channel
-  I : N<I>R channel of LAS 1.4 point type 8
-  s : <s>kip a string or a number that we don't care about
-  i : <i>ntensity
-  a : scan <a>ngle
-  n : <n>umber of returns of that given pulse
-  r : number of <r>eturn
-  h : with<h>eld flag
-  k : <k>eypoint flag
-  g : synthetic fla<g>
-  o : <o>verlap flag of LAS 1.4 point types 6, 7, 8
-  l : scanner channe<l> of LAS 1.4 point types 6, 7, 8
-  E : terrasolid <E>hco Encoding
-  c : <c>lassification
-  u : <u>ser data
-  p : <p>oint source ID
-  e : <e>dge of flight line flag
-  d : <d>irection of scan flag
-  0-9 : additional attributes described as extra bytes (0 through 9)
-  (13) : additional attributes described as extra bytes (10 and up)
-  H : a hexadecimal string encoding the RGB color
-  J : a hexadecimal string encoding the intensity
+The other supported entries are:  
+  x : [x] coordinate  
+  y : [y] coordinate  
+  z : [z] coordinate  
+  X : unscaled raw [X] value 
+  Y : unscaled raw [Y] value
+  Z : unscaled raw [Z] value
+  t : gps [t]ime  
+  R : RGB [R]ed channel  
+  G : RGB [G]reen channel  
+  B : RGB [B]lue channel  
+  s : [s]kip a string or a number that we don't care about  
+  i : [i]ntensity  
+  a : scan [a]ngle  
+  n : [n]umber of returns of that given pulse  
+  r : number of [r]eturn  
+  h : with[h]eld flag  
+  k : [k]eypoint flag  
+  g : synthetic fla[g]  
+  o : [o]verlap flag of LAS 1.4 point types 6, 7, 8  
+  l : scanner channe[l] of LAS 1.4 point types 6, 7, 8  
+  m : point index, starting at 0
+  M : point index, starting at 1
+  W : all wavepacket attributes
+  w : [w]avepacket descriptor index
+  c : [c]lassification  
+  u : [u]ser data  
+  p : [p]oint source ID  
+  e : [e]dge of flight line flag  
+  d : [d]irection of scan flag  
+  0-9 : additional attributes described as extra bytes (0 through 9)  
 
 
 ## License

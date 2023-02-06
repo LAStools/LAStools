@@ -183,7 +183,7 @@ lascanopy -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov 
 -copy_attribute_into_z [n] : copy attribute [n] value into z  
 -cores [n]                 : process multiple inputs on [n] cores in parallel  
 -cov                       : cover is computed as the number of first returns above the cover cutoff divided by the number of all first returns and output as a percentage  
--cover_cutoff [n]          : set level for -cov or -dns calculation to [n](default="-height_cutoff")  
+-cover_cutoff [n]          : set level for -cov or -dns calculation to [n]{default="-height_cutoff"}  
 -d [m] [n] [o] ...         : compute a height raster [m-n,n-o,...] in which the counts are divided by the total number of points and scaled to a percentage  
 -dns                       : compute the canopy density as the number of all points above the cover cutoff divided by the number of all returns  
 -elevation_feet            : use feet for elevation  
@@ -195,7 +195,7 @@ lascanopy -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov 
 -gps_min                   : compute GPS min value  
 -grid_ll [x] [y]           : shift raster grid lower left to [x]/[y]  
 -height_cutoff [n]         : set height cutoff to [n] (default=1.37) in meters  
--height_in_attribute [n]   : use height above ground stored in extra attribute [n](0=first) instead of from user data  
+-height_in_attribute [n]   : use height above ground stored in extra attribute [n]{0=first} instead of from user data  
 -hom                       : compute the height & intensity metric known as "Height of Median Energy"  
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
@@ -253,7 +253,7 @@ lascanopy -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov 
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n](default=262144)  
+-buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
@@ -398,7 +398,7 @@ lascanopy -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov 
 ### Simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
--keep_random_fraction [m] [n] : keep points by random fraction [m](0-1), optional seed [n]  
+-keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
 -thin_points_with_time [n]    : thin points with time, [n] = timespacing  
 -thin_pulses_with_time [n]    : thin pulses with time, [n] = timespacing  
 -thin_with_grid [n]           : thin points by min grid size of [n]  
@@ -731,7 +731,7 @@ lascanopy -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov 
 -elevation_meter                    : use meter for elevation  
 -elevation_survey_feet              : set vertical units from meters to US survey feet  
 -elevation_surveyfeet               : use survey feet for elevation  
--ellipsoid [n]                      : use the WGS-84 ellipsoid [n](do -ellipsoid -1 for a list of ellipsoids)  
+-ellipsoid [n]                      : use the WGS-84 ellipsoid [n]{do -ellipsoid -1 for a list of ellipsoids}  
 -epsg [n]                           : set datum to EPSG [n]  
 -etrs89                             : use datum ETRS89  
 -gda2020                            : use datum GDA2020  
@@ -844,36 +844,35 @@ number should be skipped, the next three numbers are
 the x, y, and z coordinate, the next two should be
 skipped, and the next number is the scan angle.
 
-The other supported entries are:
-  x : <x> coordinate
-  y : <y> coordinate
-  z : <z> coordinate
-  t : gps <t>ime
-  R : RGB <R>ed channel
-  G : RGB <G>reen channel
-  B : RGB <B>lue channel
-  I : N<I>R channel of LAS 1.4 point type 8
-  s : <s>kip a string or a number that we don't care about
-  i : <i>ntensity
-  a : scan <a>ngle
-  n : <n>umber of returns of that given pulse
-  r : number of <r>eturn
-  h : with<h>eld flag
-  k : <k>eypoint flag
-  g : synthetic fla<g>
-  o : <o>verlap flag of LAS 1.4 point types 6, 7, 8
-  l : scanner channe<l> of LAS 1.4 point types 6, 7, 8
-  E : terrasolid <E>hco Encoding
-  c : <c>lassification
-  u : <u>ser data
-  p : <p>oint source ID
-  e : <e>dge of flight line flag
-  d : <d>irection of scan flag
-  0-9 : additional attributes described as extra bytes (0 through 9)
-  (13) : additional attributes described as extra bytes (10 and up)
-  H : a hexadecimal string encoding the RGB color
-  J : a hexadecimal string encoding the intensity
-
+The other supported entries are:  
+  x : [x] coordinate  
+  y : [y] coordinate  
+  z : [z] coordinate  
+  t : gps [t]ime  
+  R : RGB [R]ed channel  
+  G : RGB [G]reen channel  
+  B : RGB [B]lue channel  
+  I : N[I]R channel of LAS 1.4 point type 8  
+  s : [s]kip a string or a number that we don't care about  
+  i : [i]ntensity  
+  a : scan [a]ngle  
+  n : [n]umber of returns of that given pulse  
+  r : number of [r]eturn  
+  h : with[h]eld flag  
+  k : [k]eypoint flag  
+  g : synthetic fla[g]  
+  o : [o]verlap flag of LAS 1.4 point types 6, 7, 8  
+  l : scanner channe[l] of LAS 1.4 point types 6, 7, 8  
+  E : terrasolid [E]hco Encoding  
+  c : [c]lassification  
+  u : [u]ser data  
+  p : [p]oint source ID  
+  e : [e]dge of flight line flag  
+  d : [d]irection of scan flag  
+  0-9 : additional attributes described as extra bytes (0 through 9)  
+  (13) : additional attributes described as extra bytes (10 and up)  
+  H : a hexadecimal string encoding the RGB color  
+  J : a hexadecimal string encoding the intensity  
 
 ## License
 

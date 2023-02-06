@@ -45,7 +45,9 @@ needed 0.00 sec for 'las12_point_data_format.las' fail
 needed 0.00 sec for 'las12_scale_factor.las' warning  
 done. total time 0.07 sec. total fail (pass=0,warning=2,fail=8)  
 
-C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml  
+C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
+
+```xml  
 <?xml version="1.0" encoding="UTF-8"?>  
 <LASvalidator>  
   <report>  
@@ -390,7 +392,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
     lasvalidate -i ..\unit\*.las -o ..\unit\validate.xml  
   </command_line>  
 </LASvalidator>  
-
+```
 
 ## Examples
 

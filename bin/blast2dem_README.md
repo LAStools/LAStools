@@ -107,12 +107,12 @@ file that georeferences the PNG file in Google Earth
 -elevation_feet            : use feet for elevation  
 -false                     : false-color based on elevation/intensity (used with PNG/TIF/JPG)  
 -feet                      : use feet  
--float_precision [n]       : sets output float precision to [n](used with ASC/BIL/TIF)  
+-float_precision [n]       : sets output float precision to [n]{used with ASC/BIL/TIF}  
 -force_precision           : force excessive elevation (z) precision  
 -gray                      : gray-scale based on elevation/intensity (used with PNG/TIF/JPG)  
 -grey                      : gray-scale based on elevation/intensity (used with PNG/TIF/JPG)  
--grid [n]                  : raster with stepsize [n] (the default is 1)  
--grid_spacing [n]          : raster with stepsize [n] (the default is 1)  
+-grid [n]                  : raster with stepsize [n] {default 1}  
+-grid_spacing [n]          : raster with stepsize [n] {default 1}  
 -hillshade                 : color the image with hillside shading  
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
@@ -148,7 +148,7 @@ file that georeferences the PNG file in Google Earth
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n](default=262144)  
+-buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
@@ -293,7 +293,7 @@ file that georeferences the PNG file in Google Earth
 ### Simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
--keep_random_fraction [m] [n] : keep points by random fraction [m](0-1), optional seed [n]  
+-keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
 -thin_points_with_time [n]    : thin points with time, [n] = timespacing  
 -thin_pulses_with_time [n]    : thin pulses with time, [n] = timespacing  
 -thin_with_grid [n]           : thin points by min grid size of [n]  
@@ -627,7 +627,7 @@ file that georeferences the PNG file in Google Earth
 -elevation_meter                    : use meter for elevation  
 -elevation_survey_feet              : set vertical units from meters to US survey feet  
 -elevation_surveyfeet               : use survey feet for elevation  
--ellipsoid [n]                      : use the WGS-84 ellipsoid [n](do -ellipsoid -1 for a list of ellipsoids)  
+-ellipsoid [n]                      : use the WGS-84 ellipsoid [n]{do -ellipsoid -1 for a list of ellipsoids}  
 -epsg [n]                           : set datum to EPSG [n]  
 -etrs89                             : use datum ETRS89  
 -gda2020                            : use datum GDA2020  
@@ -740,36 +740,35 @@ number should be skipped, the next three numbers are
 the x, y, and z coordinate, the next two should be
 skipped, and the next number is the scan angle.
 
-The other supported entries are:
-  x : <x> coordinate
-  y : <y> coordinate
-  z : <z> coordinate
-  t : gps <t>ime
-  R : RGB <R>ed channel
-  G : RGB <G>reen channel
-  B : RGB <B>lue channel
-  I : N<I>R channel of LAS 1.4 point type 8
-  s : <s>kip a string or a number that we don't care about
-  i : <i>ntensity
-  a : scan <a>ngle
-  n : <n>umber of returns of that given pulse
-  r : number of <r>eturn
-  h : with<h>eld flag
-  k : <k>eypoint flag
-  g : synthetic fla<g>
-  o : <o>verlap flag of LAS 1.4 point types 6, 7, 8
-  l : scanner channe<l> of LAS 1.4 point types 6, 7, 8
-  E : terrasolid <E>hco Encoding
-  c : <c>lassification
-  u : <u>ser data
-  p : <p>oint source ID
-  e : <e>dge of flight line flag
-  d : <d>irection of scan flag
-  0-9 : additional attributes described as extra bytes (0 through 9)
-  (13) : additional attributes described as extra bytes (10 and up)
-  H : a hexadecimal string encoding the RGB color
-  J : a hexadecimal string encoding the intensity
-
+The other supported entries are:  
+  x : [x] coordinate  
+  y : [y] coordinate  
+  z : [z] coordinate  
+  t : gps [t]ime  
+  R : RGB [R]ed channel  
+  G : RGB [G]reen channel  
+  B : RGB [B]lue channel  
+  I : N[I]R channel of LAS 1.4 point type 8  
+  s : [s]kip a string or a number that we don't care about  
+  i : [i]ntensity  
+  a : scan [a]ngle  
+  n : [n]umber of returns of that given pulse  
+  r : number of [r]eturn  
+  h : with[h]eld flag  
+  k : [k]eypoint flag  
+  g : synthetic fla[g]  
+  o : [o]verlap flag of LAS 1.4 point types 6, 7, 8  
+  l : scanner channe[l] of LAS 1.4 point types 6, 7, 8  
+  E : terrasolid [E]hco Encoding  
+  c : [c]lassification  
+  u : [u]ser data  
+  p : [p]oint source ID  
+  e : [e]dge of flight line flag  
+  d : [d]irection of scan flag  
+  0-9 : additional attributes described as extra bytes (0 through 9)  
+  (13) : additional attributes described as extra bytes (10 and up)  
+  H : a hexadecimal string encoding the RGB color  
+  J : a hexadecimal string encoding the intensity  
 
 ## License
 

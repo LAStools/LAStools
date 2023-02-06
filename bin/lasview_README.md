@@ -6,17 +6,17 @@ a TIN computed from (a selection of) the points.
 
 EDITING & DELETING POINTS
 
-Press <e> to start r<e>classifying point as noise (7). Use the
+Press [e] to start r[e]classifying point as noise (7). Use the
 pop-up menu (right click) to select other target classes. Draw
-a polygon enclosing some points and press <r> to register the
-operation. With <ESC> you can unset the last polygon point and
-with <CTRL+u> you can undo the operation or with <CTRL+o> redo
+a polygon enclosing some points and press [r] to register the
+operation. With [ESC] you can unset the last polygon point and
+with [CTRL+u] you can undo the operation or with [CTRL+o] redo
 it again.
 
-Press <d> to start <d>eleting points. Otherwise same procedure
+Press [d] to start [d]eleting points. Otherwise same procedure
 as above.
 
-When finished press <CTRL+s> to save the edits as LASlayers in
+When finished press [CTRL+s] to save the edits as LASlayers in
 to a LAY file. Warning ... if you did not start lasview with
 the '-ilay' option you will not append to an existing LAY file
 but overwrite it. There will be a WARNING though. Later, you
@@ -25,7 +25,7 @@ and continue editing with the '-ilay' option when starting
 lasview again.
 
 If you want to apply your edits and creating a new file press
-<CTRL-a> and an entirely new file (currently with "_1" at the
+[CTRL-a] and an entirely new file (currently with "_1" at the
 end of the input file name) is created.
 
 Do not use lasview with on-the-fly filters or transforms when
@@ -33,18 +33,18 @@ you plan to do editing operations that you are going to save.
 
 VIEWING AND TRAVERSING CROSS SECTIONS 
 
-For quality checking and detail views you can press <x> and
+For quality checking and detail views you can press [x] and
 select a cross section or smaller area of interest. By default
-you will draw a profile rectangle. Holding down <SHIFT> draws
+you will draw a profile rectangle. Holding down [SHIFT] draws
 a profile line. Its width can be chosen in the pop-up menu. Move
-either around with the arrow key. Holding down <SHIFT> or <ALT>
-is taking larger or smaller steps. Press <x> again and you see
+either around with the arrow key. Holding down [SHIFT] or [ALT]
+is taking larger or smaller steps. Press [x] again and you see
 only the selected area. Again, traverse the LiDAR my moving
 around with the arrow keys. You can do your edits in this
 cross section view. Jumping back between cross section view
-and the full extend with <x> help maintaining orientation.
+and the full extend with [x] help maintaining orientation.
 
-With <CTRL-x> you can end the cross section view.
+With [CTRL-x] you can end the cross section view.
 
 
 ## Examples
@@ -77,75 +77,75 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 
 ## Interactive options
 
-<t>     compute a TIN from the displayed returns  
-<T>     remove the TIN <SHIFT>+<t>  
-<h>     change shading mode for TIN (hill-shade, elevation, wire-frame)  
-<G>     show rasterization "needles" for grid set by '-grid n' value <SHIFT>+<g>  
-<R>     raster TIN with grid cell size set by '-grid n' value <SHIFT>+<r>  
+[t]     compute a TIN from the displayed returns  
+[T]     remove the TIN [SHIFT]+[t]  
+[h]     change shading mode for TIN (hill-shade, elevation, wire-frame)  
+[G]     show rasterization "needles" for grid set by '-grid n' value [SHIFT]+[g]  
+[R]     raster TIN with grid cell size set by '-grid n' value [SHIFT]+[r]  
   
-<y>     take one step of spike-free algorithm (press many times to see algorithm in action)  
-<Y>     complete spike-free algorithm to end <SHIFT>+<y>  
+[y]     take one step of spike-free algorithm (press many times to see algorithm in action)  
+[Y]     complete spike-free algorithm to end [SHIFT]+[y]  
   
-<a>     display all returns  
-<l>     display last returns only  
-<f>     display first returns only  
-<g>     display returns classified as ground  
-<b>     display returns classified as building  
-<B>     display returns classified as building + ground <SHIFT>+<b>  
-<v>     display returns classified as vegetation  
-<V>     display returns classified as vegetation + ground <SHIFT>+<v>  
-<j>     display returns classified as building + vegetation  
-<J>     display returns classified as building + vegetation + ground <SHIFT>+<j>  
-<m>     display returns classified as keypoints / mass points  
-<n>     display returns classified as noise  
-<o>     display returns classified as overlap  
-<w>     display returns classified as water  
-<u>     display returns that are unclassified  
-<0>     display ((point source IDs % 8) == 0)  
-<1>     display ((point source IDs % 8) == 1)  
-<2>     display ((point source IDs % 8) == 2)  
-<3>     display ((point source IDs % 8) == 3)  
-<4>     display ((point source IDs % 8) == 4)  
-<5>     display ((point source IDs % 8) == 5)  
-<6>     display ((point source IDs % 8) == 6)  
-<7>     display ((point source IDs % 8) == 7)  
+[a]     display all returns  
+[l]     display last returns only  
+[f]     display first returns only  
+[g]     display returns classified as ground  
+[b]     display returns classified as building  
+[B]     display returns classified as building + ground [SHIFT]+[b]  
+[v]     display returns classified as vegetation  
+[V]     display returns classified as vegetation + ground [SHIFT]+[v]  
+[j]     display returns classified as building + vegetation  
+[J]     display returns classified as building + vegetation + ground [SHIFT]+[j]  
+[m]     display returns classified as keypoints / mass points  
+[n]     display returns classified as noise  
+[o]     display returns classified as overlap  
+[w]     display returns classified as water  
+[u]     display returns that are unclassified  
+[0]     display ((point source IDs % 8) == 0)  
+[1]     display ((point source IDs % 8) == 1)  
+[2]     display ((point source IDs % 8) == 2)  
+[3]     display ((point source IDs % 8) == 3)  
+[4]     display ((point source IDs % 8) == 4)  
+[5]     display ((point source IDs % 8) == 5)  
+[6]     display ((point source IDs % 8) == 6)  
+[7]     display ((point source IDs % 8) == 7)  
   
-<e>      start editing points  
-<d>      start deleting points  
-<r>      register edit / delete operation  
+[e]      start editing points  
+[d]      start deleting points  
+[r]      register edit / delete operation  
   
-<CTRL-u> undo last changes  
-<CTRL-o> redo last undo  
+[CTRL-u] undo last changes  
+[CTRL-o] redo last undo  
   
-<CTRL-s> save changes as LASlayers  
-<CTRL-f> force LAY file overwrite  
-<CTRL-a> apply LASlayers to create new LAS/LAZ file  
+[CTRL-s] save changes as LASlayers  
+[CTRL-f] force LAY file overwrite  
+[CTRL-a] apply LASlayers to create new LAS/LAZ file  
   
-<i>       pick a point  
-<I>       pick a point and draw line to last picked point <SHIFT>+<i>  
-<x>       turn on and toggle between overview and rectangle / line cross-section   
-<SHIFT>   hold down to pick line instead of rectangle cross-section when in overview   
-<CTRL-x>  overview and rectangle / line cross-section view on / off  
+[i]       pick a point  
+[I]       pick a point and draw line to last picked point [SHIFT]+[i]  
+[x]       turn on and toggle between overview and rectangle / line cross-section   
+[SHIFT]   hold down to pick line instead of rectangle cross-section when in overview   
+[CTRL-x]  overview and rectangle / line cross-section view on / off  
   
-<SHIFT> translate mode  
-<CTRL>  zoom mode  
-<ALT>   pan mode  
-<space> switch between pan/translate/zoom/tilt  
-<-/=>   render points smaller/bigger  
-<[/]>   scale elevation  
-<{/}>   scale xy plane  
-<c>     change color mode  
-<X>     hide/show bounding box <SHIFT>+<x>  
-<s/S>   step forward/backward  
-<z/Z>   tiny step forward/backward  
+[SHIFT] translate mode  
+[CTRL]  zoom mode  
+[ALT]   pan mode  
+[space] switch between pan/translate/zoom/tilt  
+[-/=]   render points smaller/bigger  
+[[/]]   scale elevation  
+[{/}]   scale xy plane  
+[c]     change color mode  
+[X]     hide/show bounding box [SHIFT]+[x]  
+[s/S]   step forward/backward  
+[z/Z]   tiny step forward/backward  
   
-<A>     toggle adaptive Z-scaling on/off <SHIFT>+<a>  
-<Q>     show spatial index structure (if LAX file available) <SHIFT>+<q>  
-<q>     pick spatial index cell  
-<E>     render structural elements around all points <SHIFT>+<e>  
-<:>     decrease structural element radius  
-<">     increase structural element radius  
-<W>     show LAS 1.3 waveforms +/- 25 points around picked point <SHIFT>+<w>
+[A]     toggle adaptive Z-scaling on/off [SHIFT]+[a]  
+[Q]     show spatial index structure (if LAX file available) [SHIFT]+[q]  
+[q]     pick spatial index cell  
+[E]     render structural elements around all points [SHIFT]+[e]  
+[:]     decrease structural element radius  
+["]     increase structural element radius  
+[W]     show LAS 1.3 waveforms +/- 25 points around picked point [SHIFT]+[w]
 
 
 ## lasview specific arguments
@@ -157,25 +157,25 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 -background_red                     : start viewer with a red background  
 -background_white                   : start viewer with a white background  
 -buildings                          : render only points classified as building  
--bulge [n]                          : bulge sloped neighbourhoods of TIN triangles by [n](default=step/10)  
--camera 0 -59 -24 0 -0.0572 0.385   : move virtual camera to specifies parameters (print parameters with <K> or <SHIFT>+<k>)  
+-bulge [n]                          : bulge sloped neighbourhoods of TIN triangles by [n]{default=step/10}  
+-camera 0 -59 -24 0 -0.0572 0.385   : move virtual camera to specifies parameters (print parameters with [K] or [SHIFT]+[k])  
 -circles [n]                        : define structural elements as circles of radius [n]  
 -color_by_classification            : render points by classification color  
--color_by_elevation1                : render points by elevation color ramp (black->red->yellow->white)  
--color_by_elevation2                : render points by elevation color ramp (blue->yellow->red)  
+-color_by_elevation1                : render points by elevation color ramp (black-red-yellow-white)  
+-color_by_elevation2                : render points by elevation color ramp (blue-yellow-red)  
 -color_by_flightline                : render points by randomly assigning 8 different colors based on the flightline ID  
 -color_by_intensity                 : render points by intensity  
 -color_by_return                    : render points by return colors (single = yellow, first of many = red, last of many = blue, intermediate = green)  
 -color_by_rgb                       : render points by RGB color  
--color_by_user_data                 : render points by mapping the 8-bit user data field to a color ramp (blue->green->red)  
--concavity [n]                      : remove large exterior triangles from TIN who have an edge longer [n](default=50)  
+-color_by_user_data                 : render points by mapping the 8-bit user data field to a color ramp (blue-]green-]red)  
+-concavity [n]                      : remove large exterior triangles from TIN who have an edge longer [n]{default=50}  
 -cones [m] [n]                      : define structural elements as cones of radius [m] and height [n]  
 -cores [n]                          : process multiple inputs on [n] cores in parallel  
 -cp [fnt]                           : load control points with parse string xyz from file [fnt] and visualize each as red sphere with radius 1 meter  
 -cp_parse [xyz]                     : use parse string [xyz] to parse control point file  
 -every [n]                          : visualize incremental loading of points every [n] points  
 -flats [m] [n] [o]                  : define structural elements as flats of small radius [m], height [n] and large radius [o]  
--grid [n]                           : set raster spacing [n] for visualization of rasterization with <R> (default=1)  
+-grid [n]                           : set raster spacing [n] for visualization of rasterization with [R] {default=1}  
 -ground                             : render only points classified as ground  
 -ground_buildings                   : render only points classified as ground or building  
 -ground_object                      : render only points classified as ground, vegetation, or building  
@@ -183,11 +183,11 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 -holes [n]                          : remove any triangle from TIN that has an edge length bigger than [n]  
 -ilay [n]                           : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]                        : look for corresponding *.lay file in directory [n]  
--kamera [x] [y] [z] [dx] [dy] [dz]  : move virtual camera to specified parameters (print parameters with <K> or <SHIFT>+<k>)  
+-kamera [x] [y] [z] [dx] [dy] [dz]  : move virtual camera to specified parameters (print parameters with [K] or [SHIFT]+[k])  
 -kill [n]                           : remove any triangle from TIN that has an edge length bigger than [n]  
 -light [x] [y] [z]                  : set light direction vector to [x] [y] [z] for hillshaded TIN  
--load_gps_second                    : also loads GPS time stamps from file and displays them when pressing <i>  
--load_gps_time                      : also loads GPS time stamps from file and displays them when pressing <i>  
+-load_gps_second                    : also loads GPS time stamps from file and displays them when pressing [i]  
+-load_gps_time                      : also loads GPS time stamps from file and displays them when pressing [i]  
 -mark_down_spike [n]                : set markers at TIN spikes larger than [n]  
 -mark_down_spike2 [m] [n]           : set markers at TIN spikes larger than [m] within a distance of [n]  
 -mark_point [n]                     : surround point at position [n] in file with a pink sphere of 0.5 meter radius  
@@ -214,7 +214,7 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 -steep [n]                          : remove all "steep" triangles from the TIN with z values spanning more than [n] meters  
 -steps [n]                          : visualize incremental loading of points from file in [n] steps (default=50)  
 -stop_at_point [n]                  : stop loading after [n] points  
--subcircle [n]                      : prior to creating TIN with <t> replace each point with 8 segment circle of radius [n]  
+-subcircle [n]                      : prior to creating TIN with [t] replace each point with 8 segment circle of radius [n]  
 -subseq [m] [n]                     : only load subsequence from point [m] to [n]  
 -suppress_classification            : do not decompress classification for native-compressed LAS 1.4 point types 6 or higher  
 -suppress_intensity                 : do not decompress intensity for native-compressed LAS 1.4 point types 6 or higher  
@@ -240,238 +240,238 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n](default=262144)..
--comma_not_point   : use comma instead of point as decimal separator..
--neighbors [n]     : set neighbors filename or wildcard [n]..
--neighbors_lof [n] : set neighbors list of files [fnf]..
--stored            : use in memory reader..
--unique            : remove duplicate points..
+-buffered [n]      : define read or write buffer of size [n]{default=262144}  
+-comma_not_point   : use comma instead of point as decimal separator  
+-neighbors [n]     : set neighbors filename or wildcard [n]  
+-neighbors_lof [n] : set neighbors list of files [fnf]  
+-stored            : use in memory reader  
+-unique            : remove duplicate points  
 
 ### Color
--clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)..
--copy_B_into_NIR                    : copy blue color value into NearInfraRed value..
--copy_B_into_intensity              : copy blue color value to intensity..
--copy_B_into_register [n]           : copy blue color value into register [n]..
--copy_G_into_NIR                    : copy green color value into NearInfraRed value..
--copy_G_into_intensity              : copy green color value to intensity..
--copy_G_into_register [n]           : copy green color value into register [n]..
--copy_NIR_into_intensity            : copy NIR into intensity..
--copy_NIR_into_register [n]         : copy NearInfraRed value into register [n]..
--copy_RGB_into_intensity            : copy weighted RGB value to intensity..
--copy_R_into_NIR                    : copy red color value into NearInfraRed value..
--copy_R_into_intensity              : copy red color value to intensity..
--copy_R_into_register [n]           : copy red color value into register [n]..
--copy_attribute_into_B [n]          : copy attribute [n] value into blue..
--copy_attribute_into_G [n]          : copy attribute [n] value into green..
--copy_attribute_into_NIR [n]        : copy attribute [n] value into NIR (NearInfraRed)..
--copy_attribute_into_R [n]          : copy attribute [n] value into red..
--copy_intensity_into_NIR            : copy intensity into NIR (NearInfraRed) value..
--copy_register_into_B [n]           : copy register [n] into blue color value..
--copy_register_into_G [n]           : copy register [n] into green color value..
--copy_register_into_I [n]           : copy register [n] into NearInfraRed value..
--copy_register_into_NIR [n]         : copy register [n] into NearInfraRed value..
--copy_register_into_R [n]           : copy register [n] into red color value..
--drop_RGB_green [min] [max]         : drop points with green color value between [min] and [max]..
--drop_RGB_red [min] [max]           : drop points with red color value between [min] and [max]..
--force_RGB                          : force the use of the RGB value even if the point format does not support RGB..
--keep_NDVI_from_CIR [min] [max]     : keep NDVI (Normalized Difference Vegetation Index) from CIR between [min] [max]..
--keep_NDVI_green_is_NIR [min] [max] : keep NDVI (Normalized Difference Vegetation Index) where green is NIR between [min] [max]..
--keep_NDVI_intensity_is_NIR [min] [max]: keep NDVI (Normalized Difference Vegetation Index) where intensity is NIR between [min] [max]..
--keep_RGB_blue [m] [n]              : keep points with RGB blue color values between [min] [max]..
--keep_RGB_green [min] [max]         : keep points with green color value between [min] and [max]..
--keep_RGB_greenness [m] [n]         : keep points with RGB greenness values between [min] [max]..
--keep_RGB_nir [m] [n]               : keep points with RGB NIR values between [min] [max]..
--keep_RGB_red [min] [max]           : keep points with red color value between [min] and [max]..
--map_attribute_into_RGB [a] [fnm]   : map attribute [a] by table in file [fnm] to RGB values..
--scale_NIR [n]                      : scale NearInfraRed value by factor [n]..
--scale_NIR_down                     : scale NearInfraRed value down by 256..
--scale_NIR_to_16bit                 : scale 8 bit NearInfraRed value to 16 bit..
--scale_NIR_to_8bit                  : scale 16 bit NearInfraRed value downto 8 bit..
--scale_NIR_up                       : scale NearInfraRed value up by 256..
--scale_RGB [r] [g] [b]              : scale RGB values by factors in [r][g][b]..
--scale_RGB_down                     : scale RGB color values down by 256..
--scale_RGB_to_16bit                 : scale 8 bit color values to 16 bit..
--scale_RGB_to_8bit                  : scale 16 bit color values downto 8 bit..
--scale_RGB_up                       : scale RGB values from 8 bit up to 16 bit (multiply with 256)..
--scale_rgb_down                     : divides all RGB values by 256 (to go from 16 bit to 8 bit numbers)..
--scale_rgb_up                       : multiplies all RGB values by 256 (to go from 8 bit to 16 bit numbers)..
--set_NIR [n]                        : set NearInfraRed value to [n]..
--set_RGB [r] [g] [b]                : set color to [r] [g] [b]..
--set_RGB_of_class [c] [r] [g] [b]   : set RGB values of class [c] to [r][g][b] (8 or 16 bit)..
--switch_RGBI_into_CIR               : set R to NIR; G to R; B to G..
--switch_RGB_intensity_into_CIR      : set R to intensity; G to R; B to G..
--switch_R_B                         : switch red and blue color value..
--switch_R_G                         : switch red and green color value..
+-clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
+-copy_B_into_NIR                    : copy blue color value into NearInfraRed value  
+-copy_B_into_intensity              : copy blue color value to intensity  
+-copy_B_into_register [n]           : copy blue color value into register [n]  
+-copy_G_into_NIR                    : copy green color value into NearInfraRed value  
+-copy_G_into_intensity              : copy green color value to intensity  
+-copy_G_into_register [n]           : copy green color value into register [n]  
+-copy_NIR_into_intensity            : copy NIR into intensity  
+-copy_NIR_into_register [n]         : copy NearInfraRed value into register [n]  
+-copy_RGB_into_intensity            : copy weighted RGB value to intensity  
+-copy_R_into_NIR                    : copy red color value into NearInfraRed value  
+-copy_R_into_intensity              : copy red color value to intensity  
+-copy_R_into_register [n]           : copy red color value into register [n]  
+-copy_attribute_into_B [n]          : copy attribute [n] value into blue  
+-copy_attribute_into_G [n]          : copy attribute [n] value into green  
+-copy_attribute_into_NIR [n]        : copy attribute [n] value into NIR (NearInfraRed)  
+-copy_attribute_into_R [n]          : copy attribute [n] value into red  
+-copy_intensity_into_NIR            : copy intensity into NIR (NearInfraRed) value  
+-copy_register_into_B [n]           : copy register [n] into blue color value  
+-copy_register_into_G [n]           : copy register [n] into green color value  
+-copy_register_into_I [n]           : copy register [n] into NearInfraRed value  
+-copy_register_into_NIR [n]         : copy register [n] into NearInfraRed value  
+-copy_register_into_R [n]           : copy register [n] into red color value  
+-drop_RGB_green [min] [max]         : drop points with green color value between [min] and [max]  
+-drop_RGB_red [min] [max]           : drop points with red color value between [min] and [max]  
+-force_RGB                          : force the use of the RGB value even if the point format does not support RGB  
+-keep_NDVI_from_CIR [min] [max]     : keep NDVI (Normalized Difference Vegetation Index) from CIR between [min] [max]  
+-keep_NDVI_green_is_NIR [min] [max] : keep NDVI (Normalized Difference Vegetation Index) where green is NIR between [min] [max]  
+-keep_NDVI_intensity_is_NIR [min] [max]: keep NDVI (Normalized Difference Vegetation Index) where intensity is NIR between [min] [max]  
+-keep_RGB_blue [m] [n]              : keep points with RGB blue color values between [min] [max]  
+-keep_RGB_green [min] [max]         : keep points with green color value between [min] and [max]  
+-keep_RGB_greenness [m] [n]         : keep points with RGB greenness values between [min] [max]  
+-keep_RGB_nir [m] [n]               : keep points with RGB NIR values between [min] [max]  
+-keep_RGB_red [min] [max]           : keep points with red color value between [min] and [max]  
+-map_attribute_into_RGB [a] [fnm]   : map attribute [a] by table in file [fnm] to RGB values  
+-scale_NIR [n]                      : scale NearInfraRed value by factor [n]  
+-scale_NIR_down                     : scale NearInfraRed value down by 256  
+-scale_NIR_to_16bit                 : scale 8 bit NearInfraRed value to 16 bit  
+-scale_NIR_to_8bit                  : scale 16 bit NearInfraRed value downto 8 bit  
+-scale_NIR_up                       : scale NearInfraRed value up by 256  
+-scale_RGB [r] [g] [b]              : scale RGB values by factors in [r][g][b]  
+-scale_RGB_down                     : scale RGB color values down by 256  
+-scale_RGB_to_16bit                 : scale 8 bit color values to 16 bit  
+-scale_RGB_to_8bit                  : scale 16 bit color values downto 8 bit  
+-scale_RGB_up                       : scale RGB values from 8 bit up to 16 bit (multiply with 256)  
+-scale_rgb_down                     : divides all RGB values by 256 (to go from 16 bit to 8 bit numbers)  
+-scale_rgb_up                       : multiplies all RGB values by 256 (to go from 8 bit to 16 bit numbers)  
+-set_NIR [n]                        : set NearInfraRed value to [n]  
+-set_RGB [r] [g] [b]                : set color to [r] [g] [b]  
+-set_RGB_of_class [c] [r] [g] [b]   : set RGB values of class [c] to [r][g][b] (8 or 16 bit)  
+-switch_RGBI_into_CIR               : set R to NIR; G to R; B to G  
+-switch_RGB_intensity_into_CIR      : set R to intensity; G to R; B to G  
+-switch_R_B                         : switch red and blue color value  
+-switch_R_G                         : switch red and green color value  
 
 ### Coordinates
--add_attribute_to_z [n]             : add value of attribute [n] to z value..
--add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value..
--auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly..
--bin_Z_into_point_source [n]        : set point source to z/[n]..
--clamp_raw_z [min] [max]            : limit raw z values to [min] and [max]..
--clamp_z [min] [max]                : limit z values to [min] and [max]..
--clamp_z_above [n]                  : limit z values to maximal [n]..
--clamp_z_below [n]                  : limit z values to minimal [n]..
--classify_z_above_as [m] [n]        : for z value above [m] set class to [n]..
--classify_z_below_as [m] [n]        : for z value below [m] set class to [n]..
--classify_z_between_as [m] [n] [o]  : for z value between [m] and [n] set class to [o]..
--copy_attribute_into_x [n]          : copy attribute [n] value into x..
--copy_attribute_into_y [n]          : copy attribute [n] value into y..
--copy_attribute_into_z [n]          : copy attribute [n] value into z..
--copy_intensity_into_z              : copy intensity to z value..
--copy_register_into_x [n]           : copy register [n] to x value..
--copy_register_into_y [n]           : copy register [n] to y value..
--copy_register_into_z [n]           : copy register [n] to z value..
--copy_user_data_into_z              : copy user data into z..
--copy_z_into_attribute [n]          : copy z value into attribute [n] value..
--drop_x [m] [n]                     : drop points with x value between [m] and [n]..
--drop_x_above [n]                   : drop points with x value above [n]..
--drop_x_below [n]                   : drop points with x value below [n]..
--drop_xy [x1] [y1] [x2] [y2]        : drop points within the [x1] [y1] [x2] [y2] rectangle..
--drop_xyz [x1] [y1] [z1] [x2] [y2] [z2]: drop points within the given cube dimensions..
--drop_y [m] [n]                     : drop points with y value between [m] and [n]..
--drop_y_above [n]                   : drop points with y value above [n]..
--drop_y_below [n]                   : drop points with y value below [n]..
--drop_z [m] [n]                     : drop points with z value between [m] and [n]..
--drop_z_above [n]                   : drop points with z value above [n]..
--drop_z_below [n]                   : drop points with z value below [n]..
--inside [x1] [y1] [x2] [y2]         : use only points within the [x1] [y1] [x2] [y2] rectangle..
--inside_circle [x] [y] [r]          : keep circle at pos [x] [y] with radius [r]..
--inside_rectangle [x1] [y1] [x2] [y2]: use only points within the [x1] [y1] [x2] [y2] rectangle..
--inside_tile [m] [n] [o]            : use only points inside tile at lower-left [x] [y] with size [s]..
--keep_circle [x] [y] [r]            : keep circle at pos [x] [y] with radius [r]..
--keep_profile [x1] [y1] [x2] [y2] [w]: keep profile with [x1] [y1] [x2] [y2] [w]..
--keep_tile [x] [y] [size]           : keep tile at lower-left [x] [y] with size [s]..
--keep_x [m] [n]                     : keep points with x value between [m] and [n]..
--keep_xy [x1] [y1] [x2] [y2]        : keep points within the [x1] [y1] [x2] [y2] rectangle..
--keep_xyz [x1] [y1] [z1] [x2] [y2] [z2]: keep points within the given cube dimensions..
--keep_y [m] [n]                     : keep points with y value between [m] and [n]..
--keep_z [m] [n]                     : keep points with z value between [m] and [n]..
--keep_z_above [n]                   : keep points with z value above [n]..
--keep_z_below [n]                   : keep points with z value below [n]..
--reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly..
--rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly..
--rescale_xy [x] [y]                 : rescale x y by [x] [y]..
--rescale_z [z]                      : rescale z by [z]..
--rotate_xy [a] [x] [y]              : rotate points by [a] degrees, center at [x] [y]..
--rotate_xz [a] [x] [z]              : rotate points by [a] degrees, center at [x] [z]..
--rotate_yz [a] [y] [z]              : rotate points by [a] degrees, center at [y] [z]..
--scale_x [n]                        : scale x value by [n]..
--scale_xyz [m] [n] [o]              : scale xyz values by [m] [n] [o]..
--scale_y [n]                        : scale y value by [n]..
--scale_z [n]                        : scale z value by [n]..
--switch_x_y                         : exchange x and y value..
--switch_x_z                         : exchange x and z value..
--switch_y_z                         : exchange z and x value..
--transform_affine [a],[b],[c],[d]   : transform input using affine transformation with [a],[b],[c],[d]..
--transform_helmert [m] [n] [o]      : do a helmert transformation with 3 or 7 comma separated parameters [n] .....
--transform_matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]: transform input using matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]..
--translate_raw_x [n]                : translate raw x value by [n]..
--translate_raw_xy_at_random [x] [y] : translate raw xy values by random and max offset of [x] [y]..
--translate_raw_xyz [x] [y] [z]      : translate raw coordinates by [x] [y] [z]..
--translate_raw_y [n]                : translate raw y value by [n]..
--translate_raw_z [n]                : translate raw z value by [n]..
--translate_then_scale_x [m] [n]     : translate x value by [m] and scale by [n]..
--translate_then_scale_y [m] [n]     : translate y value by [m] and scale by [n]..
--translate_then_scale_z [m] [n]     : translate z value by [m] and scale by [n]..
--translate_x [n]                    : translate y value by [n]..
--translate_xyz [x] [y] [z]          : translate point coordinates by [x] [y] [z]..
--translate_y [n]                    : translate y value by [n]..
--translate_z [n]                    : translate z value by [n]..
+-add_attribute_to_z [n]             : add value of attribute [n] to z value  
+-add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
+-auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly  
+-bin_Z_into_point_source [n]        : set point source to z/[n]  
+-clamp_raw_z [min] [max]            : limit raw z values to [min] and [max]  
+-clamp_z [min] [max]                : limit z values to [min] and [max]  
+-clamp_z_above [n]                  : limit z values to maximal [n]  
+-clamp_z_below [n]                  : limit z values to minimal [n]  
+-classify_z_above_as [m] [n]        : for z value above [m] set class to [n]  
+-classify_z_below_as [m] [n]        : for z value below [m] set class to [n]  
+-classify_z_between_as [m] [n] [o]  : for z value between [m] and [n] set class to [o]  
+-copy_attribute_into_x [n]          : copy attribute [n] value into x  
+-copy_attribute_into_y [n]          : copy attribute [n] value into y  
+-copy_attribute_into_z [n]          : copy attribute [n] value into z  
+-copy_intensity_into_z              : copy intensity to z value  
+-copy_register_into_x [n]           : copy register [n] to x value  
+-copy_register_into_y [n]           : copy register [n] to y value  
+-copy_register_into_z [n]           : copy register [n] to z value  
+-copy_user_data_into_z              : copy user data into z  
+-copy_z_into_attribute [n]          : copy z value into attribute [n] value  
+-drop_x [m] [n]                     : drop points with x value between [m] and [n]  
+-drop_x_above [n]                   : drop points with x value above [n]  
+-drop_x_below [n]                   : drop points with x value below [n]  
+-drop_xy [x1] [y1] [x2] [y2]        : drop points within the [x1] [y1] [x2] [y2] rectangle  
+-drop_xyz [x1] [y1] [z1] [x2] [y2] [z2]: drop points within the given cube dimensions  
+-drop_y [m] [n]                     : drop points with y value between [m] and [n]  
+-drop_y_above [n]                   : drop points with y value above [n]  
+-drop_y_below [n]                   : drop points with y value below [n]  
+-drop_z [m] [n]                     : drop points with z value between [m] and [n]  
+-drop_z_above [n]                   : drop points with z value above [n]  
+-drop_z_below [n]                   : drop points with z value below [n]  
+-inside [x1] [y1] [x2] [y2]         : use only points within the [x1] [y1] [x2] [y2] rectangle  
+-inside_circle [x] [y] [r]          : keep circle at pos [x] [y] with radius [r]  
+-inside_rectangle [x1] [y1] [x2] [y2]: use only points within the [x1] [y1] [x2] [y2] rectangle  
+-inside_tile [m] [n] [o]            : use only points inside tile at lower-left [x] [y] with size [s]  
+-keep_circle [x] [y] [r]            : keep circle at pos [x] [y] with radius [r]  
+-keep_profile [x1] [y1] [x2] [y2] [w]: keep profile with [x1] [y1] [x2] [y2] [w]  
+-keep_tile [x] [y] [size]           : keep tile at lower-left [x] [y] with size [s]  
+-keep_x [m] [n]                     : keep points with x value between [m] and [n]  
+-keep_xy [x1] [y1] [x2] [y2]        : keep points within the [x1] [y1] [x2] [y2] rectangle  
+-keep_xyz [x1] [y1] [z1] [x2] [y2] [z2]: keep points within the given cube dimensions  
+-keep_y [m] [n]                     : keep points with y value between [m] and [n]  
+-keep_z [m] [n]                     : keep points with z value between [m] and [n]  
+-keep_z_above [n]                   : keep points with z value above [n]  
+-keep_z_below [n]                   : keep points with z value below [n]  
+-reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
+-rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
+-rescale_xy [x] [y]                 : rescale x y by [x] [y]  
+-rescale_z [z]                      : rescale z by [z]  
+-rotate_xy [a] [x] [y]              : rotate points by [a] degrees, center at [x] [y]  
+-rotate_xz [a] [x] [z]              : rotate points by [a] degrees, center at [x] [z]  
+-rotate_yz [a] [y] [z]              : rotate points by [a] degrees, center at [y] [z]  
+-scale_x [n]                        : scale x value by [n]  
+-scale_xyz [m] [n] [o]              : scale xyz values by [m] [n] [o]  
+-scale_y [n]                        : scale y value by [n]  
+-scale_z [n]                        : scale z value by [n]  
+-switch_x_y                         : exchange x and y value  
+-switch_x_z                         : exchange x and z value  
+-switch_y_z                         : exchange z and x value  
+-transform_affine [a],[b],[c],[d]   : transform input using affine transformation with [a],[b],[c],[d]  
+-transform_helmert [m] [n] [o]      : do a helmert transformation with 3 or 7 comma separated parameters [n] ...  
+-transform_matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]: transform input using matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]  
+-translate_raw_x [n]                : translate raw x value by [n]  
+-translate_raw_xy_at_random [x] [y] : translate raw xy values by random and max offset of [x] [y]  
+-translate_raw_xyz [x] [y] [z]      : translate raw coordinates by [x] [y] [z]  
+-translate_raw_y [n]                : translate raw y value by [n]  
+-translate_raw_z [n]                : translate raw z value by [n]  
+-translate_then_scale_x [m] [n]     : translate x value by [m] and scale by [n]  
+-translate_then_scale_y [m] [n]     : translate y value by [m] and scale by [n]  
+-translate_then_scale_z [m] [n]     : translate z value by [m] and scale by [n]  
+-translate_x [n]                    : translate y value by [n]  
+-translate_xyz [x] [y] [z]          : translate point coordinates by [x] [y] [z]  
+-translate_y [n]                    : translate y value by [n]  
+-translate_z [n]                    : translate z value by [n]  
 
 ### Simple thinning
--drop_every_nth [n]           : drop every [n]th point..
--keep_every_nth [n]           : keep every [n]th point..
--keep_random_fraction [m] [n] : keep points by random fraction [m](0-1), optional seed [n]..
--thin_points_with_time [n]    : thin points with time, [n] = timespacing..
--thin_pulses_with_time [n]    : thin pulses with time, [n] = timespacing..
--thin_with_grid [n]           : thin points by min grid size of [n]..
--thin_with_time [n]           : thin pulses with time, [n] = timespacing..
+-drop_every_nth [n]           : drop every [n]th point  
+-keep_every_nth [n]           : keep every [n]th point  
+-keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
+-thin_points_with_time [n]    : thin points with time, [n] = timespacing  
+-thin_pulses_with_time [n]    : thin pulses with time, [n] = timespacing  
+-thin_with_grid [n]           : thin points by min grid size of [n]  
+-thin_with_time [n]           : thin pulses with time, [n] = timespacing  
 
 ### Return number
--change_extended_number_of_returns_from_to [m] [n]: change extended number of returns from [m] to [n]..
--change_extended_return_number_from_to [m] [n]: change extended return number from [m] to [n]..
--change_number_of_returns_from_to [m] [n]: change number of returns from [m] to [n]..
--change_return_number_from_to [m] [n]: change return number from [m] to [n]..
--drop_double                        : drop double returns..
--drop_first                         : drop first return..
--drop_first_of_many                 : drop first of many returns..
--drop_last                          : drop last return..
--drop_last_of_many                  : drop last of many returns..
--drop_middle                        : drop middle returns..
--drop_number_of_returns [n]         : drop points with [n] number of returns..
--drop_quadruple                     : drop quadruple returns..
--drop_quintuple                     : drop quintuple returns..
--drop_return [m] [n]...             : drop points with return [m] [n].....
--drop_return_mask [n]               : drop points with return mask [n]..
--drop_second_last                   : drop points with second last return..
--drop_single                        : drop points with single return..
--drop_triple                        : drop points with triple return..
--first_only                         : use first return only..
--keep_double                        : keep double returns..
--keep_first                         : keep first return..
--keep_first_of_many                 : keep first of many returns..
--keep_last                          : keep last return..
--keep_last_of_many                  : keep last of many returns..
--keep_middle                        : keep mittle returns..
--keep_number_of_returns [n]         : keep points with [n] number of returns..
--keep_quadruple                     : keep quadruple returns..
--keep_quintuple                     : keep quintuple returns..
--keep_return [m] [n]...             : keep points with return [m] [n].....
--keep_return_mask [n]               : keep points with return mask [n]..
--keep_second_last                   : keep points with second last return..
--keep_single                        : keep points with single return..
--keep_triple                        : keep points with triple return..
--last_only                          : use last return only..
--repair_zero_returns                : sets return counts and number of returns that are zero to one..
--set_extended_number_of_returns [n] : set extended number of returns to [n]..
--set_extended_return_number [n]     : set extended return number to [n]..
--set_number_of_returns [n]          : set number of returns to [n]..
--set_return_number [n]              : set return number to [n]..
+-change_extended_number_of_returns_from_to [m] [n]: change extended number of returns from [m] to [n]  
+-change_extended_return_number_from_to [m] [n]: change extended return number from [m] to [n]  
+-change_number_of_returns_from_to [m] [n]: change number of returns from [m] to [n]  
+-change_return_number_from_to [m] [n]: change return number from [m] to [n]  
+-drop_double                        : drop double returns  
+-drop_first                         : drop first return  
+-drop_first_of_many                 : drop first of many returns  
+-drop_last                          : drop last return  
+-drop_last_of_many                  : drop last of many returns  
+-drop_middle                        : drop middle returns  
+-drop_number_of_returns [n]         : drop points with [n] number of returns  
+-drop_quadruple                     : drop quadruple returns  
+-drop_quintuple                     : drop quintuple returns  
+-drop_return [m] [n]...             : drop points with return [m] [n]...  
+-drop_return_mask [n]               : drop points with return mask [n]  
+-drop_second_last                   : drop points with second last return  
+-drop_single                        : drop points with single return  
+-drop_triple                        : drop points with triple return  
+-first_only                         : use first return only  
+-keep_double                        : keep double returns  
+-keep_first                         : keep first return  
+-keep_first_of_many                 : keep first of many returns  
+-keep_last                          : keep last return  
+-keep_last_of_many                  : keep last of many returns  
+-keep_middle                        : keep mittle returns  
+-keep_number_of_returns [n]         : keep points with [n] number of returns  
+-keep_quadruple                     : keep quadruple returns  
+-keep_quintuple                     : keep quintuple returns  
+-keep_return [m] [n]...             : keep points with return [m] [n]...  
+-keep_return_mask [n]               : keep points with return mask [n]  
+-keep_second_last                   : keep points with second last return  
+-keep_single                        : keep points with single return  
+-keep_triple                        : keep points with triple return  
+-last_only                          : use last return only  
+-repair_zero_returns                : sets return counts and number of returns that are zero to one  
+-set_extended_number_of_returns [n] : set extended number of returns to [n]  
+-set_extended_return_number [n]     : set extended return number to [n]  
+-set_number_of_returns [n]          : set number of returns to [n]  
+-set_return_number [n]              : set return number to [n]  
 
 ### Scanline
--drop_scan_direction [n]       : drop points with scan direction [n]..
--faf                           : input files are flightlines. do ***NOT*** use this for tiled input..
--faf_index [n]                 : set files are flightlines index [n]..
--files_are_flightlines         : input files are flightlines. do ***NOT*** use this for tiled input..
--keep_edge_of_flight_line      : keep points with "Edge of Flight Line" flag set..
--keep_scan_direction_change    : keep points with changed scan direction flag..
--set_edge_of_flight_line [0/1] : set "Edge of Flight Line" flag to [0/1]..
--set_scan_direction_flag [0/1] : set scan direction flag to [0/1]..
+-drop_scan_direction [n]       : drop points with scan direction [n]  
+-faf                           : input files are flightlines. do ***NOT*** use this for tiled input  
+-faf_index [n]                 : set files are flightlines index [n]  
+-files_are_flightlines         : input files are flightlines. do ***NOT*** use this for tiled input  
+-keep_edge_of_flight_line      : keep points with "Edge of Flight Line" flag set  
+-keep_scan_direction_change    : keep points with changed scan direction flag  
+-set_edge_of_flight_line [0/1] : set "Edge of Flight Line" flag to [0/1]  
+-set_scan_direction_flag [0/1] : set scan direction flag to [0/1]  
 
 ### Scanner channel
--copy_scanner_channel_into_point_source: copy scanner channel into point_source..
--copy_scanner_channel_into_user_data: copy scanner channel into user data..
--copy_user_data_into_scanner_channel: copy user data into scanner channel..
--drop_scanner_channel [n]           : drop points with scanner channel [n]..
--keep_scanner_channel [n]           : keep points with scanner channel [n]..
--merge_scanner_channel_into_point_source: merge scanner channel to point source..
--set_extended_scanner_channel [n]   : set extended scanner channel to [n]..
--set_scanner_channel [n]            : set scanner channel to [n]..
--split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel..
+-copy_scanner_channel_into_point_source: copy scanner channel into point_source  
+-copy_scanner_channel_into_user_data: copy scanner channel into user data  
+-copy_user_data_into_scanner_channel: copy user data into scanner channel  
+-drop_scanner_channel [n]           : drop points with scanner channel [n]  
+-keep_scanner_channel [n]           : keep points with scanner channel [n]  
+-merge_scanner_channel_into_point_source: merge scanner channel to point source  
+-set_extended_scanner_channel [n]   : set extended scanner channel to [n]  
+-set_scanner_channel [n]            : set scanner channel to [n]  
+-split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
 ### Source ID
--apply_file_source_ID               : copy file source ID to target..
--bin_Z_into_point_source [n]        : set point source to z/[n]..
--bin_abs_scan_angle_into_point_source [n]: set point source to scan_angle/[n]..
--bin_gps_time_into_point_source [n] : set point source to gps/[n]..
--change_point_source_from_to [m] [n]: change point source from [m] to [n]..
--copy_attribute_into_point_source [n]: copy attribute [n] value into point source..
--copy_classification_into_point_source: copy classification to point source..
--copy_point_source_into_register [n]: copy point source into register [n]..
--copy_register_into_point_source [n]: copy register [n] to point source..
--copy_scanner_channel_into_point_source: copy scanner channel into point_source..
--copy_user_data_into_point_source   : copy user data into point source..
--drop_point_source [n]              : drop points with point source [n]..
--drop_point_source_above [n]        : drop points with with point source above [n]..
--drop_point_source_below [n]        : drop points with with point source below [n]..
--drop_point_source_between [m] [n]  : drop points with with point source between [n] and [m]..
--keep_point_source [n]              : keep points with point source [n]..
--keep_point_source_between [m] [n]  : keep points with with point source between [n] and [m]..
--map_point_source [fnm]             : set the point source by map in file [fnm]..
--merge_scanner_channel_into_point_source: merge scanner channel to point source..
--set_point_source [n]               : set point source to [n]..
--split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel..
+-apply_file_source_ID               : copy file source ID to target  
+-bin_Z_into_point_source [n]        : set point source to z/[n]  
+-bin_abs_scan_angle_into_point_source [n]: set point source to scan_angle/[n]  
+-bin_gps_time_into_point_source [n] : set point source to gps/[n]  
+-change_point_source_from_to [m] [n]: change point source from [m] to [n]  
+-copy_attribute_into_point_source [n]: copy attribute [n] value into point source  
+-copy_classification_into_point_source: copy classification to point source  
+-copy_point_source_into_register [n]: copy point source into register [n]  
+-copy_register_into_point_source [n]: copy register [n] to point source  
+-copy_scanner_channel_into_point_source: copy scanner channel into point_source  
+-copy_user_data_into_point_source   : copy user data into point source  
+-drop_point_source [n]              : drop points with point source [n]  
+-drop_point_source_above [n]        : drop points with with point source above [n]  
+-drop_point_source_below [n]        : drop points with with point source below [n]  
+-drop_point_source_between [m] [n]  : drop points with with point source between [n] and [m]  
+-keep_point_source [n]              : keep points with point source [n]  
+-keep_point_source_between [m] [n]  : keep points with with point source between [n] and [m]  
+-map_point_source [fnm]             : set the point source by map in file [fnm]  
+-merge_scanner_channel_into_point_source: merge scanner channel to point source  
+-set_point_source [n]               : set point source to [n]  
+-split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
 ### User data
 -add_scaled_attribute_to_user_data [m] [n]: scale attribute [m] value by [n] and add to user data  
@@ -740,35 +740,35 @@ number should be skipped, the next three numbers are
 the x, y, and z coordinate, the next two should be
 skipped, and the next number is the scan angle.
 
-The other supported entries are:
-  x : <x> coordinate
-  y : <y> coordinate
-  z : <z> coordinate
-  t : gps <t>ime
-  R : RGB <R>ed channel
-  G : RGB <G>reen channel
-  B : RGB <B>lue channel
-  I : N<I>R channel of LAS 1.4 point type 8
-  s : <s>kip a string or a number that we don't care about
-  i : <i>ntensity
-  a : scan <a>ngle
-  n : <n>umber of returns of that given pulse
-  r : number of <r>eturn
-  h : with<h>eld flag
-  k : <k>eypoint flag
-  g : synthetic fla<g>
-  o : <o>verlap flag of LAS 1.4 point types 6, 7, 8
-  l : scanner channe<l> of LAS 1.4 point types 6, 7, 8
-  E : terrasolid <E>hco Encoding
-  c : <c>lassification
-  u : <u>ser data
-  p : <p>oint source ID
-  e : <e>dge of flight line flag
-  d : <d>irection of scan flag
-  0-9 : additional attributes described as extra bytes (0 through 9)
-  (13) : additional attributes described as extra bytes (10 and up)
-  H : a hexadecimal string encoding the RGB color
-  J : a hexadecimal string encoding the intensity
+The other supported entries are:  
+  x : [x] coordinate  
+  y : [y] coordinate  
+  z : [z] coordinate  
+  t : gps [t]ime  
+  R : RGB [R]ed channel  
+  G : RGB [G]reen channel  
+  B : RGB [B]lue channel  
+  I : N[I]R channel of LAS 1.4 point type 8  
+  s : [s]kip a string or a number that we don't care about  
+  i : [i]ntensity  
+  a : scan [a]ngle  
+  n : [n]umber of returns of that given pulse  
+  r : number of [r]eturn  
+  h : with[h]eld flag  
+  k : [k]eypoint flag  
+  g : synthetic fla[g]  
+  o : [o]verlap flag of LAS 1.4 point types 6, 7, 8  
+  l : scanner channe[l] of LAS 1.4 point types 6, 7, 8  
+  E : terrasolid [E]hco Encoding  
+  c : [c]lassification  
+  u : [u]ser data  
+  p : [p]oint source ID  
+  e : [e]dge of flight line flag  
+  d : [d]irection of scan flag  
+  0-9 : additional attributes described as extra bytes (0 through 9)  
+  (13) : additional attributes described as extra bytes (10 and up)  
+  H : a hexadecimal string encoding the RGB color  
+  J : a hexadecimal string encoding the intensity  
 
 
 ## License

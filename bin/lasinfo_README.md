@@ -289,12 +289,12 @@ lasinfo -i *.laz -set_system_identifier "hello world!" -set_generating_software 
 -set_number_of_variable_length_records [n]: set number of variable length records to [n]  
 -set_offset [x] [y] [z]             : CAREFUL! sets the offset in the LAS header to [x] [y] [z] without changing the point coordinates  
 -set_offset_to_point_data [n]       : CAREFUL! sets the offset to point data field of the LAS header to [n] without checking whether this will corrupt the file  
--set_point_data_format [n]          : CAREFUL! sets the point data format field of the LAS header to point type [n](1-10) without checking whether this will corrupt the file  
+-set_point_data_format [n]          : CAREFUL! sets the point data format field of the LAS header to point type [n]{1-10} without checking whether this will corrupt the file  
 -set_point_data_record_length [n]   : CAREFUL! sets the point data record length field of the LAS header to size [n] without checking whether this will corrupt the file  
 -set_scale [x] [y] [z]              : quantize ASCII points with [x] [y] [z] (unit meters)  
 -set_start_of_waveform_data_packet_record [n]: CAREFUL! sets the start of waveform data packet record field of the LAS header to [n] without checking whether this will corrupt the file  
 -set_system_identifier [n]          : set the system identifier header entry to [n] (max 31 characters)  
--set_version [n]                    : CAREFUL! sets the version field of the LAS header to [n](e.g. 1.2)  without checking whether this will corrupt the file  
+-set_version [n]                    : CAREFUL! sets the version field of the LAS header to [n]{e.g. 1.2}  without checking whether this will corrupt the file  
 -set_vlr_description [m] [n]        : set description of vlr [m] to [n]  
 -set_vlr_record_id [m] [n]          : set record id of vlr [m] to [n]  
 -set_vlr_user_id [m] [n]            : set user id of vlr [m] to [n]  
@@ -325,7 +325,7 @@ lasinfo -i *.laz -set_system_identifier "hello world!" -set_generating_software 
 ## Module arguments
 
 ### General
--buffered [n]          : define read or write buffer of size [n](default=262144)  
+-buffered [n]          : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]        : set chunk size [n] in number of bytes  
 -comma_not_point       : use comma instead of point as decimal separator  
 -histo_avg [m] [n] [o] : histogram output about [m] with step width [n] and average [o]  
@@ -471,7 +471,7 @@ lasinfo -i *.laz -set_system_identifier "hello world!" -set_generating_software 
 ### Simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
--keep_random_fraction [m] [n] : keep points by random fraction [m](0-1), optional seed [n]  
+-keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
 -thin_points_with_time [n]    : thin points with time, [n] = timespacing  
 -thin_pulses_with_time [n]    : thin pulses with time, [n] = timespacing  
 -thin_with_grid [n]           : thin points by min grid size of [n]  
@@ -852,36 +852,35 @@ number should be skipped, the next three numbers are
 the x, y, and z coordinate, the next two should be
 skipped, and the next number is the scan angle.
 
-The other supported entries are:
-  x : <x> coordinate
-  y : <y> coordinate
-  z : <z> coordinate
-  t : gps <t>ime
-  R : RGB <R>ed channel
-  G : RGB <G>reen channel
-  B : RGB <B>lue channel
-  I : N<I>R channel of LAS 1.4 point type 8
-  s : <s>kip a string or a number that we don't care about
-  i : <i>ntensity
-  a : scan <a>ngle
-  n : <n>umber of returns of that given pulse
-  r : number of <r>eturn
-  h : with<h>eld flag
-  k : <k>eypoint flag
-  g : synthetic fla<g>
-  o : <o>verlap flag of LAS 1.4 point types 6, 7, 8
-  l : scanner channe<l> of LAS 1.4 point types 6, 7, 8
-  E : terrasolid <E>hco Encoding
-  c : <c>lassification
-  u : <u>ser data
-  p : <p>oint source ID
-  e : <e>dge of flight line flag
-  d : <d>irection of scan flag
-  0-9 : additional attributes described as extra bytes (0 through 9)
-  (13) : additional attributes described as extra bytes (10 and up)
-  H : a hexadecimal string encoding the RGB color
-  J : a hexadecimal string encoding the intensity
-
+The other supported entries are:  
+  x : [x] coordinate  
+  y : [y] coordinate  
+  z : [z] coordinate  
+  t : gps [t]ime  
+  R : RGB [R]ed channel  
+  G : RGB [G]reen channel  
+  B : RGB [B]lue channel  
+  I : N[I]R channel of LAS 1.4 point type 8  
+  s : [s]kip a string or a number that we don't care about  
+  i : [i]ntensity  
+  a : scan [a]ngle  
+  n : [n]umber of returns of that given pulse  
+  r : number of [r]eturn  
+  h : with[h]eld flag  
+  k : [k]eypoint flag  
+  g : synthetic fla[g]  
+  o : [o]verlap flag of LAS 1.4 point types 6, 7, 8  
+  l : scanner channe[l] of LAS 1.4 point types 6, 7, 8  
+  E : terrasolid [E]hco Encoding  
+  c : [c]lassification  
+  u : [u]ser data  
+  p : [p]oint source ID  
+  e : [e]dge of flight line flag  
+  d : [d]irection of scan flag  
+  0-9 : additional attributes described as extra bytes (0 through 9)  
+  (13) : additional attributes described as extra bytes (10 and up)  
+  H : a hexadecimal string encoding the RGB color  
+  J : a hexadecimal string encoding the intensity  
 
 ## License
 

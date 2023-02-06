@@ -115,7 +115,7 @@ option. These are unsigned integers numbers so no scale value is required.
 -add_extra [m] [n] [o] [p] [q] [r] [s] [t]: adds a new "extra_byte" attribute of data_type [m] name [n] description [o]; optional: scale[p] offset [q] pre_scale [r] pre_offset [s] no_data_value [t]  
 -cores [n]                          : process multiple inputs on [n] cores in parallel  
 -parse [xyz]                        : in case the input file is ascii use parse string [xyz] to access point values  
--point_type [n]                     : use point type [n](1-10) of LAS 1.4 instead of point type 1 of LAS 1.2  
+-point_type [n]                     : use point type [n]{1-10} of LAS 1.4 instead of point type 1 of LAS 1.2  
 -progress [n]                       : report progress every [n] points  
 -scale_intensity [n]                : multiply intensity by [n]  
 -scale_scan_angle [n]               : scale scan angle by [n]  
@@ -125,8 +125,8 @@ option. These are unsigned integers numbers so no scale value is required.
 -set_global_encoding [0/1]          : set global encoding in LAS header to [0/1]  
 -set_offset [x] [y] [z]             : use offset [x] [y] [z] instead of auto choosing one  
 -set_ogc_wkt                        : translate GeoTIFF keys into CRS string in OGC WKT format and add it as VLR  
--set_point_data_format [n]          : use point type [n](1-10) of LAS 1.4 instead of point type 1 of LAS 1.2  
--set_point_type [n]                 : use point type [n](1-10) of LAS 1.4 instead of point type 1 of LAS 1.2  
+-set_point_data_format [n]          : use point type [n]{1-10} of LAS 1.4 instead of point type 1 of LAS 1.2  
+-set_point_type [n]                 : use point type [n]{1-10} of LAS 1.4 instead of point type 1 of LAS 1.2  
 -set_scale [x] [y] [z]              : quantize ASCII points with [x] [y] [z] (unit meters)  
 -set_system_identifier [n]          : set the system identifier header entry to [n] (max 31 characters)  
 -set_version 1.4                    : force LAS version 1.4 (even if point type 0, 1, 2, or 3 are used)  
@@ -152,7 +152,7 @@ option. These are unsigned integers numbers so no scale value is required.
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n](default=262144)  
+-buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
@@ -296,7 +296,7 @@ option. These are unsigned integers numbers so no scale value is required.
 ### Simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
--keep_random_fraction [m] [n] : keep points by random fraction [m](0-1), optional seed [n]  
+-keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
 -thin_points_with_time [n]    : thin points with time, [n] = timespacing  
 -thin_pulses_with_time [n]    : thin pulses with time, [n] = timespacing  
 -thin_with_grid [n]           : thin points by min grid size of [n]  
@@ -625,7 +625,7 @@ option. These are unsigned integers numbers so no scale value is required.
 -elevation_meter                    : use meter for elevation  
 -elevation_survey_feet              : set vertical units from meters to US survey feet  
 -elevation_surveyfeet               : use survey feet for elevation  
--ellipsoid [n]                      : use the WGS-84 ellipsoid [n](do -ellipsoid -1 for a list of ellipsoids)  
+-ellipsoid [n]                      : use the WGS-84 ellipsoid [n]{do -ellipsoid -1 for a list of ellipsoids}  
 -epsg [n]                           : set datum to EPSG [n]  
 -etrs89                             : use datum ETRS89  
 -feet                               : use feet  
@@ -735,20 +735,20 @@ option. These are unsigned integers numbers so no scale value is required.
 
 ### add_attribute
 The '-add_attribute' argument allow as first parameter the datatype
-out of this values:
-  0 : undocumented - extra bytes specify value in options field
-  1 : unsigned char (1 byte)
-  2 : char (1 byte)
-  3 : unsigned short (2 bytes)
-  4 : short (2 bytes)
-  5 : unsigned long (4 bytes)
-  6 : long (4 bytes)
-  7 : unsigned long long (8 bytes)
-  8 : long long (8 bytes)
-  9 : float (4 bytes)
-  10 : double (8 bytes)
-  11-30 : deprecated
-  31-255 : reserved
+out of this values:  
+  0 : undocumented - extra bytes specify value in options field  
+  1 : unsigned char (1 byte)  
+  2 : char (1 byte)  
+  3 : unsigned short (2 bytes)  
+  4 : short (2 bytes)  
+  5 : unsigned long (4 bytes)  
+  6 : long (4 bytes)  
+  7 : unsigned long long (8 bytes)  
+  8 : long long (8 bytes)  
+  9 : float (4 bytes)  
+  10 : double (8 bytes)  
+  11-30 : deprecated  
+  31-255 : reserved  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret
@@ -758,35 +758,35 @@ number should be skipped, the next three numbers are
 the x, y, and z coordinate, the next two should be
 skipped, and the next number is the scan angle.
 
-The other supported entries are:
-  x : <x> coordinate
-  y : <y> coordinate
-  z : <z> coordinate
-  t : gps <t>ime
-  R : RGB <R>ed channel
-  G : RGB <G>reen channel
-  B : RGB <B>lue channel
-  I : N<I>R channel of LAS 1.4 point type 8
-  s : <s>kip a string or a number that we don't care about
-  i : <i>ntensity
-  a : scan <a>ngle
-  n : <n>umber of returns of that given pulse
-  r : number of <r>eturn
-  h : with<h>eld flag
-  k : <k>eypoint flag
-  g : synthetic fla<g>
-  o : <o>verlap flag of LAS 1.4 point types 6, 7, 8
-  l : scanner channe<l> of LAS 1.4 point types 6, 7, 8
-  E : terrasolid <E>hco Encoding
-  c : <c>lassification
-  u : <u>ser data
-  p : <p>oint source ID
-  e : <e>dge of flight line flag
-  d : <d>irection of scan flag
-  0-9 : additional attributes described as extra bytes (0 through 9)
-  (13) : additional attributes described as extra bytes (10 and up)
-  H : a hexadecimal string encoding the RGB color
-  J : a hexadecimal string encoding the intensity
+The other supported entries are:  
+  x : [x] coordinate  
+  y : [y] coordinate  
+  z : [z] coordinate  
+  t : gps [t]ime  
+  R : RGB [R]ed channel  
+  G : RGB [G]reen channel  
+  B : RGB [B]lue channel  
+  I : N[I]R channel of LAS 1.4 point type 8  
+  s : [s]kip a string or a number that we don't care about  
+  i : [i]ntensity  
+  a : scan [a]ngle  
+  n : [n]umber of returns of that given pulse  
+  r : number of [r]eturn  
+  h : with[h]eld flag  
+  k : [k]eypoint flag  
+  g : synthetic fla[g]  
+  o : [o]verlap flag of LAS 1.4 point types 6, 7, 8  
+  l : scanner channe[l] of LAS 1.4 point types 6, 7, 8  
+  E : terrasolid [E]hco Encoding  
+  c : [c]lassification  
+  u : [u]ser data  
+  p : [p]oint source ID  
+  e : [e]dge of flight line flag  
+  d : [d]irection of scan flag  
+  0-9 : additional attributes described as extra bytes (0 through 9)  
+  (13) : additional attributes described as extra bytes (10 and up)  
+  H : a hexadecimal string encoding the RGB color  
+  J : a hexadecimal string encoding the intensity  
 
 
 ## License
