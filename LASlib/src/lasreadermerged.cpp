@@ -31,6 +31,7 @@
 #include "lasreadermerged.hpp"
 
 #include "lasindex.hpp"
+#include "lascopc.hpp"
 #include "lasfilter.hpp"
 #include "lastransform.hpp"
 
@@ -1269,6 +1270,17 @@ BOOL LASreaderMerged::inside_rectangle(const F64 min_x, const F64 min_y, const F
   return TRUE;
 }
 
+BOOL LASreaderMerged::inside_copc_depth(const U8 mode, const I32 depth, const F32 resolution)
+{
+  if (!header.vlr_copc_info)
+    return FALSE;
+
+  inside_depth = mode;
+  copc_depth = depth;
+  copc_resolution = resolution;
+  return TRUE;
+}
+
 I32 LASreaderMerged::get_format() const
 {
   return lasreader->get_format();
@@ -1497,11 +1509,28 @@ BOOL LASreaderMerged::open_next_file()
         fprintf(stderr, "ERROR: could not open lasreaderlas for file '%s'\n", file_names[file_name_current]);
         return FALSE;
       }
-      LASindex* index = new LASindex;
+      LASindex *index = new LASindex;
       if (index->read(file_names[file_name_current]))
         lasreaderlas->set_index(index);
       else
+      {
         delete index;
+        index = 0;
+      }
+
+      // Creation of the COPC index
+      if (lasreaderlas->header.vlr_copc_entries)
+      {
+        if (index)
+        {
+          fprintf(stderr, "WARNING: both LAX file and COPC spatial indexing registered. COPC has the precedence.\n");
+          delete index;
+          index = 0;
+        }
+
+        COPCindex *copc_index = new COPCindex(lasreaderlas->header);
+        lasreaderlas->set_copcindex(copc_index);
+      }
     }
     else if (lasreaderbin)
     {
@@ -1616,6 +1645,7 @@ BOOL LASreaderMerged::open_next_file()
       else if (inside == 1) lasreader->inside_tile(t_ll_x, t_ll_y, t_size);
       else lasreader->inside_circle(c_center_x, c_center_y, c_radius);
     }
+	if (inside_depth) lasreader->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
     return TRUE;
   }
   return FALSE;

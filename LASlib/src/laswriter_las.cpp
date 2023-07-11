@@ -155,6 +155,16 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
 
   if (!header->check()) return FALSE;
 
+  // check copc vlrs: copc not supported yet and writing copc data may invalidate the file
+  for (i = 0; i < header->number_of_variable_length_records; i++)
+  {
+    if ((strcmp(header->vlrs[i].user_id, "copc") == 0))
+    {
+      fprintf(stderr, "ERROR: COPC file not supported for writting yet.\n");
+      return FALSE;
+    }
+  }
+
   // copy scale_and_offset
   quantizer.x_scale_factor = header->x_scale_factor;
   quantizer.y_scale_factor = header->y_scale_factor;

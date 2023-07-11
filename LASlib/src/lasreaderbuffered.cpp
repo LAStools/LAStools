@@ -443,6 +443,17 @@ BOOL LASreaderBuffered::inside_rectangle(const F64 min_x, const F64 min_y, const
   return TRUE;
 }
 
+BOOL LASreaderBuffered::inside_copc_depth(const U8 mode, const I32 depth, const F32 resolution)
+{
+  if (!header.vlr_copc_info)
+    return FALSE;
+
+  inside_depth = mode;
+  copc_depth = depth;
+  copc_resolution = resolution;
+  return TRUE;
+}
+
 I32 LASreaderBuffered::get_format() const
 {
   return lasreader->get_format();

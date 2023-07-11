@@ -25,6 +25,7 @@
 
 	CHANGE HISTORY:
 
+		18 April 2023 -- adding support of COPC spatial index standard
 		10 March 2022 -- added '-iptx_transform' option
 		31 October 2019 -- adding kdtree of bounding boxes for large number of LAS/LAZ files
 		19 August 2019 -- unify '-ignore_class 7', '-ignore_withheld', etc ... in LASignore
@@ -56,6 +57,7 @@
 #include "lastransform.hpp"
 
 class LASindex;
+class COPCindex;
 class LASfilter;
 class LAStransform;
 class ByteStreamIn;
@@ -75,6 +77,8 @@ public:
 
 	void set_index(LASindex* index);
 	inline LASindex* get_index() const { return index; };
+ 	void set_copcindex(COPCindex* copc_index);
+  	inline COPCindex* get_copcindex() const { return copc_index; };
 	virtual void set_filter(LASfilter* filter);
 	inline LASfilter* get_filter() const { return filter; };
 	virtual void set_transform(LAStransform* transform);
@@ -97,6 +101,9 @@ public:
 	inline F64 get_r_min_y() const { return r_min_y; };
 	inline F64 get_r_max_x() const { return r_max_x; };
 	inline F64 get_r_max_y() const { return r_max_y; };
+	virtual BOOL inside_copc_depth(const U8 mode, const I32 depth, const F32 resolution);
+	inline I32 get_copc_depth() const { return copc_depth; };
+	inline F32 get_copc_resolution() const { return copc_resolution; };
 
 	virtual BOOL seek(const I64 p_index) = 0;
 	BOOL read_point() { return (this->*read_simple)(); };
@@ -137,6 +144,7 @@ protected:
 	virtual BOOL read_point_default() = 0;
 
 	LASindex* index;
+	COPCindex* copc_index;
 	LASfilter* filter;
 	LAStransform* transform;
 	LASignore* ignore;
@@ -146,6 +154,11 @@ protected:
 	F64 c_center_x, c_center_y, c_radius, c_radius_squared;
 	F64 r_min_x, r_min_y, r_max_x, r_max_y;
 	F64 orig_min_x, orig_min_y, orig_max_x, orig_max_y;
+
+	 // optional resolution-of-interest query (copc indexed)
+ 	U8  inside_depth;  // 0 all, 1 max depth, 2 resolution
+	F32 copc_resolution;
+	I32 copc_depth;
 
 private:
 	BOOL(LASreader::*read_simple)();
@@ -162,6 +175,11 @@ private:
 	BOOL read_point_inside_circle_indexed();
 	BOOL read_point_inside_rectangle();
 	BOOL read_point_inside_rectangle_indexed();
+
+ 	// COPC specialized readers
+  	BOOL read_point_inside_circle_copc_indexed();
+  	BOOL read_point_inside_rectangle_copc_indexed();
+  	BOOL read_point_inside_depth_copc_indexed();
 };
 
 #include "laswaveform13reader.hpp"
@@ -218,6 +236,7 @@ public:
 	void set_skip_lines(const U32 number_of_lines);
 	void set_populate_header(BOOL populate_header);
 	void set_keep_lastiling(BOOL keep_lastiling);
+	void set_keep_copc(BOOL keep_copc);
 	void set_pipe_on(BOOL pipe_on);
 	const CHAR* get_parse_string() const;
 	void usage() const;
@@ -225,6 +244,8 @@ public:
 	void set_inside_tile(const F32 ll_x, const F32 ll_y, const F32 size);
 	void set_inside_circle(const F64 center_x, const F64 center_y, const F64 radius);
 	void set_inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
+  	void set_max_depth(const I32 max_depth);
+  	void set_resolution(const F32 resolution);
 	BOOL parse(int argc, char* argv[], BOOL parse_ignore = FALSE);
 	BOOL is_piped() const;
 	BOOL is_buffered() const;
@@ -314,6 +335,7 @@ private:
 	U32 skip_lines;
 	BOOL populate_header;
 	BOOL keep_lastiling;
+	BOOL keep_copc;
 	BOOL pipe_on;
 	BOOL use_stdin;
 	BOOL unique;
@@ -331,6 +353,11 @@ private:
 	F32* inside_tile;
 	F64* inside_circle;
 	F64* inside_rectangle;
+
+  	// optional resolution-of-interest query (copc indexed)
+  	U8  inside_depth; // 0 all, 1 max depth, 2 resolution
+  	F32 copc_resolution;
+  	I32 copc_depth;
 };
 
 #endif
