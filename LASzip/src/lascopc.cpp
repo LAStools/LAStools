@@ -37,8 +37,10 @@
 #endif
 
 #include <deque>
-#include <algorithm>
 #include <cmath>
+#include <algorithm>
+
+#define MAX(a, b, c) ((a) <= (b)? (b) <= (c)? (c) : (b) : (a) <= (c)? (c) : (a)) // MSVC does not like std::max({a, b, c})
 
 EPTkey::EPTkey(I32 d, I32 x, I32 y, I32 z) : d(d), x(x), y(y), z(z) {}
 EPTkey::EPTkey() : EPTkey(-1, -1, -1, -1) {}
@@ -86,7 +88,7 @@ EPToctant::EPToctant()
   zmax = 0;
 }
 
-EPToctant::EPToctant(const LASvlr_copc_entry entry, const F64 xmin, const F64 ymin, const F64 zmin, const F64 xmax, const F64 ymax, const F64 zmax, const U64 start, const U64 end) : EPToctant()
+EPToctant::EPToctant(const LASvlr_copc_entry entry, const F64 xmin, const F64 ymin, const F64 zmin, const F64 xmax, const F64 ymax, const F64 zmax, const U64 start, const U64 end)
 {
   d = entry.key.depth;
   x = entry.key.x;
@@ -102,7 +104,7 @@ EPToctant::EPToctant(const LASvlr_copc_entry entry, const F64 xmin, const F64 ym
   position.end = end;
 
   // Step size accounts for depth level
-  F64 size = std::max({xmax - xmin, ymax - ymin, zmax - zmin});
+  F64 size = MAX(xmax - xmin, ymax - ymin, zmax - zmin);
   F64 res  = size / std::pow(2, d);
 
   // Bounding box
@@ -132,7 +134,8 @@ EPToctree::EPToctree(const LASheader& header)
     F64 center_x = (header.min_x + header.max_x)/2;
     F64 center_y = (header.min_y + header.max_y)/2;
     F64 center_z = (header.min_z + header.max_z)/2;
-    F64 halfsize = std::max({header.max_x - header.min_x, header.max_y - header.min_y, header.max_z - header.min_z})/2;
+    F64 halfsize = MAX(header.max_x - header.min_x, header.max_y - header.min_y, header.max_z - header.min_z)/2;
+
     xmin = center_x - halfsize;
     ymin = center_y - halfsize;
     zmin = center_z - halfsize;
@@ -217,12 +220,79 @@ BOOL EPToctree::set_vlr_entries(const U8* data, const U64 offset_to_first_copc_e
     return FALSE;
   }
 
-  header.number_of_copc_entries = entries.size();
+  header.number_of_copc_entries = (U32)entries.size();
   header.vlr_copc_entries = new LASvlr_copc_entry[header.number_of_copc_entries];
   for (size_t j = 0; j < header.number_of_copc_entries; j++)
     header.vlr_copc_entries[j] = entries[j];
 
   return TRUE;
+}
+
+I32 EPToctree::compute_max_depth(const LASheader& header, U64 max_points_per_octant)
+{
+  // strategy to regulate the maximum depth of the octree
+  // [TODO] check this one
+  F64 xsize = header.max_x - header.min_x;
+  F64 ysize = header.max_y - header.min_y;
+  F64 zsize = header.max_z - header.min_z;
+  F64 size  = MAX(xsize, ysize, zsize);
+  U64 npts  = MAX((U64)header.number_of_point_records, header.extended_number_of_point_records, 0);
+  I32 max_depth = 0;
+
+  while (npts > max_points_per_octant)
+  {
+    if (xsize >= size) { npts /= 2; }
+    if (ysize >= size) { npts /= 2; }
+    if (zsize >= size) { npts /= 2; }
+    size /= 2;
+    max_depth++;
+  }
+
+  return max_depth;
+}
+
+EPTkey EPToctree::get_key(const LASpoint* p, const I32 depth) const
+{
+  I32 grid_size = (I32)std::pow(2, depth);
+  F64 grid_resolution = (xmax - xmin) / grid_size;
+
+  I32 xi = I32_FLOOR((p->get_x() - xmin) / grid_resolution);
+  I32 yi = I32_FLOOR((p->get_y() - ymin) / grid_resolution);
+  I32 zi = I32_FLOOR((p->get_z() - zmin) / grid_resolution);
+
+  if (xi < 0) xi = 0;
+  if (yi < 0) yi = 0;
+  if (zi < 0) zi = 0;
+  if (xi >= grid_size) xi = grid_size - 1;
+  if (yi >= grid_size) yi = grid_size - 1;
+  if (zi >= grid_size) zi = grid_size - 1;
+
+  return EPTkey(depth, xi, yi, zi);
+}
+
+I32 EPToctree::get_cell(const LASpoint*p, const EPTkey& key) const
+{
+  F64 size = get_halfsize()*2;
+  F64 res  = size / (1 << key.d);
+
+  // Bounding box of the octant
+  F64 minx = res * key.x + (get_center_x() - get_halfsize());
+  F64 miny = res * key.y + (get_center_y() - get_halfsize());
+  F64 minz = res * key.z + (get_center_z() - get_halfsize());
+  F64 maxx = minx + res;
+  //F64 maxy = miny + res;
+  //F64 maxz = minz + res;
+
+  // Get cell id in this octant
+  F64 grid_resolution = (maxx - minx) / grid_size;
+  I32 xi = (I32)std::floor((p->get_x() - minx) / grid_resolution);
+  I32 yi = (I32)std::floor((p->get_y() - miny) / grid_resolution);
+  I32 zi = (I32)std::floor((p->get_z() - minz) / grid_resolution);
+  xi = (std::min)((std::max)(0, xi), grid_size - 1);
+  yi = (std::min)((std::max)(0, yi), grid_size - 1);
+  zi = (std::min)((std::max)(0, zi), grid_size - 1);
+
+  return zi * grid_size * grid_size + yi * grid_size + xi;
 }
 
 COPCindex::COPCindex(const LASheader& header) : EPToctree(header)
@@ -239,6 +309,8 @@ COPCindex::COPCindex(const LASheader& header) : EPToctree(header)
   r_max_y = F64_MAX;
   r_max_z = F64_MAX;
   q_depth = max_depth;
+
+  sort_octants = &spatial_order;
 }
 
 void COPCindex::set_depth_limit(const I32 depth)
@@ -308,7 +380,8 @@ bool COPCindex::query_intervals()
 {
   clear_intervals();
   query_intervals(EPTkey::root());
-  std::sort(query.begin(), query.end());
+  std::sort(query.begin(), query.end(), sort_octants);
+
   for (const EPToctant& oct : query)
   {
     points_intervals.push_back(oct.position);

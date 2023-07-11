@@ -11,6 +11,7 @@ bin/serf/potree16
 bin/*.exe
 *~
 .vs
+.vscode
 *.pdb
 *.ilk
 *.o
@@ -30,6 +31,7 @@ bin/lasmerge
 bin/lasprecision
 bin/laszip
 bin/txt2las
+bin/lascopcindex
 src/las2las
 src/las2txt
 src/lasdiff
@@ -39,3 +41,4 @@ src/lasmerge
 src/lasprecision
 src/laszip
 src/txt2las
+src/lascopcindex

@@ -32,6 +32,7 @@
 #ifndef LAS_COPC_HPP
 #define LAS_COPC_HPP
 
+#include <array>
 #include <vector>
 #include <unordered_map>
 
@@ -111,16 +112,71 @@ struct EPToctant : public EPTkey
   F64 zmax;
 };
 
+inline bool spatial_order(const EPToctant& a, const EPToctant& b)
+{
+  // 2D spatial order
+  F64 dx_a = (F64)a.x/(1 << a.d);
+  F64 dx_b = (F64)b.x/(1 << b.d);
+  if (dx_a < dx_b) return true;
+  if (dx_a > dx_b) return false;
+
+  F64 dy_a = (F64)a.y/(1 << a.d);
+  F64 dy_b = (F64)b.y/(1 << b.d);
+  if (dy_a < dy_b) return true;
+  if (dy_a > dy_b) return false;
+
+  if (a.d < b.d) return true;
+  if (a.d > b.d) return false;
+
+  F64 dz_a = (F64)a.z/(1 << a.d);
+  F64 dz_b = (F64)b.z/(1 << b.d);
+  if (dz_a < dz_b) return true;
+  if (dz_a > dz_b) return false;
+
+  return false;
+}
+
+inline bool depth_order(const EPToctant& a, const EPToctant& b)
+{
+  if (a.d < b.d) return true;
+  if (a.d > b.d) return false;
+  if (a.x < b.x) return true;
+  if (a.x > b.x) return false;
+  if (a.y < b.y) return true;
+  if (a.y > b.y) return false;
+  if (a.z < b.z) return true;
+  if (a.z > b.z) return false;
+  return false;
+}
+
+inline bool file_order(const EPToctant& a, const EPToctant& b)
+{
+  if (a.offset.start < b.offset.start) return true;
+  return false;
+}
+
 class EPToctree
 {
 public:
   EPToctree(const LASheader& header);
   static BOOL set_vlr_entries(const U8* data, const U64 offset_to_first_copc_entry, LASheader& header);
+  static I32 compute_max_depth(const LASheader& header, const U64 max_points_per_octant);
+  EPTkey get_key(const LASpoint* p, const I32 depth) const;
+  I32 get_cell(const LASpoint*p, const EPTkey& key) const;
   inline I32 get_max_depth() const { return max_depth; };
   inline F64 get_center_x() const { return (xmin+xmax)/2; };
   inline F64 get_center_y() const { return (ymin+ymax)/2; };
   inline F64 get_center_z() const { return (zmin+zmax)/2; };
   inline F64 get_halfsize() const { return (xmax-xmin)/2; };
+  inline F64 get_size() const { return xmax-xmin; };
+  inline F64 get_xmin() const { return xmin; };
+  inline F64 get_ymin() const { return ymin; };
+  inline F64 get_zmin() const { return zmin; };
+  inline F64 get_xmax() const { return xmax; };
+  inline F64 get_ymax() const { return ymax; };
+  inline F64 get_zmax() const { return zmax; };
+  inline I32 get_gridsize() const { return grid_size; };
+  inline void set_gridsize(I32 size) { if (size > 2) grid_size = size; };
 
 protected:
   F64 xmin;
@@ -131,6 +187,7 @@ protected:
   F64 zmax;
   F64 point_spacing;
   I32 max_depth;
+  I32 grid_size;
   std::unordered_map<EPTkey, EPToctant, EPTKeyHasher> registry;
 };
 
@@ -140,6 +197,9 @@ public:
   COPCindex(const LASheader& header);
   void set_depth_limit(const I32 depth);
   void set_resolution(const F64 resolution);
+  void set_stream_ordered_by_chunk() { sort_octants = &file_order; };
+  void set_stream_ordered_spatially() { sort_octants = &spatial_order; };
+  void set_stream_ordered_by_depth() { sort_octants = &depth_order; };
   void intersect_rectangle(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y);
   void intersect_cuboid(const F64 r_min_x, const F64 r_min_y, const F64 r_min_z, const F64 r_max_x, const F64 r_max_y, const F64 r_max_z);
   void intersect_circle(const F64 center_x, const F64 center_y, const F64 radius);
@@ -162,6 +222,7 @@ private:
   void clear_intervals();
   bool query_intervals();
   bool has_intervals();
+  bool (*sort_octants)(const EPToctant& a, const EPToctant& b);
 
 private:
   F64 r_min_x;

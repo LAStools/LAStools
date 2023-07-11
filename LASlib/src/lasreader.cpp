@@ -923,7 +923,10 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 						index = 0;
 					}
 
-					COPCindex* copc_index = new COPCindex(lasreaderlas->header);
+					COPCindex *copc_index = new COPCindex(lasreaderlas->header);
+					if (copc_stream_order == 0) 	 copc_index->set_stream_ordered_by_chunk();
+					else if (copc_stream_order == 1) copc_index->set_stream_ordered_spatially();
+					else if (copc_stream_order == 2) copc_index->set_stream_ordered_by_depth();
 					lasreaderlas->set_copcindex(copc_index);
 
 					// If no user-defined query we force a query anyway to never read a copc file in order but
@@ -2418,6 +2421,21 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 				set_stored(TRUE);
 				*argv[i] = '\0';
 			}
+			else if (strcmp(argv[i],"-stream_order_spatial") == 0) // COPC only
+			{
+			  set_copc_stream_ordered_spatially();
+			  *argv[i]='\0';
+			}
+			else if (strcmp(argv[i],"-stream_order_normal") == 0) // COPC only
+			{
+			  set_copc_stream_ordered_by_chunk();
+			  *argv[i]='\0';
+			}
+			else if (strcmp(argv[i],"-stream_order_level") == 0) // COPC only
+			{
+			  set_copc_stream_ordered_by_level();
+			  *argv[i]='\0';
+			}
 		}
 		else if (strcmp(argv[i], "-lof") == 0)
 		{
@@ -3702,9 +3720,11 @@ LASreadOpener::LASreadOpener()
 	ignore = 0;
 	temp_file_base = 0;
 
-  	copc_resolution = 0;
-  	copc_depth = -1;
-  	inside_depth = 0;
+	// COPC
+	inside_depth = 0;
+	copc_stream_order = 1;
+	copc_resolution = 0;
+	copc_depth = -1;
 }
 
 LASreadOpener::~LASreadOpener()

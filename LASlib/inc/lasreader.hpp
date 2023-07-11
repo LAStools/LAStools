@@ -176,10 +176,10 @@ private:
 	BOOL read_point_inside_rectangle();
 	BOOL read_point_inside_rectangle_indexed();
 
- 	// COPC specialized readers
-  	BOOL read_point_inside_circle_copc_indexed();
-  	BOOL read_point_inside_rectangle_copc_indexed();
-  	BOOL read_point_inside_depth_copc_indexed();
+	// COPC specialized readers
+	BOOL read_point_inside_circle_copc_indexed();
+	BOOL read_point_inside_rectangle_copc_indexed();
+	BOOL read_point_inside_depth_copc_indexed();
 };
 
 #include "laswaveform13reader.hpp"
@@ -244,8 +244,8 @@ public:
 	void set_inside_tile(const F32 ll_x, const F32 ll_y, const F32 size);
 	void set_inside_circle(const F64 center_x, const F64 center_y, const F64 radius);
 	void set_inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
-  	void set_max_depth(const I32 max_depth);
-  	void set_resolution(const F32 resolution);
+	void set_max_depth(const I32 max_depth);
+	void set_resolution(const F32 resolution);
 	BOOL parse(int argc, char* argv[], BOOL parse_ignore = FALSE);
 	BOOL is_piped() const;
 	BOOL is_buffered() const;
@@ -271,6 +271,9 @@ public:
 	F64 get_attribute_scale(U32 index) const { return attribute_scales[index]; };
 	F64 get_attribute_offset(U32 index) const { return attribute_offsets[index]; };
 	F64 get_attribute_no_data(U32 index) const { return attribute_no_datas[index]; };
+	void set_copc_stream_ordered_by_chunk() { copc_stream_order = 0; };
+	void set_copc_stream_ordered_spatially() { copc_stream_order = 1; };
+	void set_copc_stream_ordered_by_level() { copc_stream_order = 2; };
 	LASreadOpener();
 	~LASreadOpener();
 private:
@@ -349,15 +352,16 @@ private:
 	// optional selective decompression (compressed new LAS 1.4 point types only)
 	U32 decompress_selective;
 
-	// optional area-of-interest query (spatially indexed) 
+	// optional area-of-interest query (spatially indexed)
 	F32* inside_tile;
 	F64* inside_circle;
 	F64* inside_rectangle;
 
-  	// optional resolution-of-interest query (copc indexed)
-  	U8  inside_depth; // 0 all, 1 max depth, 2 resolution
-  	F32 copc_resolution;
-  	I32 copc_depth;
+	// optional resolution-of-interest query (copc indexed)
+	U8  inside_depth; // 0 all, 1 max depth, 2 resolution
+	U8  copc_stream_order; // 0 normal, 1 spatially, 2 depth
+	F32 copc_resolution;
+	I32 copc_depth;
 };
 
 #endif

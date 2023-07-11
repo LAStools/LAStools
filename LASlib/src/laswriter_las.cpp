@@ -155,16 +155,6 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
 
   if (!header->check()) return FALSE;
 
-  // check copc vlrs: copc not supported yet and writing copc data may invalidate the file
-  for (i = 0; i < header->number_of_variable_length_records; i++)
-  {
-    if ((strcmp(header->vlrs[i].user_id, "copc") == 0))
-    {
-      fprintf(stderr, "ERROR: COPC file not supported for writting yet.\n");
-      return FALSE;
-    }
-  }
-
   // copy scale_and_offset
   quantizer.x_scale_factor = header->x_scale_factor;
   quantizer.y_scale_factor = header->y_scale_factor;
@@ -1222,6 +1212,19 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
     }
     stream->seekEnd();
   }
+
+  // COPC EPT hierarchy EVLR is computed and added to the header after the last point is written.
+  // Therefore, it cannot be added when opening the writer. We use update_header to propagate the EVLR
+  // just before closing the writer. EVLRs are written when closing. This trick allows us to be COPC
+  // compatible with minimal changes to the code.
+  for (i = 0; i < header->number_of_extended_variable_length_records; i++)
+  {
+    if ((strcmp(header->evlrs[i].user_id, "copc") == 0) && header->evlrs[i].record_id == 1000)
+    {
+      evlrs = header->evlrs;
+    }
+  }
+
   return TRUE;
 }
 
@@ -1253,9 +1256,13 @@ I64 LASwriterLAS::close(BOOL update_npoints)
     I64 real_start_of_first_extended_variable_length_record = stream->tell();
 
     // write extended variable length records variable after variable (to avoid alignment issues)
-
+    U64 copc_root_hier_size = 0;
+    U64 copc_root_hier_offset = 0;
     for (U32 i = 0; i < number_of_extended_variable_length_records; i++)
     {
+      if ((strcmp(evlrs[i].user_id, "copc") == 0) && evlrs[i].record_id == 1000)
+        copc_root_hier_offset = stream->tell() + 60;
+
       // check variable length records contents
 
       if (evlrs[i].reserved != 0xAABB)
@@ -1308,6 +1315,15 @@ I64 LASwriterLAS::close(BOOL update_npoints)
           fprintf(stderr,"ERROR: there should be %u bytes of data in evlrs[%d].data\n", (U32)evlrs[i].record_length_after_header, i);
           return FALSE;
         }
+      }
+
+      if ((strcmp(evlrs[i].user_id, "copc") == 0) && evlrs[i].record_id == 1000)
+      {
+          copc_root_hier_size = evlrs[i].record_length_after_header;
+          stream->seek(375 + 54 + 40);
+          stream->put64bitsLE((U8*)&copc_root_hier_offset);
+          stream->put64bitsLE((U8*)&copc_root_hier_size);
+          stream->seekEnd();
       }
     }
 
@@ -1381,6 +1397,11 @@ I64 LASwriterLAS::close(BOOL update_npoints)
   p_count = 0;
 
   return bytes;
+}
+
+I64 LASwriterLAS::tell()
+{
+  return stream->tell();
 }
 
 LASwriterLAS::LASwriterLAS()
