@@ -4089,7 +4089,7 @@ int main(int argc, char *argv[])
               fprintf(file_out, "    Octree with %d levels\012", max_octree_level);
 
               U64 total = 0;
-              U32* point_count = (U32*)calloc(max_octree_level, sizeof(U32));
+              U64* point_count = (U64*)calloc(max_octree_level, sizeof(U64));
               U32* voxel_count = (U32*)calloc(max_octree_level, sizeof(U32));
 
               for (U32 j = 0 ; j < lasheader->number_of_copc_entries ; j++)
@@ -4099,10 +4099,13 @@ int main(int argc, char *argv[])
                 voxel_count[lasheader->vlr_copc_entries[j].key.depth]++;
               }
 
-              for (I32 j = 0 ; j < max_octree_level ; j++)
+              for (I32 j = 0; j < max_octree_level; j++)
               {
-                if (point_count[j] > 0)
-                  fprintf(file_out, "    Level %d : %d points in %d voxels\012", j, point_count[j], voxel_count[j]);
+#ifdef _WIN32
+                fprintf(file_out, "    Level %d : %I64u points in %u voxels\012", j, point_count[j], voxel_count[j]);
+#else
+                fprintf(file_out, "    Level %d : %llu points in %u voxels\012", j, point_count[j], voxel_count[j]);
+#endif
               }
 
               free(point_count);

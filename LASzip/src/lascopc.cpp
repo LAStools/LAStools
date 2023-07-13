@@ -154,12 +154,21 @@ EPToctree::EPToctree(const LASheader& header)
     U64 nf = 0;
     for (U32 i = 0 ; i < header.number_of_copc_entries ; i++)
     {
-      ni = nf;
-      nf = ni + header.vlr_copc_entries[i].point_count-1;
-      EPToctant octant(header.vlr_copc_entries[i], xmin, ymin, zmin, xmax, ymax, zmax, ni, nf);
-      registry[(EPTkey)octant] = octant;
-      if (octant.d > max_depth) max_depth = octant.d;
-      nf++;
+      if (header.vlr_copc_entries[i].point_count > 0)
+      {
+        ni = nf;
+        nf = ni + header.vlr_copc_entries[i].point_count-1;
+        EPToctant octant(header.vlr_copc_entries[i], xmin, ymin, zmin, xmax, ymax, zmax, ni, nf);
+        registry[(EPTkey)octant] = octant;
+        if (octant.d > max_depth) max_depth = octant.d;
+        nf++;
+      }
+      else
+      {
+        // Octants with 0 point must be added to be able to reccurse the octree
+        EPToctant octant(header.vlr_copc_entries[i], xmin, ymin, zmin, xmax, ymax, zmax, 0, 0);
+        registry[(EPTkey)octant] = octant;
+      }
     }
   }
 }
@@ -211,7 +220,7 @@ BOOL EPToctree::set_vlr_entries(const U8* data, const U64 offset_to_first_copc_e
   std::sort(entries.begin(), entries.end(), [](const LASvlr_copc_entry& e1, const LASvlr_copc_entry& e2) { return e1.offset < e2.offset; });
 
   U64 sum = 0;
-  for (size_t j = 0; j < entries.size() ; j++)
+  for (size_t j = 0; j < entries.size(); j++)
     sum += entries[j].point_count;
 
   if (sum != header.extended_number_of_point_records)
@@ -231,7 +240,6 @@ BOOL EPToctree::set_vlr_entries(const U8* data, const U64 offset_to_first_copc_e
 I32 EPToctree::compute_max_depth(const LASheader& header, U64 max_points_per_octant)
 {
   // strategy to regulate the maximum depth of the octree
-  // [TODO] check this one
   F64 xsize = header.max_x - header.min_x;
   F64 ysize = header.max_y - header.min_y;
   F64 zsize = header.max_z - header.min_z;
@@ -401,8 +409,8 @@ void COPCindex::query_intervals(const EPTkey& key)
     bool indepth = oct.d <= q_depth;
     if (indepth && inside)
     {
-      query.push_back(oct);
-      for (EPTkey const &k : key.get_children()) query_intervals(k);
+      if (oct.offset.start > 0) query.push_back(oct); // if start == 0 it is an octant with 0 points
+      for (EPTkey const &k : key.get_children()) query_intervals(k); // octants with 0 points may have childs with non 0 points
     }
   }
 }

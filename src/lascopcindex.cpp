@@ -218,6 +218,7 @@ struct LASfinalizer
   {
     finalized = false;
     I32 cell = cell_from_xyz(point->get_x(), point->get_y(), point->get_z());
+    if (grid[cell] == 0) throw std::runtime_error("internal error in the finalizer. Please report");
     grid[cell]--;
     npoints--;
     finalized = grid[cell] == 0;
@@ -308,8 +309,8 @@ struct Octant
 
   U8* point_buffer;
   I32 point_count;
-  U32 point_size;
-  I64 point_capacity;
+  I32 point_size;
+  I32 point_capacity;
   std::unordered_map<I32, VoxelRecord> occupancy;
 };
 
@@ -756,7 +757,6 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[i], "-unordered") == 0)
     {
       unordered = TRUE;
-      num_points_buffer *= 2; // reduce swap events
     }
     else if (strcmp(argv[i], "-ondisk") == 0)
     {
@@ -928,6 +928,8 @@ int main(int argc, char *argv[])
     }
   }
 
+  if (unordered || ondisk) num_points_buffer *= 2; // reduce swap events
+
   if (verbose && unordered) fprintf(stderr, "Memory optimization for spatially unordered file: enabled\n\n");
   if (verbose && ondisk)    fprintf(stderr, "Processing points on disk: enabled\n\n");
 
@@ -979,7 +981,6 @@ int main(int argc, char *argv[])
     }
 
     progressbar.done();
-    progressbar.print();
 
     // The octree must be built after the first pass in case a filter command changes the bounding box
     lasinventory->update_header(&lasreader->header);
@@ -995,7 +996,7 @@ int main(int argc, char *argv[])
     // Estimate the binomial probabilities for point swapping. See algorithm implementation details
     F64 area = occupancy_resolution * occupancy_resolution * lasoccupancygrid->get_num_occupied();
     F64 density = num_points / area;
-    F64 voxel_sizes = octree.get_halfsize() * 2 / octree.get_gridsize();
+    F64 voxel_sizes = octree.get_size() / octree.get_gridsize();
     F64 swap_probabilities[limit_depth + 1];
     for (i = 0; i <= limit_depth; i++)
     {
@@ -1315,8 +1316,8 @@ int main(int argc, char *argv[])
 
               // Check if the chunk is not too small. Otherwise, redistribute the points in the parent octant.
               // There is no guarantee that parents still exist. They may have already been written and freed.
-              // Requiring chunks with more than n = min_points_per_octant is not a strong requirement,
-              // but producing a LAZ chunks with only 2 or 3 points is suboptimal.
+              // (Requiring that chunks have more than min_points_per_octant is not a strong requirement,
+              // but producing a LAZ chunks with only 2 or 3 points is suboptimal).
               if (it->second->npoints() <= min_points_per_octant)
               {
                 bool moved = false;
@@ -1332,7 +1333,23 @@ int main(int argc, char *argv[])
                     it->second->load();
                     for (I32 k = 0; k < it->second->npoints(); k++)
                       it2->second->insert(it->second->point_buffer + k * elem_size, -1, id_buffer);
+
                     it->second->clean();
+
+                    // The octant must be inserted in the list because it may have childs
+                    if (it->first.d < max_depth)
+                    {
+                      LASvlr_copc_entry entry;
+                      entry.key.depth = it->first.d;
+                      entry.key.x = it->first.x;
+                      entry.key.y = it->first.y;
+                      entry.key.z = it->first.z;
+                      entry.point_count = 0;
+                      entry.offset = 0;
+                      entry.byte_size = 0;
+                      entries.push_back(entry);
+                    }
+
                     it = registry.erase(it);
                     moved = true;
                   }
@@ -1408,7 +1425,6 @@ int main(int argc, char *argv[])
     }
 
     progressbar.done();
-    progressbar.print();
 
     // Construct the EPT hierarchy eVLR
     LASvlr_copc_entry *hierarchy = new LASvlr_copc_entry[entries.size()];
