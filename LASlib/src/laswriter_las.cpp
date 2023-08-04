@@ -578,7 +578,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   {
     // write variable length records variable after variable (to avoid alignment issues)
 
-    U16 reserved = 0xAABB;
+    U16 reserved = 0; // used to be 0xAABB
     if (!stream->put16bitsLE((U8*)&(reserved)))
     {
       fprintf(stderr,"ERROR: writing reserved %d\n", (I32)reserved);
@@ -705,7 +705,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   {
     // write variable length records variable after variable (to avoid alignment issues)
 
-    U16 reserved = 0xAABB;
+    U16 reserved = 0; // used to be 0xAABB
     if (!stream->put16bitsLE((U8*)&(reserved)))
     {
       fprintf(stderr,"ERROR: writing reserved %d\n", (I32)reserved);
@@ -789,7 +789,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   {
     // write variable length records variable after variable (to avoid alignment issues)
 
-    U16 reserved = 0xAABB;
+    U16 reserved = 0; // used to be 0xAABB
     if (!stream->put16bitsLE((U8*)&(reserved)))
     {
       fprintf(stderr,"ERROR: writing reserved %d\n", (I32)reserved);

@@ -23,7 +23,7 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   
   CHANGE HISTORY:
-  
+    04 August 2023 -- set default of VLR header "reserved" to 0 instead of 0xAABB
     29 March 2017 -- read and write support "native LAS 1.4 extension" for LASzip
     23 October 2016 -- support writing Extended Variable Length Records (ELVRs)
     29 April 2016 -- added WARNINGs when rescale / reoffset overflows integers
