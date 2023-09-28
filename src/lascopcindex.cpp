@@ -66,15 +66,18 @@
 #include "lasreader.hpp"
 #include "laswriter.hpp"
 #include "lascopc.hpp"
+#include "lasprogress.hpp"
+#include "geoprojectionconverter.hpp"
 
+#ifdef _MSC_VER 
+#define strcasecmp _stricmp
+#endif
 
 // MSVC does not like std::max({a, b, c}) nor std::max() and wants max(). g++ want std::max not max().
 #define MIN2(a, b) ((a) < (b) ? (a) : (b))
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN3(a, b, c) MIN2(MIN2(a, b), (c))
 #define MAX3(a, b, c) MAX2(MAX2(a, b), (c))
-
-#define PROGRESS "=================================="
 
 // Default: Linux 1024, Windows 512 may be increased to 2048 with MSVC, MacOS ??? (minus 3 for stdin, stderr, stdout)
 #ifdef _WIN32
@@ -86,15 +89,16 @@ I32 MAX_FOPEN = 1000;
 static void usage(bool error = false, bool wait = false)
 {
   fprintf(stderr, "usage:\n");
-  fprintf(stderr, "lascopcindex -i *.las -o out.copc.laz\n");
-  fprintf(stderr, "lascopcindex -i *.laz -first_only -o out.copc.laz\n");
-  fprintf(stderr, "lascopcindex -i *.las -drop_return 4 5 -o out.copc.laz\n");
-  fprintf(stderr, "lascopcindex -lof file_list.txt -o out.copc.laz\n");
-  fprintf(stderr, "lascopcindex -i *.las -o out.copc.laz -progress\n");
-  fprintf(stderr, "lascopcindex -i *.las -o out.copc.laz -max_depth 5\n");
-  fprintf(stderr, "lascopcindex -i *.las -o out.copc.laz -root_light\n");
-  fprintf(stderr, "lascopcindex -i tls.laz -o tls.copc.laz -tls\n");
-  fprintf(stderr, "lascopcindex -i *.las -o out.copc.laz -ondisk -verbose\n");
+  fprintf(stderr, "lascopcindex in.las\n");
+  fprintf(stderr, "lascopcindex -i *.laz\n");
+  fprintf(stderr, "lascopcindex -i *.laz -first_only\n");
+  fprintf(stderr, "lascopcindex -merged -i *.las -drop_return 4 5\n");
+  fprintf(stderr, "lascopcindex -merged -lof file_list.txt -o out.copc.laz\n");
+  fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -progress\n");
+  fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -max_depth 5\n");
+  fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -root_light\n");
+  fprintf(stderr, "lascopcindex tls.laz -tls\n");
+  fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -ondisk -verbose\n");
   fprintf(stderr, "lascopcindex -h\n");
   if (wait)
   {
@@ -131,34 +135,6 @@ static int compare_buffers(const void *a, const void *b)
   if (get_return_number((U8*)a) < get_return_number((U8*)b)) return -1;
   return 1;
 }
-
-struct ProgressBar
-{
-  U64 ntotal;
-  U64 i;
-  U32 frequency;
-  bool display;
-
-  ProgressBar(U64 nmax) { ntotal = nmax; i = 0; display = true; frequency = (U32)(ntotal/1000); };
-  ProgressBar& operator++(int) { i++; return *this; };
-  inline void set_display(bool disp) { display = disp; };
-  inline void set_count(U64 count) { i = count; };
-  inline void set_ntotal(U64 nmax) { ntotal = nmax; frequency = (U32)(ntotal/1000); };
-  inline F64  get_progress() { return ((F64)i/(F64)ntotal)*100; };
-  inline void done() { i = ntotal; print(); if (display) fprintf(stderr, "\n"); i = 0; };
-  void print()
-  {
-    if (display && i % frequency == 0)
-    {
-      F64 percentage = ((F64)i/(F64)ntotal);
-      const I32 width = 30;
-      I32 completed = (I32)(width * percentage);
-      I32 remaining = (I32)(width - completed);
-      fprintf(stderr, "[%.*s%*s] %.1lf%%\r", completed, PROGRESS, remaining, "", percentage*100);
-      fflush(stderr);
-    }
-  };
-};
 
 struct LASfinalizer
 {
@@ -591,10 +567,6 @@ I32 OctantOnDisk::num_connexions = 0;
 
 typedef std::unordered_map<EPTkey, std::unique_ptr<Octant>, EPTKeyHasher> Registry;
 
-/*#ifdef COMPILE_WITH_GUI
- extern int lascopcindex_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
-#endif*/
-
 int main(int argc, char *argv[])
 {
   /*#ifdef COMPILE_WITH_GUI
@@ -630,11 +602,13 @@ int main(int argc, char *argv[])
   const std::array<EPTkey, 8> unordered_keys = EPTkey::root().get_children();
 
   LASreadOpener lasreadopener;
-  lasreadopener.set_merged(true);
   lasreadopener.set_populate_header(true);
 
   LASwriteOpener laswriteopener;
+  laswriteopener.set_format(LAS_TOOLS_FORMAT_LAZ);
   laswriteopener.set_chunk_size(0);
+
+  GeoProjectionConverter geoprojectionconverter;
 
   if (argc == 1)
   {
@@ -660,10 +634,9 @@ int main(int argc, char *argv[])
       if (argv[i][0] == 0x96)
         argv[i][0] = '-';
     }
-    if (!lasreadopener.parse(argc, argv))
-      byebye(true);
-    if (!laswriteopener.parse(argc, argv))
-      byebye(true);
+    //if (!geoprojectionconverter.parse(argc, argv)) byebye(true);
+    if (!lasreadopener.parse(argc, argv)) byebye(true);
+    if (!laswriteopener.parse(argc, argv)) byebye(true);
   }
 
   for (i = 1; i < argc; i++)
@@ -866,619 +839,700 @@ int main(int argc, char *argv[])
     usage(true, argc == 1);
   }
 
-  if (!laswriteopener.active())
-  {
-    fprintf(stderr, "ERROR: no output specified\n");
-    usage(true, argc == 1);
-  }
-
   if (lasreadopener.get_file_name_number() > 1 && unordered)
   {
     fprintf(stderr, "Memory optimization for spatially unordered files is supported only for a single file.\n");
     usage(true, argc == 1);
   }
 
-  // Replace the extension with ".copc.laz" (not mandatory according to the standard).
-  // This also automatically protects against user input of ".las".
-  if (!strstr(laswriteopener.get_file_name(), ".copc.laz"))
+  if (lasreadopener.is_stored())
   {
-    const char* file_name_base = laswriteopener.get_file_name_base();
-    char* file_name;
-
-    const char* extension = ".copc.laz";
-    file_name = (char*)malloc((strlen(file_name_base)+10)*sizeof(char));
-    strcpy(file_name, file_name_base);
-    strcat(file_name, extension);
-    laswriteopener.set_file_name(file_name);
-    fprintf(stderr, "WARNING: output was renamed %s\n", laswriteopener.get_file_name_only());
-    free(file_name);
-  }
-
-  LASreader* lasreader = lasreadopener.open();
-
-  if (lasreader == 0)
-  {
-    fprintf(stderr, "ERROR: could not open lasreader\n");
+    fprintf(stderr, "LASreaderStored is not supported for lascopcindex.\n");
     usage(true, argc == 1);
   }
 
-  if (!lasreader->point.have_gps_time)
+  if (lasreadopener.is_piped())
   {
-    fprintf(stderr, "WARNING: building a COPC file without gpstime.\n");
+    fprintf(stderr, "LASreaderPipon is not supported for lascopcindex.\n");
+    usage(true, argc == 1);
   }
 
-  LASheader* lasheader = &lasreader->header;
-
-  // Check if we have long/lat coordinates. Abort if long/lat detected
-  if (!units)
+  while (lasreadopener.active())
   {
-    F64 delta_x = lasheader->max_x - lasheader->min_x;
-    F64 delta_y = lasheader->max_y - lasheader->min_y;
-    F64 delta_z = lasheader->max_z - lasheader->min_z;
+    num_points = 0;
+    LASreader* lasreader = lasreadopener.open();
 
-    BOOL weird_z = 1000*delta_x < delta_z || 1000*delta_y < delta_z; // we have z and xy in different units
-    BOOL accurate_coordinates = lasheader->x_scale_factor < 0.0001 || lasheader->y_scale_factor < 0.0001;
-    BOOL longlat_extent = lasheader->max_x <= 90 && lasheader->min_x >= -90 && lasheader->max_y <= 180 && lasheader->min_y >= -180; // could be TLS centered on (0,0)
-  
-    if (weird_z && longlat_extent && accurate_coordinates)
+    if (lasreader == 0)
     {
-      fprintf(stderr, "ERROR: long/lat coordinates detected. COPC indexing supports only projected coordinates. If this is a false positive please use -m or -ft to provide the coordinates units.\n");
-      delete lasreader;
+      fprintf(stderr, "ERROR: could not open lasreader\n");
       usage(true, argc == 1);
     }
-  }
 
-  if (unordered || ondisk) num_points_buffer *= 2; // reduce swap events
-
-  if (verbose && unordered) fprintf(stderr, "Memory optimization for spatially unordered file: enabled\n\n");
-  if (verbose && ondisk)    fprintf(stderr, "Processing points on disk: enabled\n\n");
-
-  srand(seed);
-
-  try
-  {
-    // =============================================================================================
-    // PASS 1: Finalize the point cloud
-    // =============================================================================================
-
-    if (verbose || progress) fprintf(stderr, "Pass 1/2: finalizing the point cloud\n");
-
-    U64 t0 = taketime();
-
-    I32 tmp_max_depth = max_depth;
-    if (tmp_max_depth < 0)
+    if (!lasreader->point.have_gps_time)
     {
-      tmp_max_depth = EPToctree::compute_max_depth(*lasheader, max_points_per_octant);
-      tmp_max_depth = (tmp_max_depth > limit_depth) ? limit_depth : tmp_max_depth;
+      fprintf(stderr, "WARNING: building a COPC file without gpstime.\n");
     }
 
-    ProgressBar progressbar((U64)lasreader->npoints);
-    progressbar.set_display(verbose || progress);
+    // create output file name if needed
 
-    LASfinalizer lasfinalizer(lasheader, 2 << tmp_max_depth);
-    LASinventory *lasinventory = new LASinventory;
-    LASoccupancyGrid *lasoccupancygrid = new LASoccupancyGrid(occupancy_resolution);
-
-    if (verbose)
+    if (laswriteopener.get_file_name() == 0)
     {
-      fprintf(stderr, "Finalizer subdivided the coverage in %dx%dx%d = %d regions\n", lasfinalizer.ncols, lasfinalizer.nrows, lasfinalizer.nlays, lasfinalizer.ncols*lasfinalizer.nrows*lasfinalizer.nlays);
-      fprintf(stderr, "Finalizer resolutions = %.1lf %.1lf %.1lf\n", lasfinalizer.xres, lasfinalizer.yres, lasfinalizer.zres);
-    }
-
-    F64 gpstime_minimum = F64_MAX;
-    F64 gpstime_maximum = F64_MIN;
-    while (lasreader->read_point())
-    {
-      if (gpstime_minimum > lasreader->point.get_gps_time()) gpstime_minimum = lasreader->point.get_gps_time();
-      if (gpstime_maximum < lasreader->point.get_gps_time()) gpstime_maximum = lasreader->point.get_gps_time();
-      lasfinalizer.add(&lasreader->point);
-      lasoccupancygrid->add(&lasreader->point);
-      lasinventory->add(&lasreader->point);
-      num_points++;
-
-      progressbar.set_count((U64)lasreader->p_count);
-      progressbar.print();
-    }
-
-    progressbar.done();
-
-    // The octree must be built after the first pass in case a filter command changes the bounding box
-    lasinventory->update_header(&lasreader->header);
-    EPToctree octree(lasreader->header);
-    octree.set_gridsize(root_grid_size);
-
-    if (max_depth < 0)
-    {
-      max_depth = EPToctree::compute_max_depth(*lasheader, max_points_per_octant);
-      max_depth = (max_depth > limit_depth) ? limit_depth : max_depth;
-    }
-
-    // Estimate the binomial probabilities for point swapping. See algorithm implementation details
-    F64 area = occupancy_resolution * occupancy_resolution * lasoccupancygrid->get_num_occupied();
-    F64 density = num_points / area;
-    F64 voxel_sizes = octree.get_size() / octree.get_gridsize();
-    F64 swap_probabilities[limit_depth + 1];
-    for (i = 0; i <= limit_depth; i++)
-    {
-      I32 expected_num_point = (I32)(voxel_sizes * voxel_sizes * density);
-      swap_probabilities[i] = (expected_num_point >= 5) ? 1 - std::pow(1 - proba_swap_event, 1 / (F32)expected_num_point) : 0;
-      voxel_sizes /= 2;
-    }
-
-    delete lasoccupancygrid;
-    delete lasinventory;
-
-    U64 t1 = taketime();
-    if (verbose)
-    {
-      fprintf(stderr, "Area covered: %.0lf\n", area);
-      fprintf(stderr, "Number of points: %llu\n", num_points);
-      fprintf(stderr, "Density of points: %.1lf\n", density);
-      fprintf(stderr, "Maximum depth of the octree: %d\n", max_depth);
-      if (swap) 
-      { 
-        fprintf(stderr, "Swap probabilities per level: "); for (i = 0; i <= max_depth; i++) fprintf(stderr, "%.4lf ", swap_probabilities[i]); fprintf(stderr, "\n"); 
-      }
-      fprintf(stderr, "Pass 1 took %u sec.\n", (U32)(t1 - t0));
-    }
-
-    // =============================================================================================
-    // PREPARATION TO FILE CONVERSION AND WRITER (see las2las)
-    // =============================================================================================
-
-    lasreadopener.reopen(lasreader);
-
-    // Target PDRF if conversion required
-    U8 target_point_data_format = 6;
-    if (lasreader->point.have_rgb) target_point_data_format = 7;
-    if (lasreader->point.have_nir) target_point_data_format = 8;
-
-    // Upgrade to LAS 1.4
-    if (lasreader->header.version_minor < 3)
-    {
-      lasreader->header.header_size += (8 + 140);
-      lasreader->header.offset_to_point_data += (8 + 140);
-      lasreader->header.start_of_waveform_data_packet_record = 0;
-    }
-    else if (lasreader->header.version_minor == 3)
-    {
-      lasreader->header.header_size += 140;
-      lasreader->header.offset_to_point_data += 140;
-    }
-
-    if (lasreader->header.version_minor < 4)
-    {
-      lasreader->header.version_minor = 4;
-      lasreader->header.extended_number_of_point_records = lasreader->header.number_of_point_records;
-      lasreader->header.number_of_point_records = 0;
-      for (i = 0; i < 5; i++)
+      if (lasreadopener.get_file_name() == 0)
       {
-        lasreader->header.extended_number_of_points_by_return[i] = lasreader->header.number_of_points_by_return[i];
-        lasreader->header.number_of_points_by_return[i] = 0;
+        fprintf(stderr, "ERROR: no output file specified\n");
+        byebye(true, argc==1);
       }
+      laswriteopener.set_appendix(".copc");
+      laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
     }
 
-    // Upgrade to point format > 5
-    if (lasreader->header.point_data_format < 6 || lasreader->header.point_data_format > 8)
+    if (!laswriteopener.active())
     {
-      // were there extra bytes before
-      I32 num_extra_bytes = 0;
-      switch (lasreader->header.point_data_format)
-      {
-        case 0: num_extra_bytes = lasreader->header.point_data_record_length - 20; break;
-        case 1: num_extra_bytes = lasreader->header.point_data_record_length - 28; break;
-        case 2: num_extra_bytes = lasreader->header.point_data_record_length - 26; break;
-        case 3: num_extra_bytes = lasreader->header.point_data_record_length - 34; break;
-        case 4: num_extra_bytes = lasreader->header.point_data_record_length - 57; break;
-        case 5: num_extra_bytes = lasreader->header.point_data_record_length - 63; break;
-        case 6: num_extra_bytes = lasreader->header.point_data_record_length - 30; break;
-        case 7: num_extra_bytes = lasreader->header.point_data_record_length - 36; break;
-        case 8: num_extra_bytes = lasreader->header.point_data_record_length - 38; break;
-        case 9: num_extra_bytes = lasreader->header.point_data_record_length - 59; break;
-        case 10: num_extra_bytes = lasreader->header.point_data_record_length - 67; break;
-      }
-      if (num_extra_bytes < 0)
-      {
-        fprintf(stderr, "ERROR: point record length has %d fewer bytes than needed\n", num_extra_bytes);
-        byebye(true);
-      }
-
-      lasreader->header.clean_laszip();
-      lasreader->header.point_data_format = (U8)target_point_data_format;
-      switch (lasreader->header.point_data_format)
-      {
-        case 6: lasreader->header.point_data_record_length = 30 + num_extra_bytes; break;
-        case 7: lasreader->header.point_data_record_length = 36 + num_extra_bytes; break;
-        case 8: lasreader->header.point_data_record_length = 38 + num_extra_bytes; break;
-      }
+      fprintf(stderr, "ERROR: no output specified\n");
+      usage(true, argc == 1);
     }
 
-    // For format conversion
-    LASpoint *laspoint = new LASpoint;
-    laspoint->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
-
-    // Creation of the COPC info VLR
-    LASvlr_copc_info *info = new LASvlr_copc_info[1];
-    info->center_x = octree.get_center_x();
-    info->center_y = octree.get_center_y();
-    info->center_z = octree.get_center_z();
-    info->gpstime_maximum = gpstime_maximum;
-    info->gpstime_minimum = gpstime_minimum;
-    info->halfsize = octree.get_halfsize();
-    info->spacing = (octree.get_halfsize() * 2) / octree.get_gridsize();
-    info->root_hier_offset = 0; // delayed write when closing the writer
-    info->root_hier_size = 0;   // delayed write when closing the writer
-    memset(info->reserved, 0, 11 * sizeof(U64));
-
-    // COPC info *MUST* be the first VLR. We must realloc manually if any VLRs exist
-    if (lasreader->header.number_of_variable_length_records == 0)
-    {
-      lasreader->header.add_vlr("copc", 1, sizeof(LASvlr_copc_info), (U8*)info, FALSE, "copc info");
-    }
-    else
-    {
-      lasreader->header.number_of_variable_length_records++;
-      lasreader->header.offset_to_point_data += 54;
-      lasreader->header.vlrs = (LASvlr *)realloc(lasreader->header.vlrs, lasreader->header.number_of_variable_length_records * sizeof(LASvlr));
-      for (U32 i = lasreader->header.number_of_variable_length_records - 1; i > 0; i--) lasreader->header.vlrs[i] = lasreader->header.vlrs[i - 1];
-      memset((void *)&(lasreader->header.vlrs[0]), 0, sizeof(LASvlr));
-      lasreader->header.vlrs[0].reserved = 0;
-      strncpy(lasreader->header.vlrs[0].user_id, "copc", 4);
-      lasreader->header.vlrs[0].record_id = 1;
-      lasreader->header.vlrs[0].record_length_after_header = sizeof(LASvlr_copc_info);
-      lasreader->header.offset_to_point_data += lasreader->header.vlrs[0].record_length_after_header;
-      sprintf(lasreader->header.vlrs[0].description, "%.31s", "copc info");
-      lasreader->header.vlrs[0].data = (U8*)info;
-    }
-
-    strncpy(lasreader->header.system_identifier, "LAStools (c) by rapidlasso GmbH", 32);
-
-    // Placeholder to write a proper header. The actual content is resolved when closing the writer.
-    lasreader->header.add_evlr("copc", 1000, 1, new U8[1], FALSE, "EPT hierarchy");
-
-    // Create the COPC file
-    LASwriter *laswriter = laswriteopener.open(&lasreader->header);
+    // check and fix correctness of file extension
     
-    if (laswriter == 0)
+    if (laswriteopener.get_file_name())
     {
-      fprintf(stderr, "ERROR: could not open laswriter\n");
-      usage(true, argc == 1);
+      CHAR* file_name =  LASCopyString(laswriteopener.get_file_name());
+      I32 len = (I32)strlen(file_name);
+      while ((len >= 0) && (file_name[len] != '.')) len--;
+      if ((strncmp(file_name + len, ".las", 4) == 0) || (strncmp(file_name + len, ".LAS", 4) == 0))
+      {
+        fprintf(stderr, "WARNING: output file has wrong extension. COPC files must be LAZ files. Output was renamed automatically.\n");
+        len = (I32)strlen(file_name);
+        if (file_name[len-1] == 'S') file_name[len-1] = 'Z'; else file_name[len-1] = 'z';
+        laswriteopener.set_file_name(file_name);
+      }
+      free(file_name);
     }
 
-    // =============================================================================================
-    // PASS 2: This pass reads the points in a buffer of size n = num_points_buffer and shuffles the buffer.
-    // Then it builds the octree and writes LAZ chunks as soon as a region of the finalizer is finalized
-    // to free up memory.
-    // =============================================================================================
+    // replace the extension with ".copc.laz" (not mandatory by the standard but nicer).
 
-    if (verbose || progress) fprintf(stderr, "\nPass 2/2: building and writing the COPC file\n");
-    U64 t4 = taketime();
-
-    // Counters
-    U8  id_unordered_key = 0;
-    U16 id_buffer = 0;
-    I64 num_points_read = 0;
-   
-    // Buffer of points
-    U32 elem_size = laspoint->total_point_size;
-    I32 buffer_size = 0;
-    U8* buffer = (U8*)malloc(num_points_buffer * elem_size);
-    U8* temp = (U8*)malloc(elem_size);
-
-    // EPT hierarchy
-    std::vector<LASvlr_copc_entry> entries;
-
-    // For -unordered optimization
-    EPTkey current_unordered_key = unordered_keys[0];
-    bool skip = false;
-
-    // The octree is an std::unordered_map
-    Registry registry;
-    Registry::iterator it;
-
-    // Setup progress bar (*3 because updated at 3 strategic locations)
-    progressbar.set_ntotal((U64)num_points*3);
-    progressbar.set_display(progress);
-
-    // tmpdir
-    if (ondisk && tmpdir == 0) tmpdir = LASCopyString(laswriteopener.get_file_name_base());
-
-    while (lasreader->read_point())
+    if (laswriteopener.get_file_name())
     {
-      num_points_read++;
-      bool end_of_stream = num_points_read == num_points;
-
-      // Optimization for non-spatially coherent files (typically TLS). We perform 8 reads, skipping
-      // points that are not in the current region of interest.
-      if (unordered)
+      if (!strstr(laswriteopener.get_file_name(), ".copc.laz"))
       {
-        skip = octree.get_key(&lasreader->point, 1) != current_unordered_key;
-        if (end_of_stream && id_unordered_key < (unordered_keys.size() - 1))
-        {
-          num_points_read = 0;
-          lasreader->seek(0);
-          current_unordered_key = unordered_keys[++id_unordered_key];
-        }
+        const char* file_name_base = laswriteopener.get_file_name_base();
+        char* file_name;
+        const char* extension = ".copc.laz";
+        file_name = (char*)malloc((strlen(file_name_base)+10)*sizeof(char));
+        strcpy(file_name, file_name_base);
+        strcat(file_name, extension);
+        laswriteopener.set_file_name(file_name);
+        fprintf(stderr, "WARNING: output was renamed '%s'\n", laswriteopener.get_file_name_only());
+        free(file_name);
+      }
+    }
+
+    // make sure we do not corrupt the input file
+
+    if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
+    {
+      fprintf(stderr, "ERROR: input and output file name are identical: '%s'\n", lasreadopener.get_file_name());
+      usage(true);
+    }
+
+    LASheader* lasheader = &lasreader->header;
+
+    // check if we have long/lat coordinates. Abort if long/lat detected
+    if (!units)
+    {
+      F64 delta_x = lasheader->max_x - lasheader->min_x;
+      F64 delta_y = lasheader->max_y - lasheader->min_y;
+      F64 delta_z = lasheader->max_z - lasheader->min_z;
+
+      BOOL weird_z = 1000*delta_x < delta_z || 1000*delta_y < delta_z; // we have z and xy in different units
+      BOOL accurate_coordinates = lasheader->x_scale_factor < 0.0001 || lasheader->y_scale_factor < 0.0001;
+      BOOL longlat_extent = lasheader->max_x <= 90 && lasheader->min_x >= -90 && lasheader->max_y <= 180 && lasheader->min_y >= -180; // could be TLS centered on (0,0)
+    
+      if (weird_z && longlat_extent && accurate_coordinates)
+      {
+        fprintf(stderr, "ERROR: long/lat coordinates detected. COPC indexing supports only projected coordinates. If this is a false positive please use -m or -ft to provide the coordinates units.\n");
+        delete lasreader;
+        usage(true, argc == 1);
+      }
+    }
+
+    if (unordered || ondisk) num_points_buffer *= 2; // reduce swap events
+
+    if (verbose && unordered) fprintf(stderr, "Memory optimization for spatially unordered file: enabled\n\n");
+    if (verbose && ondisk)    fprintf(stderr, "Processing points on disk: enabled\n\n");
+
+    srand(seed);
+
+    try
+    {
+      // =============================================================================================
+      // PASS 1: Finalize the point cloud
+      // =============================================================================================
+
+      if (verbose || progress) fprintf(stderr, "Pass 1/2: finalizing the point cloud\n");
+
+      U64 t0 = taketime();
+
+      I32 tmp_max_depth = max_depth;
+      if (tmp_max_depth < 0)
+      {
+        tmp_max_depth = EPToctree::compute_max_depth(*lasheader, max_points_per_octant);
+        tmp_max_depth = (tmp_max_depth > limit_depth) ? limit_depth : tmp_max_depth;
       }
 
-      if (!skip)
+      LASprogress progressbar(lasreader);
+      progressbar.set_display(verbose || progress);
+
+      LASfinalizer lasfinalizer(lasheader, 2 << tmp_max_depth);
+      LASinventory *lasinventory = new LASinventory;
+      LASoccupancyGrid *lasoccupancygrid = new LASoccupancyGrid(occupancy_resolution);
+
+      if (verbose)
       {
-        *laspoint = lasreader->point; // Conversion to target format
-        laspoint->copy_to(buffer + buffer_size * elem_size);
-        buffer_size++;
-        progressbar++;
+        fprintf(stderr, "Finalizer subdivided the coverage in %dx%dx%d = %d regions\n", lasfinalizer.ncols, lasfinalizer.nrows, lasfinalizer.nlays, lasfinalizer.ncols*lasfinalizer.nrows*lasfinalizer.nlays);
+        fprintf(stderr, "Finalizer resolutions = %.1lf %.1lf %.1lf\n", lasfinalizer.xres, lasfinalizer.yres, lasfinalizer.zres);
+      }
+
+      F64 gpstime_minimum = F64_MAX;
+      F64 gpstime_maximum = F64_MIN;
+      while (lasreader->read_point())
+      {
+        if (gpstime_minimum > lasreader->point.get_gps_time()) gpstime_minimum = lasreader->point.get_gps_time();
+        if (gpstime_maximum < lasreader->point.get_gps_time()) gpstime_maximum = lasreader->point.get_gps_time();
+        lasfinalizer.add(&lasreader->point);
+        lasoccupancygrid->add(&lasreader->point);
+        lasinventory->add(&lasreader->point);
+        num_points++;
+
+        progressbar.update(lasreader);
         progressbar.print();
       }
 
-      // The buffer is full. Process the points.
-      if (buffer_size == num_points_buffer || end_of_stream)
+      progressbar.done();
+
+      // The octree must be built after the first pass in case a filter command changes the bounding box
+      lasinventory->update_header(&lasreader->header);
+      EPToctree octree(lasreader->header);
+      octree.set_gridsize(root_grid_size);
+
+      if (max_depth < 0)
       {
-        // First, we shuffle the points
-        if (shuffle)
+        max_depth = EPToctree::compute_max_depth(*lasheader, max_points_per_octant);
+        max_depth = (max_depth > limit_depth) ? limit_depth : max_depth;
+      }
+
+      // Estimate the binomial probabilities for point swapping. See algorithm implementation details
+      F64 area = occupancy_resolution * occupancy_resolution * lasoccupancygrid->get_num_occupied();
+      F64 density = num_points / area;
+      F64 voxel_sizes = octree.get_size() / octree.get_gridsize();
+      F64 swap_probabilities[limit_depth + 1];
+      for (i = 0; i <= limit_depth; i++)
+      {
+        I32 expected_num_point = (I32)(voxel_sizes * voxel_sizes * density);
+        swap_probabilities[i] = (expected_num_point >= 5) ? 1 - std::pow(1 - proba_swap_event, 1 / (F32)expected_num_point) : 0;
+        voxel_sizes /= 2;
+      }
+
+      delete lasoccupancygrid;
+      delete lasinventory;
+
+      U64 t1 = taketime();
+      if (verbose)
+      {
+        fprintf(stderr, "Area covered: %.0lf\n", area);
+        fprintf(stderr, "Number of points: %llu\n", num_points);
+        fprintf(stderr, "Density of points: %.1lf\n", density);
+        fprintf(stderr, "Maximum depth of the octree: %d\n", max_depth);
+        if (swap) 
+        { 
+          fprintf(stderr, "Swap probabilities per level: "); for (i = 0; i <= max_depth; i++) fprintf(stderr, "%.4lf ", swap_probabilities[i]); fprintf(stderr, "\n"); 
+        }
+        fprintf(stderr, "Pass 1 took %u sec.\n", (U32)(t1 - t0));
+      }
+
+      // =============================================================================================
+      // PREPARATION TO FILE CONVERSION AND WRITER (see las2las)
+      // =============================================================================================
+
+      lasreadopener.reopen(lasreader);
+
+      // Target PDRF if conversion required
+      U8 target_point_data_format = 6;
+      if (lasreader->point.have_rgb) target_point_data_format = 7;
+      if (lasreader->point.have_nir) target_point_data_format = 8;
+
+      // Upgrade to LAS 1.4
+      if (lasreader->header.version_minor < 3)
+      {
+        lasreader->header.header_size += (8 + 140);
+        lasreader->header.offset_to_point_data += (8 + 140);
+        lasreader->header.start_of_waveform_data_packet_record = 0;
+      }
+      else if (lasreader->header.version_minor == 3)
+      {
+        lasreader->header.header_size += 140;
+        lasreader->header.offset_to_point_data += 140;
+      }
+
+      if (lasreader->header.version_minor < 4)
+      {
+        lasreader->header.version_minor = 4;
+        lasreader->header.extended_number_of_point_records = lasreader->header.number_of_point_records;
+        lasreader->header.number_of_point_records = 0;
+        for (i = 0; i < 5; i++)
         {
-          for (i = 0; i < buffer_size; i++)
+          lasreader->header.extended_number_of_points_by_return[i] = lasreader->header.number_of_points_by_return[i];
+          lasreader->header.number_of_points_by_return[i] = 0;
+        }
+      }
+
+      // Upgrade to point format > 5
+      if (lasreader->header.point_data_format < 6 || lasreader->header.point_data_format > 8)
+      {
+        // were there extra bytes before
+        I32 num_extra_bytes = 0;
+        switch (lasreader->header.point_data_format)
+        {
+          case 0: num_extra_bytes = lasreader->header.point_data_record_length - 20; break;
+          case 1: num_extra_bytes = lasreader->header.point_data_record_length - 28; break;
+          case 2: num_extra_bytes = lasreader->header.point_data_record_length - 26; break;
+          case 3: num_extra_bytes = lasreader->header.point_data_record_length - 34; break;
+          case 4: num_extra_bytes = lasreader->header.point_data_record_length - 57; break;
+          case 5: num_extra_bytes = lasreader->header.point_data_record_length - 63; break;
+          case 6: num_extra_bytes = lasreader->header.point_data_record_length - 30; break;
+          case 7: num_extra_bytes = lasreader->header.point_data_record_length - 36; break;
+          case 8: num_extra_bytes = lasreader->header.point_data_record_length - 38; break;
+          case 9: num_extra_bytes = lasreader->header.point_data_record_length - 59; break;
+          case 10: num_extra_bytes = lasreader->header.point_data_record_length - 67; break;
+        }
+        if (num_extra_bytes < 0)
+        {
+          fprintf(stderr, "ERROR: point record length has %d fewer bytes than needed\n", num_extra_bytes);
+          byebye(true);
+        }
+
+        lasreader->header.clean_laszip();
+        lasreader->header.point_data_format = (U8)target_point_data_format;
+        switch (lasreader->header.point_data_format)
+        {
+          case 6: lasreader->header.point_data_record_length = 30 + num_extra_bytes; break;
+          case 7: lasreader->header.point_data_record_length = 36 + num_extra_bytes; break;
+          case 8: lasreader->header.point_data_record_length = 38 + num_extra_bytes; break;
+        }
+      }
+
+      // convert CRS from GeoTIF to OGC WKT
+      if (lasreader->header.vlr_geo_keys)
+      {
+        char* ogc_wkt = 0;
+        I32 len = 0;
+        geoprojectionconverter.set_projection_from_geo_keys(lasheader->vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasheader->vlr_geo_key_entries, lasheader->vlr_geo_ascii_params, lasheader->vlr_geo_double_params);
+        if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
+        {
+          fprintf(stderr, "WARNING: cannot convert CRS from GeoTIF to OGC WKT.\n");
+        }
+
+        if (ogc_wkt)
+        {
+          lasheader->set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+          lasheader->remove_vlr("LASF_Projection", 34735);
+          lasheader->del_geo_ascii_params();
+          lasheader->del_geo_double_params();
+          lasheader->set_geo_ogc_wkt(len, ogc_wkt);
+          if (verbose) fprintf(stderr, "CRS converted from GeoTIF to OGC WKT string: %s\n", ogc_wkt);
+          free(ogc_wkt);
+        }
+      }
+
+      // For format conversion
+      LASpoint *laspoint = new LASpoint;
+      laspoint->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
+
+      // Creation of the COPC info VLR
+      LASvlr_copc_info *info = new LASvlr_copc_info[1];
+      info->center_x = octree.get_center_x();
+      info->center_y = octree.get_center_y();
+      info->center_z = octree.get_center_z();
+      info->gpstime_maximum = gpstime_maximum;
+      info->gpstime_minimum = gpstime_minimum;
+      info->halfsize = octree.get_halfsize();
+      info->spacing = (octree.get_halfsize() * 2) / octree.get_gridsize();
+      info->root_hier_offset = 0; // delayed write when closing the writer
+      info->root_hier_size = 0;   // delayed write when closing the writer
+      memset(info->reserved, 0, 11 * sizeof(U64));
+
+      // COPC info *MUST* be the first VLR. We must realloc manually if any VLRs exist
+      if (lasreader->header.number_of_variable_length_records == 0)
+      {
+        lasreader->header.add_vlr("copc", 1, sizeof(LASvlr_copc_info), (U8*)info, FALSE, "copc info");
+      }
+      else
+      {
+        lasreader->header.number_of_variable_length_records++;
+        lasreader->header.offset_to_point_data += 54;
+        lasreader->header.vlrs = (LASvlr *)realloc(lasreader->header.vlrs, lasreader->header.number_of_variable_length_records * sizeof(LASvlr));
+        for (U32 i = lasreader->header.number_of_variable_length_records - 1; i > 0; i--) lasreader->header.vlrs[i] = lasreader->header.vlrs[i - 1];
+        memset((void*)&(lasreader->header.vlrs[0]), 0, sizeof(LASvlr));
+        lasreader->header.vlrs[0].reserved = 0;
+        strncpy(lasreader->header.vlrs[0].user_id, "copc", sizeof(lasreader->header.vlrs[0].user_id));
+        lasreader->header.vlrs[0].record_id = 1;
+        lasreader->header.vlrs[0].record_length_after_header = sizeof(LASvlr_copc_info);
+        lasreader->header.offset_to_point_data += lasreader->header.vlrs[0].record_length_after_header;
+        sprintf(lasreader->header.vlrs[0].description, "%.31s", "copc info");
+        lasreader->header.vlrs[0].data = (U8*)info;
+      }
+
+      strncpy(lasreader->header.system_identifier, "LAStools (c) by rapidlasso GmbH", 32);
+
+      // Placeholder to write a proper header. The actual content is resolved when closing the writer.
+      lasreader->header.add_evlr("copc", 1000, 1, new U8[1], FALSE, "EPT hierarchy");
+
+      // Create the COPC file
+      LASwriter* laswriter = laswriteopener.open(&lasreader->header);
+      
+      if (laswriter == 0)
+      {
+        fprintf(stderr, "ERROR: could not open laswriter\n");
+        usage(true, argc == 1);
+      }
+
+      // =============================================================================================
+      // PASS 2: This pass reads the points in a buffer of size n = num_points_buffer and shuffles the buffer.
+      // Then it builds the octree and writes LAZ chunks as soon as a region of the finalizer is finalized
+      // to free up memory.
+      // =============================================================================================
+
+      if (verbose || progress) fprintf(stderr, "\nPass 2/2: building and writing the COPC file\n");
+      U64 t4 = taketime();
+
+      // Counters
+      U8  id_unordered_key = 0;
+      U16 id_buffer = 0;
+      I64 num_points_read = 0;
+    
+      // Buffer of points
+      U32 elem_size = laspoint->total_point_size;
+      I32 buffer_size = 0;
+      U8* buffer = (U8*)malloc(num_points_buffer * elem_size);
+      U8* temp = (U8*)malloc(elem_size);
+
+      // EPT hierarchy
+      std::vector<LASvlr_copc_entry> entries;
+
+      // For -unordered optimization
+      EPTkey current_unordered_key = unordered_keys[0];
+      bool skip = false;
+
+      // The octree is an std::unordered_map
+      Registry registry;
+      Registry::iterator it;
+
+      // Setup progress bar (*3 because updated at 3 strategic locations)
+      progressbar.set_total((U64)num_points*3);
+      progressbar.set_display(progress);
+
+      // tmpdir
+      if (ondisk && tmpdir == 0) tmpdir = LASCopyString(laswriteopener.get_file_name_base());
+
+      while (lasreader->read_point())
+      {
+        num_points_read++;
+        bool end_of_stream = num_points_read == num_points;
+
+        // Optimization for non-spatially coherent files (typically TLS). We perform 8 reads, skipping
+        // points that are not in the current region of interest.
+        if (unordered)
+        {
+          skip = octree.get_key(&lasreader->point, 1) != current_unordered_key;
+          if (end_of_stream && id_unordered_key < (unordered_keys.size() - 1))
           {
-            I32 j = rand() % buffer_size;
-            U8* block1 = buffer + i * elem_size;
-            U8* block2 = buffer + j * elem_size;
-            memcpy(temp, block1, elem_size);
-            memcpy(block1, block2, elem_size);
-            memcpy(block2, temp, elem_size);
+            num_points_read = 0;
+            lasreader->seek(0);
+            current_unordered_key = unordered_keys[++id_unordered_key];
           }
         }
 
-        // We put the incoming points (coming in a random order) in the octree
-        for (i = 0; i < buffer_size; i++)
+        if (!skip)
         {
-          laspoint->copy_from(buffer + i * elem_size);
-          lasfinalizer.remove(laspoint);
-
-          // Search a place to insert the point
-          I32 lvl = 0;
-          I32 cell = 0;
-          EPTkey key;
-          bool accepted = false;
-          while (!accepted)
-          {
-            key = octree.get_key(laspoint, lvl);
-
-            if (lvl == max_depth)
-              cell = -1; // Do not build an occupancy grid for last level. Point must be inserted anyway.
-            else
-              cell = octree.get_cell(laspoint, key);
-
-            it = registry.find(key);
-            if (it == registry.end())
-            {
-              if (ondisk)
-              {
-                it = registry.insert({key, std::make_unique<OctantOnDisk>(key, tmpdir, elem_size)}).first;
-
-                // If too many files are opened we desactivate the octants. They will be auto-reactivated when needed.
-                // Innactive octants are automatically closed until they become active again. More than 500
-                // files opened can arise for very large point-clouds but most are likely to be inactive.
-                if (OctantOnDisk::num_connexions > max_files_opened)
-                {
-                  if (verbose) fprintf(stderr, "File connexions limit reached (%d). Closing all files temporarily.\n", OctantOnDisk::num_connexions);
-                  for (auto &e : registry) e.second->desactivate();
-                }
-              }
-              else
-              {
-                it = registry.insert({key, std::make_unique<OctantInMemory>(elem_size)}).first;
-              }
-
-              if (very_verbose) fprintf(stderr, "[%.0lf%%] Creation of octant %d-%d-%d-%d\n", progressbar.get_progress(), key.d, key.x, key.y, key.z);
-            }
-
-            auto it2 = it->second->occupancy.find(cell);
-            accepted = (it2 == it->second->occupancy.end()) || (lvl == max_depth);
-
-            if (swap && !accepted)
-            {
-              // bufid != id_buffer: save the heavy cost (on disk) of swapping.
-              // No need to swap two points from the same buffer: they are already shuffled.
-              if (it2->second.bufid != id_buffer && (((F32)rand()/(F32)RAND_MAX)) < swap_probabilities[lvl])
-              {
-                it->second->swap(laspoint, it2->second.posid);
-                it2->second.bufid = id_buffer;
-              }
-            }
-
-            lvl++;
-          }
-
-          // Insert the point
-          it->second->insert(laspoint, cell, id_buffer);
-
-          // Check if we finalized a cell of the finalizer.
-          // We can potentially write some chunks in the .copc.laz and free up memory
-          if (lasfinalizer.finalized)
-          {
-            // Loop through all octants to find the ones that are finalized (could be optimized).
-            for (it = registry.begin(); it != registry.end();)
-            {
-              // Bounding box of the octant
-              F64 res = octree.get_size() / (1 << it->first.d);
-              F64 minx = res * it->first.x + octree.get_xmin();
-              F64 miny = res * it->first.y + octree.get_ymin();
-              F64 minz = res * it->first.z + octree.get_zmin();
-              F64 maxx = minx + res;
-              F64 maxy = miny + res;
-              F64 maxz = minz + res;
-
-              // If the octant is not finalized we can't do anything yet
-              if (!lasfinalizer.is_finalized(minx, miny, minz, maxx, maxy, maxz))
-              {
-                it++;
-                continue;
-              }
-
-              // Check if the chunk is not too small. Otherwise, redistribute the points in the parent octant.
-              // There is no guarantee that parents still exist. They may have already been written and freed.
-              // (Requiring that chunks have more than min_points_per_octant is not a strong requirement,
-              // but producing a LAZ chunks with only 2 or 3 points is suboptimal).
-              if (it->second->npoints() <= min_points_per_octant)
-              {
-                bool moved = false;
-                key = it->first;
-                while (key != EPTkey::root() && moved == false)
-                {
-                  key = key.get_parent();
-                  auto it2 = registry.find(key);
-                  if (it2 != registry.end())
-                  {
-                    if (very_verbose) fprintf(stderr, "[%.0lf%%] Moving %d points from %d-%d-%d-%d to %d-%d-%d-%d\n", progressbar.get_progress(), it->second->npoints(), it->first.d, it->first.x, it->first.y, it->first.z, it2->first.d, it2->first.x, it2->first.y, it2->first.z);
-
-                    it->second->load();
-                    for (I32 k = 0; k < it->second->npoints(); k++)
-                      it2->second->insert(it->second->point_buffer + k * elem_size, -1, id_buffer);
-
-                    it->second->clean();
-
-                    // The octant must be inserted in the list because it may have childs
-                    if (it->first.d < max_depth)
-                    {
-                      LASvlr_copc_entry entry;
-                      entry.key.depth = it->first.d;
-                      entry.key.x = it->first.x;
-                      entry.key.y = it->first.y;
-                      entry.key.z = it->first.z;
-                      entry.point_count = 0;
-                      entry.offset = 0;
-                      entry.byte_size = 0;
-                      entries.push_back(entry);
-                    }
-
-                    it = registry.erase(it);
-                    moved = true;
-                  }
-                }
-
-                // Points were moved in another octant and the octant was deleted: we do not write this octant
-                if (moved) continue;
-              }
-
-              // The octant is finalized: we can write the chunk and free up the memory
-              LASvlr_copc_entry entry;
-              entry.key.depth = it->first.d;
-              entry.key.x = it->first.x;
-              entry.key.y = it->first.y;
-              entry.key.z = it->first.z;
-              entry.point_count = it->second->npoints();
-              entry.offset = laswriter->tell();
-
-              // The points *MUST* be sorted (to optimize compression)
-              if (sort) it->second->sort();
-
-              // Write the chunk
-              for (I32 k = 0; k < it->second->npoints(); k++)
-              {
-                laspoint->copy_from(it->second->point_buffer + k * elem_size);
-                laswriter->write_point(laspoint);
-                laswriter->update_inventory(laspoint);
-
-                progressbar++;
-                progressbar.print();
-              }
-              laswriter->chunk();
-
-              if (very_verbose) fprintf(stderr, "[%.0lf%%] Octant %d-%d-%d-%d written in COPC file\n", progressbar.get_progress(), it->first.d, it->first.x, it->first.y, it->first.z);
-
-              // Record the VLR entry
-              entry.byte_size = (I32)(laswriter->tell() - entry.offset);
-              entries.push_back(entry);
-
-              // We will never see this octant again. Goodbye.
-              it->second->clean();
-              it = registry.erase(it);
-            }
-          }
-
+          *laspoint = lasreader->point; // Conversion to target format
+          laspoint->copy_to(buffer + buffer_size * elem_size);
+          buffer_size++;
           progressbar++;
           progressbar.print();
         }
 
-        id_buffer++;
-        buffer_size = 0;
-
-        if (verbose)
-        { 
-          F32 million = (U64)num_points_buffer*id_buffer/1000000.0;
-          fprintf(stderr, "[%.0lf%%] Processed %.1f million points | LAZ chunks written: %u", progressbar.get_progress(), million, (U32)entries.size() );
-          if (ondisk) fprintf(stderr, " | Files opened: %d/%d", OctantOnDisk::num_connexions, (I32)registry.size());
-          fprintf(stderr, "\n");
-        }
-
-        if (ondisk)
+        // The buffer is full. Process the points.
+        if (buffer_size == num_points_buffer || end_of_stream)
         {
-          // If too many files are opened we desactivate the octants. They will be auto-reactivated when needed.
-          // Innactive octants are automatically closed until they become active again. More than 500
-          // files opened can arise for very large point-clouds but most are likely to be inactive.
-          if (OctantOnDisk::num_connexions > max_files_opened)
+          // First, we shuffle the points
+          if (shuffle)
           {
-            if (verbose) fprintf(stderr, "File connexions limit reached (%d). Closing all files temporarily.\n", OctantOnDisk::num_connexions);
-            for (auto &e : registry) e.second->desactivate();
+            for (i = 0; i < buffer_size; i++)
+            {
+              I32 j = rand() % buffer_size;
+              U8* block1 = buffer + i * elem_size;
+              U8* block2 = buffer + j * elem_size;
+              memcpy(temp, block1, elem_size);
+              memcpy(block1, block2, elem_size);
+              memcpy(block2, temp, elem_size);
+            }
+          }
+
+          // We put the incoming points (coming in a random order) in the octree
+          for (i = 0; i < buffer_size; i++)
+          {
+            laspoint->copy_from(buffer + i * elem_size);
+            lasfinalizer.remove(laspoint);
+
+            // Search a place to insert the point
+            I32 lvl = 0;
+            I32 cell = 0;
+            EPTkey key;
+            bool accepted = false;
+            while (!accepted)
+            {
+              key = octree.get_key(laspoint, lvl);
+
+              if (lvl == max_depth)
+                cell = -1; // Do not build an occupancy grid for last level. Point must be inserted anyway.
+              else
+                cell = octree.get_cell(laspoint, key);
+
+              it = registry.find(key);
+              if (it == registry.end())
+              {
+                if (ondisk)
+                {
+                  it = registry.insert({key, std::make_unique<OctantOnDisk>(key, tmpdir, elem_size)}).first;
+
+                  // If too many files are opened we desactivate the octants. They will be auto-reactivated when needed.
+                  // Innactive octants are automatically closed until they become active again. More than 500
+                  // files opened can arise for very large point-clouds but most are likely to be inactive.
+                  if (OctantOnDisk::num_connexions > max_files_opened)
+                  {
+                    if (verbose) fprintf(stderr, "File connexions limit reached (%d). Closing all files temporarily.\n", OctantOnDisk::num_connexions);
+                    for (auto &e : registry) e.second->desactivate();
+                  }
+                }
+                else
+                {
+                  it = registry.insert({key, std::make_unique<OctantInMemory>(elem_size)}).first;
+                }
+
+                if (very_verbose) fprintf(stderr, "[%.0lf%%] Creation of octant %d-%d-%d-%d\n", progressbar.get_progress(), key.d, key.x, key.y, key.z);
+              }
+
+              auto it2 = it->second->occupancy.find(cell);
+              accepted = (it2 == it->second->occupancy.end()) || (lvl == max_depth);
+
+              if (swap && !accepted)
+              {
+                // bufid != id_buffer: save the heavy cost (on disk) of swapping.
+                // No need to swap two points from the same buffer: they are already shuffled.
+                if (it2->second.bufid != id_buffer && (((F32)rand()/(F32)RAND_MAX)) < swap_probabilities[lvl])
+                {
+                  it->second->swap(laspoint, it2->second.posid);
+                  it2->second.bufid = id_buffer;
+                }
+              }
+
+              lvl++;
+            }
+
+            // Insert the point
+            it->second->insert(laspoint, cell, id_buffer);
+
+            // Check if we finalized a cell of the finalizer.
+            // We can potentially write some chunks in the .copc.laz and free up memory
+            if (lasfinalizer.finalized)
+            {
+              // Loop through all octants to find the ones that are finalized (could be optimized).
+              for (it = registry.begin(); it != registry.end();)
+              {
+                // Bounding box of the octant
+                F64 res = octree.get_size() / (1 << it->first.d);
+                F64 minx = res * it->first.x + octree.get_xmin();
+                F64 miny = res * it->first.y + octree.get_ymin();
+                F64 minz = res * it->first.z + octree.get_zmin();
+                F64 maxx = minx + res;
+                F64 maxy = miny + res;
+                F64 maxz = minz + res;
+
+                // If the octant is not finalized we can't do anything yet
+                if (!lasfinalizer.is_finalized(minx, miny, minz, maxx, maxy, maxz))
+                {
+                  it++;
+                  continue;
+                }
+
+                // Check if the chunk is not too small. Otherwise, redistribute the points in the parent octant.
+                // There is no guarantee that parents still exist. They may have already been written and freed.
+                // (Requiring that chunks have more than min_points_per_octant is not a strong requirement,
+                // but producing a LAZ chunks with only 2 or 3 points is suboptimal).
+                if (it->second->npoints() <= min_points_per_octant)
+                {
+                  bool moved = false;
+                  key = it->first;
+                  while (key != EPTkey::root() && moved == false)
+                  {
+                    key = key.get_parent();
+                    auto it2 = registry.find(key);
+                    if (it2 != registry.end())
+                    {
+                      if (very_verbose) fprintf(stderr, "[%.0lf%%] Moving %d points from %d-%d-%d-%d to %d-%d-%d-%d\n", progressbar.get_progress(), it->second->npoints(), it->first.d, it->first.x, it->first.y, it->first.z, it2->first.d, it2->first.x, it2->first.y, it2->first.z);
+
+                      it->second->load();
+                      for (I32 k = 0; k < it->second->npoints(); k++)
+                        it2->second->insert(it->second->point_buffer + k * elem_size, -1, id_buffer);
+
+                      it->second->clean();
+
+                      // The octant must be inserted in the list because it may have childs
+                      if (it->first.d < max_depth)
+                      {
+                        LASvlr_copc_entry entry;
+                        entry.key.depth = it->first.d;
+                        entry.key.x = it->first.x;
+                        entry.key.y = it->first.y;
+                        entry.key.z = it->first.z;
+                        entry.point_count = 0;
+                        entry.offset = 0;
+                        entry.byte_size = 0;
+                        entries.push_back(entry);
+                      }
+
+                      it = registry.erase(it);
+                      moved = true;
+                    }
+                  }
+
+                  // Points were moved in another octant and the octant was deleted: we do not write this octant
+                  if (moved) continue;
+                }
+
+                // The octant is finalized: we can write the chunk and free up the memory
+                LASvlr_copc_entry entry;
+                entry.key.depth = it->first.d;
+                entry.key.x = it->first.x;
+                entry.key.y = it->first.y;
+                entry.key.z = it->first.z;
+                entry.point_count = it->second->npoints();
+                entry.offset = laswriter->tell();
+
+                // The points *MUST* be sorted (to optimize compression)
+                if (sort) it->second->sort();
+
+                // Write the chunk
+                for (I32 k = 0; k < it->second->npoints(); k++)
+                {
+                  laspoint->copy_from(it->second->point_buffer + k * elem_size);
+                  laswriter->write_point(laspoint);
+                  laswriter->update_inventory(laspoint);
+
+                  progressbar++;
+                  progressbar.print();
+                }
+                laswriter->chunk();
+
+                if (very_verbose) fprintf(stderr, "[%.0lf%%] Octant %d-%d-%d-%d written in COPC file\n", progressbar.get_progress(), it->first.d, it->first.x, it->first.y, it->first.z);
+
+                // Record the VLR entry
+                entry.byte_size = (I32)(laswriter->tell() - entry.offset);
+                entries.push_back(entry);
+
+                // We will never see this octant again. Goodbye.
+                it->second->clean();
+                it = registry.erase(it);
+              }
+            }
+
+            progressbar++;
+            progressbar.print();
+          }
+
+          id_buffer++;
+          buffer_size = 0;
+
+          if (verbose)
+          { 
+            F32 million = (F32)((U64)num_points_buffer*id_buffer/1000000.0);
+            fprintf(stderr, "[%.0lf%%] Processed %.1f million points | LAZ chunks written: %u", progressbar.get_progress(), million, (U32)entries.size() );
+            if (ondisk) fprintf(stderr, " | Files opened: %d/%d", OctantOnDisk::num_connexions, (I32)registry.size());
+            fprintf(stderr, "\n");
+          }
+
+          if (ondisk)
+          {
+            // If too many files are opened we desactivate the octants. They will be auto-reactivated when needed.
+            // Innactive octants are automatically closed until they become active again. More than 500
+            // files opened can arise for very large point-clouds but most are likely to be inactive.
+            if (OctantOnDisk::num_connexions > max_files_opened)
+            {
+              if (verbose) fprintf(stderr, "File connexions limit reached (%d). Closing all files temporarily.\n", OctantOnDisk::num_connexions);
+              for (auto &e : registry) e.second->desactivate();
+            }
           }
         }
       }
-    }
 
-    progressbar.done();
+      progressbar.done();
 
-    // Construct the EPT hierarchy eVLR
-    LASvlr_copc_entry *hierarchy = new LASvlr_copc_entry[entries.size()];
-    std::copy(entries.begin(), entries.end(), hierarchy);
-    lasreader->header.remove_evlr("copc", 1000);
-    lasreader->header.add_evlr("copc", 1000, entries.size() * sizeof(LASvlr_copc_entry), (U8*)hierarchy, FALSE, "EPT hierarchy");
-    laswriter->update_header(&lasreader->header, TRUE, TRUE); // Propagate the updated EPT hierarchy and restores the pointer
-    laswriter->close();                                       // Write the hierarchy eVLR and updates the copc info.
-    lasreader->close();
+      // Construct the EPT hierarchy eVLR
+      LASvlr_copc_entry* hierarchy = new LASvlr_copc_entry[entries.size()];
+      std::copy(entries.begin(), entries.end(), hierarchy);
+      lasreader->header.remove_evlr("copc", 1000);
+      lasreader->header.add_evlr("copc", 1000, entries.size() * sizeof(LASvlr_copc_entry), (U8*)hierarchy, FALSE, "EPT hierarchy");
+      laswriter->update_header(&lasreader->header, TRUE, TRUE); // Propagate the updated EPT hierarchy and restores the pointer
+      laswriter->close();                                       // Write the hierarchy eVLR and updates the copc info.
+      lasreader->close();
 
-    if (laswriter->npoints != num_points)
-      fprintf(stderr, "ERROR: Different number of points in input and output. Something went wrong. Please report this error.\n");
+      if (laswriter->npoints != num_points)
+        fprintf(stderr, "ERROR: Different number of points in input and output. Something went wrong. Please report this error.\n");
 
-    delete lasreader;
-    delete laswriter;
-    delete laspoint;
-    free(buffer);
-    free(temp);
-    free(tmpdir);
+      delete lasreader;
+      delete laswriter;
+      delete laspoint;
+      free(buffer);
+      free(temp);
+      free(tmpdir);
 
-    U64 t5 = taketime();
-    if (verbose)
-    {
-      U32 num_chunks = (U32)entries.size();
-      U32 num_chunks_few_points = 0;
-      I32 highest_num_points = 0;
-      I32 lowest_num_points = I32_MAX;
-      for (const auto &chunk : entries)
+      U64 t5 = taketime();
+      if (verbose)
       {
-        if (chunk.point_count > highest_num_points) highest_num_points = chunk.point_count;
-        if (chunk.point_count < lowest_num_points) lowest_num_points = chunk.point_count;
-        if (chunk.point_count <= (I32)min_points_per_octant) num_chunks_few_points++;
+        U32 num_chunks = (U32)entries.size();
+        U32 num_chunks_few_points = 0;
+        I32 highest_num_points = 0;
+        I32 lowest_num_points = I32_MAX;
+        for (const auto &chunk : entries)
+        {
+          if (chunk.point_count > highest_num_points) highest_num_points = chunk.point_count;
+          if (chunk.point_count < lowest_num_points) lowest_num_points = chunk.point_count;
+          if (chunk.point_count <= (I32)min_points_per_octant) num_chunks_few_points++;
+        }
+
+        fprintf(stderr, "Number of chunks: %u\n", num_chunks);
+        fprintf(stderr, "Highest number of points in a chunk: %u\n", highest_num_points);
+        fprintf(stderr, "Lowest number of points in a chunk: %u\n", lowest_num_points);
+        fprintf(stderr, "Number of chunks with less than %u points: %u\n", min_points_per_octant, num_chunks_few_points);
+        fprintf(stderr, "Pass 2 took %u sec.\n\n", (U32)(t5 - t4));
+
+        fprintf(stderr, "Total time: %u sec.\n", (U32)(t5 - t0));
       }
 
-      fprintf(stderr, "Number of chunks: %u\n", num_chunks);
-      fprintf(stderr, "Highest number of points in a chunk: %u\n", highest_num_points);
-      fprintf(stderr, "Lowest number of points in a chunk: %u\n", lowest_num_points);
-      fprintf(stderr, "Number of chunks with less than %u points: %u\n", min_points_per_octant, num_chunks_few_points);
-      fprintf(stderr, "Pass 2 took %u sec.\n\n", (U32)(t5 - t4));
-
-      fprintf(stderr, "Total time: %u sec.\n", (U32)(t5 - t0));
+      laswriteopener.set_file_name(0);
     }
-  }
-  catch(std::exception& e)
-  {
-    fprintf(stderr, "ERROR: %s\n", e.what());
-    error = true;
-  }
-  catch (...)
-  {
-    fprintf(stderr, "ERROR processing file '%s'. maybe file is corrupt?\n", lasreadopener.get_file_name());
-    error = true;
+    catch(std::exception& e)
+    {
+      fprintf(stderr, "ERROR: %s\n", e.what());
+      error = true;
+    }
+    catch (...)
+    {
+      fprintf(stderr, "ERROR processing file '%s'. maybe file is corrupt?\n", lasreadopener.get_file_name());
+      error = true;
 
-    laswriteopener.set_file_name(0);
+      laswriteopener.set_file_name(0);
+    }
   }
 
   byebye(error, argc == 1);

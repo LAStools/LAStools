@@ -52,8 +52,8 @@ lasindex: lasindex.o
 	${LINKER} ${BITS} ${COPTS} lasindex.o -llas -o $@ ${LIBS} ${LASLIBS} $(INCLUDE) $(LASINCLUDE)
 	cp $@ ../bin
 
-lascopcindex: lascopcindex.o
-	${LINKER} ${BITS} ${COPTS} lascopcindex.o -llas -o $@ ${LIBS} ${LASLIBS} $(INCLUDE) $(LASINCLUDE)
+lascopcindex: lascopcindex.o  geoprojectionconverter.o 
+	${LINKER} ${BITS} ${COPTS} lascopcindex.o geoprojectionconverter.o -llas -o $@ ${LIBS} ${LASLIBS} $(INCLUDE) $(LASINCLUDE)
 	cp $@ ../bin
 
 

@@ -13,12 +13,12 @@ set(GEOPROJECTION_TARGETS
 	txt2las
 	las2las
 	lasmerge
+	lascopcindex
 )
 set(STANDALONE_TARGETS
 	las2txt
 	lasdiff
 	lasindex
-	lascopcindex
 )
 set(ALL_TARGETS ${GEOPROJECTION_TARGETS} ${STANDALONE_TARGETS})
 

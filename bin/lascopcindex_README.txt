@@ -6,10 +6,9 @@ this file is deprecated - see *.md version of this file
 
  This tool creates a COPC *.laz file version 1.4 format 6, 7 or 8
  for a given set of *.las or *.laz files. A COPC file is a LAZ 1.4
- file that stores point data organized in a clustered octree. It
- contains a VLR that describe the octree organization of data that
- are stored in LAZ 1.4 chunks (https://copc.io/). The input files are
- merged and the points are sorted.
+ file that stores point data sorted and organized in a clustered octree. 
+ It contains a VLR that describes the octree organization of data that
+ are stored in LAZ 1.4 chunks (https://copc.io/).
 
  When COPC index is present it will be used to speed up access to the
  relevant areas of the LAZ file whenever a spatial queries or depth
@@ -40,17 +39,25 @@ this file is deprecated - see *.md version of this file
   http://groups.google.com/group/lastools/
   http://lastools.org/
 
-  Jochen @rapidlasso
-
 ****************************************************************
 
 example usage:
+
+>> lascopcindex in.las
+
+creates a COPC file called 'in.copc.laz'.
 
 >> lascopcindex -i in.laz -o out.copc.laz
 
 creates a COPC file called 'out.copc.laz'.
 
->> lascopcindex -i *.laz -o out.copc.laz
+>> lascopcindex -i *.las
+
+converts all LAS files in the current folder into copc files. The COPC
+format is designed to store massive point clouds in a single file so
+this may not be the typical use case. See the next example for more details.
+
+>> lascopcindex -merged -i *.laz -o out.copc.laz
 
 creates a single COPC LAZ file by merging all input LAZ files, which has 
 the potential to be massive in size. However, creating such a large file 
@@ -67,28 +74,29 @@ For spatially coherent streams:
 For non-spatially coherent streams:
 - 10 million points: approximately 800 MB
 - 50 million points: approximately 7 GB
-- 1 billion points: memory usage estimation not provided
+- 1 billion points: not tested
 
 To mitigate the memory usage, there are options available to reduce the memory footprint.
+See -unordered, -tls and -ondisk examples.
 
->> lascopcindex -i *.laz -o out.copc.laz -progress
+>> lascopcindex -merged -i *.laz -o out.copc.laz -progress
 
 building a massive COPC LAZ file is a time-consuming process. This option displays a progress bar.
 
->> lascopcindex -i *.laz -o out.copc.laz -ft
+>> lascopcindex -merged -i *.laz -o out.copc.laz -ft
 
 If the point clouds are not in meters, users have the option to specify the units using 
 either the default option "-m" (meters) or the "-ft" option (feet). Not providing the "-ft" 
 option is not a significant issue, but if users choose to provide it, it might slightly 
-improve the speed and memory usage. 
+improve the speed and memory usage. long/lat coordinates are not supported by the COPC standard.
 
->> lascopcindex -i *.laz -o out.copc.laz -root_light
+>> lascopcindex -merged -i *.laz -o out.copc.laz -root_light
 
 The root of the octree can be more or less populated with -root_light, -root_medium (default) or -root_dense
 
->> lascopcindex -i *.laz -o out.copc.laz -root_light -keep_first
+>> lascopcindex -merged -i *.laz -o out.copc.laz -root_light -keep_first
 
-Make a COPC file from first return only.
+Make a COPC file from first return only with a lower density at each level of the octree.
 
 >> lascopcindex -i in.laz -o tls.copc.laz -unordered
 
@@ -97,15 +105,15 @@ it offers the advantage of using at least to 2 times less memory compared to the
 is specifically designed for dense point clouds obtained from sources such as drone, terrestrial lidar, 
 photogrammetry, and other non-spatially coherent acquisitions. Works only for a single input file.
 
->> lascopcindex -i in.laz -o tls.copc.laz -tls
+>> lascopcindex -i tls.laz -tls
 
 This is equivalent to -unordered -root_light. Additionally, the internal routine variation for computing 
 the maximum depth of the octree is specifically tailored to handle terrestrial lidar data more effectively.
 
->> lascopcindex -i in.laz -o out.copc.laz -ondisk
+>> lascopcindex -merge -i *.laz -o out.copc.laz -ondisk
 
 When sorting and clustering massive point clouds, it can exert a significant strain on the main memory (RAM). 
-To alleviate this memory pressure, an option is available to store the data on disk instead, reducing the memory 
+To alleviate this memory pressure, an option is available to store temporary data on disk, reducing the memory 
 usage. By storing the data on disk, the memory usage can be reduced by 2 or more, although it may lead to an increase 
 in processing time.
 
@@ -117,7 +125,7 @@ overview of all tool-specific switches:
 -vv -very_verbose   : more info reported in console
 -version            : reports this tool's version number
 -progress           : displays a progress bar (disable with verbose)
--depth              : set a maximum depth for the octree instead of relying on internal inference.
+-depth [n]          : set a maximum depth [n] for the octree instead of relying on internal inference.
 -m                  : set the units to meters (default)
 -ft                 : set the units to feets
 -root_light         : low density for the root of the octree (128 cell divisions)
@@ -386,11 +394,8 @@ Fast AOI Queries for LAS/LAZ with spatial indexing LAX files
   -inside_circle center_x center_y radius
 LAStools (by info@rapidlasso.de) version 190909
 usage:
-lascopcindex -i lidar.las
-lascopcindex -i *.las
-lascopcindex -i flight1*.las flight2*.las -v
-lascopcindex -i lidar.las -random
-lascopcindex -h
+lascopcindex in.las
+lascopcindex -merged -i *.las -o out.copc.las
 
 ---------------
 
