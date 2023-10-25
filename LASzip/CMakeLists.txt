@@ -1,14 +1,13 @@
-cmake_minimum_required(VERSION 2.8.11)
-set(CMAKE_SUPPRESS_REGENERATION true)
+cmake_minimum_required(VERSION 3.10)
 
-project(LASzip CXX C)
+project(LASZIP CXX C)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set(ROOT_DIR "${PROJECT_SOURCE_DIR}")
 
 # the next line is the ONLY place in the entire laszip system where
 # the version info is hard-coded
-set(LASZIP_API_VERSION_STRING "3.4.1" CACHE STRING "LASzip version" FORCE)
+set(LASZIP_API_VERSION_STRING "3.5.1" CACHE STRING "LASzip version" FORCE)
 
 include (CheckIncludeFileCXX)
 include(${ROOT_DIR}/cmake/common.cmake NO_POLICY_SCOPE)
@@ -26,7 +25,7 @@ include(FeatureSummary)
 mark_as_advanced(CMAKE_VERBOSE_MAKEFILE)
 
 #------------------------------------------------------------------------------
-# LASzip general settings
+# LASZIP general settings
 #------------------------------------------------------------------------------
 
 
@@ -42,7 +41,7 @@ set(LASZIP_API_VERSION ${LASZIP_API_VERSION_MAJOR}.${LASZIP_API_VERSION_MINOR}.$
 # libtool SO version naming
 # 8.0.0 for 3.2.1
 # 9.0.0 for 4.0+
-set(LASZIP_SO_VERSION "8.0.4")
+set(LASZIP_SO_VERSION "8.0.6")
 set(LASZIP_COMPATIBILITY_VERSION 8)
 
 check_include_file_cxx ("unordered_map" HAVE_UNORDERED_MAP)
@@ -57,7 +56,7 @@ check_include_file_cxx ("unordered_map" HAVE_UNORDERED_MAP)
 # laszip general settings
 
 set(LASZIP_API_VERSION_H
-    ${CMAKE_CURRENT_BINARY_DIR}/dll/laszip_api_version.h)
+    ${CMAKE_CURRENT_BINARY_DIR}/include/laszip/laszip_api_version.h)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/laszip_api_version.h.in
@@ -110,10 +109,11 @@ else(WIN32)
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${LASZIP_OUTPUT_LIB_DIR}")
 endif(WIN32)
 
-set(LASZIP_HEADERS_DIR "${PROJECT_SOURCE_DIR}/dll")
+set(LASZIP_HEADERS_DIR "${PROJECT_SOURCE_DIR}/include/laszip")
 
 add_subdirectory(src)
 add_subdirectory(dll)
 
 #
 add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
+

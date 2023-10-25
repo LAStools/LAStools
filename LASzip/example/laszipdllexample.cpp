@@ -16,11 +16,11 @@
 
   COPYRIGHT:
 
-    (c) 2007-2018, rapidlasso GmbH - fast tools to catch reality
+    (c) 2007-2023, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
-    terms of the GNU Lesser General Licence as published by the Free Software
-    Foundation. See the LICENSE.txt file for more information.
+    terms of the Apache Public License 2.0 published by the Apache Software
+    Foundation. See the COPYING file for more information.
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -48,7 +48,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "laszip_api.h"
+#include <laszip/laszip_api.h>
 
 #if defined(_MSC_VER) && \
     (_MSC_FULL_VER >= 150000000)
@@ -123,7 +123,7 @@ static double taketime()
 #define EXAMPLE_FIFTEEN 15
 #define EXAMPLE_SIXTEEN 16
 
-#define EXAMPLE EXAMPLE_EIGHT
+#define EXAMPLE EXAMPLE_SIXTEEN
 
 int main(int argc, char *argv[])
 {

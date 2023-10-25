@@ -50,6 +50,7 @@
 #define LASZIP_SOURCE
 
 #include <laszip/laszip_api.h>
+#include <limits>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -72,8 +73,8 @@ class laszip_dll_inventory
 {
 public:
   BOOL active() const { return (first == FALSE); };
-  U32 number_of_point_records;
-  U32 number_of_points_by_return[16];
+  U64 number_of_point_records;
+  U64 number_of_points_by_return[16];
   I32 max_X;
   I32 min_X;
   I32 max_Y;
@@ -89,6 +90,9 @@ public:
     }
     else
     {
+      if (number_of_point_records == std::numeric_limits<uint32_t>::max())
+        throw "number_of_point_records integer overflow";
+
       number_of_points_by_return[point->return_number]++;
     }
     if (first)
@@ -110,9 +114,8 @@ public:
   }
   laszip_dll_inventory()
   {
-    U32 i;
     number_of_point_records = 0;
-    for (i = 0; i < 16; i++) number_of_points_by_return[i] = 0;
+    for (U32 i = 0; i < 16; i++) number_of_points_by_return[i] = 0;
     max_X = min_X = 0;
     max_Y = min_Y = 0;
     max_Z = min_Z = 0;
@@ -3257,6 +3260,7 @@ laszip_close_writer(
       if (laszip_dll->header.point_data_format <= 5) // only update legacy counters for old point types
       {
         laszip_dll->streamout->seek(107);
+        // Because number of point records is now U64, this function only works with little endian machines
         if (!laszip_dll->streamout->put32bitsLE((const U8*)&(laszip_dll->inventory->number_of_point_records)))
         {
           sprintf(laszip_dll->error, "updating laszip_dll->inventory->number_of_point_records");
@@ -3312,7 +3316,7 @@ laszip_close_writer(
       if (laszip_dll->header.version_minor >= 4) // only update extended counters for LAS 1.4
       {
         laszip_dll->streamout->seek(247);
-        I64 number = laszip_dll->inventory->number_of_point_records;
+        U64 number = laszip_dll->inventory->number_of_point_records;
         if (!laszip_dll->streamout->put64bitsLE((const U8*)&number))
         {
           sprintf(laszip_dll->error, "updating laszip_dll->inventory->extended_number_of_point_records");
@@ -3331,7 +3335,7 @@ laszip_close_writer(
       laszip_dll->streamout->seekEnd();
 
       delete laszip_dll->inventory;
-      laszip_dll->inventory = 0;
+      laszip_dll->inventory = nullptr;
     }
 
     if (laszip_dll->lax_index)

@@ -13,7 +13,7 @@
 
   COPYRIGHT:
 
-    (c) 2007-2022, rapidlasso GmbH - fast tools to catch reality
+    (c) 2007-2023, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
     terms of the Apache Public License 2.0 published by the Apache Software
