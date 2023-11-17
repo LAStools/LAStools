@@ -25,6 +25,7 @@
   
   CHANGE HISTORY:
   
+     2 May 2023 -- adding support of COPC spatial index standard
     21 August 2012 -- created after swimming in the Main river 3 days in a row
   
 ===============================================================================
@@ -46,12 +47,15 @@ public:
 
   void set_index(LASindex* index);
   LASindex* get_index() const;
+  void set_copcindex(COPCindex* copcindex);
+  COPCindex* get_copcindex() const;
   void set_filter(LASfilter* filter);
   void set_transform(LAStransform* transform);
 
   BOOL inside_tile(const F32 ll_x, const F32 ll_y, const F32 size);
   BOOL inside_circle(const F64 center_x, const F64 center_y, const F64 radius);
   BOOL inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
+  BOOL inside_copc_depth(const U8 mode, const I32 depth, const F32 resolution);
 
   BOOL seek(const I64 p_index){ return FALSE; };
 

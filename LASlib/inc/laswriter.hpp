@@ -25,6 +25,7 @@
 
   CHANGE HISTORY:
 
+    14 June 2023 -- add tell() to the writers to be able to write copc files
     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     17 August 2017 -- switch on "native LAS 1.4 extension". turns off with '-no_native'.
     29 March 2017 -- enable "native LAS 1.4 extension" for LASzip via '-native'
@@ -62,6 +63,7 @@ public:
 
   virtual BOOL update_header(const LASheader* header, BOOL use_inventory=FALSE, BOOL update_extra_bytes=FALSE) = 0;
   virtual I64 close(BOOL update_npoints=TRUE) = 0;
+  virtual I64 tell() { return 0; };
 
   void dealloc();
 

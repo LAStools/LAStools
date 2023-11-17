@@ -31,6 +31,7 @@
   
   CHANGE HISTORY:
   
+    9 November 2022 -- support of COPC VLR and EVLR
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 
     1 February 2017 -- better support for OGC WKT strings in VLRs or EVLRs
     22 June 2016 -- set default of VLR header "reserved" to 0 instead of 0xAABB
@@ -158,6 +159,39 @@ private:
   U8 data[26];
 };
 
+class LASvlr_copc_info
+{
+public:
+  F64 center_x;  // Actual (unscaled) X coordinate of center of octree
+  F64 center_y;  // Actual (unscaled) Y coordinate of center of octree
+  F64 center_z;  // Actual (unscaled) Z coordinate of center of octree
+  F64 halfsize;  // Perpendicular distance from the center to any side of the root node.
+  F64 spacing;   // Space between points at the root node. This value is halved at each octree level
+  U64 root_hier_offset; // File offset to the first hierarchy page
+  U64 root_hier_size;   // Size of the first hierarchy page in bytes
+  F64 gpstime_minimum;    // Minimum of GPSTime
+  F64 gpstime_maximum;   // Maximum of GPSTime
+  U64 reserved[11];    // Must be 0
+};
+
+class LAScopc_voxelkey
+{
+public:
+  I32 depth;
+  I32 x;
+  I32 y;
+  I32 z;
+};
+
+class LASvlr_copc_entry
+{
+public:
+  LAScopc_voxelkey key;
+  U64 offset;
+  I32 byte_size;
+  I32 point_count;
+};
+
 class LASheader : public LASquantizer, public LASattributer
 {
 public:
@@ -210,6 +244,11 @@ public:
   CHAR* vlr_geo_ogc_wkt;
   LASvlr_classification* vlr_classification;
   LASvlr_wave_packet_descr** vlr_wave_packet_descr;
+
+  // LAZ 1.4 format 6 7 8 with COPC only
+  U32 number_of_copc_entries;
+  LASvlr_copc_info* vlr_copc_info;
+  LASvlr_copc_entry* vlr_copc_entries;
 
   LASzip* laszip;
   LASvlr_lastiling* vlr_lastiling;
@@ -331,6 +370,10 @@ public:
       vlr_classification = 0;
       if (vlr_wave_packet_descr) delete [] vlr_wave_packet_descr;
       vlr_wave_packet_descr = 0;
+      if (vlr_copc_info) delete vlr_copc_info;
+      vlr_copc_info = 0;
+      if (vlr_copc_entries) delete [] vlr_copc_entries;
+      vlr_copc_entries = 0;
       number_of_variable_length_records = 0;
     }
   };
@@ -545,7 +588,7 @@ public:
       offset_to_point_data += 54;
       vlrs = (LASvlr*)malloc(sizeof(LASvlr));
     }
-    memset(&(vlrs[i]), 0, sizeof(LASvlr));
+    memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
     vlrs[i].reserved = 0; // used to be 0xAABB
     strncpy(vlrs[i].user_id, user_id, 16);
     vlrs[i].record_id = record_id;
@@ -921,6 +964,23 @@ public:
     {
       remove_vlr("LASF_Projection", 2111);
       vlr_geo_ogc_wkt_math = 0;
+    }
+  }
+
+  void del_copc()
+  {
+    if (vlr_copc_info)
+    {
+      remove_vlr("copc", 1);
+	  delete vlr_copc_info;
+      vlr_copc_info = 0;
+    }
+
+    if (vlr_copc_entries)
+    {
+      remove_evlr("copc", 1000);
+      delete[] vlr_copc_entries;
+      vlr_copc_entries = 0;
     }
   }
 

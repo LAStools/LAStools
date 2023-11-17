@@ -30,6 +30,7 @@
   
   CHANGE HISTORY:
   
+     2 May 2023 -- adding support of COPC spatial index standard
     17 July 2012 -- created after converting the LASzip paper from LaTeX to Word
   
 ===============================================================================
@@ -68,6 +69,7 @@ public:
   BOOL inside_tile(const F32 ll_x, const F32 ll_y, const F32 size);
   BOOL inside_circle(const F64 center_x, const F64 center_y, const F64 radius);
   BOOL inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
+  BOOL inside_copc_depth(const U8 mode, const I32 depth, const F32 resolution);
 
   I32 get_format() const;
 

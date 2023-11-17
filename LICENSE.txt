@@ -31,6 +31,7 @@
     * lasprecision
     * LASzip
     * LASlib (with LASzip) - the API used by LAStools.
+    * lascopcindex
 
   These are also "free" to use but not (yet) available in open source.
 

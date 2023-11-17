@@ -322,6 +322,11 @@ int main(int argc, char *argv[])
         laswriteopener.make_file_name(0, file_number);
         file_number++;
         laswriter = laswriteopener.open(&lasreader->header);
+        if (laswriter == 0)
+        {
+          fprintf(stderr, "ERROR: could not open laswriter\n");
+          byebye(true, argc==1);
+        }
       }
       laswriter->write_point(&lasreader->point);
       laswriter->update_inventory(&lasreader->point);

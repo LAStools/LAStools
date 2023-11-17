@@ -74,6 +74,7 @@ public:
 
   BOOL update_header(const LASheader* header, BOOL use_inventory=FALSE, BOOL update_extra_bytes=FALSE);
   I64 close(BOOL update_npoints=TRUE);
+  I64 tell();
 
   LASwriterLAS();
   ~LASwriterLAS();

@@ -51,6 +51,7 @@ set(LAZ_SRC
 	arithmeticencoder.cpp
 	arithmeticmodel.cpp
 	lasindex.cpp
+	lascopc.cpp
 	lasquadtree.cpp
 	lasinterval.cpp
 	laszip.cpp

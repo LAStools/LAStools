@@ -35,6 +35,7 @@
 #include "bytestreamin_istream.hpp"
 #include "lasreadpoint.hpp"
 #include "lasindex.hpp"
+#include "lascopc.hpp"
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -412,7 +413,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
 
   if (header.number_of_variable_length_records)
   {
-    header.vlrs = (LASvlr*)malloc(sizeof(LASvlr)*header.number_of_variable_length_records);
+    header.vlrs = (LASvlr*)calloc(header.number_of_variable_length_records, sizeof(LASvlr));
 
     for (i = 0; i < header.number_of_variable_length_records; i++)
     {
@@ -871,6 +872,43 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
         i--;
         header.number_of_variable_length_records--;
       }
+      else if (strcmp(header.vlrs[i].user_id, "copc") == 0)
+      {
+        if (header.vlrs[i].data)
+        {
+          if (header.vlrs[i].record_id == 1) // COPC info
+          {
+            if (i != 0)
+            {
+              fprintf(stderr, "WARNING: COPC VLR info should be the first vlr (not specification-conform)\n");
+            }
+
+            if (header.version_major == 1 && header.version_minor == 4 && (header.point_data_format & 0x3F) >= 6 && (header.point_data_format & 0x3F) <= 8)
+            {
+              if (!header.vlr_copc_info)
+              {
+                // Unlike e.g. vlr_geo_ogc_wkt or vlr_classification, vlr_copc_info is not a pointer to the VLR payload (LASvlr_copc_info*)header.vlrs[i].data
+                // Instead we use a copy. This allows to remove the COPC VLR later and maintain the COPC index information for a COPC aware reader but writers
+                // will never receive any COPC data
+                header.vlr_copc_info = new LASvlr_copc_info;
+                memcpy(header.vlr_copc_info, header.vlrs[i].data, sizeof(LASvlr_copc_info));
+              }
+              else
+              {
+                fprintf(stderr, "WARNING: variable length records contain more than one copc info\n");
+              }
+            }
+            else
+            {
+              fprintf(stderr, "WARNING: COPC VLR info should belong in LAZ file 1.4 pdrf 6-8 not LAZ %u.%u pdrf %u (not specification-conform).\n", header.version_major, header.version_minor, header.point_data_format);
+            }
+          }
+        }
+        else
+        {
+          fprintf(stderr, "WARNING: no payload for copc (not specification-conform).\n");
+        }
+      }
     }
   }
 
@@ -902,7 +940,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
         I64 here = stream->tell();
         stream->seek(header.start_of_first_extended_variable_length_record);
 
-        header.evlrs = (LASevlr*)malloc(sizeof(LASevlr)*header.number_of_extended_variable_length_records);
+		header.evlrs = (LASevlr*)calloc(header.number_of_extended_variable_length_records, sizeof(LASevlr));
 
         // read the extended variable length records into the header
 
@@ -1235,10 +1273,55 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             i--;
             header.number_of_extended_variable_length_records--;
           }
+          else if (strcmp(header.evlrs[i].user_id, "copc") == 0)
+          {
+            if (header.evlrs[i].data)
+            {
+              if (header.evlrs[i].record_id == 1000) // COPC EPT hierarchy
+              {
+                if (header.vlr_copc_info)
+                {
+                  // COPC offsets values are relative to the beginning of the file. We need to compute
+                  // an extra offset relative to the beginning of this evlr payload
+                  U64 offset_to_first_copc_entry = 60 + header.start_of_first_extended_variable_length_record;
+                  for (j = 0; j < i; j++) { offset_to_first_copc_entry += 60 + header.evlrs[j].record_length_after_header; }
+
+                  if (!EPToctree::set_vlr_entries(header.evlrs[i].data, offset_to_first_copc_entry, header))
+                  {
+                    fprintf(stderr, "WARNING: invalid COPC EPT hierarchy (not specification-conform).\n");
+					          delete header.vlr_copc_info;
+                    header.vlr_copc_info = 0;
+                  }
+                }
+                else
+                {
+                  fprintf(stderr, "WARNING: no COPC VLR info before COPC EPT hierarchy EVLR (not specification-conform).\n");
+                }
+              }
+              else
+              {
+                fprintf(stderr, "WARNING: unknown COPC EVLR (not specification-conform).\n");
+              }
+            }
+            else
+            {
+              fprintf(stderr, "WARNING: no payload for COPC EVLR (not specification-conform).\n");
+            }
+          }
         }
         stream->seek(here);
       }
     }
+  }
+
+  // remove copc vlrs: the header contains two dynamically allocated pointers (vlr_copc_info and vlr_copc_entries) used to build a spatial index.
+  // COPC VLR and EVLR are removed and the header becomes the header of a regular LAZ file.
+  // This way the writers will never be able to produce and invalid the COPC file because we will never actually encounter a COPC header outside this method.
+  if (!keep_copc)
+  {
+    header.remove_vlr("copc", 1);     // copc info
+    header.remove_vlr("copc", 10000); // copc extent (deprecated and no longer part of the specs)
+    header.remove_evlr("copc", 1000); // ept hierachy
   }
 
   // check the compressor state
@@ -1478,6 +1561,7 @@ LASreaderLAS::LASreaderLAS()
   stream = 0;
   delete_stream = TRUE;
   reader = 0;
+  keep_copc = FALSE;
 }
 
 LASreaderLAS::~LASreaderLAS()

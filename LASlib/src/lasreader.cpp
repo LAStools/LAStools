@@ -49,6 +49,7 @@
 #include "lasreaderbuffered.hpp"
 #include "lasreaderstored.hpp"
 #include "lasreaderpipeon.hpp"
+#include "lascopc.hpp"
 
 #include <stdlib.h>
 #include <string.h>
@@ -60,6 +61,7 @@ LASreader::LASreader()
 	read_simple = &LASreader::read_point_default;
 	read_complex = 0;
 	index = 0;
+	copc_index = 0;
 	filter = 0;
 	transform = 0;
 	ignore = 0;
@@ -86,6 +88,7 @@ LASreader::LASreader()
 LASreader::~LASreader()
 {
 	if (index) delete index;
+	if (copc_index) delete copc_index;
 	if (transform) transform->check_for_overflow();
 }
 
@@ -98,6 +101,15 @@ void LASreader::set_index(LASindex* index)
 {
 	if (this->index) delete this->index;
 	this->index = index;
+}
+
+void LASreader::set_copcindex(COPCindex* copc_index)
+{
+  if (!this->copc_index)
+  {
+    if (this->copc_index) delete this->copc_index;
+    this->copc_index = copc_index;
+  }
 }
 
 void LASreader::set_filter(LASfilter* filter)
@@ -259,6 +271,11 @@ BOOL LASreader::inside_circle(const F64 center_x, const F64 center_y, const F64 
 			if (index) index->intersect_circle(center_x, center_y, radius);
 			read_complex = &LASreader::read_point_inside_circle_indexed;
 		}
+		else if (copc_index)
+		{
+		  copc_index->intersect_circle(center_x, center_y, radius);
+		  read_complex = &LASreader::read_point_inside_circle_copc_indexed;
+		}
 		else
 		{
 			read_complex = &LASreader::read_point_inside_circle;
@@ -270,6 +287,11 @@ BOOL LASreader::inside_circle(const F64 center_x, const F64 center_y, const F64 
 		{
 			if (index) index->intersect_circle(center_x, center_y, radius);
 			read_simple = &LASreader::read_point_inside_circle_indexed;
+		}
+		else if (copc_index)
+		{
+		  copc_index->intersect_circle(center_x, center_y, radius);
+		  read_simple = &LASreader::read_point_inside_circle_copc_indexed;
 		}
 		else
 		{
@@ -312,6 +334,11 @@ BOOL LASreader::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max
 			index->intersect_rectangle(min_x, min_y, max_x, max_y);
 			read_complex = &LASreader::read_point_inside_rectangle_indexed;
 		}
+		else if (copc_index)
+		{
+		  copc_index->intersect_rectangle(min_x, min_y, max_x, max_y);
+		  read_complex = &LASreader::read_point_inside_rectangle_copc_indexed;
+		}
 		else
 		{
 			read_complex = &LASreader::read_point_inside_rectangle;
@@ -324,11 +351,47 @@ BOOL LASreader::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max
 			index->intersect_rectangle(min_x, min_y, max_x, max_y);
 			read_simple = &LASreader::read_point_inside_rectangle_indexed;
 		}
+		else if (copc_index)
+		{
+		  copc_index->intersect_rectangle(min_x, min_y, max_x, max_y);
+		  read_simple = &LASreader::read_point_inside_rectangle_copc_indexed;
+		}
 		else
 		{
 			read_simple = &LASreader::read_point_inside_rectangle;
 		}
 	}
+	return TRUE;
+}
+
+BOOL LASreader::inside_copc_depth(const U8 mode, const I32 depth, const F32 resolution)
+{
+    if (!header.vlr_copc_info)
+        return FALSE;
+
+    inside_depth = mode;
+    copc_depth = depth;
+    copc_resolution = resolution;
+
+	if (mode == 0)
+		return FALSE;
+	else if (mode == 1)
+		copc_index->set_depth_limit(depth);
+	else if (mode == 2)
+		copc_index->set_resolution(resolution);
+	else
+		return FALSE;
+
+	// If inside we are already using read_point_inside_[rectangle|circle]_copc_indexed
+	// We do not overwrite read_[simple|complex] with a non spatial aware reader.
+	if (inside)
+		return TRUE;
+
+	if (filter || transform)
+		read_complex = &LASreader::read_point_inside_depth_copc_indexed;
+	else
+		read_simple = &LASreader::read_point_inside_depth_copc_indexed;
+
 	return TRUE;
 }
 
@@ -368,6 +431,15 @@ BOOL LASreader::read_point_inside_circle_indexed()
 	return FALSE;
 }
 
+BOOL LASreader::read_point_inside_circle_copc_indexed()
+{
+	while (copc_index->seek_next((LASreader*)this))
+  	{
+    	if (read_point_default() && point.inside_circle(c_center_x, c_center_y, c_radius_squared)) return TRUE;
+  	}
+	return FALSE;
+}
+
 BOOL LASreader::read_point_inside_rectangle()
 {
 	while (read_point_default())
@@ -384,6 +456,33 @@ BOOL LASreader::read_point_inside_rectangle_indexed()
 		if (read_point_default() && point.inside_rectangle(r_min_x, r_min_y, r_max_x, r_max_y)) return TRUE;
 	}
 	return FALSE;
+}
+
+BOOL LASreader::read_point_inside_rectangle_copc_indexed()
+{
+	bool inrect;
+	while (copc_index->seek_next((LASreader*)this))
+	{
+		inrect = point.get_x() >= r_min_x && point.get_x() <= r_max_x && point.get_y() >= r_min_y && point.get_y() <= r_max_y;
+
+		if (read_point_default() && point.inside_rectangle(r_min_x, r_min_y, r_max_x, r_max_y))
+	    	{
+	      		return TRUE;
+	    	}
+  	}
+  	return FALSE;
+}
+
+BOOL LASreader::read_point_inside_depth_copc_indexed()
+{
+	while (copc_index->seek_next((LASreader*)this))
+	{
+		if (read_point_default())
+		{
+      			return TRUE;
+    		}
+  	}
+  	return FALSE;
 }
 
 BOOL LASreader::read_point_none()
@@ -573,6 +672,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			if (inside_tile) lasreadermerged->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 			if (inside_circle) lasreadermerged->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 			if (inside_rectangle) lasreadermerged->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+			if (inside_depth) lasreadermerged->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
 			LASreader* lasreader = 0;
 			if (stored)
 			{
@@ -796,6 +896,8 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					lasreaderlas = new LASreaderLASreoffset(offset[0], offset[1], offset[2]);
 				else
 					lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
+
+				lasreaderlas->set_keep_copc(keep_copc);
 				if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
 				{
 					fprintf(stderr, "ERROR: cannot open lasreaderlas with file name '%s'\n", file_name);
@@ -806,7 +908,31 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (index->read(file_name))
 					lasreaderlas->set_index(index);
 				else
+				{
 					delete index;
+					index = 0;
+				}
+
+				// Creation of the COPC index
+				if (lasreaderlas->header.vlr_copc_entries)
+				{
+					if (index)
+					{
+						fprintf(stderr, "WARNING: both LAX file and COPC spatial indexing registered. COPC has the precedence.\n");
+						delete index;
+						index = 0;
+					}
+
+					COPCindex *copc_index = new COPCindex(lasreaderlas->header);
+					if (copc_stream_order == 0) 	 copc_index->set_stream_ordered_by_chunk();
+					else if (copc_stream_order == 1) copc_index->set_stream_ordered_spatially();
+					else if (copc_stream_order == 2) copc_index->set_stream_ordered_by_depth();
+					lasreaderlas->set_copcindex(copc_index);
+
+					// If no user-defined query we force a query anyway to never read a copc file in order but
+					// instead we enforce the use of the index to read in a spatially coherent order.
+					if (!inside_circle && !inside_rectangle && !inside_depth) set_max_depth(I32_MAX);
+				}
 				if (files_are_flightlines)
 				{
 					lasreaderlas->header.file_source_ID = file_name_current + files_are_flightlines + files_are_flightlines_index;
@@ -821,6 +947,17 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_rectangle) lasreaderlas->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
 				else if (inside_tile) lasreaderlas->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				else if (inside_circle) lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
+				if (inside_depth)
+				{
+					if (!lasreaderlas->get_copcindex())
+					{
+						fprintf(stderr, "ERROR: queries with a depth limit are restrited to COPC files.\n");
+						delete lasreaderlas;
+						return 0;
+					}
+
+					lasreaderlas->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
+				}
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -1417,6 +1554,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			if (inside_tile) lasreaderlas->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 			if (inside_circle) lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 			if (inside_rectangle) lasreaderlas->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+			if (inside_depth) lasreaderlas->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
 			LASreader* lasreader = 0;
 			if (stored)
 			{
@@ -1504,6 +1642,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				else if (inside_tile) lasreadermerged->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				else lasreadermerged->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 			}
+			if (inside_depth) lasreadermerged->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
 			return TRUE;
 		}
 		else if ((buffer_size > 0) && ((file_name_number > 1) || (neighbor_file_name_number > 0)))
@@ -1521,6 +1660,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				else if (inside_tile) lasreaderbuffered->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				else lasreaderbuffered->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 			}
+			if (inside_depth) lasreaderbuffered->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
 			if (!remain_buffered) lasreaderbuffered->remove_buffer();
 			return TRUE;
 		}
@@ -1542,6 +1682,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 					else if (inside_tile) lasreaderlas->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 					else lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				}
+				if (inside_depth) lasreaderlas->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
 				return TRUE;
 			}
 			else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN"))
@@ -1719,6 +1860,11 @@ void LASreadOpener::usage() const
 	fprintf(stderr, "  -inside min_x min_y max_x max_y\n");
 	fprintf(stderr, "  -inside_tile ll_x ll_y size\n");
 	fprintf(stderr, "  -inside_circle center_x center_y radius\n");
+	fprintf(stderr, "Fast AOI Queries for LAZ 1.4 with spatial indexing COPC VLR\n");
+	fprintf(stderr, "  -inside min_x min_y max_x max_y\n");
+	fprintf(stderr, "  -inside_circle center_x center_y radius\n");
+	fprintf(stderr, "  -max_depth 3\n");
+	fprintf(stderr, "  -resolution 0.1\n");
 }
 
 BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
@@ -2230,6 +2376,28 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 				set_offset(offset);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; i += 3;
 			}
+			else if (strcmp(argv[i],"-resolution") == 0) // copc
+			{
+				if ((i+1) >= argc)
+				{
+					fprintf(stderr, "ERROR: '%s' needs 1 argument: resolution\n", argv[i]);
+				  	return FALSE;
+				}
+				F32 resolution;
+				if (sscanf(argv[i+1], "%f", &(resolution)) != 1)
+				{
+				  	fprintf(stderr,  "ERROR: '%s' needs 1 argument: resolution, but '%s' is not a valid resolution", argv[i], argv[i+1]);
+				  	return FALSE;
+				}
+				if (resolution <= 0)
+				{
+				  	fprintf(stderr,  "ERROR: '%s' needs 1 argument: resolution, but %lf is not a valid resolution", argv[i], resolution);
+				  	return FALSE;
+				}
+
+				set_resolution(resolution);
+				*argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+			}
 		}
 		else if (strcmp(argv[i], "-unique") == 0)
 		{
@@ -2252,6 +2420,21 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				set_stored(TRUE);
 				*argv[i] = '\0';
+			}
+			else if (strcmp(argv[i],"-stream_order_spatial") == 0) // COPC only
+			{
+			  set_copc_stream_ordered_spatially();
+			  *argv[i]='\0';
+			}
+			else if (strcmp(argv[i],"-stream_order_normal") == 0) // COPC only
+			{
+			  set_copc_stream_ordered_by_chunk();
+			  *argv[i]='\0';
+			}
+			else if (strcmp(argv[i],"-stream_order_level") == 0) // COPC only
+			{
+			  set_copc_stream_ordered_by_level();
+			  *argv[i]='\0';
 			}
 		}
 		else if (strcmp(argv[i], "-lof") == 0)
@@ -2394,6 +2577,30 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 		{
 			set_populate_header(FALSE);
 			*argv[i] = '\0';
+		}
+		else if (strcmp(argv[i], "-max_depth") == 0) // copc
+		{
+			if ((i + 1) >= argc)
+			{
+				fprintf(stderr, "ERROR: '%s' needs 1 argument: depth\n", argv[i]);
+				return FALSE;
+			}
+			I32 depth;
+			if (sscanf(argv[i + 1], "%d", &(depth)) != 1)
+			{
+				fprintf(stderr, "ERROR: '%s' needs 1 argument: depth, but '%s' is not a valid depth\n", argv[i], argv[i + 1]);
+				return FALSE;
+			}
+			if (depth < 0)
+			{
+				fprintf(stderr, "ERROR: '%s' needs 1 argument: depth, but %d is not a valid depth\n", argv[i], depth);
+				return FALSE;
+			}
+
+			set_max_depth(depth);
+			*argv[i] = '\0';
+			*argv[i + 1] = '\0';
+			i += 1;
 		}
 	}
 
@@ -2954,7 +3161,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
 	{
 		// find end of line
 		I32 len = (I32)strlen(line) - 1;
-		// remove extra white spaces and line return at the end 
+		// remove extra white spaces and line return at the end
 		while ((len > 0) && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
 		{
 			line[len] = '\0';
@@ -2983,7 +3190,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
 			num++;
 			while ((num < len) && (line[num] != ',')) num++;
 			num++;
-			// remove extra white spaces at the beginning 
+			// remove extra white spaces at the beginning
 			while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++;
 			add_file_name(&line[num], ID, npoints, min_x, min_y, max_x, max_y, unique);
 		}
@@ -2997,7 +3204,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
 				num = 0;
 				while ((num < len) && (line[num] != ',')) num++;
 				num++;
-				// remove extra white spaces at the beginning 
+				// remove extra white spaces at the beginning
 				while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++;
 				add_file_name(&line[num], ID, unique);
 			}
@@ -3113,7 +3320,7 @@ BOOL LASreadOpener::add_neighbor_list_of_files(const CHAR* neighbor_list_of_file
 	{
 		// find end of line
 		I32 len = (I32)strlen(line) - 1;
-		// remove extra white spaces and line return at the end 
+		// remove extra white spaces and line return at the end
 		while ((len > 0) && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012')))
 		{
 			line[len] = '\0';
@@ -3141,7 +3348,7 @@ BOOL LASreadOpener::add_neighbor_list_of_files(const CHAR* neighbor_list_of_file
 			num++;
 			while ((num < len) && (line[num] != ',')) num++;
 			num++;
-			// remove extra white spaces at the beginning 
+			// remove extra white spaces at the beginning
 			while ((num < len) && ((line[num] == ' ') || (line[num] == '\t')))  num++;
 			add_neighbor_file_name(&line[num], npoints, min_x, min_y, max_x, max_y, unique);
 		}
@@ -3372,6 +3579,11 @@ void LASreadOpener::set_keep_lastiling(BOOL keep_lastiling)
 	this->keep_lastiling = keep_lastiling;
 }
 
+void LASreadOpener::set_keep_copc(BOOL keep_copc)
+{
+	this->keep_copc = keep_copc;
+}
+
 void LASreadOpener::set_pipe_on(BOOL pipe_on)
 {
 	this->pipe_on = pipe_on;
@@ -3417,6 +3629,18 @@ void LASreadOpener::set_inside_rectangle(const F64 min_x, const F64 min_y, const
 	inside_rectangle[1] = min_y;
 	inside_rectangle[2] = max_x;
 	inside_rectangle[3] = max_y;
+}
+
+void  LASreadOpener::set_max_depth(const I32 max_depth)
+{
+  	inside_depth = 1;
+  	copc_depth = max_depth;
+}
+
+void  LASreadOpener::set_resolution(const F32 resolution)
+{
+  	inside_depth = 2;
+  	copc_resolution = resolution;
 }
 
 BOOL LASreadOpener::active() const
@@ -3479,6 +3703,7 @@ LASreadOpener::LASreadOpener()
 	skip_lines = 0;
 	populate_header = FALSE;
 	keep_lastiling = FALSE;
+	keep_copc = FALSE;
 	pipe_on = FALSE;
 	unique = FALSE;
 	file_name_number = 0;
@@ -3494,6 +3719,12 @@ LASreadOpener::LASreadOpener()
 	transform = 0;
 	ignore = 0;
 	temp_file_base = 0;
+
+	// COPC
+	inside_depth = 0;
+	copc_stream_order = 1;
+	copc_resolution = 0;
+	copc_depth = -1;
 }
 
 LASreadOpener::~LASreadOpener()

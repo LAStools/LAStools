@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    9 November 2022 -- support of COPC VLR and EVLR
     13 June 2022 -- support unicode filenames
     10 July 2018 -- user must set seek-ability of istream (hard to determine) 
     19 April 2017 -- support for selective decompression for new LAS 1.4 points 
@@ -62,6 +63,7 @@ class LASreaderLAS : public LASreader
 public:
 
   void set_delete_stream(BOOL delete_stream=TRUE) { this->delete_stream = delete_stream; };
+  void set_keep_copc(BOOL keep_copc) { this->keep_copc = keep_copc; };
 
   BOOL open(const char* file_name, I32 io_buffer_size=LAS_TOOLS_IO_IBUFFER_SIZE, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
   BOOL open(FILE* file, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
@@ -88,6 +90,7 @@ private:
   BOOL delete_stream;
   LASreadPoint* reader;
   BOOL checked_end;
+  BOOL keep_copc;
 };
 
 class LASreaderLASrescale : public virtual LASreaderLAS
