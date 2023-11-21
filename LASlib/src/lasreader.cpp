@@ -105,11 +105,8 @@ void LASreader::set_index(LASindex* index)
 
 void LASreader::set_copcindex(COPCindex* copc_index)
 {
-  if (!this->copc_index)
-  {
     if (this->copc_index) delete this->copc_index;
     this->copc_index = copc_index;
-  }
 }
 
 void LASreader::set_filter(LASfilter* filter)
