@@ -1127,9 +1127,9 @@ int main(int argc, char *argv[])
         char* ogc_wkt = 0;
         I32 len = 0;
         geoprojectionconverter.set_projection_from_geo_keys(lasheader->vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasheader->vlr_geo_key_entries, lasheader->vlr_geo_ascii_params, lasheader->vlr_geo_double_params);
-        if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
+        if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
         {
-          fprintf(stderr, "WARNING: cannot convert CRS from GeoTIF to OGC WKT.\n");
+          fprintf(stderr, "WARNING: cannot convert CRS from GeoTIFF to OGC WKT.\n");
         }
 
         if (ogc_wkt)
