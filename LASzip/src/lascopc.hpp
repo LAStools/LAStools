@@ -191,7 +191,7 @@ protected:
   std::unordered_map<EPTkey, EPToctant, EPTKeyHasher> registry;
 };
 
-class COPCindex : private EPToctree
+class COPCindex : public EPToctree
 {
 public:
   COPCindex(const LASheader& header);

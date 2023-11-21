@@ -62,6 +62,9 @@ LASreader::LASreader()
 	read_complex = 0;
 	index = 0;
 	copc_index = 0;
+	copc_stream_order = 0;
+	copc_resolution = 0;
+	copc_depth = I32_MAX;
 	filter = 0;
 	transform = 0;
 	ignore = 0;
@@ -105,11 +108,8 @@ void LASreader::set_index(LASindex* index)
 
 void LASreader::set_copcindex(COPCindex* copc_index)
 {
-  if (!this->copc_index)
-  {
     if (this->copc_index) delete this->copc_index;
     this->copc_index = copc_index;
-  }
 }
 
 void LASreader::set_filter(LASfilter* filter)
@@ -650,6 +650,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			lasreadermerged->set_translate_scan_angle(translate_scan_angle);
 			lasreadermerged->set_scale_scan_angle(scale_scan_angle);
 			lasreadermerged->set_io_ibuffer_size(io_ibuffer_size);
+			lasreadermerged->set_copc_stream_order(copc_stream_order); 
 			if (file_names_ID)
 			{
 				for (file_name_current = 0; file_name_current < file_name_number; file_name_current++) lasreadermerged->add_file_name(file_names[file_name_current], file_names_ID[file_name_current]);
