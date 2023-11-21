@@ -66,6 +66,7 @@ public:
   void set_skip_lines(I32 skip_lines);
   void set_populate_header(BOOL populate_header);
   void set_keep_lastiling(BOOL keep_lastiling);
+  void set_copc_stream_order(U8 order);
   BOOL open();
   BOOL reopen();
 

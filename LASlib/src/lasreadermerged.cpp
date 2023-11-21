@@ -634,6 +634,12 @@ void LASreaderMerged::set_keep_lastiling(BOOL keep_lastiling)
   this->keep_lastiling = keep_lastiling;
 }
 
+void LASreaderMerged::set_copc_stream_order(U8 order)
+{
+  if (order < 0 || order > 2) order = 0;
+  copc_stream_order = order;
+}
+
 BOOL LASreaderMerged::open()
 {
   if (file_name_number == 0)
@@ -1529,6 +1535,9 @@ BOOL LASreaderMerged::open_next_file()
         }
 
         COPCindex *copc_index = new COPCindex(lasreaderlas->header);
+        if (copc_stream_order == 0) 	 copc_index->set_stream_ordered_by_chunk();
+        else if (copc_stream_order == 1) copc_index->set_stream_ordered_spatially();
+        else if (copc_stream_order == 2) copc_index->set_stream_ordered_by_depth();
         lasreaderlas->set_copcindex(copc_index);
       }
     }
