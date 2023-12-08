@@ -920,8 +920,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					if (index)
 					{
 						fprintf(stderr, "WARNING: both LAX file and COPC spatial indexing registered. COPC has the precedence.\n");
-						delete index;
-						index = 0;
+				    	lasreaderlas->set_index(0);
 					}
 
 					COPCindex *copc_index = new COPCindex(lasreaderlas->header);
