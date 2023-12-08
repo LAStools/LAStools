@@ -24,7 +24,8 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   
   CHANGE HISTORY:
-  
+
+     8 December 2023 -- Fix memory leak
     26 June 2021 -- new LASkdtreePoint after four weeks of memoy pain in Samara
     26 October 2019 -- created at LoCoworking after three days of rain in Samara
   

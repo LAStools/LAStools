@@ -1530,8 +1530,7 @@ BOOL LASreaderMerged::open_next_file()
         if (index)
         {
           fprintf(stderr, "WARNING: both LAX file and COPC spatial indexing registered. COPC has the precedence.\n");
-          delete index;
-          index = 0;
+				  lasreaderlas->set_index(0);
         }
 
         COPCindex *copc_index = new COPCindex(lasreaderlas->header);
