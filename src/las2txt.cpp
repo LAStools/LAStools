@@ -28,6 +28,8 @@
 
   CHANGE HISTORY:
 
+    19 September 2023 -- added support of custom extented -parse flags. Support of (hsl) and (hsv) flags
+    18 September 2023 -- added -coldesc argument to add column description
      7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     22 November 2017 -- parse attributes with indices > 9 by bracketing (12) them
     19 April 2017 -- 1st example for selective decompression for new LAS 1.4 points
@@ -92,6 +94,8 @@ void usage(bool error=false, bool wait=false)
   fprintf(stderr,"V - for the waVeform from the *.wdp file (LAS 1.3 only)\n");
   fprintf(stderr,"E - for an extra string. specify it with '-extra <string>'\n");
   fprintf(stderr,"0 through 9 - for additional attributes stored as extra bytes\n");
+  fprintf(stderr,"Additionnal strings (HSV), (HSL), (hsv) and (hsl) convert RGB\n");
+	fprintf(stderr,"into HSV or HSL colors models in range [0..360/100] or [0..1]\n");
   fprintf(stderr,"---------------------------------------------\n");
   fprintf(stderr,"The '-sep space' flag specifies what separator to use. The\n");
   fprintf(stderr,"default is a space but 'tab', 'comma', 'colon', 'hyphen',\n");
@@ -565,6 +569,29 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
   return TRUE;
 }
 
+enum extended_flags{HSV = -1, HSL = -2, HSV255 = -3, HSL255 = -4};
+
+static void parse_extended_flags(char *parse_string)
+{
+  const char *extended_flags[] = {"(HSV)", "(HSL)", "(hsv)", "(hsl)"};
+  const char replacement_codes[] = {HSV255, HSL255, HSV, HSL};
+  I32 nflags = (I32)(sizeof(extended_flags) / sizeof(char*));
+
+  for (I32 i = 0; i < nflags; i++)
+  {
+    char *found = strstr(parse_string, extended_flags[i]);
+
+    while (found)
+    {
+      int len_flag = (int)strlen(extended_flags[i]);
+      int len_remaining = (int)strlen(found + len_flag);
+      *found = replacement_codes[i];
+      memmove(found + 1, found + len_flag, len_remaining + 1);
+      found = strstr(parse_string, extended_flags[i]);
+    }
+  }
+}
+
 #ifdef COMPILE_WITH_GUI
 extern int las2txt_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 #endif
@@ -595,6 +622,7 @@ int main(int argc, char *argv[])
   CHAR* extra_string = 0;
   CHAR printstring[512];
   double start_time = 0.0;
+  bool coldesc = false;
 
   LASreadOpener lasreadopener;
   LASwriteOpener laswriteopener;
@@ -703,6 +731,7 @@ int main(int argc, char *argv[])
       i++;
       if (parse_string) free(parse_string);
       parse_string = LASCopyString(argv[i]);
+      parse_extended_flags(parse_string);
     }
     else if (strcmp(argv[i],"-parse_all") == 0)
     {
@@ -758,7 +787,7 @@ int main(int argc, char *argv[])
       }
       else
       {
-        fprintf(stderr, "ERROR: unknown separator '%s'\n",separator);
+        fprintf(stderr, "ERROR: unknown seperator '%s'\n",separator);
         usage(true);
       }
     }
@@ -803,6 +832,10 @@ int main(int argc, char *argv[])
         fprintf(stderr, "ERROR: unknown header comment symbol '%s'\n",argv[i]);
         usage(true);
       }
+    }
+    else if (strcmp(argv[i],"-coldesc") == 0)
+    {
+      coldesc = true;
     }
     else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))
     {
@@ -931,6 +964,10 @@ int main(int argc, char *argv[])
       case 'R': // the red channel of the RGB field
       case 'B': // the blue channel of the RGB field
       case 'G': // the green channel of the RGB field
+      case HSV: // HSV conversion in range [0, 1] (extended flag)
+      case HSL: // HSL conversion in range [0, 1] (extended flag)
+      case HSV255: // HSV conversion in range [0,360] (extended flag)
+      case HSL255: // HSL conversion in range [0,360] (extended flag)
         decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_RGB;
         break;
       case 'I': // the near infrared channel of the RGBI field
@@ -1249,6 +1286,13 @@ int main(int argc, char *argv[])
         if (lasreader->point.have_rgb == false)
           fprintf (stderr, "WARNING: requested 'B' but points do not have RGB\n");
         break;
+      case HSL:
+      case HSV:
+      case HSL255:
+      case HSV255:
+        if (lasreader->point.have_rgb == false)
+          fprintf (stderr, "WARNING: requested 'HSV' or 'HSL' but points do not have RGB\n");
+        break;
       case 'I': // the near infrared channel of the RGBI field
         if (lasreader->point.have_nir == false)
           fprintf (stderr, "WARNING: requested 'I' but points do not have NIR\n");
@@ -1334,6 +1378,73 @@ int main(int argc, char *argv[])
 #else
     if (verbose) fprintf(stderr,"processing %lld points with '%s'.\n", lasreader->npoints, parse_string);
 #endif
+
+    // print the column names in the first line
+    if (coldesc)
+    {
+      int i = 0;
+      while (true)
+      {
+        switch (parse_string[i])
+        {
+        case 'x': fprintf(file_out, "x"); break; // the z coordinate
+        case 'y': fprintf(file_out, "y"); break; // the y coordinate
+        case 'z': fprintf(file_out, "z"); break; // the z coordinate
+        case 'X': fprintf(file_out, "X"); break; // the unscaled and unoffset integer X coordinate
+        case 'Y': fprintf(file_out, "Y"); break;// the unscaled and unoffset integer Y coordinate
+        case 'Z': fprintf(file_out, "Z"); break; // the unscaled and unoffset integer Z coordinate
+        case 't': fprintf(file_out, "gps_time"); break; // the gps-time
+        case 'i': fprintf(file_out, "intensity"); break; // the intensity
+        case 'a': fprintf(file_out, "scan_angle"); break; // the scan angle
+        case 'r': fprintf(file_out, "return_number"); break; // the number of the return
+        case 'c': fprintf(file_out, "classification"); break; // the classification
+        case 'u': fprintf(file_out, "user_data"); break; // the user data
+        case 'n': fprintf(file_out, "number_of_returns"); break; // the number of returns of given pulse
+        case 'p': fprintf(file_out, "point_source_id"); break; // the point source ID
+        case 'e': fprintf(file_out, "edge_of_flight_line"); break; // the edge of flight line flag
+        case 'd': fprintf(file_out, "scan_direction_flag"); break; // the direction of scan flag
+        case 'h': fprintf(file_out, "withheld_flag"); break; // the withheld flag
+        case 'k': fprintf(file_out, "keypoint_flag"); break; // the keypoint flag
+        case 'g': fprintf(file_out, "synthetic_flag"); break; // the synthetic flag
+        case 'o': fprintf(file_out, "overlap_flag"); break; // the overlap flag
+        case 'l': fprintf(file_out, "scanner_channel"); break; // the scanner channel
+        case 'R': fprintf(file_out, "R"); break;// the red channel of the RGB field
+        case 'G': fprintf(file_out, "G"); break; // the green channel of the RGB field
+        case 'B': fprintf(file_out, "B"); break; // the blue channel of the RGB field
+        case 'm': fprintf(file_out, "0-index"); break; // the index of the point (count starts at 0)
+        case 'M': fprintf(file_out, "1-index"); break; // the index of the point (count starts at 1)
+        case '_': fprintf(file_out, "raw_int_X_diff"); break; // the raw integer X difference to the last point
+        case '!': fprintf(file_out, "raw_int_Y_diff"); break; // the raw integer Y difference to the last point
+        case '@': fprintf(file_out, "raw_int_Z_diff"); break; // the raw integer Z difference to the last point
+        case '#': fprintf(file_out, "gpstime_diff"); break; // the gps-time difference to the last point
+        case '$': fprintf(file_out, "R_diff"); break; // the R difference to the last point
+        case '%': fprintf(file_out, "G_diff"); break; // the G difference to the last point
+        case '^': fprintf(file_out, "B_diff"); break; // the B difference to the last point
+        case '&': fprintf(file_out, "bitwise_R_diff"); break; // the byte-wise R difference to the last point
+        case '+': fprintf(file_out, "bitwise_B_diff"); break; // the byte-wise B difference to the last point
+        case 'w': fprintf(file_out, "wavepacket_descriptor_index"); break;// the wavepacket descriptor index
+        case 'W': fprintf(file_out, "wavepacket_descriptor_index%cwavepacket_offset%cwavepacket_size%cwavepacket_location%cXt%cYt%cZt", separator_sign, separator_sign, separator_sign, separator_sign, separator_sign, separator_sign); break; // all wavepacket attributes
+        case 'V': break;
+        case 'E': break;
+        case HSV255: fprintf(file_out, "HSV_H%cHSV_S%cHSV_V", separator_sign, separator_sign); break; // the HSV representation of RGB in [0, 255]
+        case HSL255: fprintf(file_out, "HSL_H%cHSL_S%cHSL_L", separator_sign, separator_sign); break; // the HSL representation of RGB in [0, 255]
+        case HSV: fprintf(file_out, "HSV_h%cHSV_s%cHSV_v", separator_sign, separator_sign); break; // the HSV representation of RGB in [0, 1]
+        case HSL: fprintf(file_out, "HSL_h%cHSL_s%cHSL_l", separator_sign, separator_sign); break; // the HSL representation of RGB in [0, 1]
+        default: break; // must handle extra bytes
+        }
+
+        i++;
+        if (parse_string[i])
+        {
+          fprintf(file_out, "%c", separator_sign);
+        }
+        else
+        {
+          fprintf(file_out, "\012");
+          break;
+        }
+      }
+    }
 
     while (lasreader->read_point())
     {
@@ -1520,6 +1631,30 @@ int main(int argc, char *argv[])
         case 'E': // the extra string
           fprintf(file_out, "%s", extra_string);
           break;
+        case HSV255: { // the HSV representation of RGB
+          F32 hsv[3];
+          lasreader->point.get_hsv(hsv);
+          fprintf(file_out, "%d%c%d%c%d", (U16)(hsv[0]*360), separator_sign, (U8)(hsv[1]*100), separator_sign, (U8)(hsv[2]*100));
+          break;
+        }
+        case HSV: { // the HSV representation of RGB
+          F32 hsv[3];
+          lasreader->point.get_hsv(hsv);
+          fprintf(file_out, "%.3f%c%.3f%c%.3f", hsv[0], separator_sign, hsv[1], separator_sign, hsv[2]);
+          break;
+        }
+        case HSL255: { // the HSL representation of RGB
+          F32 hsl[3];
+          lasreader->point.get_hsl(hsl);
+          fprintf(file_out, "%d%c%d%c%d", (U16)(hsl[0]*360), separator_sign, (U8)(hsl[1]*100), separator_sign, (U8)(hsl[2]*100));
+          break;
+        }
+        case HSL: { // the HSL representation of RGB
+          F32 hsl[3];
+          lasreader->point.get_hsl(hsl);
+          fprintf(file_out, "%.3f%c%.3f%c%.3f", hsl[0], separator_sign, hsl[1], separator_sign, hsl[2]);
+          break;
+        }
         case '0': // the extra attributes
         case '1': // the extra attributes
         case '2': // the extra attributes

@@ -32,7 +32,7 @@
 
 #include "mydefs.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 #include <string.h>
 #include <stdlib.h>

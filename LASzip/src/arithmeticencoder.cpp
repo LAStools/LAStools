@@ -96,7 +96,7 @@
 #include "arithmeticencoder.hpp"
 
 #include <string.h>
-#include <assert.h>
+#include <cassert>
 
 #include <stdio.h>
 

@@ -33,15 +33,14 @@
   
 ===============================================================================
 */
-#ifndef LAS_QUADTREE_HPP
-#define LAS_QUADTREE_HPP
+#pragma once
 
 #include "mydefs.hpp"
 
 class ByteStreamIn;
 class ByteStreamOut;
 
-#define LAS_SPATIAL_QUAD_TREE 0
+constexpr int LAS_SPATIAL_QUAD_TREE = 0;
 
 class LASLIB_DLL LASquadtree
 {
@@ -157,5 +156,3 @@ private:
   void* current_cells;
   U32 next_cell_index;
 };
-
-#endif

@@ -46,7 +46,7 @@
 #include <stdlib.h>
 
 #include <map>
-using namespace std;
+
 
 #include "lasreader.hpp"
 #include "laswriter.hpp"
@@ -68,7 +68,7 @@ public:
   U32 size;
 };
 
-typedef map<U64, OffsetSize> my_offset_size_map;
+typedef std::map<U64, OffsetSize> my_offset_size_map;
 
 void usage(bool error=false, bool wait=false)
 {

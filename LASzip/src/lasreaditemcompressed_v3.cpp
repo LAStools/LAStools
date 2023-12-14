@@ -31,7 +31,7 @@
 
 #include "lasreaditemcompressed_v3.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <string.h>
 
 typedef struct LASpoint14

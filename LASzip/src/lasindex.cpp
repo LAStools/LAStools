@@ -64,12 +64,10 @@
 typedef unordered_map<I32,U32> my_cell_hash;
 #elif defined(LZ_WIN32_VC6)
 #include <hash_map>
-using namespace std;
-typedef hash_map<I32,U32> my_cell_hash;
+typedef std::hash_map<I32,U32> my_cell_hash;
 #else
 #include <unordered_map>
-using namespace std;
-typedef unordered_map<I32, U32> my_cell_hash;
+typedef std::unordered_map<I32, U32> my_cell_hash;
 #endif
 
 LASindex::LASindex()

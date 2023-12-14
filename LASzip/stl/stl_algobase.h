@@ -49,12 +49,20 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <stddef.h>
+#ifdef _WIN32
 #include <new.h>
+#else
+#include <new>
+#endif
 
 #ifdef __STL_USE_NEW_IOSTREAMS 
 #include <iosfwd>
 #else /* __STL_USE_NEW_IOSTREAMS */
+#ifdef _WIN32
 #include <iostream.h>
+#else
+#include <iostream>
+#endif
 #endif /* __STL_USE_NEW_IOSTREAMS */
 
 #ifndef __SGI_STL_INTERNAL_ITERATOR_H

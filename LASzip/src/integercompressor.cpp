@@ -37,7 +37,7 @@
 #undef CREATE_HISTOGRAMS
 
 #include <stdlib.h>
-#include <assert.h>
+#include <cassert>
 
 #ifdef CREATE_HISTOGRAMS
 #include <math.h>

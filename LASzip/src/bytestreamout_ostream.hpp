@@ -38,13 +38,13 @@
 #else
 #include <istream>
 #include <fstream>
-using namespace std;
+
 #endif
 
 class ByteStreamOutOstream : public ByteStreamOut
 {
 public:
-  ByteStreamOutOstream(ostream& stream);
+  ByteStreamOutOstream(std::ostream& stream);
 /* write a single byte                                       */
   BOOL putByte(U8 byte);
 /* write an array of bytes                                   */
@@ -60,13 +60,13 @@ public:
 /* destructor                                                */
   ~ByteStreamOutOstream(){};
 protected:
-  ostream& stream;
+  std::ostream& stream;
 };
 
 class ByteStreamOutOstreamLE : public ByteStreamOutOstream
 {
 public:
-  ByteStreamOutOstreamLE(ostream& stream);
+  ByteStreamOutOstreamLE(std::ostream& stream);
 /* write 16 bit low-endian field                             */
   BOOL put16bitsLE(const U8* bytes);
 /* write 32 bit low-endian field                             */
@@ -86,7 +86,7 @@ private:
 class ByteStreamOutOstreamBE : public ByteStreamOutOstream
 {
 public:
-  ByteStreamOutOstreamBE(ostream& stream);
+  ByteStreamOutOstreamBE(std::ostream& stream);
 /* write 16 bit low-endian field                             */
   BOOL put16bitsLE(const U8* bytes);
 /* write 32 bit low-endian field                             */
@@ -103,7 +103,7 @@ private:
   U8 swapped[8];
 };
 
-inline ByteStreamOutOstream::ByteStreamOutOstream(ostream& stream_param) :
+inline ByteStreamOutOstream::ByteStreamOutOstream(std::ostream& stream_param) :
     stream(stream_param)
 {
 }
@@ -122,7 +122,7 @@ inline BOOL ByteStreamOutOstream::putBytes(const U8* bytes, U32 num_bytes)
 
 inline BOOL ByteStreamOutOstream::isSeekable() const
 {
-  return !!(static_cast<ofstream&>(stream));
+  return !!(static_cast<std::ofstream&>(stream));
 }
 
 inline I64 ByteStreamOutOstream::tell() const
@@ -132,17 +132,17 @@ inline I64 ByteStreamOutOstream::tell() const
 
 inline BOOL ByteStreamOutOstream::seek(I64 position)
 {
-  stream.seekp(static_cast<streamoff>(position));
+  stream.seekp(static_cast<std::streamoff>(position));
   return stream.good();
 }
 
 inline BOOL ByteStreamOutOstream::seekEnd()
 {
-  stream.seekp(0, ios::end);
+  stream.seekp(0, std::ios::end);
   return stream.good();
 }
 
-inline ByteStreamOutOstreamLE::ByteStreamOutOstreamLE(ostream& stream) : ByteStreamOutOstream(stream)
+inline ByteStreamOutOstreamLE::ByteStreamOutOstreamLE(std::ostream& stream) : ByteStreamOutOstream(stream)
 {
 }
 
@@ -190,7 +190,7 @@ inline BOOL ByteStreamOutOstreamLE::put64bitsBE(const U8* bytes)
   return putBytes(swapped, 8);
 }
 
-inline ByteStreamOutOstreamBE::ByteStreamOutOstreamBE(ostream& stream) : ByteStreamOutOstream(stream)
+inline ByteStreamOutOstreamBE::ByteStreamOutOstreamBE(std::ostream& stream) : ByteStreamOutOstream(stream)
 {
 }
 

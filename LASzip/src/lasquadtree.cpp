@@ -38,9 +38,9 @@
 #include <string.h>
 
 #include <vector>
-using namespace std;
 
-typedef vector<I32> my_cell_vector;
+
+typedef std::vector<I32> my_cell_vector;
 
 /*
 

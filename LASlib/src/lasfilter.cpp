@@ -32,15 +32,50 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
+#include <iostream>
 
 #include <map>
 #include <set>
-using namespace std;
 
-typedef multimap<I64,F64> my_I64_F64_map;
-typedef set<I64> my_I64_set;
+typedef std::multimap<I64, F64> my_I64_F64_map;
+typedef std::set<I64> my_I64_set;
+
+// convert the first number in a input string to the out float
+// if the string ends with [d/D] or [p/P] the out value will be 
+// converted from [d]ecimal or [p]ercent unit
+// outside of class > will be moved external soon...
+BOOL strToFloatDegPcFail(const CHAR* cin, F32* out)
+{
+  if (sscanf(cin, "%f", out) == 1)
+  {
+    if ((tolower(cin[strlen(cin) - 1]) == 'd') || (tolower(cin[strlen(cin) - 1]) == '°')) { *out /= 360; } // 0xb0
+    if ((tolower(cin[strlen(cin) - 1]) == 'p') || (tolower(cin[strlen(cin) - 1]) == '%')) { *out /= 100; }
+    return false;
+  }
+  return true;
+}
+
+// range check
+// outside of class > will be moved external soon...
+template <typename T>
+BOOL rangeValidate(const CHAR* argv, T* is1, T* is2, T min, T max)
+{
+  if (*is1 > *is2) {
+    std::swap(*is1, *is2);
+  }
+  if (*is1 < min)
+  {
+    std::cerr << "ERROR: \"" << argv << "\" argument falls below minimum(" << *is1 << " < " << min << ")";
+    return FALSE;
+  }
+  if (*is2 > max)
+  {
+    std::cerr << "ERROR: \"" << argv << "\" argument falls above maximum (" << *is2 << " > " << max << ")";
+    return FALSE;
+  }
+  return TRUE;
+}
 
 class LAScriterionAnd : public LAScriterion
 {
@@ -726,11 +761,247 @@ public:
   inline const CHAR* name() const { return "drop_RGB"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))),  below_RGB, above_RGB); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
-  inline BOOL filter(const LASpoint* point) { return ((below_RGB <= point->rgb[channel]) && (point->rgb[channel] <= above_RGB)); };
-  LAScriterionDropRGB(I32 below_RGB, I32 above_RGB, I32 channel) { if (above_RGB < below_RGB) { this->below_RGB = above_RGB; this->above_RGB = below_RGB; } else { this->below_RGB = below_RGB; this->above_RGB = above_RGB; }; this->channel = channel; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    return ((below_RGB <= point->rgb[channel]) && (point->rgb[channel] <= above_RGB));
+  };
+  LAScriterionDropRGB(I32 below_RGB, I32 above_RGB, I32 channel)
+  {
+    if (above_RGB < below_RGB)
+    {
+      this->below_RGB = above_RGB;
+      this->above_RGB = below_RGB;
+    }
+    else {
+      this->below_RGB = below_RGB;
+      this->above_RGB = above_RGB;
+    };
+    this->channel = channel;
+  };
 private:
   I32 below_RGB, above_RGB, channel;
 };
+
+class LAScriterionKeepHSLA : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_HSL"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %f %f %f %f %f %f", name(), h_min, h_max, s_min, s_max, v_min, v_max); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    point->get_hsl(hsl);
+    return (hsl[0] < h_min) || (hsl[0] > h_max) || (hsl[1] < s_min) || (hsl[1] > s_max) || (hsl[2] < v_min) || (hsl[2] > v_max);
+  };
+  LAScriterionKeepHSLA(F32 h_min, F32 h_max, F32 s_min, F32 s_max, F32 v_min, F32 v_max)
+  {
+    this->h_min = h_min;
+    this->h_max = h_max;
+    this->s_min = s_min;
+    this->s_max = s_max;
+    this->v_min = v_min;
+    this->v_max = v_max;
+  };
+private:
+  F32 h_min, h_max, s_min, s_max, v_min, v_max;
+  F32 hsl[3];
+};
+
+class LAScriterionDropHSLA : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_HSL"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %f %f %f %f %f %f", name(), h_min, h_max, s_min, s_max, v_min, v_max); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    point->get_hsl(hsl);
+    return (hsl[0] >= h_min) && (hsl[0] <= h_max) && (hsl[1] >= s_min) && (hsl[1] <= s_max) && (hsl[2] >= v_min) && (hsl[2] <= v_max);
+  };
+  LAScriterionDropHSLA(F32 h_min, F32 h_max, F32 s_min, F32 s_max, F32 v_min, F32 v_max)
+  {
+    this->h_min = h_min;
+    this->h_max = h_max;
+    this->s_min = s_min;
+    this->s_max = s_max;
+    this->v_min = v_min;
+    this->v_max = v_max;
+  };
+private:
+  F32 h_min, h_max, s_min, s_max, v_min, v_max;
+  F32 hsl[3];
+};
+
+class LAScriterionKeepHSL : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_HSL"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %f %f ", name(), (channel == 0 ? "hue" : (channel == 1 ? "saturation" : "lightness")), below_HSL, above_HSL); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    point->get_hsl(hsl);
+    return ((hsl[channel] < below_HSL) || (above_HSL < hsl[channel]));
+  };
+  LAScriterionKeepHSL(F32 below_HSL, F32 above_HSL, I32 channel)
+  {
+    if (above_HSL < below_HSL)
+    {
+      this->below_HSL = above_HSL;
+      this->above_HSL = below_HSL;
+    }
+    else {
+      this->below_HSL = below_HSL;
+      this->above_HSL = above_HSL;
+    };
+    this->channel = channel;
+  };
+private:
+  F32 below_HSL, above_HSL;
+  I32 channel;
+  F32 hsl[3];
+};
+
+class LAScriterionDropHSL : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_HSL"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %f %f ", name(), (channel == 0 ? "hue" : (channel == 1 ? "saturation" : "lightness")), below_HSL, above_HSL); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    point->get_hsl(hsl);
+    return ((below_HSL <= hsl[channel]) && (hsl[channel] <= above_HSL));
+  };
+  LAScriterionDropHSL(F32 below_HSL, F32 above_HSL, I32 channel) {
+    if (above_HSL < below_HSL)
+    {
+      this->below_HSL = above_HSL;
+      this->above_HSL = below_HSL;
+    }
+    else {
+      this->below_HSL = below_HSL;
+      this->above_HSL = above_HSL;
+    };
+    this->channel = channel;
+  };
+
+private:
+  F32 below_HSL, above_HSL;
+  I32 channel;
+  F32 hsl[3];
+};
+
+class LAScriterionKeepHSVA : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_HSV"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %f %f %f %f %f %f", name(), h_min, h_max, s_min, s_max, v_min, v_max); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    point->get_hsv(hsv);
+    return (hsv[0] < h_min) || (hsv[0] > h_max) || (hsv[1] < s_min) || (hsv[1] > s_max) || (hsv[2] < v_min) || (hsv[2] > v_max);
+  };
+  LAScriterionKeepHSVA(F32 h_min, F32 h_max, F32 s_min, F32 s_max, F32 v_min, F32 v_max)
+  {
+    this->h_min = h_min;
+    this->h_max = h_max;
+    this->s_min = s_min;
+    this->s_max = s_max;
+    this->v_min = v_min;
+    this->v_max = v_max;
+  };
+private:
+  F32 h_min, h_max, s_min, s_max, v_min, v_max;
+  F32 hsv[3];
+};
+
+class LAScriterionDropHSVA : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_HSV"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %f %f %f %f %f %f", name(), h_min, h_max, s_min, s_max, v_min, v_max); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    point->get_hsv(hsv);
+    return (hsv[0] >= h_min) && (hsv[0] <= h_max) && (hsv[1] >= s_min) && (hsv[1] <= s_max) && (hsv[2] >= v_min) && (hsv[2] <= v_max);
+  };
+  LAScriterionDropHSVA(F32 h_min, F32 h_max, F32 s_min, F32 s_max, F32 v_min, F32 v_max)
+  {
+    this->h_min = h_min;
+    this->h_max = h_max;
+    this->s_min = s_min;
+    this->s_max = s_max;
+    this->v_min = v_min;
+    this->v_max = v_max;
+  };
+private:
+  F32 h_min, h_max, s_min, s_max, v_min, v_max;
+  F32 hsv[3];
+};
+
+class LAScriterionKeepHSV : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "keep_HSV"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %f %f ", name(), (channel == 0 ? "hue" : (channel == 1 ? "saturation" : "value")), below_HSV, above_HSV); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    point->get_hsv(hsv);
+    return ((hsv[channel] < below_HSV) || (above_HSV < hsv[channel]));
+  };
+  LAScriterionKeepHSV(F32 below_HSV, F32 above_HSV, I32 channel)
+  {
+    if (above_HSV < below_HSV)
+    {
+      this->below_HSV = above_HSV;
+      this->above_HSV = below_HSV;
+    }
+    else {
+      this->below_HSV = below_HSV;
+      this->above_HSV = above_HSV;
+    };
+    this->channel = channel;
+  };
+private:
+  F32 below_HSV, above_HSV;
+  I32 channel;
+  F32 hsv[3];
+};
+
+class LAScriterionDropHSV : public LAScriterion
+{
+public:
+  inline const CHAR* name() const { return "drop_HSV"; };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %f %f ", name(), (channel == 0 ? "hue" : (channel == 1 ? "saturation" : "value")), below_HSV, above_HSV); };
+  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
+  inline BOOL filter(const LASpoint* point)
+  {
+    point->get_hsv(hsv);
+    return ((hsv[channel] >= below_HSV) && (hsv[channel] <= above_HSV));
+  };
+  LAScriterionDropHSV(F32 below_HSV, F32 above_HSV, I32 channel)
+  {
+    if (above_HSV < below_HSV)
+    {
+      this->below_HSV = above_HSV;
+      this->above_HSV = below_HSV;
+    }
+    else {
+      this->below_HSV = below_HSV;
+      this->above_HSV = above_HSV;
+    };
+    this->channel = channel;
+  };
+private:
+  F32 below_HSV, above_HSV;
+  I32 channel;
+  F32 hsv[3];
+};
+
 
 class LAScriterionKeepNDVI : public LAScriterion
 {
@@ -1810,6 +2081,14 @@ void LASfilter::usage() const
   fprintf(stderr,"  -keep_RGB_greenness 200 65535\n");
   fprintf(stderr,"  -keep_NDVI 0.2 0.7 -keep_NDVI_from_CIR -0.1 0.5\n");
   fprintf(stderr,"  -keep_NDVI_intensity_is_NIR 0.4 0.8 -keep_NDVI_green_is_NIR -0.2 0.2\n");
+  fprintf(stderr, "  -keep_HSV 120d 130d 0.4 0.5 0 1\n");
+  fprintf(stderr, "  -keep_HSV_hue 0.2 0.3\n");
+  fprintf(stderr, "  -drop_HSV_saturation 0.25 0.7\n");
+  fprintf(stderr, "  -keep_HSV_value 0 0.3\n");
+  fprintf(stderr, "  -keep_HSL 0.3 0.4 40p 50p 0 1\n");
+  fprintf(stderr, "  -drop_HSL_hue 0 0.5\n");
+  fprintf(stderr, "  -keep_HSL_saturation 0.1 0.25\n");
+  fprintf(stderr, "  -drop_HSL_lightness 0.1 0.2\n");
   fprintf(stderr,"Filter points based on their wavepacket.\n");
   fprintf(stderr,"  -keep_wavepacket 0\n");
   fprintf(stderr,"  -drop_wavepacket 3\n");
@@ -2578,6 +2857,220 @@ BOOL LASfilter::parse(int argc, char* argv[])
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
         }
       }
+      else if (strcmp(argv[i], "-keep_HSV") == 0)
+      {
+        if ((i + 6) >= argc)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max\n", argv[i]);
+          return FALSE;
+        }
+        F32 h_min;
+        if (strToFloatDegPcFail(argv[i + 1], &h_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument h_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 h_max;
+        if (strToFloatDegPcFail(argv[i + 2], &h_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument h_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &h_min, &h_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        F32 s_min;
+        if (strToFloatDegPcFail(argv[i + 3], &s_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument s_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 s_max;
+        if (strToFloatDegPcFail(argv[i + 4], &s_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument s_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &s_min, &s_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        F32 v_min;
+        if (strToFloatDegPcFail(argv[i + 5], &v_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument v_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 v_max;
+        if (strToFloatDegPcFail(argv[i + 6], &v_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument v_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &v_min, &v_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        add_criterion(new LAScriterionKeepHSVA(h_min, h_max, s_min, s_max, v_min, v_max));
+        for (int loop = 0; loop <= 6; loop++) *argv[i + loop] = '\0';
+        i += 6;
+      }
+      else if (strncmp(argv[i], "-keep_HSV_", 10) == 0)
+      {
+        if ((i + 2) >= argc)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+          return FALSE;
+        }
+        F32 min;
+        if (strToFloatDegPcFail(argv[i + 1], &min))
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max but '%s' is no valid min\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 max;
+        if (strToFloatDegPcFail(argv[i + 2], &max))
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max but '%s' is no valid max\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &min, &max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        if (strcmp(argv[i] + 10, "hue") == 0)
+        {
+          add_criterion(new LAScriterionKeepHSV(min, max, 0));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+        else if (strcmp(argv[i] + 10, "saturation") == 0)
+        {
+          add_criterion(new LAScriterionKeepHSV(min, max, 1));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+        else if (strcmp(argv[i] + 10, "value") == 0)
+        {
+          add_criterion(new LAScriterionKeepHSV(min, max, 2));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+      }
+      else if (strcmp(argv[i], "-keep_HSL") == 0)
+      {
+        if ((i + 6) >= argc)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max\n", argv[i]);
+          return FALSE;
+        }
+        F32 h_min;
+        if (strToFloatDegPcFail(argv[i + 1], &h_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument h_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 h_max;
+        if (strToFloatDegPcFail(argv[i + 2], &h_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument h_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &h_min, &h_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        F32 s_min;
+        if (strToFloatDegPcFail(argv[i + 3], &s_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument s_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 s_max;
+        if (strToFloatDegPcFail(argv[i + 4], &s_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument s_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &s_min, &s_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        F32 v_min;
+        if (strToFloatDegPcFail(argv[i + 5], &v_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument v_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 v_max;
+        if (strToFloatDegPcFail(argv[i + 6], &v_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument v_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &v_min, &v_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        add_criterion(new LAScriterionKeepHSLA(h_min, h_max, s_min, s_max, v_min, v_max));
+        for (int loop = 0; loop <= 6; loop++) *argv[i + loop] = '\0';
+        i += 6;
+      }
+      else if (strncmp(argv[i], "-keep_HSL_", 10) == 0)
+      {
+        if ((i + 2) >= argc)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+          return FALSE;
+        }
+        F32 min;
+        if (strToFloatDegPcFail(argv[i + 1], &min))
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max but '%s' is no valid min\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 max;
+        if (strToFloatDegPcFail(argv[i + 2], &max))
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max but '%s' is no valid max\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &min, &max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        if (strcmp(argv[i] + 10, "hue") == 0)
+        {
+          add_criterion(new LAScriterionKeepHSL(min, max, 0));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+        else if (strcmp(argv[i] + 10, "saturation") == 0)
+        {
+          add_criterion(new LAScriterionKeepHSL(min, max, 1));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+        else if (strcmp(argv[i] + 10, "lightness") == 0)
+        {
+          add_criterion(new LAScriterionKeepHSL(min, max, 2));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+      }
       else if (strncmp(argv[i],"-keep_NDVI", 10) == 0)
       {
         if ((i+2) >= argc)
@@ -2779,7 +3272,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             while (((i+2) < argc) && ('0' <= argv[i+2][0]) && (argv[i+2][0] <= '9'))
             {
               *argv[i]='\0';
-              if (sscanf(argv[i+2], "%d", &ID) != 1)
+              if (sscanf(argv[i + 2], "%u", &ID) != 1)
               {
                 fprintf(stderr,"ERROR: '-keep_point_source' takes one or more IDs but '%s' is no valid ID\n", argv[i+2]);
                 return FALSE;
@@ -3920,6 +4413,220 @@ BOOL LASfilter::parse(int argc, char* argv[])
           *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
         }
       }
+      else if (strcmp(argv[i], "-drop_HSV") == 0)
+      {
+        if ((i + 6) >= argc)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max\n", argv[i]);
+          return FALSE;
+        }
+        F32 h_min;
+        if (strToFloatDegPcFail(argv[i + 1], &h_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument h_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 h_max;
+        if (strToFloatDegPcFail(argv[i + 2], &h_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument h_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &h_min, &h_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        F32 s_min;
+        if (strToFloatDegPcFail(argv[i + 3], &s_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument s_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 s_max;
+        if (strToFloatDegPcFail(argv[i + 4], &s_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument s_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &s_min, &s_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        F32 v_min;
+        if (strToFloatDegPcFail(argv[i + 5], &v_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument v_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 v_max;
+        if (strToFloatDegPcFail(argv[i + 6], &v_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument v_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &v_min, &v_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        add_criterion(new LAScriterionDropHSVA(h_min, h_max, s_min, s_max, v_min, v_max));
+        for (int loop = 0; loop <= 6; loop++) *argv[i + loop] = '\0';
+        i += 6;
+      }
+      else if (strncmp(argv[i], "-drop_HSV_", 10) == 0)
+      {
+        if ((i + 2) >= argc)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+          return FALSE;
+        }
+        F32 min;
+        if (strToFloatDegPcFail(argv[i + 1], &min))
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max but '%s' is no valid min\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 max;
+        if (strToFloatDegPcFail(argv[i + 2], &max))
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max but '%s' is no valid max\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &min, &max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        if (strcmp(argv[i] + 10, "hue") == 0)
+        {
+          add_criterion(new LAScriterionDropHSV(min, max, 0));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+        else if (strcmp(argv[i] + 10, "saturation") == 0)
+        {
+          add_criterion(new LAScriterionDropHSV(min, max, 1));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+        else if (strcmp(argv[i] + 10, "value") == 0)
+        {
+          add_criterion(new LAScriterionDropHSV(min, max, 2));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+      }
+      else if (strcmp(argv[i], "-drop_HSL") == 0)
+      {
+        if ((i + 6) >= argc)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max\n", argv[i]);
+          return FALSE;
+        }
+        F32 h_min;
+        if (strToFloatDegPcFail(argv[i + 1], &h_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument h_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 h_max;
+        if (strToFloatDegPcFail(argv[i + 2], &h_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument h_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &h_min, &h_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        F32 s_min;
+        if (strToFloatDegPcFail(argv[i + 3], &s_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument s_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 s_max;
+        if (strToFloatDegPcFail(argv[i + 4], &s_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument s_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &s_min, &s_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        F32 v_min;
+        if (strToFloatDegPcFail(argv[i + 5], &v_min))
+        {
+          fprintf(stderr, "ERROR: '%s' argument v_min is not valid: '%s'\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 v_max;
+        if (strToFloatDegPcFail(argv[i + 6], &v_max))
+        {
+          fprintf(stderr, "ERROR: '%s' argument v_max is not valid: '%s'\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &v_min, &v_max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        add_criterion(new LAScriterionDropHSLA(h_min, h_max, s_min, s_max, v_min, v_max));
+        for (int loop = 0; loop <= 6; loop++) *argv[i + loop] = '\0';
+        i += 6;
+      }
+      else if (strncmp(argv[i], "-drop_HSL_", 10) == 0)
+      {
+        if ((i + 2) >= argc)
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max\n", argv[i]);
+          return FALSE;
+        }
+        F32 min;
+        if (strToFloatDegPcFail(argv[i + 1], &min))
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max but '%s' is no valid min\n", argv[i], argv[i + 1]);
+          return FALSE;
+        }
+        F32 max;
+        if (strToFloatDegPcFail(argv[i + 2], &max))
+        {
+          fprintf(stderr, "ERROR: '%s' needs 2 arguments: min max but '%s' is no valid max\n", argv[i], argv[i + 2]);
+          return FALSE;
+        }
+        if (!rangeValidate(argv[i], &min, &max, (F32)0.0, (F32)1.0))
+        {
+          return FALSE;
+        }
+        if (strcmp(argv[i] + 10, "hue") == 0)
+        {
+          add_criterion(new LAScriterionDropHSL(min, max, 0));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+        else if (strcmp(argv[i] + 10, "saturation") == 0)
+        {
+          add_criterion(new LAScriterionDropHSL(min, max, 1));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+        else if (strcmp(argv[i] + 10, "lightness") == 0)
+        {
+          add_criterion(new LAScriterionDropHSL(min, max, 2));
+          *argv[i] = '\0';
+          *argv[i + 1] = '\0';
+          *argv[i + 2] = '\0';
+          i += 2;
+        }
+      }
       else if (strncmp(argv[i],"-drop_abs_scan_angle_",21) == 0)
       {
         if (strcmp(argv[i],"-drop_abs_scan_angle_above") == 0)
@@ -4235,7 +4942,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             return FALSE;
           }
           U32 max_ID;
-          if (sscanf(argv[i+2], "%d", &max_ID) != 1)
+          if (sscanf(argv[i + 2], "%u", &max_ID) != 1)
           {
             fprintf(stderr,"ERROR: '%s' needs 2 arguments: min_ID max_ID but '%s' is no valid max_ID\n", argv[i], argv[i+2]);
             return FALSE;

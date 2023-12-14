@@ -49,8 +49,7 @@
 #define LASZIP_DYN_LINK
 #define LASZIP_SOURCE
 
-#include <laszip/laszip_api.h>
-#include <limits>
+#include <../dll/laszip_api.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

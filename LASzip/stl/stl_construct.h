@@ -31,7 +31,11 @@
 #ifndef __SGI_STL_INTERNAL_CONSTRUCT_H
 #define __SGI_STL_INTERNAL_CONSTRUCT_H
 
+#ifdef _WIN32
 #include <new.h>
+#else
+#include <new>
+#endif
 
 __STL_BEGIN_NAMESPACE
 

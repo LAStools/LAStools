@@ -32,7 +32,7 @@
 #define DEMZIP_DYN_LINK
 #define DEMZIP_SOURCE
 
-#include "demzip_api.h"
+#include "../dll/demzip_api.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

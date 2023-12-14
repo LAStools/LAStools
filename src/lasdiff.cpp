@@ -49,6 +49,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 void usage(bool error=false, bool wait=false)
 {
   fprintf(stderr,"usage:\n");

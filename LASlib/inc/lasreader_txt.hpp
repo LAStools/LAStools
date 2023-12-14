@@ -77,6 +77,7 @@ protected:
 private:
 	U8 point_type;
 	CHAR* parse_string;
+	CHAR* parse_string_unparsed;
 	F32 translate_intensity;
 	F32 scale_intensity;
 	F32 translate_scan_angle;
@@ -100,12 +101,20 @@ private:
 	F64 attribute_pre_offsets[32];
 	F64 attribute_no_datas[32];
 	I32 attribute_starts[32];
+	BOOL parse_extended_flags(CHAR* parse_string);
+	BOOL parse_column_description(CHAR** parse_string);
 	BOOL parse_attribute(const CHAR* l, I32 index);
 	BOOL parse(const CHAR* parse_string);
 	BOOL check_parse_string(const CHAR* parse_string);
 	void populate_scale_and_offset();
 	void populate_bounding_box();
 	void clean();
+
+	enum extended_flag{
+		HSV_H = -1,  HSV_S = -2,  HSV_V = -3, 
+		HSV_h = -4,  HSV_s = -5,  HSV_v = -6, 
+		HSL_H = -7,  HSL_S = -8,  HSL_L = -9, 
+		HSL_h = -10, HSL_s = -11, HSL_l = -12};
 };
 
 class LASreaderTXTrescale : public virtual LASreaderTXT

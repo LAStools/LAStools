@@ -128,7 +128,7 @@ BOOL LASwriterTXT::open(FILE* file, const LASheader* header, const CHAR* parse_s
     }
     else
     {
-      fprintf(stderr, "ERROR: unknown seperator '%s'\n", separator);
+      fprintf(stderr, "ERROR: unknown separator '%s'\n", separator);
       return FALSE;
     }
   }
@@ -467,7 +467,21 @@ BOOL LASwriterTXT::write_point(const LASpoint* point)
       fprintf(file, "%d", point->get_return_number());
       break;
     case 'c': // the classification
+			if (header->point_data_format > 5)
+			{
+				if (point->get_extended_classification())
+				{
       fprintf(file, "%d", point->get_extended_classification());
+				}
+				else
+				{
+					fprintf(file, "%d", point->get_classification());
+				}
+			}
+			else
+			{
+				fprintf(file, "%d", point->get_classification());
+			}
       break;
     case 'u': // the user data
       fprintf(file, "%d", point->get_user_data());

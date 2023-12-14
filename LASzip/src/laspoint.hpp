@@ -130,6 +130,7 @@ public:
   BOOL have_wavepacket;
   I32 extra_bytes_number;
   U32 total_point_size;
+  U8 rgb_bits_depth;
 
 // these fields describe the point format terms of generic items
 
@@ -171,6 +172,7 @@ public:
       rgb[0] = other.rgb[0];
       rgb[1] = other.rgb[1];
       rgb[2] = other.rgb[2];
+      rgb_bits_depth = other.rgb_bits_depth;
       if (other.have_nir)
       {
         rgb[3] = other.rgb[3];
@@ -311,6 +313,7 @@ public:
       case LASitem::RGB12:
       case LASitem::RGB14:
         have_rgb = TRUE;
+        rgb_bits_depth = 16;
         this->point[i] = (U8*)(this->rgb);
         break;
       case LASitem::WAVEPACKET13:
@@ -371,6 +374,7 @@ public:
       case LASitem::RGB12:
       case LASitem::RGB14:
         have_rgb = TRUE;
+        rgb_bits_depth = 16;
         this->point[i] = (U8*)(this->rgb);
         break;
       case LASitem::WAVEPACKET13:
@@ -498,6 +502,7 @@ public:
     have_nir = FALSE;
     extra_bytes_number = 0;
     total_point_size = 0;
+    rgb_bits_depth = 0;
     
     num_items = 0;
     if (items) delete [] items;
@@ -604,6 +609,152 @@ public:
   inline F32 get_abs_scan_angle() const { if (extended_point_type) return (extended_scan_angle < 0 ? -0.006f*extended_scan_angle : 0.006f*extended_scan_angle) ; else return (scan_angle_rank < 0 ? (F32)-scan_angle_rank : (F32)scan_angle_rank); };
 
   inline void set_scan_angle(F32 scan_angle) { if (extended_point_type) set_extended_scan_angle(I16_QUANTIZE(scan_angle/0.006f)); else set_scan_angle_rank(I8_QUANTIZE(scan_angle)); };
+
+  // Adapted from https://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
+  void get_hsl(F32* hsl) const
+  {
+    if (!have_rgb)
+    {
+      hsl[0] = hsl[1] = hsl[2] = 0.0f;
+      return;
+    }
+  
+    F32 max_color = (F32)(1 << rgb_bits_depth);
+    F32 r = (F32)(rgb[0])/max_color;
+    F32 g = (F32)(rgb[1])/max_color;
+    F32 b = (F32)(rgb[2])/max_color;
+
+    F32 max = (r > g) ? ((r > b) ? r : b) : ((g > b) ? g : b);
+    F32 min = (r < g) ? ((r < b) ? r : b) : ((g < b) ? g : b);
+    F32 h = (max + min) / 2.0f;
+    F32 s = h;
+    F32 l = h;
+
+    if (max == min)
+    {    
+      h = s = 0.0f;
+    }
+    else
+    {
+      F32 delta = max - min;
+      s = (l > 0.5f) ? delta / (2.0f - max - min) : delta / (max + min);
+      if (max == r) h = (g - b) / delta + (g < b ? 6.0f : 0.0f);
+      else if (max == g) h = (b - r) / delta + 2.0f;
+      else h = (r - g) / delta + 4.0f;
+      h /= 6;
+    }
+
+    hsl[0] = h;
+    hsl[1] = s;
+    hsl[2] = l;
+  };
+
+  // Adapted from https://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
+  void get_hsv(F32* hsv) const
+  {
+    if (!have_rgb)
+    {
+      hsv[0] = hsv[1] = hsv[2] = 0.0f;
+      return;
+    }
+
+    F32 max_color = (F32)(1 << rgb_bits_depth);
+    F32 r = (F32)(rgb[0])/max_color;
+    F32 g = (F32)(rgb[1])/max_color;
+    F32 b = (F32)(rgb[2])/max_color;
+
+    F32 max = (r > g ? (r > b ? r : b) : (g > b ? g : b));
+    F32 min = (r < g ? (r < b ? r : b) : (g < b ? g : b));
+    F32 delta = max - min;
+    F32 h = max; 
+    F32 s = max;
+    F32 v = max;
+
+    s = (max == 0) ? 0 : delta / max;
+
+    if(max == min)
+    {
+      h = 0.0f;
+    }
+    else
+    {
+      if (max == r) h = (g - b) / delta + (g < b ? 6.0f : 0.0f);
+      else if (max == g) h = (b - r) / delta + 2.0f;
+      else h = (r - g) / delta + 4.0f;
+      h /= 6.0f;
+    }
+
+    hsv[0] = h;
+    hsv[1] = s;
+    hsv[2] = v;
+  };
+
+  // Adapted from https://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
+  void set_RGB_from_HSL(const F32* hsl)
+  {
+    if (!have_rgb) return;
+
+    F32 h = hsl[0];
+    F32 s = hsl[1];
+    F32 l = hsl[2];
+
+    if (s == 0)
+    {
+      rgb[0] = (U16)(l * 65535);
+      rgb[1] = rgb[0];
+      rgb[2] = rgb[0];
+    }
+    else
+    {
+      auto hue2rgb = [](F32 p, F32 q, F32 t)
+      {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1.0f / 6.0f) return p + (q - p) * 6.0f * t;
+        if (t < 1.0f / 2.0f) return q;
+        if (t < 2.0f / 3.0f) return p + (q - p) * (2.0f / 3.0f - t) * 6.0f;
+        return p;
+      };
+
+      F32 q = (l < 0.5) ? l * (1 + s) : l + s - l * s;
+      F32 p = 2 * l - q;
+      rgb[0] = (U16)(hue2rgb(p, q, h + 1.0f / 3.0f) * 65535);
+      rgb[1] = (U16)(hue2rgb(p, q, h) * 65535);
+      rgb[2] = (U16)(hue2rgb(p, q, h - 1.0f / 3.0f) * 65535);
+    }
+  };
+
+  // Adapted from https://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
+  void set_RGB_from_HSV(const F32* hsv)
+  {
+    if (!have_rgb) return;
+
+    F32 h = hsv[0];
+    F32 s = hsv[1];
+    F32 v = hsv[2];
+
+    F32 r, g, b;
+
+    I32 i = (I32)(h * 6);
+	  F32 f = h * 6 - i;
+	  F32 p = v * (1 - s);
+	  F32 q = v * (1 - f * s);
+	  F32 t = v * (1 - (1 - f) * s);
+	
+    switch (i % 6) 
+    {
+      case 0: r = v, g = t, b = p; break;
+      case 1: r = q, g = v, b = p; break;
+      case 2: r = p, g = v, b = t; break;
+      case 3: r = p, g = q, b = v; break;
+      case 4: r = t, g = p, b = v; break;
+      case 5: r = v, g = p, b = q; break;
+    }
+    
+    rgb[0] = (U16)(r * 65535);
+    rgb[1] = (U16)(g * 65535);
+    rgb[2] = (U16)(b * 65535);
+  };
 
   inline void compute_coordinates()
   {

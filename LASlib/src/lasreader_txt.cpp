@@ -66,6 +66,7 @@ BOOL LASreaderTXT::open(const CHAR* file_name, U8 point_type, const CHAR* parse_
 BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const CHAR* parse_string, I32 skip_lines, BOOL populate_header)
 {
 	int i;
+	BOOL has_column_description = FALSE;
 
 	if (file == 0)
 	{
@@ -115,7 +116,50 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 		}
 	}
 
-	if (parse_string && !check_parse_string(parse_string))
+	this->skip_lines = skip_lines;
+
+	if (parse_string)
+	{
+		// User-input parse string has the precedence
+		this->parse_string = LASCopyString(parse_string);
+
+		// User provided a parse_string but the file may contain the column description
+		for (i = 0; i < this->skip_lines; i++) fgets(line, 512, file);
+		char* auto_parse_string = 0;
+		has_column_description = parse_column_description(&auto_parse_string);
+		fseek(file, 0, SEEK_SET);
+
+		if (has_column_description && auto_parse_string == 0)
+		{
+		return FALSE;
+	}
+
+		if (has_column_description && strcmp(this->parse_string, auto_parse_string) != 0)
+		{
+			fprintf(stderr, "WARNING: input parse string is '%s' but the column description produced '%s'. User input has the precedence.\n", this->parse_string, auto_parse_string);
+		}
+
+		if (auto_parse_string) free(auto_parse_string);
+	}
+	else 
+	{
+		// User did not provide a parse_string the file may contain the column description
+		for (i = 0; i < this->skip_lines; i++) fgets(line, 512, file);
+		has_column_description = parse_column_description(&this->parse_string);
+		fseek(file, 0, SEEK_SET);
+
+		// Column description found but nothing parsed.
+		if (has_column_description && this->parse_string == 0) return FALSE;
+	}
+
+	// Parse the special extended string flags into non ascii char
+	if (this->parse_string)	
+	{
+		parse_string_unparsed = LASCopyString(this->parse_string);
+		parse_extended_flags(this->parse_string);
+	}
+
+	if (this->parse_string && !check_parse_string(this->parse_string))
 	{
 		return FALSE;
 	}
@@ -176,17 +220,25 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 		}
 		header.point_data_format = point_type;
 	}
-	else if (parse_string)
+	else if (this->parse_string)
 	{
-		if (strstr(parse_string, "o") || strstr(parse_string, "l") || strstr(parse_string, "I"))
+		// Is there non ascii extended flags?
+		BOOL has_hsv_hsl = FALSE;
+		for (I32 i = 0; i < (I32)strlen(this->parse_string); i++)
+		{
+			char c = this->parse_string[i];
+			has_hsv_hsl	= (c == HSV_H) || (c == HSV_S) || (c == HSV_V) || (c == HSL_h) || (c == HSL_H) || (c == HSL_S) || (c == HSL_L) || (c == HSL_h) || (c == HSL_s) || (c == HSL_l) || (c == HSV_h) || (c == HSV_s) || (c == HSV_v);
+		}
+
+		if (strstr(this->parse_string, "o") || strstr(this->parse_string, "l") || strstr(this->parse_string, "I"))
 		{
 			// new point types
-			if (strstr(parse_string, "I"))
+			if (strstr(this->parse_string, "I"))
 			{
 				header.point_data_format = 8;
 				header.point_data_record_length = 38;
 			}
-			else if (strstr(parse_string, "R") || strstr(parse_string, "G") || strstr(parse_string, "B") || strstr(parse_string, "H"))
+			else if (strstr(this->parse_string, "R") || strstr(this->parse_string, "G") || strstr(this->parse_string, "B") || strstr(this->parse_string, "H") || has_hsv_hsl)
 			{
 				header.point_data_format = 7;
 				header.point_data_record_length = 36;
@@ -197,9 +249,9 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 				header.point_data_record_length = 30;
 			}
 		}
-		else if (strstr(parse_string, "t"))
+		else if (strstr(this->parse_string, "t"))
 		{
-			if (strstr(parse_string, "R") || strstr(parse_string, "G") || strstr(parse_string, "B") || strstr(parse_string, "H"))
+			if (strstr(this->parse_string, "R") || strstr(this->parse_string, "G") || strstr(this->parse_string, "B") || strstr(this->parse_string, "H") || has_hsv_hsl)
 			{
 				header.point_data_format = 3;
 				header.point_data_record_length = 34;
@@ -212,7 +264,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 		}
 		else
 		{
-			if (strstr(parse_string, "R") || strstr(parse_string, "G") || strstr(parse_string, "B") || strstr(parse_string, "H"))
+			if (strstr(this->parse_string, "R") || strstr(this->parse_string, "G") || strstr(this->parse_string, "B") || strstr(this->parse_string, "H") || has_hsv_hsl)
 			{
 				header.point_data_format = 2;
 				header.point_data_record_length = 26;
@@ -254,14 +306,14 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 		// create a cheaper parse string that only looks for 'x' 'y' 'z' 'r' and attributes in extra bytes
 
 		char* parse_less;
-		if (parse_string == 0)
+		if (this->parse_string == 0)
 		{
 			parse_less = LASCopyString("xyz");
 		}
 		else
 		{
-			parse_less = LASCopyString(parse_string);
-			for (i = 0; i < (int)strlen(parse_string); i++)
+			parse_less = LASCopyString(this->parse_string);
+			for (i = 0; i < (int)strlen(parse_less); i++)
 			{
 				if (parse_less[i] != 'x' && parse_less[i] != 'y' && parse_less[i] != 'z' && parse_less[i] != 'r' && (parse_less[i] < '0' || parse_less[i] > '0'))
 				{
@@ -277,7 +329,8 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 
 		// skip lines if we have to
 
-		for (i = 0; i < skip_lines; i++) fgets(line, 512, file);
+		for (i = 0; i < this->skip_lines; i++) fgets(line, 512, file);
+		if (has_column_description) fgets(line, 512, file);
 
 		if (ipts)
 		{
@@ -627,21 +680,17 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 		}
 	}
 
-	if (parse_string == 0)
+	if (this->parse_string == 0)
 	{
+		this->parse_string_unparsed = LASCopyString("xyz");
 		this->parse_string = LASCopyString("xyz");
-	}
-	else
-	{
-		this->parse_string = LASCopyString(parse_string);
 	}
 
 	// skip lines if we have to
 
-	this->skip_lines = skip_lines;
-	if (skip_lines)
+	if (this->skip_lines)
 	{
-		for (i = 0; i < skip_lines; i++) fgets(line, 512, file);
+		for (i = 0; i < this->skip_lines; i++) fgets(line, 512, file);
 	}
 	else if (ipts)
 	{
@@ -959,7 +1008,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 		else
 		{
 			line[strlen(line) - 1] = '\0';
-			fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, this->parse_string);
+			fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, this->parse_string_unparsed);
 		}
 	}
 
@@ -967,7 +1016,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 
 	if (i != 1)
 	{
-		fprintf(stderr, "ERROR: could not parse any lines with '%s'\n", this->parse_string);
+		fprintf(stderr, "ERROR: could not parse any lines with '%s'\n", this->parse_string_unparsed);
 		fclose(this->file);
 		this->file = 0;
 		free(this->parse_string);
@@ -1133,13 +1182,13 @@ BOOL LASreaderTXT::seek(const I64 p_index)
 			else
 			{
 				line[strlen(line) - 1] = '\0';
-				fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, this->parse_string);
+				fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, this->parse_string_unparsed);
 			}
 		}
 		// did we manage to parse a line
 		if (i != 1)
 		{
-			fprintf(stderr, "ERROR: could not parse any lines with '%s'\n", this->parse_string);
+			fprintf(stderr, "ERROR: could not parse any lines with '%s'\n", this->parse_string_unparsed);
 			fclose(file);
 			file = 0;
 			free(this->parse_string);
@@ -1172,7 +1221,7 @@ BOOL LASreaderTXT::read_point_default()
 				else
 				{
 					line[strlen(line) - 1] = '\0';
-					fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, this->parse_string);
+					fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, parse_string_unparsed);
 				}
 			}
 			else
@@ -1304,7 +1353,7 @@ BOOL LASreaderTXT::reopen(const char* file_name)
 		else
 		{
 			line[strlen(line) - 1] = '\0';
-			fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, parse_string);
+			fprintf(stderr, "WARNING: cannot parse '%s' with '%s'. skipping ...\n", line, parse_string_unparsed);
 		}
 	}
 
@@ -1335,6 +1384,11 @@ void LASreaderTXT::clean()
 		free(parse_string);
 		parse_string = 0;
 	}
+	if (parse_string_unparsed)
+	{
+		free(parse_string_unparsed);
+		parse_string_unparsed = 0;
+	}
 	skip_lines = 0;
 	populated_header = FALSE;
 }
@@ -1345,6 +1399,7 @@ LASreaderTXT::LASreaderTXT()
 	piped = false;
 	point_type = 0;
 	parse_string = 0;
+	parse_string_unparsed = 0;
 	scale_factor = 0;
 	offset = 0;
 	ipts = FALSE;
@@ -1540,12 +1595,228 @@ BOOL LASreaderTXT::parse_attribute(const char* l, I32 index)
 	return TRUE;
 }
 
+BOOL LASreaderTXT::parse_extended_flags(CHAR* parse_string)
+{
+  const char* extended_flags[] = {"(HSV)", "(HSL)", "(hsv)", "(hsl)"}; 
+  int nflags = (int)(sizeof(extended_flags) / sizeof(char*));
+
+  for (int i = 0; i < nflags; i++)
+  {
+    char *found = strstr(parse_string, extended_flags[i]);
+
+    while (found)
+    {
+      if (strcmp(extended_flags[i], "(HSV)") == 0)
+      {
+        found[0] = HSV_H; found[1] = HSV_S; found[2] = HSV_V;
+        int len_flag = (int)strlen(extended_flags[i]);
+        int len_remaining = (int)strlen(found + len_flag);
+        memmove(found + 3, found + 5, len_remaining + 1);
+        found = strstr(parse_string, extended_flags[i]);
+      }
+      else if (strcmp(extended_flags[i], "(HSL)") == 0)
+      {
+        found[0] = HSL_H; found[1] = HSL_S; found[2] = HSL_L;
+        int len_flag = (int)strlen(extended_flags[i]);
+        int len_remaining = (int)strlen(found + len_flag);
+        memmove(found + 3, found + 5, len_remaining + 1);
+        found = strstr(parse_string, extended_flags[i]);
+      }
+      else if (strcmp(extended_flags[i], "(hsv)") == 0)
+      {
+        found[0] = HSV_h; found[1] = HSV_s; found[2] = HSV_v;
+        int len_flag = (int)strlen(extended_flags[i]);
+        int len_remaining = (int)strlen(found + len_flag);
+        memmove(found + 3, found + 5, len_remaining + 1);
+        found = strstr(parse_string, extended_flags[i]);
+      }
+      else if (strcmp(extended_flags[i], "(hsl)") == 0)
+      {
+        found[0] = HSL_h; found[1] = HSL_s; found[2] = HSL_l;
+        int len_flag = (int)strlen(extended_flags[i]);
+        int len_remaining = (int)strlen(found + len_flag);
+        memmove(found + 3, found + 5, len_remaining + 1);
+        found = strstr(parse_string, extended_flags[i]);
+      }
+      else
+      {
+        found = 0;
+      }
+    }
+  }
+
+  return TRUE;
+}
+
+BOOL LASreaderTXT::parse_column_description(CHAR** parse_string)
+{
+	// Read the first line
+	I32 here = ftell(file);
+	fgets(line, 512, file);
+
+	// If it contains column description
+	if (strstr(line, "x") || strstr(line, "y") || strstr(line, "z") || strstr(line, "X") || strstr(line, "Y") || strstr(line, "Z"))
+	{
+		const char* delimiters = ",;.:- \t\n";
+		char* token = strtok(line, delimiters);
+		char* auto_parse_string = (char*)calloc(64, sizeof(char));
+
+		U32 i = 0;
+		while (token)
+		{
+			if (strcmp(token, "x") == 0) auto_parse_string[i] = 'x';
+			else if (strcmp(token, "y") == 0) auto_parse_string[i] = 'y';
+			else if (strcmp(token, "z") == 0) auto_parse_string[i] = 'z';
+			else if (strcmp(token, "X") == 0) auto_parse_string[i] = 'X';
+			else if (strcmp(token, "Y") == 0) auto_parse_string[i] = 'Y';
+			else if (strcmp(token, "Z") == 0) auto_parse_string[i] = 'Z';
+			else if (strcmp(token, "gps_time") == 0) auto_parse_string[i] = 't';
+			else if (strcmp(token, "intensity") == 0) auto_parse_string[i] = 'i';
+			else if (strcmp(token, "scan_angle") == 0) auto_parse_string[i] = 'a';
+			else if (strcmp(token, "point_source_id") == 0) auto_parse_string[i] = 'p';
+			else if (strcmp(token, "classification") == 0) auto_parse_string[i] = 'c';
+			else if (strcmp(token, "user_data") == 0) auto_parse_string[i] = 'u';
+			else if (strcmp(token, "return_number") == 0) auto_parse_string[i] = 'r';
+			else if (strcmp(token, "number_of_returns") == 0) auto_parse_string[i] = 'n';
+			else if (strcmp(token, "edge_of_flight_line") == 0)	auto_parse_string[i] = 'e';
+			else if (strcmp(token, "scan_direction_flag") == 0)	auto_parse_string[i] = 'd';
+			else if (strcmp(token, "withheld_flag") == 0) auto_parse_string[i] = 'h';
+			else if (strcmp(token, "keypoint_flag") == 0) auto_parse_string[i] = 'k';
+			else if (strcmp(token, "synthetic_flag") == 0) auto_parse_string[i] = 'g';
+			else if (strcmp(token, "overlap_flag") == 0) auto_parse_string[i] = 'o';
+			else if (strcmp(token, "scanner_channel") == 0) auto_parse_string[i] = 'l';
+			else if (strcmp(token, "R") == 0) auto_parse_string[i] = 'R';
+			else if (strcmp(token, "G") == 0) auto_parse_string[i] = 'G';
+			else if (strcmp(token, "B") == 0) auto_parse_string[i] = 'B';
+			else if (strcmp(token, "HSV_H") == 0) 
+			{ 
+				memcpy(&auto_parse_string[i], "(HSV)", 5); i += 4;
+				token = strtok(NULL, delimiters);
+
+				// One flag for 3 columns implies that we assume they are consecutive
+				BOOL error = TRUE;
+				if (strcmp(token, "HSV_S") == 0)
+				{
+					token = strtok(NULL, delimiters);
+					if (strcmp(token, "HSV_V") == 0) error = FALSE;
+				}
+				if (error)
+				{
+					fprintf(stderr, "ERROR: column 'HSV_H' is not followed by 'HSV_S' and 'HSV_V'\n");
+					return true;
+				}
+			}
+			else if (strcmp(token, "HSL_h") == 0) 
+			{ 
+				memcpy(&auto_parse_string[i], "(hsl)", 5); i += 4;
+				token = strtok(NULL, delimiters);
+
+				// One flag for 3 columns implies that we assume they are consecutive
+				BOOL error = TRUE;
+				if (strcmp(token, "HSL_s") == 0)
+				{
+					token = strtok(NULL, delimiters);
+					if (strcmp(token, "HSL_l") == 0) error = FALSE;
+				}
+				if (error)
+				{
+					fprintf(stderr, "ERROR: column 'HSL_h' is not followed by 'HSL_s' and 'HSL_l'\n");
+					return true;
+				}
+			}
+			else if (strcmp(token, "HSV_h") == 0) 
+			{ 
+				memcpy(&auto_parse_string[i], "(hsv)", 5); i += 4;
+				token = strtok(NULL, delimiters);
+
+				// One flag for 3 columns implies that we assume they are consecutive
+				BOOL error = TRUE;
+				if (strcmp(token, "HSV_s") == 0)
+				{
+					token = strtok(NULL, delimiters);
+					if (strcmp(token, "HSV_v") == 0) error = FALSE;
+				}
+				if (error)
+				{
+					fprintf(stderr, "ERROR: column 'HSV_h' is not followed by 'HSV_s' and 'HSV_v'\n");
+					return true;
+				}
+			}
+			else if (strcmp(token, "HSL_H") == 0) 
+			{ 
+				memcpy(&auto_parse_string[i], "(HSL)", 5); i += 4;
+				token = strtok(NULL, delimiters);
+
+				// One flag for 3 columns implies that we assume they are consecutive
+				BOOL error = TRUE;
+				if (strcmp(token, "HSL_S") == 0)
+				{
+					token = strtok(NULL, delimiters);
+					if (strcmp(token, "HSL_L") == 0) error = FALSE;
+				}
+				if (error)
+				{
+					fprintf(stderr, "ERROR: column 'HSL_H' is not followed by 'HSL_S' and 'HSL_L'\n");
+					return true;
+				}
+			}
+			else if (strcmp(token, "HSV_S") == 0 || strcmp(token, "HSV_V") == 0) 
+			{
+				// Assuming that HSV columns are consecutive HSV_S should have already been parsed
+				fprintf(stderr, "ERROR: column 'HSV_S' or 'HSV_V' is not led by 'HSV_H'\n");
+				return true;
+			}
+			else if (strcmp(token, "HSV_s") == 0 || strcmp(token, "HSV_v") == 0) 
+			{
+				fprintf(stderr, "ERROR: column 'HSV_s' or 'HSV_v' is not led by 'HSV_h'\n");
+				return true;
+			}
+			else if (strcmp(token, "HSL_S") == 0 || strcmp(token, "HSL_L") == 0) 
+			{
+				fprintf(stderr, "ERROR: column 'HSL_S' or 'HSL_L' is not led by 'HSL_H'\n");
+				return true;
+			}
+			else if (strcmp(token, "HSL_s") == 0 || strcmp(token, "HSL_l") == 0) 
+			{
+				fprintf(stderr, "ERROR: column 'HSL_s' or 'HSL_l' is not led by 'HSL_h'\n");
+				return true;
+			}
+			else
+			{
+				fprintf(stderr, "WARNING: unknown parse item '%s'. skipping ...\n", token);
+				auto_parse_string[i] = 's';
+			}
+			token = strtok(NULL, delimiters);
+			i++;
+		}
+
+    fprintf(stderr, "Column description detected. Parse string is %s\n", auto_parse_string);
+		
+		if (*parse_string) free(*parse_string);
+		*parse_string = LASCopyString(auto_parse_string);
+		free(auto_parse_string);
+		skip_lines++;
+		return TRUE;
+	}
+	else
+	{
+		fseek(file, here, SEEK_SET);
+		return FALSE;
+	}
+}
+
 BOOL LASreaderTXT::parse(const char* parse_string)
 {
 	I32 temp_i;
 	F32 temp_f;
 	const char* p = parse_string;
 	const char* l = line;
+
+	// HSL HSV special parsing
+	BOOL has_hsl = false;
+	BOOL has_hsv = false;
+	F32 hsl[3];
+	F32 hsv[3];
 
 	while (p[0])
 	{
@@ -1881,12 +2152,148 @@ BOOL LASreaderTXT::parse(const char* parse_string)
 			l += 6;
 			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
 		}
+		else if (p[0] == HSL_H) // we expect the HSL hue representation of RGB in range [0,255]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+			if (temp_i < 0 || temp_i > 255) fprintf(stderr, "WARNING: HSL hue %d is out of range of height bits\n", temp_i);
+			temp_i = U8_CLAMP(temp_i);
+			hsl[0] = (F32)temp_i/255.f;
+			has_hsl = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSL_S) // we expect the HSL saturation representation of RGB in range [0,255]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+			if (temp_i < 0 || temp_i > 255) fprintf(stderr, "WARNING: HSL saturation %d is out of range of height bits\n", temp_i);
+			temp_i = U8_CLAMP(temp_i);
+			hsl[1] = (F32)temp_i/255.f;
+			has_hsl = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSL_L) // we expect the HSL lightness representation of RGB in range [0,255]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+			if (temp_i < 0 || temp_i > 255) fprintf(stderr, "WARNING: HSL lightness %d is out of range of height bits\n", temp_i);
+			temp_i = U8_CLAMP(temp_i);
+			hsl[2] = (F32)temp_i/255.f;
+			has_hsl = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSL_h) // we expect the HSL hue representation of RGB in range [0,1]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%f", &temp_f) != 1) return FALSE;
+			if (temp_f < 0 || temp_f > 1) fprintf(stderr, "WARNING: HSL hue %f is out of range [0,1]\n", temp_f);
+			hsl[0] = (temp_f <= 0) ? 0 : ((temp_f >= 1) ? 1 : temp_f);
+			has_hsl = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSL_s) // we expect the HSL saturation representation of RGB in range [0,1]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%f", &temp_f) != 1) return FALSE;
+			if (temp_f < 0 || temp_f > 1) fprintf(stderr, "WARNING: HSL saturation %f is out of range [0,1]\n", temp_f);
+			hsl[1] = (temp_f <= 0) ? 0 : ((temp_f >= 1) ? 1 : temp_f);
+			has_hsl = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSL_l) // we expect the HSL lightness representation of RGB in range [0,1]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%f", &temp_f) != 1) return FALSE;
+			if (temp_f < 0 || temp_f > 1) fprintf(stderr, "WARNING: HSL lightness %f is out of range [0,1]\n", temp_f);
+			hsl[2] = (temp_f <= 0) ? 0 : ((temp_f >= 1) ? 1 : temp_f);
+			has_hsl = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSV_H) // we expect the HSV hue representation of RGB in range [0,255]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+			if (temp_i < 0 || temp_i > 255) fprintf(stderr, "WARNING: HSV hue %d is out of range of height bits\n", temp_i);
+			temp_i = U8_CLAMP(temp_i);
+			hsv[0] = (F32)temp_i/255.f;
+			has_hsv = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSV_S) // we expect the HSV saturation representation of RGB in range [0,255]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+			if (temp_i < 0 || temp_i > 255) fprintf(stderr, "WARNING: HSV saturation %d is out of range of height bits\n", temp_i);
+			temp_i = U8_CLAMP(temp_i);
+			hsv[1] = (F32)temp_i/255.f;
+			has_hsv = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSV_V) // we expect the HSL value representation of RGB in range [0,255]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%d", &temp_i) != 1) return FALSE;
+			if (temp_i < 0 || temp_i > 255) fprintf(stderr, "WARNING: HSV value %d is out of range of height bits\n", temp_i);
+			temp_i = U8_CLAMP(temp_i);
+			hsv[2] = (F32)temp_i/255.f;
+			has_hsv = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSV_h) // we expect the HSV hue representation of RGB in range [0,1]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%f", &temp_f) != 1) return FALSE;
+			if (temp_f < 0 || temp_f > 1) fprintf(stderr, "WARNING: HSV hue %f is out of range [0,1]\n", temp_f);
+			hsv[0] = (temp_f <= 0) ? 0 : ((temp_f >= 1) ? 1 : temp_f);
+			has_hsv = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSV_s) // we expect the HSV saturation representation of RGB in range [0,1]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%f", &temp_f) != 1) return FALSE;
+			if (temp_f < 0 || temp_f > 1) fprintf(stderr, "WARNING: HSV saturation %f is out of range [0,1]\n", temp_f);
+			hsv[1] = (temp_f <= 0) ? 0 : ((temp_f >= 1) ? 1 : temp_f);
+			has_hsv = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
+		else if (p[0] == HSV_v) // we expect the HSL value representation of RGB in range [0,1]
+		{
+			while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';')) l++; // first skip white spaces
+			if (l[0] == 0) return FALSE;
+			if (sscanf(l, "%f", &temp_f) != 1) return FALSE;
+			if (temp_f < 0 || temp_f > 1) fprintf(stderr, "WARNING: HSV value %f is out of range [0,1]\n", temp_f);
+			hsv[2] = (temp_f <= 0) ? 0 : ((temp_f >= 1) ? 1 : temp_f);
+			has_hsv = true;
+			while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
+		}
 		else
 		{
 			fprintf(stderr, "ERROR: unknown symbol '%c' in parse string\n", p[0]);
 		}
 		p++;
 	}
+
+	if (has_hsv)
+	{
+		point.set_RGB_from_HSV(hsv);
+	}
+	if (has_hsl)
+	{
+		point.set_RGB_from_HSL(hsl);
+	}
+
 	return TRUE;
 }
 
@@ -1920,7 +2327,19 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
 			(p[0] != 'e') && // we expect the edge of flight line flag
 			(p[0] != 'd') && // we expect the direction of scan flag
 			(p[0] != 'H') && // we expect hexadecimal coded RGB(I) colors
-			(p[0] != 'J'))   // we expect a hexadecimal coded intensity
+			(p[0] != 'J') && // we expect a hexadecimal coded intensity
+			(p[0] != HSL_H) && // we expect one of the non ascii special flags for HSL and HSV
+			(p[0] != HSL_S) &&
+			(p[0] != HSL_L) &&
+			(p[0] != HSV_H) &&
+			(p[0] != HSV_S) &&
+			(p[0] != HSV_V) &&
+			(p[0] != HSL_h) &&
+			(p[0] != HSL_s) &&
+			(p[0] != HSL_l) &&
+			(p[0] != HSV_h) &&
+			(p[0] != HSV_s) &&
+			(p[0] != HSV_v))
 		{
 			if ((p[0] >= '0') && (p[0] <= '9'))
 			{
@@ -1992,6 +2411,10 @@ BOOL LASreaderTXT::check_parse_string(const char* parse_string)
 				fprintf(stderr, "    '(13)' : additional attributes described as extra bytes (10 and up)\n");
 				fprintf(stderr, "       'H' : a hexadecimal string encoding the RGB color\n");
 				fprintf(stderr, "       'J' : a hexadecimal string encoding the intensity\n");
+				fprintf(stderr, "   '(hsv)' : the RGB colors in the HSV color model coded in [0, 1]\n");
+				fprintf(stderr, "   '(hsl)' : the RGB colors in the hsv color model coded in [0, 1]\n");
+				fprintf(stderr, "   '(HSV)' : the RGB colors in the HSV color model coded in [0, 255]\n");
+				fprintf(stderr, "   '(HSL)' : the RGB colors in the hsv color model coded in [0, 255]\n");				
 				return FALSE;
 			}
 		}

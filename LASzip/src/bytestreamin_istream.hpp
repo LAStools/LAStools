@@ -41,13 +41,12 @@
 #else
 #include <istream>
 #include <fstream>
-using namespace std;
 #endif
 
 class ByteStreamInIstream : public ByteStreamIn
 {
 public:
-  ByteStreamInIstream(istream& stream, BOOL seekable=TRUE);
+  ByteStreamInIstream(std::istream& stream, BOOL seekable=TRUE);
 /* read a single byte                                        */
   U32 getByte();
 /* read an array of bytes                                    */
@@ -63,14 +62,14 @@ public:
 /* destructor                                                */
   ~ByteStreamInIstream(){};
 protected:
-  istream& stream;
+  std::istream& stream;
   BOOL seekable;
 };
 
 class ByteStreamInIstreamLE : public ByteStreamInIstream
 {
 public:
-  ByteStreamInIstreamLE(istream& stream, BOOL seekable=TRUE);
+  ByteStreamInIstreamLE(std::istream& stream, BOOL seekable=TRUE);
 /* read 16 bit low-endian field                              */
   void get16bitsLE(U8* bytes);
 /* read 32 bit low-endian field                              */
@@ -90,7 +89,7 @@ private:
 class ByteStreamInIstreamBE : public ByteStreamInIstream
 {
 public:
-  ByteStreamInIstreamBE(istream& stream, BOOL seekable=TRUE);
+  ByteStreamInIstreamBE(std::istream& stream, BOOL seekable=TRUE);
 /* read 16 bit low-endian field                              */
   void get16bitsLE(U8* bytes);
 /* read 32 bit low-endian field                              */
@@ -107,7 +106,7 @@ private:
   U8 swapped[8];
 };
 
-inline ByteStreamInIstream::ByteStreamInIstream(istream& stream_param, BOOL seekable_param) : stream(stream_param), seekable(seekable_param)
+inline ByteStreamInIstream::ByteStreamInIstream(std::istream& stream_param, BOOL seekable_param) : stream(stream_param), seekable(seekable_param)
 {
 }
 
@@ -139,7 +138,7 @@ inline BOOL ByteStreamInIstream::seek(const I64 position)
 {
   if (tell() != position)
   {
-    stream.seekg(static_cast<streamoff>(position));
+    stream.seekg(static_cast<std::streamoff>(position));
     return stream.good();
   }
   return TRUE;
@@ -147,11 +146,11 @@ inline BOOL ByteStreamInIstream::seek(const I64 position)
 
 inline BOOL ByteStreamInIstream::seekEnd(const I64 distance)
 {
-  stream.seekg(static_cast<streamoff>(-distance), ios::end);
+  stream.seekg(static_cast<std::streamoff>(-distance), std::ios::end);
   return stream.good();
 }
 
-inline ByteStreamInIstreamLE::ByteStreamInIstreamLE(istream& stream, BOOL seekable) : ByteStreamInIstream(stream, seekable)
+inline ByteStreamInIstreamLE::ByteStreamInIstreamLE(std::istream& stream, BOOL seekable) : ByteStreamInIstream(stream, seekable)
 {
 }
 
@@ -199,7 +198,7 @@ inline void ByteStreamInIstreamLE::get64bitsBE(U8* bytes)
   bytes[7] = swapped[0];
 }
 
-inline ByteStreamInIstreamBE::ByteStreamInIstreamBE(istream& stream, BOOL seekable) : ByteStreamInIstream(stream, seekable)
+inline ByteStreamInIstreamBE::ByteStreamInIstreamBE(std::istream& stream, BOOL seekable) : ByteStreamInIstream(stream, seekable)
 {
 }
 

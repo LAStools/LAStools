@@ -35,7 +35,7 @@
 
 #include "lasreaditem.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 class LASreadItemRaw_POINT10_LE : public LASreadItemRaw
 {

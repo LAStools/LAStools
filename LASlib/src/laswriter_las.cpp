@@ -123,7 +123,7 @@ BOOL LASwriterLAS::open(FILE* file, const LASheader* header, U32 compressor, I32
   return open(out, header, compressor, requested_version, chunk_size);
 }
 
-BOOL LASwriterLAS::open(ostream& stream, const LASheader* header, U32 compressor, I32 requested_version, I32 chunk_size)
+BOOL LASwriterLAS::open(std::ostream& stream, const LASheader* header, U32 compressor, I32 requested_version, I32 chunk_size)
 {
   ByteStreamOut* out;
   if (IS_LITTLE_ENDIAN())

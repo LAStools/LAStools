@@ -41,9 +41,8 @@
 
 #include <list>
 #include <set>
-using namespace std;
 
-typedef set<U32> my_index_set;
+typedef std::set<U32> my_index_set;
 
 class LASkdtreeRectangle
 {
@@ -70,7 +69,7 @@ public:
   LASkdtreePoint(F64 x, F64 y);
 };
 
-typedef list<LASkdtreeRectangle> my_rectangle_list;
+typedef std::list<LASkdtreeRectangle> my_rectangle_list;
 
 class LASkdtreeRectanglesNode
 {

@@ -32,7 +32,7 @@
 #include "lasreaditemcompressed_v1.hpp"
 #include "laszip_common_v1.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <string.h>
 
 /*

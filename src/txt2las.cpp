@@ -101,6 +101,8 @@ void usage(bool error = false, bool wait = false)
 	fprintf(stderr, "flag, k - keypoint flag, g - synthetic flag, 0 - first\n");
 	fprintf(stderr, "additional attribute specified, 1 - second additional\n");
 	fprintf(stderr, "attribute specified, 2 - third ...\n");
+	fprintf(stderr, "Additionnal strings (HSV), (HSL), (hsv) and (hsl) convert HSV\n");
+	fprintf(stderr, "or HSL colors models ranging into [0,255] or [0,1] into RGB.\n");
 	fprintf(stderr, "---------------------------------------------\n");
 	fprintf(stderr, "Other parameters are\n");
 	fprintf(stderr, "'-set_point_type 6\n");

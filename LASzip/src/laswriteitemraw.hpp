@@ -37,7 +37,7 @@
 
 #include "laswriteitem.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 class LASwriteItemRaw_POINT10_LE : public LASwriteItemRaw
 {

@@ -96,7 +96,7 @@
 #include "arithmeticdecoder.hpp"
 
 #include <string.h>
-#include <assert.h>
+#include <cassert>
 
 #include "arithmeticmodel.hpp"
 

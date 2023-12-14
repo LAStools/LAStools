@@ -67,8 +67,7 @@
 
 ===============================================================================
 */
-#ifndef GEO_PROJECTION_CONVERTER_HPP
-#define GEO_PROJECTION_CONVERTER_HPP
+#pragma once
 
 struct GeoProjectionGeoKeys
 {
@@ -491,5 +490,3 @@ private:
   void compute_hom_parameters(bool source);
   void compute_os_parameters(bool source);
 };
-
-#endif

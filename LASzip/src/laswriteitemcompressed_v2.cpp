@@ -31,7 +31,7 @@
 
 #include "laswriteitemcompressed_v2.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <string.h>
 
 /*
