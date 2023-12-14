@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>src;inc;..\LASzip\inc;..\LASzip\src;</AdditionalIncludeDirectories>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\LASzip\src\lascopc.cpp" />
+    <ClCompile Include="src\fopen_compressed.cpp" />
+    <ClCompile Include="src\lasfilter.cpp" />
+    <ClCompile Include="src\lasignore.cpp" />
+    <ClCompile Include="src\laskdtree.cpp" />
+    <ClCompile Include="src\lasreader.cpp" />
+    <ClCompile Include="src\lasreaderbuffered.cpp" />
+    <ClCompile Include="src\lasreadermerged.cpp" />
+    <ClCompile Include="src\lasreaderpipeon.cpp" />
+    <ClCompile Include="src\lasreaderstored.cpp" />
+    <ClCompile Include="src\lasreader_asc.cpp" />
+    <ClCompile Include="src\lasreader_bil.cpp" />
+    <ClCompile Include="src\lasreader_bin.cpp" />
+    <ClCompile Include="src\lasreader_dtm.cpp" />
+    <ClCompile Include="src\lasreader_las.cpp" />
+    <ClCompile Include="src\lasreader_ply.cpp" />
+    <ClCompile Include="src\lasreader_qfit.cpp" />
+    <ClCompile Include="src\lasreader_shp.cpp" />
+    <ClCompile Include="src\lasreader_txt.cpp" />
+    <ClCompile Include="src\lastransform.cpp" />
+    <ClCompile Include="src\lasutility.cpp" />
+    <ClCompile Include="src\laswaveform13reader.cpp" />
+    <ClCompile Include="src\laswaveform13writer.cpp" />
+    <ClCompile Include="src\laswriter.cpp" />
+    <ClCompile Include="src\laswritercompatible.cpp" />
+    <ClCompile Include="src\laswriter_bin.cpp" />
+    <ClCompile Include="src\laswriter_las.cpp" />
+    <ClCompile Include="src\laswriter_qfit.cpp" />
+    <ClCompile Include="src\laswriter_txt.cpp" />
+    <ClCompile Include="src\laswriter_wrl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\LASzip\src\lascopc.hpp" />
+    <ClInclude Include="inc\lasdefinitions.hpp" />
+    <ClInclude Include="inc\lasfilter.hpp" />
+    <ClInclude Include="inc\lasignore.hpp" />
+    <ClInclude Include="inc\laskdtree.hpp" />
+    <ClInclude Include="inc\lasreader.hpp" />
+    <ClInclude Include="inc\lasreaderbuffered.hpp" />
+    <ClInclude Include="inc\lasreadermerged.hpp" />
+    <ClInclude Include="inc\lasreaderpipeon.hpp" />
+    <ClInclude Include="inc\lasreaderstored.hpp" />
+    <ClInclude Include="inc\lasreader_asc.hpp" />
+    <ClInclude Include="inc\lasreader_bil.hpp" />
+    <ClInclude Include="inc\lasreader_bin.hpp" />
+    <ClInclude Include="inc\lasreader_dtm.hpp" />
+    <ClInclude Include="inc\lasreader_las.hpp" />
+    <ClInclude Include="inc\lasreader_ply.hpp" />
+    <ClInclude Include="inc\lasreader_qfit.hpp" />
+    <ClInclude Include="inc\lasreader_shp.hpp" />
+    <ClInclude Include="inc\lasreader_txt.hpp" />
+    <ClInclude Include="inc\lastransform.hpp" />
+    <ClInclude Include="inc\lasutility.hpp" />
+    <ClInclude Include="inc\lasvlr.hpp" />
+    <ClInclude Include="inc\lasvlrpayload.hpp" />
+    <ClInclude Include="inc\laswaveform13reader.hpp" />
+    <ClInclude Include="inc\laswaveform13writer.hpp" />
+    <ClInclude Include="inc\laswriter.hpp" />
+    <ClInclude Include="inc\laswritercompatible.hpp" />
+    <ClInclude Include="inc\laswriter_bin.hpp" />
+    <ClInclude Include="inc\laswriter_las.hpp" />
+    <ClInclude Include="inc\laswriter_qfit.hpp" />
+    <ClInclude Include="inc\laswriter_txt.hpp" />
+    <ClInclude Include="inc\laswriter_wrl.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{9bcf8f61-7e42-4864-889f-e45ecfb950df}</ProjectGuid>
+    <RootNamespace>laslib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>$(ProjectName)64</TargetName>
+    <OutDir>$(SolutionDir)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

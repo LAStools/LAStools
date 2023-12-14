@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>laszip64</TargetName>
+    <OutDir>$(SolutionDir)\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>src;inc;..\LASlib\inc;..\LASlib\src;</AdditionalIncludeDirectories>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>..\$(Platform)\$(Configuration)\laslib64.lib;..\$(Platform)\$(Configuration)\lassrclib64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\arithmeticdecoder.cpp" />
+    <ClCompile Include="src\arithmeticencoder.cpp" />
+    <ClCompile Include="src\arithmeticmodel.cpp" />
+    <ClCompile Include="src\integercompressor.cpp" />
+    <ClCompile Include="src\lascopc.cpp" />
+    <ClCompile Include="src\lasindex.cpp" />
+    <ClCompile Include="src\lasinterval.cpp" />
+    <ClCompile Include="src\lasquadtree.cpp" />
+    <ClCompile Include="src\lasreaditemcompressed_v1.cpp" />
+    <ClCompile Include="src\lasreaditemcompressed_v2.cpp" />
+    <ClCompile Include="src\lasreaditemcompressed_v3.cpp" />
+    <ClCompile Include="src\lasreaditemcompressed_v4.cpp" />
+    <ClCompile Include="src\lasreadpoint.cpp" />
+    <ClCompile Include="src\laswriteitemcompressed_v1.cpp" />
+    <ClCompile Include="src\laswriteitemcompressed_v2.cpp" />
+    <ClCompile Include="src\laswriteitemcompressed_v3.cpp" />
+    <ClCompile Include="src\laswriteitemcompressed_v4.cpp" />
+    <ClCompile Include="src\laswritepoint.cpp" />
+    <ClCompile Include="src\laszip.cpp" />
+    <ClCompile Include="src\mydefs.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\arithmeticdecoder.hpp" />
+    <ClInclude Include="src\arithmeticencoder.hpp" />
+    <ClInclude Include="src\arithmeticmodel.hpp" />
+    <ClInclude Include="src\bytestreamin.hpp" />
+    <ClInclude Include="src\bytestreaminout.hpp" />
+    <ClInclude Include="src\bytestreaminout_file.hpp" />
+    <ClInclude Include="src\bytestreamin_array.hpp" />
+    <ClInclude Include="src\bytestreamin_file.hpp" />
+    <ClInclude Include="src\bytestreamin_istream.hpp" />
+    <ClInclude Include="src\bytestreamout.hpp" />
+    <ClInclude Include="src\bytestreamout_array.hpp" />
+    <ClInclude Include="src\bytestreamout_file.hpp" />
+    <ClInclude Include="src\bytestreamout_nil.hpp" />
+    <ClInclude Include="src\bytestreamout_ostream.hpp" />
+    <ClInclude Include="src\integercompressor.hpp" />
+    <ClInclude Include="src\lasattributer.hpp" />
+    <ClInclude Include="src\lascopc.hpp" />
+    <ClInclude Include="src\lasindex.hpp" />
+    <ClInclude Include="src\lasinterval.hpp" />
+    <ClInclude Include="src\laspoint.hpp" />
+    <ClInclude Include="src\lasquadtree.hpp" />
+    <ClInclude Include="src\lasquantizer.hpp" />
+    <ClInclude Include="src\lasreaditem.hpp" />
+    <ClInclude Include="src\lasreaditemcompressed_v1.hpp" />
+    <ClInclude Include="src\lasreaditemcompressed_v2.hpp" />
+    <ClInclude Include="src\lasreaditemcompressed_v3.hpp" />
+    <ClInclude Include="src\lasreaditemcompressed_v4.hpp" />
+    <ClInclude Include="src\lasreaditemraw.hpp" />
+    <ClInclude Include="src\lasreadpoint.hpp" />
+    <ClInclude Include="src\laswriteitem.hpp" />
+    <ClInclude Include="src\laswriteitemcompressed_v1.hpp" />
+    <ClInclude Include="src\laswriteitemcompressed_v2.hpp" />
+    <ClInclude Include="src\laswriteitemcompressed_v3.hpp" />
+    <ClInclude Include="src\laswriteitemcompressed_v4.hpp" />
+    <ClInclude Include="src\laswriteitemraw.hpp" />
+    <ClInclude Include="src\laswritepoint.hpp" />
+    <ClInclude Include="src\laszip.hpp" />
+    <ClInclude Include="src\laszip_common_v1.hpp" />
+    <ClInclude Include="src\laszip_common_v2.hpp" />
+    <ClInclude Include="src\laszip_common_v3.hpp" />
+    <ClInclude Include="src\laszip_decompress_selective_v3.hpp" />
+    <ClInclude Include="src\mydefs.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{28E29AE8-ECC4-4189-A2F4-A72F33D119A2}</ProjectGuid>
+    <RootNamespace>liblaszip</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>lasziplib</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

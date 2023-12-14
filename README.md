@@ -1,4 +1,4 @@
-# LAStools
+﻿# LAStools
 
 **Award-winning software for efficient LiDAR processing (with LASzip)**
 
@@ -21,12 +21,6 @@ All code is written in ultra-light-weight, very efficient and superfast C++.
 
 LAStools are a collection of highly-efficient, scriptable tools with multi-core batching that process LAS, compressed LAZ, Terrasolid BIN, ESRI Shapefiles (SHP), ASCII and others.
 
-You find the open-source part in 
-.\LASlib and 
-.\LASzip
-The documentation is placed at
-.\bin 
-
 ## Open source tools:
 
 * `las2las` extracts last returns, clips, subsamples, translates, etc ...
@@ -37,6 +31,7 @@ The documentation is placed at
 * `lasprecision`  analyses the actual precision of the LIDAR points
 * `laszip`  powerful, lossless LiDAR compressor that turns large LAS files into much smaller LAZ files that are only 7 - 20 percent of the original file size
 * `txt2las` converts LIDAR data from ASCII text to binary LAS format
+* `lascopcindex` create a copc indexed copc.laz file
 
 ## Closed source tools:
 
@@ -85,34 +80,57 @@ The documentation is placed at
 * `blast2dem` rasters like las2dem but with streaming TINs for billions of points. 
 * `blast2iso` contours like las2iso but with streaming TINs for billions of points. 
 
-## Binaries
+## Documentation
 
-For Windows all binaries are included in the download file. All open source tools can be compiled
-from the source code. For MSVC6.0 there is a project file. For Linux and MacOS
-the makefiles are included. Simply go into the root directory and run 'make':
+All documentation is provided as a readme markdown files (*.md) in the ".\bin" directory. 
 
-The binary download contain the ArcGIS toolbox in `.\LAStools\ArcGIS_toolbox` and 
-the QGIS toolbox in `.\LAStools\QGIS_toolbox`. A few example DOS batch scripts can be found
-in the `.\LAStools\example_batch_scripts` directory.
+## Installation
 
-1. `unzip LAStools.zip`
-2. `cd LAStools/`
-3. `make`
+All binaries can be downloaded at https://rapidlasso.de/downloads/
+
+Just download the files to a directory.
+There is no installation needed. Just run the tools from commandline or use 
+a client software to access the tools.
+
+## Usage
+
+### Console
+This command will do a ground classification of the "lake.laz" file and writes the 
+result into the file "out.laz".  
+    las2ground64 -i lake.laz -o out.laz
+It is common to use the commands in a batch script to process huge amount of data. 
+
+### Client software: laslook
+laslook is a graphical frontend and workbench for LAStools.
+The software contains the full documentation of LAStools and is free to use.
+See https://rapidlasso.de/laslook/ for details.
+
+### Client software: QGIS plugin
+The QGIS plugin is available within the QGIS plugin manager.
+
+### Client software: ArcGIS pro plugin
+The windows binary download contains the ArcGIS toolbox in `.\LAStools\ArcGIS_toolbox`.
+
+## Compile the sources
+To build own binaries out of this sources it is recommended to use cmake.
+
+    cmake .
+    cmake --build .
+    
+For windows there is also a MSVC solution file (*.sln) and project files in the repository.
+This provides a simple "Release" build configuration.
+
+A few example DOS batch scripts can be found in the `.\LAStools\example_batch_scripts` directory.
 
 ## Links
 
-Full windows binary download at
-https://downloads.rapidlasso.de/LAStools.zip
-Linux binaries on request.
-
-* official page:  http://lastools.org
-* company page:   https://rapidlasso.de
+* download page: https://rapidlasso.de/downloads/
+* company page:  https://rapidlasso.de
 * user group:     http://groups.google.com/group/lastools
 
 ## License
 
 Please read the `LICENSE.txt` file for information on the legal use and licensing
-of LAStools. I would also really like it if you would send me an email and tell me
-what you use LAStools for and what features and improvements you could need. 
+of LAStools. We appreciate any feedback. 
 
-(c) 2007-2022 info@rapidlasso.de - https://rapidlasso.de
+(c) 2007-2023 info@rapidlasso.de - https://rapidlasso.de
