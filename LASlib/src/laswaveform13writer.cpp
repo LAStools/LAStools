@@ -168,7 +168,7 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
 
   // write extended variable length header variable after variable (to avoid alignment issues)
 
-  U16 reserved = 0xAABB;
+  U16 reserved = 0; // used to be 0xAABB
   if (!stream->put16bitsLE((U8*)&reserved))
   {
     fprintf(stderr,"ERROR: writing EVLR reserved\n");

@@ -24,7 +24,7 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
   CHANGE HISTORY:
-
+    04 August 2023 -- set default of VLR header "reserved" to 0 instead of 0xAABB
      7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     17 October 2011 -- created after bauarbeiter on the roof next door woke me
 
