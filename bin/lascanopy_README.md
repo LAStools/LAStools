@@ -824,11 +824,11 @@ lascanopy -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov 
 -odtm                    : output as dtm (Digital Terrain Models)  
 -oflt                    : output as flt (Float file format)  
 -oforce                  : force output creation also on errors or warnings  
--oimg                    : output as img (Image file)  
+-oimg                    : output as img (Image file) (Win32 only)  
 -ojpg                    : output as jpg (JPG image)  
 -olaz                    : output as LAZ (compressed LAS)  
 -opng                    : output as png (PNG image)  
--osep [n]                : set text output separator as char [n]  
+-osep [sep]              : set text output separator as [sep](see table below)  
 -otif                    : output as GeoTIFF image  
 -oxyz                    : output as xyz textfile  
 -pipe_on                 : write output to command pipe, see also -std_in  
@@ -873,6 +873,18 @@ The other supported entries are:
   (13) : additional attributes described as extra bytes (10 and up)  
   H : a hexadecimal string encoding the RGB color  
   J : a hexadecimal string encoding the intensity  
+
+### output separator
+The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
+Supported [sep] values:
+
+  comma
+  tab
+  dot
+  colon
+  semicolon
+  hyphen
+  space
 
 ## License
 

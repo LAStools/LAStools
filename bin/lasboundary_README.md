@@ -117,7 +117,6 @@ lasboundary -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.shp
 -concavity [n]        : use [n] as granularity for grow concavities inwards (minimum: twice the pulse spacing) (default=50)  
 -convex               : compute a convex hull (same as setting concavity to infinite)  
 -convex_hull          : compute a convex hull (same as setting concavity to infinite)  
--cores [n]            : process multiple inputs on [n] cores in parallel  
 -disjoint             : allow polygon to fragment for point clusters farther than concavity apart  
 -disjoint_hull        : allow polygon to fragment for point clusters farther than concavity apart  
 -extra_pass           : do extra read pass to count points (only makes sense when filtering)  
@@ -137,13 +136,14 @@ lasboundary -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.shp
 -week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--version : reports this tool's version number  
+-cpu64     : start 64 bit executable (instead of default 32 bit executable)  
+-cores [n] : process multiple inputs on [n] cores in parallel  
+-fail      : fail if license expired or invalid  
+-gui       : start with files loaded into GUI  
+-h         : print help output  
+-license   : show license information  
+-v         : verbose output (print extra information)  
+-version   : reports this tool's version number  
 
 ## Module arguments
 

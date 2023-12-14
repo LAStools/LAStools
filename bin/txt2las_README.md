@@ -32,6 +32,13 @@ the "Extra Bytes" concept with '-add_attribute'.
 It is also possible to pipe the ASCII into txt2las. For this you
 will need to add both '-stdin' and '-itxt' to the command-line.
 
+Each line will be parsed according to the parameters of the 
+"-parse" argument.
+If the input file contains a column description in the first line the 
+parse string can be generated automatic by this line.
+A column description can be created by las2txt command. 
+See "parse" section below for valid parse tokens.
+
  
 ## Examples
 
@@ -724,7 +731,7 @@ option. These are unsigned integers numbers so no scale value is required.
 -optx            : output as PTX (plain text with header)  
 -oqi             : output in QFIT format (.qi)(ATM project, NASA)  
 -oscale_rgb [n]  : scale output RGB by [n]  
--osep [n]        : set text output separator as char [n]  
+-osep [sep]      : set text output separator as [sep](see table below)  
 -otxt            : output as textfile  
 -owrl            : output as VRLM (Virtual Reality Modeling Language) text  
 -pipe_on         : write output to command pipe, see also -std_in  
@@ -758,6 +765,12 @@ number should be skipped, the next three numbers are
 the x, y, and z coordinate, the next two should be
 skipped, and the next number is the scan angle.
 
+If the file contains a line with the column description,
+as outputted by the '-coldesc' flag in las2txt, the 
+'-parse' argument can be omitted, and it will be 
+automatically detected by inferring the format from the 
+file's own description.
+
 The other supported entries are:  
   x : [x] coordinate  
   y : [y] coordinate  
@@ -787,7 +800,22 @@ The other supported entries are:
   (13) : additional attributes described as extra bytes (10 and up)  
   H : a hexadecimal string encoding the RGB color  
   J : a hexadecimal string encoding the intensity  
+(HSV): the color of the point in HSV model with values ranging in [0,360|100] for each channel. It is converted internally to RGB..
+(HSL): the color of the point in HSL model with values ranging in [0,360|100] for each channel. It is converted internally to RGB..
+(hsv): the color of the point in HSV model with values ranging in [0,1] for each channel. It is converted internally to RGB..
+(hsl): the color of the point in HSL model with values ranging in [0,1] for each channel. It is converted internally to RGB..
 
+### output separator
+The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
+Supported [sep] values:
+
+  comma
+  tab
+  dot
+  colon
+  semicolon
+  hyphen
+  space
 
 ## License
 

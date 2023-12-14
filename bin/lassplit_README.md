@@ -33,6 +33,13 @@ in the command line with
 -rescale 0.01 0.01 0.001  
 -reoffset 600000 4000000 0  
 
+The id for the filename can be adjusted using '-split_offset'.
+If '-update_point_source' is set the point_source for every point will be
+rewritten with the id. '-point_source_offset' allow to give an additional 
+offset only for the new point_source. 
+If the id is negative it will be set to '1000000-id'.
+Point_source of points is limited/mapped to a unsigned 16 Bit integer.
+ 
 # See also
 
 lasmerge - Merge or split lidar data files by number of points
@@ -119,6 +126,9 @@ lassplit -i *.las -merged -split 100000000 -digits 2
 -split [n]                        : split into containing [n] points each  
 -switch_G_B                       : switch green and blue value  
 -week_to_adjusted [n]             : converts time stamps from GPS week [n] to Adjusted Standard GPS  
+-split_offset [n]                 : add offset [n] to the split-id which is relevant for the filename and may the point_source
+-update_point_source              : point_source will be updated by split-id
+-point_source_offset [n]          : additional offset [n] only for the point_source if point_source is updated
 
 ### Basics
 -fail    : fail if license expired or invalid  
@@ -709,7 +719,7 @@ lassplit -i *.las -merged -split 100000000 -digits 2
 -optx            : output as PTX (plain text with header)  
 -oqi             : output in QFIT format (.qi)(ATM project, NASA)  
 -oscale_rgb [n]  : scale output RGB by [n]  
--osep [n]        : set text output separator as char [n]  
+-osep [sep]      : set text output separator as [sep](see table below)  
 -otxt            : output as textfile  
 -owrl            : output as VRLM (Virtual Reality Modeling Language) text  
 -pipe_on         : write output to command pipe, see also -std_in  
@@ -755,6 +765,18 @@ The other supported entries are:
   (13) : additional attributes described as extra bytes (10 and up)  
   H : a hexadecimal string encoding the RGB color  
   J : a hexadecimal string encoding the intensity  
+
+### output separator
+The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
+Supported [sep] values:
+
+  comma
+  tab
+  dot
+  colon
+  semicolon
+  hyphen
+  space
 
 ## License
 

@@ -191,8 +191,8 @@ tiles the last returns from huge.laz into compressed tiling.
 -buffer [n]                         : increase tile by a bounding box of size [n]  
 -cores [n]                          : process multiple inputs on [n] cores in parallel  
 -dont_delete_refined                : keep original tiles around tile refinement to 4 smaller tiles  
--external_tile                      : generate one external defined tile with the given bounding box  
--external_tiling [fns] [n]          : use tile info of [fns] and DBF attribute [n]  
+-external_tile [x1] [y1] [x2] [y2]  : generate one external defined tile with the given bounding box  
+-external_tiling [fns] [n]          : use tile info of SHP file [fns] and DBF attribute [n]  
 -extra_pass                         : do extra read pass to count points (only makes sense when filtering)  
 -flag_as_synthetic                  : flag buffer points as synthetic  
 -flag_as_withheld                   : flag buffer points as withheld  
@@ -209,7 +209,7 @@ tiles the last returns from huge.laz into compressed tiling.
 -single_tile [n]                    : generate just tile with index [n]  
 -single_tile_bb [n] [x1] [y1] [x2] [y2]: generate tile with index [n] and the given bounding box  
 -tile_ll [x] [y]                    : shift tiling off its standard modulo tile_size tiling [x] [y]  
--tile_size [n]                      : set smallest spatial area indexed to [n]x[n] units (default=10)  
+-tile_size [n]                      : set smallest spatial area indexed to [n]x[n] units (default=1000)  
 -unindexed                          : force processing even if input is not indexed  
 
 ### Basics
@@ -805,7 +805,7 @@ tiles the last returns from huge.laz into compressed tiling.
 -optx            : output as PTX (plain text with header)  
 -oqi             : output in QFIT format (.qi)(ATM project, NASA)  
 -oscale_rgb [n]  : scale output RGB by [n]  
--osep [n]        : set text output separator as char [n]  
+-osep [sep]      : set text output separator as [sep](see table below)  
 -otxt            : output as textfile  
 -owrl            : output as VRLM (Virtual Reality Modeling Language) text  
 -pipe_on         : write output to command pipe, see also -std_in    
@@ -851,6 +851,18 @@ The other supported entries are:
   (13) : additional attributes described as extra bytes (10 and up)  
   H : a hexadecimal string encoding the RGB color  
   J : a hexadecimal string encoding the intensity  
+
+### output separator
+The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
+Supported [sep] values:
+
+  comma
+  tab
+  dot
+  colon
+  semicolon
+  hyphen
+  space
 
 ## License
 

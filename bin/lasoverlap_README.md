@@ -779,7 +779,7 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -ojpg                    : output as jpg (JPG image)  
 -olaz                    : output as LAZ (compressed LAS)  
 -opng                    : output as png (PNG image)  
--osep [n]                : set text output separator as char [n]  
+-osep [n]                : set text output separator as [sep] (see below, only xyz)  
 -otif                    : output as GeoTIFF image  
 -oxyz                    : output as xyz textfile  
 -pipe_on                 : write output to command pipe, see also -std_in  
@@ -823,6 +823,18 @@ The other supported entries are:
   (13) : additional attributes described as extra bytes (10 and up)  
   H : a hexadecimal string encoding the RGB color  
   J : a hexadecimal string encoding the intensity  
+
+### output separator
+The '-osep [sep]' argument specifies the output format of a text(xyz) output.
+Supported [sep] values:
+
+  comma
+  tab
+  dot
+  colon
+  semicolon
+  hyphen
+  space
 
 ## License
 

@@ -13,6 +13,8 @@ can be adjusted up or down.
                 -poly ..\data\lake_breakline.shp ^
                 -o lake.laz
 
+Will classify all points within a range of 4 and step of 0.5 with class 20.   
+
     lasdistance -i ..\data\lake.laz ^
                 -poly ..\data\lake_breakline.shp ^
                 -distance_xy 10.0 -step_xy 1.0 ^
@@ -665,7 +667,7 @@ lasdistance -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o out.
 -optx            : output as PTX (plain text with header)  
 -oqi             : output in QFIT format (.qi)(ATM project, NASA)  
 -oscale_rgb [n]  : scale output RGB by [n]  
--osep [n]        : set text output separator as char [n]  
+-osep [sep]      : set text output separator as [sep](see table below)  
 -otxt            : output as textfile  
 -owrl            : output as VRLM (Virtual Reality Modeling Language) text  
 -pipe_on         : write output to command pipe, see also -std_in  
@@ -711,6 +713,18 @@ The other supported entries are:
   (13) : additional attributes described as extra bytes (10 and up)  
   H : a hexadecimal string encoding the RGB color  
   J : a hexadecimal string encoding the intensity  
+
+### output separator
+The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
+Supported [sep] values:
+
+  comma
+  tab
+  dot
+  colon
+  semicolon
+  hyphen
+  space
 
 ## License
 

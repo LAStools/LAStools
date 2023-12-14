@@ -97,6 +97,7 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 
 ## las2txt specific arguments
 
+-coldesc     : writes a header with column description into the output file  
 -cores [n]   : process multiple inputs on [n] cores in parallel  
 -extra [n]   : use [n] as value of output extra string  
 -header [n]  : use header prefix [n] (pound,percent,dollar,comma,star,colon,semicolon)  
@@ -105,6 +106,7 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 -parse [xyz] : use parse string [xyz] to access point values  
 -parse_all   : set "txyzirndecaup" as parse string to parse all available information  
 -sep [n]     : output separator [comma,space,semicolon,tab,colon,hyphen,dot], (default=space)  
+
 
 ### Basics
 -cpu64   : start 64 bit executable (instead of default 32 bit executable)  
@@ -626,7 +628,7 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 -oparse [xyz]    : parse on-the-fly to ASCII using fields [xyz]  
 -oqi             : output in QFIT format (.qi)(ATM project, NASA)  
 -oscale_rgb [n]  : scale output RGB by [n]  
--osep [n]        : set text output separator as char [n]  
+-osep [sep]      : set text output separator as [sep](see table below)  
 -otxt            : output as textfile  
 -owrl            : output as VRLM (Virtual Reality Modeling Language) text  
 -pipe_on         : write output to command pipe, see also -std_in  
@@ -687,7 +689,23 @@ The other supported entries are:
     + : the byte-wise B difference to the last point  
     V : the waveform data  
     E : extra string (-extra)  
-    
+    (HSL): the HSL conversion of RGB in range [0,360/100] for each channel  
+    (HSV): the HSV conversion of RGB in range [0,360/100] for each channel  
+    (hsl): the HSL conversion of RGB in range [0,1] for each channel  
+    (hsv): the HSV conversion of RGB in range [0,1] for each channel  
+
+### output separator
+The '-osep [sep]' argument specifies the output format of a text(xyz) output.
+Supported [sep] values:
+
+  comma
+  tab
+  dot
+  colon
+  semicolon
+  hyphen
+  space
+
 
 ## License
 
