@@ -33,7 +33,7 @@ LAS or LAZ files that are not indexed yet.
 
 ## Examples
 
-    lasindex -i in.laz
+    lasindex64 -i in.laz
 
 creates a spatial indexing file called 'in.lax' that need to be
 in the same folder as the file 'in.laz' to be useful. If you
@@ -41,28 +41,28 @@ modify the spatial location, the number of points, or their order
 in the file then you need to recreate the LAX file.
 
 
-    lasindex -i *.laz
+    lasindex64 -i *.laz
 
 creates a spatial indexing file for all LAZ files *.laz
 
 
-    lasindex -i *.laz -append
+    lasindex64 -i *.laz -append
 
 creates a spatial indexing file for all LAZ files *.laz and appends
 them to then end of the LAZ file (not possible when indexing LAS)
 
 
-    lasindex -i *.laz -dont_reindex
+    lasindex64 -i *.laz -dont_reindex
 
 creates a spatial indexing file for all LAZ files *.laz that do
 not yet have a LAX file
 
 
-lasindex -h  
-lasindex -i lidar.las  
-lasindex -i *.las  
-lasindex -i flight1*.las flight2*.las -v  
-lasindex -i lidar.las -tile_size 2 -maximum -50
+lasindex64 -h  
+lasindex64 -i lidar.las  
+lasindex64 -i *.las  
+lasindex64 -i flight1*.las flight2*.las -v  
+lasindex64 -i lidar.las -tile_size 2 -maximum -50
 
 
 ## lasindex specific arguments
@@ -642,5 +642,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

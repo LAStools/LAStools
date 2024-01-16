@@ -29,22 +29,22 @@ the difference grid.
 
 ## Examples
 
-    lasvdatum -i Nad83\test.laz -epsg 26917 ^
+    lasvdatum64 -i Nad83\test.laz -epsg 26917 ^
 	          -vgrid g2012bu0.gtx -o Geoid12B\test.laz
 
 convert from (UTM17 + NAD83 ellipsoidal) to (UTM17 + NAVD88 Geoid12B)
 
-    lasvdatum -i Geoid12B\test.laz -epsg 26917 ^
+    lasvdatum64 -i Geoid12B\test.laz -epsg 26917 ^
               -vgrid g2012bu0.gtx -backward -o Nad83\test.laz
 
 convert from (UTM17 + NAVD88 Geoid12B) to (UTM17 + NAD83 ellipsoidal)
 
 
-lasvdatum -h  
-lasvdatum -i in.laz -vgrid g2012bu0.gtx -o out.laz  
-lasvdatum -i in.laz -vgrid g2012bu0.gtx -backward -o out.laz  
-lasvdatum -i in.laz -epsg 26917 -vgrid g2012bu0.gtx out.laz  
-lasvdatum -i in.laz -epsg 26917 -vgrid g2012bu0.gtx -backward -o out.laz
+lasvdatum64 -h  
+lasvdatum64 -i in.laz -vgrid g2012bu0.gtx -o out.laz  
+lasvdatum64 -i in.laz -vgrid g2012bu0.gtx -backward -o out.laz  
+lasvdatum64 -i in.laz -epsg 26917 -vgrid g2012bu0.gtx out.laz  
+lasvdatum64 -i in.laz -epsg 26917 -vgrid g2012bu0.gtx -backward -o out.laz
 
 
 ## lasvdatum specific arguments
@@ -726,8 +726,7 @@ You will get plenty of samples to this tool.
 To get further support see our
 [rapidlasso service page](https://rapidlasso.de/service/)
 
-Check for latest updates at
-https://rapidlasso.de/category/blog/releases/
+Check for latest updates at https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

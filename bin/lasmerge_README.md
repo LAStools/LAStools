@@ -40,19 +40,19 @@ Similarly a new offset can be specified
 
 ## Examples
 
-    lasmerge -i *.las -o out.las
+    lasmerge64 -i *.las -o out.las
 
 merge all *.las files into one out.las file. 
 
 
-    lasmerge -i *.las -o out0000.las -split 1000000000
+    lasmerge64 -i *.las -o out0000.las -split 1000000000
 
 merge all *.las files into one and then split it into several
 output files that contain one billion points each and that are
 called out0000.las, out0001.las, out0002.las, out0003.las, ...
 
 
-    lasmerge -i big.txt -iparse xyzt -o out000.laz -split 500000000
+    lasmerge64 -i big.txt -iparse xyzt -o out000.laz -split 500000000
 
 split the text file big.txt that could, for example, contain 25
 billion points one and then split it into several compressed
@@ -60,39 +60,39 @@ output LAZ files that contain 500 million points each that are
 called out000.laz, out001.laz, out002.laz, out003.laz, ...
 
 
-    lasmerge -i *.txt -iparse xyztiarn -o out.las
+    lasmerge64 -i *.txt -iparse xyztiarn -o out.las
 
 merge all *.txt files, parsed with 'xyztiarn', into one out.las file. 
 
 
-    lasmerge -i in1.las in2.las in3.las -o out.las
+    lasmerge64 -i in1.las in2.las in3.las -o out.las
 
 merge the three inX.las files into one out.las file. 
 
 
-    lasmerge -lof file_list.txt -o out.laz
+    lasmerge64 -lof file_list.txt -o out.laz
 
 merges all LAS files listed in the text file into one out.laz file
 
 
-    lasmerge -lof file_list.txt -o out.las -rescale 0.01 0.01 0.001 -v
+    lasmerge64 -lof file_list.txt -o out.las -rescale 0.01 0.01 0.001 -v
 
 merges the file and stores the LIDAR points with 0.01 accuracy 
 in x y and z and prints out control information
 
 
-    lasmerge -lof file_list.txt -o out.las -rescale 0.01 0.01 0.01 -reoffset 600000 4000000 0 -v
+    lasmerge64 -lof file_list.txt -o out.las -rescale 0.01 0.01 0.01 -reoffset 600000 4000000 0 -v
 
 same but with a different accuracy for z and an offset
 
 
-lasmerge -h  
-lasmerge -i *.las -o out.las  
-lasmerge -lof lasfiles.txt -o out.las  
-lasmerge -i *.las -o out0000.laz -split 1000000000  
-lasmerge -i file1.las file2.las file3.las -o out.las  
-lasmerge -i file1.las file2.las -reoffset 600000 4000000 0 -olas > out.las  
-lasmerge -lof lasfiles.txt -rescale 0.01 0.01 0.01 -v -o out.las
+lasmerge64 -h  
+lasmerge64 -i *.las -o out.las  
+lasmerge64 -lof lasfiles.txt -o out.las  
+lasmerge64 -i *.las -o out0000.laz -split 1000000000  
+lasmerge64 -i file1.las file2.las file3.las -o out.las  
+lasmerge64 -i file1.las file2.las -reoffset 600000 4000000 0 -olas > out.las  
+lasmerge64 -lof lasfiles.txt -rescale 0.01 0.01 0.01 -v -o out.las
 
 
 ## lasmerge specific arguments
@@ -767,5 +767,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

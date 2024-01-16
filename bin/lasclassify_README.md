@@ -45,48 +45,48 @@ for example. The default is 2 meters.
 
 ## Examples
 
-    lasground -i lidar.las -o lidar_with_bare_earth.las -city
-    lasheight -i lidar_with_bare_earth.las -o lidar_with_heights.las
-    lasclassify -i lidar_with_heights.las -o lidar_classified.las
+    lasground64 -i lidar.las -o lidar_with_bare_earth.las -city
+    lasheight64 -i lidar_with_bare_earth.las -o lidar_with_heights.las
+    lasclassify64 -i lidar_with_heights.las -o lidar_classified.las
 
 finds the ground points with lasground, computes the height of each
 point with lasheight, and classifies buildings and high vegetation
 with the default settings.
 
 
-    lasground -i lidar.las -o lidar_with_bare_earth.las -city -feet -elevation_feet
-    lasheight -i lidar_with_bare_earth.las -o lidar_with_heights.las
-    lasclassify -i lidar_with_heights.las -o lidar_classified.las -feet -elevation_feet
+    lasground64 -i lidar.las -o lidar_with_bare_earth.las -city -feet -elevation_feet
+    lasheight64 -i lidar_with_bare_earth.las -o lidar_with_heights.las
+    lasclassify64 -i lidar_with_heights.las -o lidar_classified.las -feet -elevation_feet
 
 the same as above for LIDAR where both horizontal and vertical units
 are in feet instead of in meters (meters are assumed by default unless
 there is projection information in the LAS file saying otherwise).
 
 
-    lasclassify -i *.las
+    lasclassify64 -i *.las
 
 classifies all LAS files with the default settings (the LAS files need
 to already have ground points classified and point heigths computed).
 
 
-    lasclassify -i *.laz
+    lasclassify64 -i *.laz
 
 classifies all LAZ files with the default settings (the LAZ files need
 to already have ground points classified and point heigths computed).
 
 
-    lasclassify -i *.laz -planar 0.2
+    lasclassify64 -i *.laz -planar 0.2
 
 experimental. same as above but more points will be joined into roofs.
 
 
-lasclassify -h  
-lasclassify -i in.las -o out.laz  
-lasclassify -i in.laz -o out.las -feet -elevation_feet  
-lasclassify -i in.laz -o out.las -verbose -planar 0.2  
-lasclassify -i in.laz -o out.las -verbose -planar 0.15 -ground_offset 1.5 -wide_gutters  
-lasclassify -i *.las  
-lasclassify -i *.laz -verbose -feet -elevation_feet
+lasclassify64 -h  
+lasclassify64 -i in.las -o out.laz  
+lasclassify64 -i in.laz -o out.las -feet -elevation_feet  
+lasclassify64 -i in.laz -o out.las -verbose -planar 0.2  
+lasclassify64 -i in.laz -o out.las -verbose -planar 0.15 -ground_offset 1.5 -wide_gutters  
+lasclassify64 -i *.las  
+lasclassify64 -i *.laz -verbose -feet -elevation_feet
 
 
 ## lasclassify specific arguments
@@ -797,5 +797,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

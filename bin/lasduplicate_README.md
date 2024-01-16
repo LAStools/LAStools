@@ -44,62 +44,62 @@ lascopy - Copy point properties from different sources to a target
 
 ## Examples
 
-    lasduplicate -i *.las
+    lasduplicate64 -i *.las
 
 removes all duplicates from all LAS file matching '*.las' and stores
 each result to a corresponding LAS file '*_1.las'.
 
 
-    lasduplicate -i *.las -lowest_z
+    lasduplicate64 -i *.las -lowest_z
 
 same as above but keeps the duplicate with the lowest z coordinate.
 
 
-    lasduplicate -i *.txt -iparse xyziat -otxt -oparse xyziat
+    lasduplicate64 -i *.txt -iparse xyziat -otxt -oparse xyziat
 
 removes all duplicates from all ASCII file matching '*.txt' that are
 then parsed with 'xyziat' and stores each result to a corresponding
 ASCII file '*_1.txt'.
 
 
-    lasduplicate -i in.las -o out.las
+    lasduplicate64 -i in.las -o out.las
 
 removes all duplicates from the LAS file 'in.las' and stores the
 result to the LAS file 'out.las'.
 
 
-    lasduplicate -i in.las -o out.las -v
+    lasduplicate64 -i in.las -o out.las -v
 
 same as above but reports every removed point in the stderr.
 
 
-    lasduplicate -i in.laz -nearby 0.005 -o out.laz 
+    lasduplicate64 -i in.laz -nearby 0.005 -o out.laz 
 
 removes all duplicates and nearby points from fulfilling the criteria
 desribed above from the LAS file 'in.laz' and stores the result to the
 LAS file 'out.laz'.
 
 
-    lasduplicate -i in.laz -o out.laz
+    lasduplicate64 -i in.laz -o out.laz
 
 removes all duplicates from the LASzip compressed file 'in.laz'
 and stores the result to the LASzip compressed 'out.laz'.
 
 
-    lasduplicate -i in.txt -iparse xyzai -o out.txt -oparse xyzai 
+    lasduplicate64 -i in.txt -iparse xyzai -o out.txt -oparse xyzai 
 
 removes all duplicates from the ASCII file 'in.txt' and stores
 the result to the ASCII file 'out.txt'.
 
 
-    lasduplicate -lof files.txt -merged -o merged.laz
+    lasduplicate64 -lof files.txt -merged -o merged.laz
 
 removes all duplicates from the merged points of all LAS/LAZ files
 listed in 'files.txt' and stores the merged result to the LASzip
 compressed file 'merged.laz'.
 
 
-    lasduplicate -i in.las ^
+    lasduplicate64 -i in.las ^
                 -unique_xyz -record_removed ^
                 -o out.laz
 
@@ -107,21 +107,21 @@ removes all xyz duplicates from in.las and stores the xyz unique
 points to out.laz and all removed xyz duplicates to out_removed.laz
 
 
-    lasduplicate -lof files.txt -iparse xyzcirn -olas
+    lasduplicate64 -lof files.txt -iparse xyzcirn -olas
 
 same as above but for a list of ASCII files, without merging them,
 and with storing each result to a LAS file.
 
 
-    lasduplicate -i first.txt -iparse xyzi ^
+    lasduplicate64 -i first.txt -iparse xyzi ^
                 -set_return_number 1 -set_number_of_returns 2 ^
                 -unique_xyz ^
                 -o first.laz
-    lasduplicate -i last.txt -iparse xyzi ^
+    lasduplicate64 -i last.txt -iparse xyzi ^
                 -set_return_number 2 -set_number_of_returns 2 ^
                 -unique_xyz ^
                 -o last.laz
-    lasduplicate -i first.laz -i last.laz -merged ^
+    lasduplicate64 -i first.laz -i last.laz -merged ^
                 -single_returns ^
                 -o final.laz
 
@@ -134,17 +134,17 @@ the last.laz file on-the-fly, removes all xy unique duplicates
 and marks the sole survivor as the only return of one.
 
 
-lasduplicate -h  
-lasduplicate -i *.las  
-lasduplicate -i tile.laz -o out.laz -flag_as_withheld  
-lasduplicate -i *.txt -iparse xyzit -otxt -oparse xyzit  
-lasduplicate -i in.las -lowest_z -o out.las  
-lasduplicate -i *.laz -unique_xyz -odix _unique -olaz  
-lasduplicate -i *.laz -nearby 0.01 -odix _nearby01 -olaz  
-lasduplicate -i in.laz -unique_xyz -record_removed -o out.laz  
-lasduplicate -i tiles\*.laz -single_returns -odir fixed\ -olaz  
-lasduplicate -i in.txt -iparse xyzit -o out.txt -oparse xyzit  
-lasduplicate -i in.las -nil
+lasduplicate64 -h  
+lasduplicate64 -i *.las  
+lasduplicate64 -i tile.laz -o out.laz -flag_as_withheld  
+lasduplicate64 -i *.txt -iparse xyzit -otxt -oparse xyzit  
+lasduplicate64 -i in.las -lowest_z -o out.las  
+lasduplicate64 -i *.laz -unique_xyz -odix _unique -olaz  
+lasduplicate64 -i *.laz -nearby 0.01 -odix _nearby01 -olaz  
+lasduplicate64 -i in.laz -unique_xyz -record_removed -o out.laz  
+lasduplicate64 -i tiles\*.laz -single_returns -odir fixed\ -olaz  
+lasduplicate64 -i in.txt -iparse xyzit -o out.txt -oparse xyzit  
+lasduplicate64 -i in.las -nil
 
 
 ## lasduplicate specific arguments
@@ -844,5 +844,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

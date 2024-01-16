@@ -42,7 +42,7 @@ the LiDAR from the calculation that also computes the average error.
 
 ## Examples
 
-    lascontrol -i *.laz -cp cp.csv -cp_out report.txt -keep_class 2 8 -adjust_z -odix _adjusted
+    lascontrol64 -i *.laz -cp cp.csv -cp_out report.txt -keep_class 2 8 -adjust_z -odix _adjusted
 
 assumes the x/y/z coordinates of the control points are stored as
 the 1nd/2nd/3rd entry on each line of the 'cp.csv' file and only
@@ -54,7 +54,7 @@ error is used to adjust the z coordinate of all LAZ files that are
 then written to files with the same name and appendix "_adjusted"
 
 
-    lascontrol -i *.las -cp cp.csv -keep_class 2 8 -parse sssxyz
+    lascontrol64 -i *.las -cp cp.csv -keep_class 2 8 -parse sssxyz
 
 assumes the x/y/z coordinates of the control points are stored as
 the 4th/5th/6rth entry on each line of the 'cp.csv' file and only
@@ -63,7 +63,7 @@ are used to construct the reference TIN. all LAS files that match
 '*.las' get merged on the fly into one. output goes to stdout.
 
 
-    lascontrol -i lidar.las -cp cp.csv -keep_class 2 -parse sxyz
+    lascontrol64 -i lidar.las -cp cp.csv -keep_class 2 -parse sxyz
 
 assumes the x/y/z coordinates of the control points are stored as
 the 2nd/3rd/4th entry on each line of the 'cp.csv' file and only
@@ -71,7 +71,7 @@ points with ground classification (class = 2) are used to construct
 the reference TIN. output goes to stdout.
 
 
-    lascontrol -i lidar.laz -cp cp.csv -keep_class 2 -parse xsysz -cp_out cp_out.csv
+    lascontrol64 -i lidar.laz -cp cp.csv -keep_class 2 -parse xsysz -cp_out cp_out.csv
 
 assumes the x/y/z coordinates of the control points are stored as
 the 1st/3rd/5th entry on each line of the 'cp.csv' file and only
@@ -79,7 +79,7 @@ points with ground classification (class = 2) are used to construct
 the reference TIN. output goes to 'cp_out.csv'.
 
 
-    lascontrol -i *.laz -cp cp.txt -skip 3 -keep_class 2
+    lascontrol64 -i *.laz -cp cp.txt -skip 3 -keep_class 2
 
 skips the first three lines of the file 'cp.txt' and assumes the
 x/y/z coordinates of the control points are stored as 1st/2nd/3rd
@@ -87,7 +87,7 @@ entry on each line. all LAS files that match '*.laz' get merged
 on the fly into one. output goes to stdout.
 
 
-    lascontrol -i flight1*.txt -iparse sxyz -iskip 2 -cp cp.txt -parse sssxyz -skip 1  -cp_out cp_out.csv
+    lascontrol64 -i flight1*.txt -iparse sxyz -iskip 2 -cp cp.txt -parse sssxyz -skip 1  -cp_out cp_out.csv
 
 skips the first lines of the file 'cp.txt' and assumes the x/y/z
 coordinates of the control points are stored as the 4th/5th/6th
@@ -98,13 +98,13 @@ LIDAR points are taked from the nd/3rd/4th entry on each line and
 the output goes to 'cp_out.csv'.
 
 
-lascontrol -h  
-lascontrol -i lidar.las -cp cp.txt -keep_class 2  
-lascontrol -i lidar.las -cp cp.csv -keep_class 2 8 -parse sxyz -step 2  
-lascontrol -i lidar.laz -cp cp.csv -keep_class 2 8 -parse xsysz -cp_out cp_out.csv  
-lascontrol -i *.las -cp cp.txt -skip 3 -keep_class 2  
-lascontrol -i lidar.txt -iparse cssxyz -cp cp.txt -parse ssxyz -skip 3 -keep_class 2 8  
-lascontrol -i flight1*.txt -iparse sxyz -iskip 2 -cp cp.txt -parse sssxyz -skip 1
+lascontrol64 -h  
+lascontrol64 -i lidar.las -cp cp.txt -keep_class 2  
+lascontrol64 -i lidar.las -cp cp.csv -keep_class 2 8 -parse sxyz -step 2  
+lascontrol64 -i lidar.laz -cp cp.csv -keep_class 2 8 -parse xsysz -cp_out cp_out.csv  
+lascontrol64 -i *.las -cp cp.txt -skip 3 -keep_class 2  
+lascontrol64 -i lidar.txt -iparse cssxyz -cp cp.txt -parse ssxyz -skip 3 -keep_class 2 8  
+lascontrol64 -i flight1*.txt -iparse sxyz -iskip 2 -cp cp.txt -parse sssxyz -skip 1
 
 
 ## lascontrol specific arguments
@@ -802,5 +802,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

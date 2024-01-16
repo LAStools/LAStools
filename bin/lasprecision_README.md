@@ -47,7 +47,7 @@ either 10, 20, 30, 40, or other multiple of 10 units spaced apart.
 Hence the true precision is only centimeters (=> 0.01). This is
 not nice and makes compression less efficient.
 
-    lasprecision -i MARS_Sample_Filtered_LiDAR.las -all
+    lasprecision64 -i MARS_Sample_Filtered_LiDAR.las -all
 original scale factors: 0.001 0.001 0.001
 loading first 8146178 of 8146178 points
 X differences
@@ -73,7 +73,7 @@ Z differences
 Let can take a closer look at the *raw* XYZ integers in this LAS
 file to understand what is happening:
 
-    las2txt -parse XYZ -i "MARS_Sample_Filtered_LiDAR.las" -otxt | more
+    las2txt64 -parse XYZ -i "MARS_Sample_Filtered_LiDAR.las" -otxt | more
 2136823840 1699144370 5192090  
 2136824490 1699143020 5192110  
 2136825130 1699141660 5192130  
@@ -93,13 +93,13 @@ in the header with lasinfo.exe would be lead to mistakenly assume that
 the file has more precision that it actually has. We can fix that by
 changing the scale factor to reflect the actual precision in this file:
 
-    lasprecision -i MARS_Sample_Filtered_LiDAR.las -rescale 0.01 0.01 0.01 -o MARS_Sample_Filtered_LiDAR_rescaled.las
+    lasprecision64 -i MARS_Sample_Filtered_LiDAR.las -rescale 0.01 0.01 0.01 -o MARS_Sample_Filtered_LiDAR_rescaled.las
 new scale factors: 0.01 0.01 0.01
 
 So lets look at the rescaled file and we see that now we get the type of
 histogram one would expect.
 
-    lasprecision -i MARS_Sample_Filtered_LiDAR_rescaled.las -all
+    lasprecision64 -i MARS_Sample_Filtered_LiDAR_rescaled.las -all
 original scale factors: 0.01 0.01 0.01  
 loading first 8146178 of 8146178 points  
 X differences  
@@ -126,7 +126,7 @@ double-precision coordinates after scaling are *identical* as lasdiff.exe
 tell us (see below). That might not always be the case because usually tiny
 rounding-error are introduced when excessive "fake" precision is in the file. 
 
-    lasdiff -i MARS_Sample_Filtered_LiDAR.las -i MARS_Sample_Filtered_LiDAR_rescaled.las
+    lasdiff64 -i MARS_Sample_Filtered_LiDAR.las -i MARS_Sample_Filtered_LiDAR_rescaled.las
 header is different  
   WARNING: different x_scale_factor: 0.001 0.01  
   WARNING: different y_scale_factor: 0.001 0.01  
@@ -237,7 +237,7 @@ some output from the header contents with lasinfo.exe. I very much dislike
 the way the offset that was chosen as well as how the scaling was set such
 that the raw integers of x, y, and z range from 0 to 2147483647. bad idea!
 
-    lasinfo -i "Mount St Helens Oct 4 2004.las"
+    lasinfo64 -i "Mount St Helens Oct 4 2004.las"
 ...    
   generating_software:       'Lidar Explorer by ProLogic, Inc.'    
 ...    
@@ -260,13 +260,13 @@ are for the "Z differences" but 0.001 should be enough (i.e. millimeter )
 precision given the data presents elevations in meters. We also move the
 offset a bit. Why? This is left as a exercise for the reader ... (-;
 
-    lasprecision -i "Mount St Helens Oct 4 2004.las" -o "Mount St Helens Oct 4 2004 rescaled.las" -rescale 0.01 0.01 0.001 -reoffset 1048576 262144 4096
+    lasprecision64 -i "Mount St Helens Oct 4 2004.las" -o "Mount St Helens Oct 4 2004 rescaled.las" -rescale 0.01 0.01 0.001 -reoffset 1048576 262144 4096
 new scale factors: 0.01 0.01 0.001
 
 After rescaling the file we get a maximal floating point difference
 of 0.005, 0.005, and 0.0005 for x, y, and z respectively.
 
-    lasdiff -i "Mount St Helens Oct 4 2004.las" -i "Mount St Helens Oct 4 2004 rescaled.las"
+    lasdiff64 -i "Mount St Helens Oct 4 2004.las" -i "Mount St Helens Oct 4 2004 rescaled.las"
 header is different  
   WARNING: different x_scale_factor: 0.000012 0.01  
   WARNING: different y_scale_factor: 0.000017 0.01  
@@ -297,7 +297,7 @@ excessive and "fake" presision in the lower bits that is really just noise.
 
 A few other files where I found excessive precision with lasprecision.exe:
 
-    lasprecision -i "Grass Lake Small.las"
+    lasprecision64 -i "Grass Lake Small.las"
 original scale factors: 0.01 0.01 0.01  
 loading first 5000000 of 6190800 points  
 X differences  
@@ -320,7 +320,7 @@ Z differences
          13 :          1   0.13  
          17 :          1   0.17  
   
-    lasprecision -i IowaDNR-CloudPeakSoft-1.0-UTM15N.las  
+    lasprecision64 -i IowaDNR-CloudPeakSoft-1.0-UTM15N.las  
 original scale factors: 0.001 0.001 0.001  
 loading first 5000000 of 5847380 points  
 X differences  
@@ -337,7 +337,7 @@ Z differences
           2 :       1167   0.002  
           3 :        356   0.003  
   
-    lasprecision -i LAS12_Sample_withRGB_QT_Modeler.las  
+    lasprecision64 -i LAS12_Sample_withRGB_QT_Modeler.las  
 original scale factors: 0.001 0.001 0.001  
 loading first 3837973 of 3837973 points  
 WARNING: end-of-file after 3813696 of 3837973 points  
@@ -360,7 +360,7 @@ Z differences
           5 :         60   0.005  
           6 :         26   0.006  
   
-    lasprecision -i Lincoln.las  
+    lasprecision64 -i Lincoln.las  
 original scale factors: 1.45584e-006 1.38473e-006 6.72668e-008  
 loading first 5000000 of 9278073 points  
 X differences  
@@ -391,7 +391,7 @@ Z differences
           6 :        440   4.03601e-007  
           7 :      57413   4.70867e-007  
   
-    lasprecision -i line_27007_dd.las  
+    lasprecision64 -i line_27007_dd.las  
 original scale factors: 1e-007 1e-007 1e-007  
 loading first 5000000 of 5380156 points  
 X differences  
@@ -424,7 +424,7 @@ Z differences
      290000 :          1   0.029  
      300000 :          1   0.03  
   
-    lasprecision -i "Palm Beach Pre Hurricane.las"  
+    lasprecision64 -i "Palm Beach Pre Hurricane.las"  
 original scale factors: 3.22228e-006 5.53148e-006 2.28007e-007  
 loading first 2580410 of 2580410 points  
 X differences  
@@ -468,14 +468,14 @@ Z differences
   
   
   
-lasprecision -h  
-lasprecision -i in.las  
-lasprecision -i in.las -number 1000000  
-lasprecision -i in.las -all -gps -lines 50  
-lasprecision -i in.las -no_x -no_y -no_z -rgb  
-lasprecision -i in.las -diff_diff  
-lasprecision -i in.las -o out.las -rescale 0.01 0.01 0.001 -reoffset 300000 2000000 0  
-lasprecision -i in.las -o out.las -rescale 0.333333333 0.333333333 0.01
+lasprecision64 -h  
+lasprecision64 -i in.las  
+lasprecision64 -i in.las -number 1000000  
+lasprecision64 -i in.las -all -gps -lines 50  
+lasprecision64 -i in.las -no_x -no_y -no_z -rgb  
+lasprecision64 -i in.las -diff_diff  
+lasprecision64 -i in.las -o out.las -rescale 0.01 0.01 0.001 -reoffset 300000 2000000 0  
+lasprecision64 -i in.las -o out.las -rescale 0.333333333 0.333333333 0.01
 
 
 ## lasprecision specific arguments
@@ -1160,5 +1160,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

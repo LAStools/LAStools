@@ -58,7 +58,7 @@ operation will be applied exclusively to the other points.
 Obviously you can always combine filtering, for example to keep
 only last returns ('-last_only') or to keep only two particular
 classifications ('-keep_class 2 8'), with the thinning. There
-are many other filters to choose from. Simply run 'lasthin -h'
+are many other filters to choose from. Simply run 'lasthin64 -h'
 to lists them all.
 
 The grid spacing default is 1 unit and it can be changed, for
@@ -67,49 +67,49 @@ example to 5 units, with '-step 5'.
  
 ## Examples
 
-    lasthin -i *.las -odix _thinned
+    lasthin64 -i *.las -odix _thinned
 
 thins all LAS files with the grid spacing default of 1 unit
 and keeps the lowest point per grid cell and forms output file
 names by adding appendix '_thinned' to the input file names.
 
 
-    lasthin -i *.laz -odix _thinned -olaz
+    lasthin64 -i *.laz -odix _thinned -olaz
 
 same as above but with LAZ files
 
 
-    lasthin -i *.txt -iparse xyzt -oparse xyzt -odix _thinned -otxt
+    lasthin64 -i *.txt -iparse xyzt -oparse xyzt -odix _thinned -otxt
 
 same as above but with ASCII files
 
 
-    lasthin -i in.las -o out.las
+    lasthin64 -i in.las -o out.las
 
 does LAS thinning with the grid spacing default of 1 unit
 and keeps the lowest point per grid cell
 
 
-    lasthin -i in.las -o out.las -highest -step 2.0
+    lasthin64 -i in.las -o out.las -highest -step 2.0
 
 does point thinning with a grid spacing of 2.0 units and
 keeps the highest point per grid cell
 
 
-    lasthin -i in.laz -step 0.5 -o out.laz -random
+    lasthin64 -i in.laz -step 0.5 -o out.laz -random
 
 does point thinning with a grid spacing of 0.5 units and
 keeps a random point per grid cell
 
 
-    lasthin -i in.laz -adaptive 0.2 5.0 -o out.laz
+    lasthin64 -i in.laz -adaptive 0.2 5.0 -o out.laz
 
 thins out all points that can be removed from a TIN without 
 deviating more than 0.2 vertical units from the original while
 keeping the maximum horizontal distance to 5.0 units.
 
 
-    lasthin -i in.laz -ignore_class 1 3 4 5 6 7 9 -adaptive 0.1 -classify_as 8 -o out.laz
+    lasthin64 -i in.laz -ignore_class 1 3 4 5 6 7 9 -adaptive 0.1 -classify_as 8 -o out.laz
 
 intends to only operate on ground points (class 8) and classifies
 those points with classification code 8 that form a TIN that deviates
@@ -117,20 +117,20 @@ less than 0.1 vertical units from the original TIN while keeping the
 maximum horizontal distance between points to 10.0 units.
 
 
-    lasthin -i in.laz -step 5.0 -percentile 50 20 -classify_as 8 -o out.laz -random
+    lasthin64 -i in.laz -step 5.0 -percentile 50 20 -classify_as 8 -o out.laz -random
 
 keeps all the points but sets the classification of the point
 that is closest to the 50th percentile in z to 8. this is
 done in each 5.0 unit by 5.0 unit cell with 20 or more points
 
 
-    lasthin -i in.laz -step 0.5 -o out.laz -sparse
+    lasthin64 -i in.laz -step 0.5 -o out.laz -sparse
 
 does point thinning with a grid spacing of 0.5 units using
 a sparse grid representation
 
 
-    lasthin -i in.las -o out.las -highest -step 0.5 -subcircle 0.15
+    lasthin64 -i in.las -o out.las -highest -step 0.5 -subcircle 0.15
 
 does point thinning with a grid spacing of 0.5 units but
 thickens every input point by adding a discrete ring of 8
@@ -139,19 +139,19 @@ input point before and then keeps only the highest of those
 points per grid cell
 
 
-    lasthin -i in.laz -o out.laz -first_only
+    lasthin64 -i in.laz -o out.laz -first_only
 
 does LIDAR thinning with a grid spacing of 1 unit but keeps
 the highest points while considering only first returns
 
 
-    lasthin -i in.las -o out.las -keep_class 2 -keep_class 3
+    lasthin64 -i in.las -o out.las -keep_class 2 -keep_class 3
 
 looks only at the points classfied as 2 or 3 from in.las and
 thins them with a grid spacing of 1 unit 
 
 
-    lasthin -i file_list.txt -lof -o combined.laz
+    lasthin64 -i file_list.txt -lof -o combined.laz
 
 looks at all the points from all the LAS or LAZ files listed
 in the text file 'file_list.txt', thins them with a grid
@@ -873,5 +873,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

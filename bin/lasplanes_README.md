@@ -24,22 +24,22 @@ off-planar standard deviation. The surviving planes are output
   
 ## Examples
 
-    lasplanes -i terrestrial_scan.laz -o planes.pef
+    lasplanes64 -i terrestrial_scan.laz -o planes.pef
 
 finds all planar patches in the file 'terrestrial_scan.laz' and
 stores the result in RIEGL's PEF format
 
 
-    lasplanes -i terrestrial_scan.laz -o planes.pef
+    lasplanes64 -i terrestrial_scan.laz -o planes.pef
 
 same as above but outputting the SHP format
 
 
-lasplanes -h  
-lasplanes -i in.las -o planes.shp  
-lasplanes -i in.las -oshp  
-lasplanes -i in.las -o planes.pef  
-lasplanes -i in.las -opef
+lasplanes64 -h  
+lasplanes64 -i in.las -o planes.shp  
+lasplanes64 -i in.las -oshp  
+lasplanes64 -i in.las -o planes.pef  
+lasplanes64 -i in.las -opef
 
 
 ## lasplanes specific arguments
@@ -726,5 +726,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

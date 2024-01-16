@@ -14,19 +14,19 @@ to the command line.
 
 ## Examples
 
-    lasdatum -i mgi\test.laz -epsg 31256 -grid AT_GIS_GRID.gsb ^
+    lasdatum64 -i mgi\test.laz -epsg 31256 -grid AT_GIS_GRID.gsb ^
              -target_epsg 25833 -o utm33\test.laz
 
 convert from MGI / Austria GK East to ETRS89 / UTM zone 33N using a grid
 
 
-    lasdatum -i utm33\test.laz -epsg 25833 -grid AT_GIS_GRID.gsb ^
+    lasdatum64 -i utm33\test.laz -epsg 25833 -grid AT_GIS_GRID.gsb ^
              -backward -target_epsg 31256 -o mgi\test.laz
 
 convert from ETRS89 / UTM zone 33N to MGI / Austria GK East using a grid
 
 
-    lasdatum -i mgi\test.laz -epsg 31256 -cvr 
+    lasdatum64 -i mgi\test.laz -epsg 31256 -cvr 
              -seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 ^
              -target_epsg 25833 -o utm33\test.laz
 
@@ -34,7 +34,7 @@ convert from MGI / Austria GK East to ETRS89 / UTM zone 33N using
 a seven parameter transform in CFR convention
 
 
-    lasdatum -i utm33\test.laz -epsg 25833 -cfr ^
+    lasdatum64 -i utm33\test.laz -epsg 25833 -cfr ^
              -seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 ^
              -backward -target_epsg 31256 -o mgi\test.laz
 
@@ -42,12 +42,12 @@ convert from ETRS89 / UTM zone 33N to MGI / Austria GK East using
 a seven parameter transform in CFR convention
 
 
-lasdatum -h  
-lasdatum -i in.laz -grid datumshift.gsb -o out.laz  
-lasdatum -i in.laz -epsg 31256 -grid AT_GRID.gsb -target_epsg 25833 -o out.laz  
-lasdatum -i in.laz -epsg 25833 -grid AT_GRID.gsb -backward -target_epsg 31256 -o out.laz  
-lasdatum -i in.laz -epsg 31256 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 -target_epsg 25833 -o out.laz  
-lasdatum -i in.laz -epsg 25833 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 -backward -target_epsg 31256 -o out.laz
+lasdatum64 -h  
+lasdatum64 -i in.laz -grid datumshift.gsb -o out.laz  
+lasdatum64 -i in.laz -epsg 31256 -grid AT_GRID.gsb -target_epsg 25833 -o out.laz  
+lasdatum64 -i in.laz -epsg 25833 -grid AT_GRID.gsb -backward -target_epsg 31256 -o out.laz  
+lasdatum64 -i in.laz -epsg 31256 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 -target_epsg 25833 -o out.laz  
+lasdatum64 -i in.laz -epsg 25833 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.297,2.423 -backward -target_epsg 31256 -o out.laz
 
 
 ## lasdatum specific arguments
@@ -740,5 +740,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

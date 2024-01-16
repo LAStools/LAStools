@@ -51,19 +51,19 @@ to color pixels that are not black, white, or not white.
   
 ## Examples
 
-    lascolor -i LAS_18910_2010_25.laz ^
+    lascolor64 -i LAS_18910_2010_25.laz ^
              -image cir_18910_2010_tiled_16bit.tif ^
              -odix _rgb -olaz
 
-    lascolor -i LAS_18910_2010_25.laz ^
+    lascolor64 -i LAS_18910_2010_25.laz ^
              -image cir_18910_2010_2_scanline_8bit.tif ^
              -odix _rgb1 -olaz
 
-    lascolor -i LAS_18910_2010_25.laz ^
+    lascolor64 -i LAS_18910_2010_25.laz ^
              -image cir_18910_2010_2_tiled_8bit.tif ^
              -odix _rgb2 -olaz
 
-    lascolor -i point_clouds\*.laz ^
+    lascolor64 -i point_clouds\*.laz ^
              -imagedir ortho_photos ^
              -odir colored_point_clouds -olaz ^
              -cores 4
@@ -194,12 +194,12 @@ histogram of classification of points:
           486674  Created, never classified (0)
 
 
-lascolor -h  
-lascolor -i in.las -image ortho.tif -o out.laz  
-lascolor -i in.laz -image ortho.tif -dont_scale_rgb_up -odix _rgb -olaz  
-lascolor -i in_rgb.laz -image ortho.tif -zero_rgb -odix _new -olaz  
-lascolor -i lidar\*.laz -imagedir ortho -odir colored_lidar -olaz -cores 4  
-lascolor -i lidar\*.laz -odir colored_lidar -olaz -cores 4
+lascolor64 -h  
+lascolor64 -i in.las -image ortho.tif -o out.laz  
+lascolor64 -i in.laz -image ortho.tif -dont_scale_rgb_up -odix _rgb -olaz  
+lascolor64 -i in_rgb.laz -image ortho.tif -zero_rgb -odix _new -olaz  
+lascolor64 -i lidar\*.laz -imagedir ortho -odir colored_lidar -olaz -cores 4  
+lascolor64 -i lidar\*.laz -odir colored_lidar -olaz -cores 4
 
 
 ## lascolor specific arguments
@@ -933,5 +933,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

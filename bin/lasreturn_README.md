@@ -11,14 +11,14 @@ files where the problematic groups of returns are marked.
 
 ## Examples
 
-    lasreturn -i lidar.laz -repair_number_of_returns -odix _repaired -olaz
+    lasreturn64 -i lidar.laz -repair_number_of_returns -odix _repaired -olaz
 
 the 'number of returns' field of every point is set to the highest
 return number that is found for each set of returns with the same
 unique GPS time stamp. assumes sorted input (use lassort -gps_time).
 
 
-    lasreturn -i lidar.laz -compute_gap_to_next_return -odix _gaps -olaz
+    lasreturn64 -i lidar.laz -compute_gap_to_next_return -odix _gaps -olaz
 
 adds an additional per point attribute called 'gap to next return [m]'
 as "extra bytes". it stores the 3D distance from the current to the
@@ -28,28 +28,28 @@ their matching GPS time stamps. the computation assumes sorted input
 and will exit if this is not the case (use lassort -gps_time).
 
 
-    lasreturn -i lidar.laz -histo return_distance 0.1
+    lasreturn64 -i lidar.laz -histo return_distance 0.1
 
 computes the distances between all subsequent returns from the same
 pulse and prints a histogram with bin size 0.1 meter. assumes sorted
 input (use lassort -gps_time).
 
 
-    lasreturn -i lidar.laz -histo return_distance 0.1 0.0 4.99
+    lasreturn64 -i lidar.laz -histo return_distance 0.1 0.0 4.99
 
 same as before but limits the histogram to the range rfrom 0 to 5
 
 
-    lasreturn -i in.laz -check_return_numbering
+    lasreturn64 -i in.laz -check_return_numbering
 
 checks the file in.laz for whether all returns of each multi-return
 pulse are in the file and prints a histogram of missing or duplicate
 returns. assumes sorted input (use lassort -gps_time).
 
 
-    lasreturn -i strips\*.laz -check_return_numbering -classify_missing_as 8 -odix _marked -olaz
-    lasreturn -i strips\*.laz -check_return_numbering -flag_as_synthetic -odix _flagged -olaz
-    lasreturn -i strips\*.laz -check_return_numbering -flag_as_withheld -odir strips_flagged -olaz
+    lasreturn64 -i strips\*.laz -check_return_numbering -classify_missing_as 8 -odix _marked -olaz
+    lasreturn64 -i strips\*.laz -check_return_numbering -flag_as_synthetic -odix _flagged -olaz
+    lasreturn64 -i strips\*.laz -check_return_numbering -flag_as_withheld -odir strips_flagged -olaz
 
 same as above but also produces an output file where all remaining
 returns (those that are from pulses that led to a multi-return but
@@ -57,29 +57,29 @@ whose returns are not all listed) are either marked by a requested
 classification code or flagged as synthetic or withheld.
 
 
-    lasreturn -i strips\*.laz -check_return_numbering -classify_duplicate_as 9 -odix _marked -olaz
-    lasreturn -i strips\*.laz -check_return_numbering -classify_violation_as 8 -odix _marked -olaz
-    lasreturn -i strips\*.laz -check_return_numbering -classify_missing_as 8 ^
+    lasreturn64 -i strips\*.laz -check_return_numbering -classify_duplicate_as 9 -odix _marked -olaz
+    lasreturn64 -i strips\*.laz -check_return_numbering -classify_violation_as 8 -odix _marked -olaz
+    lasreturn64 -i strips\*.laz -check_return_numbering -classify_missing_as 8 ^
       -classify_duplicate_as 9 -classify_violation_as 8 -odix _marked -olaz
 
 classify the sets of problematic returns that have missing, duplicate, and violating returns with
 the selected classification code (usually done to inspect where the trouble spots are).
 
 
-lasreturn -h  
-lasreturn -i in.laz -repair_number_of_returns -o out.laz  
-lasreturn -i in.laz -check_return_numbering  
-lasreturn -i in.laz -compute_gap_to_next_return -o out.laz  
-lasreturn -i strips\*.laz -check_return_numbering -classify_missing_as 8 -odix _marked -olaz  
-lasreturn -i strips\*.laz -check_return_numbering -classify_duplicate_as 9 -odix _marked -olaz  
-lasreturn -i strips\*.laz -check_return_numbering -classify_duplicate_as 9 -classify_violation_as 7 -odix _marked -olaz  
-lasreturn -i strips\*.laz -check_return_numbering -classify_missing_as 8 -classify_duplicate_as 9 -classify_violation_as 7 -odix _marked -olaz  
-lasreturn -i strips\*.laz -check_return_numbering -flag_as_synthetic -odix _flagged -olaz  
-lasreturn -i strips\*.laz -check_return_numbering -flag_as_withheld -odir strips_flagged -olaz  
-lasreturn -i bad_files\*.laz -repair_number_of_returns -odir good_files -olaz  
-lasreturn -i in.laz -histo return_distance 0.05  
-lasreturn -i in.laz -histo return_distance 0.05 0.0 2.99  
-lasreturn -i in.laz -histo angle_bigger_error 0.1
+lasreturn64 -h  
+lasreturn64 -i in.laz -repair_number_of_returns -o out.laz  
+lasreturn64 -i in.laz -check_return_numbering  
+lasreturn64 -i in.laz -compute_gap_to_next_return -o out.laz  
+lasreturn64 -i strips\*.laz -check_return_numbering -classify_missing_as 8 -odix _marked -olaz  
+lasreturn64 -i strips\*.laz -check_return_numbering -classify_duplicate_as 9 -odix _marked -olaz  
+lasreturn64 -i strips\*.laz -check_return_numbering -classify_duplicate_as 9 -classify_violation_as 7 -odix _marked -olaz  
+lasreturn64 -i strips\*.laz -check_return_numbering -classify_missing_as 8 -classify_duplicate_as 9 -classify_violation_as 7 -odix _marked -olaz  
+lasreturn64 -i strips\*.laz -check_return_numbering -flag_as_synthetic -odix _flagged -olaz  
+lasreturn64 -i strips\*.laz -check_return_numbering -flag_as_withheld -odir strips_flagged -olaz  
+lasreturn64 -i bad_files\*.laz -repair_number_of_returns -odir good_files -olaz  
+lasreturn64 -i in.laz -histo return_distance 0.05  
+lasreturn64 -i in.laz -histo return_distance 0.05 0.0 2.99  
+lasreturn64 -i in.laz -histo angle_bigger_error 0.1
 
 
 ## lasreturn specific arguments
@@ -794,5 +794,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

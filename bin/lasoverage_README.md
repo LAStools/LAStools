@@ -64,7 +64,7 @@ it should be using the word "overage".
 
 ## Examples
 
-    lasoverage -i tile.las -step 2 -o tile_overage.laz
+    lasoverage64 -i tile.las -step 2 -o tile_overage.laz
 
 finds the overlap points and classifies them as 12 for a LAS tile
 with a point spacing of around 1.0 meters. For this to work, the
@@ -72,13 +72,13 @@ LiDAR points in the LAS file have their point source ID populated
 with the flight line number. The output is also compressed.
 
 
-    lasoverage -i tiles\tile_*.laz -step 2 -flag_as_withheld -olaz
+    lasoverage64 -i tiles\tile_*.laz -step 2 -flag_as_withheld -olaz
 
 same as above but for an entire folder of LAZ tiles and with the
 overage points being marked as "withheld".
 
 
-    lasoverage -i tiles\tile_*.laz -step 2 -recover_flightlines ^
+    lasoverage64 -i tiles\tile_*.laz -step 2 -recover_flightlines ^
 	           -flag_as_withheld -cores 4 -odix _flagged -olaz
 
 same as above but with an initial pass over each tile where the
@@ -87,7 +87,7 @@ the points by looking for continuous intervals of GPS time stamps
 and by operating on 4 cores.
 
 
-    lasoverage -i tiles\tile_*.las -step 2 -flag_as_overlap ^
+    lasoverage64 -i tiles\tile_*.las -step 2 -flag_as_overlap ^
 	           -odix _flagged -olas
 
 same as above but for an entire folder of LAS 1.4 tiles and with 
@@ -95,7 +95,7 @@ the overage points being marked as "overlap". this can only be used
 with the new point types 6 and higher ...
 
 
-    lasoverage -i flight\lines*.laz -files_are_flightlines ^
+    lasoverage64 -i flight\lines*.laz -files_are_flightlines ^
 	           -odir flight_flagged -olaz
 
 here all files are considered to be part of the same flight and
@@ -814,5 +814,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

@@ -32,13 +32,13 @@ biggly when beam switches are ignored.
 
 ## Examples
 
-    lasoptimize -i final\*.las -odir optimized
+    lasoptimize64 -i final\*.las -odir optimized
 
 optimizes all LAS files in the 'final' folder to the 'optimized'
 folder while over-writing any existing file.
 
 
-    lasoptimize -i final\*.laz -scanner_channel_in_point_source_ID -odir optimized
+    lasoptimize64 -i final\*.laz -scanner_channel_in_point_source_ID -odir optimized
 
 optimizes all LAZ files in the 'final' folder to the 'optimized'
 folder while over-writing any existing file. The files are from
@@ -47,8 +47,8 @@ flightline number that is stored in the 'pount source ID' field
 of each point.
 
 
-    lasoptimize -h
-    lasoptimize -i lidar.las -o lidar.laz
+    lasoptimize64 -h
+    lasoptimize64 -i lidar.las -o lidar.laz
 
 
 ## lasoptimize specific arguments
@@ -738,5 +738,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

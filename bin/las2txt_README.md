@@ -15,22 +15,23 @@ possible are 'percent', 'dollar', 'comma', 'star',
 
 ## Examples
 
-    las2txt -i *.las -parse xyzit -sep comma
+    las2txt64 -i *.laz -parse xyzit -sep comma
 
-converts all LAS files *.las to ASCII files *.txt and places the
+converts all LAZ files to ASCII files and places the
 x, y, and z coordinate of each point as the 1st, 2nd, and 3rd
 entries, the intensity as the 4th entry, and the gps_time as the
-5th entry of each line. the entries are separated by commas.
+5th entry of each line. The output files containing a first line 
+with the column description to enable automatic reconversion using txt2las64.
 
 
-    las2txt -i lidar.las -o lidar.txt -parse xyz
+    las2txt64 -i lidar.las -o lidar.txt -parse xyz
 
 converts LAS file to ASCII and places the x, y, and z coordinate
 of each point at the 1st, 2nd, and 3rd entry of each line. the
 entries are separated by a space.
 
 
-    las2txt -i lidar.laz -o lidar.txt -parse xyzEit -extra 0.1
+    las2txt64 -i lidar.laz -o lidar.txt -parse xyzEit -extra 0.1
 
 converts LAZ file to ASCII and places the x, y, and z coordinate
 of each point at the 1st, 2nd, and 3rd entry of each line. the
@@ -38,14 +39,14 @@ extra string "0.1" as the 4th entry and the intensity and time
 of each point as the 5th and 6th entry.
 
 
-    las2txt -i lidar_1_3.las -o lidar.txt -parse WV
+    las2txt64 -i lidar_1_3.las -o lidar.txt -parse WV
 
 converts LAS 1.3 file including waveform information to ASCII. it
 places the wavepacket info of each point followed by its entire
 waveform into one line separated by spaces.
 
 
-    las2txt -i lidar.laz -o lidar.txt -parse txyzr -sep comma
+    las2txt64 -i lidar.laz -o lidar.txt -parse txyzr -sep comma
 
 converts LAZ file to ASCII and places the gps_time as the first
 entry, the x, y, and z coordinates at the 2nd, 3rd, and 4th entry
@@ -53,7 +54,7 @@ and the number of the return as the 5th entry of each line. the
 entries are separated by a comma.
 
  
-    las2txt -i lidar.laz -o lidar.txt -parse xyzRGB
+    las2txt64 -i lidar.laz -o lidar.txt -parse xyzRGB
 
 converts LAZ file to ASCII and places the x, y, and z coordinates
 at the 1st, 2nd, and 3rd entry and the r, g, and b value of the
@@ -62,7 +63,7 @@ are separated by a space. note that lidar.las should be format 1.2
 or higher (because 1.0 and 1.1 do not support RGB colors).
 
 
-    las2txt -i lidar.las -o lidar.txt -parse xyzia -sep semicolon -header pound
+    las2txt64 -i lidar.las -o lidar.txt -parse xyzia -sep semicolon -header pound
 
 converts LAS file to ASCII and places the x, y, and z coordinate
 at the 1st, 2nd, and 3rd entry, the intensity at the 4th and the
@@ -71,7 +72,7 @@ by a semicolon. at the beginning of the file we print the header
 information as a comment starting with a '#' symbol.
 
 
-    las2txt -i lidar.laz -o lidar.txt -parse xyzcu -sep tab -header percent
+    las2txt64 -i lidar.laz -o lidar.txt -parse xyzcu -sep tab -header percent
 
 converts LAZ file to ASCII and places the x, y, and z coordinate
 at the 1st, 2nd, and 3rd entry, the classification at the 4th and
@@ -80,7 +81,7 @@ separated by a semicolon. at the beginning of the file we print
 the header information as a comment starting with a '%' symbol.
 
 
-    las2txt -i lidar.las -o lidar.txt -parse ko
+    las2txt64 -i lidar.las -o lidar.txt -parse ko
 
 extracts only the 'k'eypoint and the 'o'verlap flags of each LiDAR
 points into an ASCII file. Note that the overlap flag exists only
@@ -97,7 +98,6 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 
 ## las2txt specific arguments
 
--coldesc     : writes a header with column description into the output file  
 -cores [n]   : process multiple inputs on [n] cores in parallel  
 -extra [n]   : use [n] as value of output extra string  
 -header [n]  : use header prefix [n] (pound,percent,dollar,comma,star,colon,semicolon)  
@@ -105,8 +105,9 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 -optx        : output as PTX (plain text with header)  
 -parse [xyz] : use parse string [xyz] to access point values  
 -parse_all   : set "txyzirndecaup" as parse string to parse all available information  
--sep [n]     : output separator [comma,space,semicolon,tab,colon,hyphen,dot], (default=space)  
-
+-sep [n]     : output separator [comma,space,semicolon,tab,colon,hyphen,dot], (default=space)
+-coldesc     : write a header line to the output containing the column description
+               (this enables to omit -parse during import using txt2las)
 
 ### Basics
 -cpu64   : start 64 bit executable (instead of default 32 bit executable)  
@@ -121,13 +122,13 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 ## Module arguments
 
 ### General
+-comma_not_point   : use comma instead of point as decimal separator  
+-unique            : remove duplicate points  
 -buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
--comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
 -stored            : use in memory reader  
--unique            : remove duplicate points  
 
 ### Color
 -clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
@@ -656,7 +657,6 @@ The other supported entries are:
     G : RGB [G]reen channel  
     B : RGB [B]lue channel  
     I : N[I]R channel of LAS 1.4 point type 8  
-    s : [s]kip a string or a number that we don't care about  
     i : [i]ntensity  
     a : scan [a]ngle  
     n : [n]umber of returns of that given pulse  
@@ -689,10 +689,10 @@ The other supported entries are:
     + : the byte-wise B difference to the last point  
     V : the waveform data  
     E : extra string (-extra)  
-    (HSL): the HSL conversion of RGB in range [0,360/100] for each channel  
-    (HSV): the HSV conversion of RGB in range [0,360/100] for each channel  
-    (hsl): the HSL conversion of RGB in range [0,1] for each channel  
-    (hsv): the HSV conversion of RGB in range [0,1] for each channel  
+ (HSV): color in HSV model [0,360|100]. Converted from RGB.
+ (HSL): color in HSL model [0,360|100]. Converted from RGB.
+ (hsv): color in HSV model [0,1]. Converted from RGB.
+ (hsl): color in HSL model [0,1]. Converted from RGB.
 
 ### output separator
 The '-osep [sep]' argument specifies the output format of a text(xyz) output.
@@ -724,5 +724,4 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.

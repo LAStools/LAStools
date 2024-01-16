@@ -46,40 +46,40 @@ TO_core_last.las data set to clip away the Toronto city hall.
 
 ## Examples
 
-    lasclip -i *.las -poly polygon.shp -v
+    lasclip64 -i *.las -poly polygon.shp -v
 
 clips all the LAS files matching "*.las" against the polygon(s) in 
 "polygon.shp" and stores each result to a LAS file called "*_1.las".
 
 
-    lasclip -i *.txt -iparse xyzt -poly polygon.shp -otxt -oparse xyzt
+    lasclip64 -i *.txt -iparse xyzt -poly polygon.shp -otxt -oparse xyzt
 
 same but for ASCII input/output that gets parsed with "xyzt".
 
 
-    lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -interior -v
+    lasclip64 -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -interior -v
 
 clips the points falling *inside* the polygon that describes the building
 footprint of the toronto city hall from the file TO_core_last_zoom.laz
 and stores the result to output.laz.
 
 
-    lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -v
+    lasclip64 -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -v
 
 same as above but now it clips points falling *outside* of the polygon.
 
 
-    lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -classify 6 -interior -v
+    lasclip64 -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -classify 6 -interior -v
 
 classifies the points falling *inside* the polygon as "Building".
 
 
-    lasclip -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -flag_as_withheld -interior
+    lasclip64 -i TO_core_last_zoom.laz -poly TO_city_hall.shp -o output.laz -flag_as_withheld -interior
 
 flags the points falling *inside* the polygon as 'withheld'.
 
 
-    lasclip -i city.las -poly buildings.txt -interior -o city_without_buildings.las
+    lasclip64 -i city.las -poly buildings.txt -interior -o city_without_buildings.las
 
 clips the points from the inside of the buildings footprints specified
 in 'buildings.txt' out of the LAS file 'city.las' and stores the other
@@ -810,5 +810,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

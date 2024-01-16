@@ -20,73 +20,73 @@ and at https://github.com/LASzip/LASzip under Apache Public License 2.0.
 
 ## Examples
 
-    laszip *.las
+    laszip64 *.las
 
 compresses all LAS files in the current folder overwriting any
 existing file.
 
 
-    laszip *.laz
+    laszip64 *.laz
 
 decompresses all LAZ files in the current folder overwriting any
 existing file.
 
 
-    laszip *.txt -iparse xyztairn
+    laszip64 *.txt -iparse xyztairn
 
 parses and compresses all ASCII files in the current folder.
 
 
-    laszip lidar.las
+    laszip64 lidar.las
 
 compresses the LAS file 'lidar.las' to the LAZ file 'lidar.laz'
 overwriting any existing file.
 
 
-    laszip lidar.laz
+    laszip64 lidar.laz
 
 decompresses the LAZ file 'lidar.laz' to the LAS file 'lidar.las'
 overwriting any existing file.
 
 
-    laszip -i lidar.las -o lidar_comp.laz
+    laszip64 -i lidar.las -o lidar_comp.laz
 
 compresses the LAS file 'lidar.las' to the LAZ file 'lidar_comp.laz'
 
 
-    laszip -i data\flight*.las -merged -o merged.laz
+    laszip64 -i data\flight*.las -merged -o merged.laz
 
 merges all the LAS files that match the wild card 'data\flight*.las'
 and compresses them to the LAZ file 'merged.laz'
 
 
-    laszip -lof file_list.txt
+    laszip64 -lof file_list.txt
 
 compresses (or uncompresses) all LAS/TXT (or LAZ) files listed in the
 the text file 'file_list.txt'
 
 
-    laszip -lof file_list.txt -merged -o merged.laz
+    laszip64 -lof file_list.txt -merged -o merged.laz
 
 merges all the LAS/LAZ files listed in the text file 'file_list.txt'
 and compresses them to the LAZ file 'merged.laz'
 
 
-    laszip -i lidar.txt -iparse xyziRGB -itranslate_intensity 2047
+    laszip64 -i lidar.txt -iparse xyziRGB -itranslate_intensity 2047
 
 parses the ASCII file 'lidar.txt' with parse string 'xyziRGB' and
 converts it on-the-fly to LAS while translating the intensity with
 an offset of 2047 and compresses it to the LAZ file 'lidar.laz'
 
 
-    laszip -i *.txt -iparse xyzt -iscale_intensity 65535
+    laszip64 -i *.txt -iparse xyzt -iscale_intensity 65535
 
 parses all ASCII file ending in *.txt with parse string 'xyzt' and
 converts them on-the-fly to LAS while scaling the intensity with a
 multiplier of 65535 and compresses it to a properly named LAZ file.
 
 
-    laszip -i *.txt -iparse xyzt -iscale_intensity 65535 -merged -o merged.laz
+    laszip64 -i *.txt -iparse xyzt -iscale_intensity 65535 -merged -o merged.laz
 
 same as above but all matching ASCII files are merged into one LAS
 file.
@@ -780,5 +780,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

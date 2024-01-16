@@ -1,25 +1,7 @@
 ﻿# lasvalidate
 
-A simple tool (open source LGPL) to determine if LAS files
+A simple tool to determine if LAS files
 conform to the ASPRS LAS 1.0 to 1.4 specifications.
-
-
-## Source code
-
-The source code compiles under Windows and Linux is available from
-github at http://github.com/LASvalidator
-
-    mkdir LASvalidator
-    cd LASvalidator
-    git clone https://github.com/LASvalidator/LASread.git 
-    cd LASread 
-    make 
-    cd .. 
-    git clone https://github.com/LASvalidator/lasvalidate.git 
-    cd lasvalidate 
-    make 
-    cd bin 
-
 
 ## Sample output
 
@@ -397,7 +379,7 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
 ## Examples
 
     lasvalidate -i ..\data\*.las -oxml
-    
+   
     lasvalidate -i ..\data\*.las -o ..\data\summary.xml
 
     lasvalidate -h
@@ -420,10 +402,14 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
 
 -oxml : output as xml  
 
-
 ## License
 
 This tool is free to use.
+
+## Source code
+
+The source code compiles under Windows and Linux is available from
+github at https://github.com/LASvalidator/lasvalidate
 
 ## Support
 
@@ -435,8 +421,6 @@ You will get plenty of samples to this tool.
 To get further support see our
 [rapidlasso service page](https://rapidlasso.de/service/)
 
-Check for latest updates at
-https://rapidlasso.de/category/blog/releases/
+Check for latest updates at https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.

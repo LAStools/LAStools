@@ -86,51 +86,51 @@ with the command-line option '-skip_files'.
 
 ## Examples
 
-    lasground -i terrain.las -o classified_terrain.las
+    lasground64 -i terrain.las -o classified_terrain.las
 
 classifies a terrain with the default settings.
 
 
-    lasground -i terrain.las -o classified_terrain.las -feet -elevation_feet
+    lasground64 -i terrain.las -o classified_terrain.las -feet -elevation_feet
 
 classifies a terrain where both horizontal and vertical units are
 in feet instead of in meters (which is assumed by default unless
 there is projection information in the LAS file saying otherwise).
 
 
-    lasground -i terrain.las -o classified_terrain.las -all_returns
+    lasground64 -i terrain.las -o classified_terrain.las -all_returns
 
 classifies a terrain considering all points - not just the last
 returns (as is the default behavior).
 
 
-    lasground -i *.las
+    lasground64 -i *.las
 
 classifies all LAS files with the default settings.
 
 
-    lasground -i *.las -town
+    lasground64 -i *.las -town
 
 the same as above but uses wider spacing to allow for small
 buildings and other man-made structures.
 
 
-    lasground -i *.las -city
+    lasground64 -i *.las -city
 
 the same as above but uses even wider spacing to allow for
 very large buildings.
 
 
-lasground -h  
-lasground -i in.las -o out.las  
-lasground -i in.las -o out.las -feet -elevation_feet  
-lasground -i in.las -o out.las -town  
-lasground -i in.las -o out.las -city -ignore_class 7  
-lasground -i in.las -o out.las -metro  
-lasground -i in.las -o out.las -v -step 10 -spike 2 -offset 0.1  
-lasground -i in.laz -o out.laz -no_stddev -no_bulge  
-lasground -i *.las -v -odix _g -olaz  
-lasground -i *.laz -v -odir ground_classified  -olaz
+lasground64 -h  
+lasground64 -i in.las -o out.las  
+lasground64 -i in.las -o out.las -feet -elevation_feet  
+lasground64 -i in.las -o out.las -town  
+lasground64 -i in.las -o out.las -city -ignore_class 7  
+lasground64 -i in.las -o out.las -metro  
+lasground64 -i in.las -o out.las -v -step 10 -spike 2 -offset 0.1  
+lasground64 -i in.laz -o out.laz -no_stddev -no_bulge  
+lasground64 -i *.las -v -odix _g -olaz  
+lasground64 -i *.laz -v -odir ground_classified  -olaz
 
 
 ## lasground specific arguments
@@ -872,5 +872,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

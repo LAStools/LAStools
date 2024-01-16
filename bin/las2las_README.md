@@ -42,7 +42,7 @@ only those points. For all options run 'las2las -h'.
  
 ## Examples
 
-    las2las -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet
+    las2las64 -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet
 
 Adding the projection information to the file 's1885565.laz'. This
 will not modify the points but merely change the projection VLR in the
@@ -55,7 +55,7 @@ header to contain these four geokeys:
   - key 4099 value_offset 9002 - VerticalUnitsGeoKey: Linear_Foot  
 
 
-    las2las -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet -target_utm auto
+    las2las64 -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet -target_utm auto
 
 Reprojects the points from the Ohio_South NAD83 state plane with all units
 in feet to NAD83 UTM coordinates with all units in meter and sets these four
@@ -68,7 +68,7 @@ geokeys as the projection information:
   - key 4099 value_offset 9001 - VerticalUnitsGeoKey: Linear_Meter  
 
 
-    las2las -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet -target_longlat
+    las2las64 -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet -target_longlat
 
 Reprojects the points from the Ohio_South NAD83 state plane with all units
 in feet to geographic coordinates with x being longitude and y latitude and
@@ -80,104 +80,104 @@ sets these three geokeys as the projection information:
   - key 4099 value_offset 9001 - VerticalUnitsGeoKey: Linear_Meter  
 
 
-    las2las -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet -target_sp83 OH_N -target_survey_feet -target_elevation_survey_feet 
-    las2las -i TO_core_last_zoom.laz -o out.laz -utm 17T
-    las2las -i TO_core_last_zoom.laz -o out.laz -utm 17T -target_latlong
+    las2las64 -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet -target_sp83 OH_N -target_survey_feet -target_elevation_survey_feet 
+    las2las64 -i TO_core_last_zoom.laz -o out.laz -utm 17T
+    las2las64 -i TO_core_last_zoom.laz -o out.laz -utm 17T -target_latlong
 
 other variations of adding / changing projection information.
 
 
-    las2las -i *.las -last_only
+    las2las64 -i *.las -last_only
 
 processes all LAS files that match *.las and stores only the last returns
 to a corresponding LAS file called *_1.las (an added '_1' in the name).
 
 
-    las2las -i *.las -olaz -keep_tile 630000 4830000 10000
+    las2las64 -i *.las -olaz -keep_tile 630000 4830000 10000
 
 keeps a 10000 by 10000 tile with a lower left coordinate of x=630000
 and y=4830000 out of all LAS files that match *.las and stores each as a
 compressed LAZ file *_1.laz (an added '_1' in the name).
 
 
-    las2las -i *.txt -iparse xyztiarn -keep_scan_angle -15 15
+    las2las64 -i *.txt -iparse xyztiarn -keep_scan_angle -15 15
 
 processes all ASCII files that match *.txt, parses them with "xyztiarn",
 keeps all points whose scan angle is between -15 and 15, and stores them
 to a corresponding LAS file called *_1.las (an added '_1' in the name).
 
 
-    las2las -i in.las -o out.las -keep_xy 630250 4834500 630500 4834750
+    las2las64 -i in.las -o out.las -keep_xy 630250 4834500 630500 4834750
 
 keeps only points of in.las whose double-precision coordinates fall inside
 the rectangle (630250,4834500) to (630500,4834750) and stores these points 
 to out.las.
 
 
-    las2las -lof file_list.txt -merged -o out.laz -keep_circle 630000 4850000 100
+    las2las64 -lof file_list.txt -merged -o out.laz -keep_circle 630000 4850000 100
 
 keeps only those points from all files listed in the list of files file_list.txt
 whose double-precision coordinates fall into the circle centered at 630000 4850000
 with radius 100 and stores these points compressed to out.laz.
 
 
-    las2las -i in.las -o out.las -keep_z 10 100
+    las2las64 -i in.las -o out.las -keep_z 10 100
 
 keeps points of in.las whose double-precision elevations falls inside the
 range 10 to 100 and stores these points to out.las.
 
 
-    las2las -i in.las -o out.laz -drop_return 1
+    las2las64 -i in.las -o out.laz -drop_return 1
 
 drops all points of in.las that are designated first returns by
 the value in their return_number field and stores surviving points
 compressed to out.laz.
 
 
-    las2las -i in.laz -o out.las -drop_scan_angle_above 15
+    las2las64 -i in.laz -o out.las -drop_scan_angle_above 15
 
 drops all points of compressed in.laz whose scan angle is above 15 or
 below -15 and stores surviving points compressed to out.laz.
 
 
-    las2las -i in.las -o out.las -drop_intensity_below 1000 -remove_padding
+    las2las64 -i in.las -o out.las -drop_intensity_below 1000 -remove_padding
 
 drops all points of in.las whose intensity is below 1000 and stores
 surviving points to out.las. in addition any additional user data after
 the LAS header or after the VLR block are stripped from the file.
 
 
-    las2las -i in.laz -o out.laz -last_only
+    las2las64 -i in.laz -o out.laz -last_only
 
 extracts all last return points from compressed in.laz and stores them
 compressed to out.laz.
 
 
-    las2las -i in.las -o out.las -scale_rgb_up
+    las2las64 -i in.las -o out.las -scale_rgb_up
 
 multiplies all rgb values in the file with 256. this is used to scale
 the rgb values from standard unsigned char range (0 ... 255) to the
 unsigned short range (0 ... 65535) used in the LAS format.
 
 
-    las2las -i in.laz -o out.laz -scale_rgb_down
+    las2las64 -i in.laz -o out.laz -scale_rgb_down
 
 does the opposite with compressed input and output files
 
 
-    las2las -i in.las -o out.las -subseq 1000 2000
+    las2las64 -i in.las -o out.las -subseq 1000 2000
 
 extracts a subsequence of points by skipping the first 1000 points and
 then collecting points until 2000 points were read.
 
 
-    las2las -i in.las -o out.las -keep_class 2 -keep_class 3
+    las2las64 -i in.las -o out.las -keep_class 2 -keep_class 3
 
 extracts all points classfied as 2 or 3 from in.las and stores
 them to out.las.
 
 
-    las2las -i in.las -o out.las -keep_XY 63025000 483450000 63050000 483475000
+    las2las64 -i in.las -o out.las -keep_XY 63025000 483450000 63050000 483475000
 
 similar to '-keep_xy' but uses the integer values point.X and point.Y
 that the points are stored with for the checks (and not the double
@@ -187,7 +187,7 @@ point.X>63050000 or point.Y>483475000 and stores surviving points to
 out.las (use lasinfo.exe to see the range of point.Z and point.Y).
 
 
-    las2las -i in.las -o out.las -keep_Z 1000 4000
+    las2las64 -i in.las -o out.las -keep_Z 1000 4000
 
 similar to '-keep_z' but uses the integer values point.Z that the
 points are stored with for the checks (and not the double-precision
@@ -197,22 +197,22 @@ surviving points to out.las (use lasinfo.exe to see the range of
 point.Z).
 
 
-    las2las -h
-    las2las -i *.las -utm 13N
-    las2las -i *.laz -first_only -olaz
-    las2las -i *.las -drop_return 4 5 -olaz
-    las2las -latlong -target_utm 12T -i in.las -o out.las
-    las2las -i in.laz -target_epsg 2972 -o out.laz
-    las2las -set_point_type 0 -lof file_list.txt -merged -o out.las
-    las2las -remove_vlr 2 -scale_rgb_up -i in.las -o out.las
-    las2las -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las
-    las2las -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt
-    las2las -i in.las -remove_padding -keep_scan_angle -15 15 -o out.las
-    las2las -i in.las -rescale 0.01 0.01 0.01 -reoffset 0 300000 0 -o out.las
-    las2las -i in.las -set_version 1.2 -keep_gpstime 46.5 47.5 -o out.las
-    las2las -i in.las -drop_intensity_below 10 -olaz -stdout > out.laz
-    las2las -i in.las -last_only -drop_gpstime_below 46.75 -otxt -oparse xyzt -stdout > out.txt
-    las2las -i in.las -remove_all_vlrs -keep_class 2 3 4 -olas -stdout > out.las
+    las2las64 -h
+    las2las64 -i *.las -utm 13N
+    las2las64 -i *.laz -first_only -olaz
+    las2las64 -i *.las -drop_return 4 5 -olaz
+    las2las64 -latlong -target_utm 12T -i in.las -o out.las
+    las2las64 -i in.laz -target_epsg 2972 -o out.laz
+    las2las64 -set_point_type 0 -lof file_list.txt -merged -o out.las
+    las2las64 -remove_vlr 2 -scale_rgb_up -i in.las -o out.las
+    las2las64 -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las
+    las2las64 -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt
+    las2las64 -i in.las -remove_padding -keep_scan_angle -15 15 -o out.las
+    las2las64 -i in.las -rescale 0.01 0.01 0.01 -reoffset 0 300000 0 -o out.las
+    las2las64 -i in.las -set_version 1.2 -keep_gpstime 46.5 47.5 -o out.las
+    las2las64 -i in.las -drop_intensity_below 10 -olaz -stdout > out.laz
+    las2las64 -i in.las -last_only -drop_gpstime_below 46.75 -otxt -oparse xyzt -stdout > out.txt
+    las2las64 -i in.las -remove_all_vlrs -keep_class 2 3 4 -olas -stdout > out.las
 
 
 ## las2las specific arguments
@@ -945,5 +945,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

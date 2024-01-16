@@ -16,7 +16,7 @@ the output CSV file. You can also query a list of circular plots
 from a text file with each line listing: "center_x center_y radius"
 with a command like:
 
-lascanopy -i forest\*.laz -loc circles.txt -cov -p 50 95 -o plots.csv
+lascanopy64 -i forest\*.laz -loc circles.txt -cov -p 50 95 -o plots.csv
 
 And if you want to override the radius then you can do this by
 adding a fix radius with '-loc_radius 2' or '-loc_radius 7.5'
@@ -29,7 +29,7 @@ You can also query a list of rectangular plots from a text
 file with each line listing: "min_x min_y max_x max_y" with a
 command like:
 
-lascanopy -i forest\*.laz -lor rectangles.txt -dns -gap -b 50 75 -o stands.csv
+lascanopy64 -i forest\*.laz -lor rectangles.txt -dns -gap -b 50 75 -o stands.csv
 
 It is also possible to use text files where each line consists
 of "name min_x min_y max_x max_y" as the list of rectangular
@@ -37,7 +37,7 @@ plots. Then add '-names' before '-lor' to handle this correctly.
 
 You can also load more general polygonal plots from a shapefile with
 
-lascanopy -i forest\*.laz -lop polygons.shp -int_p 25 50 75 -centroids -o results.csv
+lascanopy64 -i forest\*.laz -lop polygons.shp -int_p 25 50 75 -centroids -o results.csv
 
 If the SHP file with plots has a DBF file with  that contain either an
 integer number or a string attributes for each plot you can add the name
@@ -141,14 +141,14 @@ Let us know which other metrics you would like to see ...
 
 ## Examples
 
-    lascanopy -i *.las -min -max -avg
+    lascanopy64 -i *.las -min -max -avg
 
 for each *.las files and for all height above 1.37 it computes
 the minimum, maximum, and average value from all points that fall
 into cells of size 20 by 20 and stores the resulting grid in ASC
 format using the endings '_min.asc', '_max.asc', '_avg.asc'.
 
-    lascanopy -i lidar*.laz -merged -p 20 40 60 80 -step 10 -o dem.bil
+    lascanopy64 -i lidar*.laz -merged -p 20 40 60 80 -step 10 -o dem.bil
 
 merges the points of all files that match the wildcard lidar*.laz
 on-the-fly into one file and computes for all heights above 1.37
@@ -157,18 +157,18 @@ and stores the resulting rasters in BIL format using the endings
 '_p20.bil', '_p40.bil', '_p60.bil', and '_p80.bil'.
 
 
-lascanopy -h  
-lascanopy -i *.las -max -avg -qav -p 50 95  
-lascanopy -i *.laz -p 1 5 10 25 50 75 90 95 99  
-lascanopy -i *.laz -c 2.0 5.0 10.0 20.0 -cov -dns -otif  
-lascanopy -i *.laz -merged -max -avg -int_p 5 50 95 -o merged.dtm  
-lascanopy -i *.laz -d 2.0 10.0 20.0 40.0 -cov -height_cutoff 2.0  
-lascanopy -i *.laz -int_p 25 50 75 -dns -gap -fractions -otif  
-lascanopy -i *.las -files_are_plots -int_avg -int_std -cov -gap  
-lascanopy -i *.laz -p 25 50 75 95 -loc list_of_circles.txt  
-lascanopy -i *.laz -d 2.0 4.0 6.0 8.0 -fractions -lor list_of_rectangles.txt  
-lascanopy -i *.laz -p 95 -int_p 95 -cov -fractions -lop list_of_polygons.shp  
-lascanopy -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov -p 50 95
+lascanopy64 -h  
+lascanopy64 -i *.las -max -avg -qav -p 50 95  
+lascanopy64 -i *.laz -p 1 5 10 25 50 75 90 95 99  
+lascanopy64 -i *.laz -c 2.0 5.0 10.0 20.0 -cov -dns -otif  
+lascanopy64 -i *.laz -merged -max -avg -int_p 5 50 95 -o merged.dtm  
+lascanopy64 -i *.laz -d 2.0 10.0 20.0 40.0 -cov -height_cutoff 2.0  
+lascanopy64 -i *.laz -int_p 25 50 75 -dns -gap -fractions -otif  
+lascanopy64 -i *.las -files_are_plots -int_avg -int_std -cov -gap  
+lascanopy64 -i *.laz -p 25 50 75 95 -loc list_of_circles.txt  
+lascanopy64 -i *.laz -d 2.0 4.0 6.0 8.0 -fractions -lor list_of_rectangles.txt  
+lascanopy64 -i *.laz -p 95 -int_p 95 -cov -fractions -lop list_of_polygons.shp  
+lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov -p 50 95
 
 
 ## lascanopy specific arguments
@@ -907,5 +907,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

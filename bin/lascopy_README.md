@@ -22,12 +22,12 @@ copies the requested attribute in the order the point are in.
 
 ## Examples
 
-lascopy -h  
-lascopy -i source.las -i target.las -o result.las  
-lascopy -i source.laz -i target.laz -o result.laz  
-lascopy -i source.laz -i target.laz -odix _copied -olaz  
-lascopy -i source.laz -i target.laz -classification -o result.laz  
-lascopy -i source.laz -i target.laz -classification -zero -o result.laz
+lascopy64 -h  
+lascopy64 -i source.las -i target.las -o result.las  
+lascopy64 -i source.laz -i target.laz -o result.laz  
+lascopy64 -i source.laz -i target.laz -odix _copied -olaz  
+lascopy64 -i source.laz -i target.laz -classification -o result.laz  
+lascopy64 -i source.laz -i target.laz -classification -zero -o result.laz
 
 
 ## lascopy specific arguments
@@ -733,5 +733,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

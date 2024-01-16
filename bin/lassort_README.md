@@ -40,49 +40,49 @@ IDs and then by time).
 
 ## Examples
 
-    lassort *.las 
+    lassort64 *.las 
 
 z-orders all LAS files with a default bucket size. 
 
 
-    lassort flight1*.las flight2*.las -gps_time
+    lassort64 flight1*.las flight2*.las -gps_time
 
 sorts all LAS files by their GPS time
 
 
-    lassort *.las -olaz -point_source
+    lassort64 *.las -olaz -point_source
 
 sorts all LAS files by their point source ID and stores them compressed
 
 
-    lassort *.laz -olaz -point_source -gps_time
+    lassort64 *.laz -olaz -point_source -gps_time
 
 sorts all LAZ files first by their point source ID and then by their
 GPS time and stores them compressed
 
 
-    lassort *.txt -iparse xyzt -otxt -oparse xyzt   
+    lassort64 *.txt -iparse xyzt -otxt -oparse xyzt   
 
 z-orders all ASCII files with a default bucket size. 
 
 
-    lassort lidar.las sorted.las -v
+    lassort64 lidar.las sorted.las -v
 
 z-orders the points from lidar.las with a default bucket size. 
 
 
-    lassort -i tile.las -o tile_subtiled.las -levels 3 -v
+    lassort64 -i tile.las -o tile_subtiled.las -levels 3 -v
 
 z-orders the points from tile tile.las with 3 subtiling levels. 
 
 
-    lassort -i tile.las -o tile_subtiled.las -average 1000 -v
+    lassort64 -i tile.las -o tile_subtiled.las -average 1000 -v
 
 z-orders the points from tile tile.las with as many subtiling
 levels as required to get an average of 1000 points per bucket.
 
 
-    lassort -i lidar.las -o lidar_sorted.las -bucket_size 2 -v
+    lassort64 -i lidar.las -o lidar_sorted.las -bucket_size 2 -v
 
 z-orders the points from lidar.las with bucket size 2.
 
@@ -789,5 +789,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

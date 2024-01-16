@@ -19,7 +19,7 @@ to "lidar_info.txt" and with '-odir E:\reports' you choose a
 particular directory. These options are especially useful in
 batch mode such as:
 
-lasinfo -i *.laz -otxt -odir ..\reports -odix _info -cores 3
+lasinfo64 -i *.laz -otxt -odir ..\reports -odix _info -cores 3
 
 The tool can also be used to modify various other entries in
 the header as described below. This needs to be done with care
@@ -53,192 +53,192 @@ listed in the GUI are:
 
 ## Examples
 
-    lasinfo lidar.las
+    lasinfo64 lidar.las
 
 reports all information to stderr.
 
 
-    lasinfo -i lidar1.las lidar2.las -merged
+    lasinfo64 -i lidar1.las lidar2.las -merged
 
 reports all information for a merged LAS file that contains the
 merged contents of lidar1.las and lidar2.las to stderr.
 
 
-    lasinfo -i lidar1.las lidar2.las
+    lasinfo64 -i lidar1.las lidar2.las
 
 reports the information of the two files individually to stderr.
 
 
-    lasinfo *.las -merged -stdout
+    lasinfo64 *.las -merged -stdout
 
 reports information for all files merged to stdout.
 
 
-    lasinfo *.las -stdout
+    lasinfo64 *.las -stdout
 
 reports information for all files individually to stdout.
 
 
-    lasinfo *.las -odix _info
+    lasinfo64 *.las -odix _info
 
 reports information for all files individually to *_info.txt
 
 
-    lasinfo -i lidar.las -o lidar_info.txt 
+    lasinfo64 -i lidar.las -o lidar_info.txt 
 
 reports the information to a text file called lidar_info.txt.
 
 
-    lasinfo -i lidar.las -no_header
+    lasinfo64 -i lidar.las -no_header
 
 supresses the reporting of the header information (short: '-nh').
 
 
-    lasinfo -i lidar.las -no_vlrs
+    lasinfo64 -i lidar.las -no_vlrs
 
 supresses the reporting of variable length records (short: '-nv').
 
 
-    lasinfo -i lidar.las -no_min_max
+    lasinfo64 -i lidar.las -no_min_max
 
 supresses the reporting of minimum/maximum value for each attribute
 of the point records (short: '-nmm').
 
 
-    lasinfo -i lidar.las -no_check_outside
+    lasinfo64 -i lidar.las -no_check_outside
 
 supresses checking whether points fall outside of the bounding box that
 is reported in the header (short: '-nco').
 
 
-    lasinfo -i lidar.las -report_outside
+    lasinfo64 -i lidar.las -report_outside
 
 reports the index and the coordinates of each point that falls outside
 of the bounding box that is reported in the header (short: '-ro').
 
 
-    lasinfo -i lidar.las -nh -nv -progress 1000000
+    lasinfo64 -i lidar.las -nh -nv -progress 1000000
 
 supresses reporting of the header information and the vlrs and reports
 progress each time 1,000,000 points are parsed.
 
 
-    lasinfo -i lidar.las -no_check
+    lasinfo64 -i lidar.las -no_check
 
 only reports header information (short: '-nc'). does not parse the points.
 
 
-    lasinfo -i lidar.las -compute_density
+    lasinfo64 -i lidar.las -compute_density
 
 computes and reports a good estimate of the point density (short: '-cd').
 
 
-    lasinfo -i lidar.las -repair_bb
+    lasinfo64 -i lidar.las -repair_bb
 
 corrects missing or wrong bounding box info in the header.
 
 
-    lasinfo -i lidar.las -repair_counters
+    lasinfo64 -i lidar.las -repair_counters
 
 corrects missing or wrong point number info in the header.
 
 
-    lasinfo -i lidar.las -set_file_source_ID 27
+    lasinfo64 -i lidar.las -set_file_source_ID 27
 
 sets the file source ID in the LAS header to 27.
 
 
-    lasinfo -i lidar.las -auto_date
+    lasinfo64 -i lidar.las -auto_date
 
 sets the file creation day/year in the header to the creation date of the file.
 
 
-    lasinfo -i lidar.las -set_file_creation 8 2007
+    lasinfo64 -i lidar.las -set_file_creation 8 2007
 
 sets the file creation day/year in the header to 8/2007
 
 
-    lasinfo -i lidar.las -set_system_identifier "hello world!"
+    lasinfo64 -i lidar.las -set_system_identifier "hello world!"
 
 copies the first 31 characters of the string into the system_identifier field of the header 
 
 
-    lasinfo -i lidar.las -set_generating_software "this is a test (-:"
+    lasinfo64 -i lidar.las -set_generating_software "this is a test (-:"
 
 copies the first 31 characters of the string into the generating_software field of the header 
 
 
-    lasinfo -i lidar.las -set_bounding_box 4100000 1800000 150 4110000 1810000 400
+    lasinfo64 -i lidar.las -set_bounding_box 4100000 1800000 150 4110000 1810000 400
 
 sets the bounding box in the header to min_x=4100000, max_x=4110000, min_y=1800000, ...
 
 
-    lasinfo -i lidar.las -set_offset 3000000 1000000 0
+    lasinfo64 -i lidar.las -set_offset 3000000 1000000 0
 
 CAREFUL! sets the offset in the LAS header to 3000000 1000000 0 without changing
 the point coordinates. hence this will, in general, translate the point cloud.
 
 
-    lasinfo -i lidar.las -set_scale 0.001 0.001 0.001
+    lasinfo64 -i lidar.las -set_scale 0.001 0.001 0.001
 
 CAREFUL! sets the scale in the LAS header to 0.001 0.001 0.001 without changing
 the point coordinates. hence this will, in general, scale the point cloud.
 
 
-    lasinfo -i lidar.las -set_global_encoding 1
+    lasinfo64 -i lidar.las -set_global_encoding 1
 
 CAREFUL! sets the global encoding field of the LAS header to 1 without checking
 whether this will corrupt the file.
 
 
-    lasinfo -i lidar.las -set_version 1.1
+    lasinfo64 -i lidar.las -set_version 1.1
 
 CAREFUL! sets the version field of the LAS header to 1.1 without checking whether
 this will corrupt the file.
 
 
-    lasinfo -i lidar.las -set_header_size 235
+    lasinfo64 -i lidar.las -set_header_size 235
 
 CAREFUL! sets the header size field of the LAS header to 235 without checking
 whether this will corrupt the file.
 
 
-    lasinfo -i lidar.las -set_offset_to_point_data 460
+    lasinfo64 -i lidar.las -set_offset_to_point_data 460
 
 CAREFUL! sets the offset to point data field of the LAS header to 460 without
 checking whether this will corrupt the file.
 
 
-    lasinfo -i lidar.las -set_point_data_format 1
+    lasinfo64 -i lidar.las -set_point_data_format 1
 
 CAREFUL! sets the point data format field of the LAS header to point type 1
 without checking whether this will corrupt the file.
 
 
-    lasinfo -i lidar.las -set_point_data_record_length 32
+    lasinfo64 -i lidar.las -set_point_data_record_length 32
 
 CAREFUL! sets the point data record length field of the LAS header to size 32
 without checking whether this will corrupt the file.
 
 
-    lasinfo -i lidar.las -set_start_of_waveform_data_packet_record 0
+    lasinfo64 -i lidar.las -set_start_of_waveform_data_packet_record 0
 
 CAREFUL! sets the start of waveform data packet record field of the LAS header
 to 0 without checking whether this will corrupt the file.
 
 
-lasinfo -i lidar.las  
-lasinfo -i lidar.las -compute_density -o lidar_info.txt  
-lasinfo -i *.las  
-lasinfo -i *.las -single -otxt  
-lasinfo -no_header -no_vlrs -i lidar.laz  
-lasinfo -nv -nc -stdout -i lidar.las  
-lasinfo -nv -nc -stdout -i *.laz -single | grep version  
-lasinfo -i *.laz -subseq 100000 100100 -histo user_data 8  
-lasinfo -i *.las -repair  
-lasinfo -i *.laz -repair_bb -set_file_creation 8 2007  
-lasinfo -i *.las -repair_counters -set_version 1.2  
-lasinfo -i *.laz -set_system_identifier "hello world!" -set_generating_software "this is a test (-:"
+lasinfo64 -i lidar.las  
+lasinfo64 -i lidar.las -compute_density -o lidar_info.txt  
+lasinfo64 -i *.las  
+lasinfo64 -i *.las -single -otxt  
+lasinfo64 -no_header -no_vlrs -i lidar.laz  
+lasinfo64 -nv -nc -stdout -i lidar.las  
+lasinfo64 -nv -nc -stdout -i *.laz -single | grep version  
+lasinfo64 -i *.laz -subseq 100000 100100 -histo user_data 8  
+lasinfo64 -i *.las -repair  
+lasinfo64 -i *.laz -repair_bb -set_file_creation 8 2007  
+lasinfo64 -i *.las -repair_counters -set_version 1.2  
+lasinfo64 -i *.laz -set_system_identifier "hello world!" -set_generating_software "this is a test (-:"
 
 
 ## lasinfo specific arguments
@@ -911,5 +911,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

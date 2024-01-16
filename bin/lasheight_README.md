@@ -61,7 +61,7 @@ heights. For this we need the Geoid model as a grid of points
 "geoid.txt", "geoid.las" or "geoid.xyz" whose elevations express
 the difference between the ellipsoid and the geoid. Simply run:
 
-lasheight -i lidar.las -ground_points geoid.txt -replace_z -odix _geoid
+lasheight64 -i lidar.las -ground_points geoid.txt -replace_z -odix _geoid
 
 When using external ground points with '-ground_points geoid.laz'
 lasheight will *not* use all points in the file but cut out a
@@ -73,66 +73,66 @@ when the 'geoid.laz' file has sparsely spaced points. Using the
  
 ## Examples
 
-    lasheight -i *.las
+    lasheight64 -i *.las
 
 computes heights for all LAS files that match '*.las' and stores
 them quantized and clamped into the "user data" field (an 8-bit
 unsigned char) of each point record.
 
 
-    lasheight -i *.las -class 3
+    lasheight64 -i *.las -class 3
 
 the same as above but uses points with classification 3 instead
 of the default 2 to create the TIN that serves as the reference
 elevation against which the heights are computed.
 
 
-    lasheight -i *.laz -olaz
+    lasheight64 -i *.laz -olaz
 
 the same as above for LASzip-compressed input and output.
 
 
-    lasheight -i *.las -replace_z
+    lasheight64 -i *.las -replace_z
 
 replaces the z coordinate of each point with the computed height
 to avoid quantizing and clamping their value at the expense of
 losing the original z elevation values.
 
 
-    lasheight -i lidar.las -o brush.las -drop_below 1.0 -drop_above 3.0
+    lasheight64 -i lidar.las -o brush.las -drop_below 1.0 -drop_above 3.0
 
 kepps only those points who are between 1 and 3 units above the
 ground.
 
 
-    lasheight -i lidar.las -o heights.txt -oparse u
+    lasheight64 -i lidar.las -o heights.txt -oparse u
 
 stores the heights to a file called 'heights.txt' as quantized
 and clamped "unsigned chars".
 
 
-    lasheight -i lidar.las -replace_z -o heights.txt -oparse z
+    lasheight64 -i lidar.las -replace_z -o heights.txt -oparse z
 
 stores the heights to a file called 'heights.txt' as floating-
 point values of the same precision as the original elevations.
 
 
-lasheight -h  
-lasheight -i *.las -v  
-lasheight -i *.laz -olaz -quiet  
-lasheight -i *.las -classification 2 8 -replace_z  
-lasheight -i *.las -ground_points ground.las -replace_z  
-lasheight -i *.las -ground_points geoid.xyz -replace_z  
-lasheight -i in.las -o out.las -drop_below 1.5  
-lasheight -i in.las -o out.txt -drop_above 6.5 -oparse xyzu  
-lasheight -i in.las -o out.las -drop_between 0.5 2.5  
-lasheight -i in.laz -o out.laz -classify_below -1 7  
-lasheight -i in.laz -o out.laz -classify_above 100 10  
-lasheight -i in.laz -o out.laz -classify_between 0.5 2 3 -classify_between 2 5 4 -ignore_class 6  
-lasheight -i in.laz -o out.laz -replace_z  
-lasheight -i in.las -o out.txt -replace_z -oparse z  
-lasheight -i tiles_ground\*.laz -store_as_extra_bytes -odir tiles_height -olaz -cores 4  
-lasheight -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_height -olaz -cores 4
+lasheight64 -h  
+lasheight64 -i *.las -v  
+lasheight64 -i *.laz -olaz -quiet  
+lasheight64 -i *.las -classification 2 8 -replace_z  
+lasheight64 -i *.las -ground_points ground.las -replace_z  
+lasheight64 -i *.las -ground_points geoid.xyz -replace_z  
+lasheight64 -i in.las -o out.las -drop_below 1.5  
+lasheight64 -i in.las -o out.txt -drop_above 6.5 -oparse xyzu  
+lasheight64 -i in.las -o out.las -drop_between 0.5 2.5  
+lasheight64 -i in.laz -o out.laz -classify_below -1 7  
+lasheight64 -i in.laz -o out.laz -classify_above 100 10  
+lasheight64 -i in.laz -o out.laz -classify_between 0.5 2 3 -classify_between 2 5 4 -ignore_class 6  
+lasheight64 -i in.laz -o out.laz -replace_z  
+lasheight64 -i in.las -o out.txt -replace_z -oparse z  
+lasheight64 -i tiles_ground\*.laz -store_as_extra_bytes -odir tiles_height -olaz -cores 4  
+lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_height -olaz -cores 4
 
 
 ## lasheight specific arguments
@@ -851,5 +851,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

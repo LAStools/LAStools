@@ -35,75 +35,75 @@ and while they can be open they must also have elevations.
 
 ## Examples
 
-    las2tin -i lidar.laz -last_only -histo_only edge_length 0.1
+    las2tin64 -i lidar.laz -last_only -histo_only edge_length 0.1
 
 computes an edge length histogram for the last-return TIN
 
 
-    las2tin -i lidar.laz -last_only -histo_only min_edge_length 0.1
+    las2tin64 -i lidar.laz -last_only -histo_only min_edge_length 0.1
 
 computes a histogram of the shortest edge length found around
 each vertex in the last-return TIN
 
 
-    las2tin -i lidar.laz -last_only -histo_only max_edge_length 0.5
+    las2tin64 -i lidar.laz -last_only -histo_only max_edge_length 0.5
 
 computes a histogram of the longest edge length found around
 each vertex in the last-return TIN
 
 
-    las2tin -i *.las
+    las2tin64 -i *.las
 
 triangulates all files individually and stores the resulting
 TINs in ESRI's Shapefile format in files with the same name but
 different endings.
 
 
-    las2tin -i *.las -concavity 25
+    las2tin64 -i *.las -concavity 25
 
 same as above but dropping large triangles along the boundary ...
 
 
-    las2tin -i lidar.las -o tin.shp
+    las2tin64 -i lidar.las -o tin.shp
 
 triangulates all points and stores the resulting TIN in ESRI's Shapefile
 format.
 
 
-    las2tin -i lidar.las -o tin.obj
+    las2tin64 -i lidar.las -o tin.obj
 
 triangulates all points and stores the resulting TIN in OBJ format.
 
 
-    las2tin -i lidar.laz -o triangles.txt -last_only
+    las2tin64 -i lidar.laz -o triangles.txt -last_only
 
 triangulates all last return points from lidar.laz and stores them
 as a list of triangles in ASCII format in triangles.txt.
 
 
-    las2tin -i lidar.laz -o tin.shp -keep_class 2 3
+    las2tin64 -i lidar.laz -o tin.shp -keep_class 2 3
 
 triangulates all points classfied as 2 or 3 from lidar.laz and stores
 the resulting TIN in ESRI's Shapefile format to file tin.shp.
 
 
-    las2tin -i lidar1.las lidar2.laz lidar3.laz lidar4.las -merged -o tin.shp
+    las2tin64 -i lidar1.las lidar2.laz lidar3.laz lidar4.las -merged -o tin.shp
 
 triangulates the combined points from the four LAS and LAZ files and
 stores the resulting TIN in ESRI's Shapefile format to file tin.shp.
 
 
-las2tin -h  
-las2tin -i *.las  
-las2tin -i *.las -concavity 25 -oobj  
-las2tin -i *.laz -concavity 1000 -kill 10 -oshp  
-las2tin -i lidar.las -o tin.shp  
-las2tin -i lidar.laz -first_only -o mesh.obj  
-las2tin -i lidar.laz -last_only -o indices_only.txt  
-las2tin -i lidar.las -last_only -keep_class 2 6 8 -o tin.shp  
-las2tin -i lidar.laz -keep_class 8  
-las2tin -i lidar.laz -last_only -histo_only edge_length 0.1  
-las2tin -i lidar.laz -last_only -histo_only min_edge_length 0.1
+las2tin64 -h  
+las2tin64 -i *.las  
+las2tin64 -i *.las -concavity 25 -oobj  
+las2tin64 -i *.laz -concavity 1000 -kill 10 -oshp  
+las2tin64 -i lidar.las -o tin.shp  
+las2tin64 -i lidar.laz -first_only -o mesh.obj  
+las2tin64 -i lidar.laz -last_only -o indices_only.txt  
+las2tin64 -i lidar.las -last_only -keep_class 2 6 8 -o tin.shp  
+las2tin64 -i lidar.laz -keep_class 8  
+las2tin64 -i lidar.laz -last_only -histo_only edge_length 0.1  
+las2tin64 -i lidar.laz -last_only -histo_only min_edge_length 0.1
 
 
 ## las2tin specific arguments
@@ -803,5 +803,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

@@ -55,7 +55,7 @@ thereby "washes out" hard boundaries.
 
 ## Examples
 
-    lasoverlap -i tile.las -step 2 -o overlap.png
+    lasoverlap64 -i tile.las -step 2 -o overlap.png
 
 creates an overlap raster as well as a difference raster with a step of 2 
 units. For this, it is necessary that the LiDAR points in the LAS file 
@@ -66,13 +66,13 @@ that maps blue to -2.5, white to 0, and red to 2.5. The default output
 is PNG.
 
 
-    lasoverlap -i tile.las -step 2 -values -oasc
+    lasoverlap64 -i tile.las -step 2 -values -oasc
 
 same as above but output the actual values into an ASC raster (instead of 
 the color-coded values into a PNG).
 
 
-    lasoverlap -i tile.las -step 2 -values -oasc -recover_flightlines
+    lasoverlap64 -i tile.las -step 2 -values -oasc -recover_flightlines
 
 same as above for the case the tile does not have proper information in 
 the point source ID field but has valid GPS time stamps. The GPS time 
@@ -80,7 +80,7 @@ stamps are then used to recover the flight line information by looking
 for continous segments (or rather interruptions) in the GPS time stamps.
 
 
-    lasoverlap -i LDR*.las -files_are_flightlines -step 3 ^
+    lasoverlap64 -i LDR*.las -files_are_flightlines -step 3 ^
 	           -min_diff 0.1 -max_diff 0.4 -o overlap.png
 
 merges all the files "LDR*.las" while assigning the points of each file 
@@ -93,7 +93,7 @@ range (0.1 ... 0.4) to (white ... red). The range (-0.1 ... 0.1) is
 mapped to white.  
 
 
-    lasoverlap -i LDR*.las -files_are_flightlines -step 3 ^
+    lasoverlap64 -i LDR*.las -files_are_flightlines -step 3 ^
 	           -min_diff 1.0 -max_diff 2.0 -o overlap.png
 
 same as above. But here the difference raster uses '-min_diff 1' and 
@@ -101,20 +101,20 @@ same as above. But here the difference raster uses '-min_diff 1' and
 range (-1 ... +1) to white and (+1 ... +2) to (white ... red).
 
 
-    lasoverlap -i LDR*.las -files_are_flightlines -step 2 ^
+    lasoverlap64 -i LDR*.las -files_are_flightlines -step 2 ^
 	           -max_diff 0.5 -no_over
 
 same as above but does not output an overlap raster ('-no_over') and 
 operates with different '-step 2' and '-max_diff 0.5' settings.
 
 
-    lasoverlap -i LDR*.las -files_are_flightlines -step 5 -no_diff
+    lasoverlap64 -i LDR*.las -files_are_flightlines -step 5 -no_diff
 
 same as above but does not output a difference raster ('-no_diff') but 
 only a coarse (-step 5) overlap raster.
 
 
-    lasoverlap -i tiles*.laz -step 2 -no_over -utm 15N
+    lasoverlap64 -i tiles*.laz -step 2 -no_over -utm 15N
 
 operates tile by tile (e.g. creates one difference raster per file) and 
 generates a Google Earth KML file for each tile using UTM 15N. It is 
@@ -122,14 +122,14 @@ necessary that the LiDAR points in the LAZ file have their point source
 ID populated.
 
 
-    lasoverlap -i tiles*.laz -step 2 -no_over -utm 15N ^
+    lasoverlap64 -i tiles*.laz -step 2 -no_over -utm 15N ^
 	           -intensity -highest
 
 same as above but computes intensity differences. For intensities the 
 difference raster maps range -255 ... 0 ... 255 (e.g. '-max_diff 255').
 
 
-    lasoverlap -i tiles*.laz -keep_last -step 2 -no_over ^
+    lasoverlap64 -i tiles*.laz -keep_last -step 2 -no_over ^
 	           -utm 15N -counter -highest
 
 same as above but computes last return count differences. For counts the 
@@ -857,5 +857,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

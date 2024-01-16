@@ -47,21 +47,21 @@ lasmerge - Merge or split lidar data files by number of points
 
 ## Examples
 
-    lassplit -i lidar.las -olaz
+    lassplit64 -i lidar.las -olaz
 
 splits the file "lidar.las" based on the point source ID into
 files named "lidar.XXXXX.laz" where XXXXX corresponds to the
 point source ID.
 
 
-    lassplit -i *.las -olas
+    lassplit64 -i *.las -olas
 
 splits all files that match "*.las" based on the point source
 ID into files named "*.XXXXX.las" where XXXXX corresponds to
 the point source ID.
 
 
-    lassplit -i *.laz -olaz -recover_flightlines
+    lassplit64 -i *.laz -olaz -recover_flightlines
 
 this is a special option for the case that the LiDAR tiles do
 not have the point source ID correctly populated but have a proper
@@ -69,21 +69,21 @@ GPS time stamp per point. here lassplit recovers the most likely
 flightlines based on conituity (or rather gaps) in the GPS times.
 
 
-    lassplit -i *.las -merged -o flightlines.laz
+    lassplit64 -i *.las -merged -o flightlines.laz
 
 merges files that match "*.las" and splits the result based on
 the point source ID into files named "flightlines.XXXXX.laz" where
 XXXXX corresponds to the point source ID.
 
 
-    lassplit -i *.las -merged -o chopped.las -digits 2 -split 10000000
+    lassplit64 -i *.las -merged -o chopped.las -digits 2 -split 10000000
 
 merges all *.las files into one and then splits the result into
 several output files that contain ten million points each and that
 are called chopped.00.las, chopped.01.las, chopped.02.las, ...
 
 
-    lassplit -i big.txt -iparse xyztp -o split.laz -split 500000000
+    lassplit64 -i big.txt -iparse xyztp -o split.laz -split 500000000
 
 split the ASCII file "big.txt" that could, for example, contain 25
 billion points one and then split it into several compressed
@@ -91,19 +91,19 @@ output LAZ files that contain 500 million points each that are
 called split.00000.laz, split.00001.laz, split.00002.laz, ...
 
 
-lassplit -h  
-lassplit -i *.las  
-lassplit -i *.laz -merged -o flightlines.las  
-lassplit -i *.laz -merged -recover_flightlines -o flightlines.las  
-lassplit -i lidar.laz -by_gps_time_interval 5.0 -o segments.laz  
-lassplit -i lidar.laz -by_intensity_interval 32 -o intensities.laz  
-lassplit -i lidar.laz -by_classification -o slices.laz  
-lassplit -i lidar.laz -by_user_data_interval 8 -o slices.laz  
-lassplit -i forest.laz -by_attribute_interval 0 1.0 -o trees.laz  
-lassplit -i lidar.laz -by_x_interval 5.0 -o slices_x.laz  
-lassplit -i lidar.laz -by_y_interval 2.5 -o slices_y.laz  
-lassplit -i lidar.laz -by_z_interval 1.0 -o slices_z.laz  
-lassplit -i *.las -merged -split 100000000 -digits 2
+lassplit64 -h  
+lassplit64 -i *.las  
+lassplit64 -i *.laz -merged -o flightlines.las  
+lassplit64 -i *.laz -merged -recover_flightlines -o flightlines.las  
+lassplit64 -i lidar.laz -by_gps_time_interval 5.0 -o segments.laz  
+lassplit64 -i lidar.laz -by_intensity_interval 32 -o intensities.laz  
+lassplit64 -i lidar.laz -by_classification -o slices.laz  
+lassplit64 -i lidar.laz -by_user_data_interval 8 -o slices.laz  
+lassplit64 -i forest.laz -by_attribute_interval 0 1.0 -o trees.laz  
+lassplit64 -i lidar.laz -by_x_interval 5.0 -o slices_x.laz  
+lassplit64 -i lidar.laz -by_y_interval 2.5 -o slices_y.laz  
+lassplit64 -i lidar.laz -by_z_interval 1.0 -o slices_z.laz  
+lassplit64 -i *.las -merged -split 100000000 -digits 2
 
 
 ## lassplit specific arguments
@@ -799,5 +799,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

@@ -80,7 +80,7 @@ which might be useful for subsequent tree top detection.
 
 ## Examples
 
-    lasgrid -i *.las -opng -step 5 -false -sp83 OH_N
+    lasgrid64 -i *.las -opng -step 5 -false -sp83 OH_N
 
 rasters for each *.las files the lowest elevation of all points
 that fall into cells of size 5 by 5, stores the resulting grid
@@ -88,21 +88,21 @@ in PNG format using false coloring, and creates a KML file that
 maps the PNG to state plane NAD83 of Northern Ohio.
 
 
-    lasgrid -i *.txt -iparse xyz -oasc -step 2 -highest
+    lasgrid64 -i *.txt -iparse xyz -oasc -step 2 -highest
 
 rasters for each *.txt files the highest elevation of all points
 that fall into cells of size 2 by 2 and stores the resulting grids
 in ASC format.
 
 
-    lasgrid -i lidar1.las lidar2.las lidar3.las -merged -o dem.bil -step 4 -highest -intensity
+    lasgrid64 -i lidar1.las lidar2.las lidar3.las -merged -o dem.bil -step 4 -highest -intensity
 
 merges the points of lidar1.las lidar2.las lidar3.las and rasters
 the highest intensity of all points that fall into cells of size 4
 by 4 and stores the resulting grid in BIL format.
 
 
-    lasgrid -v -i lidar.las -o dem.png -step 5 -false -stddev -utm 14T
+    lasgrid64 -v -i lidar.las -o dem.png -step 5 -false -stddev -utm 14T
 
 rasters the standard deviations of the elevation of all points that
 fall into cells of size 5 by 5 and stores the resulting grid in PNG
@@ -110,34 +110,34 @@ format using false coloring and creates a KML file that maps the file
 to UTM zone 14
 
 
-    lasgrid -v -i lidar.las -o dem.jpg -last_only -false -highest -step 2
+    lasgrid64 -v -i lidar.las -o dem.jpg -last_only -false -highest -step 2
 
 rasters the highest elevation from all points that fall into cells of
 size 2 by 2 units and are classfied as last returns and stores the
 resulting grid in JPG format using false elevation coloring
 
 
-    lasgrid -v -i lidar.las -o dem.tif -keep_class 2 -keep_class 3 -gray
+    lasgrid64 -v -i lidar.las -o dem.tif -keep_class 2 -keep_class 3 -gray
 
 rasters the lowest elevation from all points that fall into cells of
 size 1 by 1 unit and are classfied as 2 or 3 and stores the resulting
 grid in TIF format using gray-scale elevation coloring
 
 
-    lasgrid -v -i lidar.las -o dem.asc -step 2 -average
+    lasgrid64 -v -i lidar.las -o dem.asc -step 2 -average
 
 rasters the average elevations from all points that fall into cells of
 size 2 by 2 units and stores the resulting grid in ASC format.
 
 
-    lasgrid -v -lof lidar_files.txt -merged -o merged.bil -step 10
+    lasgrid64 -v -lof lidar_files.txt -merged -o merged.bil -step 10
 
 rasters the lowest elevation from all points of all files listed in
 lidar_files.txt that fall into cells of size 10 by 10 units and stores
 the resulting grid in BIL format with 32 bits floats.
 
 
-    lasgrid -v -lof lidar_files.txt -obil -step 10
+    lasgrid64 -v -lof lidar_files.txt -obil -step 10
 
 rasters the lowest elevation for each file listed in lidar_files.txt
 individually that fall into cells of size 10 by 10 units and stores
@@ -146,59 +146,59 @@ each resulting grid in BIL format with 32 bits floats.
 the following commands generate some interesting georeferenced grids that
 you can look at in Google Earth by double clicking the generated KML file
 
-    lasgrid -i ..\data\test.las -false -o test.png
-    lasgrid -i ..\data\TO_core_last_zoom.las -gray -o toronto.png -utm 17T
-    lasgrid -i ..\data\SerpentMound.las -false -o SerpentMound.png
+    lasgrid64 -i ..\data\test.las -false -o test.png
+    lasgrid64 -i ..\data\TO_core_last_zoom.las -gray -o toronto.png -utm 17T
+    lasgrid64 -i ..\data\SerpentMound.las -false -o SerpentMound.png
 
 
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -o elev_low.png  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -o elev_high.png -highest  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -o elev_std.png -stddev  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -keep_class 2 -o elev_grnd_low.png  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -keep_class 2 -o elev_grnd_low_fill.png -fill 5  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -keep_class 2 -o elev_grnd_std_fill.png -stddev -fill 5  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -o elev_low.png  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -o elev_high.png -highest  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -o elev_std.png -stddev  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -keep_class 2 -o elev_grnd_low.png  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -keep_class 2 -o elev_grnd_low_fill.png -fill 5  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -keep_class 2 -o elev_grnd_std_fill.png -stddev -fill 5  
   
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -o elev_f_low.png  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -o elev_f_high.png -highest  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -o elev_f_std.png -stddev  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -keep_class 2 -o elev_f_grnd_low.png  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -keep_class 2 -o elev_f_grnd_low_fill.png -fill 5  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -keep_class 2 -o elev_f_grnd_std_fill.png -std -fill 5  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -o elev_f_low.png  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -o elev_f_high.png -highest  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -o elev_f_std.png -stddev  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -keep_class 2 -o elev_f_grnd_low.png  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -keep_class 2 -o elev_f_grnd_low_fill.png -fill 5  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -keep_class 2 -o elev_f_grnd_std_fill.png -std -fill 5  
   
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -intensity -o int_low.png  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -intensity -o int_high.png -highest  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -intensity -o int_avg.png -average  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -intensity -o int_std.png -stddev  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -intensity -o int_low.png  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -intensity -o int_high.png -highest  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -intensity -o int_avg.png -average  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -intensity -o int_std.png -stddev  
   
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -intensity -o int_f_low.png  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -intensity -o int_f_high.png -highest  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -intensity -o int_f_avg.png -average  
-lasgrid -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -intensity -o int_f_std.png -stddev  
-  
-  
-lasgrid -v -o result.png -false -i line_27007_dd.las -lonlat -step 0.00002 -stddev  
-lasgrid -v -o result.png -false -i IowaDNR-CloudPeakSoft-1.0-UTM15N.las   
-lasgrid -v -o result.png -false -i LAS12_Sample_withIntensity_Quick_Terrain_Modeler.las -step 2 -stddev  
-lasgrid -v -o result.png -false -i LAS12_Sample_withRGB_Quick_Terrain_Modeler.las -high  
-lasgrid -v -o result.png -false -i Lincoln.las -utm 14T -step 5  
-lasgrid -v -o result.png -false -i S1C1_strip021.las -set_min_max 1630 1690 -step 2 -high  
-lasgrid -v -o result.png -false -i "Serpent Mound Model LAS Data.las" -intensity -set_min_max 0 400  
-lasgrid -v -o result.png -false -i USACE_Merrick_lots_of_VLRs.las -step 10 -intensity  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -intensity -o int_f_low.png  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -intensity -o int_f_high.png -highest  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -intensity -o int_f_avg.png -average  
+lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -false -intensity -o int_f_std.png -stddev  
   
   
-lasgrid -h  
-lasgrid -i *.las -opng -step 5 -false  
-lasgrid -i in.las -o dtm.asc -mem 1000  
-lasgrid -i in.las -o chm.png -false -subcircle 0.5 -set_min_max 0 30  
-lasgrid -i in.laz -o dsm.img -elevation_highest -mem 1900 -temp_files E:\tmp  
-lasgrid -i in.laz -o out.png -elevation_stddev -false -step 5  
-lasgrid -i in.las -o intensity.asc -intensity_lowest -step 2 -temp_files E:\tmp  
-lasgrid -i in.laz -o out.png -scan_angle_abs_lowest -gray -step 2  
-lasgrid -i in.las -o map.asc -occupancy -step 0.5  
-lasgrid -i in.laz -o ortho.png -rgb -temp_files E:\tmp  
-lasgrid -i in.las -o counter.tif -counter -false -step 2  
-lasgrid -i in.laz -o counter.bil -counter_16bit -step 5  
-lasgrid -i in.laz -o out.asc -classification_majority -step 1
+lasgrid64 -v -o result.png -false -i line_27007_dd.las -lonlat -step 0.00002 -stddev  
+lasgrid64 -v -o result.png -false -i IowaDNR-CloudPeakSoft-1.0-UTM15N.las   
+lasgrid64 -v -o result.png -false -i LAS12_Sample_withIntensity_Quick_Terrain_Modeler.las -step 2 -stddev  
+lasgrid64 -v -o result.png -false -i LAS12_Sample_withRGB_Quick_Terrain_Modeler.las -high  
+lasgrid64 -v -o result.png -false -i Lincoln.las -utm 14T -step 5  
+lasgrid64 -v -o result.png -false -i S1C1_strip021.las -set_min_max 1630 1690 -step 2 -high  
+lasgrid64 -v -o result.png -false -i "Serpent Mound Model LAS Data.las" -intensity -set_min_max 0 400  
+lasgrid64 -v -o result.png -false -i USACE_Merrick_lots_of_VLRs.las -step 10 -intensity  
+  
+  
+lasgrid64 -h  
+lasgrid64 -i *.las -opng -step 5 -false  
+lasgrid64 -i in.las -o dtm.asc -mem 1000  
+lasgrid64 -i in.las -o chm.png -false -subcircle 0.5 -set_min_max 0 30  
+lasgrid64 -i in.laz -o dsm.img -elevation_highest -mem 1900 -temp_files E:\tmp  
+lasgrid64 -i in.laz -o out.png -elevation_stddev -false -step 5  
+lasgrid64 -i in.las -o intensity.asc -intensity_lowest -step 2 -temp_files E:\tmp  
+lasgrid64 -i in.laz -o out.png -scan_angle_abs_lowest -gray -step 2  
+lasgrid64 -i in.las -o map.asc -occupancy -step 0.5  
+lasgrid64 -i in.laz -o ortho.png -rgb -temp_files E:\tmp  
+lasgrid64 -i in.las -o counter.tif -counter -false -step 2  
+lasgrid64 -i in.laz -o counter.bil -counter_16bit -step 5  
+lasgrid64 -i in.laz -o out.asc -classification_majority -step 1
 
 
 ## lasgrid specific arguments
@@ -1064,5 +1064,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

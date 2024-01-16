@@ -39,7 +39,7 @@ withheld, or removed with the '-ignore_class 2' option.
 
 ## Examples
 
-    lasnoise -i tiles\*.laz ^
+    lasnoise64 -i tiles\*.laz ^
             -step 2 -isolated 3 ^
             -odix _denoised -olaz ^
             -cores 7
@@ -50,7 +50,7 @@ in the center cell) where each cell is 2 by 2 by 2 meters in size
 as classification code 7.
 
 
-    lasnoise -i lidar.las ^
+    lasnoise64 -i lidar.las ^
             -remove_noise ^
             -ignore_class 2 ^
             -o lidar_without_noise.laz
@@ -61,7 +61,7 @@ grid (with the respective point in the center cell) where each cell
 is 4 by 4 by 4 meters in size.
 
 
-    lasnoise -i tiles_raw\*.laz ^
+    lasnoise64 -i tiles_raw\*.laz ^
             -classify_as 31 ^
             -step_xy 1 -step_z 0.2 -isolated 5 ^
             -odir tiles_denoised\ -olaz ^
@@ -74,13 +74,13 @@ surrounding 3 by 3 by 3 grid are considered noise. here points
 are classified to class 31 instead of being removed.
 
 
-lasnoise -h  
-lasnoise -i in.laz -o out.laz  
-lasnoise -i raw\*.laz -step 2 -isolated 3 -odir D:\denoised -olaz  
-lasnoise -i raw\*.laz -step_xy 1 -step_z 0.25 -isolated 10 -classify_as 7 -odix suffix -olaz  
-lasnoise -i *.laz -step 4 -isolated 5 -olaz -remove_noise  
-lasnoise -i *.laz -step_xy 2 -step_z 0.5 -isolated 10 -flag_as_withheld -odix suffix -olaz  
-lasnoise -i tiles\*.laz -step 3 -isolated 3 -classify_as 31 -odir denoised -olaz
+lasnoise64 -h  
+lasnoise64 -i in.laz -o out.laz  
+lasnoise64 -i raw\*.laz -step 2 -isolated 3 -odir D:\denoised -olaz  
+lasnoise64 -i raw\*.laz -step_xy 1 -step_z 0.25 -isolated 10 -classify_as 7 -odix suffix -olaz  
+lasnoise64 -i *.laz -step 4 -isolated 5 -olaz -remove_noise  
+lasnoise64 -i *.laz -step_xy 2 -step_z 0.5 -isolated 10 -flag_as_withheld -odix suffix -olaz  
+lasnoise64 -i tiles\*.laz -step 3 -isolated 3 -classify_as 31 -odir denoised -olaz
 
 
 ## lasnoise specific arguments
@@ -789,5 +789,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

@@ -17,12 +17,12 @@ and first point should be identical).
 
 ## Examples
 
-    las3dpoly -i in.laz -poly line.shp -o out.laz -distance 10 -classify_as 13 -v
+    las3dpoly64 -i in.laz -poly line.shp -o out.laz -distance 10 -classify_as 13 -v
 
 classify all points within the result file as class 13 if they are within radial distance=10
 to the line specified by line.shp and list a verbose report of what has been done. 
 
-   las3dpoly -i in.laz -poly line.csv -distance 10 20 -o out.laz -remove_points 
+   las3dpoly64 -i in.laz -poly line.csv -distance 10 20 -o out.laz -remove_points 
 
 clip away all points of in.laz which are less than 10 units vertically and 20 units horizontal from the line specified by line.csv
 
@@ -739,5 +739,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

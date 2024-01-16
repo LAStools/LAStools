@@ -26,7 +26,7 @@ number of points in the input file is exceeded.
 
 ## Examples
 
-    lasvoxel -v -i ..\data\france.laz -i ..\data\fusa.laz -step 1 -odix _mist -olaz
+    lasvoxel64 -v -i ..\data\france.laz -i ..\data\fusa.laz -step 1 -odix _mist -olaz
 voxelizing 101206 points with step_xy 1 units and step_z 1 units ...  
 took 0.063 sec. created 15 vertical layers. outputting ...  
 done with '..\data\france_mist.laz'. took 0.078 sec.  
@@ -35,9 +35,9 @@ took 0.186 sec. created 23 vertical layers. outputting ...
 done with '..\data\fusa_mist.laz'. took 0.241 sec.  
 done with all files. total time for 2 files 0.319 sec.  
 
-    lastile -i shitloadoflidar.laz -tile_size 10 -odir tiles -o small.laz
-    lasvoxel -i tiles/small*.laz -odir result -olaz
-    lasmerge -i result/small*.laz -o big_result.laz
+    lastile64 -i shitloadoflidar.laz -tile_size 10 -odir tiles -o small.laz
+    lasvoxel64 -i tiles/small*.laz -odir result -olaz
+    lasmerge64 -i result/small*.laz -o big_result.laz
 
 the above workflow is for larger areas and/or tiny voxels sizes
 
@@ -738,5 +738,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

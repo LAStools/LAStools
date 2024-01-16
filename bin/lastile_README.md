@@ -65,27 +65,27 @@ may repeat if greater adaptivity is needed. This is especially
 useful for surveys with great density variation, like mobile,
 terrestrial, and UAV scans. Here a small example:
 
-lastile -i mobile_scan/strip0*.laz ^  
+    lastile64 -i mobile_scan/strip0*.laz ^  
         -tile_size 1024 -buffer 5 ^  
         -refine_tiling 10000000 ^  
         -odir tiles_raw -o singapore.laz            
   
-lastile -i tiles_raw/singapore*_1024.laz ^  
+    lastile64 -i tiles_raw/singapore*_1024.laz ^  
         -refine_tiling 10000000 ^  
         -olaz ^  
         -cores 4  
   
-lastile -i tiles_raw/singapore*_512.laz ^  
+    lastile64 -i tiles_raw/singapore*_512.laz ^  
         -refine_tiling 10000000 ^  
         -olaz ^  
         -cores 4  
   
-lastile -i tiles_raw/singapore*_256.laz ^  
+    lastile64 -i tiles_raw/singapore*_256.laz ^  
         -refine_tiling 10000000 ^  
         -olaz ^  
         -cores 4          
   
-lastile -i tiles_raw/singapore*_128.laz ^  
+    lastile64 -i tiles_raw/singapore*_128.laz ^  
         -refine_tiling 10000000 ^  
         -olaz ^  
         -cores 4  
@@ -111,18 +111,18 @@ attribute called TNAME in the DBF file.
 
 # See also
 
-lassplit - Merge or split lidar data files by number of points
+lassplit64 - Merge or split lidar data files by number of points
 
 
 ## Examples
 
-    lastile -i *.las -o tile.las
+    lastile64 -i *.las -o tile.las
 
 tiles all points from all files using the default tile size of 1000.
 
 
     lasindex -i *.laz -cores 8
-    lastile -i *.laz -files_are_flightlines -buffer 25 -o tiles\tile.laz -cores 4
+    lastile64 -i *.laz -files_are_flightlines -buffer 25 -o tiles\tile.laz -cores 4
 
 spatially indexes all compressed LAZ files and then tiles them on 4
 cores using the default tile size of 1000 and a buffer of 25 while
@@ -130,7 +130,7 @@ setting the point source ID of each point to the file number it is
 from.
 
 
-    lastile -i *.las -full_bb -o tile.laz
+    lastile64 -i *.las -full_bb -o tile.laz
 
 same but sets the bounding box in the header to the full extend of
 all tiles (rather than to the actual extent of its points) and also
@@ -139,16 +139,16 @@ compresses the while writing them tiles
 
     mkdir tiles
     mkdir tiles_no_buffer
-    lastile -i *.las -buffer 10 -o tiles\tile.las
-    lastile -i tiles\tile_*.las -remove_buffer -odir tiles_no_buffer -olaz
+    lastile64 -i *.las -buffer 10 -o tiles\tile.las
+    lastile64 -i tiles\tile_*.las -remove_buffer -odir tiles_no_buffer -olaz
 
 each tile gets buffer points for 10 units in all directions. also puts
 the tiles into directory 'tiles'. the second command removes all buffer
 points and writes the tiles compressed to the 'tiles_no_buffer' folder
 
 
-    lastile -i large.laz -tile_size 500 -buffer 10 -reversible -o tile.laz 
-    lastile -i tile_*.laz -reverse_tiling -o large_reversed.laz
+    lastile64 -i large.laz -tile_size 500 -buffer 10 -reversible -o tile.laz 
+    lastile64 -i tile_*.laz -reverse_tiling -o large_reversed.laz
 
 tiles file 'large.laz' with tile size 500 and buffer 10 in reversible
 mode. the second command removes all buffer points, reconstructs the
@@ -156,24 +156,24 @@ original point order, and stored the result as 'large_reversed.laz'.
 
 
     mkdir toronto
-    lastile -i *.txt -iparse xyzti -odir toronto -o tile.laz 
+    lastile64 -i *.txt -iparse xyzti -odir toronto -o tile.laz 
 
 same but with on-the-fly converted ASCII input
 
 
-    lastile -i in1.las in2.las in3.las -o sydney.laz -tile_size 500
+    lastile64 -i in1.las in2.las in3.las -o sydney.laz -tile_size 500
 
 tiles the points from the three LAS files with a tile size of 500. 
 
 
     mkdir outer_banks 
-    lastile -lof obx_files.txt -keep_class 2 3 -tile_size 100 -odir outer_banks -o tile.laz 
+    lastile64 -lof obx_files.txt -keep_class 2 3 -tile_size 100 -odir outer_banks -o tile.laz 
 
 tiles all LAS/LAZ files listed in the text file with a tile size
 of 100 keeping only points with classification 2 or 3
 
 
-    lastile -lof file_list.txt -o tile.laz -extra_pass
+    lastile64 -lof file_list.txt -o tile.laz -extra_pass
 
 tiles all LAS/LAZ files listed in the text file into a LASzip
 compressed tiling using the default tile size of 1000 and uses
@@ -181,7 +181,7 @@ an extra read pass in an attempt to use less memory.
 
 
     mkdir toronto
-    lastile -i huge.laz -last_only -odir toronto -o tile.laz
+    lastile64 -i huge.laz -last_only -odir toronto -o tile.laz
 
 tiles the last returns from huge.laz into compressed tiling.
 
@@ -885,5 +885,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

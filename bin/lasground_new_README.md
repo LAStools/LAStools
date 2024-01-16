@@ -75,47 +75,47 @@ with the command-line option '-skip_files'.
 
 ## Examples
 
-    lasground_new -i terrain.laz -o classified_terrain.laz
+    lasground_new64 -i terrain.laz -o classified_terrain.laz
 
 classifies a terrain with the default settings.
 
-    lasground_new -i terrain.laz -o classified_terrain.laz -feet -elevation_feet
+    lasground_new64 -i terrain.laz -o classified_terrain.laz -feet -elevation_feet
 
 classifies a terrain where both horizontal and vertical units are
 in feet instead of in meters (which is assumed by default unless
 there is projection information in the LAS file saying otherwise).
 
-    lasground_new -i terrain.laz -o classified_terrain.laz -all_returns
+    lasground_new64 -i terrain.laz -o classified_terrain.laz -all_returns
 
 classifies a terrain considering all points - not just the last
 returns (as is the default behavior).
 
-    lasground_new -i tiles_raw\*.laz -odir tiles_ground -olaz -cores 16
+    lasground_new64 -i tiles_raw\*.laz -odir tiles_ground -olaz -cores 16
 
 classifies all LAZ files from the tiles_raw folder with the default
 settings on multiple cores and stores the result as LAZ files in the
 tiles_ground folder (that must exist).
 
-    lasground_new -i *.laz -town -odix _g -olaz -cores 8
+    lasground_new64 -i *.laz -town -odix _g -olaz -cores 8
 
 the same as above but uses finer spacing to allowing only smaller
 buildings and other man-made structures to be removed.
 
-    lasground_new -i *.laz -metro -odix _ground -olaz -cores 4
+    lasground_new64 -i *.laz -metro -odix _ground -olaz -cores 4
 
 the same as above but uses a wider spacing to allow removing very
 large buildings such as warehouses and factories.
 
 
-lasground_new -h  
-lasground_new -i in.laz -o out.laz  
-lasground_new -i *.laz -odix _g -olaz -cores 4  
-lasground_new -i in.las -o out.laz -metro  
-lasground_new -i in.laz -o out.laz -town -ignore_class 7  
-lasground_new -i in.laz -o out.laz -v -step 45 -spike 1.5 -down_spike 2.5 -bulge 2.5 -offset 0.1  
-lasground_new -i in.las -o out.laz -feet -elevation_feet  
-lasground_new -i in.laz -o out.laz -no_bulge  
-lasground_new -i *.laz -v -odir ground_classified -olaz -cores 8
+lasground_new64 -h  
+lasground_new64 -i in.laz -o out.laz  
+lasground_new64 -i *.laz -odix _g -olaz -cores 4  
+lasground_new64 -i in.las -o out.laz -metro  
+lasground_new64 -i in.laz -o out.laz -town -ignore_class 7  
+lasground_new64 -i in.laz -o out.laz -v -step 45 -spike 1.5 -down_spike 2.5 -bulge 2.5 -offset 0.1  
+lasground_new64 -i in.las -o out.laz -feet -elevation_feet  
+lasground_new64 -i in.laz -o out.laz -no_bulge  
+lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 
 
 ## lasground_new specific arguments
@@ -855,5 +855,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

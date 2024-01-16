@@ -9,30 +9,30 @@ If you want to use PointZ records instead you need to add
  
 ## Examples
 
-    las2shp -i *.las
+    las2shp64 -i *.las
 
 converts all LAS files matching '*.las' to ESRI's Shapefile format
 '*.shp' using MultiPointZ records containing 1024 points each.
 
-    las2shp -i lidar.laz -o shapefile.shp -record 2048
+    las2shp64 -i lidar.laz -o shapefile.shp -record 2048
 
 converts the LAZ file 'lidar.las' to ESRI's Shapefile 'shapefile.shp'
 using MultiPointZ records containing 2048 points each.
 
-    las2shp -lof file_list.txt -merged -o lidar.shp -record 2048
+    las2shp64 -lof file_list.txt -merged -o lidar.shp -record 2048
 
 converts the contents of all LAS files listed in 'file_list.txt' to ESRI's
 Shapefile format 'lidar.shp' using MultiPointZ records containing 2048
 points each.
 
 
-las2shp -h  
-las2shp -i *.las  
-las2shp -i *.txt -iparse xyza -keep_scan_angle -10 10  
-las2shp -i lidar.las -o shapefile.shp -record_size 2048  
-las2shp -i lidar.laz -last_only -record_size 10000  
-las2shp -i lidar.laz -keep_class 2 8  
-las2shp -i *.laz -drop_return 1
+las2shp64 -h  
+las2shp64 -i *.las  
+las2shp64 -i *.txt -iparse xyza -keep_scan_angle -10 10  
+las2shp64 -i lidar.las -o shapefile.shp -record_size 2048  
+las2shp64 -i lidar.laz -last_only -record_size 10000  
+las2shp64 -i lidar.laz -keep_class 2 8  
+las2shp64 -i *.laz -drop_return 1
 
 
 ## las2shp specific arguments
@@ -714,5 +714,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

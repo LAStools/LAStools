@@ -5,12 +5,12 @@ whether they are identical or whether they are different.
  
 ## Examples
 
-    lasdiff -i lidar.las -i lidar.laz
+    lasdiff64 -i lidar.las -i lidar.laz
 
 verifies the original LAS file and the compressed LAZ file are
 identical and if not prints out differences.
 
-    lasdiff -i lidar1.las -i lidar2.las -o lidar3.las 
+    lasdiff64 -i lidar1.las -i lidar2.las -o lidar3.las 
 
 in case two LiDAR files contain the same points that are in the
 same order it can be interesting to compute a possible elevation 
@@ -22,16 +22,16 @@ lastools.zip distribution.
 
 1. first we create a digital surface model (DSM)
 
-    las2dem -i ..\data\fusa.laz -step 2 -first_only -o dsm.asc
+    las2dem64 -i ..\data\fusa.laz -step 2 -first_only -o dsm.asc
 
 2. then we create a digital terrain model (DTM)
 
-    las2dem -i ..\data\fusa.laz -step 2 -keep_class 2 -o dtm.asc
+    las2dem64 -i ..\data\fusa.laz -step 2 -keep_class 2 -o dtm.asc
 
 3. now we create a difference of the two
 
-    lasdiff -i dsm.asc -i dtm.asc -o nsm.las
-    lasdiff -i dsm.asc -i dtm.asc -o nsm.xyz
+    lasdiff64 -i dsm.asc -i dtm.asc -o nsm.las
+    lasdiff64 -i dsm.asc -i dtm.asc -o nsm.xyz
 
 4. if the two rasters were identical then all z coordinates
 would be zero. the variation in z coordinate can be used to
@@ -40,15 +40,15 @@ the variation in z coordinate represents a normalized surface
 model (NSM).
 
 
-lasdiff -h  
-lasdiff lidar.las  
-lasdiff lidar1.las lidar1.laz  
-lasdiff *.las  
-lasdiff lidar1.las lidar2.las -shutup 20  
-lasdiff lidar1.txt lidar2.txt -iparse xyzti  
-lasdiff lidar1.las lidar1.laz  
-lasdiff lidar1.las lidar1.laz -random_seeks  
-lasdiff -i lidar1.las -i lidar2.las -o diff.las
+lasdiff64 -h  
+lasdiff64 lidar.las  
+lasdiff64 lidar1.las lidar1.laz  
+lasdiff64 *.las  
+lasdiff64 lidar1.las lidar2.las -shutup 20  
+lasdiff64 lidar1.txt lidar2.txt -iparse xyzti  
+lasdiff64 lidar1.las lidar1.laz  
+lasdiff64 lidar1.las lidar1.laz -random_seeks  
+lasdiff64 -i lidar1.las -i lidar2.las -o diff.las
 
 
 ## lasdiff specific arguments
@@ -657,5 +657,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

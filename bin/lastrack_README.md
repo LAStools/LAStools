@@ -69,7 +69,7 @@ integer overflow use the _precise version of the parameter.
   
 ## Examples
 
-    lastrack -i *.las ^
+    lastrack64 -i *.las ^
              -track track.laz ^
              -offset -2.12 ^
              -drop_below -1.2 ^
@@ -81,7 +81,7 @@ file 'track.laz' and drops all points whose height is below -1.20
 and stores them with an appendix '_cleaned' as compressed LAZ.
 
 
-    lastrack -i tj0012\*.laz ^
+    lastrack64 -i tj0012\*.laz ^
              -track tj0012.laz ^
              -offset -2.47 ^
              -classify_below -0.4 7 ^
@@ -97,7 +97,7 @@ and all points whose height is between 3.00 as 10.00 as 25 and
 stores them with an appendix '_classed' as compressed LAZ.
 
 
-    lastrack -i session017\*.laz ^
+    lastrack64 -i session017\*.laz ^
              -track s017.laz ^
              -offset -1.84 ^
              -replace_z ^
@@ -110,13 +110,13 @@ values with with this height, and then stores them with appendix
 '_normalized' as compressed LAZ into directory 'session017_norm'.
 
 
-lastrack -h  
-lastrack -i in.laz -track tj.laz -offset -2.21 -classify_below -0.4 7 -o out.laz  
-lastrack -i in.laz -track tj.laz -offset -1.87 -drop_below -2.00 -o out.laz -verbose  
-lastrack -i *.laz -track tj.laz -offset -2.07 -classify_between -0.4 0.5 2 -classify_between 3.5 10.5 25 -odir classed -olaz  
-lastrack -i t028\*.laz -track tj28.laz -offset -1.92 -replace_z -odix _norm -olaz  
-lastrack -i traj1\*.laz -track traj1.laz -classify_xy_range_between 0 4 7 -odix _denoised -olaz  
-lastrack -version
+lastrack64 -h  
+lastrack64 -i in.laz -track tj.laz -offset -2.21 -classify_below -0.4 7 -o out.laz  
+lastrack64 -i in.laz -track tj.laz -offset -1.87 -drop_below -2.00 -o out.laz -verbose  
+lastrack64 -i *.laz -track tj.laz -offset -2.07 -classify_between -0.4 0.5 2 -classify_between 3.5 10.5 25 -odir classed -olaz  
+lastrack64 -i t028\*.laz -track tj28.laz -offset -1.92 -replace_z -odix _norm -olaz  
+lastrack64 -i traj1\*.laz -track traj1.laz -classify_xy_range_between 0 4 7 -odix _denoised -olaz  
+lastrack64 -version
 
 
 ## lastrack specific arguments
@@ -839,5 +839,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

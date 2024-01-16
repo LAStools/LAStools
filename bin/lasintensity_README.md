@@ -21,13 +21,13 @@ https://downloads.rapidlasso.de/doc/lasintensity.pdf
 
 ## Examples
 
-    lasintensity -i in.laz -scanner_height 3 -av 9 -w 0.705
+    lasintensity64 -i in.laz -scanner_height 3 -av 9 -w 0.705
 
 The most straight forward use of lasintensity specify the laser wavelength, 
 the visibility range and the lidar scanners altitude to correct the measured intensities
 as a function of the scan angle.
 
-    lasintensity -i in.laz -scanner_height 2.8 -a ...
+    lasintensity64 -i in.laz -scanner_height 2.8 -a ...
 
 Using an attenuation factor to correct the intensities in the data.
 
@@ -722,5 +722,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+

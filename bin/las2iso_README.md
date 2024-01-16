@@ -52,63 +52,63 @@ and while they can be open they must also have elevations.
 
 ## Examples
 
-    las2iso -i *.las -iso_every 2 -oshp 
+    las2iso64 -i *.las -iso_every 2 -oshp 
 
 extracts 2 unit contours from all files that match *.las and stores
 the result in ESRI's Shapefile format.
 
-    las2iso -i *.laz -iso_every 2 -oshp -odbf
+    las2iso64 -i *.laz -iso_every 2 -oshp -odbf
 
 extracts 2 unit contours from all files that match *.laz and stores
 the result in ESRI's Shapefile format with the elevations of the
 contour line being an explicit attribues in the DBF file.
 
-    las2iso -i *.txt -iparse ssxyz -oshp -iso_number 20
+    las2iso64 -i *.txt -iparse ssxyz -oshp -iso_number 20
 
 extracts 20 evenly spaced contours from all ASCII files *.txt that
 are parsed with "ssxyz" and stores the result in Shapefile format.
 
-    las2iso -i lidar.las -o contours.kml -iso_number 20 -utm 10T
+    las2iso64 -i lidar.las -o contours.kml -iso_number 20 -utm 10T
 
 extracts 20 evenly spaced contours and stores the result in KML
 format using UTM 10T as projection information.
 
-    las2iso -i flight1*.laz flight2*.laz -oshp -iso_every 2
+    las2iso64 -i flight1*.laz flight2*.laz -oshp -iso_every 2
 
 extracts 2 unit contours from all LAZ files that match flight1*.laz
 or flight2*.laz and stores the result in ESRI's Shapefile format.
 
-    las2iso -i lidar.txt -iparse xyz -o contours.kml -iso_number 50 -sp83 IA_N
+    las2iso64 -i lidar.txt -iparse xyz -o contours.kml -iso_number 50 -sp83 IA_N
 
 extracts 50 evenly spaced contours and stores the result in KML
 format using state plane83 Iowa North as projection information.
 
-    las2iso -i lidar1.las lidar2.las -merged -o contours.wkt -iso_range 400 800 5 
+    las2iso64 -i lidar1.las lidar2.las -merged -o contours.wkt -iso_range 400 800 5 
 
 merges LAS files lidar1.las lidar2.las, extracts 5 units contours
 from 400 to 800, and stores the result in Well Known Text format.
 
-    las2iso -i lidar.laz -o contours.shp -last_only -clean 100
+    las2iso64 -i lidar.laz -o contours.shp -last_only -clean 100
 
 extracts 10 contours using only the last returns from the LAZ file, 
 cleans out all contours whose total length is shorter than 100 units,
 and stores the result in ESRI's Shapefile format.
 
-    las2iso -i data*.las -merged -o merged.shp -iso_every 5 -keep_class 2 3
+    las2iso64 -i data*.las -merged -o merged.shp -iso_every 5 -keep_class 2 3
 
 merges all LAS files data*.las into one and extracts contours every
 5 units using only points that are classified as 2 or 3 and stores
 the result in ESRI's Shapefile format.
 
 
-    las2iso -h
-    las2iso -i *.las -oshp
-    las2iso -i flight1*.las flight2*.las -oshp -smooth 3 -clean 10
-    las2iso -i *.las -okml -iso_range 400 600 20 -utm 14S
-    las2iso -i *.txt -iparse ssxyz -owkt -iso_every 2 -smooth 2 -concavity 100
-    las2iso -i lidar.las -first_only -o contours.wkt -iso_number 20
-    las2iso -i lidar.las -o contours.shp -last_only -iso_range 400 600 20
-    las2iso -i lidar.las -otxt -stdout -keep_class 2 3 9 > lines.txt
+    las2iso64 -h
+    las2iso64 -i *.las -oshp
+    las2iso64 -i flight1*.las flight2*.las -oshp -smooth 3 -clean 10
+    las2iso64 -i *.las -okml -iso_range 400 600 20 -utm 14S
+    las2iso64 -i *.txt -iparse ssxyz -owkt -iso_every 2 -smooth 2 -concavity 100
+    las2iso64 -i lidar.las -first_only -o contours.wkt -iso_number 20
+    las2iso64 -i lidar.las -o contours.shp -last_only -iso_range 400 600 20
+    las2iso64 -i lidar.las -otxt -stdout -keep_class 2 3 9 > lines.txt
 
 
 ## las2iso specific arguments
@@ -787,5 +787,5 @@ To get further support see our
 Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
-If you have any suggestions please let us (support@rapidlasso.de) know.
-Jochen @rapidlasso
+If you have any suggestions please let us (info@rapidlasso.de) know.
+
