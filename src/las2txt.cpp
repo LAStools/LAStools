@@ -1426,8 +1426,8 @@ int main(int argc, char *argv[])
         case 'W': fprintf(file_out, "wavepacket_descriptor_index%cwavepacket_offset%cwavepacket_size%cwavepacket_location%cXt%cYt%cZt", separator_sign, separator_sign, separator_sign, separator_sign, separator_sign, separator_sign); break; // all wavepacket attributes
         case 'V': break;
         case 'E': break;
-        case HSV255: fprintf(file_out, "HSV_H%cHSV_S%cHSV_V", separator_sign, separator_sign); break; // the HSV representation of RGB in [0, 255]
-        case HSL255: fprintf(file_out, "HSL_H%cHSL_S%cHSL_L", separator_sign, separator_sign); break; // the HSL representation of RGB in [0, 255]
+        case HSV255: fprintf(file_out, "HSV_H%cHSV_S%cHSV_V", separator_sign, separator_sign); break; // the HSV representation of RGB in [0,360|100]
+        case HSL255: fprintf(file_out, "HSL_H%cHSL_S%cHSL_L", separator_sign, separator_sign); break; // the HSL representation of RGB in [0,360|100]
         case HSV: fprintf(file_out, "HSV_h%cHSV_s%cHSV_v", separator_sign, separator_sign); break; // the HSV representation of RGB in [0, 1]
         case HSL: fprintf(file_out, "HSL_h%cHSL_s%cHSL_l", separator_sign, separator_sign); break; // the HSL representation of RGB in [0, 1]
         default: break; // must handle extra bytes

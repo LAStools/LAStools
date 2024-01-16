@@ -59,7 +59,6 @@ public:
 	void add_attribute(I32 data_type, const CHAR* name, const CHAR* description = 0, F64 scale = 1.0, F64 offset = 0.0, F64 pre_scale = 1.0, F64 pre_offset = 0.0, F64 no_data = F64_MAX);
 	virtual BOOL open(const CHAR* file_name, U8 point_type = 0, const CHAR* parse_string = 0, I32 skip_lines = 0, BOOL populate_header = FALSE);
 	virtual BOOL open(FILE* file, const CHAR* file_name = 0, U8 point_type = 0, const CHAR* parse_string = 0, I32 skip_lines = 0, BOOL populate_header = FALSE);
-
 	I32 get_format() const { return LAS_TOOLS_FORMAT_TXT; };
 
 	BOOL seek(const I64 p_index);
@@ -90,6 +89,7 @@ private:
 	BOOL iptx;
 	FILE* file;
 	bool piped;
+	const char* lptr;
 	CHAR line[512];
 	I32 number_attributes;
 	I32 attributes_data_types[32];
@@ -104,8 +104,16 @@ private:
 	BOOL parse_extended_flags(CHAR* parse_string);
 	BOOL parse_column_description(CHAR** parse_string);
 	BOOL parse_attribute(const CHAR* l, I32 index);
+	template<typename T>
+	BOOL parse_item_i(I32* out, const I32 imin, const I32 imax, const CHAR* context, T addon);
+	BOOL parse_item_i(I32* out, const I32 imin, const I32 imax, const CHAR* context);
+	template<typename T>
+	BOOL parse_item_f(F32* out, const F32 imin, const F32 imax, const CHAR* context, T addon);
+	BOOL parse_item_f(F32* out, const F32 imin, const F32 imax, const CHAR* context);
 	BOOL parse(const CHAR* parse_string);
 	BOOL check_parse_string(const CHAR* parse_string);
+	BOOL skip_pre();
+	void skip_post();
 	void populate_scale_and_offset();
 	void populate_bounding_box();
 	void clean();

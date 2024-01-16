@@ -954,7 +954,7 @@ CHAR* LASwriteOpener::get_file_name_base() const
   {
     I32 len = (I32)strlen(directory);
     file_name_base = (CHAR*)malloc(len+2);
-    sprintf(file_name_base, "%s\\", directory);
+    sprintf(file_name_base, "%s%c", directory, DIRECTORY_SLASH);
   }
 
   return file_name_base;

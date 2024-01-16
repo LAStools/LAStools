@@ -47,7 +47,6 @@
 
 #include <map>
 
-
 #include "lasreader.hpp"
 #include "laswriter.hpp"
 #include "laswritercompatible.hpp"

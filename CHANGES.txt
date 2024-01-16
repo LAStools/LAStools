@@ -1,3 +1,4 @@
+15 January 2024 -- fix coldesc support las2txt, txt2las; doc update
 04 August 2023 -- set default of VLR header "reserved" to 0 instead of 0xAABB
 31 July 2023 -- NEW: las3dpoly and lasintensity
 30 March 2023 -- lasclip: Enable large SHP files in split mode

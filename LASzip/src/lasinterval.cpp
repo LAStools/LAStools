@@ -38,7 +38,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cassert>
-#include <map>
 
 #include <map>
 #include <set>
@@ -57,7 +56,7 @@
 #  elif defined(UNORDERED_FOUND)
 #    include <tr1/unordered_map>
 #  endif
-typedef std::unordered_map<I32, LASintervalStartCell*> my_cell_hash;
+typedef unordered_map<I32, LASintervalStartCell*> my_cell_hash;
 #elif defined(LZ_WIN32_VC6)
 #include <hash_map>
 
