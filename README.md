@@ -38,6 +38,7 @@ The documentation is placed at
 * `lasprecision`  analyses the actual precision of the LIDAR points
 * `laszip`  powerful, lossless LiDAR compressor that turns large LAS files into much smaller LAZ files that are only 7 - 20 percent of the original file size
 * `txt2las` converts LIDAR data from ASCII text to binary LAS format
+* `lascopcindex` creates a COPC *.laz file for a given set of *.las or *.laz files
 
 ### Closed source tools:
 
