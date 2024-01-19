@@ -64,6 +64,7 @@ macro(LASZIP_ADD_LIBRARY _name)
         CLEAN_DIRECT_OUTPUT 1
         FOLDER Libraries
     )
+    set_property(TARGET ${_name} PROPERTY CXX_STANDARD 11)
 
     install(TARGETS ${_name}
         EXPORT LASZIPTargets
