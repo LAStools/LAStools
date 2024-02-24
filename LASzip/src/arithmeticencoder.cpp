@@ -100,8 +100,6 @@
 
 #include <stdio.h>
 
-FILE* file = 0;
-
 #include "arithmeticmodel.hpp"
 
 ArithmeticEncoder::ArithmeticEncoder()
@@ -130,6 +128,8 @@ BOOL ArithmeticEncoder::init(ByteStreamOut* outstream)
 
 void ArithmeticEncoder::done()
 {
+  if (outstream == 0) return;
+
   U32 init_base = base;                 // done encoding: set final data bytes
   BOOL another_byte = TRUE;
 
@@ -347,6 +347,7 @@ inline void ArithmeticEncoder::renorm_enc_interval()
 
 inline void ArithmeticEncoder::manage_outbuffer()
 {
+  assert(outstream);
   if (outbyte == endbuffer) outbyte = outbuffer;
   outstream->putBytes(outbyte, AC_BUFFER_SIZE);
   endbyte = outbyte + AC_BUFFER_SIZE;
