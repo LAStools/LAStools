@@ -307,7 +307,7 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::createAndInitModelsAndCompressors
   contexts[context].ic_Z->initCompressor();
   for (i = 0; i < 8; i++)
   {
-    contexts[context].last_Z[i] = ((LASpoint14*)item)->Z;
+    contexts[context].last_Z[i] = ((const LASpoint14*)item)->Z;
   }
 
   /* for the classification layer */
@@ -326,7 +326,7 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::createAndInitModelsAndCompressors
   contexts[context].ic_intensity->initCompressor();
   for (i = 0; i < 8; i++)
   {
-    contexts[context].last_intensity[i] = ((LASpoint14*)item)->intensity;
+    contexts[context].last_intensity[i] = ((const LASpoint14*)item)->intensity;
   }
 
   /* for the scan_angle layer */
@@ -351,7 +351,7 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::createAndInitModelsAndCompressors
   contexts[context].multi_extreme_counter[1] = 0;
   contexts[context].multi_extreme_counter[2] = 0;
   contexts[context].multi_extreme_counter[3] = 0;
-  contexts[context].last_gpstime[0].f64 = ((LASpoint14*)item)->gps_time;
+  contexts[context].last_gpstime[0].f64 = ((const LASpoint14*)item)->gps_time;
   contexts[context].last_gpstime[1].u64 = 0;
   contexts[context].last_gpstime[2].u64 = 0;
   contexts[context].last_gpstime[3].u64 = 0;
@@ -456,7 +456,7 @@ BOOL LASwriteItemCompressed_POINT14_v3::init(const U8* item, U32& context)
 
   /* set scanner channel as current context */
 
-  current_context = ((LASpoint14*)item)->scanner_channel;
+  current_context = ((const LASpoint14*)item)->scanner_channel;
   context = current_context; // the POINT14 writer sets context for all other items
 
   /* create and init entropy models and integer compressors (and init context from item) */
@@ -487,7 +487,7 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
 
   // get the (potentially new) context
 
-  U32 scanner_channel = ((LASpoint14*)item)->scanner_channel;
+  U32 scanner_channel = ((const LASpoint14*)item)->scanner_channel;
 
   // if context has changed (and the new context already exists) get last for new context
 
@@ -501,17 +501,17 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
 
   // determine changed attributes
 
-  BOOL point_source_change = (((LASpoint14*)item)->point_source_ID != ((LASpoint14*)last_item)->point_source_ID);
-  BOOL gps_time_change = (((LASpoint14*)item)->gps_time != ((LASpoint14*)last_item)->gps_time);
-  BOOL scan_angle_change = (((LASpoint14*)item)->scan_angle != ((LASpoint14*)last_item)->scan_angle);
+  BOOL point_source_change = (((const LASpoint14*)item)->point_source_ID != ((LASpoint14*)last_item)->point_source_ID);
+  BOOL gps_time_change = (((const LASpoint14*)item)->gps_time != ((LASpoint14*)last_item)->gps_time);
+  BOOL scan_angle_change = (((const LASpoint14*)item)->scan_angle != ((LASpoint14*)last_item)->scan_angle);
 
   // get last and current return counts
 
   U32 last_n = ((LASpoint14*)last_item)->number_of_returns;
   U32 last_r = ((LASpoint14*)last_item)->return_number;
 
-  U32 n = ((LASpoint14*)item)->number_of_returns;
-  U32 r = ((LASpoint14*)item)->return_number;
+  U32 n = ((const LASpoint14*)item)->number_of_returns;
+  U32 r = ((const LASpoint14*)item)->return_number;
 
   // create the 7 bit mask that encodes various changes (its value ranges from 0 to 127)
 
@@ -623,14 +623,14 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
 
   // compress X coordinate
   median = contexts[current_context].last_X_diff_median5[(m<<1) | gps_time_change].get();
-  diff = ((LASpoint14*)item)->X - ((LASpoint14*)last_item)->X;
+  diff = ((const LASpoint14*)item)->X - ((LASpoint14*)last_item)->X;
   contexts[current_context].ic_dX->compress(median, diff, n==1);
   contexts[current_context].last_X_diff_median5[(m<<1) | gps_time_change].add(diff);
 
   // compress Y coordinate
   k_bits = contexts[current_context].ic_dX->getK();
   median = contexts[current_context].last_Y_diff_median5[(m<<1) | gps_time_change].get();
-  diff = ((LASpoint14*)item)->Y - ((LASpoint14*)last_item)->Y;
+  diff = ((const LASpoint14*)item)->Y - ((LASpoint14*)last_item)->Y;
   contexts[current_context].ic_dY->compress(median, diff, (n==1) + ( k_bits < 20 ? U32_ZERO_BIT_0(k_bits) : 20 ));
   contexts[current_context].last_Y_diff_median5[(m<<1) | gps_time_change].add(diff);
 
@@ -639,15 +639,15 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
   ////////////////////////////////////////
 
   k_bits = (contexts[current_context].ic_dX->getK() + contexts[current_context].ic_dY->getK()) / 2;
-  contexts[current_context].ic_Z->compress(contexts[current_context].last_Z[l], ((LASpoint14*)item)->Z, (n==1) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
-  contexts[current_context].last_Z[l] = ((LASpoint14*)item)->Z;
+  contexts[current_context].ic_Z->compress(contexts[current_context].last_Z[l], ((const LASpoint14*)item)->Z, (n==1) + (k_bits < 18 ? U32_ZERO_BIT_0(k_bits) : 18));
+  contexts[current_context].last_Z[l] = ((const LASpoint14*)item)->Z;
 
   ////////////////////////////////////////
   // compress classifications layer 
   ////////////////////////////////////////
 
   U32 last_classification = ((LASpoint14*)last_item)->classification;
-  U32 classification = ((LASpoint14*)item)->classification;
+  U32 classification = ((const LASpoint14*)item)->classification;
 
   if (classification != last_classification)
   {
@@ -667,7 +667,7 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
   ////////////////////////////////////////
 
   U32 last_flags = (((LASpoint14*)last_item)->edge_of_flight_line << 5) | (((LASpoint14*)last_item)->scan_direction_flag << 4) | ((LASpoint14*)last_item)->classification_flags;
-  U32 flags = (((LASpoint14*)item)->edge_of_flight_line << 5) | (((LASpoint14*)item)->scan_direction_flag << 4) | ((LASpoint14*)item)->classification_flags;
+  U32 flags = (((const LASpoint14*)item)->edge_of_flight_line << 5) | (((const LASpoint14*)item)->scan_direction_flag << 4) | ((const LASpoint14*)item)->classification_flags;
 
   if (flags != last_flags)
   {
@@ -685,12 +685,12 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
   // compress intensity layer 
   ////////////////////////////////////////
 
-  if (((LASpoint14*)item)->intensity != ((LASpoint14*)last_item)->intensity)
+  if (((const LASpoint14*)item)->intensity != ((LASpoint14*)last_item)->intensity)
   {
     changed_intensity = TRUE;
   }
-  contexts[current_context].ic_intensity->compress(contexts[current_context].last_intensity[(cpr<<1) | gps_time_change], ((LASpoint14*)item)->intensity, cpr);
-  contexts[current_context].last_intensity[(cpr<<1) | gps_time_change] = ((LASpoint14*)item)->intensity;
+  contexts[current_context].ic_intensity->compress(contexts[current_context].last_intensity[(cpr<<1) | gps_time_change], ((const LASpoint14*)item)->intensity, cpr);
+  contexts[current_context].last_intensity[(cpr<<1) | gps_time_change] = ((const LASpoint14*)item)->intensity;
   
   ////////////////////////////////////////
   // compress scan_angle layer 
@@ -699,14 +699,14 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
   if (scan_angle_change)
   {
     changed_scan_angle = TRUE;
-    contexts[current_context].ic_scan_angle->compress(((LASpoint14*)last_item)->scan_angle, ((LASpoint14*)item)->scan_angle, gps_time_change); // if the GPS time has changed
+    contexts[current_context].ic_scan_angle->compress(((LASpoint14*)last_item)->scan_angle, ((const LASpoint14*)item)->scan_angle, gps_time_change); // if the GPS time has changed
   }
 
   ////////////////////////////////////////
   // compress user_data layer 
   ////////////////////////////////////////
 
-  if (((LASpoint14*)item)->user_data != ((LASpoint14*)last_item)->user_data)
+  if (((const LASpoint14*)item)->user_data != ((LASpoint14*)last_item)->user_data)
   {
     changed_user_data = TRUE;
   }
@@ -715,7 +715,7 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
     contexts[current_context].m_user_data[((LASpoint14*)last_item)->user_data/4] = enc_user_data->createSymbolModel(256);
     enc_user_data->initSymbolModel(contexts[current_context].m_user_data[((LASpoint14*)last_item)->user_data/4]);
   }
-  enc_user_data->encodeSymbol(contexts[current_context].m_user_data[((LASpoint14*)last_item)->user_data/4], ((LASpoint14*)item)->user_data);
+  enc_user_data->encodeSymbol(contexts[current_context].m_user_data[((LASpoint14*)last_item)->user_data/4], ((const LASpoint14*)item)->user_data);
 
   ////////////////////////////////////////
   // compress point_source layer 
@@ -724,7 +724,7 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
   if (point_source_change)
   {
     changed_point_source = TRUE;
-    contexts[current_context].ic_point_source_ID->compress(((LASpoint14*)last_item)->point_source_ID, ((LASpoint14*)item)->point_source_ID);
+    contexts[current_context].ic_point_source_ID->compress(((LASpoint14*)last_item)->point_source_ID, ((const LASpoint14*)item)->point_source_ID);
   }
 
   ////////////////////////////////////////
@@ -736,7 +736,7 @@ inline BOOL LASwriteItemCompressed_POINT14_v3::write(const U8* item, U32& contex
     changed_gps_time = TRUE;
 
     U64I64F64 gps_time;
-    gps_time.f64 = ((LASpoint14*)item)->gps_time;
+    gps_time.f64 = ((const LASpoint14*)item)->gps_time;
 
     write_gps_time(gps_time);
   }
@@ -1288,46 +1288,46 @@ inline BOOL LASwriteItemCompressed_RGB14_v3::write(const U8* item, U32& context)
   I32 diff_l = 0;
   I32 diff_h = 0;
   I32 corr;
-  U32 sym = ((last_item[0]&0x00FF) != (((U16*)item)[0]&0x00FF)) << 0;
-  sym |= ((last_item[0]&0xFF00) != (((U16*)item)[0]&0xFF00)) << 1;
-  sym |= ((last_item[1]&0x00FF) != (((U16*)item)[1]&0x00FF)) << 2;
-  sym |= ((last_item[1]&0xFF00) != (((U16*)item)[1]&0xFF00)) << 3;
-  sym |= ((last_item[2]&0x00FF) != (((U16*)item)[2]&0x00FF)) << 4;
-  sym |= ((last_item[2]&0xFF00) != (((U16*)item)[2]&0xFF00)) << 5;
-  sym |= (((((U16*)item)[0]&0x00FF) != (((U16*)item)[1]&0x00FF)) || ((((U16*)item)[0]&0x00FF) != (((U16*)item)[2]&0x00FF)) || ((((U16*)item)[0]&0xFF00) != (((U16*)item)[1]&0xFF00)) || ((((U16*)item)[0]&0xFF00) != (((U16*)item)[2]&0xFF00))) << 6;
+  U32 sym = ((last_item[0]&0x00FF) != (((const U16*)item)[0]&0x00FF)) << 0;
+  sym |= ((last_item[0]&0xFF00) != (((const U16*)item)[0]&0xFF00)) << 1;
+  sym |= ((last_item[1]&0x00FF) != (((const U16*)item)[1]&0x00FF)) << 2;
+  sym |= ((last_item[1]&0xFF00) != (((const U16*)item)[1]&0xFF00)) << 3;
+  sym |= ((last_item[2]&0x00FF) != (((const U16*)item)[2]&0x00FF)) << 4;
+  sym |= ((last_item[2]&0xFF00) != (((const U16*)item)[2]&0xFF00)) << 5;
+  sym |= (((((const U16*)item)[0]&0x00FF) != (((const U16*)item)[1]&0x00FF)) || ((((const U16*)item)[0]&0x00FF) != (((const U16*)item)[2]&0x00FF)) || ((((const U16*)item)[0]&0xFF00) != (((const U16*)item)[1]&0xFF00)) || ((((const U16*)item)[0]&0xFF00) != (((const U16*)item)[2]&0xFF00))) << 6;
   enc_RGB->encodeSymbol(contexts[current_context].m_byte_used, sym);
   if (sym & (1 << 0))
   {
-    diff_l = ((int)(((U16*)item)[0]&255)) - (last_item[0]&255);
+    diff_l = ((int)(((const U16*)item)[0]&255)) - (last_item[0]&255);
     enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_0, U8_FOLD(diff_l));
   }
   if (sym & (1 << 1))
   {
-    diff_h = ((int)(((U16*)item)[0]>>8)) - (last_item[0]>>8);
+    diff_h = ((int)(((const U16*)item)[0]>>8)) - (last_item[0]>>8);
     enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_1, U8_FOLD(diff_h));
   }
   if (sym & (1 << 6))
   {
     if (sym & (1 << 2))
     {
-      corr = ((int)(((U16*)item)[1]&255)) - U8_CLAMP(diff_l + (last_item[1]&255));
+      corr = ((int)(((const U16*)item)[1]&255)) - U8_CLAMP(diff_l + (last_item[1]&255));
       enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_2, U8_FOLD(corr));
     }
     if (sym & (1 << 4))
     {
-      diff_l = (diff_l + (((U16*)item)[1]&255) - (last_item[1]&255)) / 2;
-      corr = ((int)(((U16*)item)[2]&255)) - U8_CLAMP(diff_l + (last_item[2]&255));
+      diff_l = (diff_l + (((const U16*)item)[1]&255) - (last_item[1]&255)) / 2;
+      corr = ((int)(((const U16*)item)[2]&255)) - U8_CLAMP(diff_l + (last_item[2]&255));
       enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_4, U8_FOLD(corr));
     }
     if (sym & (1 << 3))
     {
-      corr = ((int)(((U16*)item)[1]>>8)) - U8_CLAMP(diff_h + (last_item[1]>>8));
+      corr = ((int)(((const U16*)item)[1]>>8)) - U8_CLAMP(diff_h + (last_item[1]>>8));
       enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_3, U8_FOLD(corr));
     }
     if (sym & (1 << 5))
     {
-      diff_h = (diff_h + (((U16*)item)[1]>>8) - (last_item[1]>>8)) / 2;
-      corr = ((int)(((U16*)item)[2]>>8)) - U8_CLAMP(diff_h + (last_item[2]>>8));
+      diff_h = (diff_h + (((const U16*)item)[1]>>8) - (last_item[1]>>8)) / 2;
+      corr = ((int)(((const U16*)item)[2]>>8)) - U8_CLAMP(diff_h + (last_item[2]>>8));
       enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_5, U8_FOLD(corr));
     }
   }
@@ -1585,46 +1585,46 @@ inline BOOL LASwriteItemCompressed_RGBNIR14_v3::write(const U8* item, U32& conte
   I32 diff_l = 0;
   I32 diff_h = 0;
   I32 corr;
-  U32 sym = ((last_item[0]&0x00FF) != (((U16*)item)[0]&0x00FF)) << 0;
-  sym |= ((last_item[0]&0xFF00) != (((U16*)item)[0]&0xFF00)) << 1;
-  sym |= ((last_item[1]&0x00FF) != (((U16*)item)[1]&0x00FF)) << 2;
-  sym |= ((last_item[1]&0xFF00) != (((U16*)item)[1]&0xFF00)) << 3;
-  sym |= ((last_item[2]&0x00FF) != (((U16*)item)[2]&0x00FF)) << 4;
-  sym |= ((last_item[2]&0xFF00) != (((U16*)item)[2]&0xFF00)) << 5;
-  sym |= (((((U16*)item)[0]&0x00FF) != (((U16*)item)[1]&0x00FF)) || ((((U16*)item)[0]&0x00FF) != (((U16*)item)[2]&0x00FF)) || ((((U16*)item)[0]&0xFF00) != (((U16*)item)[1]&0xFF00)) || ((((U16*)item)[0]&0xFF00) != (((U16*)item)[2]&0xFF00))) << 6;
+  U32 sym = ((last_item[0]&0x00FF) != (((const U16*)item)[0]&0x00FF)) << 0;
+  sym |= ((last_item[0]&0xFF00) != (((const U16*)item)[0]&0xFF00)) << 1;
+  sym |= ((last_item[1]&0x00FF) != (((const U16*)item)[1]&0x00FF)) << 2;
+  sym |= ((last_item[1]&0xFF00) != (((const U16*)item)[1]&0xFF00)) << 3;
+  sym |= ((last_item[2]&0x00FF) != (((const U16*)item)[2]&0x00FF)) << 4;
+  sym |= ((last_item[2]&0xFF00) != (((const U16*)item)[2]&0xFF00)) << 5;
+  sym |= (((((const U16*)item)[0]&0x00FF) != (((const U16*)item)[1]&0x00FF)) || ((((const U16*)item)[0]&0x00FF) != (((const U16*)item)[2]&0x00FF)) || ((((const U16*)item)[0]&0xFF00) != (((const U16*)item)[1]&0xFF00)) || ((((const U16*)item)[0]&0xFF00) != (((const U16*)item)[2]&0xFF00))) << 6;
   enc_RGB->encodeSymbol(contexts[current_context].m_rgb_bytes_used, sym);
   if (sym & (1 << 0))
   {
-    diff_l = ((int)(((U16*)item)[0]&255)) - (last_item[0]&255);
+    diff_l = ((int)(((const U16*)item)[0]&255)) - (last_item[0]&255);
     enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_0, U8_FOLD(diff_l));
   }
   if (sym & (1 << 1))
   {
-    diff_h = ((int)(((U16*)item)[0]>>8)) - (last_item[0]>>8);
+    diff_h = ((int)(((const U16*)item)[0]>>8)) - (last_item[0]>>8);
     enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_1, U8_FOLD(diff_h));
   }
   if (sym & (1 << 6))
   {
     if (sym & (1 << 2))
     {
-      corr = ((int)(((U16*)item)[1]&255)) - U8_CLAMP(diff_l + (last_item[1]&255));
+      corr = ((int)(((const U16*)item)[1]&255)) - U8_CLAMP(diff_l + (last_item[1]&255));
       enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_2, U8_FOLD(corr));
     }
     if (sym & (1 << 4))
     {
-      diff_l = (diff_l + (((U16*)item)[1]&255) - (last_item[1]&255)) / 2;
-      corr = ((int)(((U16*)item)[2]&255)) - U8_CLAMP(diff_l + (last_item[2]&255));
+      diff_l = (diff_l + (((const U16*)item)[1]&255) - (last_item[1]&255)) / 2;
+      corr = ((int)(((const U16*)item)[2]&255)) - U8_CLAMP(diff_l + (last_item[2]&255));
       enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_4, U8_FOLD(corr));
     }
     if (sym & (1 << 3))
     {
-      corr = ((int)(((U16*)item)[1]>>8)) - U8_CLAMP(diff_h + (last_item[1]>>8));
+      corr = ((int)(((const U16*)item)[1]>>8)) - U8_CLAMP(diff_h + (last_item[1]>>8));
       enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_3, U8_FOLD(corr));
     }
     if (sym & (1 << 5))
     {
-      diff_h = (diff_h + (((U16*)item)[1]>>8) - (last_item[1]>>8)) / 2;
-      corr = ((int)(((U16*)item)[2]>>8)) - U8_CLAMP(diff_h + (last_item[2]>>8));
+      diff_h = (diff_h + (((const U16*)item)[1]>>8) - (last_item[1]>>8)) / 2;
+      corr = ((int)(((const U16*)item)[2]>>8)) - U8_CLAMP(diff_h + (last_item[2]>>8));
       enc_RGB->encodeSymbol(contexts[current_context].m_rgb_diff_5, U8_FOLD(corr));
     }
   }
@@ -1633,17 +1633,17 @@ inline BOOL LASwriteItemCompressed_RGBNIR14_v3::write(const U8* item, U32& conte
     changed_RGB = TRUE;
   }
 
-  sym = ((last_item[3]&0x00FF) != (((U16*)item)[3]&0x00FF)) << 0;
-  sym |= ((last_item[3]&0xFF00) != (((U16*)item)[3]&0xFF00)) << 1;
+  sym = ((last_item[3]&0x00FF) != (((const U16*)item)[3]&0x00FF)) << 0;
+  sym |= ((last_item[3]&0xFF00) != (((const U16*)item)[3]&0xFF00)) << 1;
   enc_NIR->encodeSymbol(contexts[current_context].m_nir_bytes_used, sym);
   if (sym & (1 << 0))
   {
-    diff_l = ((int)(((U16*)item)[3]&255)) - (last_item[3]&255);
+    diff_l = ((int)(((const U16*)item)[3]&255)) - (last_item[3]&255);
     enc_NIR->encodeSymbol(contexts[current_context].m_nir_diff_0, U8_FOLD(diff_l));
   }
   if (sym & (1 << 1))
   {
-    diff_h = ((int)(((U16*)item)[3]>>8)) - (last_item[3]>>8);
+    diff_h = ((int)(((const U16*)item)[3]>>8)) - (last_item[3]>>8);
     enc_NIR->encodeSymbol(contexts[current_context].m_nir_diff_1, U8_FOLD(diff_h));
   }
   if (sym)

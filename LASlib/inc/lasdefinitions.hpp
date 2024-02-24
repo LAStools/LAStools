@@ -145,10 +145,10 @@ public:
   void clean() {memset(data, 0, 26);};
   inline U8 getBitsPerSample() const {return data[0];};
   inline U8 getCompressionType() const {return data[1];};
-  inline U32 getNumberOfSamples() const {return ((U32*)&(data[2]))[0];};
-  inline U32 getTemporalSpacing() const {return ((U32*)&(data[6]))[0];};
-  inline F64 getDigitizerGain() const {return ((F64*)&(data[10]))[0];};
-  inline F64 getDigitizerOffset() const {return ((F64*)&(data[18]))[0];};
+  inline U32 getNumberOfSamples() const {return ((const U32*)&(data[2]))[0];};
+  inline U32 getTemporalSpacing() const {return ((const U32*)&(data[6]))[0];};
+  inline F64 getDigitizerGain() const {return ((const F64*)&(data[10]))[0];};
+  inline F64 getDigitizerOffset() const {return ((const F64*)&(data[18]))[0];};
   inline void setBitsPerSample(U8 bps) {data[0] = bps;};
   inline void setCompressionType(U8 compression) {data[1] = compression;};
   inline void setNumberOfSamples(U32 samples) {((U32*)&(data[2]))[0] = samples;};

@@ -134,67 +134,67 @@ public:
   }
   BOOL save(ByteStreamOut* stream) const
   {
-    if (!stream->put32bitsLE((U8*)&nbands))
+    if (!stream->put32bitsLE((const U8*)&nbands))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.nbands\n");
       return FALSE;
     }
-    if (!stream->put32bitsLE((U8*)&nbits))
+    if (!stream->put32bitsLE((const U8*)&nbits))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.nbits\n");
       return FALSE;
     }
-    if (!stream->put32bitsLE((U8*)&ncols))
+    if (!stream->put32bitsLE((const U8*)&ncols))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.ncols\n");
       return FALSE;
     }
-    if (!stream->put32bitsLE((U8*)&nrows))
+    if (!stream->put32bitsLE((const U8*)&nrows))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.nrows\n");
       return FALSE;
     }
-    if (!stream->put32bitsLE((U8*)&reserved1))
+    if (!stream->put32bitsLE((const U8*)&reserved1))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.reserved1\n");
       return FALSE;
     }
-    if (!stream->put32bitsLE((U8*)&reserved2))
+    if (!stream->put32bitsLE((const U8*)&reserved2))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.reserved2\n");
       return FALSE;
     }
-    if (!stream->put64bitsLE((U8*)&stepx))
+    if (!stream->put64bitsLE((const U8*)&stepx))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.stepx\n");
       return FALSE;
     }
-    if (!stream->put64bitsLE((U8*)&stepx_y))
+    if (!stream->put64bitsLE((const U8*)&stepx_y))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.stepx_y\n");
       return FALSE;
     }
-    if (!stream->put64bitsLE((U8*)&stepy))
+    if (!stream->put64bitsLE((const U8*)&stepy))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.stepy\n");
       return FALSE;
     }
-    if (!stream->put64bitsLE((U8*)&stepy_x))
+    if (!stream->put64bitsLE((const U8*)&stepy_x))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.stepy_x\n");
       return FALSE;
     }
-    if (!stream->put64bitsLE((U8*)&llx))
+    if (!stream->put64bitsLE((const U8*)&llx))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.llx\n");
       return FALSE;
     }
-    if (!stream->put64bitsLE((U8*)&lly))
+    if (!stream->put64bitsLE((const U8*)&lly))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.lly\n");
       return FALSE;
     }
-    if (!stream->put64bitsLE((U8*)&sigmaxy))
+    if (!stream->put64bitsLE((const U8*)&sigmaxy))
     {
       fprintf(stderr,"ERROR: writing LASvlrRasterLAZ.sigmaxy\n");
       return FALSE;

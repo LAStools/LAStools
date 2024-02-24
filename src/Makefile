@@ -1,7 +1,7 @@
 # makefile for LGPL-licensed LAStools
 #
 #COPTS    = -g -Wall -Wno-deprecated -DDEBUG 
-COPTS     = -O3 -Wall -Wno-deprecated -Wno-strict-aliasing -Wno-write-strings -Wno-unused-result -DNDEBUG -std=c++14
+COPTS     = -O3 -Wall -Wno-deprecated -Wno-strict-aliasing -Wno-write-strings -Wno-unused-result -Wcast-qual -DNDEBUG -std=c++14
 #COMPILER  = CC
 COMPILER  = g++
 LINKER  = g++

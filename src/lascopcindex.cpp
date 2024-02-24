@@ -123,16 +123,16 @@ static U64 taketime()
   return (U64)time(NULL); // using time instead of clock to get wall clock
 }
 
-static inline F64 get_gps_time(const U8* buf) { return *((F64*)&buf[22]); };
+static inline F64 get_gps_time(const U8* buf) { return *((const F64*)&buf[22]); };
 static inline U8 get_scanner_channel(const U8* buf) { return (buf[15] >> 4) & 0x03; };
 static inline U8 get_return_number(const U8* buf) { return buf[14] & 0x0F; };
 static int compare_buffers(const void *a, const void *b)
 {
-  if (get_gps_time((U8*)a) < get_gps_time((U8*)b)) return -1;
-  if (get_gps_time((U8*)a) > get_gps_time((U8*)b)) return 1;
-  if (get_scanner_channel((U8*)a) < get_scanner_channel((U8*)b)) return -1;
-  if (get_scanner_channel((U8*)a) > get_scanner_channel((U8*)b)) return 1;
-  if (get_return_number((U8*)a) < get_return_number((U8*)b)) return -1;
+  if (get_gps_time((const U8*)a) < get_gps_time((const U8*)b)) return -1;
+  if (get_gps_time((const U8*)a) > get_gps_time((const U8*)b)) return 1;
+  if (get_scanner_channel((const U8*)a) < get_scanner_channel((const U8*)b)) return -1;
+  if (get_scanner_channel((const U8*)a) > get_scanner_channel((const U8*)b)) return 1;
+  if (get_return_number((const U8*)a) < get_return_number((const U8*)b)) return -1;
   return 1;
 }
 
