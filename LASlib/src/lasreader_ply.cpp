@@ -1739,7 +1739,7 @@ BOOL LASreaderPLY::parse_header()
           items++;
         }
       }
-      else if (strncmp(&line[9], "uchar", 5) == 0)
+      else if ((strncmp(&line[9], "uchar", 5) == 0) || strncmp(&line[9], "uint8", 5) == 0)
       {
         if (strstr(&line[15], "red"))
         {
