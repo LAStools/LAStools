@@ -1,5 +1,7 @@
 # LAStools
 
+<a href="https://rapidlasso.de" target="_blank"> ![](./readme_logo.png) </a>
+
 **Award-winning software for efficient LiDAR processing (with LASzip)**
 
 ## Overview
@@ -28,19 +30,26 @@ The documentation is located in
 
 ### Open source tools:
 
+* `laszip` powerful, lossless LiDAR compressor that turns large LAS files into much smaller LAZ files
 * `las2las` extracts last returns, clips, subsamples, translates, etc. ...
 * `las2txt` turns LAS into human-readable and easy-to-parse ASCII
-* `lasindex` creates a spatial index LAX file for fast spatial queries
-* `lasinfo` prints out a quick overview of the contents of a LAS file
-* `lasmerge` merges several LAS or LAZ files into a single LAS or LAZ file
-* `lasprecision` analyses the actual precision of the LIDAR points
-* `laszip` powerful, lossless LiDAR compressor that turns large LAS files into much smaller LAZ files that are only 7 - 20 percent of the original file size
 * `txt2las` converts LIDAR data from ASCII text to binary LAS format
+* `lasindex` creates a spatial index LAX file for fast spatial queries
+* `lasmerge` merges several LAS or LAZ files into a single LAS or LAZ file
+* `lasinfo` prints out a quick overview of the contents of a LAS file
 * `lascopcindex` creates a COPC *.laz file for a given set of *.las or *.laz files
+* `lasdiff` compares LIDAR data and reports whether they are identical or different
+* `lasprecision` analyses the actual precision of the LIDAR points
+
+### Free tools:
+* `lasvalidate` determine if LAS files are conform to the ASPRS LAS specifications
+* `lasview` visualizes a LAS file with a simple OpenGL viewer
+* `e572las` extracts the points from the E57 format and stores them as LAS/LAZ files
+* `demzip` compresses and uncompresses raster data from ASC, BIL, TIF, IMG format to the compressed RasterLAZ format
 
 ### Closed source tools:
 
-* `las2dem` rasters (via a TIN) into elevation/slope/intensity/rgb DEMs
+* `las2dem` rasters pointclouds (via a TIN) into elevation/slope/intensity/RGB DEMs
 * `las2iso` extracts, optionally simplified, elevation contours
 * `las2shp` turns binary LAS into ESRI's Shapefile format
 * `las2tin` triangulates the points of a LAS file into a TIN
@@ -75,11 +84,8 @@ The documentation is located in
 * `lastile` tiles huge amounts of LAS points into square tiles
 * `lastool` is an old GUI for multiple LAStools (now each tool has its own GUI)
 * `lastrack` classifies LiDAR point based on distance from a trajectory
-* `lasvalidate` determine if LAS files are conform to the ASPRS LAS specifications
 * `lasvdatum` transforms iDAR from ellipsoidal to orthometric elevations using a grid
-* `lasview` visualizes a LAS file with a simple OpenGL viewer
 * `lasvoxel` computes voxelization of points
-* `e572las` extracts the points from the E57 format and stores them as LAS/LAZ files
 * `shp2las` turns an ESRI's Shapefile into binary LAS
 
 ## BLAST extension
