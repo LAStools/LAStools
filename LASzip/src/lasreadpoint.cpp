@@ -388,7 +388,10 @@ BOOL LASreadPoint::seek(const U32 current, const U32 target)
     }
     while (delta)
     {
-      read(seek_point);
+      if (!read(seek_point))
+      {
+        return FALSE;
+      }
       delta--;
     }
   }
