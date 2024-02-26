@@ -1,4 +1,9 @@
+26 February 2024 -- LASMessage concept; warnings fix; error handling
+13 February 2024 -- bugfix BIL writer and multi-core argument parser
+18 January 2024 -- implement translate_scale_translate functions (64bit)
 15 January 2024 -- fix coldesc support las2txt, txt2las; doc update
+14 December 2023 -- hsv/hsl colormodel implementation
+8 December 2023 -- copc implementation 
 04 August 2023 -- set default of VLR header "reserved" to 0 instead of 0xAABB
 31 July 2023 -- NEW: las3dpoly and lasintensity
 30 March 2023 -- lasclip: Enable large SHP files in split mode
