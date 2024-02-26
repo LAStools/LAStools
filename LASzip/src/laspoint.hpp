@@ -45,12 +45,12 @@ public:
   LASwavepacket() {zero();};
   void zero() {memset(data, 0, 29);};
   inline U8 getIndex() const {return data[0];};
-  inline U64 getOffset() const {return ((U64*)&(data[1]))[0];};
-  inline U32 getSize() const {return ((U32*)&(data[9]))[0];};
-  inline F32 getLocation() const {return ((F32*)&(data[13]))[0];};
-  inline F32 getXt() const {return ((F32*)&(data[17]))[0];};
-  inline F32 getYt() const {return ((F32*)&(data[21]))[0];};
-  inline F32 getZt() const {return ((F32*)&(data[25]))[0];};
+  inline U64 getOffset() const {return ((const U64*)&(data[1]))[0];};
+  inline U32 getSize() const {return ((const U32*)&(data[9]))[0];};
+  inline F32 getLocation() const {return ((const F32*)&(data[13]))[0];};
+  inline F32 getXt() const {return ((const F32*)&(data[17]))[0];};
+  inline F32 getYt() const {return ((const F32*)&(data[21]))[0];};
+  inline F32 getZt() const {return ((const F32*)&(data[25]))[0];};
   inline void setIndex(U8 index) {data[0] = index;};
   inline void setOffset(U64 offset) {((U64*)&(data[1]))[0] = offset;};
   inline void setSize(U32 size) {((U32*)&(data[9]))[0] = size;};
@@ -220,12 +220,12 @@ public:
     if (extended_point_type)
     {
       memcpy(buffer, &X, 14);
-      buffer[14] = ((U8*)&X)[24]; // extended return number and number of returns
-      buffer[15] = (((U8*)&X)[14] & 0xC0) | (extended_scanner_channel << 4) | (extended_classification_flags & 0x08) | ((((U8*)&X)[15]) >> 5);
-      buffer[16] = ((U8*)&X)[23]; // extended classification
-      buffer[17] = ((U8*)&X)[17]; // user data
-      ((I16*)buffer)[9] = ((I16*)&X)[10]; // extended scan angle
-      ((U16*)buffer)[10] = ((U16*)&X)[9]; // point source ID
+      buffer[14] = ((const U8*)&X)[24]; // extended return number and number of returns
+      buffer[15] = (((const U8*)&X)[14] & 0xC0) | (extended_scanner_channel << 4) | (extended_classification_flags & 0x08) | ((((const U8*)&X)[15]) >> 5);
+      buffer[16] = ((const U8*)&X)[23]; // extended classification
+      buffer[17] = ((const U8*)&X)[17]; // user data
+      ((I16*)buffer)[9] = ((const I16*)&X)[10]; // extended scan angle
+      ((U16*)buffer)[10] = ((const U16*)&X)[9]; // point source ID
       memcpy(buffer+22, &gps_time, 8);
     }
     else
@@ -255,8 +255,8 @@ public:
       ((U8*)&X)[23] = buffer[16]; // extended classification
       if (extended_classification < 32) classification = extended_classification;
       ((U8*)&X)[17] = buffer[17]; // user data
-      ((I16*)&X)[10] = ((I16*)buffer)[9]; // extended scan angle
-      ((U16*)&X)[9] = ((U16*)buffer)[10]; // point source ID
+      ((I16*)&X)[10] = ((const I16*)buffer)[9]; // extended scan angle
+      ((U16*)&X)[9] = ((const U16*)buffer)[10]; // point source ID
       memcpy(&gps_time, buffer+22, 8);
     }
     else

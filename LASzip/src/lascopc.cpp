@@ -184,7 +184,7 @@ BOOL EPToctree::set_vlr_entries(const U8* data, const U64 offset_to_first_copc_e
   std::vector<LASvlr_copc_entry> page;
   std::vector<LASvlr_copc_entry> entries;
   std::deque<LASvlr_copc_entry> child_entries;
-  LASvlr_copc_entry* payload = (LASvlr_copc_entry*)data;
+  const LASvlr_copc_entry* payload = (const LASvlr_copc_entry*)data;
 
   // Read the root page
   U64 n_root_entries = header.vlr_copc_info->root_hier_size/sizeof(LASvlr_copc_entry);

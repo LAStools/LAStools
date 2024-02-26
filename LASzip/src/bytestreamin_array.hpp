@@ -151,7 +151,7 @@ inline void ByteStreamInArray::getBytes(U8* bytes, const U32 num_bytes)
   {
     throw EOF;
   }
-  memcpy((void*)bytes, (void*)(data+curr), num_bytes);
+  memcpy((void*)bytes, (const void*)(data+curr), num_bytes);
   curr += num_bytes;
 }
 

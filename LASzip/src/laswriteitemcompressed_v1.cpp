@@ -173,30 +173,30 @@ inline BOOL LASwriteItemCompressed_POINT10_v1::write(const U8* item, U32& contex
   }
 
   // compress x y z coordinates
-  I32 x_diff = ((LASpoint10*)item)->x - ((LASpoint10*)last_item)->x;
-  I32 y_diff = ((LASpoint10*)item)->y - ((LASpoint10*)last_item)->y;
+  I32 x_diff = ((const LASpoint10*)item)->x - ((LASpoint10*)last_item)->x;
+  I32 y_diff = ((const LASpoint10*)item)->y - ((LASpoint10*)last_item)->y;
 
   ic_dx->compress(median_x, x_diff);
   // we use the number k of bits corrector bits to switch contexts
   U32 k_bits = ic_dx->getK();
   ic_dy->compress(median_y, y_diff, (k_bits < 19 ? k_bits : 19));
   k_bits = (k_bits + ic_dy->getK()) / 2;
-  ic_z->compress(((LASpoint10*)last_item)->z, ((LASpoint10*)item)->z, (k_bits < 19 ? k_bits : 19));
+  ic_z->compress(((LASpoint10*)last_item)->z, ((const LASpoint10*)item)->z, (k_bits < 19 ? k_bits : 19));
 
   // compress which other values have changed
-  I32 changed_values = ((((LASpoint10*)last_item)->intensity != ((LASpoint10*)item)->intensity) << 5) |
+  I32 changed_values = ((((LASpoint10*)last_item)->intensity != ((const LASpoint10*)item)->intensity) << 5) |
                        ((last_item[14] != item[14]) << 4) | // bit_byte
                        ((last_item[15] != item[15]) << 3) | // classification
                        ((last_item[16] != item[16]) << 2) | // scan_angle_rank
                        ((last_item[17] != item[17]) << 1) | // user_data
-                       ((((LASpoint10*)last_item)->point_source_ID != ((LASpoint10*)item)->point_source_ID));
+                       ((((LASpoint10*)last_item)->point_source_ID != ((const LASpoint10*)item)->point_source_ID));
 
   enc->encodeSymbol(m_changed_values, changed_values);
 
   // compress the intensity if it has changed
   if (changed_values & 32)
   {
-    ic_intensity->compress(((LASpoint10*)last_item)->intensity, ((LASpoint10*)item)->intensity);
+    ic_intensity->compress(((LASpoint10*)last_item)->intensity, ((const LASpoint10*)item)->intensity);
   }
 
   // compress the edge_of_flight_line, scan_direction_flag, ... if it has changed
@@ -241,7 +241,7 @@ inline BOOL LASwriteItemCompressed_POINT10_v1::write(const U8* item, U32& contex
   // compress the point_source_ID ... if it has changed
   if (changed_values & 1)
   {
-    ic_point_source_ID->compress(((LASpoint10*)last_item)->point_source_ID, ((LASpoint10*)item)->point_source_ID);
+    ic_point_source_ID->compress(((LASpoint10*)last_item)->point_source_ID, ((const LASpoint10*)item)->point_source_ID);
   }
 
   // record the difference
@@ -293,14 +293,14 @@ BOOL LASwriteItemCompressed_GPSTIME11_v1::init(const U8* item, U32& context)
   ic_gpstime->initCompressor();
 
   /* init last item */
-  last_gpstime.u64 = *((U64*)item);
+  last_gpstime.u64 = *((const U64*)item);
   return TRUE;
 }
 
 inline BOOL LASwriteItemCompressed_GPSTIME11_v1::write(const U8* item, U32& context)
 {
   U64I64F64 this_gpstime;
-  this_gpstime.i64 = *((I64*)item);
+  this_gpstime.i64 = *((const I64*)item);
 
   if (last_gpstime_diff == 0) // if the last integer difference was zero
   {
@@ -453,19 +453,19 @@ BOOL LASwriteItemCompressed_RGB12_v1::init(const U8* item, U32& context)
 
 inline BOOL LASwriteItemCompressed_RGB12_v1::write(const U8* item, U32& context)
 {
-  U32 sym = ((((U16*)last_item)[0]&0x00FF) != (((U16*)item)[0]&0x00FF)) << 0;
-  sym |= ((((U16*)last_item)[0]&0xFF00) != (((U16*)item)[0]&0xFF00)) << 1;
-  sym |= ((((U16*)last_item)[1]&0x00FF) != (((U16*)item)[1]&0x00FF)) << 2;
-  sym |= ((((U16*)last_item)[1]&0xFF00) != (((U16*)item)[1]&0xFF00)) << 3;
-  sym |= ((((U16*)last_item)[2]&0x00FF) != (((U16*)item)[2]&0x00FF)) << 4;
-  sym |= ((((U16*)last_item)[2]&0xFF00) != (((U16*)item)[2]&0xFF00)) << 5;
+  U32 sym = ((((U16*)last_item)[0]&0x00FF) != (((const U16*)item)[0]&0x00FF)) << 0;
+  sym |= ((((U16*)last_item)[0]&0xFF00) != (((const U16*)item)[0]&0xFF00)) << 1;
+  sym |= ((((U16*)last_item)[1]&0x00FF) != (((const U16*)item)[1]&0x00FF)) << 2;
+  sym |= ((((U16*)last_item)[1]&0xFF00) != (((const U16*)item)[1]&0xFF00)) << 3;
+  sym |= ((((U16*)last_item)[2]&0x00FF) != (((const U16*)item)[2]&0x00FF)) << 4;
+  sym |= ((((U16*)last_item)[2]&0xFF00) != (((const U16*)item)[2]&0xFF00)) << 5;
   enc->encodeSymbol(m_byte_used, sym);
-  if (sym & (1 << 0)) ic_rgb->compress(((U16*)last_item)[0]&255,((U16*)item)[0]&255, 0);
-  if (sym & (1 << 1)) ic_rgb->compress(((U16*)last_item)[0]>>8,((U16*)item)[0]>>8, 1);
-  if (sym & (1 << 2)) ic_rgb->compress(((U16*)last_item)[1]&255,((U16*)item)[1]&255, 2);
-  if (sym & (1 << 3)) ic_rgb->compress(((U16*)last_item)[1]>>8,((U16*)item)[1]>>8, 3);
-  if (sym & (1 << 4)) ic_rgb->compress(((U16*)last_item)[2]&255,((U16*)item)[2]&255, 4);
-  if (sym & (1 << 5)) ic_rgb->compress(((U16*)last_item)[2]>>8,((U16*)item)[2]>>8, 5);
+  if (sym & (1 << 0)) ic_rgb->compress(((U16*)last_item)[0]&255,((const U16*)item)[0]&255, 0);
+  if (sym & (1 << 1)) ic_rgb->compress(((U16*)last_item)[0]>>8,((const U16*)item)[0]>>8, 1);
+  if (sym & (1 << 2)) ic_rgb->compress(((U16*)last_item)[1]&255,((const U16*)item)[1]&255, 2);
+  if (sym & (1 << 3)) ic_rgb->compress(((U16*)last_item)[1]>>8,((const U16*)item)[1]>>8, 3);
+  if (sym & (1 << 4)) ic_rgb->compress(((U16*)last_item)[2]&255,((const U16*)item)[2]&255, 4);
+  if (sym & (1 << 5)) ic_rgb->compress(((U16*)last_item)[2]>>8,((const U16*)item)[2]>>8, 5);
   memcpy(last_item, item, 6);
   return TRUE;
 }

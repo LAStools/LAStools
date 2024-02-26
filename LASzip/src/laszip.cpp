@@ -94,33 +94,33 @@ bool LASzip::unpack(const U8* bytes, const I32 num)
   // do the unpacking
   U16 i;
   const U8* b = bytes;
-  compressor = *((U16*)b);
+  compressor = *((const U16*)b);
   b += 2;
-  coder = *((U16*)b);
+  coder = *((const U16*)b);
   b += 2;
-  version_major = *((U8*)b);
+  version_major = *((const U8*)b);
   b += 1;
-  version_minor = *((U8*)b);
+  version_minor = *((const U8*)b);
   b += 1;
-  version_revision = *((U16*)b);
+  version_revision = *((const U16*)b);
   b += 2;
-  options = *((U32*)b);
+  options = *((const U32*)b);
   b += 4;
-  chunk_size = *((U32*)b);
+  chunk_size = *((const U32*)b);
   b += 4;
-  number_of_special_evlrs = *((I64*)b);
+  number_of_special_evlrs = *((const I64*)b);
   b += 8;
-  offset_to_special_evlrs = *((I64*)b);
+  offset_to_special_evlrs = *((const I64*)b);
   b += 8;
-  num_items = *((U16*)b);
+  num_items = *((const U16*)b);
   b += 2;
   for (i = 0; i < num_items; i++)
   {
-    items[i].type = (LASitem::Type)*((U16*)b);
+    items[i].type = (LASitem::Type)*((const U16*)b);
     b += 2;
-    items[i].size = *((U16*)b);
+    items[i].size = *((const U16*)b);
     b += 2;
-    items[i].version = *((U16*)b);
+    items[i].version = *((const U16*)b);
     b += 2;
   }
   assert((bytes + num) == b);

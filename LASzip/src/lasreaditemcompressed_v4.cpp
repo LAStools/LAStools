@@ -321,7 +321,7 @@ inline BOOL LASreadItemCompressed_POINT14_v4::createAndInitModelsAndDecompressor
   contexts[context].ic_Z->initDecompressor();
   for (i = 0; i < 8; i++)
   {
-    contexts[context].last_Z[i] = ((LASpoint14*)item)->Z;
+    contexts[context].last_Z[i] = ((const LASpoint14*)item)->Z;
   }
 
   /* for the classification layer */
@@ -340,7 +340,7 @@ inline BOOL LASreadItemCompressed_POINT14_v4::createAndInitModelsAndDecompressor
   contexts[context].ic_intensity->initDecompressor();
   for (i = 0; i < 8; i++)
   {
-    contexts[context].last_intensity[i] = ((LASpoint14*)item)->intensity;
+    contexts[context].last_intensity[i] = ((const LASpoint14*)item)->intensity;
   }
 
   /* for the scan_angle layer */
@@ -365,7 +365,7 @@ inline BOOL LASreadItemCompressed_POINT14_v4::createAndInitModelsAndDecompressor
   contexts[context].multi_extreme_counter[1] = 0;
   contexts[context].multi_extreme_counter[2] = 0;
   contexts[context].multi_extreme_counter[3] = 0;
-  contexts[context].last_gpstime[0].f64 = ((LASpoint14*)item)->gps_time;
+  contexts[context].last_gpstime[0].f64 = ((const LASpoint14*)item)->gps_time;
   contexts[context].last_gpstime[1].u64 = 0;
   contexts[context].last_gpstime[2].u64 = 0;
   contexts[context].last_gpstime[3].u64 = 0;
@@ -693,7 +693,7 @@ BOOL LASreadItemCompressed_POINT14_v4::init(const U8* item, U32& context)
 
   /* set scanner channel as current context */
 
-  current_context = ((LASpoint14*)item)->scanner_channel;
+  current_context = ((const LASpoint14*)item)->scanner_channel;
   context = current_context; // the POINT14 reader sets context for all other items
 
   /* create and init models and decompressors */
