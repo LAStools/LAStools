@@ -29,6 +29,7 @@
     <ClCompile Include="src\lasfilter.cpp" />
     <ClCompile Include="src\lasignore.cpp" />
     <ClCompile Include="src\laskdtree.cpp" />
+    <ClCompile Include="src\lasmessage.cpp" />
     <ClCompile Include="src\lasreader.cpp" />
     <ClCompile Include="src\lasreaderbuffered.cpp" />
     <ClCompile Include="src\lasreadermerged.cpp" />
@@ -61,6 +62,7 @@
     <ClInclude Include="inc\lasfilter.hpp" />
     <ClInclude Include="inc\lasignore.hpp" />
     <ClInclude Include="inc\laskdtree.hpp" />
+    <ClInclude Include="inc\lasmessage.hpp" />
     <ClInclude Include="inc\lasreader.hpp" />
     <ClInclude Include="inc\lasreaderbuffered.hpp" />
     <ClInclude Include="inc\lasreadermerged.hpp" />

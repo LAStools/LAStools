@@ -84,7 +84,7 @@ private:
   F64 attribute_pre_scales[32];
   F64 attribute_pre_offsets[32];
   F64 attribute_no_datas[32];
-  BOOL parse_header(BOOL quiet);
+  BOOL parse_header();
   BOOL set_attribute(I32 index, F64 value);
   BOOL parse_attribute(const CHAR* l, I32 index);
   BOOL parse(const CHAR* parse_string);

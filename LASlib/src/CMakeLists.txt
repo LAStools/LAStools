@@ -33,6 +33,7 @@ set(LAS_SRC
 	lastransform.cpp
 	laskdtree.cpp
 	fopen_compressed.cpp
+	lasmessage.cpp
 )
 
 set(LAZ_SRC
