@@ -1,6 +1,6 @@
 # LAStools
 
-<a href="https://rapidlasso.de" target="_blank"> ![](./readme_logo.png) </a>
+<a href="https://rapidlasso.de" target="_blank"> ![](./readme_logo.jpg) </a>
 
 **Award-winning software for efficient LiDAR processing (with LASzip)**
 
