@@ -161,10 +161,12 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
     {
+      set_message_log_level(LAS_VERBOSE);
       verbose = TRUE;
     }
     else if (strcmp(argv[i],"-vv") == 0 || strcmp(argv[i],"-very_verbose") == 0)
     {
+      set_message_log_level(LAS_VERY_VERBOSE);
       verbose = TRUE;
       very_verbose = TRUE;
     }

@@ -30,6 +30,7 @@
 */
 #include "lasreaderpipeon.hpp"
 
+#include "lasmessage.hpp"
 #include "lasindex.hpp"
 #include "lascopc.hpp"
 #include "lasfilter.hpp"
@@ -44,7 +45,7 @@ BOOL LASreaderPipeOn::open(LASreader* lasreader)
 {
   if (lasreader == 0)
   {
-    fprintf(stderr, "ERROR: no lasreader\n");
+    LASMessage(LAS_ERROR, "no lasreader");
     return FALSE;
   }
 
@@ -90,14 +91,14 @@ BOOL LASreaderPipeOn::open(LASreader* lasreader)
 
   if (laswriterlas == 0)
   {
-    fprintf(stderr, "ERROR: allocating laswriterlas\n");
+    LASMessage(LAS_ERROR, "allocating laswriterlas");
     return FALSE;
   }
 
   if (!laswriterlas->open(stdout, &header))
   {
     delete laswriterlas;
-    fprintf(stderr, "ERROR: opening laswriterlas to stdout\n");
+    LASMessage(LAS_ERROR, "opening laswriterlas to stdout");
     return FALSE;
   }
 

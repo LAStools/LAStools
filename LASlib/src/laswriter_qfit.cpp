@@ -30,6 +30,7 @@
 */
 #include "laswriter_qfit.hpp"
 
+#include "lasmessage.hpp"
 #include "bytestreamout_file.hpp"
 
 #ifdef _WIN32
@@ -51,7 +52,7 @@ BOOL LASwriterQFIT::open(const char* file_name, const LASheader* header, I32 ver
 {
   if (file_name == 0)
   {
-    fprintf(stderr,"ERROR: file name pointer is zero\n");
+    LASMessage(LAS_ERROR, "file name pointer is zero");
     return FALSE;
   }
 
@@ -59,13 +60,13 @@ BOOL LASwriterQFIT::open(const char* file_name, const LASheader* header, I32 ver
 
   if (file == 0)
   {
-    fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
+    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
     return FALSE;
   }
 
   if (setvbuf(file, NULL, _IOFBF, io_buffer_size) != 0)
   {
-    fprintf(stderr, "WARNING: setvbuf() failed with buffer size %u\n", io_buffer_size);
+    LASMessage(LAS_WARNING, "setvbuf() failed with buffer size %u", io_buffer_size);
   }
 
   return open(file, header, version);
@@ -75,7 +76,7 @@ BOOL LASwriterQFIT::open(FILE* file, const LASheader* header, I32 version)
 {
   if (file == 0)
   {
-    fprintf(stderr,"ERROR: file pointer is zero\n");
+    LASMessage(LAS_ERROR, "file pointer is zero");
     return FALSE;
   }
 
@@ -84,7 +85,7 @@ BOOL LASwriterQFIT::open(FILE* file, const LASheader* header, I32 version)
   {
     if(_setmode( _fileno( stdout ), _O_BINARY ) == -1 )
     {
-      fprintf(stderr, "ERROR: cannot set stdout to binary (untranslated) mode\n");
+      LASMessage(LAS_ERROR, "cannot set stdout to binary (untranslated) mode");
     }
   }
 #endif
@@ -108,14 +109,14 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
 {
   if (stream == 0)
   {
-    fprintf(stderr,"ERROR: ByteStreamOut pointer is zero\n");
+    LASMessage(LAS_ERROR, "ByteStreamOut pointer is zero");
     return FALSE;
   }
   this->stream = stream;
 
   if (header == 0)
   {
-    fprintf(stderr,"ERROR: LASheader pointer is zero\n");
+    LASMessage(LAS_ERROR, "LASheader pointer is zero");
     return FALSE;
   }
 
@@ -123,7 +124,7 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
 
   if (((-361 < header->min_x) && (-361 < header->min_y) && (header->max_x < 361) && (header->max_y < 361)) == FALSE)
   {
-    fprintf(stderr,"ERROR: bounding box (%g %g / %g %g) exceeds longitude / latitude\n", header->min_x, header->min_y, header->max_x, header->max_y);
+    LASMessage(LAS_ERROR, "bounding box (%g %g / %g %g) exceeds longitude / latitude", header->min_x, header->min_y, header->max_x, header->max_y);
     return FALSE;
   }
 
@@ -166,7 +167,7 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
   }
   else
   {
-    fprintf(stderr,"WARNING: version %d of QFIT unknown ... using 48\n", version);
+    LASMessage(LAS_WARNING, "version %d of QFIT unknown ... using 48", version);
     this->version = 48;
   }
 
@@ -174,7 +175,7 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
 
   if (!stream->put32bitsLE((U8*)&version))
   {
-    fprintf(stderr,"ERROR: while writing version of QFIT header\n");
+    LASMessage(LAS_ERROR, "while writing version of QFIT header");
     return FALSE;
   }
 
@@ -185,7 +186,7 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
 
   if (!stream->putBytes((U8*)buffer, version-4))
   {
-    fprintf(stderr,"ERROR: writing first header record of QFIT header\n");
+    LASMessage(LAS_ERROR, "writing first header record of QFIT header");
     return FALSE;
   }
 
@@ -196,12 +197,12 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
 
   if (!stream->put32bitsLE((U8*)&buffer[0]))
   {
-    fprintf(stderr,"ERROR: while writing -9000000 into QFIT header\n");
+    LASMessage(LAS_ERROR, "while writing -9000000 into QFIT header");
     return FALSE;
   }
   if (!stream->put32bitsLE((U8*)&buffer[1]))
   {
-    fprintf(stderr,"ERROR: while writing offset into QFIT header\n");
+    LASMessage(LAS_ERROR, "while writing offset into QFIT header");
     return FALSE;
   }
 
@@ -211,7 +212,7 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
   sprintf((char*)buffer, "LAStools by rapidlasso GmbH");
   if (!stream->putBytes((U8*)buffer, version-8))
   {
-    fprintf(stderr,"ERROR: writing second header record of QFIT header\n");
+    LASMessage(LAS_ERROR, "writing second header record of QFIT header");
     return FALSE;
   }
 

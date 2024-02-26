@@ -50,7 +50,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 240115
+#define LAS_TOOLS_VERSION 240226
 
 #include <stdio.h>
 #include <string.h>
@@ -61,6 +61,7 @@
 #include "lasvlr.hpp"
 #include "laszip.hpp"
 #include "laspoint.hpp"
+#include "lasmessage.hpp"
 
 #define LAS_TOOLS_FORMAT_DEFAULT 0
 #define LAS_TOOLS_FORMAT_LAS     1
@@ -481,40 +482,40 @@ public:
   {
     if (strncmp(file_signature, "LASF", 4) != 0)
     {
-      fprintf(stderr,"ERROR: wrong file signature '%4s'\n", file_signature);
+      LASMessage(LAS_ERROR, "wrong file signature '%4s'", file_signature);
       return FALSE;
     }
     if ((version_major != 1) || (version_minor > 4))
     {
-      fprintf(stderr,"WARNING: unknown version %d.%d (should be 1.0 or 1.1 or 1.2 or 1.3 or 1.4)\n", version_major, version_minor);
+      LASMessage(LAS_WARNING, "unknown version %d.%d (should be 1.0 or 1.1 or 1.2 or 1.3 or 1.4)", version_major, version_minor);
     }
     if (header_size < 227)
     {
-      fprintf(stderr,"ERROR: header size is %d but should be at least 227\n", header_size);
+      LASMessage(LAS_ERROR, "header size is %d but should be at least 227", header_size);
       return FALSE;
     }
     if (offset_to_point_data < header_size)
     {
-      fprintf(stderr,"ERROR: offset to point data %d is smaller than header size %d\n", offset_to_point_data, header_size);
+      LASMessage(LAS_ERROR, "offset to point data %d is smaller than header size %d", offset_to_point_data, header_size);
       return FALSE;
     }
     if (x_scale_factor == 0)
     {
-      fprintf(stderr,"WARNING: x scale factor is zero.\n");
+      LASMessage(LAS_WARNING, "x scale factor is zero.");
     }
     if (y_scale_factor == 0)
     {
-      fprintf(stderr,"WARNING: y scale factor is zero.\n");
+      LASMessage(LAS_WARNING, "y scale factor is zero.");
     }
     if (z_scale_factor == 0)
     {
-      fprintf(stderr,"WARNING: z scale factor is zero.\n");
+      LASMessage(LAS_WARNING, "z scale factor is zero.");
     }
     if (max_x < min_x || max_y < min_y || max_z < min_z)
     {
       if (number_of_point_records || extended_number_of_point_records)
       {
-        fprintf(stderr,"WARNING: invalid bounding box [ %g %g %g / %g %g %g ]\n", min_x, min_y, min_z, max_x, max_y, max_z);
+        LASMessage(LAS_WARNING, "invalid bounding box [ %g %g %g / %g %g %g ]", min_x, min_y, min_z, max_x, max_y, max_z);
       }
     }
     return TRUE;

@@ -30,6 +30,7 @@
 */
 #include "lasreader_qfit.hpp"
 
+#include "lasmessage.hpp"
 #include "bytestreamin.hpp"
 #include "bytestreamin_file.hpp"
 
@@ -44,7 +45,7 @@ BOOL LASreaderQFIT::open(const char* file_name)
 {
   if (file_name == 0)
   {
-    fprintf(stderr,"ERROR: file name pointer is zero\n");
+    LASMessage(LAS_ERROR, "file name pointer is zero");
     return FALSE;
   }
 
@@ -53,7 +54,7 @@ BOOL LASreaderQFIT::open(const char* file_name)
   file = fopen(file_name, "rb");
   if (file == 0)
   {
-    fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
+    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
     return FALSE;
   }
 
@@ -125,7 +126,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
 
   if (stream == 0)
   {
-    fprintf(stderr,"ERROR: ByteStreamIn* pointer is zero\n");
+    LASMessage(LAS_ERROR, "ByteStreamIn* pointer is zero");
     return FALSE;
   }
 
@@ -135,7 +136,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
 
   try { stream->get32bitsLE((U8*)&version); } catch(...)
   {
-    fprintf(stderr,"ERROR: reading QFIT header\n");
+    LASMessage(LAS_ERROR, "reading QFIT header");
     return FALSE;
   }
 
@@ -156,7 +157,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
     }
     else
     {
-      fprintf(stderr,"ERROR: corrupt QFIT header.\n");
+      LASMessage(LAS_ERROR, "corrupt QFIT header.");
       return FALSE;
     }
   }
@@ -165,7 +166,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
 
   try { stream->getBytes((U8*)buffer, version); } catch(...)
   {
-    fprintf(stderr,"ERROR: reading %d bytes until point start offset from QFIT header\n", version);
+    LASMessage(LAS_ERROR, "reading %d bytes until point start offset from QFIT header", version);
     return FALSE;
   }
 
@@ -173,7 +174,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
 
   try { if (little_endian) stream->get32bitsLE((U8*)&offset); else stream->get32bitsBE((U8*)&offset); } catch(...)
   {
-    fprintf(stderr,"ERROR: reading point start offset from QFIT header\n");
+    LASMessage(LAS_ERROR, "reading point start offset from QFIT header");
     return FALSE;
   }
 
@@ -212,7 +213,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
     header.add_attribute(scan_azimuth);
   }
   catch(...) {
-    fprintf(stderr,"ERROR: initializing attribute scan_azimuth\n");
+    LASMessage(LAS_ERROR, "initializing attribute scan_azimuth");
     return FALSE;
   }
 
@@ -225,7 +226,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
     header.add_attribute(pitch);
   }
   catch(...) {
-    fprintf(stderr,"ERROR: initializing attribute pitch\n");
+    LASMessage(LAS_ERROR, "initializing attribute pitch");
     return FALSE;
   }
 
@@ -238,7 +239,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
     header.add_attribute(roll);
   }
   catch(...) {
-    fprintf(stderr,"ERROR: initializing attribute roll\n");
+    LASMessage(LAS_ERROR, "initializing attribute roll");
     return FALSE;
   }
 
@@ -249,7 +250,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
       header.add_attribute(pulse_width);
     }
     catch(...) {
-      fprintf(stderr,"ERROR: initializing attribute pulse width\n");
+      LASMessage(LAS_ERROR, "initializing attribute pulse width");
       return FALSE;
     }
   }
@@ -314,7 +315,7 @@ BOOL LASreaderQFIT::read_point_default()
   {
     try { stream->getBytes((U8*)buffer, version); } catch(...)
     {
-      fprintf(stderr,"ERROR: reading QFIT point after %u of %u\n", (U32)p_count, (U32)npoints);
+      LASMessage(LAS_ERROR, "reading QFIT point after %u of %u", (U32)p_count, (U32)npoints);
       return FALSE;
     }
 
@@ -402,7 +403,7 @@ BOOL LASreaderQFIT::reopen(const char* file_name)
 {
   if (file_name == 0)
   {
-    fprintf(stderr,"ERROR: file name pointer is zero\n");
+    LASMessage(LAS_ERROR, "file name pointer is zero");
     return FALSE;
   }
 
@@ -411,7 +412,7 @@ BOOL LASreaderQFIT::reopen(const char* file_name)
   file = fopen(file_name, "rb");
   if (file == 0)
   {
-    fprintf(stderr, "ERROR: cannot open file '%s'\n", file_name);
+    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
     return FALSE;
   }
 

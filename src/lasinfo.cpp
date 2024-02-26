@@ -215,6 +215,13 @@ extern int lasinfo_multi_core(int argc, char *argv[], LASreadOpener* lasreadopen
 
 int main(int argc, char *argv[])
 {
+  float f = 2.3;
+  set_message_log_level(LAS_DEBUG);
+  LASDebug("debug message (%.2f)...\n", f);
+  LASMessage(LAS_ERROR, "Das ist ein Test %.2f\nmultiline without ident\n", f); //multiline with lf at the end
+  LASMessage(LAS_ERROR, "Das ist ein Test %.2f\n\tmultiline with ident", f);    //multiline without lf at the end  (lf will be attached) 
+  LASMessage(LAS_WARNING, "Das ist ein Test %.4f\n  vordefinierte einrueckung (2 leerzeichen)\n", f); //multiline mit vordefinierte einrückung
+  LASMessage(LAS_SERIOUS_WARNING, "Das ist ein Test %.2f\n\t2. line with ident\n\t3. line with ident", f);
   int i;
 #ifdef COMPILE_WITH_GUI
   bool gui = false;

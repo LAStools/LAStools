@@ -30,6 +30,7 @@
 */
 #include "lasreaderstored.hpp"
 
+#include "lasmessage.hpp"
 #include "lasindex.hpp"
 #include "lasfilter.hpp"
 #include "lastransform.hpp"
@@ -44,7 +45,7 @@ BOOL LASreaderStored::open(LASreader* lasreader)
 {
   if (lasreader == 0)
   {
-    fprintf(stderr, "ERROR: no lasreader\n");
+    LASMessage(LAS_ERROR, "no lasreader");
     return FALSE;
   }
 
@@ -88,7 +89,7 @@ BOOL LASreaderStored::open(LASreader* lasreader)
 
   if (streamoutarray == 0)
   {
-    fprintf(stderr, "ERROR: allocating streamoutarray\n");
+    LASMessage(LAS_ERROR, "allocating streamoutarray");
     return FALSE;
   }
 
@@ -101,7 +102,7 @@ BOOL LASreaderStored::open(LASreader* lasreader)
 
   if (laswriterlas == 0)
   {
-    fprintf(stderr, "ERROR: allocating laswriterlas\n");
+    LASMessage(LAS_ERROR, "allocating laswriterlas");
     return FALSE;
   }
 
@@ -109,7 +110,7 @@ BOOL LASreaderStored::open(LASreader* lasreader)
   {
     delete laswriterlas;
     laswriterlas = 0;
-    fprintf(stderr, "ERROR: opening laswriterlas to streamoutarray\n");
+    LASMessage(LAS_ERROR, "opening laswriterlas to streamoutarray");
     return FALSE;
   }
 
@@ -133,13 +134,13 @@ BOOL LASreaderStored::reopen()
   {
     if (streamoutarray == 0)
     {
-      fprintf(stderr, "ERROR: no streamoutarray\n");
+      LASMessage(LAS_ERROR, "no streamoutarray");
       return FALSE;
     }
 
     if (streamoutarray->getSize() == 0)
     {
-      fprintf(stderr, "ERROR: nothing stored in streamoutarray\n");
+      LASMessage(LAS_ERROR, "nothing stored in streamoutarray");
       return FALSE;
     }
 
@@ -150,7 +151,7 @@ BOOL LASreaderStored::reopen()
 
     if (streaminarray == 0)
     {
-      fprintf(stderr, "ERROR: creating streaminarray\n");
+      LASMessage(LAS_ERROR, "creating streaminarray");
       return FALSE;
     }
   }
@@ -164,7 +165,7 @@ BOOL LASreaderStored::reopen()
 
   if (lasreaderlas == 0)
   {
-    fprintf(stderr, "ERROR: allocating lasreaderlas\n");
+    LASMessage(LAS_ERROR, "allocating lasreaderlas");
     return FALSE;
   }
 
@@ -172,7 +173,7 @@ BOOL LASreaderStored::reopen()
   {
     delete lasreaderlas;
     lasreaderlas = 0;
-    fprintf(stderr, "ERROR: opening lasreaderlas from streaminarray\n");
+    LASMessage(LAS_ERROR, "opening lasreaderlas from streaminarray");
     return FALSE;
   }
 
