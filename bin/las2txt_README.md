@@ -123,7 +123,6 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 
 ### General
 -comma_not_point   : use comma instead of point as decimal separator  
--unique            : remove duplicate points  
 -buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
@@ -609,6 +608,7 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 -iskip [n]      : skip [n] lines at the beginning of the text input  
 -itxt           : expect input as text file  
 -lof [fnf]      : use input out of a list of files [fnf]  
+-unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
 -stdin          : pipe from stdin  
 

@@ -203,84 +203,166 @@ lasgrid64 -i in.laz -o out.asc -classification_majority -step 1
 
 ## lasgrid specific arguments
 
--attribute [n]             : use attribute [n] value as output color parameter  
--average                   : for each grid cell compute average  
--avg                       : for each grid cell compute average  
--classification            : use classification as values  
+### aggregate arguments
+Aggregate arguments will overwrite aggreagte endings given with the grouping arguments.
+-low     : for each grid cell keep lowest value  
+-lowest  : for each grid cell keep lowest value  
+-min     : for each grid cell keep lowest value  
+-mean    : for each grid cell compute average  
+-average : for each grid cell compute average  
+-avg     : for each grid cell compute average  
+-high    : for each grid cell keep highest value  
+-highest : for each grid cell keep highest value  
+-max     : for each grid cell keep highest value  
+-std     : for each grid cell compute standard deviation  
+-stddev  : for each grid cell compute standard deviation  
+
+### grouping arguments - samples
+Grouping arguments can have aggreate endings. No aggregate arguments are needed then.
+See "grouping arguments by tokens" below to see all possible tokens to generate grouping arguments. 
+-attribute [n]          : use attribute [n] value as output color parameter  
+-counter_2bit           : counts points per cell with an 8 bit counter
+-counter_4bit           : counts points per cell with an 4 bit counter
+-counter_8bit           : counts points per cell with an 8 bit counter
+-counter_16bit          : counts points per cell with an 16 bit counter
+-counter_32bit          : counts points per cell with an 32 bit counter
+-counter_quotient_8bit  : calculate density quotient with an 8 bit counter 
+-counter_quotient_16bit : calculate density quotient with an 16 bit counter
+-elevation_highest      : use highest elevation values 
+-elevation_min          : use min elevation as values
+-elevation_max          : use max elevation as values
+-elevation_average      : use average elevation as values
+-elevation_avg          : use average elevation as values
+-elevation_stddev       : use standard derivation of elevation as values  
+-elevation_std          : use standard derivation of elevation as values
+-elevation_range        : use elevation range as values
+-elevation_index        : use elevation index as values
+-intensity_lowest       : use intensity minimum as values
+-intensity_min          : use intensity minimum as values
+-intensity_max          : use intensity maximum as values
+-intensity_average      : use intensity average as values  
+-intensity_avg          : use intensity average as values
+-intensity_stddev       : use standard derivation of intensity as values
+-intensity_std          : use standard derivation of intensity as values
+-intensity_range        : use intensity range as values
+-scan_angle_min         : use minimum scan angle as values
+-scan_angle_min_abs     : use minimum absolute scan angle as values
+-scan_angle_max         : use maximum scan angle as values
+-scan_angle_max_abs     : use maximum absolute scan angle as values
+-scan_angle_highest     : use maximum scan angle as values
+-scan_angle_highest_abs : use maximum absolute scan angle as values
+-scan_angle_range       : use scan angle range as values
+-scan_angle_average     : use average scan angle as values
+-scan_angle_average_abs : use average absolute scan angle as values
+-scan_angle_avg         : use average scan angle as values
+-scan_angle_avg_abs     : use average absolute scan angle as values
+-user_data_lowest       : use minimum of user data as values
+-user_data_min          : use minimum of user data as values
+-user_data_max          : use maximum of user data as values
+-user_data_average      : use average of user data as values
+-user_data_avg          : use average of user data as values
+-user_data_stddev       : use standard derivation of user data as values
+-user_data_std          : use standard derivation of user data as values
+-user_data_range        : use user data range as values
+-point_source_lowest    : use minimum of point source as values
+-point_source_min       : use minimum of point source as values
+-point_source_max       : use maximum of point source as values
+-point_source_range     : use range of point source as values
+-gps_time_lowest        : use minimum of gps time as values
+-gps_time_min           : use minimum of gps time as values
+-gps_time_max           : use maximum of gps time as values
+-gps_time_range         : use range of gps time as values
+-number_returns_avg     : use average number of returns as values
+-number_returns_lowest  : use minimum number of returns as values
+-number_returns_min     : use minimum number of returns as values
+-number_returns_highest : use maximum number of returns as values
+-number_returns_max     : use maximum number of returns as values
+-number_returns_stddev  : use standard derivation of returns as values
+-number_returns_std     : use standard derivation of returns as values
+-range_elevation        : use range of elevation as values
+-range_intensity        : use range of intensity as values
+-range_scan_angle       : use range of scan_angle as values
+-range_user_data        : use range of user_data as values
+-range_point_source     : use range of point_source as values
+-range_attribute        : use range of attribute as values
+-range_gps_time         : use range of gps time as values
+-return_type_lowest     : use return type minimum as values
+-return_type_min        : use return type minimum as values
+-return_type_max        : use return type maximum as values
+-return_type_highest    : use return type maximum as values
+-rgb                    : use rgb values if available (only used with PNG/TIF/JPG)  
+-occupancy              : use occupancy as value
+-classification_8bit                      : use classification majority as values using a 8 bit counter
+-classification_16bit                     : use classification majority as values using a 16 bit counter
+-classification_32bit                     : use classification majority as values using a 32 bit counter
+-classification_majority_8bit             : use classification majority as values using a 8 bit counter
+-classification_majority_16bit            : use classification majority as values using a 16 bit counter
+-classification_majority_32bit            : use classification majority as values using a 32 bit counter
+-classification_1_quotient_8bit           : use quotient of classification 1 as values using a 8 bit counter
+-classification_2_quotient_8bit           : use quotient of classification 2 as values using a 8 bit counter
+-classification_3_quotient_8bit           : use quotient of classification 3 as values using a 8 bit counter
+-classification_4_quotient_8bit           : use quotient of classification 4 as values using a 8 bit counter
+-classification_5_quotient_8bit           : use quotient of classification 5 as values using a 8 bit counter
+-classification_6_quotient_8bit           : use quotient of classification 6 as values using a 8 bit counter
+-classification_7_quotient_8bit           : use quotient of classification 7 as values using a 8 bit counter
+-classification_8_quotient_8bit           : use quotient of classification 8 as values using a 8 bit counter
+-classification_1_quotient_16bit          : use quotient of classification 1 as values using a 16 bit counter
+-classification_2_quotient_16bit          : use quotient of classification 2 as values using a 16 bit counter
+-classification_3_quotient_16bit          : use quotient of classification 3 as values using a 16 bit counter
+-classification_4_quotient_16bit          : use quotient of classification 4 as values using a 16 bit counter
+-classification_5_quotient_16bit          : use quotient of classification 5 as values using a 16 bit counter
+-classification_6_quotient_16bit          : use quotient of classification 6 as values using a 16 bit counter
+-classification_7_quotient_16bit          : use quotient of classification 7 as values using a 16 bit counter
+-classification_8_quotient_16bit          : use quotient of classification 8 as values using a 16 bit counter
+-classification_variety                   : use classification variety as values
+-extended_classification_8bit             : use classification majority as values using a 8 bit counter
+-extended_classification_16bit            : use classification majority as values using a 16 bit counter
+-extended_classification_32bit            : use classification majority as values using a 32 bit counter
+-extended_classification_majority_8bit    : use classification majority as values using a 8 bit counter
+-extended_classification_majority_16bit   : use classification majority as values using a 16 bit counter
+-extended_classification_majority_32bit   : use classification majority as values using a 32 bit counter
+-extended_classification_1_quotient_8bit  : use quotient of classification 1 as values using a 8 bit counter
+-extended_classification_2_quotient_8bit  : use quotient of classification 2 as values using a 8 bit counter
+-extended_classification_3_quotient_8bit  : use quotient of classification 3 as values using a 8 bit counter
+-extended_classification_4_quotient_8bit  : use quotient of classification 4 as values using a 8 bit counter
+-extended_classification_5_quotient_8bit  : use quotient of classification 5 as values using a 8 bit counter
+-extended_classification_6_quotient_8bit  : use quotient of classification 6 as values using a 8 bit counter
+-extended_classification_7_quotient_8bit  : use quotient of classification 7 as values using a 8 bit counter
+-extended_classification_8_quotient_8bit  : use quotient of classification 8 as values using a 8 bit counter
+-extended_classification_1_quotient_16bit : use quotient of classification 1 as values using a 16 bit counter
+-extended_classification_2_quotient_16bit : use quotient of classification 2 as values using a 16 bit counter
+-extended_classification_3_quotient_16bit : use quotient of classification 3 as values using a 16 bit counter
+-extended_classification_4_quotient_16bit : use quotient of classification 4 as values using a 16 bit counter
+-extended_classification_5_quotient_16bit : use quotient of classification 5 as values using a 16 bit counter
+-extended_classification_6_quotient_16bit : use quotient of classification 6 as values using a 16 bit counter
+-extended_classification_7_quotient_16bit : use quotient of classification 7 as values using a 16 bit counter
+-extended_classification_8_quotient_16bit : use quotient of classification 8 as values using a 16 bit counter
+-extended_classification_variety          : use classification variety as values
+
+
+### other specific arguments
 -color_map [fnm]           : load colormap txt file [fnm] to define class colors  
 -compute_min_max           : computes the range for -gray and -false  
 -copy_attribute_into_z [n] : copy attribute [n] value into z  
--cores [n]                 : process multiple inputs on [n] cores in parallel  
--counter                   : counts points per cell with an 8 bit counter  
--counter_16bit             : counts points per cell with a 16 bit counter  
--counter_32bit             : counts points per cell with a 32 bit counter  
 -density                   : check difference in point density per overlapping flightline per cell with an 8 bit counter  
--elevation                 : use elevation as values  
--elevation_average         : use elevation average values  
--elevation_feet            : use feet for elevation  
--elevation_highest         : use elevation highest values  
--elevation_lowest          : use elevation lowest values  
--elevation_range           : use elevation range values  
--elevation_stddev          : use elevation stddev values  
--extended_classification   : use extended classification values  
 -false                     : false-color based on min/max range (used with PNG/TIF/JPG)  
+-elevation_feet            : use feet for elevation  
 -feet                      : use feet  
 -fill [n]                  : fills voids in the grid with a square search radius of [n]  
 -gray                      : gray-scale based on min/max range (used with PNG/TIF/JPG)  
 -grey                      : gray-scale based on min/max range (used with PNG/TIF/JPG)  
 -grid_ll [x] [y]           : shift raster grid lower left to [x]/[y]  
 -grid_spacing [n]          : raster with stepsize [n] (the default is 1)  
--high                      : for each grid cell keep highest value  
--highest                   : for each grid cell keep highest value  
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
--intensity                 : use intensity as values  
--intensity_average         : use intensity average values  
--intensity_highest         : use intensity highest values  
--intensity_lowest          : use intensity lowest values  
--intensity_range           : use intensity range values  
--intensity_stddev          : use intensity stddev values  
 -invert_ramp               : invert color ramp for output  
 -ll [x] [y]                : start rastering at these lower left [x] and [y] coordinates  
--low                       : for each grid cell keep lowest value  
--lowest                    : for each grid cell keep lowest value  
--max                       : for each grid cell keep highest value  
--mean                      : for each grid cell compute average  
 -mem [n]                   : use [n] MB of main memory (500-2000; default=1500)  
--min                       : for each grid cell keep lowest value  
 -nbits [n]                 : use [n] bits to represent the elevation (mainly used with BIL format)  
 -ncols [n]                 : raster at most [n] columns (starting from the lower left)  
 -nodata [n]                : use [n] as the nodata value in the BIL/ASC format  
 -nrows [n]                 : raster at most [n] rows (starting from the lower left)  
--number_returns            : use number of returns  
--number_returns_average    : use number of returns average values  
--number_returns_highest    : use number of returns highest values  
--number_returns_lowest     : use number of returns lowest values  
--number_returns_stddev     : use number of returns stddev values  
--occupancy                 : use occupancy values  
--point_density             : computes area-normalized point densities with an 8 bit counter  
--point_density_16bit       : computes area-normalized point densities with a 16 bit counter  
--point_density_32bit       : computes area-normalized point densities with a 32 bit counter  
--point_source              : use point source as value  
--point_source_highest      : for each grid cell keep highest point source value  
--point_source_lowest       : for each grid cell keep lowest point source value  
--point_source_range        : use point source range  
--range                     : use range as grid value  
--return_type               : use return type as grid value  
--return_type_highest       : use highest return type  
--return_type_lowest        : use lowest return type  
--rgb                       : use rgb values if available (only used with PNG/TIF/JPG)  
--scan_angle                : use scan angle as values  
--scan_angle_abs            : use absolute scan angle as values  
--scan_angle_abs_average    : for each grid cell keep average absolute scan angle value  
--scan_angle_abs_highest    : for each grid cell keep highest absolute scan angle value  
--scan_angle_abs_lowest     : for each grid cell keep lowest absolute scan angle value  
--scan_angle_highest        : for each grid cell keep highest scan angle value  
--scan_angle_lowest         : for each grid cell keep lowest scan angle value  
--scan_angle_range          : use scan angle range value  
 -set_min_max               : sets min & max range for -gray and -false  
--std                       : for each grid cell compute standard deviation  
--stddev                    : for each grid cell compute standard deviation  
 -step [n]                  : raster with stepsize [n]{default=1}  
 -subcircle [r] [z]         : each point is "splatted" with a circle of extra 8 points at radius [r], optional with [z] offset  
 -subsample [n]             : see long explanation above [n]  
@@ -292,14 +374,109 @@ lasgrid64 -i in.laz -o out.asc -classification_majority -step 1
 -use_orig_bb               : only raster extend of original bounding box (for tiles generated with '-buffered 30')  
 -use_tile_bb               : only raster extend of tile bounding box (for tiles generated with lastile)  
 -use_tile_size             : use tile size without bounding box  
--user_data                 : use user data as values  
--user_data_highest         : for each grid cell keep highest user data value  
--user_data_lowest          : for each grid cell keep lowest user data value  
--user_data_range           : use user data range values  
 -week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
+
+
+### grouping arguments by tokens
+As grid value paramter each parameter will be checked for serveral tokens.
+If a token is detected, the next level of tokens will be checked.
+The order of the tokens is not relevant.
+If a subtoken is not present and a (default) is defined, this will be used. 
+
+    counter
+      quotient
+        16bit
+        (default):8bit
+      16bit
+      32bit
+      2bit
+      4bit
+      (default):8bit
+    elevation
+      highest|max
+      average|avg
+      stddev|std
+      range
+      index
+      (default):min
+    intensity
+      lowest|min
+      average|avg
+      stddev|std
+      range
+      (default):max
+    scan_angle
+      highest_abs|abs_highest|max_abs|abs_max
+      average_abs|abs_average|avg_abs|abs_avg
+      highest|max
+      abs
+      range
+      (default):min
+    user_data
+      lowest|min
+      average|avg
+      stddev|std
+      range
+      (default):max
+    point_source    
+      lowest|min
+      range
+      (default):max
+    gps_time
+      lowest|min
+      range
+      (default):max
+    number_returns
+      lowest|min
+      highest|max
+      stddev|std
+      (default):avg
+    return_type  
+      lowest|min
+      highest|max
+    rgb
+    occupancy
+    classification
+      extended_classification
+        variety  
+        quotient
+          _1_
+          _2_
+          _3_
+          _4_
+          _5_
+          _6_
+          _7_
+          _8_
+          16bit
+          -else:8bit
+        majority
+          16bit
+          32bit
+          -else:8bit
+      variety    
+      quotient
+        _1_
+        _2_
+        _3_
+        _4_
+        _5_
+        _6_
+        _7_
+        _8_
+        16bit
+        -else:8bit
+      majority
+        16bit
+        32bit
+        -else:8bit
+    value
+    mean_xyz     
+
 
 ### Basics
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  
 -h            : print help output  
@@ -323,7 +500,6 @@ lasgrid64 -i in.laz -o out.asc -classification_majority -step 1
 -no_kml            : avoids auto-creation of KML wrapper  
 -no_world_file     : avoid world-file for PNG, JPG, TIF and BIL output  
 -stored            : use in memory reader  
--unique            : remove duplicate points  
 
 ### Color
 -clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
@@ -868,6 +1044,7 @@ lasgrid64 -i in.laz -o out.asc -classification_majority -step 1
 -iskip [n]      : skip [n] lines at the beginning of the text input  
 -itxt           : expect input as text file  
 -lof [fnf]      : use input out of a list of files [fnf]  
+-unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
 -stdin          : pipe from stdin  
 
@@ -895,103 +1072,6 @@ lasgrid64 -i in.laz -o out.asc -classification_majority -step 1
 -pipe_on                 : write output to command pipe, see also -std_in  
 -populate                : populate header on output  
 -target_ecef             : output is geocentric (Earth-centered Earth-fixed)  
-
-### grid options
-As grid value paramter each parameter will be checked for serveral tokens.
-If a token is detected, the next level of tokens will be checked.
-The order of the tokens is not relevant.
-If a subtoken is not present and a (default) is defined, this will be used. 
-
-    counter
-      quotient
-        16bit
-        (default):8bit
-      16bit
-      32bit
-      2bit
-      4bit
-      (default):8bit
-    elevation
-      highest|max
-      average|avg
-      stddev|std
-      range
-      index
-      (default):min
-    intensity
-      lowest|min
-      average|avg
-      stddev|std
-      range
-      (default):max
-    xyz_random
-    scan_angle
-      highest_abs|abs_highest|max_abs|abs_max
-      average_abs|abs_average|avg_abs|abs_avg
-      highest|max
-      abs
-      range
-      (default):min
-    user_data
-      lowest|min
-      average|avg
-      stddev|std
-      range
-      (default):max
-    point_source    
-      lowest|min
-      range
-      (default):max
-    gps_time
-      lowest|min
-      range
-      (default):max
-    number_returns
-      lowest|min
-      highest|max
-      stddev|std
-      (default):avg
-    return_type  
-      lowest|min
-      highest|max
-    rgb
-    occupancy
-    classification
-      extended_classification
-        variety  
-        quotient
-          _1_
-          _2_
-          _3_
-          _4_
-          _5_
-          _6_
-          _7_
-          _8_
-          16bit
-          -else:8bit
-        majority
-          16bit
-          32bit
-          -else:8bit
-      variety    
-      quotient
-        _1_
-        _2_
-        _3_
-        _4_
-        _5_
-        _6_
-        _7_
-        _8_
-        16bit
-        -else:8bit
-      majority
-        16bit
-        32bit
-        -else:8bit
-    value
-    mean_xyz     
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret

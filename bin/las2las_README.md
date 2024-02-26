@@ -143,7 +143,7 @@ below -15 and stores surviving points compressed to out.laz.
     las2las64 -i in.las -o out.las -drop_intensity_below 1000 -remove_padding
 
 drops all points of in.las whose intensity is below 1000 and stores
-surviving points to out.las. in addition any additional user data after
+surviving points to out.las. In addition any additional user data after
 the LAS header or after the VLR block are stripped from the file.
 
 
@@ -179,22 +179,21 @@ them to out.las.
 
     las2las64 -i in.las -o out.las -keep_XY 63025000 483450000 63050000 483475000
 
-similar to '-keep_xy' but uses the integer values point.X and point.Y
-that the points are stored with for the checks (and not the double
-precision floating point coordinates they represent). drops all the
-points of in.las that have point.X<63025000 or point.Y<483450000 or
-point.X>63050000 or point.Y>483475000 and stores surviving points to
-out.las (use lasinfo.exe to see the range of point.Z and point.Y).
+similar to '-keep_xy' (lowercase!) but uses the integer values point.X and point.Y
+that the points are stored with for the checks (and not the double precision 
+floating point coordinates they represent). Drops all the points of in.las that 
+have point.X<63025000 or point.Y<483450000 or point.X>63050000 or point.Y>483475000 
+and stores surviving points to out.las (use lasinfo.exe to see the range of 
+point.Z and point.Y).
 
 
     las2las64 -i in.las -o out.las -keep_Z 1000 4000
 
-similar to '-keep_z' but uses the integer values point.Z that the
-points are stored with for the checks (and not the double-precision
-floating point coordinates they represent). drops all the points
-of in.las that have point.Z<1000 or point.Z>4000 and stores all
-surviving points to out.las (use lasinfo.exe to see the range of
-point.Z).
+similar to '-keep_z' (lowercase!) but uses the integer values point.Z that the
+points are stored with for the checks (and not the double-precision floating 
+point coordinates they represent). Drops all the points of in.las that have 
+point.Z<1000 or point.Z>4000 and stores all surviving points to out.las 
+(use lasinfo.exe to see the range of point.Z).
 
 
     las2las64 -h
@@ -248,7 +247,7 @@ point.Z).
 -set_global_encoding_gps_bit [n]    : sets bit in global encoding field specifying Adjusted GPS Standard time stamps  
 -set_lastiling_buffer_flag [0/1]    : sets buffer flag in LAStiling VLR (if it exists) to [0/1]  
 -set_ogc_wkt [n]                    : translate GeoTIFF keys [n] into CRS string in OGC WKT format and add it as VLR  
--set_ogc_wkt_in_evlr [n]            : same as "set_ogc_wkt" but adds [n] as LAS 1.4 EVLR instead. really not recommended!!!  
+-set_ogc_wkt_in_evlr [n]            : same as "set_ogc_wkt" but adds [n] as LAS 1.4 EVLR instead. Really not recommended!!!  
 -set_point_data_format [n]          : force point type to be [n]{1-10}  
 -set_point_data_record_length [n]   : CAREFUL! sets the point data record length field of the LAS header to size [n] without checking whether this will corrupt the file  
 -set_point_size [n]                 : force point size to be [n]  
@@ -285,7 +284,6 @@ point.Z).
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
 -stored            : use in memory reader  
--unique            : remove duplicate points  
 
 ### Color
 -clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
@@ -827,6 +825,7 @@ point.Z).
 -iskip [n]      : skip [n] lines at the beginning of the text input  
 -itxt           : expect input as text file  
 -lof [fnf]      : use input out of a list of files [fnf]  
+-unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
 -stdin          : pipe from stdin  
 
@@ -876,13 +875,10 @@ out of this values:
   31-255 : reserved
 
 ### parse
-The '-parse [xyz]' flag specifies how to set the 
-columns in a ASCII output file. 
-For example, 'tsxyzssa' means that the first number 
-is the gpstime, the next number should be skipped, 
-the next three numbers are the x, y, and z coordinate, 
-the next two should be skipped and the next number
-is the scan angle.
+The '-parse [xyz]' flag specifies how to set the columns in a ASCII output file. 
+For example, 'tsxyzssa' means that the first number is the gpstime, the next 
+number should be skipped, the next three numbers are the x, y, and z coordinate, 
+the next two should be skipped and the next number is the scan angle.
 
 The other supported entries are:  
   x : [x] coordinate  

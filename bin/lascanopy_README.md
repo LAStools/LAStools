@@ -94,7 +94,7 @@ In addition, the tool can also concurrently produce several
 height count rasters. The option '-c 0.5 2 4 10 50', for example,
 would compute four rasters that count the points whose heights
 are falling into the intervals: 
-[0.5, 2), [2, 4), [4, 10), and [10, 50). 
+[0.5, 2], [2, 4], [4, 10], and [10, 50]. 
 In the same manner the option '-d 0.5 2 4 10 50' will
 produce a relative height density raster in which the counts are
 divided by the total number of points and scaled to a percentage.
@@ -261,7 +261,6 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 -no_kml            : avoids auto-creation of KML wrapper  
 -no_world_file     : avoid world-file for PNG, JPG, TIF and BIL output  
 -stored            : use in memory reader  
--unique            : remove duplicate points  
 
 ### Color
 -clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
@@ -807,6 +806,7 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 -iskip [n]      : skip [n] lines at the beginning of the text input  
 -itxt           : expect input as text file  
 -lof [fnf]      : use input out of a list of files [fnf]  
+-unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
 -stdin          : pipe from stdin  
 

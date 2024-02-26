@@ -160,7 +160,7 @@ lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_heig
 -replace_z                      : store heights to z coordinate (instead of in dm in user_data field). original elevations are lost.  
 -scale_u [n]                    : scale height quantized to [n] increments in user_data field (default=10 cm)  
 -skip_files                     : skip (instead of the default copy) files that have an insufficient number of ground points  
--store_as_extra_bytes           : store height with cm precision as short in "extra bytes" (instead of in dm in user_data field)  
+-store_as_extra_bytes           : store height with cm precision as short in "extra bytes" (instead of in dm in user_data field)
 -store_in_user_data             : store also in user_data field (even when storing to z coordinate or as extra bytes)  
 -store_precise_as_extra_bytes   : store height with mm precision as int in "extra bytes" (instead of in dm in user_data field)  
 -switch_G_B                     : switch green and blue value  
@@ -189,7 +189,6 @@ lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_heig
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
 -stored            : use in memory reader  
--unique            : remove duplicate points  
 
 ### Color
 -clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
@@ -749,6 +748,7 @@ lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_heig
 -iskip [n]      : skip [n] lines at the beginning of the text input  
 -itxt           : expect input as text file  
 -lof [fnf]      : use input out of a list of files [fnf]  
+-unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
 -stdin          : pipe from stdin  
 
