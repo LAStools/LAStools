@@ -31,6 +31,7 @@
 #include "laszip.hpp"
 
 #include "mydefs.hpp"
+#include "lasmessage.hpp"
 
 #include <cassert>
 
@@ -496,7 +497,7 @@ bool LASzip::setup(U16* num_items, LASitem** items, const U8 point_type, const U
 
   if (extra_bytes_number < 0)
   {
-    fprintf(stderr, "WARNING: point size %d too small by %d bytes for point type %d. assuming point_size of %d\n", point_size, -extra_bytes_number, point_type, point_size-extra_bytes_number);
+    LASMessage(LAS_WARNING, "point size %d too small by %d bytes for point type %d. assuming point_size of %d", point_size, -extra_bytes_number, point_type, point_size-extra_bytes_number);
     extra_bytes_number = 0;
   }
 

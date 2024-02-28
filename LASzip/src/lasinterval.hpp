@@ -79,7 +79,7 @@ public:
   BOOL merge_cells(const U32 num_indices, const I32* indices, const I32 new_index);
 
   // merge adjacent intervals with small gaps in cells to reduce total interval number to maximum
-  void merge_intervals(U32 maximum, const BOOL verbose=TRUE);
+  void merge_intervals(U32 maximum);
 
   // read from file or write to file
   BOOL read(ByteStreamIn* stream);

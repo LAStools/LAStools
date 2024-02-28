@@ -61,6 +61,7 @@
 #include "laszip_decompress_selective_v3.hpp"
 #include "lasindex.hpp"
 #include "lasquadtree.hpp"
+#include "lasmessage.hpp"
 
 void usage(bool error=false, bool wait=false)
 {
@@ -480,7 +481,7 @@ int main(int argc, char *argv[])
 
     // adaptive coarsening
 
-    lasindex.complete(minimum_points, maximum_intervals, very_verbose);
+    lasindex.complete(minimum_points, maximum_intervals);
 
     // write to file
 
