@@ -214,7 +214,7 @@ void LASindex::print()
     }
     if (total_check != interval->total)
     {
-      LASMessage(LAS_ERROR, "total_check %d != interval->total %d", total_check, interval->total);
+      LASMessage(LAS_VERBOSE, "total_check %d != interval->total %d", total_check, interval->total);
     }
     LASMessage(LAS_VERY_VERBOSE, "cell %d intervals %d full %d total %d (%.2f)", interval->index, intervals, interval->full, interval->total, 100.0f*interval->full/interval->total);
     total_cells++;
