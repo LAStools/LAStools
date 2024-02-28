@@ -3308,7 +3308,7 @@ laszip_close_writer(
 
     if (laszip_dll->lax_index)
     {
-      laszip_dll->lax_index->complete(100000, -20, FALSE);
+      laszip_dll->lax_index->complete(100000, -20);
 
       if (!laszip_dll->lax_index->write(laszip_dll->lax_file_name))
       {
