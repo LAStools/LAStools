@@ -50,6 +50,7 @@
 #include "lasreadpoint.hpp"
 #include "lasquadtree.hpp"
 #include "lasindex.hpp"
+#include "lasmessage.hpp"
 
 class demzip_dll_inventory
 {
@@ -1831,11 +1832,7 @@ demzip_prepare_header_for_write(
     {
       if (demzip_dll->header.number_of_point_records != 0)
       {
-#ifdef _WIN32
-        sprintf(demzip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %I64d", demzip_dll->header.number_of_point_records, demzip_dll->header.extended_number_of_point_records);
-#else
         sprintf(demzip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %llu", demzip_dll->header.number_of_point_records, demzip_dll->header.extended_number_of_point_records);
-#endif
         return 1;
       }
       else if (demzip_dll->header.extended_number_of_point_records <= U32_MAX)
@@ -1849,11 +1846,7 @@ demzip_prepare_header_for_write(
       {
         if (demzip_dll->header.number_of_points_by_return[i] != 0)
         {
-#ifdef _WIN32
-          sprintf(demzip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %I64d", i, demzip_dll->header.number_of_points_by_return[i], i, demzip_dll->header.extended_number_of_points_by_return[i]);
-#else
           sprintf(demzip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %llu", i, demzip_dll->header.number_of_points_by_return[i], i, demzip_dll->header.extended_number_of_points_by_return[i]);
-#endif
           return 1;
         }
         else if (demzip_dll->header.extended_number_of_points_by_return[i] <= U32_MAX)
@@ -1898,11 +1891,7 @@ demzip_prepare_point_for_write(
 
       if (demzip_dll->header.extended_number_of_point_records > U32_MAX)
       {
-#ifdef _WIN32
-        sprintf(demzip_dll->error, "extended_number_of_point_records of %I64d is too much for 32-bit counters of compatibility mode", demzip_dll->header.extended_number_of_point_records);
-#else
         sprintf(demzip_dll->error, "extended_number_of_point_records of %llu is too much for 32-bit counters of compatibility mode", demzip_dll->header.extended_number_of_point_records);
-#endif
         return 1;
       }
 
@@ -1986,29 +1975,21 @@ demzip_prepare_point_for_write(
       U64 start_of_waveform_data_packet_record = demzip_dll->header.start_of_waveform_data_packet_record;
       if (start_of_waveform_data_packet_record != 0)
       {
-#ifdef _WIN32
-        fprintf(stderr,"WARNING: header->start_of_waveform_data_packet_record is %I64d. writing 0 instead.\n", start_of_waveform_data_packet_record);
-#else
-        fprintf(stderr,"WARNING: header->start_of_waveform_data_packet_record is %llu. writing 0 instead.\n", start_of_waveform_data_packet_record);
-#endif
+        LASMessage(LAS_WARNING, "header->start_of_waveform_data_packet_record is %llu. writing 0 instead.", start_of_waveform_data_packet_record);
         start_of_waveform_data_packet_record = 0;
       }
       out->put64bitsLE((U8*)&start_of_waveform_data_packet_record);
       U64 start_of_first_extended_variable_length_record = demzip_dll->header.start_of_first_extended_variable_length_record;
       if (start_of_first_extended_variable_length_record != 0)
       {
-#ifdef _WIN32
-        fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %I64d. writing 0 instead.\n", start_of_first_extended_variable_length_record);
-#else
-        fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %llu. writing 0 instead.\n", start_of_first_extended_variable_length_record);
-#endif
+        LASMessage(LAS_WARNING, "EVLRs not supported. header->start_of_first_extended_variable_length_record is %llu. writing 0 instead.", start_of_first_extended_variable_length_record);
         start_of_first_extended_variable_length_record = 0;
       }
       out->put64bitsLE((U8*)&start_of_first_extended_variable_length_record);
       U32 number_of_extended_variable_length_records = demzip_dll->header.number_of_extended_variable_length_records;
       if (number_of_extended_variable_length_records != 0)
       {
-        fprintf(stderr,"WARNING: EVLRs not supported. header->number_of_extended_variable_length_records is %u. writing 0 instead.\n", number_of_extended_variable_length_records);
+        LASMessage(LAS_WARNING, "EVLRs not supported. header->number_of_extended_variable_length_records is %u. writing 0 instead.", number_of_extended_variable_length_records);
         number_of_extended_variable_length_records = 0;
       }
       out->put32bitsLE((U8*)&number_of_extended_variable_length_records);
@@ -2571,11 +2552,7 @@ demzip_write_header(
     {
       if (demzip_dll->header.start_of_waveform_data_packet_record != 0)
       {
-#ifdef _WIN32
-        sprintf(demzip_dll->warning, "header.start_of_waveform_data_packet_record is %I64d. writing 0 instead.", demzip_dll->header.start_of_waveform_data_packet_record);
-#else
         sprintf(demzip_dll->warning, "header.start_of_waveform_data_packet_record is %llu. writing 0 instead.", demzip_dll->header.start_of_waveform_data_packet_record);
-#endif
         demzip_dll->header.start_of_waveform_data_packet_record = 0;
       }
       try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.start_of_waveform_data_packet_record)); } catch(...)
@@ -3111,11 +3088,7 @@ demzip_write_point(
     // write the point
     if (!demzip_dll->writer->write(demzip_dll->point_items))
     {
-#ifdef _WIN32
-      sprintf(demzip_dll->error, "writing point %I64d of %I64d total points", demzip_dll->p_count, demzip_dll->npoints);
-#else
       sprintf(demzip_dll->error, "writing point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
-#endif
       return 1;
     }
 
@@ -3145,11 +3118,7 @@ demzip_write_indexed_point(
     // write the point
     if (!demzip_dll->writer->write(demzip_dll->point_items))
     {
-#ifdef _WIN32
-      sprintf(demzip_dll->error, "writing point %I64d of %I64d total points", demzip_dll->p_count, demzip_dll->npoints);
-#else
       sprintf(demzip_dll->error, "writing point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
-#endif
       return 1;
     }
     // index the point
@@ -4077,40 +4046,28 @@ demzip_read_header(
           in->get64bitsLE((U8*)&start_of_waveform_data_packet_record);
           if (start_of_waveform_data_packet_record != 0)
           {
-#ifdef _WIN32
-            fprintf(stderr,"WARNING: start_of_waveform_data_packet_record is %I64d. reading 0 instead.\n", start_of_waveform_data_packet_record);
-#else
-            fprintf(stderr,"WARNING: start_of_waveform_data_packet_record is %llu. reading 0 instead.\n", start_of_waveform_data_packet_record);
-#endif
+            LASMessage(LAS_WARNING, "start_of_waveform_data_packet_record is %llu. reading 0 instead.", start_of_waveform_data_packet_record);
           }
           demzip_dll->header.start_of_waveform_data_packet_record = 0;
           U64 start_of_first_extended_variable_length_record;
           in->get64bitsLE((U8*)&start_of_first_extended_variable_length_record);
           if (start_of_first_extended_variable_length_record != 0)
           {
-#ifdef _WIN32
-            fprintf(stderr,"WARNING: EVLRs not supported. start_of_first_extended_variable_length_record is %I64d. reading 0 instead.\n", start_of_first_extended_variable_length_record);
-#else
-            fprintf(stderr,"WARNING: EVLRs not supported. start_of_first_extended_variable_length_record is %llu. reading 0 instead.\n", start_of_first_extended_variable_length_record);
-#endif
+            LASMessage(LAS_WARNING, "EVLRs not supported. start_of_first_extended_variable_length_record is %llu. reading 0 instead.", start_of_first_extended_variable_length_record);
           }
           demzip_dll->header.start_of_first_extended_variable_length_record = 0;
           U32 number_of_extended_variable_length_records ;
           in->get32bitsLE((U8*)&number_of_extended_variable_length_records);
           if (number_of_extended_variable_length_records != 0)
           {
-            fprintf(stderr,"WARNING: EVLRs not supported. number_of_extended_variable_length_records is %u. reading 0 instead.\n", number_of_extended_variable_length_records);
+            LASMessage(LAS_WARNING, "EVLRs not supported. number_of_extended_variable_length_records is %u. reading 0 instead.", number_of_extended_variable_length_records);
           }
           demzip_dll->header.number_of_extended_variable_length_records = 0;
           U64 extended_number_of_point_records = 0;
           in->get64bitsLE((U8*)&extended_number_of_point_records);
           if (demzip_dll->header.number_of_point_records != 0 && ((U64)(demzip_dll->header.number_of_point_records)) != extended_number_of_point_records)
           {
-#ifdef _WIN32
-            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %I64u.\n", demzip_dll->header.number_of_point_records, extended_number_of_point_records);
-#else
-            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %llu.\n", demzip_dll->header.number_of_point_records, extended_number_of_point_records);
-#endif
+            LASMessage(LAS_WARNING, "number_of_point_records is %u. but extended_number_of_point_records is %llu.", demzip_dll->header.number_of_point_records, extended_number_of_point_records);
           }
           demzip_dll->header.extended_number_of_point_records = extended_number_of_point_records;
           U64 extended_number_of_points_by_return;
@@ -4119,11 +4076,7 @@ demzip_read_header(
             in->get64bitsLE((U8*)&extended_number_of_points_by_return);
             if ((r < 5) && demzip_dll->header.number_of_points_by_return[r] != 0 && ((U64)(demzip_dll->header.number_of_points_by_return[r])) != extended_number_of_points_by_return)
             {
-#ifdef _WIN32
-              fprintf(stderr,"WARNING: number_of_points_by_return[%u] is %u. but extended_number_of_points_by_return[%u] is %I64u.\n", r, demzip_dll->header.number_of_points_by_return[r], r, extended_number_of_points_by_return);
-#else
-              fprintf(stderr,"WARNING: number_of_points_by_return[%u] is %u. but extended_number_of_points_by_return[%u] is %llu.\n", r, demzip_dll->header.number_of_points_by_return[r], r, extended_number_of_points_by_return);
-#endif
+              LASMessage(LAS_WARNING, "number_of_points_by_return[%u] is %u. but extended_number_of_points_by_return[%u] is %llu.", r, demzip_dll->header.number_of_points_by_return[r], r, extended_number_of_points_by_return);
             }
             demzip_dll->header.extended_number_of_points_by_return[r] = extended_number_of_points_by_return;
           }
@@ -4517,11 +4470,7 @@ demzip_seek_point(
     // seek to the point
     if (!demzip_dll->reader->seek((U32)demzip_dll->p_count, (U32)index))
     {
-#ifdef _WIN32
-      sprintf(demzip_dll->error, "seeking from index %I64d to index %I64d for file with %I64d points", demzip_dll->p_count, index, demzip_dll->npoints);
-#else
       sprintf(demzip_dll->error, "seeking from index %lld to index %lld for file with %lld points", demzip_dll->p_count, index, demzip_dll->npoints);
-#endif
       return 1;
     }
     demzip_dll->p_count = index;
@@ -4550,11 +4499,7 @@ demzip_read_point(
     // read the point
     if (!demzip_dll->reader->read(demzip_dll->point_items))
     {
-#ifdef _WIN32
-      sprintf(demzip_dll->error, "reading point %I64d of %I64d total points", demzip_dll->p_count, demzip_dll->npoints);
-#else
       sprintf(demzip_dll->error, "reading point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
-#endif
       return 1;
     }
 
@@ -4660,11 +4605,7 @@ demzip_read_inside_point(
       {
         if (demzip_dll->p_count < demzip_dll->npoints)
         {
-#ifdef _WIN32
-          sprintf(demzip_dll->error, "reading point %I64d of %I64d total points", demzip_dll->p_count, demzip_dll->npoints);
-#else
           sprintf(demzip_dll->error, "reading point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
-#endif
           return 1;
         }
       }

@@ -766,11 +766,7 @@ BOOL LASreadPoint::read_chunk_table()
       }
       else
       {
-#ifdef _WIN32
-        sprintf(last_warning, "chunk table and %I64d bytes are missing. LAZ file truncated during copy or transfer?", chunk_table_start_position - last_position);
-#else
         sprintf(last_warning, "chunk table and %lld bytes are missing. LAZ file truncated during copy or transfer?", chunk_table_start_position - last_position);
-#endif
       }
     }
     else

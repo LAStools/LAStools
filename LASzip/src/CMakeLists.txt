@@ -27,6 +27,7 @@ set(LASZIP_SOURCES
     laszip.cpp
     laszip_dll.cpp
     mydefs.cpp
+	lasmessage.cpp
 )
 
 add_definitions(-DLASZIPDLL_EXPORTS)

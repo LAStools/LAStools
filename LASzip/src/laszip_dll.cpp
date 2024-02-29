@@ -67,6 +67,7 @@
 #include "lasreadpoint.hpp"
 #include "lasquadtree.hpp"
 #include "lasindex.hpp"
+#include "lasmessage.hpp"
 
 class laszip_dll_inventory
 {
@@ -1852,11 +1853,7 @@ laszip_prepare_header_for_write(
     {
       if (laszip_dll->header.number_of_point_records != 0)
       {
-#ifdef _WIN32
-        sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %I64d", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
-#else
         sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %llu", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
-#endif
         return 1;
       }
       else if (laszip_dll->header.extended_number_of_point_records <= U32_MAX)
@@ -1870,11 +1867,7 @@ laszip_prepare_header_for_write(
       {
         if (laszip_dll->header.number_of_points_by_return[i] != 0)
         {
-#ifdef _WIN32
-          sprintf(laszip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %I64d", i, laszip_dll->header.number_of_points_by_return[i], i, laszip_dll->header.extended_number_of_points_by_return[i]);
-#else
           sprintf(laszip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %llu", i, laszip_dll->header.number_of_points_by_return[i], i, laszip_dll->header.extended_number_of_points_by_return[i]);
-#endif
           return 1;
         }
         else if (laszip_dll->header.extended_number_of_points_by_return[i] <= U32_MAX)
@@ -1919,11 +1912,7 @@ laszip_prepare_point_for_write(
 
       if (laszip_dll->header.extended_number_of_point_records > U32_MAX)
       {
-#ifdef _WIN32
-        sprintf(laszip_dll->error, "extended_number_of_point_records of %I64d is too much for 32-bit counters of compatibility mode", laszip_dll->header.extended_number_of_point_records);
-#else
         sprintf(laszip_dll->error, "extended_number_of_point_records of %llu is too much for 32-bit counters of compatibility mode", laszip_dll->header.extended_number_of_point_records);
-#endif
         return 1;
       }
 
@@ -2007,29 +1996,21 @@ laszip_prepare_point_for_write(
       U64 start_of_waveform_data_packet_record = laszip_dll->header.start_of_waveform_data_packet_record;
       if (start_of_waveform_data_packet_record != 0)
       {
-#ifdef _WIN32
-        fprintf(stderr,"WARNING: header->start_of_waveform_data_packet_record is %I64d. writing 0 instead.\n", start_of_waveform_data_packet_record);
-#else
-        fprintf(stderr,"WARNING: header->start_of_waveform_data_packet_record is %llu. writing 0 instead.\n", start_of_waveform_data_packet_record);
-#endif
+        LASMessage(LAS_WARNING, "header->start_of_waveform_data_packet_record is %llu. writing 0 instead.", start_of_waveform_data_packet_record);
         start_of_waveform_data_packet_record = 0;
       }
       out->put64bitsLE((U8*)&start_of_waveform_data_packet_record);
       U64 start_of_first_extended_variable_length_record = laszip_dll->header.start_of_first_extended_variable_length_record;
       if (start_of_first_extended_variable_length_record != 0)
       {
-#ifdef _WIN32
-        fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %I64d. writing 0 instead.\n", start_of_first_extended_variable_length_record);
-#else
-        fprintf(stderr,"WARNING: EVLRs not supported. header->start_of_first_extended_variable_length_record is %llu. writing 0 instead.\n", start_of_first_extended_variable_length_record);
-#endif
+        LASMessage(LAS_WARNING, "EVLRs not supported. header->start_of_first_extended_variable_length_record is %llu. writing 0 instead.", start_of_first_extended_variable_length_record);
         start_of_first_extended_variable_length_record = 0;
       }
       out->put64bitsLE((U8*)&start_of_first_extended_variable_length_record);
       U32 number_of_extended_variable_length_records = laszip_dll->header.number_of_extended_variable_length_records;
       if (number_of_extended_variable_length_records != 0)
       {
-        fprintf(stderr,"WARNING: EVLRs not supported. header->number_of_extended_variable_length_records is %u. writing 0 instead.\n", number_of_extended_variable_length_records);
+        LASMessage(LAS_WARNING, "EVLRs not supported. header->number_of_extended_variable_length_records is %u. writing 0 instead.", number_of_extended_variable_length_records);
         number_of_extended_variable_length_records = 0;
       }
       out->put32bitsLE((U8*)&number_of_extended_variable_length_records);
@@ -2592,11 +2573,7 @@ laszip_write_header(
     {
       if (laszip_dll->header.start_of_waveform_data_packet_record != 0)
       {
-#ifdef _WIN32
-        sprintf(laszip_dll->warning, "header.start_of_waveform_data_packet_record is %I64d. writing 0 instead.", laszip_dll->header.start_of_waveform_data_packet_record);
-#else
         sprintf(laszip_dll->warning, "header.start_of_waveform_data_packet_record is %llu. writing 0 instead.", laszip_dll->header.start_of_waveform_data_packet_record);
-#endif
         laszip_dll->header.start_of_waveform_data_packet_record = 0;
       }
       try { laszip_dll->streamout->put64bitsLE((const U8*)&(laszip_dll->header.start_of_waveform_data_packet_record)); } catch(...)
@@ -3138,11 +3115,7 @@ laszip_write_point(
     // write the point
     if (!laszip_dll->writer->write(laszip_dll->point_items))
     {
-#ifdef _WIN32
-      sprintf(laszip_dll->error, "writing point %I64d of %I64d total points", laszip_dll->p_count, laszip_dll->npoints);
-#else
       sprintf(laszip_dll->error, "writing point %lld of %lld total points", laszip_dll->p_count, laszip_dll->npoints);
-#endif
       return 1;
     }
 
@@ -3172,11 +3145,7 @@ laszip_write_indexed_point(
     // write the point
     if (!laszip_dll->writer->write(laszip_dll->point_items))
     {
-#ifdef _WIN32
-      sprintf(laszip_dll->error, "writing point %I64d of %I64d total points", laszip_dll->p_count, laszip_dll->npoints);
-#else
       sprintf(laszip_dll->error, "writing point %lld of %lld total points", laszip_dll->p_count, laszip_dll->npoints);
-#endif
       return 1;
     }
     // index the point
@@ -3339,7 +3308,7 @@ laszip_close_writer(
 
     if (laszip_dll->lax_index)
     {
-      laszip_dll->lax_index->complete(100000, -20, FALSE);
+      laszip_dll->lax_index->complete(100000, -20);
 
       if (!laszip_dll->lax_index->write(laszip_dll->lax_file_name))
       {
@@ -4105,40 +4074,28 @@ laszip_read_header(
           in->get64bitsLE((U8*)&start_of_waveform_data_packet_record);
           if (start_of_waveform_data_packet_record != 0)
           {
-#ifdef _WIN32
-            fprintf(stderr,"WARNING: start_of_waveform_data_packet_record is %I64d. reading 0 instead.\n", start_of_waveform_data_packet_record);
-#else
-            fprintf(stderr,"WARNING: start_of_waveform_data_packet_record is %llu. reading 0 instead.\n", start_of_waveform_data_packet_record);
-#endif
+            LASMessage(LAS_WARNING, "start_of_waveform_data_packet_record is %llu. reading 0 instead.", start_of_waveform_data_packet_record);
           }
           laszip_dll->header.start_of_waveform_data_packet_record = 0;
           U64 start_of_first_extended_variable_length_record;
           in->get64bitsLE((U8*)&start_of_first_extended_variable_length_record);
           if (start_of_first_extended_variable_length_record != 0)
           {
-#ifdef _WIN32
-            fprintf(stderr,"WARNING: EVLRs not supported. start_of_first_extended_variable_length_record is %I64d. reading 0 instead.\n", start_of_first_extended_variable_length_record);
-#else
-            fprintf(stderr,"WARNING: EVLRs not supported. start_of_first_extended_variable_length_record is %llu. reading 0 instead.\n", start_of_first_extended_variable_length_record);
-#endif
+            LASMessage(LAS_WARNING, "EVLRs not supported. start_of_first_extended_variable_length_record is %llu. reading 0 instead.", start_of_first_extended_variable_length_record);
           }
           laszip_dll->header.start_of_first_extended_variable_length_record = 0;
           U32 number_of_extended_variable_length_records ;
           in->get32bitsLE((U8*)&number_of_extended_variable_length_records);
           if (number_of_extended_variable_length_records != 0)
           {
-            fprintf(stderr,"WARNING: EVLRs not supported. number_of_extended_variable_length_records is %u. reading 0 instead.\n", number_of_extended_variable_length_records);
+            LASMessage(LAS_WARNING, "EVLRs not supported. number_of_extended_variable_length_records is %u. reading 0 instead.", number_of_extended_variable_length_records);
           }
           laszip_dll->header.number_of_extended_variable_length_records = 0;
           U64 extended_number_of_point_records = 0;
           in->get64bitsLE((U8*)&extended_number_of_point_records);
           if (laszip_dll->header.number_of_point_records != 0 && ((U64)(laszip_dll->header.number_of_point_records)) != extended_number_of_point_records)
           {
-#ifdef _WIN32
-            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %I64u.\n", laszip_dll->header.number_of_point_records, extended_number_of_point_records);
-#else
-            fprintf(stderr,"WARNING: number_of_point_records is %u. but extended_number_of_point_records is %llu.\n", laszip_dll->header.number_of_point_records, extended_number_of_point_records);
-#endif
+            LASMessage(LAS_WARNING, "number_of_point_records is %u. but extended_number_of_point_records is %llu.", laszip_dll->header.number_of_point_records, extended_number_of_point_records);
           }
           laszip_dll->header.extended_number_of_point_records = extended_number_of_point_records;
           U64 extended_number_of_points_by_return;
@@ -4147,11 +4104,7 @@ laszip_read_header(
             in->get64bitsLE((U8*)&extended_number_of_points_by_return);
             if ((r < 5) && laszip_dll->header.number_of_points_by_return[r] != 0 && ((U64)(laszip_dll->header.number_of_points_by_return[r])) != extended_number_of_points_by_return)
             {
-#ifdef _WIN32
-              fprintf(stderr,"WARNING: number_of_points_by_return[%u] is %u. but extended_number_of_points_by_return[%u] is %I64u.\n", r, laszip_dll->header.number_of_points_by_return[r], r, extended_number_of_points_by_return);
-#else
-              fprintf(stderr,"WARNING: number_of_points_by_return[%u] is %u. but extended_number_of_points_by_return[%u] is %llu.\n", r, laszip_dll->header.number_of_points_by_return[r], r, extended_number_of_points_by_return);
-#endif
+              LASMessage(LAS_WARNING, "number_of_points_by_return[%u] is %u. but extended_number_of_points_by_return[%u] is %llu.", r, laszip_dll->header.number_of_points_by_return[r], r, extended_number_of_points_by_return);
             }
             laszip_dll->header.extended_number_of_points_by_return[r] = extended_number_of_points_by_return;
           }
@@ -4551,11 +4504,7 @@ laszip_seek_point(
     // seek to the point
     if (!laszip_dll->reader->seek((U32)laszip_dll->p_count, (U32)index))
     {
-#ifdef _WIN32
-      sprintf(laszip_dll->error, "seeking from index %I64d to index %I64d for file with %I64d points", laszip_dll->p_count, index, laszip_dll->npoints);
-#else
       sprintf(laszip_dll->error, "seeking from index %lld to index %lld for file with %lld points", laszip_dll->p_count, index, laszip_dll->npoints);
-#endif
       return 1;
     }
     laszip_dll->p_count = index;
@@ -4584,11 +4533,7 @@ laszip_read_point(
     // read the point
     if (!laszip_dll->reader->read(laszip_dll->point_items))
     {
-#ifdef _WIN32
-      sprintf(laszip_dll->error, "reading point %I64d of %I64d total points", laszip_dll->p_count, laszip_dll->npoints);
-#else
       sprintf(laszip_dll->error, "reading point %lld of %lld total points", laszip_dll->p_count, laszip_dll->npoints);
-#endif
       return 1;
     }
 
@@ -4694,11 +4639,7 @@ laszip_read_inside_point(
       {
         if (laszip_dll->p_count < laszip_dll->npoints)
         {
-#ifdef _WIN32
-          sprintf(laszip_dll->error, "reading point %I64d of %I64d total points", laszip_dll->p_count, laszip_dll->npoints);
-#else
           sprintf(laszip_dll->error, "reading point %lld of %lld total points", laszip_dll->p_count, laszip_dll->npoints);
-#endif
           return 1;
         }
       }

@@ -29,6 +29,7 @@
 ===============================================================================
 */
 #include "integercompressor.hpp"
+#include "lasmessage.hpp"
 
 #define COMPRESS_ONLY_K
 #undef COMPRESS_ONLY_K
@@ -205,12 +206,12 @@ IntegerCompressor::~IntegerCompressor()
           entropy -= log(prob)*prob/log(2.0);
         }
       }
-      fprintf(stderr, "k: %d number: %d different: %d entropy: %lg raw: %1.1f\n",k,number,different,entropy, (float)(k?k:1));
+      LASMessage(LAS_INFO, "k: %d number: %d different: %d entropy: %lg raw: %1.1f",k,number,different,entropy, (float)(k?k:1));
       total_number += number;
       total_entropy += (entropy*number);
       total_raw += ((k?k:1)*number);
     }  
-    fprintf(stderr, "TOTAL: number: %d entropy: %lg raw: %lg\n",total_number,total_entropy/total_number,total_raw/total_number);
+    LASMessage(LAS_INFO, "TOTAL: number: %d entropy: %lg raw: %lg",total_number,total_entropy/total_number,total_raw/total_number);
   }
 #endif
 }
