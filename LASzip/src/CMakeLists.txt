@@ -27,7 +27,7 @@ set(LASZIP_SOURCES
     laszip.cpp
     laszip_dll.cpp
     mydefs.cpp
-	../../LASlib/src/lasmessage.cpp		#LASMessage concept also requires lasmessage.cpp files
+	lasmessage.cpp
 )
 
 add_definitions(-DLASZIPDLL_EXPORTS)
@@ -37,4 +37,3 @@ if(HAVE_UNORDERED_MAP)
     add_definitions(-DHAVE_UNORDERED_MAP=1)
 endif(HAVE_UNORDERED_MAP)
 LASZIP_ADD_LIBRARY(${LASZIP_BASE_LIB_NAME} ${LASZIP_SOURCES})
-target_include_directories(${LASZIP_BASE_LIB_NAME} PRIVATE "../../LASlib/inc" ".")	#make sure that lasmessage.hpp is accessible  as well

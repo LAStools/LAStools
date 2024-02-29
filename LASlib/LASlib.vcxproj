@@ -25,11 +25,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\LASzip\src\lascopc.cpp" />
+    <ClCompile Include="..\LASzip\src\lasmessage.cpp" />
     <ClCompile Include="src\fopen_compressed.cpp" />
     <ClCompile Include="src\lasfilter.cpp" />
     <ClCompile Include="src\lasignore.cpp" />
     <ClCompile Include="src\laskdtree.cpp" />
-    <ClCompile Include="src\lasmessage.cpp" />
     <ClCompile Include="src\lasreader.cpp" />
     <ClCompile Include="src\lasreaderbuffered.cpp" />
     <ClCompile Include="src\lasreadermerged.cpp" />
@@ -58,11 +58,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\LASzip\src\lascopc.hpp" />
+    <ClInclude Include="..\LASzip\src\lasmessage.hpp" />
     <ClInclude Include="inc\lasdefinitions.hpp" />
     <ClInclude Include="inc\lasfilter.hpp" />
     <ClInclude Include="inc\lasignore.hpp" />
     <ClInclude Include="inc\laskdtree.hpp" />
-    <ClInclude Include="inc\lasmessage.hpp" />
     <ClInclude Include="inc\lasreader.hpp" />
     <ClInclude Include="inc\lasreaderbuffered.hpp" />
     <ClInclude Include="inc\lasreadermerged.hpp" />

@@ -33,7 +33,6 @@ set(LAS_SRC
 	lastransform.cpp
 	laskdtree.cpp
 	fopen_compressed.cpp
-	lasmessage.cpp
 )
 
 set(LAZ_SRC
@@ -57,6 +56,7 @@ set(LAZ_SRC
 	lasinterval.cpp
 	laszip.cpp
 	mydefs.cpp
+	lasmessage.cpp
 )
 
 foreach(file ${LAZ_SRC})
