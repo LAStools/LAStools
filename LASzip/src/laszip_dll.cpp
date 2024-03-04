@@ -49,12 +49,13 @@
 #define LASZIP_DYN_LINK
 #define LASZIP_SOURCE
 
-#include <../dll/laszip_api.h>
+#include <limits>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <vector>
 
+#include "../dll/laszip_api.h"
 #include "laszip.hpp"
 #include "lasattributer.hpp"
 #include "bytestreamout_file.hpp"
