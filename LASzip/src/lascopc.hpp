@@ -45,7 +45,7 @@ class LASreadPoint;
 class LASreader;
 #endif
 
-struct Range
+struct LASLIB_DLL Range
 {
   U64 start;
   U64 end;
@@ -53,7 +53,7 @@ struct Range
 
 inline bool operator<(const Range& a, const Range& b) { return a.start < b.start; }
 
-struct EPTkey
+struct LASLIB_DLL EPTkey
 {
   EPTkey();
   EPTkey(I32 d, I32 x, I32 y, I32 z);
@@ -68,7 +68,7 @@ struct EPTkey
   I32 z;
 };
 
-struct EPTKeyHasher
+struct LASLIB_DLL EPTKeyHasher
 {
   // PDAL hash method copied
   std::size_t operator()(const EPTkey &k) const
@@ -95,7 +95,7 @@ inline bool operator<(const EPTkey& a, const EPTkey& b)
   return false;
 }
 
-struct EPToctant : public EPTkey
+struct LASLIB_DLL EPToctant : public EPTkey
 {
   EPToctant();
   EPToctant(const LASvlr_copc_entry entry, const F64 xmin, const F64 ymin, const F64 zmin, const F64 xmax, const F64 ymax, const F64 zmax, const U64 start, const U64 end);
@@ -155,7 +155,7 @@ inline bool file_order(const EPToctant& a, const EPToctant& b)
   return false;
 }
 
-class EPToctree
+class LASLIB_DLL EPToctree
 {
 public:
   EPToctree(const LASheader& header);
@@ -191,7 +191,7 @@ protected:
   std::unordered_map<EPTkey, EPToctant, EPTKeyHasher> registry;
 };
 
-class COPCindex : public EPToctree
+class LASLIB_DLL COPCindex : public EPToctree
 {
 public:
   COPCindex(const LASheader& header);
