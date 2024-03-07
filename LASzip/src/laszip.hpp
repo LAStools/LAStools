@@ -92,7 +92,9 @@ typedef long long SIGNED_INT64;
 
 #define LASZIP_CHUNK_SIZE_DEFAULT           50000
 
-class LASitem
+#include "mydefs.hpp"
+
+class LASLIB_DLL LASitem
 {
 public:
   enum Type { BYTE = 0, SHORT, INT, LONG, FLOAT, DOUBLE, POINT10, GPSTIME11, RGB12, WAVEPACKET13, POINT14, RGB14, RGBNIR14, WAVEPACKET14, BYTE14 } type;
@@ -102,7 +104,7 @@ public:
   const char* get_name() const;
 };
 
-class LASzip
+class LASLIB_DLL LASzip
 {
 public:
 

@@ -37,7 +37,7 @@
 
 #include "mydefs.hpp"
 
-class LASquantizer
+class LASLIB_DLL LASquantizer
 {
 public:
   F64 x_scale_factor;

@@ -90,7 +90,7 @@
 #define MAX_PATH 256
 #endif
 
-class LASvlr
+class LASLIB_DLL LASvlr
 {
 public:
   U16 reserved;
@@ -102,7 +102,7 @@ public:
   LASvlr() { memset(this, 0, sizeof(LASvlr)); };
 };
 
-class LASevlr
+class LASLIB_DLL LASevlr
 {
 public:
   U16 reserved;
@@ -114,7 +114,7 @@ public:
   LASevlr() { memset(this, 0, sizeof(LASevlr)); };
 };
 
-class LASvlr_geo_keys
+class LASLIB_DLL LASvlr_geo_keys
 {
 public:
   U16 key_directory_version;
@@ -123,7 +123,7 @@ public:
   U16 number_of_keys;
 };
 
-class LASvlr_key_entry
+class LASLIB_DLL LASvlr_key_entry
 {
 public:
   U16 key_id;
@@ -132,14 +132,14 @@ public:
   U16 value_offset;
 };
 
-class LASvlr_classification
+class LASLIB_DLL LASvlr_classification
 {
 public:
   U8 class_number;
   CHAR description[15];
 };
 
-class LASvlr_wave_packet_descr
+class LASLIB_DLL LASvlr_wave_packet_descr
 {
 public:
   LASvlr_wave_packet_descr() {clean();};
@@ -160,7 +160,7 @@ private:
   U8 data[26];
 };
 
-class LASvlr_copc_info
+class LASLIB_DLL LASvlr_copc_info
 {
 public:
   F64 center_x;  // Actual (unscaled) X coordinate of center of octree
@@ -175,7 +175,7 @@ public:
   U64 reserved[11];    // Must be 0
 };
 
-class LAScopc_voxelkey
+class LASLIB_DLL LAScopc_voxelkey
 {
 public:
   I32 depth;
@@ -184,7 +184,7 @@ public:
   I32 z;
 };
 
-class LASvlr_copc_entry
+class LASLIB_DLL LASvlr_copc_entry
 {
 public:
   LAScopc_voxelkey key;
@@ -193,7 +193,7 @@ public:
   I32 point_count;
 };
 
-class LASheader : public LASquantizer, public LASattributer
+class LASLIB_DLL LASheader : public LASquantizer, public LASattributer
 {
 public:
   CHAR file_signature[4];                  // starts at byte   0

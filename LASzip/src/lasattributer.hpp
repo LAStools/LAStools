@@ -47,7 +47,7 @@
 #define LAS_ATTRIBUTE_F32 8
 #define LAS_ATTRIBUTE_F64 9
 
-class LASattribute
+class LASLIB_DLL LASattribute
 {
 public:
   U8 reserved[2];           // 2 bytes
@@ -266,7 +266,6 @@ public:
       *((F64*)pointer) = unoffset_and_unscaled_value;
   };
 
-private:
   inline I32 get_type() const
   {
     return ((I32)data_type - 1)%10;
@@ -275,6 +274,8 @@ private:
   {
     return ((I32)data_type - 1)/10 + 1;
   };
+
+private:
   inline U64I64F64 cast(U8* pointer) const
   {
     I32 type = get_type();
@@ -335,7 +336,7 @@ private:
   };
 };
 
-class LASattributer
+class LASLIB_DLL LASattributer
 {
 public:
   BOOL attributes_linked;

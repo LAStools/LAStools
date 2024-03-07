@@ -97,7 +97,7 @@ private:
   BOOL first;
 };
 
-class LASbin
+class LASLIB_DLL LASbin
 {
 public:
   void add(I32 item);
