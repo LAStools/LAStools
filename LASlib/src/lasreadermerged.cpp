@@ -2,17 +2,17 @@
 ===============================================================================
 
   FILE:  lasreadermerged.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
-  
+
     info@rapidlasso.de  -  https://rapidlasso.de
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-2019, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasreadermerged.hpp"
@@ -823,7 +823,7 @@ BOOL LASreaderMerged::open()
         // have there not been any points before
         if (npoints == lasreader->npoints)
         {
-          // use the counters 
+          // use the counters
           header.number_of_point_records = lasreader->header.number_of_point_records;
           for (j = 0; j < 5; j++)
           {
@@ -859,7 +859,7 @@ BOOL LASreaderMerged::open()
         }
         else
         {
-          // increment point counters 
+          // increment point counters
           header.number_of_point_records += lasreader->header.number_of_point_records;
           for (j = 0; j < 5; j++)
           {
@@ -1036,7 +1036,7 @@ BOOL LASreaderMerged::open()
       reoffset = TRUE;
     }
   }
-    
+
   // check y
 
   if ((((header.max_y - header.y_offset) / header.y_scale_factor) > I32_MAX) || (((header.min_y - header.y_offset) / header.y_scale_factor) < I32_MIN))
@@ -1062,7 +1062,7 @@ BOOL LASreaderMerged::open()
       reoffset = TRUE;
     }
   }
-    
+
   // check z
 
   if ((((header.max_z - header.z_offset) / header.z_scale_factor) > I32_MAX) || (((header.min_z - header.z_offset) / header.z_scale_factor) < I32_MIN))
@@ -1341,7 +1341,7 @@ BOOL LASreaderMerged::read_point_default()
 
 void LASreaderMerged::close(BOOL close_stream)
 {
-  if (lasreader) 
+  if (lasreader)
   {
     lasreader->close(close_stream);
   }
@@ -1358,7 +1358,7 @@ BOOL LASreaderMerged::reopen()
 
 void LASreaderMerged::clean()
 {
-  if (lasreader) 
+  if (lasreader)
   {
     delete lasreader;
     lasreader = 0;
@@ -1508,6 +1508,10 @@ BOOL LASreaderMerged::open_next_file()
         LASMessage(LAS_ERROR, "could not open lasreaderlas for file '%s'", file_names[file_name_current]);
         return FALSE;
       }
+
+      lasreaderlas->set_index(0);
+      lasreaderlas->set_copcindex(0);
+
       LASindex *index = new LASindex;
       if (index->read(file_names[file_name_current]))
         lasreaderlas->set_index(index);
@@ -1540,6 +1544,9 @@ BOOL LASreaderMerged::open_next_file()
         LASMessage(LAS_ERROR, "could not open lasreaderbin for file '%s'", file_names[file_name_current]);
         return FALSE;
       }
+
+      lasreaderbin->set_index(0);
+
       LASindex* index = new LASindex;
       if (index->read(file_names[file_name_current]))
         lasreaderbin->set_index(index);
@@ -1569,6 +1576,9 @@ BOOL LASreaderMerged::open_next_file()
         LASMessage(LAS_ERROR, "could not open lasreaderbil for file '%s'", file_names[file_name_current]);
         return FALSE;
       }
+
+      lasreaderbil->set_index(0);
+
       LASindex* index = new LASindex;
       if (index->read(file_names[file_name_current]))
         lasreaderbil->set_index(index);
@@ -1582,6 +1592,9 @@ BOOL LASreaderMerged::open_next_file()
         LASMessage(LAS_ERROR, "could not open lasreaderdtm for file '%s'", file_names[file_name_current]);
         return FALSE;
       }
+
+      lasreaderdtm->set_index(0);
+
       LASindex* index = new LASindex;
       if (index->read(file_names[file_name_current]))
         lasreaderdtm->set_index(index);
@@ -1595,6 +1608,9 @@ BOOL LASreaderMerged::open_next_file()
         LASMessage(LAS_ERROR, "could not open lasreaderply for file '%s'", file_names[file_name_current]);
         return FALSE;
       }
+
+      lasreaderply->set_index(0);
+
       LASindex* index = new LASindex;
       if (index->read(file_names[file_name_current]))
         lasreaderply->set_index(index);
@@ -1608,6 +1624,9 @@ BOOL LASreaderMerged::open_next_file()
         LASMessage(LAS_ERROR, "could not open lasreaderqfit for file '%s'", file_names[file_name_current]);
         return FALSE;
       }
+
+      lasreaderqfit->set_index(0);
+
       LASindex* index = new LASindex;
       if (index->read(file_names[file_name_current]))
         lasreaderqfit->set_index(index);
