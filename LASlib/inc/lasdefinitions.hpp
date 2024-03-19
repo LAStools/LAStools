@@ -50,7 +50,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 240226
+#define LAS_TOOLS_VERSION 240319
 
 #include <stdio.h>
 #include <string.h>
@@ -333,6 +333,10 @@ public:
     x_scale_factor = 0.01;
     y_scale_factor = 0.01;
     z_scale_factor = 0.01;
+    x_offset = 0.0;
+    y_offset = 0.0;
+    z_offset = 0.0;
+    z_from_attrib = -1;
   };
 
   void clean_user_data_in_header()

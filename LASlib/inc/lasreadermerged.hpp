@@ -85,7 +85,7 @@ public:
   ByteStreamIn* get_stream() const { return 0; };
   void close(BOOL close_stream=TRUE);
 
-  LASreaderMerged();
+  LASreaderMerged(LASreadOpener* opener);
   ~LASreaderMerged();
 
 protected:

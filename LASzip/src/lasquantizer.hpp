@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  lasquantizer.hpp
-  
+
   CONTENTS:
-  
+
     This class assists with converting between a fixed-point notation based on
     scaled integers plus large offsets and standard double-precision floating-
     point numbers. For efficieny in storage and uniform precision (far from the
@@ -25,11 +25,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     19 July 2015 -- created after FOSS4GE in the train back from Lake Como
-  
+
 ===============================================================================
 */
 #ifndef LAS_QUANTIZER_HPP
@@ -46,26 +46,40 @@ public:
   F64 x_offset;
   F64 y_offset;
   F64 z_offset;
+  I16 z_from_attrib; // optional: use LAS attribute [n] as normalized z value
 
   inline F64 get_x(const I32 X) const { return x_scale_factor*X+x_offset; };
   inline F64 get_y(const I32 Y) const { return y_scale_factor*Y+y_offset; };
   inline F64 get_z(const I32 Z) const { return z_scale_factor*Z+z_offset; };
 
-  inline I64 get_X(const F64 x) const { if (x >= x_offset) return (I64)(((x-x_offset)/x_scale_factor)+0.5); else return (I64)(((x-x_offset)/x_scale_factor)-0.5); };
-  inline I64 get_Y(const F64 y) const { if (y >= y_offset) return (I64)(((y-y_offset)/y_scale_factor)+0.5); else return (I64)(((y-y_offset)/y_scale_factor)-0.5); };
-  inline I64 get_Z(const F64 z) const { if (z >= z_offset) return (I64)(((z-z_offset)/z_scale_factor)+0.5); else return (I64)(((z-z_offset)/z_scale_factor)-0.5); };
+  inline I64 get_X(const F64 x) const {
+    if (x >= x_offset) return (I64)(((x - x_offset) / x_scale_factor) + 0.5); else return (I64)(((x - x_offset) / x_scale_factor) - 0.5);
+  };
+  inline I64 get_Y(const F64 y) const {
+    if (y >= y_offset) return (I64)(((y - y_offset) / y_scale_factor) + 0.5); else return (I64)(((y - y_offset) / y_scale_factor) - 0.5);
+  };
+  inline I64 get_Z(const F64 z) const {
+    if (z >= z_offset) return (I64)(((z - z_offset) / z_scale_factor) + 0.5); else return (I64)(((z - z_offset) / z_scale_factor) - 0.5);
+  };
+
+  // input: z_attrib in scale 0.01 or 0.001; output as int in header scale
+  I64 get_zai(const F64 z) const {
+    return (I64)((z - z_offset) / z_scale_factor);
+  };
 
   LASquantizer()
   {
+    // ! will maybe be overwritten by clean_las_header
     x_scale_factor = 0.01;
     y_scale_factor = 0.01;
     z_scale_factor = 0.01;
     x_offset = 0.0;
     y_offset = 0.0;
     z_offset = 0.0;
+    z_from_attrib = -1;
   };
 
-  LASquantizer & operator=(const LASquantizer & quantizer)
+  LASquantizer& operator=(const LASquantizer& quantizer)
   {
     this->x_scale_factor = quantizer.x_scale_factor;
     this->y_scale_factor = quantizer.y_scale_factor;

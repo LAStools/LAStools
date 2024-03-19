@@ -1,3 +1,6 @@
+19 March 2024 -- new: read z from attribute (-z_from_attribute) 
+19 March 2024 -- fix: find licensefile at bin location (linux)
+19 March 2024 -- fix: multicore bin localization (linux)
 26 February 2024 -- LASMessage concept; warnings fix; error handling
 13 February 2024 -- bugfix BIL writer and multi-core argument parser
 18 January 2024 -- implement translate_scale_translate functions (64bit)

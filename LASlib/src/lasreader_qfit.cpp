@@ -428,7 +428,7 @@ BOOL LASreaderQFIT::reopen(const char* file_name)
   return stream->seek(offset);
 }
 
-LASreaderQFIT::LASreaderQFIT()
+LASreaderQFIT::LASreaderQFIT(LASreadOpener* opener) :LASreader(opener)
 {
   file = 0;
   stream = 0;
@@ -448,7 +448,7 @@ LASreaderQFIT::~LASreaderQFIT()
   if (stream) close();
 }
 
-LASreaderQFITrescale::LASreaderQFITrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderQFIT()
+LASreaderQFITrescale::LASreaderQFITrescale(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderQFIT(opener)
 {
   scale_factor[0] = x_scale_factor;
   scale_factor[1] = y_scale_factor;
@@ -474,7 +474,7 @@ BOOL LASreaderQFITrescale::open(ByteStreamIn* stream)
   return TRUE;
 }
 
-LASreaderQFITreoffset::LASreaderQFITreoffset(F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderQFIT()
+LASreaderQFITreoffset::LASreaderQFITreoffset(LASreadOpener* opener, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderQFIT(opener)
 {
   this->offset[0] = x_offset;
   this->offset[1] = y_offset;
@@ -500,7 +500,10 @@ BOOL LASreaderQFITreoffset::open(ByteStreamIn* stream)
   return TRUE;
 }
 
-LASreaderQFITrescalereoffset::LASreaderQFITrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderQFITrescale(x_scale_factor, y_scale_factor, z_scale_factor), LASreaderQFITreoffset(x_offset, y_offset, z_offset)
+LASreaderQFITrescalereoffset::LASreaderQFITrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : 
+  LASreaderQFIT(opener),
+  LASreaderQFITrescale(opener, x_scale_factor, y_scale_factor, z_scale_factor),
+  LASreaderQFITreoffset(opener, x_offset, y_offset, z_offset) 
 {
 }
 

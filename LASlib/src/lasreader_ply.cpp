@@ -804,7 +804,7 @@ void LASreaderPLY::clean()
   populated_header = FALSE;
 }
 
-LASreaderPLY::LASreaderPLY()
+LASreaderPLY::LASreaderPLY(LASreadOpener* opener) :LASreader(opener)
 {
   file = 0;
   streamin = 0;
@@ -1945,7 +1945,7 @@ void LASreaderPLY::populate_bounding_box()
   }
 }
 
-LASreaderPLYrescale::LASreaderPLYrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderPLY()
+LASreaderPLYrescale::LASreaderPLYrescale(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderPLY(opener)
 {
   scale_factor[0] = x_scale_factor;
   scale_factor[1] = y_scale_factor;
@@ -1971,7 +1971,7 @@ BOOL LASreaderPLYrescale::open(const CHAR* file_name, U8 point_type, BOOL popula
   return TRUE;
 }
 
-LASreaderPLYreoffset::LASreaderPLYreoffset(F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderPLY()
+LASreaderPLYreoffset::LASreaderPLYreoffset(LASreadOpener* opener, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderPLY(opener)
 {
   this->offset[0] = x_offset;
   this->offset[1] = y_offset;
@@ -1997,7 +1997,10 @@ BOOL LASreaderPLYreoffset::open(const CHAR* file_name, U8 point_type, BOOL popul
   return TRUE;
 }
 
-LASreaderPLYrescalereoffset::LASreaderPLYrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderPLYrescale(x_scale_factor, y_scale_factor, z_scale_factor), LASreaderPLYreoffset(x_offset, y_offset, z_offset)
+LASreaderPLYrescalereoffset::LASreaderPLYrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : 
+  LASreaderPLY(opener),
+  LASreaderPLYrescale(opener, x_scale_factor, y_scale_factor, z_scale_factor),
+  LASreaderPLYreoffset(opener, x_offset, y_offset, z_offset)
 {
 }
 

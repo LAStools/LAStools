@@ -55,6 +55,7 @@
 #include "lasdefinitions.hpp"
 #include "lasignore.hpp"
 #include "lastransform.hpp"
+#include "laswaveform13reader.hpp"
 
 class LASindex;
 class COPCindex;
@@ -62,10 +63,12 @@ class LASfilter;
 class LAStransform;
 class ByteStreamIn;
 class LASkdtreeRectangles;
+class LASreadOpener;
 
 class LASLIB_DLL LASreader
 {
 public:
+	LASreadOpener* opener;
 	LASheader header;
 	LASpoint point;
 	I64 npoints;
@@ -135,7 +138,7 @@ public:
 	virtual ByteStreamIn* get_stream() const = 0;
 	virtual void close(BOOL close_stream = TRUE) = 0;
 
-	LASreader();
+	LASreader(LASreadOpener* opener);
 	virtual ~LASreader();
 
 	void dealloc();
@@ -155,7 +158,7 @@ protected:
 	F64 r_min_x, r_min_y, r_max_x, r_max_y;
 	F64 orig_min_x, orig_min_y, orig_max_x, orig_max_y;
 
-	 // optional resolution-of-interest query (copc indexed)
+	// optional resolution-of-interest query (copc indexed)
  	U8  inside_depth;  // 0 all, 1 max depth, 2 resolution
 	U8  copc_stream_order; // 0 normal, 1 spatially, 2 depth
 	F32 copc_resolution;
@@ -183,11 +186,13 @@ private:
 	BOOL read_point_inside_depth_copc_indexed();
 };
 
-#include "laswaveform13reader.hpp"
-
 class LASLIB_DLL LASreadOpener
 {
 public:
+	BOOL z_from_attribute = false; // z from attribute requested
+	BOOL z_from_attribute_try; // z from attribute can be tried
+	I16 z_from_attribute_idx = -1;
+	void z_from_attribute_bydefault();
 	void set_io_ibuffer_size(const U32 buffer_size);
 	inline U32 get_io_ibuffer_size() const { return io_ibuffer_size; };
 	U32 get_file_name_number() const;

@@ -55,9 +55,9 @@ called out0000.las, out0001.las, out0002.las, out0003.las, ...
     lasmerge64 -i big.txt -iparse xyzt -o out000.laz -split 500000000
 
 split the text file big.txt that could, for example, contain 25
-billion points one and then split it into several compressed
-output LAZ files that contain 500 million points each that are
-called out000.laz, out001.laz, out002.laz, out003.laz, ...
+billion points it into several compressed output LAZ files that 
+contain 500 million points each that are called out000.laz, 
+out001.laz, out002.laz, out003.laz, ...
 
 
     lasmerge64 -i *.txt -iparse xyztiarn -o out.las
@@ -239,7 +239,7 @@ lasmerge64 -lof lasfiles.txt -rescale 0.01 0.01 0.01 -v -o out.las
 -switch_x_y                         : exchange x and y value  
 -switch_x_z                         : exchange x and z value  
 -switch_y_z                         : exchange z and x value  
--transform_affine [a],[b],[c],[d]   : transform input using affine transformation with [a],[b],[c],[d]  
+-transform_affine [k,w,x,y]         : transform by k*cos(w)+k*sin(w)+tx;k*cos(w)+k*sin(w)+ty - angle in second of arc  
 -transform_helmert [m] [n] [o]      : do a helmert transformation with 3 or 7 comma separated parameters [n] ...  
 -transform_matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]: transform input using matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]  
 -translate_raw_x [n]                : translate raw x value by [n]  

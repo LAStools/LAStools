@@ -55,8 +55,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-LASreader::LASreader()
+LASreader::LASreader(LASreadOpener* opener)
 {
+	this->opener = opener;
+	if (!opener) LASMessage(LAS_VERBOSE, "reader opened without opener");
 	npoints = 0;
 	p_count = 0;
 	read_simple = &LASreader::read_point_default;
@@ -628,6 +630,16 @@ void LASreadOpener::reset()
 	file_name = 0;
 }
 
+// setup to use z from attribute by default for certain tools
+void LASreadOpener::z_from_attribute_bydefault()
+{
+	if (!z_from_attribute) 
+	{
+		z_from_attribute = true;
+		z_from_attribute_try = true;
+	}
+}
+
 LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_other)
 {
 	if (filter) filter->reset();
@@ -639,7 +651,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 		if (file_name_current == file_name_number && other_file_name == 0) return 0;
 		if ((other_file_name == 0) && ((file_name_number > 1) || (file_names_ID)) && merged)
 		{
-			LASreaderMerged* lasreadermerged = new LASreaderMerged();
+			LASreaderMerged* lasreadermerged = new LASreaderMerged(this);
 			lasreadermerged->set_scale_factor(scale_factor);
 			lasreadermerged->set_offset(offset);
 			lasreadermerged->set_parse_string(parse_string);
@@ -678,7 +690,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			LASreader* lasreader = 0;
 			if (stored)
 			{
-				LASreaderStored* lasreaderstored = new LASreaderStored();
+				LASreaderStored* lasreaderstored = new LASreaderStored(this);
 				if (!lasreaderstored->open(lasreadermerged))
 				{
 					LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreadermerged");
@@ -693,7 +705,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			}
 			if (pipe_on)
 			{
-				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 				if (!lasreaderpipeon->open(lasreader))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreadermerged");
@@ -710,7 +722,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 		else if ((buffer_size > 0) && ((file_name_number > 1) || (neighbor_file_name_number > 0)))
 		{
 			U32 i;
-			LASreaderBuffered* lasreaderbuffered = new LASreaderBuffered();
+			LASreaderBuffered* lasreaderbuffered = new LASreaderBuffered(this);
 			lasreaderbuffered->set_buffer_size(buffer_size);
 			lasreaderbuffered->set_scale_factor(scale_factor);
 			lasreaderbuffered->set_offset(offset);
@@ -829,7 +841,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			LASreader* lasreader = 0;
 			if (stored)
 			{
-				LASreaderStored* lasreaderstored = new LASreaderStored();
+				LASreaderStored* lasreaderstored = new LASreaderStored(this);
 				if (!lasreaderstored->open(lasreaderbuffered))
 				{
 					LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderbuffered");
@@ -844,7 +856,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			}
 			if (pipe_on)
 			{
-				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 				if (!lasreaderpipeon->open(lasreader))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderbuffered");
@@ -883,21 +895,21 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (scale_factor == 0 && offset == 0)
 				{
 					if (auto_reoffset)
-						lasreaderlas = new LASreaderLASreoffset();
+						lasreaderlas = new LASreaderLASreoffset(this);
 					else
-						lasreaderlas = new LASreaderLAS();
+						lasreaderlas = new LASreaderLAS(this);
 				}
 				else if (scale_factor != 0 && offset == 0)
 				{
 					if (auto_reoffset)
-						lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2]);
+						lasreaderlas = new LASreaderLASrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2]);
 					else
-						lasreaderlas = new LASreaderLASrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
+						lasreaderlas = new LASreaderLASrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
 				}
 				else if (scale_factor == 0 && offset != 0)
-					lasreaderlas = new LASreaderLASreoffset(offset[0], offset[1], offset[2]);
+					lasreaderlas = new LASreaderLASreoffset(this, offset[0], offset[1], offset[2]);
 				else
-					lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
+					lasreaderlas = new LASreaderLASrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 
 				lasreaderlas->set_keep_copc(keep_copc);
 				if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
@@ -959,10 +971,11 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 
 					lasreaderlas->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
 				}
+				//
 				LASreader* lasreader = 0;
 				if (stored)
 				{
-					LASreaderStored* lasreaderstored = new LASreaderStored();
+					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderlas))
 					{
 						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderlas");
@@ -977,7 +990,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (pipe_on)
 				{
-					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
 						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderlas");
@@ -995,13 +1008,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			{
 				LASreaderBIN* lasreaderbin;
 				if (scale_factor == 0 && offset == 0)
-					lasreaderbin = new LASreaderBIN();
+					lasreaderbin = new LASreaderBIN(this);
 				else if (scale_factor != 0 && offset == 0)
-					lasreaderbin = new LASreaderBINrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
+					lasreaderbin = new LASreaderBINrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
 				else if (scale_factor == 0 && offset != 0)
-					lasreaderbin = new LASreaderBINreoffset(offset[0], offset[1], offset[2]);
+					lasreaderbin = new LASreaderBINreoffset(this, offset[0], offset[1], offset[2]);
 				else
-					lasreaderbin = new LASreaderBINrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
+					lasreaderbin = new LASreaderBINrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderbin->open(file_name))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreaderbin with file name '%s'", file_name);
@@ -1023,7 +1036,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreader* lasreader = 0;
 				if (stored)
 				{
-					LASreaderStored* lasreaderstored = new LASreaderStored();
+					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderbin))
 					{
 						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderbin");
@@ -1038,7 +1051,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (pipe_on)
 				{
-					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
 						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderbin");
@@ -1056,13 +1069,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			{
 				LASreaderSHP* lasreadershp;
 				if (scale_factor == 0 && offset == 0)
-					lasreadershp = new LASreaderSHP();
+					lasreadershp = new LASreaderSHP(this);
 				else if (scale_factor != 0 && offset == 0)
-					lasreadershp = new LASreaderSHPrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
+					lasreadershp = new LASreaderSHPrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
 				else if (scale_factor == 0 && offset != 0)
-					lasreadershp = new LASreaderSHPreoffset(offset[0], offset[1], offset[2]);
+					lasreadershp = new LASreaderSHPreoffset(this, offset[0], offset[1], offset[2]);
 				else
-					lasreadershp = new LASreaderSHPrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
+					lasreadershp = new LASreaderSHPrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreadershp->open(file_name))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreadershp with file name '%s'", file_name);
@@ -1079,7 +1092,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreader* lasreader = 0;
 				if (stored)
 				{
-					LASreaderStored* lasreaderstored = new LASreaderStored();
+					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreadershp))
 					{
 						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreadershp");
@@ -1094,7 +1107,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (pipe_on)
 				{
-					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
 						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreadershp");
@@ -1112,13 +1125,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			{
 				LASreaderASC* lasreaderasc;
 				if (scale_factor == 0 && offset == 0)
-					lasreaderasc = new LASreaderASC();
+					lasreaderasc = new LASreaderASC(this);
 				else if (scale_factor != 0 && offset == 0)
-					lasreaderasc = new LASreaderASCrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
+					lasreaderasc = new LASreaderASCrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
 				else if (scale_factor == 0 && offset != 0)
-					lasreaderasc = new LASreaderASCreoffset(offset[0], offset[1], offset[2]);
+					lasreaderasc = new LASreaderASCreoffset(this, offset[0], offset[1], offset[2]);
 				else
-					lasreaderasc = new LASreaderASCrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
+					lasreaderasc = new LASreaderASCrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderasc->open(file_name, comma_not_point))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreaderasc with file name '%s'", file_name);
@@ -1135,7 +1148,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreader* lasreader = 0;
 				if (stored)
 				{
-					LASreaderStored* lasreaderstored = new LASreaderStored();
+					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderasc))
 					{
 						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderasc");
@@ -1150,7 +1163,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (pipe_on)
 				{
-					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
 						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderasc");
@@ -1168,13 +1181,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			{
 				LASreaderBIL* lasreaderbil;
 				if (scale_factor == 0 && offset == 0)
-					lasreaderbil = new LASreaderBIL();
+					lasreaderbil = new LASreaderBIL(this);
 				else if (scale_factor != 0 && offset == 0)
-					lasreaderbil = new LASreaderBILrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
+					lasreaderbil = new LASreaderBILrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
 				else if (scale_factor == 0 && offset != 0)
-					lasreaderbil = new LASreaderBILreoffset(offset[0], offset[1], offset[2]);
+					lasreaderbil = new LASreaderBILreoffset(this, offset[0], offset[1], offset[2]);
 				else
-					lasreaderbil = new LASreaderBILrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
+					lasreaderbil = new LASreaderBILrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderbil->open(file_name))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreaderbil with file name '%s'", file_name);
@@ -1191,7 +1204,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreader* lasreader = 0;
 				if (stored)
 				{
-					LASreaderStored* lasreaderstored = new LASreaderStored();
+					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderbil))
 					{
 						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderbil");
@@ -1206,7 +1219,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (pipe_on)
 				{
-					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
 						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderbil");
@@ -1224,13 +1237,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			{
 				LASreaderDTM* lasreaderdtm;
 				if (scale_factor == 0 && offset == 0)
-					lasreaderdtm = new LASreaderDTM();
+					lasreaderdtm = new LASreaderDTM(this);
 				else if (scale_factor != 0 && offset == 0)
-					lasreaderdtm = new LASreaderDTMrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
+					lasreaderdtm = new LASreaderDTMrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
 				else if (scale_factor == 0 && offset != 0)
-					lasreaderdtm = new LASreaderDTMreoffset(offset[0], offset[1], offset[2]);
+					lasreaderdtm = new LASreaderDTMreoffset(this, offset[0], offset[1], offset[2]);
 				else
-					lasreaderdtm = new LASreaderDTMrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
+					lasreaderdtm = new LASreaderDTMrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderdtm->open(file_name))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreaderdtm with file name '%s'", file_name);
@@ -1247,7 +1260,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreader* lasreader = 0;
 				if (stored)
 				{
-					LASreaderStored* lasreaderstored = new LASreaderStored();
+					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderdtm))
 					{
 						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderdtm");
@@ -1262,7 +1275,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (pipe_on)
 				{
-					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
 						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderdtm");
@@ -1278,7 +1291,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			}
 			else if (strstr(file_name, ".ply") || strstr(file_name, ".PLY"))
 			{
-				LASreaderPLY* lasreaderply = new LASreaderPLY();
+				LASreaderPLY* lasreaderply = new LASreaderPLY(this);
 				if (translate_intensity != 0.0f) lasreaderply->set_translate_intensity(translate_intensity);
 				if (scale_intensity != 1.0f) lasreaderply->set_scale_intensity(scale_intensity);
 				lasreaderply->set_scale_factor(scale_factor);
@@ -1299,7 +1312,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreader* lasreader = 0;
 				if (stored)
 				{
-					LASreaderStored* lasreaderstored = new LASreaderStored();
+					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderply))
 					{
 						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderply");
@@ -1314,7 +1327,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (pipe_on)
 				{
-					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
 						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderply");
@@ -1332,13 +1345,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			{
 				LASreaderQFIT* lasreaderqfit;
 				if (scale_factor == 0 && offset == 0)
-					lasreaderqfit = new LASreaderQFIT();
+					lasreaderqfit = new LASreaderQFIT(this);
 				else if (scale_factor != 0 && offset == 0)
-					lasreaderqfit = new LASreaderQFITrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
+					lasreaderqfit = new LASreaderQFITrescale(this,scale_factor[0], scale_factor[1], scale_factor[2]);
 				else if (scale_factor == 0 && offset != 0)
-					lasreaderqfit = new LASreaderQFITreoffset(offset[0], offset[1], offset[2]);
+					lasreaderqfit = new LASreaderQFITreoffset(this,offset[0], offset[1], offset[2]);
 				else
-					lasreaderqfit = new LASreaderQFITrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
+					lasreaderqfit = new LASreaderQFITrescalereoffset(this,scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderqfit->open(file_name))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreaderqfit with file name '%s'", file_name);
@@ -1360,7 +1373,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreader* lasreader = 0;
 				if (stored)
 				{
-					LASreaderStored* lasreaderstored = new LASreaderStored();
+					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderqfit))
 					{
 						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderqfit");
@@ -1375,7 +1388,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (pipe_on)
 				{
-					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
 						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderqfit");
@@ -1391,7 +1404,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			}
 			else
 			{
-				LASreaderTXT* lasreadertxt = new LASreaderTXT();
+				LASreaderTXT* lasreadertxt = new LASreaderTXT(this);
 				if (ipts) lasreadertxt->set_pts(TRUE);
 				else {
 					if (iptx) lasreadertxt->set_ptx(TRUE);
@@ -1432,7 +1445,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreader* lasreader = 0;
 				if (stored)
 				{
-					LASreaderStored* lasreaderstored = new LASreaderStored();
+					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreadertxt))
 					{
 						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreadertxt");
@@ -1447,7 +1460,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (pipe_on)
 				{
-					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
 						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreadertxt");
@@ -1468,7 +1481,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 		use_stdin = FALSE; populate_header = TRUE;
 		if (itxt)
 		{
-			LASreaderTXT* lasreadertxt = new LASreaderTXT();
+			LASreaderTXT* lasreadertxt = new LASreaderTXT(this);
 			if (ipts) lasreadertxt->set_pts(TRUE);
 			else {
 				if (iptx) lasreadertxt->set_ptx(TRUE);
@@ -1503,7 +1516,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			LASreader* lasreader = 0;
 			if (stored)
 			{
-				LASreaderStored* lasreaderstored = new LASreaderStored();
+				LASreaderStored* lasreaderstored = new LASreaderStored(this);
 				if (!lasreaderstored->open(lasreadertxt))
 				{
 					LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreadertxt");
@@ -1518,7 +1531,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			}
 			if (pipe_on)
 			{
-				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 				if (!lasreaderpipeon->open(lasreader))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreadertxt");
@@ -1536,13 +1549,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 		{
 			LASreaderLAS* lasreaderlas;
 			if (scale_factor == 0 && offset == 0)
-				lasreaderlas = new LASreaderLAS();
+				lasreaderlas = new LASreaderLAS(this);
 			else if (scale_factor != 0 && offset == 0)
-				lasreaderlas = new LASreaderLASrescale(scale_factor[0], scale_factor[1], scale_factor[2]);
+				lasreaderlas = new LASreaderLASrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
 			else if (scale_factor == 0 && offset != 0)
-				lasreaderlas = new LASreaderLASreoffset(offset[0], offset[1], offset[2]);
+				lasreaderlas = new LASreaderLASreoffset(this, offset[0], offset[1], offset[2]);
 			else
-				lasreaderlas = new LASreaderLASrescalereoffset(scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
+				lasreaderlas = new LASreaderLASrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 			if (!lasreaderlas->open(stdin))
 			{
 				LASMessage(LAS_ERROR, "cannot open lasreaderlas from stdin ");
@@ -1559,7 +1572,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			LASreader* lasreader = 0;
 			if (stored)
 			{
-				LASreaderStored* lasreaderstored = new LASreaderStored();
+				LASreaderStored* lasreaderstored = new LASreaderStored(this);
 				if (!lasreaderstored->open(lasreaderlas))
 				{
 					LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderlas");
@@ -1574,7 +1587,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			}
 			if (pipe_on)
 			{
-				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn();
+				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 				if (!lasreaderpipeon->open(lasreader))
 				{
 					LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderlas from stdin");
@@ -2598,11 +2611,22 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 				LASMessage(LAS_ERROR, "'%s' needs 1 argument: depth, but %d is not a valid depth", argv[i], depth);
 				return FALSE;
 			}
-
 			set_max_depth(depth);
 			*argv[i] = '\0';
 			*argv[i + 1] = '\0';
 			i += 1;
+		}
+		else if (strcmp(argv[i], "-z_from_attribute") == 0)
+		{
+		  z_from_attribute = true;
+			*argv[i] = '\0';
+			if (((i + 1) < argc) && (argv[i + 1][0] != '-'))
+			{
+				i++;
+				z_from_attribute_idx = atoi(argv[i]);
+				*argv[i] = '\0';
+			}
+		  i += 1;
 		}
 	}
 

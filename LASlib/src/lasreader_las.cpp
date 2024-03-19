@@ -1363,8 +1363,27 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
 
   reader = new LASreadPoint(decompress_selective);
 
-  // initialize point and the reader
+  // optional z replacement
+  if (opener && (opener->z_from_attribute)) {
+    if (opener->z_from_attribute_idx < 0) {
+      // argument number not given - try to get by name
+      opener->z_from_attribute_idx = header.get_attribute_index("height above ground");
+      if (opener->z_from_attribute_idx < 0) {
+        if (!opener->z_from_attribute_try) {
+          LASMessage(LAS_WARNING, "\"height above ground\" not found in extra bytes. using Z\n");
+        }
+      }
+      else
+      {
+        LASMessage(LAS_VERBOSE, "autodetect extra_byte[%d] as z\n", opener->z_from_attribute_idx);
+      }
+    }
+    if (opener->z_from_attribute_idx >= 0) {
+      header.z_from_attrib = opener->z_from_attribute_idx;
+    }
+  }
 
+  // initialize point and the reader
   if (header.laszip)
   {
     if (!point.init(&header, header.laszip->num_items, header.laszip->items, &header)) return FALSE;
@@ -1555,7 +1574,7 @@ void LASreaderLAS::close(BOOL close_stream)
   }
 }
 
-LASreaderLAS::LASreaderLAS()
+LASreaderLAS::LASreaderLAS(LASreadOpener* opener) : LASreader(opener)
 {
   file = 0;
   file_name = 0;
@@ -1570,7 +1589,7 @@ LASreaderLAS::~LASreaderLAS()
   if (reader || stream) close(TRUE);
 }
 
-LASreaderLASrescale::LASreaderLASrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, BOOL check_for_overflow) : LASreaderLAS()
+LASreaderLASrescale::LASreaderLASrescale(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, BOOL check_for_overflow) : LASreaderLAS(opener)
 {
   scale_factor[0] = x_scale_factor;
   scale_factor[1] = y_scale_factor;
@@ -1689,7 +1708,7 @@ BOOL LASreaderLASrescale::open(ByteStreamIn* stream, BOOL peek_only, U32 decompr
   return TRUE;
 }
 
-LASreaderLASreoffset::LASreaderLASreoffset(F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderLAS()
+LASreaderLASreoffset::LASreaderLASreoffset(LASreadOpener* opener, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderLAS(opener)
 {
   auto_reoffset = FALSE;
   this->offset[0] = x_offset;
@@ -1697,7 +1716,7 @@ LASreaderLASreoffset::LASreaderLASreoffset(F64 x_offset, F64 y_offset, F64 z_off
   this->offset[2] = z_offset;
 }
 
-LASreaderLASreoffset::LASreaderLASreoffset() : LASreaderLAS()
+LASreaderLASreoffset::LASreaderLASreoffset(LASreadOpener* opener) : LASreaderLAS(opener)
 {
   auto_reoffset = TRUE;
 }
@@ -1828,11 +1847,17 @@ BOOL LASreaderLASreoffset::open(ByteStreamIn* stream, BOOL peek_only, U32 decomp
   return TRUE;
 }
 
-LASreaderLASrescalereoffset::LASreaderLASrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderLASrescale(x_scale_factor, y_scale_factor, z_scale_factor, FALSE), LASreaderLASreoffset(x_offset, y_offset, z_offset)
+LASreaderLASrescalereoffset::LASreaderLASrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : 
+  LASreaderLAS(opener),
+  LASreaderLASrescale(opener, x_scale_factor, y_scale_factor, z_scale_factor, FALSE),
+  LASreaderLASreoffset(opener, x_offset, y_offset, z_offset)
 {
 }
 
-LASreaderLASrescalereoffset::LASreaderLASrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderLASrescale(x_scale_factor, y_scale_factor, z_scale_factor, FALSE), LASreaderLASreoffset()
+LASreaderLASrescalereoffset::LASreaderLASrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : 
+  LASreaderLAS(opener),
+  LASreaderLASrescale(opener, x_scale_factor, y_scale_factor, z_scale_factor, FALSE), 
+  LASreaderLASreoffset(opener)
 {
 }
 

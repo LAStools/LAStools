@@ -54,7 +54,7 @@ public:
   void close(BOOL close_stream=TRUE);
   BOOL reopen(const CHAR* file_name);
 
-  LASreaderASC();
+  LASreaderASC(LASreadOpener* opener);
   virtual ~LASreaderASC();
 
 protected:
@@ -87,7 +87,7 @@ class LASreaderASCrescale : public virtual LASreaderASC
 {
 public:
   virtual BOOL open(const CHAR* file_name, BOOL comma_not_point=FALSE);
-  LASreaderASCrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor);
+  LASreaderASCrescale(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor);
 
 protected:
   F64 scale_factor[3];
@@ -97,7 +97,7 @@ class LASreaderASCreoffset : public virtual LASreaderASC
 {
 public:
   virtual BOOL open(const CHAR* file_name, BOOL comma_not_point=FALSE);
-  LASreaderASCreoffset(F64 x_offset, F64 y_offset, F64 z_offset);
+  LASreaderASCreoffset(LASreadOpener* opener, F64 x_offset, F64 y_offset, F64 z_offset);
 protected:
   F64 offset[3];
 };
@@ -106,7 +106,7 @@ class LASreaderASCrescalereoffset : public LASreaderASCrescale, LASreaderASCreof
 {
 public:
   BOOL open(const CHAR* file_name, BOOL comma_not_point=FALSE);
-  LASreaderASCrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset);
+  LASreaderASCrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset);
 };
 
 #endif

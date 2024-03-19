@@ -33,21 +33,21 @@ lascopy64 -i source.laz -i target.laz -classification -zero -o result.laz
 ## lascopy specific arguments
 
 -classification       : copy classification attribute (default)  
--cores [n]            : process multiple inputs on [n] cores in parallel  
--elevation            : copy elevation attribute  
--ilay [n]             : apply [n] or all LASlayers found in corresponding *.lay file on read  
--ilaydir [n]          : look for corresponding *.lay file in directory [n]  
+-elevation            : copy elevation attribute (z-value)  
+-withheld_flag        : copy withheld flag to target  
 -intensity            : copy intensity attribute  
 -keypoint_flag        : copy keypoint flag to target  
 -overlap_flag         : copy overlap flag to target  
--switch_G_B           : switch green and blue value  
 -synthetic_flag       : copy synthetic flag to target  
+-switch_G_B           : switch green and blue value  
 -unmatched            : copy attributes from source to target by point order  
 -week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
--withheld_flag        : copy withheld flag to target  
 -zero                 : set attribute of points to zero if not found in source  
+-ilay [n]             : apply [n] or all LASlayers found in corresponding *.lay file on read  
+-ilaydir [n]          : look for corresponding *.lay file in directory [n]  
 
 ### Basics
+-cores [n]            : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  
@@ -188,7 +188,7 @@ lascopy64 -i source.laz -i target.laz -classification -zero -o result.laz
 -switch_x_y                         : exchange x and y value  
 -switch_x_z                         : exchange x and z value  
 -switch_y_z                         : exchange z and x value  
--transform_affine [a],[b],[c],[d]   : transform input using affine transformation with [a],[b],[c],[d]  
+-transform_affine [k,w,x,y]         : transform by k*cos(w)+k*sin(w)+tx;k*cos(w)+k*sin(w)+ty - angle in second of arc  
 -transform_helmert [m] [n] [o]      : do a helmert transformation with 3 or 7 comma separated parameters [n] ...  
 -transform_matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]: transform input using matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]  
 -translate_raw_x [n]                : translate raw x value by [n]  

@@ -852,7 +852,7 @@ void LASreaderBIL::clean()
   overflow_I32_z = 0;
 }
 
-LASreaderBIL::LASreaderBIL()
+LASreaderBIL::LASreaderBIL(LASreadOpener* opener) :LASreader(opener)
 {
   file = 0;
   scale_factor = 0;
@@ -1008,7 +1008,7 @@ void LASreaderBIL::populate_bounding_box()
   }
 }
 
-LASreaderBILrescale::LASreaderBILrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderBIL()
+LASreaderBILrescale::LASreaderBILrescale(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderBIL(opener)
 {
   scale_factor[0] = x_scale_factor;
   scale_factor[1] = y_scale_factor;
@@ -1022,7 +1022,7 @@ BOOL LASreaderBILrescale::open(const CHAR* file_name)
   return TRUE;
 }
 
-LASreaderBILreoffset::LASreaderBILreoffset(F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderBIL()
+LASreaderBILreoffset::LASreaderBILreoffset(LASreadOpener* opener, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderBIL(opener)
 {
   this->offset[0] = x_offset;
   this->offset[1] = y_offset;
@@ -1036,7 +1036,10 @@ BOOL LASreaderBILreoffset::open(const CHAR* file_name)
   return TRUE;
 }
 
-LASreaderBILrescalereoffset::LASreaderBILrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderBILrescale(x_scale_factor, y_scale_factor, z_scale_factor), LASreaderBILreoffset(x_offset, y_offset, z_offset)
+LASreaderBILrescalereoffset::LASreaderBILrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : 
+  LASreaderBIL(opener),
+  LASreaderBILrescale(opener, x_scale_factor, y_scale_factor, z_scale_factor),
+  LASreaderBILreoffset(opener, x_offset, y_offset, z_offset)
 {
 }
 

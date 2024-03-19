@@ -62,7 +62,7 @@ public:
   ByteStreamIn* get_stream() const { return 0; };
   void close(BOOL close_stream=TRUE);
 
-  LASreaderPipeOn();
+  LASreaderPipeOn(LASreadOpener* opener);
   ~LASreaderPipeOn();
 
 protected:

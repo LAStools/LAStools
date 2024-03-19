@@ -105,7 +105,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     if (lasreaderlas == 0)
     {
-      lasreader = lasreaderlas = new LASreaderLAS();
+      lasreader = lasreaderlas = new LASreaderLAS(opener);
     }
   }
   else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN"))
@@ -152,7 +152,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     if (lasreaderbin == 0)
     {
-      lasreader = lasreaderbin = new LASreaderBIN();
+      lasreader = lasreaderbin = new LASreaderBIN(opener);
     }
   }
   else if (strstr(file_name, ".shp") || strstr(file_name, ".SHP"))
@@ -199,7 +199,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     if (lasreadershp == 0)
     {
-      lasreader = lasreadershp = new LASreaderSHP();
+      lasreader = lasreadershp = new LASreaderSHP(opener);
     }
   }
   else if (strstr(file_name, ".asc") || strstr(file_name, ".ASC"))
@@ -246,7 +246,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     if (lasreaderasc == 0)
     {
-      lasreader = lasreaderasc = new LASreaderASC();
+      lasreader = lasreaderasc = new LASreaderASC(opener);
     }
   }
   else if (strstr(file_name, ".bil") || strstr(file_name, ".BIL"))
@@ -293,7 +293,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     if (lasreaderbil == 0)
     {
-      lasreader = lasreaderbil = new LASreaderBIL();
+      lasreader = lasreaderbil = new LASreaderBIL(opener);
     }
   }
   else if (strstr(file_name, ".dtm") || strstr(file_name, ".DTM"))
@@ -340,7 +340,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     if (lasreaderdtm == 0)
     {
-      lasreader = lasreaderdtm = new LASreaderDTM();
+      lasreader = lasreaderdtm = new LASreaderDTM(opener);
     }
   }
   else if (strstr(file_name, ".ply") || strstr(file_name, ".PLY"))
@@ -387,7 +387,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     if (lasreaderply == 0)
     {
-      lasreader = lasreaderply = new LASreaderPLY();
+      lasreader = lasreaderply = new LASreaderPLY(opener);
     }
   }
   else if (strstr(file_name, ".qi") || strstr(file_name, ".QI"))
@@ -434,7 +434,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     if (lasreaderqfit == 0)
     {
-      lasreader = lasreaderqfit = new LASreaderQFIT();
+      lasreader = lasreaderqfit = new LASreaderQFIT(opener);
     }
   }
   else
@@ -481,7 +481,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     if (lasreadertxt == 0)
     {
-      lasreader = lasreadertxt = new LASreaderTXT();
+      lasreader = lasreadertxt = new LASreaderTXT(opener);
     }
   }
   // add the file
@@ -490,10 +490,10 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     file_name_allocated += 1024;
     if (file_names)
     {
-      file_names = (CHAR**)realloc(file_names, sizeof(CHAR*)*file_name_allocated);
+      file_names = (CHAR**)realloc(file_names, sizeof(CHAR*) * file_name_allocated);
       if (file_names_ID)
       {
-        file_names_ID = (U32*)realloc(file_names_ID, sizeof(U32)*file_name_allocated);
+        file_names_ID = (U32*)realloc(file_names_ID, sizeof(U32) * file_name_allocated);
         if (file_names_ID == 0)
         {
           LASMessage(LAS_ERROR, "alloc for file_names_ID array failed at %d", file_name_allocated);
@@ -503,7 +503,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     else
     {
-      file_names = (CHAR**)malloc(sizeof(CHAR*)*file_name_allocated);
+      file_names = (CHAR**)malloc(sizeof(CHAR*) * file_name_allocated);
     }
     if (file_names == 0)
     {
@@ -522,14 +522,14 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name, U32 ID)
   {
     if (file_names_ID == 0)
     {
-      file_names_ID = (U32*)malloc(sizeof(U32)*file_name_allocated);
+      file_names_ID = (U32*)malloc(sizeof(U32) * file_name_allocated);
       if (file_names_ID == 0)
       {
         LASMessage(LAS_ERROR, "alloc for file_names_ID array failed at %d", file_name_allocated);
         return FALSE;
       }
     }
-    file_names_ID[file_name_number-1] = ID;
+    file_names_ID[file_name_number - 1] = ID;
     return TRUE;
   }
   return FALSE;
@@ -546,7 +546,7 @@ void LASreaderMerged::set_scale_factor(const F64* scale_factor)
   }
   else if (this->scale_factor)
   {
-    delete [] this->scale_factor;
+    delete[] this->scale_factor;
     this->scale_factor = 0;
   }
 }
@@ -562,7 +562,7 @@ void LASreaderMerged::set_offset(const F64* offset)
   }
   else if (this->offset)
   {
-    delete [] this->offset;
+    delete[] this->offset;
     this->offset = 0;
   }
 }
@@ -650,15 +650,15 @@ BOOL LASreaderMerged::open()
   }
 
   // allocate space for the individual bounding_boxes
-  if (bounding_boxes) delete [] bounding_boxes;
-  bounding_boxes = new F64[file_name_number*4];
+  if (bounding_boxes) delete[] bounding_boxes;
+  bounding_boxes = new F64[file_name_number * 4];
 
   // clean  header
   header.clean();
 
   // combine all headers
 
-  U32 i,j;
+  U32 i, j;
   BOOL first = TRUE;
   BOOL attributes = FALSE;
 
@@ -747,18 +747,18 @@ BOOL LASreaderMerged::open()
     if (lasreader->npoints == 0)
     {
       // record ignoring bounding box info
-      bounding_boxes[4*i+0] = F64_MAX;
-      bounding_boxes[4*i+1] = F64_MAX;
-      bounding_boxes[4*i+2] = F64_MIN;
-      bounding_boxes[4*i+3] = F64_MIN;
+      bounding_boxes[4 * i + 0] = F64_MAX;
+      bounding_boxes[4 * i + 1] = F64_MAX;
+      bounding_boxes[4 * i + 2] = F64_MIN;
+      bounding_boxes[4 * i + 3] = F64_MIN;
     }
     else
     {
       // record individual bounding box info
-      bounding_boxes[4*i+0] = lasreader->header.min_x;
-      bounding_boxes[4*i+1] = lasreader->header.min_y;
-      bounding_boxes[4*i+2] = lasreader->header.max_x;
-      bounding_boxes[4*i+3] = lasreader->header.max_y;
+      bounding_boxes[4 * i + 0] = lasreader->header.min_x;
+      bounding_boxes[4 * i + 1] = lasreader->header.min_y;
+      bounding_boxes[4 * i + 2] = lasreader->header.max_x;
+      bounding_boxes[4 * i + 3] = lasreader->header.max_y;
     }
     // populate the merged header
     if (first)
@@ -823,7 +823,7 @@ BOOL LASreaderMerged::open()
         // have there not been any points before
         if (npoints == lasreader->npoints)
         {
-          // use the counters
+          // use the counters 
           header.number_of_point_records = lasreader->header.number_of_point_records;
           for (j = 0; j < 5; j++)
           {
@@ -859,7 +859,7 @@ BOOL LASreaderMerged::open()
         }
         else
         {
-          // increment point counters
+          // increment point counters 
           header.number_of_point_records += lasreader->header.number_of_point_records;
           for (j = 0; j < 5; j++)
           {
@@ -889,17 +889,17 @@ BOOL LASreaderMerged::open()
 
         // and check if we need to resample points because scalefactor of offsets change
         if (header.x_scale_factor != lasreader->header.x_scale_factor ||
-            header.y_scale_factor != lasreader->header.y_scale_factor ||
-            header.z_scale_factor != lasreader->header.z_scale_factor)
+          header.y_scale_factor != lasreader->header.y_scale_factor ||
+          header.z_scale_factor != lasreader->header.z_scale_factor)
         {
-  //        if (!rescale) LASMessage(LAS_WARNING, "files have different scale factors: %g %g %g vs %g %g %g", header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, lasreader->header.x_scale_factor, lasreader->header.y_scale_factor, lasreader->header.z_scale_factor);
+          //        if (!rescale) LASMessage(LAS_WARNING, "files have different scale factors: %g %g %g vs %g %g %g", header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, lasreader->header.x_scale_factor, lasreader->header.y_scale_factor, lasreader->header.z_scale_factor);
           rescale = TRUE;
         }
         if (header.x_offset != lasreader->header.x_offset ||
-            header.y_offset != lasreader->header.y_offset ||
-            header.z_offset != lasreader->header.z_offset)
+          header.y_offset != lasreader->header.y_offset ||
+          header.z_offset != lasreader->header.z_offset)
         {
-  //        if (!reoffset) LASMessage(LAS_WARNING, "files have different offsets: %g %g %g vs %g %g %g", header.x_offset, header.y_offset, header.z_offset, lasreader->header.x_offset, lasreader->header.y_offset, lasreader->header.z_offset);
+          //        if (!reoffset) LASMessage(LAS_WARNING, "files have different offsets: %g %g %g vs %g %g %g", header.x_offset, header.y_offset, header.z_offset, lasreader->header.x_offset, lasreader->header.y_offset, lasreader->header.z_offset);
           reoffset = TRUE;
         }
         // a point type change could be problematic
@@ -1016,7 +1016,7 @@ BOOL LASreaderMerged::open()
   if ((((header.max_x - header.x_offset) / header.x_scale_factor) > I32_MAX) || (((header.min_x - header.x_offset) / header.x_scale_factor) < I32_MIN))
   {
     // maybe we can fix it by adjusting the offset (and if needed by lowering the resolution via the scale factor)
-    F64 x_offset = (F64)I64_QUANTIZE((header.min_x + header.max_x)/2);
+    F64 x_offset = (F64)I64_QUANTIZE((header.min_x + header.max_x) / 2);
     F64 x_scale_factor = header.x_scale_factor;
     while ((((header.max_x - x_offset) / x_scale_factor) > I32_MAX) || (((header.min_x - x_offset) / x_scale_factor) < I32_MIN))
     {
@@ -1042,7 +1042,7 @@ BOOL LASreaderMerged::open()
   if ((((header.max_y - header.y_offset) / header.y_scale_factor) > I32_MAX) || (((header.min_y - header.y_offset) / header.y_scale_factor) < I32_MIN))
   {
     // maybe we can fix it by adjusting the offset (and if needed by lowering the resolution via the scale factor)
-    F64 y_offset = (F64)I64_QUANTIZE((header.min_y + header.max_y)/2);
+    F64 y_offset = (F64)I64_QUANTIZE((header.min_y + header.max_y) / 2);
     F64 y_scale_factor = header.y_scale_factor;
     while ((((header.max_y - y_offset) / y_scale_factor) > I32_MAX) || (((header.min_y - y_offset) / y_scale_factor) < I32_MIN))
     {
@@ -1068,7 +1068,7 @@ BOOL LASreaderMerged::open()
   if ((((header.max_z - header.z_offset) / header.z_scale_factor) > I32_MAX) || (((header.min_z - header.z_offset) / header.z_scale_factor) < I32_MIN))
   {
     // maybe we can fix it by adjusting the offset (and if needed by lowering the resolution via the scale factor)
-    F64 z_offset = (F64)I64_QUANTIZE((header.min_z + header.max_z)/2);
+    F64 z_offset = (F64)I64_QUANTIZE((header.min_z + header.max_z) / 2);
     F64 z_scale_factor = header.z_scale_factor;
     while ((((header.max_z - z_offset) / z_scale_factor) > I32_MAX) || (((header.min_z - z_offset) / z_scale_factor) < I32_MIN))
     {
@@ -1095,99 +1095,99 @@ BOOL LASreaderMerged::open()
     {
       delete lasreaderlas;
       if (rescale && reoffset)
-        lasreaderlas = new LASreaderLASrescalereoffset(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+        lasreaderlas = new LASreaderLASrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
-        lasreaderlas = new LASreaderLASrescale(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+        lasreaderlas = new LASreaderLASrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
       else
-        lasreaderlas = new LASreaderLASreoffset(header.x_offset, header.y_offset, header.z_offset);
+        lasreaderlas = new LASreaderLASreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
       lasreader = lasreaderlas;
     }
     else if (lasreaderbin)
     {
       delete lasreaderbin;
       if (rescale && reoffset)
-        lasreaderbin = new LASreaderBINrescalereoffset(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+        lasreaderbin = new LASreaderBINrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
-        lasreaderbin = new LASreaderBINrescale(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+        lasreaderbin = new LASreaderBINrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
       else
-        lasreaderbin = new LASreaderBINreoffset(header.x_offset, header.y_offset, header.z_offset);
+        lasreaderbin = new LASreaderBINreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
       lasreader = lasreaderbin;
     }
     else if (lasreadershp)
     {
       delete lasreadershp;
       if (rescale && reoffset)
-        lasreadershp = new LASreaderSHPrescalereoffset(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+        lasreadershp = new LASreaderSHPrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
-        lasreadershp = new LASreaderSHPrescale(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+        lasreadershp = new LASreaderSHPrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
       else
-        lasreadershp = new LASreaderSHPreoffset(header.x_offset, header.y_offset, header.z_offset);
+        lasreadershp = new LASreaderSHPreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
       lasreader = lasreadershp;
     }
     else if (lasreaderasc)
     {
       delete lasreaderasc;
       if (rescale && reoffset)
-        lasreaderasc = new LASreaderASCrescalereoffset(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+        lasreaderasc = new LASreaderASCrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
-        lasreaderasc = new LASreaderASCrescale(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+        lasreaderasc = new LASreaderASCrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
       else
-        lasreaderasc = new LASreaderASCreoffset(header.x_offset, header.y_offset, header.z_offset);
+        lasreaderasc = new LASreaderASCreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
       lasreader = lasreaderasc;
     }
     else if (lasreaderbil)
     {
       delete lasreaderbil;
       if (rescale && reoffset)
-        lasreaderbil = new LASreaderBILrescalereoffset(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+        lasreaderbil = new LASreaderBILrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
-        lasreaderbil = new LASreaderBILrescale(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+        lasreaderbil = new LASreaderBILrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
       else
-        lasreaderbil = new LASreaderBILreoffset(header.x_offset, header.y_offset, header.z_offset);
+        lasreaderbil = new LASreaderBILreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
       lasreader = lasreaderbil;
     }
     else if (lasreaderdtm)
     {
       delete lasreaderdtm;
       if (rescale && reoffset)
-        lasreaderdtm = new LASreaderDTMrescalereoffset(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+        lasreaderdtm = new LASreaderDTMrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
-        lasreaderdtm = new LASreaderDTMrescale(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+        lasreaderdtm = new LASreaderDTMrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
       else
-        lasreaderdtm = new LASreaderDTMreoffset(header.x_offset, header.y_offset, header.z_offset);
+        lasreaderdtm = new LASreaderDTMreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
       lasreader = lasreaderdtm;
     }
     else if (lasreaderply)
     {
       delete lasreaderply;
       if (rescale && reoffset)
-        lasreaderply = new LASreaderPLYrescalereoffset(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+        lasreaderply = new LASreaderPLYrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
-        lasreaderply = new LASreaderPLYrescale(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+        lasreaderply = new LASreaderPLYrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
       else
-        lasreaderply = new LASreaderPLYreoffset(header.x_offset, header.y_offset, header.z_offset);
+        lasreaderply = new LASreaderPLYreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
       lasreader = lasreaderply;
     }
     else if (lasreaderqfit)
     {
       delete lasreaderqfit;
       if (rescale && reoffset)
-        lasreaderqfit = new LASreaderQFITrescalereoffset(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+        lasreaderqfit = new LASreaderQFITrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
-        lasreaderqfit = new LASreaderQFITrescale(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+        lasreaderqfit = new LASreaderQFITrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
       else
-        lasreaderqfit = new LASreaderQFITreoffset(header.x_offset, header.y_offset, header.z_offset);
+        lasreaderqfit = new LASreaderQFITreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
       lasreader = lasreaderqfit;
     }
     else
     {
       delete lasreadertxt;
       if (rescale && reoffset)
-        lasreadertxt = new LASreaderTXTrescalereoffset(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+        lasreadertxt = new LASreaderTXTrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
-        lasreadertxt = new LASreaderTXTrescale(header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+        lasreadertxt = new LASreaderTXTrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
       else
-        lasreadertxt = new LASreaderTXTreoffset(header.x_offset, header.y_offset, header.z_offset);
+        lasreadertxt = new LASreaderTXTreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
       lasreadertxt->set_translate_intensity(translate_intensity);
       lasreadertxt->set_scale_intensity(scale_intensity);
       lasreadertxt->set_translate_scan_angle(translate_scan_angle);
@@ -1239,7 +1239,7 @@ BOOL LASreaderMerged::inside_circle(const F64 center_x, const F64 center_y, cons
   c_center_x = center_x;
   c_center_y = center_y;
   c_radius = radius;
-  c_radius_squared = radius*radius;
+  c_radius_squared = radius * radius;
   orig_min_x = header.min_x;
   orig_min_y = header.min_y;
   orig_max_x = header.max_x;
@@ -1379,12 +1379,12 @@ void LASreaderMerged::clean()
   reoffset = FALSE;
   if (scale_factor)
   {
-    delete [] scale_factor;
+    delete[] scale_factor;
     scale_factor = 0;
   }
   if (offset)
   {
-    delete [] offset;
+    delete[] offset;
     offset = 0;
   }
   if (parse_string)
@@ -1417,7 +1417,7 @@ void LASreaderMerged::clean()
   }
   if (bounding_boxes)
   {
-    delete [] bounding_boxes;
+    delete[] bounding_boxes;
     bounding_boxes = 0;
   }
   file_name_current = 0;
@@ -1426,7 +1426,7 @@ void LASreaderMerged::clean()
   inside = 0;
 }
 
-LASreaderMerged::LASreaderMerged()
+LASreaderMerged::LASreaderMerged(LASreadOpener* opener) :LASreader(opener)
 {
   lasreader = 0;
   lasreaderlas = 0;
@@ -1465,12 +1465,12 @@ BOOL LASreaderMerged::open_next_file()
       // check if bounding box overlaps requested bounding box
       if (inside < 3) // tile or circle
       {
-        if (bounding_boxes[4*file_name_current+0] >= header.max_x)
+        if (bounding_boxes[4 * file_name_current + 0] >= header.max_x)
         {
           file_name_current++;
           continue;
         }
-        if (bounding_boxes[4*file_name_current+1] >= header.max_y)
+        if (bounding_boxes[4 * file_name_current + 1] >= header.max_y)
         {
           file_name_current++;
           continue;
@@ -1478,23 +1478,23 @@ BOOL LASreaderMerged::open_next_file()
       }
       else // rectangle
       {
-        if (bounding_boxes[4*file_name_current+0] > header.max_x)
+        if (bounding_boxes[4 * file_name_current + 0] > header.max_x)
         {
           file_name_current++;
           continue;
         }
-        if (bounding_boxes[4*file_name_current+1] > header.max_y)
+        if (bounding_boxes[4 * file_name_current + 1] > header.max_y)
         {
           file_name_current++;
           continue;
         }
       }
-      if (bounding_boxes[4*file_name_current+2] < header.min_x)
+      if (bounding_boxes[4 * file_name_current + 2] < header.min_x)
       {
         file_name_current++;
         continue;
       }
-      if (bounding_boxes[4*file_name_current+3] < header.min_y)
+      if (bounding_boxes[4 * file_name_current + 3] < header.min_y)
       {
         file_name_current++;
         continue;
@@ -1512,7 +1512,7 @@ BOOL LASreaderMerged::open_next_file()
       lasreaderlas->set_index(0);
       lasreaderlas->set_copcindex(0);
 
-      LASindex *index = new LASindex;
+      LASindex* index = new LASindex;
       if (index->read(file_names[file_name_current]))
         lasreaderlas->set_index(index);
       else
@@ -1527,10 +1527,10 @@ BOOL LASreaderMerged::open_next_file()
         if (index)
         {
           LASMessage(LAS_WARNING, "both LAX file and COPC spatial indexing registered. COPC has the precedence.");
-				  lasreaderlas->set_index(0);
+          lasreaderlas->set_index(0);
         }
 
-        COPCindex *copc_index = new COPCindex(lasreaderlas->header);
+        COPCindex* copc_index = new COPCindex(lasreaderlas->header);
         if (copc_stream_order == 0) 	 copc_index->set_stream_ordered_by_chunk();
         else if (copc_stream_order == 1) copc_index->set_stream_ordered_spatially();
         else if (copc_stream_order == 2) copc_index->set_stream_ordered_by_depth();
@@ -1665,7 +1665,7 @@ BOOL LASreaderMerged::open_next_file()
       else if (inside == 1) lasreader->inside_tile(t_ll_x, t_ll_y, t_size);
       else lasreader->inside_circle(c_center_x, c_center_y, c_radius);
     }
-	if (inside_depth) lasreader->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
+    if (inside_depth) lasreader->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
     return TRUE;
   }
   return FALSE;

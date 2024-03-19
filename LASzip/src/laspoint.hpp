@@ -279,11 +279,9 @@ public:
   BOOL init(const LASquantizer* quantizer, const U8 point_type, const U16 point_size, const LASattributer* attributer=0)
   {
     // clean the point
-
     clean();
 
     // switch over the point types we know
-
     if (!LASzip().setup(&num_items, &items, point_type, point_size, LASZIP_COMPRESSOR_NONE))
     {
       LASMessage(LAS_ERROR, "unknown point type %d with point size %d", (I32)point_type, (I32)point_size);
@@ -291,7 +289,6 @@ public:
     }
 
     // create point's item pointers
-
     point = new U8*[num_items];
 
     U16 i;
@@ -342,13 +339,9 @@ public:
   BOOL init(const LASquantizer* quantizer, const U32 num_items, const LASitem* items, const LASattributer* attributer=0)
   {
     U32 i;
-
     // clean the point
-
     clean();
-
     // create item description
-
     this->num_items = num_items;
     if (this->items) delete [] this->items;
     this->items = new LASitem[num_items];
@@ -532,7 +525,17 @@ public:
 
   inline I32 get_X() const { return X; };
   inline I32 get_Y() const { return Y; };
-  inline I32 get_Z() const { return Z; };
+  I32 get_Z() const {
+    if ((quantizer == nullptr) || (quantizer->z_from_attrib < 0)) {
+      return Z;
+    }
+    else
+    {
+      // get Z from extrabyte - reverse scaled to I32
+      F64 aaf = get_attribute_as_float(quantizer->z_from_attrib);
+      return I32_CLAMP(quantizer->get_Z(aaf));
+    }
+  }
   inline const I32* get_XYZ() const { return &X; };
   inline U16 get_intensity() const { return intensity; };
   inline U8 get_return_number() const { return return_number; };
@@ -585,7 +588,7 @@ public:
 
   inline F64 get_x() const { return quantizer->get_x(X); };
   inline F64 get_y() const { return quantizer->get_y(Y); };
-  inline F64 get_z() const { return quantizer->get_z(Z); };
+  inline F64 get_z() const { return quantizer->get_z(get_Z()); };
 
   inline BOOL set_x(const F64 x) { I64 X = quantizer->get_X(x); this->X = (I32)(X); return I32_FITS_IN_RANGE(X); };
   inline BOOL set_y(const F64 y) { I64 Y = quantizer->get_Y(y); this->Y = (I32)(Y); return I32_FITS_IN_RANGE(Y); };

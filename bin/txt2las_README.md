@@ -39,19 +39,23 @@ parse string can be generated automatic by this line.
 A column description can be created by las2txt command. 
 See "parse" section below for valid parse tokens.
 
+It is important to set the required scale using '-set_scale'.
+If your input lines has a resolution of e.g. x y z
+'0.01 0.01 0.01' you should use '-set_scale 0.01 0.01 0.01' to get 
+the correct resolution within your LAS/LAZ file.
  
 ## Examples
 
-    txt2las64 -i lidar.txt.gz -o lidar.las -parse ssxyz
+    txt2las64 -i lidar.txt.gz -o lidar.las -parse ssxyz -set_scale 0.1 0.1 0.1
 
-converts a gzipped ASCII file and uses the 3rd, 4th, and 5th entry
-of each line as the x, y, and z coordinate of each point
+converts a gzipped ASCII file and uses the 3rd, 4th, and 5th entry of each line
+as the x, y, and z coordinate of each point in a resolution of 0.1
 
 
-    txt2las64 -i lidar.zip -o lidar.laz -parse ssxyz -utm 14T
+    txt2las64 -i lidar.zip -o lidar.laz -parse ssxyz -utm 14T -set_scale 0.1 0.1 0.1
 
-same as above for a zipped ASCII file but produces compressed LAZ
-and adds projection info for utm zone with wgs84 
+same as above for a zipped ASCII file but produces compressed LAZ and adds
+projection info for utm zone with wgs84 
 
 
     txt2las64 -i lidar.txt -o lidar.laz -parse xyzai -scale_scan_angle 57.3 -scale_intensity 65535
@@ -283,7 +287,7 @@ option. These are unsigned integers numbers so no scale value is required.
 -switch_x_y                         : exchange x and y value  
 -switch_x_z                         : exchange x and z value  
 -switch_y_z                         : exchange z and x value  
--transform_affine [a],[b],[c],[d]   : transform input using affine transformation with [a],[b],[c],[d]  
+-transform_affine [k,w,x,y]         : transform by k*cos(w)+k*sin(w)+tx;k*cos(w)+k*sin(w)+ty - angle in second of arc  
 -transform_helmert [m] [n] [o]      : do a helmert transformation with 3 or 7 comma separated parameters [n] ...  
 -transform_matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]: transform input using matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]  
 -translate_raw_x [n]                : translate raw x value by [n]  

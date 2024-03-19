@@ -565,7 +565,7 @@ BOOL LASreaderBuffered::copy_point_from_buffer()
   return TRUE;
 }
 
-LASreaderBuffered::LASreaderBuffered() : points_per_buffer(10000)
+LASreaderBuffered::LASreaderBuffered(LASreadOpener* opener): points_per_buffer(10000), LASreader(opener)
 {
   lasreader = 0;
   lasreadopener_neighbors.set_merged(TRUE);

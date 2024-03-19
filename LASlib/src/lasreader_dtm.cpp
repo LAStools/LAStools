@@ -1403,7 +1403,7 @@ void LASreaderDTM::clean()
   overflow_I32_z = 0;
 }
 
-LASreaderDTM::LASreaderDTM()
+LASreaderDTM::LASreaderDTM(LASreadOpener* opener) :LASreader(opener)
 {
   file = 0;
   scale_factor = 0;
@@ -1545,7 +1545,7 @@ void LASreaderDTM::populate_bounding_box()
   }
 }
 
-LASreaderDTMrescale::LASreaderDTMrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderDTM()
+LASreaderDTMrescale::LASreaderDTMrescale(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderDTM(opener)
 {
   scale_factor[0] = x_scale_factor;
   scale_factor[1] = y_scale_factor;
@@ -1559,7 +1559,7 @@ BOOL LASreaderDTMrescale::open(const CHAR* file_name)
   return TRUE;
 }
 
-LASreaderDTMreoffset::LASreaderDTMreoffset(F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderDTM()
+LASreaderDTMreoffset::LASreaderDTMreoffset(LASreadOpener* opener, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderDTM(opener)
 {
   this->offset[0] = x_offset;
   this->offset[1] = y_offset;
@@ -1573,7 +1573,10 @@ BOOL LASreaderDTMreoffset::open(const CHAR* file_name)
   return TRUE;
 }
 
-LASreaderDTMrescalereoffset::LASreaderDTMrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderDTMrescale(x_scale_factor, y_scale_factor, z_scale_factor), LASreaderDTMreoffset(x_offset, y_offset, z_offset)
+LASreaderDTMrescalereoffset::LASreaderDTMrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : 
+  LASreaderDTM(opener),
+  LASreaderDTMrescale(opener, x_scale_factor, y_scale_factor, z_scale_factor),
+  LASreaderDTMreoffset(opener, x_offset, y_offset, z_offset)
 {
 }
 

@@ -51,7 +51,7 @@ public:
   void close(BOOL close_stream=TRUE);
   BOOL reopen(const char* file_name);
 
-  LASreaderBIN();
+  LASreaderBIN(LASreadOpener* opener);
   virtual ~LASreaderBIN();
 
 protected:
@@ -68,7 +68,7 @@ class LASreaderBINrescale : public virtual LASreaderBIN
 {
 public:
   virtual BOOL open(ByteStreamIn* stream);
-  LASreaderBINrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor);
+  LASreaderBINrescale(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor);
 
 protected:
   F64 scale_factor[3];
@@ -78,7 +78,7 @@ class LASreaderBINreoffset : public virtual LASreaderBIN
 {
 public:
   virtual BOOL open(ByteStreamIn* stream);
-  LASreaderBINreoffset(F64 x_offset, F64 y_offset, F64 z_offset);
+  LASreaderBINreoffset(LASreadOpener* opener, F64 x_offset, F64 y_offset, F64 z_offset);
 protected:
   F64 offset[3];
 };
@@ -87,7 +87,7 @@ class LASreaderBINrescalereoffset : public LASreaderBINrescale, LASreaderBINreof
 {
 public:
   BOOL open(ByteStreamIn* stream);
-  LASreaderBINrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset);
+  LASreaderBINrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset);
 };
 
 #endif

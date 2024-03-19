@@ -161,7 +161,7 @@ BOOL LASreaderStored::reopen()
   if (lasreader) delete lasreader;
   lasreader = 0;
 
-  LASreaderLAS* lasreaderlas = new LASreaderLAS();
+  LASreaderLAS* lasreaderlas = new LASreaderLAS(opener);
 
   if (lasreaderlas == 0)
   {
@@ -275,7 +275,7 @@ void LASreaderStored::close(BOOL close_stream)
   }
 }
 
-LASreaderStored::LASreaderStored()
+LASreaderStored::LASreaderStored(LASreadOpener* opener) :LASreader(opener)
 {
   lasreader = 0;
   laswriter = 0;

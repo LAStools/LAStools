@@ -1352,7 +1352,7 @@ void LASreaderTXT::clean()
   populated_header = FALSE;
 }
 
-LASreaderTXT::LASreaderTXT()
+LASreaderTXT::LASreaderTXT(LASreadOpener* opener) :LASreader(opener)
 {
   file = 0;
   piped = false;
@@ -2473,7 +2473,7 @@ void LASreaderTXT::populate_bounding_box()
   }
 }
 
-LASreaderTXTrescale::LASreaderTXTrescale(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderTXT()
+LASreaderTXTrescale::LASreaderTXTrescale(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor) : LASreaderTXT(opener)
 {
   scale_factor[0] = x_scale_factor;
   scale_factor[1] = y_scale_factor;
@@ -2499,7 +2499,7 @@ BOOL LASreaderTXTrescale::open(const CHAR* file_name, U8 point_type, const CHAR*
   return TRUE;
 }
 
-LASreaderTXTreoffset::LASreaderTXTreoffset(F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderTXT()
+LASreaderTXTreoffset::LASreaderTXTreoffset(LASreadOpener* opener, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderTXT(opener)
 {
   this->offset[0] = x_offset;
   this->offset[1] = y_offset;
@@ -2525,7 +2525,10 @@ BOOL LASreaderTXTreoffset::open(const CHAR* file_name, U8 point_type, const CHAR
   return TRUE;
 }
 
-LASreaderTXTrescalereoffset::LASreaderTXTrescalereoffset(F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : LASreaderTXTrescale(x_scale_factor, y_scale_factor, z_scale_factor), LASreaderTXTreoffset(x_offset, y_offset, z_offset)
+LASreaderTXTrescalereoffset::LASreaderTXTrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset) : 
+  LASreaderTXT(opener),
+  LASreaderTXTrescale(opener, x_scale_factor, y_scale_factor, z_scale_factor), 
+  LASreaderTXTreoffset(opener, x_offset, y_offset, z_offset)
 {
 }
 
