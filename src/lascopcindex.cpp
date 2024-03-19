@@ -73,7 +73,7 @@
 #define strcasecmp _stricmp
 #endif
 
-// MSVC does not like std::max({a, b, c}) nor std::max() and wants max(). g++ want std::max not max().
+ // MSVC does not like std::max({a, b, c}) nor std::max() and wants max(). g++ want std::max not max().
 #define MIN2(a, b) ((a) < (b) ? (a) : (b))
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN3(a, b, c) MIN2(MIN2(a, b), (c))
@@ -83,7 +83,7 @@
 #ifdef _WIN32
 I32 MAX_FOPEN = 500;
 #else
-I32 MAX_FOPEN = 1000; 
+I32 MAX_FOPEN = 1000;
 #endif
 
 static void usage(bool error = false, bool wait = false)
@@ -126,7 +126,7 @@ static U64 taketime()
 static inline F64 get_gps_time(const U8* buf) { return *((const F64*)&buf[22]); };
 static inline U8 get_scanner_channel(const U8* buf) { return (buf[15] >> 4) & 0x03; };
 static inline U8 get_return_number(const U8* buf) { return buf[14] & 0x0F; };
-static int compare_buffers(const void *a, const void *b)
+static int compare_buffers(const void* a, const void* b)
 {
   if (get_gps_time((const U8*)a) < get_gps_time((const U8*)b)) return -1;
   if (get_gps_time((const U8*)a) > get_gps_time((const U8*)b)) return 1;
@@ -154,7 +154,7 @@ struct LASfinalizer
   bool finalized;
   U32* grid;
 
-  LASfinalizer(const LASheader *header, const I32 division)
+  LASfinalizer(const LASheader* header, const I32 division)
   {
     xmin = header->min_x;
     xmax = header->max_x;
@@ -182,7 +182,7 @@ struct LASfinalizer
 
   ~LASfinalizer() { delete[] grid; };
 
-  bool add(const LASpoint *point)
+  bool add(const LASpoint* point)
   {
     I32 cell = cell_from_xyz(point->get_x(), point->get_y(), point->get_z());
     grid[cell]++;
@@ -190,7 +190,7 @@ struct LASfinalizer
     return true;
   };
 
-  bool remove(const LASpoint *point)
+  bool remove(const LASpoint* point)
   {
     finalized = false;
     I32 cell = cell_from_xyz(point->get_x(), point->get_y(), point->get_z());
@@ -225,16 +225,16 @@ struct LASfinalizer
     I32 startx = I32_FLOOR((xmin - this->xmin) / xres);
     I32 starty = I32_FLOOR((this->ymax - ymax) / yres);
     I32 startz = I32_FLOOR((zmin - this->zmin) / zres);
-    I32 endx   = I32_CEIL((xmax - this->xmin) / xres);
-    I32 endy   = I32_CEIL((this->ymax - ymin) / yres);
-    I32 endz   = I32_CEIL((zmax - this->zmin) / zres);
+    I32 endx = I32_CEIL((xmax - this->xmin) / xres);
+    I32 endy = I32_CEIL((this->ymax - ymin) / yres);
+    I32 endz = I32_CEIL((zmax - this->zmin) / zres);
 
     startx = MAX2(startx, 0);
     starty = MAX2(starty, 0);
     startz = MAX2(startz, 0);
-    endx   = MIN2(endx, ncols - 1);
-    endy   = MIN2(endy, nrows - 1);
-    endz   = MIN2(endz, nlays - 1);
+    endx = MIN2(endx, ncols - 1);
+    endy = MIN2(endy, nrows - 1);
+    endz = MIN2(endz, nlays - 1);
 
     I32 cell;
     for (I32 col = startx; col <= endx; col++)
@@ -259,17 +259,17 @@ struct VoxelRecord
   I32 posid; // The position of the point in the array
   VoxelRecord() { bufid = 0; posid = 0; };
   VoxelRecord(U16 buf, I32 pos) { bufid = buf; posid = pos; };
-};
+  };
 
 struct Octant
 {
-  Octant(){};
-  ~Octant(){};
+  Octant() {};
+  ~Octant() {};
 
-  void sort() 
-  { 
+  void sort()
+  {
     load();
-    qsort((void *)point_buffer, point_count, point_size, compare_buffers); 
+    qsort((void*)point_buffer, point_count, point_size, compare_buffers);
   };
   I32 npoints() const { return point_count; };
 
@@ -279,9 +279,9 @@ struct Octant
   virtual void reactivate() { return; }
   virtual void desactivate() { return; }
   virtual void clean() = 0;
-  virtual void swap(LASpoint *laspoint, const I32 pos) = 0;
-  virtual void insert(const U8*buffer, const I32 cell, const U16 chunk) = 0;
-  virtual void insert(const LASpoint *point, const I32 cell, const U16 chunk) = 0;
+  virtual void swap(LASpoint* laspoint, const I32 pos) = 0;
+  virtual void insert(const U8* buffer, const I32 cell, const U16 chunk) = 0;
+  virtual void insert(const LASpoint* point, const I32 cell, const U16 chunk) = 0;
 
   U8* point_buffer;
   I32 point_count;
@@ -315,12 +315,12 @@ struct OctantInMemory : public Octant
     memcpy(point_buffer + point_count * point_size, buffer, point_size);
 
     // cell = -1 means that recording the location of the point is useless (save memory)
-    if (cell >= 0) occupancy.insert({cell, VoxelRecord(chunk, point_count)});
+    if (cell >= 0) occupancy.insert({ cell, VoxelRecord(chunk, point_count) });
 
     point_count++;
   };
 
-  void insert(const LASpoint *laspoint, const I32 cell, const U16 chunk)
+  void insert(const LASpoint* laspoint, const I32 cell, const U16 chunk)
   {
     if (point_count == point_capacity)
     {
@@ -331,12 +331,12 @@ struct OctantInMemory : public Octant
     laspoint->copy_to(point_buffer + point_count * point_size);
 
     // cell = -1 means that recording the location of the point is useless (save memory)
-    if (cell >= 0) occupancy.insert({cell, VoxelRecord(chunk, point_count)});
+    if (cell >= 0) occupancy.insert({ cell, VoxelRecord(chunk, point_count) });
 
     point_count++;
   };
 
-  void swap(LASpoint *laspoint, const I32 pos)
+  void swap(LASpoint* laspoint, const I32 pos)
   {
     U8* tmp = (U8*)malloc(point_size);
     laspoint->copy_to(tmp);
@@ -371,16 +371,16 @@ struct OctantOnDisk : public Octant
     fp = 0;
     char suffix[32];
 
-    filename_points = (char*)malloc((strlen(dir)+32)*sizeof(char));
+    filename_points = (char*)malloc((strlen(dir) + 32) * sizeof(char));
     strcpy(filename_points, dir);
     sprintf(suffix, "points-%d-%d-%d-%d.bin", key.x, key.y, key.z, key.d);
     strcat(filename_points, suffix);
 
-    filename_octant = (char*)malloc((strlen(dir)+32)*sizeof(char));
+    filename_octant = (char*)malloc((strlen(dir) + 32) * sizeof(char));
     strcpy(filename_octant, dir);
     sprintf(suffix, "octant-%d-%d-%d-%d.bin", key.x, key.y, key.z, key.d);
     strcat(filename_octant, suffix);
-    
+
     open("w+b");
     close();
 
@@ -393,12 +393,12 @@ struct OctantOnDisk : public Octant
   void insert(const U8* buffer, const I32 cell, const U16 chunk)
   {
     reactivate("r+b");
-  
+
     fwrite(buffer, point_size, 1, fp);
- 
+
     // cell = -1 means that recording the location of the point is useless (save memory)
     if (cell >= 0)
-      occupancy.insert({cell, VoxelRecord(chunk, point_count)});
+      occupancy.insert({ cell, VoxelRecord(chunk, point_count) });
 
     point_count++;
 
@@ -416,7 +416,7 @@ struct OctantOnDisk : public Octant
 
     // cell = -1 means that recording the location of the point is useless (save memory)
     if (cell >= 0)
-      occupancy.insert({cell, VoxelRecord(chunk, point_count)});
+      occupancy.insert({ cell, VoxelRecord(chunk, point_count) });
 
     point_count++;
 
@@ -429,11 +429,11 @@ struct OctantOnDisk : public Octant
 
     U8* buffer1 = (U8*)malloc(point_size);
     U8* buffer2 = (U8*)malloc(point_size);
-    fseek(fp, pos*point_size, SEEK_SET);
+    fseek(fp, pos * point_size, SEEK_SET);
     fread(buffer1, point_size, 1, fp);
     laspoint->copy_to(buffer2);
     laspoint->copy_from(buffer1);
-    fseek(fp, pos*point_size, SEEK_SET);
+    fseek(fp, pos * point_size, SEEK_SET);
     fwrite(buffer2, point_size, 1, fp);
     fseek(fp, 0, SEEK_END);
     free(buffer1);
@@ -442,7 +442,7 @@ struct OctantOnDisk : public Octant
     close();
   };
 
-  void reactivate(const char* mode) 
+  void reactivate(const char* mode)
   {
     if (!active)
     {
@@ -450,10 +450,10 @@ struct OctantOnDisk : public Octant
       I32 cell;
       U16 buffid;
       I32 posid;
-      FILE *f = fopen(filename_octant, "rb");
+      FILE* f = fopen(filename_octant, "rb");
       if (f == 0)
       {
-        fprintf(stderr, "ERROR: cannot open file '%s': %s\n", filename_octant, strerror(errno));
+        LASMessage(LAS_ERROR, "cannot open file '%s': %s", filename_octant, strerror(errno));
         throw std::runtime_error("Unexpected I/O error.");
       }
       while (fread(&cell, sizeof(I32), 1, f))
@@ -464,24 +464,24 @@ struct OctantOnDisk : public Octant
       }
       fclose(f);
       remove(filename_octant);
-    } 
-    
+    }
+
     open(mode);
     active = true;
   };
 
-  void desactivate() 
-  { 
+  void desactivate()
+  {
     if (active)
     {
       // write occupancy map on disk
-      FILE *f = fopen(filename_octant, "wb");
+      FILE* f = fopen(filename_octant, "wb");
       if (f == 0)
       {
-        fprintf(stderr, "ERROR: cannot open file '%s': %s\n", filename_octant, strerror(errno));
+        LASMessage(LAS_ERROR, "cannot open file '%s': %s", filename_octant, strerror(errno));
         throw std::runtime_error("Unexpected I/O error.");
       }
-      for (const auto & e: occupancy)
+      for (const auto& e : occupancy)
       {
         fwrite(&e.first, sizeof(I32), 1, f);
         fwrite(&e.second.bufid, sizeof(U16), 1, f);
@@ -494,7 +494,7 @@ struct OctantOnDisk : public Octant
       occupancy = std::unordered_map<I32, VoxelRecord>();
 
       // close the file that stores the points
-      close(true); 
+      close(true);
 
       active = false;
     }
@@ -528,7 +528,7 @@ struct OctantOnDisk : public Octant
       free(filename_octant);
     }
 
-    if (point_buffer) 
+    if (point_buffer)
     {
       free(point_buffer);
     }
@@ -541,7 +541,7 @@ struct OctantOnDisk : public Octant
       fp = fopen(filename_points, mode);
       if (fp == 0)
       {
-        fprintf(stderr, "ERROR: cannot open file '%s': %s\n", filename_points, strerror(errno));
+        LASMessage(LAS_ERROR, "cannot open file '%s': %s", filename_points, strerror(errno));
         throw std::runtime_error("Unexpected I/O error.");
       }
       fseek(fp, 0, SEEK_END);
@@ -551,7 +551,7 @@ struct OctantOnDisk : public Octant
 
   void close(bool force = false)
   {
-    if (fp) 
+    if (fp)
     {
       if (force || num_connexions >= MAX_FOPEN)
       {
@@ -567,7 +567,7 @@ I32 OctantOnDisk::num_connexions = 0;
 
 typedef std::unordered_map<EPTkey, std::unique_ptr<Octant>, EPTKeyHasher> Registry;
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   /*#ifdef COMPILE_WITH_GUI
     bool gui = false;
@@ -575,7 +575,6 @@ int main(int argc, char *argv[])
 
   // Program options
   BOOL verbose = FALSE;
-  BOOL very_verbose = FALSE;
   BOOL progress = FALSE;
   BOOL shuffle = TRUE;
   BOOL swap = TRUE;
@@ -597,7 +596,7 @@ int main(int argc, char *argv[])
   F32 proba_swap_event = 0.95F;
   I32 num_points_buffer = 1000000; // Approx 40 MB
   CHAR* tmpdir = 0;
-  I32 max_files_opened = (I32)(0.5*MAX_FOPEN);
+  I32 max_files_opened = (I32)(0.5 * MAX_FOPEN);
   const I32 limit_depth = 10;
   const std::array<EPTkey, 8> unordered_keys = EPTkey::root().get_children();
 
@@ -652,12 +651,13 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-verbose") == 0)
     {
-      verbose = TRUE;
+      verbose = true;
+      set_message_log_level(LAS_VERBOSE);
     }
     else if (strcmp(argv[i], "-vv") == 0 || strcmp(argv[i], "-very_verbose") == 0)
     {
-      verbose = TRUE;
-      very_verbose = TRUE;
+      verbose = true;
+      set_message_log_level(LAS_VERY_VERBOSE);
     }
     else if (strcmp(argv[i], "-version") == 0)
     {
@@ -672,17 +672,17 @@ int main(int argc, char *argv[])
       /*#ifdef COMPILE_WITH_GUI
             gui = true;
       #else*/
-      fprintf(stderr, "WARNING: not compiled with GUI support. ignoring '-gui' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
       // #endif
     }
     else if (strcmp(argv[i], "-cores") == 0)
     {
-      fprintf(stderr, "WARNING: not compiled with multi-core batching. ignoring '-cores' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
       i++;
     }
     else if (strcmp(argv[i], "-cpu64") == 0)
     {
-      fprintf(stderr, "WARNING: not compiled with 64 bit support. ignoring '-cpu64' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
       argv[i][0] = '\0';
     }
     else if (strcmp(argv[i], "-progress") == 0)
@@ -724,7 +724,7 @@ int main(int argc, char *argv[])
 #ifdef _MSC_VER
       _setmaxstdio(2000);
       MAX_FOPEN = _getmaxstdio();
-      max_files_opened = (I32)(0.5*MAX_FOPEN);
+      max_files_opened = (I32)(0.5 * MAX_FOPEN);
 #endif
     }
     else if (strcmp(argv[i], "-unordered") == 0)
@@ -738,11 +738,11 @@ int main(int argc, char *argv[])
 #ifdef _MSC_VER
       if (_setmaxstdio(MAX_FOPEN) == -1)
       {
-        fprintf(stderr, "WARNING: the operating system cannot open %d files and is limited to %d\n", MAX_FOPEN, _getmaxstdio());
+        LASMessage(LAS_WARNING, "the operating system cannot open %d files and is limited to %d", MAX_FOPEN, _getmaxstdio());
         byebye(true);
       }
       MAX_FOPEN = _getmaxstdio();
-      max_files_opened = (I32)(0.5*MAX_FOPEN);
+      max_files_opened = (I32)(0.5 * MAX_FOPEN);
 #endif
     }
     else if (strcmp(argv[i], "-m") == 0)
@@ -759,12 +759,12 @@ int main(int argc, char *argv[])
     {
       if ((i + 1) >= argc)
       {
-        fprintf(stderr, "ERROR: '%s' needs 1 argument: depth\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: depth", argv[i]);
         byebye(true);
       }
       if (sscanf(argv[i + 1], "%d", &max_depth) != 1)
       {
-        fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i + 1], argv[i]);
+        LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
         usage(true);
       }
       if (max_depth > limit_depth || max_depth < 0)
@@ -775,27 +775,27 @@ int main(int argc, char *argv[])
     {
       if ((i + 1) >= argc)
       {
-        fprintf(stderr, "ERROR: '%s' needs 1 argument: num\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: num", argv[i]);
         byebye(true);
       }
       if (sscanf(argv[i + 1], "%d", &MAX_FOPEN) != 1)
       {
-        fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i + 1], argv[i]);
+        LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
         usage(true);
       }
-      max_files_opened = (I32)(0.5*MAX_FOPEN);
+      max_files_opened = (I32)(0.5 * MAX_FOPEN);
       i += 1;
     }
     else if (strcmp(argv[i], "-seed") == 0)
     {
       if ((i + 1) >= argc)
       {
-        fprintf(stderr, "ERROR: '%s' needs 1 argument: seed\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: seed", argv[i]);
         byebye(true);
       }
       if (sscanf(argv[i + 1], "%u", &seed) != 1)
       {
-        fprintf(stderr, "ERROR: cannot understand argument '%s' for '%s'\n", argv[i + 1], argv[i]);
+        LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
         usage(true);
       }
       i += 1;
@@ -804,7 +804,7 @@ int main(int argc, char *argv[])
     {
       if ((i + 1) >= argc)
       {
-        fprintf(stderr, "ERROR: '%s' needs at least 1 argument: directory\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: directory", argv[i]);
         return FALSE;
       }
       i += 1;
@@ -817,7 +817,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
       usage(true);
     }
   }
@@ -835,25 +835,25 @@ int main(int argc, char *argv[])
 
   if (!lasreadopener.active())
   {
-    fprintf(stderr, "ERROR: no input specified\n");
+    LASMessage(LAS_ERROR, "no input specified");
     usage(true, argc == 1);
   }
 
   if (lasreadopener.get_file_name_number() > 1 && unordered)
   {
-    fprintf(stderr, "Memory optimization for spatially unordered files is supported only for a single file.\n");
+    LASMessage(LAS_INFO, "Memory optimization for spatially unordered files is supported only for a single file.");
     usage(true, argc == 1);
   }
 
   if (lasreadopener.is_stored())
   {
-    fprintf(stderr, "LASreaderStored is not supported for lascopcindex.\n");
+    LASMessage(LAS_INFO, "LASreaderStored is not supported for lascopcindex.");
     usage(true, argc == 1);
   }
 
   if (lasreadopener.is_piped())
   {
-    fprintf(stderr, "LASreaderPipon is not supported for lascopcindex.\n");
+    LASMessage(LAS_INFO, "LASreaderPipon is not supported for lascopcindex.");
     usage(true, argc == 1);
   }
 
@@ -864,13 +864,13 @@ int main(int argc, char *argv[])
 
     if (lasreader == 0)
     {
-      fprintf(stderr, "ERROR: could not open lasreader\n");
+      LASMessage(LAS_ERROR, "could not open lasreader");
       usage(true, argc == 1);
     }
 
     if (!lasreader->point.have_gps_time)
     {
-      fprintf(stderr, "WARNING: building a COPC file without gpstime.\n");
+      LASMessage(LAS_WARNING, "building a COPC file without gpstime.");
     }
 
     // create output file name if needed
@@ -879,8 +879,8 @@ int main(int argc, char *argv[])
     {
       if (lasreadopener.get_file_name() == 0)
       {
-        fprintf(stderr, "ERROR: no output file specified\n");
-        byebye(true, argc==1);
+        LASMessage(LAS_ERROR, "no output file specified");
+        byebye(true, argc == 1);
       }
       laswriteopener.set_appendix(".copc");
       laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
@@ -888,22 +888,22 @@ int main(int argc, char *argv[])
 
     if (!laswriteopener.active())
     {
-      fprintf(stderr, "ERROR: no output specified\n");
+      LASMessage(LAS_ERROR, "no output specified");
       usage(true, argc == 1);
     }
 
     // check and fix correctness of file extension
-    
+
     if (laswriteopener.get_file_name())
     {
-      CHAR* file_name =  LASCopyString(laswriteopener.get_file_name());
+      CHAR* file_name = LASCopyString(laswriteopener.get_file_name());
       I32 len = (I32)strlen(file_name);
       while ((len >= 0) && (file_name[len] != '.')) len--;
       if ((strncmp(file_name + len, ".las", 4) == 0) || (strncmp(file_name + len, ".LAS", 4) == 0))
       {
-        fprintf(stderr, "WARNING: output file has wrong extension. COPC files must be LAZ files. Output was renamed automatically.\n");
+        LASMessage(LAS_WARNING, "output file has wrong extension. COPC files must be LAZ files. Output was renamed automatically.");
         len = (I32)strlen(file_name);
-        if (file_name[len-1] == 'S') file_name[len-1] = 'Z'; else file_name[len-1] = 'z';
+        if (file_name[len - 1] == 'S') file_name[len - 1] = 'Z'; else file_name[len - 1] = 'z';
         laswriteopener.set_file_name(file_name);
       }
       free(file_name);
@@ -918,11 +918,11 @@ int main(int argc, char *argv[])
         const char* file_name_base = laswriteopener.get_file_name_base();
         char* file_name;
         const char* extension = ".copc.laz";
-        file_name = (char*)malloc((strlen(file_name_base)+10)*sizeof(char));
+        file_name = (char*)malloc((strlen(file_name_base) + 10) * sizeof(char));
         strcpy(file_name, file_name_base);
         strcat(file_name, extension);
         laswriteopener.set_file_name(file_name);
-        fprintf(stderr, "WARNING: output was renamed '%s'\n", laswriteopener.get_file_name_only());
+        LASMessage(LAS_WARNING, "output was renamed '%s'", laswriteopener.get_file_name_only());
         free(file_name);
       }
     }
@@ -931,7 +931,7 @@ int main(int argc, char *argv[])
 
     if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
     {
-      fprintf(stderr, "ERROR: input and output file name are identical: '%s'\n", lasreadopener.get_file_name());
+      LASMessage(LAS_ERROR, "input and output file name are identical: '%s'", lasreadopener.get_file_name());
       usage(true);
     }
 
@@ -944,13 +944,13 @@ int main(int argc, char *argv[])
       F64 delta_y = lasheader->max_y - lasheader->min_y;
       F64 delta_z = lasheader->max_z - lasheader->min_z;
 
-      BOOL weird_z = 1000*delta_x < delta_z || 1000*delta_y < delta_z; // we have z and xy in different units
+      BOOL weird_z = 1000 * delta_x < delta_z || 1000 * delta_y < delta_z; // we have z and xy in different units
       BOOL accurate_coordinates = lasheader->x_scale_factor < 0.0001 || lasheader->y_scale_factor < 0.0001;
       BOOL longlat_extent = lasheader->max_x <= 90 && lasheader->min_x >= -90 && lasheader->max_y <= 180 && lasheader->min_y >= -180; // could be TLS centered on (0,0)
-    
+
       if (weird_z && longlat_extent && accurate_coordinates)
       {
-        fprintf(stderr, "ERROR: long/lat coordinates detected. COPC indexing supports only projected coordinates. If this is a false positive please use -m or -ft to provide the coordinates units.\n");
+        LASMessage(LAS_ERROR, "long/lat coordinates detected. COPC indexing supports only projected coordinates. If this is a false positive please use -m or -ft to provide the coordinates units.");
         delete lasreader;
         usage(true, argc == 1);
       }
@@ -958,8 +958,8 @@ int main(int argc, char *argv[])
 
     if (unordered || ondisk) num_points_buffer *= 2; // reduce swap events
 
-    if (verbose && unordered) fprintf(stderr, "Memory optimization for spatially unordered file: enabled\n\n");
-    if (verbose && ondisk)    fprintf(stderr, "Processing points on disk: enabled\n\n");
+    if (unordered) LASMessage(LAS_VERBOSE, "Memory optimization for spatially unordered file: enabled");
+    if (ondisk)    LASMessage(LAS_VERBOSE, "Processing points on disk: enabled");
 
     srand(seed);
 
@@ -969,7 +969,7 @@ int main(int argc, char *argv[])
       // PASS 1: Finalize the point cloud
       // =============================================================================================
 
-      if (verbose || progress) fprintf(stderr, "Pass 1/2: finalizing the point cloud\n");
+      if (progress) LASMessage(LAS_VERBOSE, "Pass 1/2: finalizing the point cloud");
 
       U64 t0 = taketime();
 
@@ -984,14 +984,11 @@ int main(int argc, char *argv[])
       progressbar.set_display(verbose || progress);
 
       LASfinalizer lasfinalizer(lasheader, 2 << tmp_max_depth);
-      LASinventory *lasinventory = new LASinventory;
-      LASoccupancyGrid *lasoccupancygrid = new LASoccupancyGrid(occupancy_resolution);
+      LASinventory* lasinventory = new LASinventory;
+      LASoccupancyGrid* lasoccupancygrid = new LASoccupancyGrid(occupancy_resolution);
 
-      if (verbose)
-      {
-        fprintf(stderr, "Finalizer subdivided the coverage in %dx%dx%d = %d regions\n", lasfinalizer.ncols, lasfinalizer.nrows, lasfinalizer.nlays, lasfinalizer.ncols*lasfinalizer.nrows*lasfinalizer.nlays);
-        fprintf(stderr, "Finalizer resolutions = %.1lf %.1lf %.1lf\n", lasfinalizer.xres, lasfinalizer.yres, lasfinalizer.zres);
-      }
+      LASMessage(LAS_VERBOSE, "Finalizer subdivided the coverage in %dx%dx%d = %d regions", lasfinalizer.ncols, lasfinalizer.nrows, lasfinalizer.nlays, lasfinalizer.ncols * lasfinalizer.nrows * lasfinalizer.nlays);
+      LASMessage(LAS_VERBOSE, "Finalizer resolutions = %.1lf %.1lf %.1lf", lasfinalizer.xres, lasfinalizer.yres, lasfinalizer.zres);
 
       F64 gpstime_minimum = F64_MAX;
       F64 gpstime_maximum = F64_MIN;
@@ -1037,17 +1034,16 @@ int main(int argc, char *argv[])
       delete lasinventory;
 
       U64 t1 = taketime();
-      if (verbose)
-      {
-        fprintf(stderr, "Area covered: %.0lf\n", area);
-        fprintf(stderr, "Number of points: %llu\n", num_points);
-        fprintf(stderr, "Density of points: %.1lf\n", density);
-        fprintf(stderr, "Maximum depth of the octree: %d\n", max_depth);
-        if (swap) 
-        { 
-          fprintf(stderr, "Swap probabilities per level: "); for (i = 0; i <= max_depth; i++) fprintf(stderr, "%.4lf ", swap_probabilities[i]); fprintf(stderr, "\n"); 
+      if (verbose) {
+        LASMessage(LAS_VERBOSE, "Area covered: %.0lf", area);
+        LASMessage(LAS_VERBOSE, "Number of points: %llu", num_points);
+        LASMessage(LAS_VERBOSE, "Density of points: %.1lf", density);
+        LASMessage(LAS_VERBOSE, "Maximum depth of the octree: %d", max_depth);
+        if (swap)
+        {
+          LASMessage(LAS_VERBOSE, "Swap probabilities per level: "); for (i = 0; i <= max_depth; i++) fprintf(stderr, "%.4lf ", swap_probabilities[i]); fprintf(stderr, "");
         }
-        fprintf(stderr, "Pass 1 took %u sec.\n", (U32)(t1 - t0));
+        LASMessage(LAS_VERBOSE, "Pass 1 took %u sec.", (U32)(t1 - t0));
       }
 
       // =============================================================================================
@@ -1093,21 +1089,21 @@ int main(int argc, char *argv[])
         I32 num_extra_bytes = 0;
         switch (lasreader->header.point_data_format)
         {
-          case 0: num_extra_bytes = lasreader->header.point_data_record_length - 20; break;
-          case 1: num_extra_bytes = lasreader->header.point_data_record_length - 28; break;
-          case 2: num_extra_bytes = lasreader->header.point_data_record_length - 26; break;
-          case 3: num_extra_bytes = lasreader->header.point_data_record_length - 34; break;
-          case 4: num_extra_bytes = lasreader->header.point_data_record_length - 57; break;
-          case 5: num_extra_bytes = lasreader->header.point_data_record_length - 63; break;
-          case 6: num_extra_bytes = lasreader->header.point_data_record_length - 30; break;
-          case 7: num_extra_bytes = lasreader->header.point_data_record_length - 36; break;
-          case 8: num_extra_bytes = lasreader->header.point_data_record_length - 38; break;
-          case 9: num_extra_bytes = lasreader->header.point_data_record_length - 59; break;
-          case 10: num_extra_bytes = lasreader->header.point_data_record_length - 67; break;
+        case 0: num_extra_bytes = lasreader->header.point_data_record_length - 20; break;
+        case 1: num_extra_bytes = lasreader->header.point_data_record_length - 28; break;
+        case 2: num_extra_bytes = lasreader->header.point_data_record_length - 26; break;
+        case 3: num_extra_bytes = lasreader->header.point_data_record_length - 34; break;
+        case 4: num_extra_bytes = lasreader->header.point_data_record_length - 57; break;
+        case 5: num_extra_bytes = lasreader->header.point_data_record_length - 63; break;
+        case 6: num_extra_bytes = lasreader->header.point_data_record_length - 30; break;
+        case 7: num_extra_bytes = lasreader->header.point_data_record_length - 36; break;
+        case 8: num_extra_bytes = lasreader->header.point_data_record_length - 38; break;
+        case 9: num_extra_bytes = lasreader->header.point_data_record_length - 59; break;
+        case 10: num_extra_bytes = lasreader->header.point_data_record_length - 67; break;
         }
         if (num_extra_bytes < 0)
         {
-          fprintf(stderr, "ERROR: point record length has %d fewer bytes than needed\n", num_extra_bytes);
+          LASMessage(LAS_ERROR, "point record length has %d fewer bytes than needed", num_extra_bytes);
           byebye(true);
         }
 
@@ -1115,9 +1111,9 @@ int main(int argc, char *argv[])
         lasreader->header.point_data_format = (U8)target_point_data_format;
         switch (lasreader->header.point_data_format)
         {
-          case 6: lasreader->header.point_data_record_length = 30 + num_extra_bytes; break;
-          case 7: lasreader->header.point_data_record_length = 36 + num_extra_bytes; break;
-          case 8: lasreader->header.point_data_record_length = 38 + num_extra_bytes; break;
+        case 6: lasreader->header.point_data_record_length = 30 + num_extra_bytes; break;
+        case 7: lasreader->header.point_data_record_length = 36 + num_extra_bytes; break;
+        case 8: lasreader->header.point_data_record_length = 38 + num_extra_bytes; break;
         }
       }
 
@@ -1129,7 +1125,7 @@ int main(int argc, char *argv[])
         geoprojectionconverter.set_projection_from_geo_keys(lasheader->vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasheader->vlr_geo_key_entries, lasheader->vlr_geo_ascii_params, lasheader->vlr_geo_double_params);
         if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
         {
-          fprintf(stderr, "WARNING: cannot convert CRS from GeoTIFF to OGC WKT.\n");
+          LASMessage(LAS_WARNING, "cannot convert CRS from GeoTIFF to OGC WKT.");
         }
 
         if (ogc_wkt)
@@ -1139,17 +1135,17 @@ int main(int argc, char *argv[])
           lasheader->del_geo_ascii_params();
           lasheader->del_geo_double_params();
           lasheader->set_geo_ogc_wkt(len, ogc_wkt);
-          if (verbose) fprintf(stderr, "CRS converted from GeoTIF to OGC WKT string: %s\n", ogc_wkt);
+          LASMessage(LAS_VERBOSE, "CRS converted from GeoTIF to OGC WKT string: %s", ogc_wkt);
           free(ogc_wkt);
         }
       }
 
       // For format conversion
-      LASpoint *laspoint = new LASpoint;
+      LASpoint* laspoint = new LASpoint;
       laspoint->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
 
       // Creation of the COPC info VLR
-      LASvlr_copc_info *info = new LASvlr_copc_info[1];
+      LASvlr_copc_info* info = new LASvlr_copc_info[1];
       info->center_x = octree.get_center_x();
       info->center_y = octree.get_center_y();
       info->center_z = octree.get_center_z();
@@ -1170,7 +1166,7 @@ int main(int argc, char *argv[])
       {
         lasreader->header.number_of_variable_length_records++;
         lasreader->header.offset_to_point_data += 54;
-        lasreader->header.vlrs = (LASvlr *)realloc(lasreader->header.vlrs, lasreader->header.number_of_variable_length_records * sizeof(LASvlr));
+        lasreader->header.vlrs = (LASvlr*)realloc(lasreader->header.vlrs, lasreader->header.number_of_variable_length_records * sizeof(LASvlr));
         for (U32 i = lasreader->header.number_of_variable_length_records - 1; i > 0; i--) lasreader->header.vlrs[i] = lasreader->header.vlrs[i - 1];
         memset((void*)&(lasreader->header.vlrs[0]), 0, sizeof(LASvlr));
         lasreader->header.vlrs[0].reserved = 0;
@@ -1189,10 +1185,10 @@ int main(int argc, char *argv[])
 
       // Create the COPC file
       LASwriter* laswriter = laswriteopener.open(&lasreader->header);
-      
+
       if (laswriter == 0)
       {
-        fprintf(stderr, "ERROR: could not open laswriter\n");
+        LASMessage(LAS_ERROR, "could not open laswriter");
         usage(true, argc == 1);
       }
 
@@ -1202,14 +1198,14 @@ int main(int argc, char *argv[])
       // to free up memory.
       // =============================================================================================
 
-      if (verbose || progress) fprintf(stderr, "\nPass 2/2: building and writing the COPC file\n");
+      if (progress) LASMessage(LAS_VERBOSE, "\nPass 2/2: building and writing the COPC file");
       U64 t4 = taketime();
 
       // Counters
       U8  id_unordered_key = 0;
       U16 id_buffer = 0;
       I64 num_points_read = 0;
-    
+
       // Buffer of points
       U32 elem_size = laspoint->total_point_size;
       I32 buffer_size = 0;
@@ -1228,7 +1224,7 @@ int main(int argc, char *argv[])
       Registry::iterator it;
 
       // Setup progress bar (*3 because updated at 3 strategic locations)
-      progressbar.set_total((U64)num_points*3);
+      progressbar.set_total((U64)num_points * 3);
       progressbar.set_display(progress);
 
       // tmpdir
@@ -1303,23 +1299,23 @@ int main(int argc, char *argv[])
               {
                 if (ondisk)
                 {
-                  it = registry.insert({key, std::make_unique<OctantOnDisk>(key, tmpdir, elem_size)}).first;
+                  it = registry.insert({ key, std::make_unique<OctantOnDisk>(key, tmpdir, elem_size) }).first;
 
                   // If too many files are opened we desactivate the octants. They will be auto-reactivated when needed.
                   // Innactive octants are automatically closed until they become active again. More than 500
                   // files opened can arise for very large point-clouds but most are likely to be inactive.
                   if (OctantOnDisk::num_connexions > max_files_opened)
                   {
-                    if (verbose) fprintf(stderr, "File connexions limit reached (%d). Closing all files temporarily.\n", OctantOnDisk::num_connexions);
-                    for (auto &e : registry) e.second->desactivate();
+                    LASMessage(LAS_VERBOSE, "File connexions limit reached (%d). Closing all files temporarily.", OctantOnDisk::num_connexions);
+                    for (auto& e : registry) e.second->desactivate();
                   }
                 }
                 else
                 {
-                  it = registry.insert({key, std::make_unique<OctantInMemory>(elem_size)}).first;
+                  it = registry.insert({ key, std::make_unique<OctantInMemory>(elem_size) }).first;
                 }
 
-                if (very_verbose) fprintf(stderr, "[%.0lf%%] Creation of octant %d-%d-%d-%d\n", progressbar.get_progress(), key.d, key.x, key.y, key.z);
+                LASMessage(LAS_VERY_VERBOSE, "[%.0lf%%] Creation of octant %d-%d-%d-%d", progressbar.get_progress(), key.d, key.x, key.y, key.z);
               }
 
               auto it2 = it->second->occupancy.find(cell);
@@ -1329,7 +1325,7 @@ int main(int argc, char *argv[])
               {
                 // bufid != id_buffer: save the heavy cost (on disk) of swapping.
                 // No need to swap two points from the same buffer: they are already shuffled.
-                if (it2->second.bufid != id_buffer && (((F32)rand()/(F32)RAND_MAX)) < swap_probabilities[lvl])
+                if (it2->second.bufid != id_buffer && (((F32)rand() / (F32)RAND_MAX)) < swap_probabilities[lvl])
                 {
                   it->second->swap(laspoint, it2->second.posid);
                   it2->second.bufid = id_buffer;
@@ -1379,7 +1375,7 @@ int main(int argc, char *argv[])
                     auto it2 = registry.find(key);
                     if (it2 != registry.end())
                     {
-                      if (very_verbose) fprintf(stderr, "[%.0lf%%] Moving %d points from %d-%d-%d-%d to %d-%d-%d-%d\n", progressbar.get_progress(), it->second->npoints(), it->first.d, it->first.x, it->first.y, it->first.z, it2->first.d, it2->first.x, it2->first.y, it2->first.z);
+                      LASMessage(LAS_VERY_VERBOSE, "[%.0lf%%] Moving %d points from %d-%d-%d-%d to %d-%d-%d-%d", progressbar.get_progress(), it->second->npoints(), it->first.d, it->first.x, it->first.y, it->first.z, it2->first.d, it2->first.x, it2->first.y, it2->first.z);
 
                       it->second->load();
                       for (I32 k = 0; k < it->second->npoints(); k++)
@@ -1434,7 +1430,7 @@ int main(int argc, char *argv[])
                 }
                 laswriter->chunk();
 
-                if (very_verbose) fprintf(stderr, "[%.0lf%%] Octant %d-%d-%d-%d written in COPC file\n", progressbar.get_progress(), it->first.d, it->first.x, it->first.y, it->first.z);
+                LASMessage(LAS_VERY_VERBOSE, "[%.0lf%%] Octant %d-%d-%d-%d written in COPC file", progressbar.get_progress(), it->first.d, it->first.x, it->first.y, it->first.z);
 
                 // Record the VLR entry
                 entry.byte_size = (I32)(laswriter->tell() - entry.offset);
@@ -1454,9 +1450,9 @@ int main(int argc, char *argv[])
           buffer_size = 0;
 
           if (verbose)
-          { 
-            F32 million = (F32)((U64)num_points_buffer*id_buffer/1000000.0);
-            fprintf(stderr, "[%.0lf%%] Processed %.1f million points | LAZ chunks written: %u", progressbar.get_progress(), million, (U32)entries.size() );
+          {
+            F32 million = (F32)((U64)num_points_buffer * id_buffer / 1000000.0);
+            fprintf(stderr, "[%.0lf%%] Processed %.1f million points | LAZ chunks written: %u", progressbar.get_progress(), million, (U32)entries.size());
             if (ondisk) fprintf(stderr, " | Files opened: %d/%d", OctantOnDisk::num_connexions, (I32)registry.size());
             fprintf(stderr, "\n");
           }
@@ -1468,8 +1464,8 @@ int main(int argc, char *argv[])
             // files opened can arise for very large point-clouds but most are likely to be inactive.
             if (OctantOnDisk::num_connexions > max_files_opened)
             {
-              if (verbose) fprintf(stderr, "File connexions limit reached (%d). Closing all files temporarily.\n", OctantOnDisk::num_connexions);
-              for (auto &e : registry) e.second->desactivate();
+              LASMessage(LAS_VERBOSE, "File connexions limit reached (%d). Closing all files temporarily.", OctantOnDisk::num_connexions);
+              for (auto& e : registry) e.second->desactivate();
             }
           }
         }
@@ -1487,7 +1483,7 @@ int main(int argc, char *argv[])
       lasreader->close();
 
       if (laswriter->npoints != num_points)
-        fprintf(stderr, "ERROR: Different number of points in input and output. Something went wrong. Please report this error.\n");
+        LASMessage(LAS_ERROR, "Different number of points in input and output. Something went wrong. Please report this error.");
 
       delete lasreader;
       delete laswriter;
@@ -1503,32 +1499,29 @@ int main(int argc, char *argv[])
         U32 num_chunks_few_points = 0;
         I32 highest_num_points = 0;
         I32 lowest_num_points = I32_MAX;
-        for (const auto &chunk : entries)
+        for (const auto& chunk : entries)
         {
           if (chunk.point_count > highest_num_points) highest_num_points = chunk.point_count;
           if (chunk.point_count < lowest_num_points) lowest_num_points = chunk.point_count;
           if (chunk.point_count <= (I32)min_points_per_octant) num_chunks_few_points++;
         }
-
-        fprintf(stderr, "Number of chunks: %u\n", num_chunks);
-        fprintf(stderr, "Highest number of points in a chunk: %u\n", highest_num_points);
-        fprintf(stderr, "Lowest number of points in a chunk: %u\n", lowest_num_points);
-        fprintf(stderr, "Number of chunks with less than %u points: %u\n", min_points_per_octant, num_chunks_few_points);
-        fprintf(stderr, "Pass 2 took %u sec.\n\n", (U32)(t5 - t4));
-
-        fprintf(stderr, "Total time: %u sec.\n", (U32)(t5 - t0));
+        LASMessage(LAS_VERBOSE, "Number of chunks: %u", num_chunks);
+        LASMessage(LAS_VERBOSE, "Highest number of points in a chunk: %u", highest_num_points);
+        LASMessage(LAS_VERBOSE, "Lowest number of points in a chunk: %u", lowest_num_points);
+        LASMessage(LAS_VERBOSE, "Number of chunks with less than %u points: %u", min_points_per_octant, num_chunks_few_points);
+        LASMessage(LAS_VERBOSE, "Pass 2 took %u sec.\n", (U32)(t5 - t4));
+        LASMessage(LAS_VERBOSE, "Total time: %u sec.", (U32)(t5 - t0));
       }
-
       laswriteopener.set_file_name(0);
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
-      fprintf(stderr, "ERROR: %s\n", e.what());
+      LASMessage(LAS_ERROR, "%s", e.what());
       error = true;
     }
     catch (...)
     {
-      fprintf(stderr, "ERROR processing file '%s'. maybe file is corrupt?\n", lasreadopener.get_file_name());
+      LASMessage(LAS_INFO, "ERROR processing file '%s'. maybe file is corrupt?", lasreadopener.get_file_name());
       error = true;
 
       laswriteopener.set_file_name(0);

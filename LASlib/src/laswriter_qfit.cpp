@@ -248,15 +248,15 @@ BOOL LASwriterQFIT::write_point(const LASpoint* point)
 
   if (endian_swap)
   {
-    ENDIAN_SWAP_32((U8*)&buffer[0]);
-    ENDIAN_SWAP_32((U8*)&buffer[1]);
-    ENDIAN_SWAP_32((U8*)&buffer[2]);
-    ENDIAN_SWAP_32((U8*)&buffer[3]);
-    ENDIAN_SWAP_32((U8*)&buffer[5]);
-    ENDIAN_SWAP_32((U8*)&buffer[6]);
-    ENDIAN_SWAP_32((U8*)&buffer[7]);
-    ENDIAN_SWAP_32((U8*)&buffer[8]);
-    ENDIAN_SWAP_32((U8*)&buffer[10]);
+    ENDIAN_SWAP_32_((U8*)&buffer[0]);
+    ENDIAN_SWAP_32_((U8*)&buffer[1]);
+    ENDIAN_SWAP_32_((U8*)&buffer[2]);
+    ENDIAN_SWAP_32_((U8*)&buffer[3]);
+    ENDIAN_SWAP_32_((U8*)&buffer[5]);
+    ENDIAN_SWAP_32_((U8*)&buffer[6]);
+    ENDIAN_SWAP_32_((U8*)&buffer[7]);
+    ENDIAN_SWAP_32_((U8*)&buffer[8]);
+    ENDIAN_SWAP_32_((U8*)&buffer[10]);
   }
 
   if (!stream->putBytes((U8*)buffer, version)) return FALSE;

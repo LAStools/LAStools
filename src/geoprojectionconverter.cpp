@@ -42,6 +42,7 @@
 #else
 #include <unistd.h>
 #endif
+#include "lasmessage.hpp"
 
 #if defined(_MSC_VER) && \
     (_MSC_FULL_VER >= 150000000)
@@ -978,7 +979,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         ellipsoid = GEO_ELLIPSOID_KRASSOWSKY;
         break;
       default:
-        fprintf(stderr, "GeographicTypeGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
+        LASMessage(LAS_ERROR, "GeographicTypeGeoKey: look-up for %d not implemented", geo_keys[i].value_offset);
       }
       break;
     case 2050: // GeogGeodeticDatumGeoKey
@@ -1071,7 +1072,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         ellipsoid = GEO_ELLIPSOID_KRASSOWSKY;
         break;
       default:
-        fprintf(stderr, "GeogGeodeticDatumGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
+        LASMessage(LAS_ERROR, "GeogGeodeticDatumGeoKey: look-up for %d not implemented", geo_keys[i].value_offset);
       }
       break;
     case 2052: // GeogLinearUnitsGeoKey
@@ -1087,7 +1088,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         set_coordinates_in_survey_feet();
         break;
       default:
-        fprintf(stderr, "GeogLinearUnitsGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
+        LASMessage(LAS_ERROR, "GeogLinearUnitsGeoKey: look-up for %d not implemented", geo_keys[i].value_offset);
       }
       break;
     case 2056: // GeogEllipsoidGeoKey
@@ -1110,76 +1111,76 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
         user_defined_projection = 16;
         break;
       case 2: // CT_TransvMercator_Modified_Alaska
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_TransvMercator_Modified_Alaska not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_TransvMercator_Modified_Alaska not implemented");
         break;
       case 3: // CT_ObliqueMercator
         user_defined_projection = 3;
         break;
       case 4: // CT_ObliqueMercator_Laborde
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Laborde not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_ObliqueMercator_Laborde not implemented");
         break;
       case 5: // CT_ObliqueMercator_Rosenmund
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Rosenmund not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_ObliqueMercator_Rosenmund not implemented");
         break;
       case 6: // CT_ObliqueMercator_Spherical
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_ObliqueMercator_Spherical not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_ObliqueMercator_Spherical not implemented");
         break;
       case 7: // CT_Mercator
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Mercator not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_Mercator not implemented");
         break;
       case 9: // CT_LambertConfConic_Helmert
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_LambertConfConic_Helmert not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_LambertConfConic_Helmert not implemented");
         break;
       case 10: // CT_LambertAzimEqualArea
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_LambertAzimEqualArea not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_LambertAzimEqualArea not implemented");
         break;
       case 12: // CT_AzimuthalEquidistant
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_AzimuthalEquidistant not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_AzimuthalEquidistant not implemented");
         break;
       case 13: // CT_EquidistantConic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_EquidistantConic not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_EquidistantConic not implemented");
         break;
       case 14: // CT_Stereographic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Stereographic not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_Stereographic not implemented");
         break;
       case 15: // CT_PolarStereographic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_PolarStereographic not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_PolarStereographic not implemented");
         break;
       case 17: // CT_Equirectangular
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Equirectangular not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_Equirectangular not implemented");
         break;
       case 18: // CT_CassiniSoldner
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_CassiniSoldner not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_CassiniSoldner not implemented");
         break;
       case 19: // CT_Gnomonic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Gnomonic not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_Gnomonic not implemented");
         break;
       case 20: // CT_MillerCylindrical
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_MillerCylindrical not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_MillerCylindrical not implemented");
         break;
       case 21: // CT_Orthographic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Orthographic not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_Orthographic not implemented");
         break;
       case 22: // CT_Polyconic
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Polyconic not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_Polyconic not implemented");
         break;
       case 23: // CT_Robinson
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Robinson not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_Robinson not implemented");
         break;
       case 24: // CT_Sinusoidal
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_Sinusoidal not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_Sinusoidal not implemented");
         break;
       case 25: // CT_VanDerGrinten
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_VanDerGrinten not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_VanDerGrinten not implemented");
         break;
       case 26: // CT_NewZealandMapGrid
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_NewZealandMapGrid not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_NewZealandMapGrid not implemented");
         break;
       case 27: // CT_TransvMercator_SouthOriented
-        fprintf(stderr, "ProjCoordTransGeoKey: CT_TransvMercator_SouthOriented not implemented\n");
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: CT_TransvMercator_SouthOriented not implemented");
         break;
       default:
-        fprintf(stderr, "ProjCoordTransGeoKey: look-up for %d not implemented\n", geo_keys[i].value_offset);
+        LASMessage(LAS_ERROR, "ProjCoordTransGeoKey: look-up for %d not implemented", geo_keys[i].value_offset);
       }
       break;
     case 3078: // ProjStdParallel1GeoKey
@@ -1812,7 +1813,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
       }
       else
       {
-        fprintf(stderr, "get_geo_keys_from_projection for generic projection not implemented\n");
+        LASMessage(LAS_ERROR, "get_geo_keys_from_projection for generic projection not implemented");
       }
     }
     else if (projection->type == GEO_PROJECTION_LAT_LONG || projection->type == GEO_PROJECTION_LONG_LAT)
@@ -1956,7 +1957,7 @@ bool get_unit_from_ogc_wkt(const char* ogc_wkt, double* value)
         curr++;
         if (sscanf(&ogc_wkt[curr], "%lf", value) == 1)
         {
-//          fprintf(stderr, "unit %f\n", *value);
+//          LASMessage(LAS_INFO, "unit %f", *value);
           return true;
         }
       }
@@ -1988,7 +1989,7 @@ bool get_parameter_from_ogc_wkt(const char* ogc_wkt, const char* name, double* v
         curr++;
         if (sscanf(&ogc_wkt[curr], "%lf", value) == 1)
         {
-//          fprintf(stderr, "%s %f\n", name, *value);
+//          LASMessage(LAS_INFO, "%s %f", name, *value);
           return true;
         }
       }
@@ -3472,7 +3473,7 @@ short GeoProjectionConverter::get_GeographicTypeGeoKey() const
   case GEO_ELLIPSOID_WGS84: // GCS_WGS_84
     return 4326;
   default:
-    fprintf(stderr, "GeographicTypeGeoKey: look-up for ellipsoid with id %d not implemented\n", ellipsoid->id);
+    LASMessage(LAS_ERROR, "GeographicTypeGeoKey: look-up for ellipsoid with id %d not implemented", ellipsoid->id);
   }
   return 0;
 }
@@ -3662,7 +3663,7 @@ bool GeoProjectionConverter::set_ProjectedCSTypeGeoKey(short value, char* descri
   {
     return true;
   }
-  fprintf(stderr, "set_ProjectedCSTypeGeoKey: look-up for %d not implemented\n", value);
+  LASMessage(LAS_ERROR, "set_ProjectedCSTypeGeoKey: look-up for %d not implemented", value);
   return false;
 }
 
@@ -3811,7 +3812,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for NAD83 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for NAD83 out-of-range", utm->utm_zone_number);
             }
           }
           else
@@ -3824,7 +3825,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
               }
               else
               {
-                fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern MGA zone %d for GDA94 does not exist\n", utm->utm_zone_number);
+                LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern MGA zone %d for GDA94 does not exist", utm->utm_zone_number);
               }
             }
             else if (gcs_code == GEO_GCS_GDA2020)
@@ -3835,12 +3836,12 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
               }
               else
               {
-                fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern MGA zone %d for GDA2020 does not exist\n", utm->utm_zone_number);
+                LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern MGA zone %d for GDA2020 does not exist", utm->utm_zone_number);
               }
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD83 does not exist\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD83 does not exist", utm->utm_zone_number);
             }
           }
         }
@@ -3854,12 +3855,12 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for NAD27 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for NAD27 out-of-range", utm->utm_zone_number);
             }
           }
           else
           {
-            fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD27 does not exist\n", utm->utm_zone_number);
+            LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD27 does not exist", utm->utm_zone_number);
           }
         }
         else if (ellipsoid->id == GEO_ELLIPSOID_GRS1967)
@@ -3872,7 +3873,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for SAD69 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for SAD69 out-of-range", utm->utm_zone_number);
             }
           }
           else
@@ -3883,7 +3884,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for SAD69 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for SAD69 out-of-range", utm->utm_zone_number);
             }
           }
         }
@@ -3897,12 +3898,12 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for ED50 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for ED50 out-of-range", utm->utm_zone_number);
             }
           }
           else
           {
-            fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for ED50 does not exist\n", utm->utm_zone_number);
+            LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for ED50 does not exist", utm->utm_zone_number);
           }
         }
         else if (ellipsoid->id == GEO_ELLIPSOID_ID74)
@@ -3915,7 +3916,7 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for ID74 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for ID74 out-of-range", utm->utm_zone_number);
             }
           }
           else
@@ -3926,13 +3927,13 @@ short GeoProjectionConverter::get_ProjectedCSTypeGeoKey(bool source) const
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for ID74 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for ID74 out-of-range", utm->utm_zone_number);
             }
           }
         }
         else
         {
-          fprintf(stderr, "get_ProjectedCSTypeGeoKey: look-up for UTM zone %d and ellipsoid with id %d not implemented\n", utm->utm_zone_number, ellipsoid->id);
+          LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: look-up for UTM zone %d and ellipsoid with id %d not implemented", utm->utm_zone_number, ellipsoid->id);
         }
       }
     }
@@ -4115,7 +4116,7 @@ short GeoProjectionConverter::get_GeogEllipsoidGeoKey() const
   case 23: // Ellipse_WGS_84
     return 7030;
   default:
-    fprintf(stderr, "GeogEllipsoidGeoKey: look-up for ellipsoid with id %d not implemented\n", ellipsoid->id);
+    LASMessage(LAS_ERROR, "GeogEllipsoidGeoKey: look-up for ellipsoid with id %d not implemented", ellipsoid->id);
   }
   return 0;
 }
@@ -4134,7 +4135,7 @@ bool GeoProjectionConverter::set_ProjLinearUnitsGeoKey(short value, bool source)
     set_coordinates_in_survey_feet(source);
     break;
   default:
-    fprintf(stderr, "set_ProjLinearUnitsGeoKey: look-up for %d not implemented\n", value);
+    LASMessage(LAS_ERROR, "set_ProjLinearUnitsGeoKey: look-up for %d not implemented", value);
     return false;
   }
   return true;
@@ -4196,7 +4197,7 @@ bool GeoProjectionConverter::set_VerticalUnitsGeoKey(short value)
     set_elevation_in_survey_feet();
     break;
   default:
-    fprintf(stderr, "set_VerticalUnitsGeoKey: look-up for %d not implemented\n", value);
+    LASMessage(LAS_ERROR, "set_VerticalUnitsGeoKey: look-up for %d not implemented", value);
     return false;
   }
   return true;
@@ -4322,9 +4323,7 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
     FILE* file = open_geo_file(argv_zero, true, true);
     if (file == 0)
     {
-      fprintf(stderr, "ERROR: cannot open 'vertcs.csv' file. maybe your LAStools distribution\n");
-      fprintf(stderr, "       has no .\\LAStools\\bin\\serf\\geo\\vertcs.csv file. download the\n");
-      fprintf(stderr, "       latest version at http://lastools.org/download/LAStools.zip\n");
+      LASMessage(LAS_ERROR, "cannot open 'vertcs.csv' file. maybe your LAStools distribution\thas no .\\LAStools\\bin\\serf\\geo\\vertcs.csv file. download the\tlatest version at http://lastools.org/download/LAStools.zip ");
       return false;
     }
     int epsg_code = 0;
@@ -4377,12 +4376,12 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
           // scan
           if (sscanf(&line[run], "%d,%d", &units, &dummy) != 2)
           {
-            fprintf(stderr, "failed to scan units from '%s'", line);
+            LASMessage(LAS_ERROR, "failed to scan units from '%s'", line);
             return false;
           }
           if (!set_VerticalUnitsGeoKey(units))
           {
-            fprintf(stderr, "units %d of EPSG code %d not implemented.\n", units, value);
+            LASMessage(LAS_ERROR, "units %d of EPSG code %d not implemented.", units, value);
             return false;
           }
           vertical_geokey = value;
@@ -4390,11 +4389,11 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
         }
       }
     }
-    fprintf(stderr, "EPSG code %d not found in 'vertcs.csv' file\n", value);
+    LASMessage(LAS_ERROR, "EPSG code %d not found in 'vertcs.csv' file", value);
     fclose(file);
     file = 0;
   }
-  fprintf(stderr, "set_VerticalCSTypeGeoKey: look-up for %d not implemented\012", value);
+  LASMessage(LAS_ERROR, "set_VerticalCSTypeGeoKey: look-up for %d not implemented", value);
   return false;
 }
 
@@ -4602,9 +4601,7 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
     FILE* file = open_geo_file(argv_zero, false);
     if (file == 0)
     {
-      fprintf(stderr, "ERROR: cannot open 'gcs.csv' file. maybe your LAStools distribution\n");
-      fprintf(stderr, "       has no .\\LAStools\\bin\\serf\\geo\\gcs.csv file. download the\n");
-      fprintf(stderr, "       latest version at http://lastools.org/download/LAStools.zip\n");
+      LASMessage(LAS_ERROR, "cannot open 'gcs.csv' file.");
       return false;
     }
     int value = 0;
@@ -4692,7 +4689,7 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
             int ellipsoid_id = set_GeogEllipsoidGeoKey(value);
             if (ellipsoid_id != -1)
             {
-//              fprintf(stderr, "set ellipsoid %d for EPSG code %d for '%s'\n", ellipsoid_id, value, gname);
+//              LASMessage(LAS_INFO, "set ellipsoid %d for EPSG code %d for '%s'", ellipsoid_id, value, gname);
               set_reference_ellipsoid(ellipsoid_id);
               sprintf(gcs_name, "%s", gname);
               datum_code = dcode;
@@ -4703,7 +4700,7 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
             }
             else
             {
-              fprintf(stderr, "ERROR: ellipsoid with EPSG code %d for '%s' not supported\n", value, gname);
+              LASMessage(LAS_ERROR, "ellipsoid with EPSG code %d for '%s' not supported", value, gname);
               break;
             }
           }
@@ -4751,7 +4748,7 @@ void GeoProjectionConverter::set_geokey(short geokey, bool source)
     }
     else
     {
-      fprintf(stderr, "WARNING: source_projection not set despite geokey %d\n", geokey);
+      LASMessage(LAS_WARNING, "source_projection not set despite geokey %d", geokey);
     }
   }
   else
@@ -4763,7 +4760,7 @@ void GeoProjectionConverter::set_geokey(short geokey, bool source)
     }
     else
     {
-      fprintf(stderr, "WARNING: target_projection not set despite geokey %d\n", geokey);
+      LASMessage(LAS_WARNING, "target_projection not set despite geokey %d", geokey);
     }
   }
 }
@@ -4776,12 +4773,12 @@ void GeoProjectionConverter::check_geokey(short geokey, bool source)
     {
       if (source_projection->geokey != geokey)
       {
-        fprintf(stderr, "WARNING: source_projection->geokey %d != geokey %d\n", source_projection->geokey, geokey);
+        LASMessage(LAS_WARNING, "source_projection->geokey %d != geokey %d", source_projection->geokey, geokey);
       }
     }
     else
     {
-      fprintf(stderr, "WARNING: source_projection not set despite geokey %d\n", geokey);
+      LASMessage(LAS_WARNING, "source_projection not set despite geokey %d", geokey);
     }
   }
   else
@@ -4790,12 +4787,12 @@ void GeoProjectionConverter::check_geokey(short geokey, bool source)
     {
       if (target_projection->geokey != geokey)
       {
-        fprintf(stderr, "WARNING: target_projection->geokey %d != geokey %d\n", target_projection->geokey, geokey);
+        LASMessage(LAS_WARNING, "target_projection->geokey %d != geokey %d", target_projection->geokey, geokey);
       }
     }
     else
     {
-      fprintf(stderr, "WARNING: target_projection not set despite geokey %d\n", geokey);
+      LASMessage(LAS_WARNING, "target_projection not set despite geokey %d", geokey);
     }
   }
 }
@@ -5230,14 +5227,14 @@ static double unit2decdeg(double length, int unit)
       secs = floor(((fraction - mins) * 100.0 * 100000.0) + 0.5) / 100000.0;
       decimal -= ((mins / 60.0) + (secs/3600.0));
     }
-//    fprintf(stderr, "length: %.15g fraction %.15g decimal: %.15g mins: %.15g secs: %.15g\n", length, fraction, decimal, mins, secs);
+//    LASMessage(LAS_length, "%.15g fraction %.15g decimal: %.15g mins: %.15g secs: %.15g", length, fraction, decimal, mins, secs);
     return decimal;
   }
   else if (unit == 9105)
   {
     return length * 0.9;
   }
-  fprintf(stderr, "ERROR: unit %d not known\n", unit);
+  LASMessage(LAS_ERROR, "unit %d not known", unit);
   return 0.0;
 }
 
@@ -5255,7 +5252,7 @@ static double unit2meter(double length, int unit)
   {
     return length*0.3048006096012;
   }
-  fprintf(stderr, "ERROR: unit %d not known\n", unit);
+  LASMessage(LAS_ERROR, "unit %d not known", unit);
   return 0.0;
 }
 
@@ -5368,9 +5365,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     FILE* file = open_geo_file(argv_zero, true);
     if (file == 0)
     {
-      fprintf(stderr, "ERROR: cannot open 'pcs.csv' file. maybe your LAStools distribution\n");
-      fprintf(stderr, "       has no .\\LAStools\\bin\\serf\\geo\\pcs.csv file. download the\n");
-      fprintf(stderr, "       latest version at http://lastools.org/download/LAStools.zip\n");
+      LASMessage(LAS_ERROR, "cannot open 'pcs.csv' file. check for \\LAStools\\bin\\serf\\geo\\pcs.csv file. download latest version.");
       return false;
     }
     int epsg_code = 0;
@@ -5417,17 +5412,17 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
           // scan
           if (sscanf(&line[run], "%d,%d,%d,%d,%d", &units, &gcs, &dummy, &transform, &dummy) != 5)
           {
-            fprintf(stderr, "failed to scan units, gcs, and transform from '%s'", line);
+            LASMessage(LAS_ERROR, "failed to scan units, gcs, and transform from '%s'", line);
             return false;
           }
           if (!set_ProjLinearUnitsGeoKey(units, source))
           {
-            fprintf(stderr, "units %d of EPSG code %d not implemented.\n", units, value);
+            LASMessage(LAS_ERROR, "units %d of EPSG code %d not implemented.", units, value);
             return false;
           }
           if (!set_gcs(gcs))
           {
-            fprintf(stderr, "GCS %d of EPSG code %d not implemented.\n", gcs, value);
+            LASMessage(LAS_ERROR, "GCS %d of EPSG code %d not implemented.", gcs, value);
             return false;
           }
           // skip eight commas
@@ -5460,7 +5455,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             int unit_false_northing;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_origin, &unit_latitude_of_origin, &dummy, &central_meridian, &unit_central_meridian, &dummy, &scale_factor, &dummy, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 14)
             {
-              fprintf(stderr, "failed to scan TM parameters from '%s'\n", line);
+              LASMessage(LAS_INFO, "failed to scan TM parameters from '%s'", line);
               return false;
             }
             double latitude_of_origin_decdeg = unit2decdeg(latitude_of_origin, unit_latitude_of_origin);
@@ -5488,7 +5483,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             int unit_false_northing;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_origin, &unit_latitude_of_origin, &dummy, &central_meridian, &unit_central_meridian, &dummy, &standard_parallel_1, &unit_standard_parallel_1, &dummy, &standard_parallel_2, &unit_standard_parallel_2, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 17)
             {
-              fprintf(stderr, "failed to scan LCC(2SP) parameters from '%s'\n", line);
+              LASMessage(LAS_INFO, "failed to scan LCC(2SP) parameters from '%s'", line);
               return false;
             }
             double latitude_of_origin_decdeg = unit2decdeg(latitude_of_origin, unit_latitude_of_origin);
@@ -5516,7 +5511,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
 
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_natural_origin, &unit_latitude_of_natural_origin, &dummy, &longitude_of_natural_origin, &unit_longitude_of_natural_origin, &dummy, &scale_factor_at_natural_origin, &dummy, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 14)
             {
-              fprintf(stderr, "failed to scan LCC(1SP) parameters from '%s'\n", line);
+              LASMessage(LAS_INFO, "failed to scan LCC(1SP) parameters from '%s'", line);
               return false;
             }
             double latitude_of_natural_origin_decdeg = unit2decdeg(latitude_of_natural_origin, unit_latitude_of_natural_origin);
@@ -5524,14 +5519,14 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             double false_easting_meter = unit2meter(false_easting, unit_false_easting);
             double false_northing_meter = unit2meter(false_northing, unit_false_northing);
 /*
-            fprintf(stderr, "Lambert Conic Conformal (1SP)\n");
-            fprintf(stderr, "Latitude of natural origin:  %.10g\n", latitude_of_natural_origin_decdeg);
-            fprintf(stderr, "Longitude of natural origin: %.10g\n", longitude_of_natural_origin_decdeg);
-            fprintf(stderr, "Scale factor at natural origin: %.10g\n", scale_factor_at_natural_origin);
-            fprintf(stderr, "False easting:  %.10g\n", false_easting_meter);
-            fprintf(stderr, "False northing: %.10g\n", false_northing_meter);
+            LASMessage(LAS_INFO, "Lambert Conic Conformal (1SP)");
+            LASMessage(LAS_INFO, "Latitude of natural origin:  %.10g", latitude_of_natural_origin_decdeg);
+            LASMessage(LAS_INFO, "Longitude of natural origin: %.10g", longitude_of_natural_origin_decdeg);
+            LASMessage(LAS_INFO, "Scale factor at natural origin: %.10g", scale_factor_at_natural_origin);
+            LASMessage(LAS_INFO, "False easting:  %.10g", false_easting_meter);
+            LASMessage(LAS_INFO, "False northing: %.10g", false_northing_meter);
 */
-            if (scale_factor_at_natural_origin != 1.0) fprintf(stderr, "\nWARNING: current implementation for Lambert Conic Conformal (1SP) ignores scale factor %.10g and uses 1.0 instead\n", scale_factor_at_natural_origin);
+            if (scale_factor_at_natural_origin != 1.0) LASMessage(LAS_WARNING, "implementation for Lambert Conic Conformal(1SP) ignores scale factor % .10g and uses 1.0 instead", scale_factor_at_natural_origin);
             set_lambert_conformal_conic_projection(false_easting_meter, false_northing_meter, latitude_of_natural_origin_decdeg, longitude_of_natural_origin_decdeg, latitude_of_natural_origin, latitude_of_natural_origin, 0, source, name);
             set_geokey(value, source);
             if (description) sprintf(description, "%s", name);
@@ -5553,7 +5548,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             int unit_false_northing;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_center, &unit_latitude_of_center, &dummy, &longitude_of_center, &unit_longitude_of_center, &dummy, &standard_parallel_1, &unit_standard_parallel_1, &dummy, &standard_parallel_2, &unit_standard_parallel_2, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 17)
             {
-              fprintf(stderr, "failed to scan AEAC parameters from '%s'\n", line);
+              LASMessage(LAS_INFO, "failed to scan AEAC parameters from '%s'", line);
               return false;
             }
             double latitude_of_center_decdeg = unit2decdeg(latitude_of_center, unit_latitude_of_center);
@@ -5584,7 +5579,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             double scale_factor;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf", &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing, &dummy, &latitude_of_center, &unit_latitude_of_center, &dummy, &longitude_of_center, &unit_longitude_of_center, &dummy,&azimuth, &unit_azimuth, &dummy, &rectified_grid_angle, &unit_rectified_grid_angle, &dummy, &scale_factor) != 19)
             {
-              fprintf(stderr, "failed to scan HOM parameters from '%s'\n", line);
+              LASMessage(LAS_INFO, "failed to scan HOM parameters from '%s'", line);
               return false;
             }
             double false_easting_meter = unit2meter(false_easting, unit_false_easting);
@@ -5611,7 +5606,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
             int unit_false_northing;
             if (sscanf(&line[run], "%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d,%d,%lf,%d", &latitude_of_origin, &unit_latitude_of_origin, &dummy, &central_meridian, &unit_central_meridian, &dummy, &scale_factor, &dummy, &dummy, &false_easting, &unit_false_easting, &dummy, &false_northing, &unit_false_northing) != 14)
             {
-              fprintf(stderr, "failed to scan OS parameters from '%s'\n", line);
+              LASMessage(LAS_INFO, "failed to scan OS parameters from '%s'", line);
               return false;
             }
             double latitude_of_origin_decdeg = unit2decdeg(latitude_of_origin, unit_latitude_of_origin);
@@ -5625,13 +5620,13 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
           }
           else
           {
-            fprintf(stderr, "transform %d of EPSG code %d not implemented.\n", transform, value);
+            LASMessage(LAS_INFO, "transform %d of EPSG code %d not implemented.", transform, value);
             return false;
           }
         }
       }
     }
-    fprintf(stderr, "EPSG code %d not found in 'pcs.csv' file\n", value);
+    LASMessage(LAS_INFO, "EPSG code %d not found in 'pcs.csv' file", value);
     fclose(file);
     file = 0;
     return false;
@@ -5711,7 +5706,7 @@ void GeoProjectionConverter::print_all_state_plane_nad27_lcc() const
   int i = 0;
   while (state_plane_lcc_nad27_list[i].zone)
   {
-    fprintf(stderr, "%s - false east/north: %g/%g [m], origin lat/meridian long: %g/%g, parallel 1st/2nd: %g/%g\n", state_plane_lcc_nad27_list[i].zone, state_plane_lcc_nad27_list[i].falseEastingMeter, state_plane_lcc_nad27_list[i].falseNorthingMeter, state_plane_lcc_nad27_list[i].latOriginDegree, state_plane_lcc_nad27_list[i].longMeridianDegree, state_plane_lcc_nad27_list[i].firstStdParallelDegree, state_plane_lcc_nad27_list[i].secondStdParallelDegree);
+    LASMessage(LAS_INFO, "%s - false east/north: %g/%g [m], origin lat/meridian long: %g/%g, parallel 1st/2nd: %g/%g", state_plane_lcc_nad27_list[i].zone, state_plane_lcc_nad27_list[i].falseEastingMeter, state_plane_lcc_nad27_list[i].falseNorthingMeter, state_plane_lcc_nad27_list[i].latOriginDegree, state_plane_lcc_nad27_list[i].longMeridianDegree, state_plane_lcc_nad27_list[i].firstStdParallelDegree, state_plane_lcc_nad27_list[i].secondStdParallelDegree);
     i++;
   }
 }
@@ -5744,7 +5739,7 @@ void GeoProjectionConverter::print_all_state_plane_nad83_lcc() const
   int i = 0;
   while (state_plane_lcc_nad83_list[i].zone)
   {
-    fprintf(stderr, "%s - false east/north: %g/%g [m], origin lat/meridian long: %g/%g, parallel 1st/2nd: %g/%g\n", state_plane_lcc_nad83_list[i].zone, state_plane_lcc_nad83_list[i].falseEastingMeter, state_plane_lcc_nad83_list[i].falseNorthingMeter,state_plane_lcc_nad83_list[i].latOriginDegree,state_plane_lcc_nad83_list[i].longMeridianDegree,state_plane_lcc_nad83_list[i].firstStdParallelDegree,state_plane_lcc_nad83_list[i].secondStdParallelDegree);
+    LASMessage(LAS_INFO, "%s - false east/north: %g/%g [m], origin lat/meridian long: %g/%g, parallel 1st/2nd: %g/%g", state_plane_lcc_nad83_list[i].zone, state_plane_lcc_nad83_list[i].falseEastingMeter, state_plane_lcc_nad83_list[i].falseNorthingMeter,state_plane_lcc_nad83_list[i].latOriginDegree,state_plane_lcc_nad83_list[i].longMeridianDegree,state_plane_lcc_nad83_list[i].firstStdParallelDegree,state_plane_lcc_nad83_list[i].secondStdParallelDegree);
     i++;
   }
 }
@@ -5777,7 +5772,7 @@ void GeoProjectionConverter::print_all_state_plane_nad27_tm() const
   int i = 0;
   while (state_plane_tm_nad27_list[i].zone)
   {
-    fprintf(stderr, "%s - false east/north: %g/%g [m], origin lat/meridian long: %g/%g, scale factor: %g\n", state_plane_tm_nad27_list[i].zone, state_plane_tm_nad27_list[i].falseEastingMeter, state_plane_tm_nad27_list[i].falseNorthingMeter,state_plane_tm_nad27_list[i].latOriginDegree,state_plane_tm_nad27_list[i].longMeridianDegree,state_plane_tm_nad27_list[i].scaleFactor);
+    LASMessage(LAS_INFO, "%s - false east/north: %g/%g [m], origin lat/meridian long: %g/%g, scale factor: %g", state_plane_tm_nad27_list[i].zone, state_plane_tm_nad27_list[i].falseEastingMeter, state_plane_tm_nad27_list[i].falseNorthingMeter,state_plane_tm_nad27_list[i].latOriginDegree,state_plane_tm_nad27_list[i].longMeridianDegree,state_plane_tm_nad27_list[i].scaleFactor);
     i++;
   }
 }
@@ -5810,7 +5805,7 @@ void GeoProjectionConverter::print_all_state_plane_nad83_tm() const
   int i = 0;
   while (state_plane_tm_nad83_list[i].zone)
   {
-    fprintf(stderr, "%s - false east/north: %g/%g [m], origin lat/meridian long: %g/%g, scale factor: %g\n", state_plane_tm_nad83_list[i].zone, state_plane_tm_nad83_list[i].falseEastingMeter, state_plane_tm_nad83_list[i].falseNorthingMeter,state_plane_tm_nad83_list[i].latOriginDegree,state_plane_tm_nad83_list[i].longMeridianDegree,state_plane_tm_nad83_list[i].scaleFactor);
+    LASMessage(LAS_INFO, "%s - false east/north: %g/%g [m], origin lat/meridian long: %g/%g, scale factor: %g", state_plane_tm_nad83_list[i].zone, state_plane_tm_nad83_list[i].falseEastingMeter, state_plane_tm_nad83_list[i].falseNorthingMeter,state_plane_tm_nad83_list[i].latOriginDegree,state_plane_tm_nad83_list[i].longMeridianDegree,state_plane_tm_nad83_list[i].scaleFactor);
     i++;
   }
 }
@@ -7328,7 +7323,6 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
 {
   int i;
   char tmp[256];
-  bool verbose = false;
 
   if (argv_zero) free(argv_zero);
   argv_zero = LASCopyString(argv[0]);
@@ -7343,29 +7337,25 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     {
       return true;
     }
-    else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
-    {
-      verbose = true;
-    }
     else if (strcmp(argv[i],"-ellipsoid") == 0)
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: ellipsoid_id\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: ellipsoid_id", argv[i]);
         return false;
       }
       int ellipsoid_id = atoi(argv[i+1]);
       if (set_reference_ellipsoid(ellipsoid_id, tmp))
       {
-        if (verbose) fprintf(stderr, "using ellipsoid '%s'\n", tmp);
+        LASMessage(LAS_VERBOSE, "using ellipsoid '%s'", tmp);
       }
       else
       {
-        fprintf(stderr, "ERROR: ellipsoid with id %d is unknown. use one of those: \n", ellipsoid_id);
+        LASMessage(LAS_ERROR, "ellipsoid with id %d is unknown. use one of those: ", ellipsoid_id);
         ellipsoid_id = 1;
         while (set_reference_ellipsoid(ellipsoid_id++, tmp))
         {
-          fprintf(stderr, "  %s\n", tmp);
+          LASMessage(LAS_INFO, "  %s", tmp);
         }
         return false;
       }
@@ -7374,25 +7364,25 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     else if (strcmp(argv[i],"-wgs72") == 0)
     {
       set_gcs(GEO_GCS_WGS72, tmp);
-      if (verbose) fprintf(stderr, "using ellipsoid '%s'\n", tmp);
+      LASMessage(LAS_VERBOSE, "using ellipsoid '%s'", tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-wgs84") == 0)
     {
       set_gcs(GEO_GCS_WGS84, tmp);
-      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-grs80") == 0)
     {
       set_reference_ellipsoid(GEO_ELLIPSOID_GRS1980, tmp);
-      if (verbose) fprintf(stderr, "using ellipsoid '%s'\n", tmp);
+      LASMessage(LAS_VERBOSE, "using ellipsoid '%s'", tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-nad27") == 0)
     {
       set_gcs(GEO_GCS_NAD27, tmp);
-      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strncmp(argv[i],"-nad83", 6) == 0)
@@ -7400,61 +7390,61 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       if (strcmp(argv[i],"-nad83") == 0)
       {
         set_gcs(GEO_GCS_NAD83, tmp);
-        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
       else if (strcmp(argv[i],"-nad83_2011") == 0)
       {
         set_gcs(GEO_GCS_NAD83_2011, tmp);
-        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
       else if (strcmp(argv[i],"-nad83_harn") == 0)
       {
         set_gcs(GEO_GCS_NAD83_HARN, tmp);
-        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
       else if (strcmp(argv[i],"-nad83_csrs") == 0)
       {
         set_gcs(GEO_GCS_NAD83_CSRS, tmp);
-        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
       else if (strcmp(argv[i],"-nad83_pa11") == 0)
       {
         set_gcs(GEO_GCS_NAD83_PA11, tmp);
-        if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+        LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
         *argv[i]='\0';
       }
       else
       {
-        fprintf(stderr,"ERROR: unknown datum '%s'.\n", argv[i]);
+        LASMessage(LAS_ERROR, "unknown datum '%s'.", argv[i]);
         return false;
       }
     }
     else if (strcmp(argv[i],"-gda94") == 0)
     {
       set_gcs(GEO_GCS_GDA94, tmp);
-      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-gda2020") == 0)
     {
       set_gcs(GEO_GCS_GDA2020, tmp);
-      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-etrs89") == 0)
     {
       set_gcs(GEO_GCS_ETRS89, tmp);
-      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-osgb1936") == 0)
     {
       set_gcs(GEO_GCS_OSGB1936, tmp);
-      if (verbose) fprintf(stderr, "using datum '%s' with ellipsoid '%s'\n", tmp, get_ellipsoid_name());
+      LASMessage(LAS_VERBOSE, "using datum '%s' with ellipsoid '%s'", tmp, get_ellipsoid_name());
       *argv[i]='\0';
     }
     else if (strncmp(argv[i],"-vertical_", 10) == 0)
@@ -7500,7 +7490,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         }
         else
         {
-          fprintf(stderr, "WARNING: unknown specialization of NAVD88 '%s'\n", argv[i] + 16);
+          LASMessage(LAS_WARNING, "unknown specialization of NAVD88 '%s'", argv[i] + 16);
         }
         *argv[i]='\0';
       }
@@ -7563,28 +7553,28 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: EPSG code", argv[i]);
           return false;
         }
         unsigned int code = 0;
         if (sscanf(argv[i+1], "%u", &code) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code but '%s' is not a valid code\n", argv[i], argv[i+1]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: EPSG code but '%s' is not a valid code", argv[i], argv[i+1]);
           return false;
         }
         if (code > 32767)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code but %u is not a valid code\n", argv[i], code);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: EPSG code but %u is not a valid code", argv[i], code);
           return false;
         }
         if (!set_VerticalCSTypeGeoKey(code))
         {
-          fprintf(stderr, "ERROR: unknown vertical EPSG code in '%s %s'.\n", argv[i], argv[i+1]);
+          LASMessage(LAS_ERROR, "unknown vertical EPSG code in '%s %s'.", argv[i], argv[i+1]);
           return false;
         }
         else
         {
-          if (verbose) fprintf(stderr, "using vertical EPSG code %d\n", code);
+          LASMessage(LAS_VERBOSE, "using vertical EPSG code %d", code);
         }
         *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
       }
@@ -7593,21 +7583,21 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
     {
       bool source = (strcmp(argv[i],"-latlong") == 0);
       set_latlong_projection(tmp, source);
-      if (verbose) fprintf(stderr, "using %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      LASMessage(LAS_VERBOSE, "using %s '%s'", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-longlat") == 0 || strcmp(argv[i],"-target_longlat") == 0)
     {
       bool source = (strcmp(argv[i],"-longlat") == 0);
       set_longlat_projection(tmp, source);
-      if (verbose) fprintf(stderr, "using %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      LASMessage(LAS_VERBOSE, "using %s '%s'", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-ecef") == 0 || strcmp(argv[i],"-target_ecef") == 0)
     {
       bool source = (strcmp(argv[i],"-ecef") == 0);
       set_ecef_projection(tmp, source);
-      if (verbose) fprintf(stderr, "using %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      LASMessage(LAS_VERBOSE, "using %s '%s'", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0';
     }
     else if (strcmp(argv[i],"-utm") == 0 || strcmp(argv[i],"-target_utm") == 0)
@@ -7616,7 +7606,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       if (!source && (strcmp(argv[i+1],"auto") == 0))
       {
         set_target_utm_projection(tmp);
-        if (verbose) fprintf(stderr, "using target projection UTM '%s'\n", tmp);
+        LASMessage(LAS_VERBOSE, "using target projection UTM '%s'", tmp);
       }
       else
       {
@@ -7642,11 +7632,11 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
         }
         if (set_utm_projection(argv[i+1], tmp, source))
         {
-          if (verbose) fprintf(stderr, "using %s UTM '%s'\n", (source ? "projection" : "target projection"), tmp);
+          LASMessage(LAS_VERBOSE, "using %s UTM '%s'", (source ? "projection" : "target projection"), tmp);
         }
         else
         {
-          fprintf(stderr, "ERROR: utm zone '%s' is unknown. use '32north', '55south', '10n', '56s', '17U', or '49L'\n", argv[i+1]);
+          LASMessage(LAS_ERROR, "utm zone '%s' is unknown. use '32north', '55south', '10n', '56s', '17U', or '49L'", argv[i+1]);
           return false;
         }
       }
@@ -7658,22 +7648,22 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       unsigned int code = 0;
       if (sscanf(argv[i+1], "%u", &code) != 1)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code but '%s' is not a valid code\n", argv[i], argv[i+1]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: EPSG code but '%s' is not a valid code", argv[i], argv[i+1]);
         return false;
       }
       if (code > 32767)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: EPSG code but %u is not a valid code\n", argv[i], code);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: EPSG code but %u is not a valid code", argv[i], code);
         return false;
       }
       if (!set_epsg_code((short)code, 0, source))
       {
-        fprintf(stderr, "ERROR: unknown EPSG code in '%s %s'.\n", argv[i], argv[i+1]);
+        LASMessage(LAS_ERROR, "unknown EPSG code in '%s %s'.", argv[i], argv[i+1]);
         return false;
       }
       else
       {
-        if (verbose) fprintf(stderr, "using %s EPSG code %d\n", (source ? "projection" : "target projection"), code);
+        LASMessage(LAS_VERBOSE, "using %s EPSG code %d", (source ? "projection" : "target projection"), code);
       }
       *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
     }
@@ -7702,10 +7692,10 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       }
       else
       {
-        fprintf(stderr,"ERROR: wrong options for '-lcc'. use like shown in these examples:\n");
-        fprintf(stderr,"  %s 609601.22 0 meter 33.75 -79 34.33333 36.16666\n", argv[i]);
-        fprintf(stderr,"  %s 1640416.666667 0 survey_feet 47.000000 -120.833333 47.5 48.733333\n", argv[i]);
-        fprintf(stderr,"  %s 1500000 0 feet 47.000000 -120.833333 47.5 48.733333\n", argv[i]);
+        LASMessage(LAS_ERROR, "wrong options for '-lcc'. use like shown in these examples:");
+        LASMessage(LAS_INFO, "  %s 609601.22 0 meter 33.75 -79 34.33333 36.16666", argv[i]);
+        LASMessage(LAS_INFO, "  %s 1640416.666667 0 survey_feet 47.000000 -120.833333 47.5 48.733333", argv[i]);
+        LASMessage(LAS_INFO, "  %s 1500000 0 feet 47.000000 -120.833333 47.5 48.733333", argv[i]);
         return false;
       }
       double latOfOriginDeg = atof(argv[i+4]);
@@ -7713,7 +7703,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       double firstStdParallelDeg = atof(argv[i+6]);
       double secondStdParallelDeg = atof(argv[i+7]);
       set_lambert_conformal_conic_projection(falseEasting, falseNorthing, latOfOriginDeg, longOfOriginDeg, firstStdParallelDeg, secondStdParallelDeg, tmp, source);
-      if (verbose) fprintf(stderr, "using LCC %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      LASMessage(LAS_VERBOSE, "using LCC %s '%s'", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0';  *argv[i+3]='\0';  *argv[i+4]='\0';  *argv[i+5]='\0';  *argv[i+6]='\0';  *argv[i+7]='\0'; i+=7;
     }
     else if (strcmp(argv[i],"-sp83") == 0 || strcmp(argv[i],"-target_sp83") == 0)
@@ -7721,15 +7711,15 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       bool source = (strcmp(argv[i],"-sp83") == 0);
       if (set_state_plane_nad83_lcc(argv[i+1], tmp, source))
       {
-        if (verbose) fprintf(stderr, "using %s '%s' (NAD83 LCC) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
+        LASMessage(LAS_VERBOSE, "using %s '%s' (NAD83 LCC) '%s'", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
       }
       else if (set_state_plane_nad83_tm(argv[i+1], tmp, source))
       {
-        if (verbose) fprintf(stderr, "using %s '%s' (NAD83 TM) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
+        LASMessage(LAS_VERBOSE, "using %s '%s' (NAD83 TM) '%s'", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
       }
       else
       {
-        fprintf(stderr, "ERROR: bad state code in '%s %s'.\n", argv[i], argv[i+1]);
+        LASMessage(LAS_ERROR, "bad state code in '%s %s'.", argv[i], argv[i+1]);
         print_all_state_plane_nad83_lcc();
         print_all_state_plane_nad83_tm();
         return false;
@@ -7741,15 +7731,15 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       bool source = (strcmp(argv[i],"-sp27") == 0);
       if (set_state_plane_nad27_lcc(argv[i+1], tmp, source))
       {
-        if (verbose) fprintf(stderr, "using %s '%s' (NAD27 LCC) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
+        LASMessage(LAS_VERBOSE, "using %s '%s' (NAD27 LCC) '%s'", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
       }
       else if (set_state_plane_nad27_tm(argv[i+1], tmp, source))
       {
-        if (verbose) fprintf(stderr, "using %s '%s' (NAD27 TM) '%s'\n", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
+        LASMessage(LAS_VERBOSE, "using %s '%s' (NAD27 TM) '%s'", (source ? "state plane" : "target state plane"), argv[i+1], tmp);
       }
       else
       {
-        fprintf(stderr, "ERROR: bad state code in '%s %s'.\n", argv[i], argv[i+1]);
+        LASMessage(LAS_ERROR, "bad state code in '%s %s'.", argv[i], argv[i+1]);
         print_all_state_plane_nad27_lcc();
         print_all_state_plane_nad27_tm();
         return false;
@@ -7781,17 +7771,17 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       }
       else
       {
-        fprintf(stderr,"ERROR: wrong options for '%s'. use like shown in these examples:\n",argv[i]);
-        fprintf(stderr,"  %s 500000 0 meter 0 -93 0.99996\n",argv[i]);
-        fprintf(stderr,"  %s 1500000 0 feet 47 -120.833333 0.99996\n",argv[i]);
-        fprintf(stderr,"  %s 1640416.666667 0 survey_feet 47 -120.833333 0.99996\n",argv[i]);
+        LASMessage(LAS_ERROR, "wrong options for '%s'. use like shown in these examples:",argv[i]);
+        LASMessage(LAS_INFO, "  %s 500000 0 meter 0 -93 0.99996",argv[i]);
+        LASMessage(LAS_INFO, "  %s 1500000 0 feet 47 -120.833333 0.99996",argv[i]);
+        LASMessage(LAS_INFO, "  %s 1640416.666667 0 survey_feet 47 -120.833333 0.99996",argv[i]);
         return false;
       }
       double latOriginDeg; sscanf(argv[i+4], "%lf", &latOriginDeg);
       double longMeridianDeg; sscanf(argv[i+5], "%lf", &longMeridianDeg);
       double scaleFactor; sscanf(argv[i+6], "%lf", &scaleFactor);
       set_transverse_mercator_projection(falseEasting, falseNorthing, latOriginDeg, longMeridianDeg, scaleFactor, tmp, source);
-      if (verbose) fprintf(stderr, "using TM %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      LASMessage(LAS_VERBOSE, "using TM %s '%s'", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0';  *argv[i+3]='\0';  *argv[i+4]='\0';  *argv[i+5]='\0';  *argv[i+6]='\0'; i+=6;
     }
     else if (strcmp(argv[i],"-aeac") == 0 || strcmp(argv[i],"-target_aeac") == 0)
@@ -7819,10 +7809,10 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       }
       else
       {
-        fprintf(stderr,"ERROR: wrong options for '-aeac'. use like shown in these examples:\n");
-        fprintf(stderr,"  %s 609601.22 0 meter 33.75 -79 34.33333 36.16666\n", argv[i]);
-        fprintf(stderr,"  %s 1640416.666667 0 survey_feet 47.000000 -120.833333 47.5 48.733333\n", argv[i]);
-        fprintf(stderr,"  %s 1500000 0 feet 47.000000 -120.833333 47.5 48.733333\n", argv[i]);
+        LASMessage(LAS_ERROR, "wrong options for '-aeac'. use like shown in these examples:");
+        LASMessage(LAS_INFO, "  %s 609601.22 0 meter 33.75 -79 34.33333 36.16666", argv[i]);
+        LASMessage(LAS_INFO, "  %s 1640416.666667 0 survey_feet 47.000000 -120.833333 47.5 48.733333", argv[i]);
+        LASMessage(LAS_INFO, "  %s 1500000 0 feet 47.000000 -120.833333 47.5 48.733333", argv[i]);
         return false;
       }
       double latOfCenterDeg = atof(argv[i+4]);
@@ -7830,7 +7820,7 @@ bool GeoProjectionConverter::parse(int argc, char* argv[])
       double firstStdParallelDeg = atof(argv[i+6]);
       double secondStdParallelDeg = atof(argv[i+7]);
       set_albers_equal_area_conic_projection(falseEasting, falseNorthing, latOfCenterDeg, longOfCenterDeg, firstStdParallelDeg, secondStdParallelDeg, tmp, source);
-      if (verbose) fprintf(stderr, "using AEAC %s '%s'\n", (source ? "projection" : "target projection"), tmp);
+      LASMessage(LAS_VERBOSE, "using AEAC %s '%s'", (source ? "projection" : "target projection"), tmp);
       *argv[i]='\0'; *argv[i+1]='\0';  *argv[i+2]='\0';  *argv[i+3]='\0';  *argv[i+4]='\0';  *argv[i+5]='\0';  *argv[i+6]='\0';  *argv[i+7]='\0'; i+=7;
     }
     else if (strcmp(argv[i],"-surveyfeet") == 0 || strcmp(argv[i],"-survey_feet") == 0)
@@ -8366,19 +8356,19 @@ bool GeoProjectionConverter::check_horizontal_datum_before_reprojection()
     }
     else if (source_projection->datum == 0)
     {
-      fprintf(stderr, "WARNING: horizontal datum of source unspecified. assuming same as target.\n");
+      LASMessage(LAS_WARNING, "horizontal datum of source unspecified. assuming same as target.");
       source_projection->datum = target_projection->datum;
       return true;
     }
     else if (target_projection->datum == 0)
     {
-//      fprintf(stderr, "WARNING: horizontal datum of target unspecified. assuming same as source.\n");
+//      LASMessage(LAS_WARNING, "horizontal datum of target unspecified. assuming same as source.");
       target_projection->datum = source_projection->datum;
       return true;
     }
     else
     {
-      fprintf(stderr, "SERIOUS WARNING: horizontal datum of source and target incompatible.\n");
+      LASMessage(LAS_SERIOUS_WARNING, "horizontal datum of source and target incompatible.");
       return false;
     }
   }
@@ -8568,12 +8558,12 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for NAD83 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for NAD83 out-of-range", utm->utm_zone_number);
             }
           }
           else
           {
-            fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD83 does not exist\n", utm->utm_zone_number);
+            LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD83 does not exist", utm->utm_zone_number);
           }
         }
         else if (ellipsoid->id == GEO_ELLIPSOID_CLARKE1866)
@@ -8586,12 +8576,12 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for NAD27 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for NAD27 out-of-range", utm->utm_zone_number);
             }
           }
           else
           {
-            fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD27 does not exist\n", utm->utm_zone_number);
+            LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for NAD27 does not exist", utm->utm_zone_number);
           }
         }
         else if (ellipsoid->id == GEO_ELLIPSOID_GRS1967)
@@ -8604,7 +8594,7 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for SAD69 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for SAD69 out-of-range", utm->utm_zone_number);
             }
           }
           else
@@ -8615,7 +8605,7 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for SAD69 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for SAD69 out-of-range", utm->utm_zone_number);
             }
           }
         }
@@ -8629,12 +8619,12 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for ED50 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for ED50 out-of-range", utm->utm_zone_number);
             }
           }
           else
           {
-            fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for ED50 does not exist\n", utm->utm_zone_number);
+            LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for ED50 does not exist", utm->utm_zone_number);
           }
         }
         else if (ellipsoid->id == GEO_ELLIPSOID_ID74)
@@ -8647,7 +8637,7 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for ID74 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: northern UTM zone %d for ID74 out-of-range", utm->utm_zone_number);
             }
           }
           else
@@ -8658,13 +8648,13 @@ bool GeoProjectionConverter::get_img_datum_parameters(char** psDatumame, int* pr
             }
             else
             {
-              fprintf(stderr, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for ID74 out-of-range\n", utm->utm_zone_number);
+              LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: southern UTM zone %d for ID74 out-of-range", utm->utm_zone_number);
             }
           }
         }
         else
         {
-          fprintf(stderr, "get_ProjectedCSTypeGeoKey: look-up for UTM zone %d and ellipsoid with id %d not implemented\n", utm->utm_zone_number, ellipsoid->id);
+          LASMessage(LAS_ERROR, "get_ProjectedCSTypeGeoKey: look-up for UTM zone %d and ellipsoid with id %d not implemented", utm->utm_zone_number, ellipsoid->id);
         }
         }
   psDatum->datumname
@@ -9117,7 +9107,7 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(short* horizontal_uni
           break;
         default:
           *coordinate_zone = 0;
-          fprintf(stderr, "state plane with geotiff tag %d not implemented\n", (int)geokey);
+          LASMessage(LAS_ERROR, "state plane with geotiff tag %d not implemented", (int)geokey);
         }
         if (*coordinate_zone)
         {

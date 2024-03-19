@@ -224,7 +224,6 @@ int main(int argc, char *argv[])
   BOOL cpu64 = FALSE;
 #endif
   bool wait = false;
-  bool verbose = false;
   bool no_header = false;
   bool no_variable_header = false;
   bool no_returns = false;
@@ -341,7 +340,7 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-v") == 0)
     {
-      verbose = true;
+     set_message_log_level(LAS_VERBOSE);
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
@@ -360,7 +359,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
       gui = true;
 #else
-      fprintf(stderr, "WARNING: not compiled with GUI support. ignoring '-gui' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
 #endif
     }
     else if (strcmp(argv[i],"-cores") == 0)
@@ -368,7 +367,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
         usage(true);
       }
       argv[i][0] = '\0';
@@ -376,7 +375,7 @@ int main(int argc, char *argv[])
       cores = atoi(argv[i]);
       argv[i][0] = '\0';
 #else
-      fprintf(stderr, "WARNING: not compiled with multi-core batching. ignoring '-cores' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
       i++;
 #endif
     }
@@ -385,7 +384,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
       cpu64 = TRUE;
 #else
-      fprintf(stderr, "WARNING: not compiled with 64 bit support. ignoring '-cpu64' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
 #endif
       argv[i][0] = '\0';
     }
@@ -443,52 +442,32 @@ int main(int argc, char *argv[])
     {
       if ((i+2) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start stop", argv[i]);
         byebye(true);
       }
-#ifdef _WIN32
-      if (sscanf(argv[i+1], "%I64d", &subsequence_start) != 1)
-#else
       if (sscanf(argv[i+1], "%lld", &subsequence_start) != 1)
-#endif
       {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%s' is not a valid start\n", argv[i], argv[i+1]);
+        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start stop but '%s' is not a valid start", argv[i], argv[i+1]);
         byebye(true);
       }
       if (subsequence_start < 0)
       {
-#ifdef _WIN32
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%I64d' is not a valid start\n", argv[i], subsequence_start);
-#else
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%lld' is not a valid start\n", argv[i], subsequence_start);
-#endif
+        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start stop but '%lld' is not a valid start", argv[i], subsequence_start);
         byebye(true);
       }
-#ifdef _WIN32
-      if (sscanf(argv[i+2], "%I64d", &subsequence_stop) != 1)
-#else
       if (sscanf(argv[i+2], "%lld", &subsequence_stop) != 1)
-#endif
       {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%s' is not a valid stop\n", argv[i], argv[i+2]);
+        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start stop but '%s' is not a valid stop", argv[i], argv[i+2]);
         byebye(true);
       }
       if (subsequence_stop < 0)
       {
-#ifdef _WIN32
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%I64d' is not a valid stop\n", argv[i], subsequence_stop);
-#else
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%lld' is not a valid stop\n", argv[i], subsequence_stop);
-#endif
+        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start stop but '%lld' is not a valid stop", argv[i], subsequence_stop);
         byebye(true);
       }
       if (subsequence_start >= subsequence_stop)
       {
-#ifdef _WIN32
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%I64d' and '%I64d' are no valid start and stop combination \n", argv[i], subsequence_start, subsequence_stop);
-#else
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: start stop but '%lld' and '%lld' are no valid start and stop combination \n", argv[i], subsequence_start, subsequence_stop);
-#endif
+        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start stop but '%lld' and '%lld' are no valid start and stop combination ", argv[i], subsequence_start, subsequence_stop);
         byebye(true);
       }
       i+=2;
@@ -497,25 +476,17 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: start\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: start", argv[i]);
         byebye(true);
       }
-#ifdef _WIN32
-      if (sscanf(argv[i+1], "%I64d", &subsequence_start) != 1)
-#else
       if (sscanf(argv[i+1], "%lld", &subsequence_start) != 1)
-#endif
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%s' is not a valid start\n", argv[i], argv[i+1]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: start but '%s' is not a valid start", argv[i], argv[i+1]);
         byebye(true);
       }
       if (subsequence_start < 0)
       {
-#ifdef _WIN32
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%I64d' is not a valid start\n", argv[i], subsequence_start);
-#else
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%lld' is not a valid start\n", argv[i], subsequence_start);
-#endif
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: start but '%lld' is not a valid start", argv[i], subsequence_start);
         byebye(true);
       }
       i+=1;
@@ -524,25 +495,17 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: stop\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: stop", argv[i]);
         byebye(true);
       }
-#ifdef _WIN32
-      if (sscanf(argv[i+1], "%I64d", &subsequence_stop) != 1)
-#else
       if (sscanf(argv[i+1], "%lld", &subsequence_stop) != 1)
-#endif
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%s' is not a valid stop\n", argv[i], argv[i+1]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: start but '%s' is not a valid stop", argv[i], argv[i+1]);
         byebye(true);
       }
       if (subsequence_stop < 0)
       {
-#ifdef _WIN32
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%I64d' is not a valid stop\n", argv[i], subsequence_stop);
-#else
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: start but '%lld' is not a valid stop\n", argv[i], subsequence_stop);
-#endif
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: start but '%lld' is not a valid stop", argv[i], subsequence_stop);
         byebye(true);
       }
       i+=1;
@@ -577,17 +540,17 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: index\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
           byebye(true);
         }
         if (sscanf(argv[i+1], "%u", &set_file_source_ID) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: index but '%s' is no valid index\n", argv[i], argv[i+1]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i+1]);
           byebye(true);
         }
         if (set_file_source_ID > U16_MAX)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: index between 0 and %u but %u is out of range\n", argv[i], U16_MAX, set_file_source_ID);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: index between 0 and %u but %u is out of range", argv[i], U16_MAX, set_file_source_ID);
           byebye(true);
         }
 			  i++;
@@ -602,7 +565,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: value1\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: value1", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -614,7 +577,7 @@ int main(int argc, char *argv[])
         {
           if ((i+1) >= argc)
           {
-            fprintf(stderr,"ERROR: '%s' needs hexadecimal GUID in 'F794F8A4-A23E-421E-A134-ACF7754E1C54' format\n", argv[i]);
+            LASMessage(LAS_ERROR, "'%s' needs hexadecimal GUID in 'F794F8A4-A23E-421E-A134-ACF7754E1C54' format", argv[i]);
             byebye(true);
           }
         }
@@ -624,7 +587,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: name\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: name", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -637,7 +600,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: name\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: name", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -650,7 +613,7 @@ int main(int argc, char *argv[])
       {
         if ((i+6) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z", argv[i]);
           byebye(true);
         }
 			  set_bounding_box = new F64[6];
@@ -672,7 +635,7 @@ int main(int argc, char *argv[])
       {
         if ((i+3) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: x y z", argv[i]);
           byebye(true);
         }
 			  set_offset = new F64[3];
@@ -688,7 +651,7 @@ int main(int argc, char *argv[])
       {
         if ((i+3) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 3 arguments: x y z\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: x y z", argv[i]);
           byebye(true);
         }
 			  set_scale = new F64[3];
@@ -704,7 +667,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -715,7 +678,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: major.minor\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: major.minor", argv[i]);
           byebye(true);
         }
         i++;
@@ -723,7 +686,7 @@ int main(int argc, char *argv[])
         int minor;
         if (sscanf(argv[i],"%d.%d",&major,&minor) != 2)
         {
-          fprintf(stderr,"ERROR: cannot understand argument '%s' of '%s'\n", argv[i], argv[i-1]);
+          LASMessage(LAS_ERROR, "cannot understand argument '%s' of '%s'", argv[i], argv[i-1]);
           usage();
         }
         set_version_major = (I8)major;
@@ -734,7 +697,7 @@ int main(int argc, char *argv[])
       {
         if ((i+2) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: day year\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: day year", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -747,7 +710,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -758,7 +721,7 @@ int main(int argc, char *argv[])
       {
         if ((i+5) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 5 arguments: ret1 ret2 ret3 ret4 ret5\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 5 arguments: ret1 ret2 ret3 ret4 ret5", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -777,7 +740,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: size", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -788,7 +751,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: offset\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -799,7 +762,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -810,7 +773,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: type\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: type", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -821,7 +784,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: size", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -832,7 +795,7 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: start\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: start", argv[i]);
           byebye(true);
         }
 			  i++;
@@ -843,17 +806,17 @@ int main(int argc, char *argv[])
       {
         if ((i+2) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index user_id\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index user_id", argv[i]);
           byebye(true);
         }
         if (sscanf(argv[i+1], "%d", &set_vlr_user_id_index) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index user_ID but '%s' is no valid index\n", argv[i], argv[i+1]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index user_ID but '%s' is no valid index", argv[i], argv[i+1]);
           byebye(true);
         }
         if ((set_vlr_user_id_index < 0) || (set_vlr_user_id_index > U16_MAX))
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index user_ID, but index %d is out of range\n", argv[i], set_vlr_user_id_index);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index user_ID, but index %d is out of range", argv[i], set_vlr_user_id_index);
           byebye(true);
         }
 			  i++;
@@ -865,27 +828,27 @@ int main(int argc, char *argv[])
       {
         if ((i+2) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index record_ID", argv[i]);
           byebye(true);
         }
         if (sscanf(argv[i+1], "%d", &set_vlr_record_id_index) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID but '%s' is no valid index\n", argv[i], argv[i+1]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index record_ID but '%s' is no valid index", argv[i], argv[i+1]);
           byebye(true);
         }
         if ((set_vlr_record_id_index < 0) || (set_vlr_record_id_index > U16_MAX))
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID, but index %d is out of range\n", argv[i], set_vlr_record_id_index);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index record_ID, but index %d is out of range", argv[i], set_vlr_record_id_index);
           byebye(true);
         }
         if (sscanf(argv[i+2], "%d", &set_vlr_record_id) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID but '%s' is no valid record ID\n", argv[i], argv[i+2]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index record_ID but '%s' is no valid record ID", argv[i], argv[i+2]);
           byebye(true);
         }
         if ((set_vlr_record_id < 0) || (set_vlr_record_id > U16_MAX))
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index record_ID, but record_ID %d is out of range\n", argv[i], set_vlr_record_id_index);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index record_ID, but record_ID %d is out of range", argv[i], set_vlr_record_id_index);
           byebye(true);
         }
 			  i++;
@@ -896,17 +859,17 @@ int main(int argc, char *argv[])
       {
         if ((i+2) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index description", argv[i]);
           byebye(true);
         }
         if (sscanf(argv[i+1], "%d", &set_vlr_description_index) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description but '%s' is no valid index\n", argv[i], argv[i+1]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index description but '%s' is no valid index", argv[i], argv[i+1]);
           byebye(true);
         }
         if ((set_vlr_description_index < 0) || (set_vlr_description_index > U16_MAX))
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description, but index %d is out of range\n", argv[i], set_vlr_description_index);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index description, but index %d is out of range", argv[i], set_vlr_description_index);
           byebye(true);
         }
 			  i++;
@@ -919,17 +882,17 @@ int main(int argc, char *argv[])
       {
         if ((i+2) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index description", argv[i]);
           byebye(true);
         }
         if (sscanf(argv[i+1], "%d", &set_evlr_description_index) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description but '%s' is no valid index\n", argv[i], argv[i+1]);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index description but '%s' is no valid index", argv[i], argv[i+1]);
           byebye(true);
         }
         if ((set_evlr_description_index < 0) || (set_evlr_description_index > U16_MAX))
         {
-          fprintf(stderr,"ERROR: '%s' needs 2 arguments: index description, but index %d is out of range\n", argv[i], set_vlr_description_index);
+          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index description, but index %d is out of range", argv[i], set_vlr_description_index);
           byebye(true);
         }
 			  i++;
@@ -942,17 +905,17 @@ int main(int argc, char *argv[])
       {
         if ((i+1) >= argc)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: code\n", argv[i]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: code", argv[i]);
           byebye(true);
         }
         if (sscanf(argv[i+1], "%u", &set_geotiff_epsg) != 1)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: code but '%s' is no valid code\n", argv[i], argv[i+1]);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: code but '%s' is no valid code", argv[i], argv[i+1]);
           byebye(true);
         }
         if (set_geotiff_epsg > U16_MAX)
         {
-          fprintf(stderr,"ERROR: '%s' needs 1 argument: code between 0 and %u but %u is out of range\n", argv[i], U16_MAX, set_geotiff_epsg);
+          LASMessage(LAS_ERROR, "'%s' needs 1 argument: code between 0 and %u but %u is out of range", argv[i], U16_MAX, set_geotiff_epsg);
           byebye(true);
         }
 			  i++;
@@ -960,7 +923,7 @@ int main(int argc, char *argv[])
 		  }
       else
       {
-        fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+        LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
         byebye(TRUE);
       }
     }
@@ -1004,7 +967,7 @@ int main(int argc, char *argv[])
       }
       else
       {
-        fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+        LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
         byebye(TRUE);
       }
     }
@@ -1012,7 +975,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: base name\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: base name", argv[i]);
         byebye(true);
       }
 			i++;
@@ -1022,17 +985,17 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: every\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: every", argv[i]);
         byebye(true);
       }
       if (sscanf(argv[i+1], "%u", &progress) != 1)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: every but '%s' is no valid number\n", argv[i], argv[i+1]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: every but '%s' is no valid number", argv[i], argv[i+1]);
         byebye(true);
       }
       if (progress == 0)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: every but '%u' is no valid number\n", argv[i], progress);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: every but '%u' is no valid number", argv[i], progress);
         byebye(true);
       }
 			i++;
@@ -1044,7 +1007,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
       byebye(true);
     }
   }
@@ -1061,11 +1024,11 @@ int main(int argc, char *argv[])
   {
     if (lasreadopener.get_file_name_number() < 2)
     {
-      fprintf(stderr,"WARNING: only %u input files. ignoring '-cores %d' ...\n", lasreadopener.get_file_name_number(), cores);
+      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
     }
     else if (lasreadopener.is_merged())
     {
-      fprintf(stderr,"WARNING: input files merged on-the-fly. ignoring '-cores %d' ...\n", cores);
+      LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", cores);
     }
     else
     {
@@ -1082,7 +1045,7 @@ int main(int argc, char *argv[])
 
   if (!lasreadopener.active())
   {
-    fprintf (stderr, "ERROR: no input specified\n");
+    LASMessage(LAS_ERROR, "no input specified");
     byebye(true, argc==1);
   }
 
@@ -1145,23 +1108,23 @@ int main(int argc, char *argv[])
     {
       if (lasreadopener.is_piped())
       {
-        fprintf(stderr, "ERROR: cannot edit header of piped input\n");
+        LASMessage(LAS_ERROR, "cannot edit header of piped input");
         edit_header = false;
       }
       else if (lasreadopener.is_merged())
       {
-        fprintf(stderr, "ERROR: cannot edit header of merged input\n");
+        LASMessage(LAS_ERROR, "cannot edit header of merged input");
         edit_header = false;
       }
       else if (lasreadopener.is_buffered())
       {
-        fprintf(stderr, "ERROR: cannot edit header of buffered input\n");
+        LASMessage(LAS_ERROR, "cannot edit header of buffered input");
         edit_header = false;
       }
       const CHAR* file_name = lasreadopener.get_file_name(lasreadopener.get_file_name_current());
       if ((strstr(file_name, ".laz") == 0) && (strstr(file_name, ".las") == 0) && (strstr(file_name, ".LAZ") == 0) && (strstr(file_name, ".LAS") == 0))
       {
-        fprintf(stderr, "ERROR: can only edit for LAS or LAZ files, not for '%s'\n", file_name);
+        LASMessage(LAS_ERROR, "can only edit for LAS or LAZ files, not for '%s'", file_name);
         edit_header = false;
       }
       if (set_file_source_ID_from_point_source_ID)
@@ -1169,7 +1132,7 @@ int main(int argc, char *argv[])
         LASreader* lasreader = lasreadopener.open(file_name, FALSE);
         if (lasreader == 0)
         {
-          fprintf(stderr, "ERROR: cannot open lasreader for '%s'\n", file_name);
+          LASMessage(LAS_ERROR, "cannot open lasreader for '%s'", file_name);
           byebye(true, argc==1);
         }
         if (lasreader->read_point())
@@ -1189,7 +1152,7 @@ int main(int argc, char *argv[])
         LASreader* lasreader = lasreadopener.open(file_name, FALSE);
         if (lasreader == 0)
         {
-          fprintf(stderr, "ERROR: cannot open lasreader for '%s'\n", file_name);
+          LASMessage(LAS_ERROR, "cannot open lasreader for '%s'", file_name);
           byebye(true, argc==1);
         }
         if (set_vlr_user_id_index < (I32)lasreader->header.number_of_variable_length_records)
@@ -1204,7 +1167,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-          fprintf(stderr, "SKIPPING: cannot set user_ID of VLR with index %d for file '%s'\n", set_vlr_user_id_index, file_name);
+          LASMessage(LAS_INFO, "SKIPPING: cannot set user_ID of VLR with index %d for file '%s'", set_vlr_user_id_index, file_name);
         }
         lasreader->close();
         delete lasreader;
@@ -1215,7 +1178,7 @@ int main(int argc, char *argv[])
         LASreader* lasreader = lasreadopener.open(file_name, FALSE);
         if (lasreader == 0)
         {
-          fprintf(stderr, "ERROR: cannot open lasreader for '%s'\n", file_name);
+          LASMessage(LAS_ERROR, "cannot open lasreader for '%s'", file_name);
           byebye(true, argc==1);
         }
         if (set_vlr_record_id_index < (I32)lasreader->header.number_of_variable_length_records)
@@ -1230,7 +1193,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-          fprintf(stderr, "SKIPPING: cannot set record_ID of VLR with index %d for file '%s'\n", set_vlr_record_id_index, file_name);
+          LASMessage(LAS_INFO, "SKIPPING: cannot set record_ID of VLR with index %d for file '%s'", set_vlr_record_id_index, file_name);
         }
         lasreader->close();
         delete lasreader;
@@ -1241,7 +1204,7 @@ int main(int argc, char *argv[])
         LASreader* lasreader = lasreadopener.open(file_name, FALSE);
         if (lasreader == 0)
         {
-          fprintf(stderr, "ERROR: cannot open lasreader for '%s'\n", file_name);
+          LASMessage(LAS_ERROR, "cannot open lasreader for '%s'", file_name);
           byebye(true, argc==1);
         }
         if (set_vlr_description_index < (I32)lasreader->header.number_of_variable_length_records)
@@ -1256,7 +1219,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-          fprintf(stderr, "SKIPPING: cannot set desciption of VLR with index %d for file '%s'\n", set_vlr_description_index, file_name);
+          LASMessage(LAS_INFO, "SKIPPING: cannot set desciption of VLR with index %d for file '%s'", set_vlr_description_index, file_name);
         }
         lasreader->close();
         delete lasreader;
@@ -1272,7 +1235,7 @@ int main(int argc, char *argv[])
         LASreader* lasreader = lasreadopener.open(file_name, FALSE);
         if (lasreader == 0)
         {
-          fprintf(stderr, "ERROR: cannot open lasreader for '%s'\n", file_name);
+          LASMessage(LAS_ERROR, "cannot open lasreader for '%s'", file_name);
           byebye(true, argc==1);
         }
         I64 pos = lasreader->header.header_size;
@@ -1305,7 +1268,7 @@ int main(int argc, char *argv[])
       FILE* file = fopen(file_name, "rb+");
       if (file == 0)
       {
-        fprintf (stderr, "ERROR: could not open file '%s' for edit of header\n", file_name);
+        LASMessage(LAS_ERROR, "could not open file '%s' for edit of header", file_name);
         edit_header = false;
       }
       else if (edit_header)
@@ -1544,27 +1507,27 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                  fprintf(stderr, "WARNING: cannot set EPSG to %u because file '%s' has not enough header space for GeoTIFF tags\n", set_geotiff_epsg, file_name);
+                  LASMessage(LAS_WARNING, "cannot set EPSG to %u because file '%s' has not enough header space for GeoTIFF tags", set_geotiff_epsg, file_name);
                 }
               }
               else
               {
-                fprintf(stderr, "WARNING: cannot set EPSG in GeoTIFF tags of because no GeoTIFF tags available for code %u\n", set_geotiff_epsg);
+                LASMessage(LAS_WARNING, "cannot set EPSG in GeoTIFF tags of because no GeoTIFF tags available for code %u", set_geotiff_epsg);
                 set_geotiff_epsg = -1;
               }
             }
             else
             {
-              fprintf(stderr, "WARNING: cannot set EPSG in GeoTIFF tags of because code %u is unknown\n", set_geotiff_epsg);
+              LASMessage(LAS_WARNING, "cannot set EPSG in GeoTIFF tags of because code %u is unknown", set_geotiff_epsg);
               set_geotiff_epsg = -1;
             }
           }
           else
           {
-            fprintf(stderr, "WARNING: cannot set EPSG to %u because file '%s' has no GeoTIFF tags\n", set_geotiff_epsg, file_name);
+            LASMessage(LAS_WARNING, "cannot set EPSG to %u because file '%s' has no GeoTIFF tags", set_geotiff_epsg, file_name);
           }
         }
-        if (verbose) fprintf(stderr, "edited '%s' ...\n", file_name);
+        LASMessage(LAS_VERBOSE, "edited '%s' ...", file_name);
         fclose(file);
       }
     }
@@ -1574,18 +1537,16 @@ int main(int argc, char *argv[])
     LASreader* lasreader = lasreadopener.open();
     if (lasreader == 0)
     {
-      fprintf(stderr, "ERROR: cannot open lasreader\n");
+      LASMessage(LAS_ERROR, "cannot open lasreader");
       byebye(true, argc==1);
     }
 
     if (delete_empty && lasreadopener.get_file_name())
     {
 #ifdef _WIN32
-      if (verbose) fprintf(stderr, "delete check for '%s' with %I64d points\n", lasreadopener.get_file_name(), lasreader->npoints);
-#elif _WIN64
-      if (verbose) fprintf(stderr, "delete check for '%s' with %I64d points\n", lasreadopener.get_file_name(), lasreader->npoints);
+      LASMessage(LAS_VERBOSE, "delete check for '%s' with %I64d points", lasreadopener.get_file_name(), lasreader->npoints);
 #else
-      fprintf(stderr, "ERROR: deleting not implemented ...\n");
+      LASMessage(LAS_ERROR, "deleting not implemented ...");
       byebye(true, argc==1);
 #endif
       if (lasreader->npoints == 0)
@@ -1594,11 +1555,11 @@ int main(int argc, char *argv[])
 
         char command[2048];
         sprintf(command, "del \"%s\"", lasreadopener.get_file_name());
-        if (verbose) fprintf(stderr, "executing '%s'\n", command);
+        LASMessage(LAS_VERBOSE, "executing '%s'", command);
 
         if (system(command) != 0)
         {
-          fprintf(stderr, "ERROR: failed to execute '%s'\n", command);
+          LASMessage(LAS_ERROR, "failed to execute '%s'", command);
           byebye(true);
         }
       }
@@ -1618,9 +1579,9 @@ int main(int argc, char *argv[])
       lasreader->close();
 
 #ifdef _WIN32
-      if (verbose) fprintf(stderr, "renaming '%s' with %I64d points\n", lasreadopener.get_file_name(), lasreader->npoints);
+      LASMessage(LAS_VERBOSE, "renaming '%s' with %I64d points", lasreadopener.get_file_name(), lasreader->npoints);
 #else
-      fprintf(stderr, "ERROR: renaming not implemented ...\n");
+      LASMessage(LAS_ERROR, "renaming not implemented ...");
       byebye(true, argc==1);
 #endif
 
@@ -1640,23 +1601,17 @@ int main(int argc, char *argv[])
       command[len2-2] = lasreadopener.get_file_name()[len1-1];
       delete lasreader;
 
-      if (verbose) fprintf(stderr, "executing '%s'\n", command);
+      LASMessage(LAS_VERBOSE, "executing '%s'", command);
 
       if (system(command) != 0)
       {
-        fprintf(stderr, "ERROR: failed to execute '%s'\n", command);
+        LASMessage(LAS_ERROR, "failed to execute '%s'", command);
         byebye(true);
       }
       continue;
     }
 
-
-#ifdef _WIN32
-    if (verbose) fprintf(stderr, "%s '%s' with %I64d points\n", (repair_bb || repair_counters ? "repairing" : "reading"), (lasreadopener.get_file_name() ? lasreadopener.get_file_name() : "stdin"), lasreader->npoints);
-#else
-    if (verbose) fprintf(stderr, "%s '%s' with %lld points\n", (repair_bb || repair_counters ? "repairing" : "reading"), (lasreadopener.get_file_name() ? lasreadopener.get_file_name() : "stdin"), lasreader->npoints);
-#endif
-
+    LASMessage(LAS_VERBOSE, "%s '%s' with %lld points", (repair_bb || repair_counters ? "repairing" : "reading"), (lasreadopener.get_file_name() ? lasreadopener.get_file_name() : "stdin"), lasreader->npoints);
     if (auto_date_creation && lasreadopener.get_file_name())
     {
 #ifdef _WIN32
@@ -1686,14 +1641,14 @@ int main(int argc, char *argv[])
       // make sure we do not corrupt the input file
       if (lasreadopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
       {
-        fprintf(stderr, "ERROR: input and output file name for '%s' are identical\n", lasreadopener.get_file_name());
+        LASMessage(LAS_ERROR, "input and output file name for '%s' are identical", lasreadopener.get_file_name());
         usage(true);
       }
       // open the text output file
       file_out = fopen(laswriteopener.get_file_name(), "w");
       if (file_out == 0)
       {
-        fprintf (stderr, "WARNING: could not open output text file '%s'\n", laswriteopener.get_file_name());
+        LASMessage(LAS_WARNING, "could not open output text file '%s'", laswriteopener.get_file_name());
         file_out = stderr;
       }
     }
@@ -1727,11 +1682,7 @@ int main(int argc, char *argv[])
     {
       if (lasreadopener.is_merged() && (lasreader->header.version_minor < 4))
       {
-#ifdef _WIN32
-        if (lasreader->npoints > number_of_point_records) fprintf(file_out, "WARNING: merged file has %I64d points, more than the 32 bits counters of LAS 1.%d can handle.\012", lasreader->npoints, lasreader->header.version_minor);
-#else
         if (lasreader->npoints > number_of_point_records) fprintf(file_out, "WARNING: merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.\012", lasreader->npoints, lasreader->header.version_minor);
-#endif
       }
       fprintf(file_out, "reporting all LAS header entries:\012");
       fprintf(file_out, "  file signature:             '%.4s'\012", lasheader->file_signature);
@@ -1779,33 +1730,18 @@ int main(int argc, char *argv[])
       }
       if ((lasheader->version_major == 1) && (lasheader->version_minor >= 3))
       {
-#ifdef _WIN32
-        fprintf(file_out, "  start of waveform data packet record: %I64d\012", lasheader->start_of_waveform_data_packet_record);
-#else
         fprintf(file_out, "  start of waveform data packet record: %lld\012", lasheader->start_of_waveform_data_packet_record);
-#endif
       }
       if ((lasheader->version_major == 1) && (lasheader->version_minor >= 4))
       {
-#ifdef _WIN32
-        fprintf(file_out, "  start of first extended variable length record: %I64d\012", lasheader->start_of_first_extended_variable_length_record);
-#else
         fprintf(file_out, "  start of first extended variable length record: %lld\012", lasheader->start_of_first_extended_variable_length_record);
-#endif
         fprintf(file_out, "  number of extended_variable length records: %d\012", lasheader->number_of_extended_variable_length_records);
-#ifdef _WIN32
-        fprintf(file_out, "  extended number of point records: %I64d\012", lasheader->extended_number_of_point_records);
-        fprintf(file_out, "  extended number of points by return: %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d\012", lasheader->extended_number_of_points_by_return[0], lasheader->extended_number_of_points_by_return[1], lasheader->extended_number_of_points_by_return[2], lasheader->extended_number_of_points_by_return[3], lasheader->extended_number_of_points_by_return[4], lasheader->extended_number_of_points_by_return[5], lasheader->extended_number_of_points_by_return[6], lasheader->extended_number_of_points_by_return[7], lasheader->extended_number_of_points_by_return[8], lasheader->extended_number_of_points_by_return[9], lasheader->extended_number_of_points_by_return[10], lasheader->extended_number_of_points_by_return[11], lasheader->extended_number_of_points_by_return[12], lasheader->extended_number_of_points_by_return[13], lasheader->extended_number_of_points_by_return[14]);
-#else
         fprintf(file_out, "  extended number of point records: %lld\012", lasheader->extended_number_of_point_records);
         fprintf(file_out, "  extended number of points by return: %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld\012", lasheader->extended_number_of_points_by_return[0], lasheader->extended_number_of_points_by_return[1], lasheader->extended_number_of_points_by_return[2], lasheader->extended_number_of_points_by_return[3], lasheader->extended_number_of_points_by_return[4], lasheader->extended_number_of_points_by_return[5], lasheader->extended_number_of_points_by_return[6], lasheader->extended_number_of_points_by_return[7], lasheader->extended_number_of_points_by_return[8], lasheader->extended_number_of_points_by_return[9], lasheader->extended_number_of_points_by_return[10], lasheader->extended_number_of_points_by_return[11], lasheader->extended_number_of_points_by_return[12], lasheader->extended_number_of_points_by_return[13], lasheader->extended_number_of_points_by_return[14]);
-#endif
       }
       if (lasheader->user_data_in_header_size) fprintf(file_out, "the header contains %u user-defined bytes\012", lasheader->user_data_in_header_size);
     }
-
     // maybe print variable header
-
     if (file_out && !no_variable_header)
     {
       for (int i = 0; i < (int)lasheader->number_of_variable_length_records; i++)
@@ -3934,11 +3870,7 @@ int main(int argc, char *argv[])
                     {
                       if (type < 8)
                       {
-#ifdef _WIN32
-                        fprintf(file_out, " %I64d", ((I64*)(lasheader->vlrs[i].data + j + 64))[k]);
-#else
                         fprintf(file_out, ", %lld", ((I64*)(lasheader->vlrs[i].data + j + 64))[k]);
-#endif
                       }
                       else
                       {
@@ -3953,11 +3885,7 @@ int main(int argc, char *argv[])
                     {
                       if (type < 8)
                       {
-#ifdef _WIN32
-                        fprintf(file_out, " %I64d", ((I64*)(lasheader->vlrs[i].data + j + 88))[k]);
-#else
                         fprintf(file_out, ", %lld", ((I64*)(lasheader->vlrs[i].data + j + 88))[k]);
-#endif
                       }
                       else
                       {
@@ -4053,11 +3981,7 @@ int main(int argc, char *argv[])
         fprintf(file_out, "  reserved             %d\012", lasreader->header.evlrs[i].reserved);
         fprintf(file_out, "  user ID              '%.16s'\012", lasreader->header.evlrs[i].user_id);
         fprintf(file_out, "  record ID            %d\012", lasreader->header.evlrs[i].record_id);
-#ifdef _WIN32
-        fprintf(file_out, "  length after header  %I64d\012", lasreader->header.evlrs[i].record_length_after_header);
-#else
         fprintf(file_out, "  length after header  %lld\012", lasreader->header.evlrs[i].record_length_after_header);
-#endif
         fprintf(file_out, "  description          '%.32s'\012", lasreader->header.evlrs[i].description);
         if (strcmp(lasheader->evlrs[i].user_id, "LASF_Projection") == 0)
         {
@@ -4260,11 +4184,7 @@ int main(int argc, char *argv[])
 
         if (file_out && progress && (lasreader->p_count % progress) == 0)
         {
-#ifdef _WIN32
-          fprintf(file_out, " ... processed %I64d points ...\012", lasreader->p_count);
-#else
           fprintf(file_out, " ... processed %lld points ...\012", lasreader->p_count);
-#endif
         }
       }
       if (file_out && !no_min_max)
@@ -4314,11 +4234,7 @@ int main(int argc, char *argv[])
         if (lasreader->point.have_wavepacket)
         {
           fprintf(file_out, "  Wavepacket Index    %d %d\012", lassummary.min.wavepacket.getIndex(), lassummary.max.wavepacket.getIndex());
-#ifdef _WIN32
-          fprintf(file_out, "             Offset   %I64d %I64d\012", lassummary.min.wavepacket.getOffset(), lassummary.max.wavepacket.getOffset());
-#else
           fprintf(file_out, "             Offset   %lld %lld\012", lassummary.min.wavepacket.getOffset(), lassummary.max.wavepacket.getOffset());
-#endif
           fprintf(file_out, "             Size     %d %d\012", lassummary.min.wavepacket.getSize(), lassummary.max.wavepacket.getSize());
           fprintf(file_out, "             Location %g %g\012", lassummary.min.wavepacket.getLocation(), lassummary.max.wavepacket.getLocation());
           fprintf(file_out, "             Xt       %g %g\012", lassummary.min.wavepacket.getXt(), lassummary.max.wavepacket.getXt());
@@ -4356,11 +4272,7 @@ int main(int argc, char *argv[])
       }
       if (!no_warnings && file_out && outside_bounding_box)
       {
-#ifdef _WIN32
-        fprintf(file_out, "WARNING: %I64d points outside of header bounding box\012", outside_bounding_box);
-#else
         fprintf(file_out, "WARNING: %lld points outside of header bounding box\012", outside_bounding_box);
-#endif
       }
       if (!no_warnings && file_out && lassummary.has_fluff())
       {
@@ -4380,17 +4292,10 @@ int main(int argc, char *argv[])
       }
       if (file_out && !no_returns)
       {
-#ifdef _WIN32
-        fprintf(file_out, "number of first returns:        %I64d\012", num_first_returns);
-        fprintf(file_out, "number of intermediate returns: %I64d\012", num_intermediate_returns);
-        fprintf(file_out, "number of last returns:         %I64d\012", num_last_returns);
-        fprintf(file_out, "number of single returns:       %I64d\012", num_single_returns);
-#else
         fprintf(file_out, "number of first returns:        %lld\012", num_first_returns);
         fprintf(file_out, "number of intermediate returns: %lld\012", num_intermediate_returns);
         fprintf(file_out, "number of last returns:         %lld\012", num_last_returns);
         fprintf(file_out, "number of single returns:       %lld\012", num_single_returns);
-#endif
       }
       if (file_out && lasoccupancygrid)
       {
@@ -4433,28 +4338,28 @@ int main(int argc, char *argv[])
     {
       if (lasreadopener.is_piped())
       {
-        fprintf(stderr, "ERROR: cannot repair header of piped input\n");
+        LASMessage(LAS_ERROR, "cannot repair header of piped input");
         repair_bb = repair_counters = false;
       }
       else if (lasreadopener.is_merged())
       {
-        fprintf(stderr, "ERROR: cannot repair header of merged input\n");
+        LASMessage(LAS_ERROR, "cannot repair header of merged input");
         repair_bb = repair_counters = false;
       }
       else if (lasreadopener.is_buffered())
       {
-        fprintf(stderr, "ERROR: cannot repair header of buffered input\n");
+        LASMessage(LAS_ERROR, "cannot repair header of buffered input");
         repair_bb = repair_counters = false;
       }
       else if (lasreader->get_format() > LAS_TOOLS_FORMAT_LAZ)
       {
-        fprintf(stderr, "ERROR: can only repair header for LAS or LAZ files, not for '%s'\n", lasreadopener.get_file_name());
+        LASMessage(LAS_ERROR, "can only repair header for LAS or LAZ files, not for '%s'", lasreadopener.get_file_name());
         repair_bb = repair_counters = false;
       }
       file = fopen(lasreadopener.get_file_name(), "rb+");
       if (file == 0)
       {
-        fprintf (stderr, "ERROR: could not reopen file '%s' for repair of header\n", lasreadopener.get_file_name());
+        LASMessage(LAS_ERROR, "could not reopen file '%s' for repair of header", lasreadopener.get_file_name());
         repair_bb = repair_counters = false;
       }
     }
@@ -4481,11 +4386,7 @@ int main(int argc, char *argv[])
           {
             if (file_out)
             {
-#ifdef _WIN32
-              fprintf(file_out, "WARNING: real number of point records (%I64d) exceeds 4,294,967,295. cannot repair. too big.\n", lassummary.number_of_point_records);
-#else
               fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.\n", lassummary.number_of_point_records);
-#endif
             }
           }
           else if (lasheader->number_of_point_records != 0)
@@ -4495,11 +4396,7 @@ int main(int argc, char *argv[])
             fwrite(&number_of_point_records, sizeof(U32), 1, file);
             if (file_out)
             {
-#ifdef _WIN32
-              fprintf(file_out, "WARNING: real number of point records (%I64d) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
-#else
               fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
-#endif
             }
           }
           else
@@ -4516,27 +4413,15 @@ int main(int argc, char *argv[])
           {
             if (lassummary.number_of_point_records <= U32_MAX)
             {
-#ifdef _WIN32
-              fprintf(file_out, "WARNING: real number of point records (%I64d) is different from header entry (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
-#else
               fprintf(file_out, "WARNING: real number of point records (%lld) is different from header entry (%u).\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
-#endif
             }
             else if (lasheader->version_minor < 4)
             {
-#ifdef _WIN32
-              fprintf(file_out, "WARNING: real number of point records (%I64d) exceeds 4,294,967,295.\n", lassummary.number_of_point_records);
-#else
               fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295.\n", lassummary.number_of_point_records);
-#endif
             }
             else if (lasheader->number_of_point_records != 0)
             {
-#ifdef _WIN32
-              fprintf(file_out, "WARNING: real number of point records (%I64d) exceeds 4,294,967,295. but header entry is %u instead of zero.\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
-#else
               fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead of zero.\n", lassummary.number_of_point_records, lasheader->number_of_point_records);
-#endif
             }
           }
         }
@@ -4579,11 +4464,7 @@ int main(int argc, char *argv[])
           }
           if (!no_warnings && file_out)
           {
-#ifdef _WIN32
-            fprintf(file_out, "WARNING: real number of point records (%I64d) is different from extended header entry (%I64d).%s\n", lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
-#else
             fprintf(file_out, "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s\n", lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
-#endif
           }
         }
         else
@@ -4630,11 +4511,7 @@ int main(int argc, char *argv[])
           {
             if (!no_warnings && file_out)
             {
-#ifdef _WIN32
-              fprintf(file_out, "WARNING: for return %d real number of points by return (%I64d) exceeds 4,294,967,295.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
-#else
               fprintf(file_out, "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
-#endif
             }
           }
           else if (lasheader->number_of_points_by_return[i-1] != 0)
@@ -4643,11 +4520,7 @@ int main(int argc, char *argv[])
             wrong_entry = true;
             if (!no_warnings && file_out)
             {
-#ifdef _WIN32
-              fprintf(file_out, "WARNING: for return %d real number of points by return (%I64d) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
-#else
               fprintf(file_out, "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
-#endif
             }
           }
           else
@@ -4704,19 +4577,11 @@ int main(int argc, char *argv[])
             {
               if (was_set)
               {
-#ifdef _WIN32
-                fprintf(file_out, "WARNING: real extended number of points by return [%d] is %I64d - different from header entry %I64d.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
-#else
                 fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i, lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i-1], (repair_counters ? " it was repaired." : ""));
-#endif
               }
               else
               {
-#ifdef _WIN32
-                fprintf(file_out, "WARNING: real extended number of points by return [%d] is %I64d but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
-#else
                 fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i, lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
-#endif
               }
             }
           }
@@ -4738,35 +4603,21 @@ int main(int argc, char *argv[])
 
       if (!no_warnings && file_out && !no_returns)
       {
-#ifdef _WIN32
-        if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there %s %I64d point%s with return number 0\n", (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[0], (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
-        if (lasheader->version_minor < 4)
-        {
-          if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there %s %I64d point%s with return number 6\n", (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[6], (lassummary.number_of_points_by_return[6] > 1 ? "s" : ""));
-          if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there %s %I64d point%s with return number 7\n", (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[7], (lassummary.number_of_points_by_return[7] > 1 ? "s" : ""));
-        }
-#else
         if (lassummary.number_of_points_by_return[0]) fprintf(file_out, "WARNING: there %s %lld point%s with return number 0\n", (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[0], (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
         if (lasheader->version_minor < 4)
         {
           if (lassummary.number_of_points_by_return[6]) fprintf(file_out, "WARNING: there %s %lld point%s with return number 6\n", (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[6], (lassummary.number_of_points_by_return[6] > 1 ? "s" : ""));
           if (lassummary.number_of_points_by_return[7]) fprintf(file_out, "WARNING: there %s %lld point%s with return number 7\n", (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[7], (lassummary.number_of_points_by_return[7] > 1 ? "s" : ""));
         }
-#endif
 
         wrong_entry = false;
-
         if (lasheader->version_minor > 3)
         {
           for (i = 1; i < 16; i++) if (lassummary.number_of_returns[i]) wrong_entry = true;
           if (wrong_entry)
           {
            fprintf(file_out, "overview over extended number of returns of given pulse:");
-#ifdef _WIN32
-            for (i = 1; i < 16; i++) fprintf(file_out, " %I64d", lassummary.number_of_returns[i]);
-#else
             for (i = 1; i < 16; i++) fprintf(file_out, " %lld", lassummary.number_of_returns[i]);
-#endif
             fprintf(file_out, "\n");
           }
         }
@@ -4776,20 +4627,12 @@ int main(int argc, char *argv[])
           if (wrong_entry)
           {
            fprintf(file_out, "overview over number of returns of given pulse:");
-#ifdef _WIN32
-            for (i = 1; i < 8; i++) fprintf(file_out, " %I64d", lassummary.number_of_returns[i]);
-#else
             for (i = 1; i < 8; i++) fprintf(file_out, " %lld", lassummary.number_of_returns[i]);
-#endif
             fprintf(file_out, "\n");
           }
         }
 
-#ifdef _WIN32
-        if (lassummary.number_of_returns[0]) fprintf(file_out, "WARNING: there are %I64d points with a number of returns of given pulse of 0\n", lassummary.number_of_returns[0]);
-#else
         if (lassummary.number_of_returns[0]) fprintf(file_out, "WARNING: there are %lld points with a number of returns of given pulse of 0\n", lassummary.number_of_returns[0]);
-#endif
       }
 
       if (file_out && !no_min_max)
@@ -4801,27 +4644,6 @@ int main(int argc, char *argv[])
         if (wrong_entry)
         {
           fprintf(file_out, "histogram of classification of points:\n");
-#ifdef _WIN32
-          for (i = 0; i < 32; i++) if (lassummary.classification[i]) fprintf(file_out, " %15I64d  %s (%u)\n", lassummary.classification[i], LASpointClassification[i], i);
-          if (lassummary.flagged_synthetic)
-          {
-            fprintf(file_out, " +-> flagged as synthetic: %I64d\n", lassummary.flagged_synthetic);
-            for (i = 0; i < 32; i++) if (lassummary.flagged_synthetic_classification[i]) fprintf(file_out, "  +---> %15I64d of those are %s (%u)\n", lassummary.flagged_synthetic_classification[i], LASpointClassification[i], i);
-            for (i = 32; i < 256; i++) if (lassummary.flagged_synthetic_classification[i]) fprintf(file_out, "  +---> %15I64d  of those are classification (%u)\n", lassummary.flagged_synthetic_classification[i], i);
-          }
-          if (lassummary.flagged_keypoint)
-          {
-            fprintf(file_out,  " +-> flagged as keypoints: %I64d\n", lassummary.flagged_keypoint);
-            for (i = 0; i < 32; i++) if (lassummary.flagged_keypoint_classification[i]) fprintf(file_out, "  +---> %15I64d of those are %s (%u)\n", lassummary.flagged_keypoint_classification[i], LASpointClassification[i], i);
-            for (i = 32; i < 256; i++) if (lassummary.flagged_keypoint_classification[i]) fprintf(file_out, "  +---> %15I64d  of those are classification (%u)\n", lassummary.flagged_keypoint_classification[i], i);
-          }
-          if (lassummary.flagged_withheld)
-          {
-            fprintf(file_out,  " +-> flagged as withheld:  %I64d\n", lassummary.flagged_withheld);
-            for (i = 0; i < 32; i++) if (lassummary.flagged_withheld_classification[i]) fprintf(file_out, "  +---> %15I64d of those are %s (%u)\n", lassummary.flagged_withheld_classification[i], LASpointClassification[i], i);
-            for (i = 32; i < 256; i++) if (lassummary.flagged_withheld_classification[i]) fprintf(file_out, "  +---> %15I64d  of those are classification (%u)\n", lassummary.flagged_withheld_classification[i], i);
-          }
-#else
           for (i = 0; i < 32; i++) if (lassummary.classification[i]) fprintf(file_out, " %15lld  %s (%u)\n", lassummary.classification[i], LASpointClassification[i], i);
           if (lassummary.flagged_synthetic)
           {
@@ -4841,38 +4663,23 @@ int main(int argc, char *argv[])
             for (i = 0; i < 32; i++) if (lassummary.flagged_withheld_classification[i]) fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_withheld_classification[i], LASpointClassification[i], i);
             for (i = 32; i < 256; i++) if (lassummary.flagged_withheld_classification[i]) fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_withheld_classification[i], i);
           }
-#endif
         }
 
         if (lasreader->point.extended_point_type)
         {
-#ifdef _WIN32
-          if (lassummary.flagged_extended_overlap)
-          {
-            fprintf(file_out, " +-> flagged as extended overlap: %I64d\n", lassummary.flagged_extended_overlap);
-            for (i = 0; i < 32; i++) if (lassummary.flagged_extended_overlap_classification[i]) fprintf(file_out, "  +---> %15I64d of those are %s (%u)\n", lassummary.flagged_extended_overlap_classification[i], LASpointClassification[i], i);
-            for (i = 32; i < 256; i++) if (lassummary.flagged_extended_overlap_classification[i]) fprintf(file_out, "  +---> %15I64d  of those are classification (%u)\n", lassummary.flagged_extended_overlap_classification[i], i);
-          }
-#else
           if (lassummary.flagged_extended_overlap)
           {
             fprintf(file_out, " +-> flagged as extended overlap: %lld\n", lassummary.flagged_extended_overlap);
             for (i = 0; i < 32; i++) if (lassummary.flagged_extended_overlap_classification[i]) fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_extended_overlap_classification[i], LASpointClassification[i], i);
             for (i = 32; i < 256; i++) if (lassummary.flagged_extended_overlap_classification[i]) fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_extended_overlap_classification[i], i);
           }
-#endif
-
           wrong_entry = false;
           for (i = 32; i < 256; i++) if (lassummary.extended_classification[i]) wrong_entry = true;
 
           if (wrong_entry)
           {
             fprintf(file_out, "histogram of extended classification of points:\n");
-  #ifdef _WIN32
-            for (i = 32; i < 256; i++) if (lassummary.extended_classification[i]) fprintf(file_out, " %15I64d  extended classification (%u)\n", lassummary.extended_classification[i], i);
-  #else
             for (i = 32; i < 256; i++) if (lassummary.extended_classification[i]) fprintf(file_out, " %15lld  extended classification (%u)\n", lassummary.extended_classification[i], i);
-  #endif
           }
         }
       }

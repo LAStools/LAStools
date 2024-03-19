@@ -31,11 +31,10 @@
 #ifndef LAS_MESSAGE_HPP
 #define LAS_MESSAGE_HPP
 
-
 #include "mydefs.hpp"
 
 /// maximum length of
-#define LAS_MAX_MESSAGE_LENGTH 4096
+#define LAS_MAX_MESSAGE_LENGTH 8192
 
 enum LAS_MESSAGE_TYPE {
     LAS_DEBUG = 0,

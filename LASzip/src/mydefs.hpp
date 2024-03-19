@@ -195,14 +195,14 @@ inline BOOL IS_LITTLE_ENDIAN()
 	  ((((U32) n) >>  8) & 0x0000FF00) |	\
 	  ((((U32) n) >> 24) & 0x000000FF) )
 
-inline void ENDIAN_SWAP_16(U8* field)
+inline void ENDIAN_SWAP_16_(U8* field)
 {
   U8 help = field[0];
   field[0] = field[1];
   field[1] = help;
 }
 
-inline void ENDIAN_SWAP_32(U8* field)
+inline void ENDIAN_SWAP_32_(U8* field)
 {
   U8 help;
   help = field[0];
@@ -213,7 +213,7 @@ inline void ENDIAN_SWAP_32(U8* field)
   field[2] = help;
 }
 
-inline void ENDIAN_SWAP_64(U8* field)
+inline void ENDIAN_SWAP_64_(U8* field)
 {
   U8 help;
   help = field[0];
@@ -259,6 +259,21 @@ inline void ENDIAN_SWAP_64(const U8* from, U8* to)
 #if defined(_MSC_VER)
 #include <windows.h>
 wchar_t* UTF8toUTF16(const char* utf8);
+#endif
+
+// 32bit/64bit detection
+#ifdef _WIN64
+#define IS64 true
+#elif _WIN32
+#define IS64 false
+#else
+#define IS64 true
+#endif
+
+#ifdef _WIN32
+#define DIRECTORY_SLASH '\\'
+#else
+#define DIRECTORY_SLASH '/'
 #endif
 
 #endif

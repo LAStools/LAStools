@@ -108,7 +108,7 @@ BOOL LASwriterLAS::open(FILE* file, const LASheader* header, U32 compressor, I32
 #ifdef _WIN32
   if (file == stdout)
   {
-    if(_setmode( _fileno( stdout ), _O_BINARY ) == -1 )
+    if (_setmode(_fileno(stdout), _O_BINARY) == -1)
     {
       LASMessage(LAS_ERROR, "cannot set stdout to binary (untranslated) mode");
     }
@@ -201,10 +201,13 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     laszip->setup(point.num_items, point.items, compressor);
     if (chunk_size > -1) laszip->set_chunk_size((U32)chunk_size);
     if (compressor == LASZIP_COMPRESSOR_NONE) laszip->request_version(0);
-    else if (chunk_size == 0 && (point_data_format <= 5)) { LASMessage(LAS_ERROR, "adaptive chunking is depricated for point type %d.\n       only available for new LAS 1.4 point types 6 or higher.", point_data_format); return FALSE; }
+    else if (chunk_size == 0 && (point_data_format <= 5)) {
+      LASMessage(LAS_ERROR, "adaptive chunking is depricated for point type %d. only available for new LAS 1.4 point types 6 or higher.", point_data_format); 
+      return FALSE;
+    }
     else if (requested_version) laszip->request_version(requested_version);
     else laszip->request_version(2);
-    laszip_vlr_data_size = 34 + 6*laszip->num_items;
+    laszip_vlr_data_size = 34 + 6 * laszip->num_items;
   }
 
   // create and setup the point writer
@@ -518,7 +521,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
 
     if (header->vlrs[i].reserved != 0xAABB)
     {
-//      LASMessage(LAS_WARNING, "wrong header->vlrs[%d].reserved: %d != 0xAABB", i, header->vlrs[i].reserved);
+      //      LASMessage(LAS_WARNING, "wrong header->vlrs[%d].reserved: %d != 0xAABB", i, header->vlrs[i].reserved);
     }
 
     // write variable length records variable after variable (to avoid alignment issues)
@@ -753,7 +756,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
       LASMessage(LAS_ERROR, "writing header->vlr_lastiling->level_index %u", header->vlr_lastiling->level_index);
       return FALSE;
     }
-    if (!stream->put32bitsLE(((U8*)header->vlr_lastiling)+8))
+    if (!stream->put32bitsLE(((U8*)header->vlr_lastiling) + 8))
     {
       LASMessage(LAS_ERROR, "writing header->vlr_lastiling->implicit_levels %u", header->vlr_lastiling->implicit_levels);
       return FALSE;
@@ -929,7 +932,7 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
   if (use_inventory)
   {
     U32 number;
-    stream->seek(header_start_position+107);
+    stream->seek(header_start_position + 107);
     if (header->point_data_format >= 6)
     {
       number = 0; // legacy counters are zero for new point types
@@ -962,7 +965,7 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
       {
         number = 0; // legacy counters are zero for new point types
       }
-      else if (inventory.extended_number_of_points_by_return[i+1] > U32_MAX)
+      else if (inventory.extended_number_of_points_by_return[i + 1] > U32_MAX)
       {
         if (header->version_minor >= 4)
         {
@@ -975,7 +978,7 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
       }
       else
       {
-        number = (U32)inventory.extended_number_of_points_by_return[i+1];
+        number = (U32)inventory.extended_number_of_points_by_return[i + 1];
       }
       if (!stream->put32bitsLE((const U8*)&number))
       {
@@ -983,7 +986,7 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
         return FALSE;
       }
     }
-    stream->seek(header_start_position+179);
+    stream->seek(header_start_position + 179);
     F64 value;
     value = quantizer.get_x(inventory.max_X);
     if (!stream->put64bitsLE((const U8*)&value))
@@ -1024,7 +1027,7 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
     // special handling for LAS 1.4 or higher.
     if (header->version_minor >= 4)
     {
-      stream->seek(header_start_position+247);
+      stream->seek(header_start_position + 247);
       if (!stream->put64bitsLE((const U8*)&(inventory.extended_number_of_point_records)))
       {
         LASMessage(LAS_ERROR, "updating header->extended_number_of_point_records");
@@ -1032,7 +1035,7 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
       }
       for (i = 0; i < 15; i++)
       {
-        if (!stream->put64bitsLE((const U8*)&(inventory.extended_number_of_points_by_return[i+1])))
+        if (!stream->put64bitsLE((const U8*)&(inventory.extended_number_of_points_by_return[i + 1])))
         {
           LASMessage(LAS_ERROR, "updating header->extended_number_of_points_by_return[%d]", i);
           return FALSE;
@@ -1043,7 +1046,7 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
   else
   {
     U32 number;
-    stream->seek(header_start_position+107);
+    stream->seek(header_start_position + 107);
     if (header->point_data_format >= 6)
     {
       number = 0; // legacy counters are zero for new point types
@@ -1074,7 +1077,7 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
         return FALSE;
       }
     }
-    stream->seek(header_start_position+179);
+    stream->seek(header_start_position + 179);
     if (!stream->put64bitsLE((const U8*)&(header->max_x)))
     {
       LASMessage(LAS_ERROR, "updating header->max_x");
@@ -1131,7 +1134,7 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
     // special handling for LAS 1.4 or higher.
     if (header->version_minor >= 4)
     {
-      stream->seek(header_start_position+235);
+      stream->seek(header_start_position + 235);
       if (!stream->put64bitsLE((const U8*)&(header->start_of_first_extended_variable_length_record)))
       {
         LASMessage(LAS_ERROR, "updating header->start_of_first_extended_variable_length_record");
@@ -1256,7 +1259,7 @@ I64 LASwriterLAS::close(BOOL update_npoints)
 
       if (evlrs[i].reserved != 0xAABB)
       {
-  //      LASMessage(LAS_WARNING, "wrong evlrs[%d].reserved: %d != 0xAABB", i, evlrs[i].reserved);
+        //      LASMessage(LAS_WARNING, "wrong evlrs[%d].reserved: %d != 0xAABB", i, evlrs[i].reserved);
       }
 
       // write variable length records variable after variable (to avoid alignment issues)
@@ -1308,18 +1311,18 @@ I64 LASwriterLAS::close(BOOL update_npoints)
 
       if ((strcmp(evlrs[i].user_id, "copc") == 0) && evlrs[i].record_id == 1000)
       {
-          copc_root_hier_size = evlrs[i].record_length_after_header;
-          stream->seek(375 + 54 + 40);
-          stream->put64bitsLE((const U8*)&copc_root_hier_offset);
-          stream->put64bitsLE((const U8*)&copc_root_hier_size);
-          stream->seekEnd();
+        copc_root_hier_size = evlrs[i].record_length_after_header;
+        stream->seek(375 + 54 + 40);
+        stream->put64bitsLE((const U8*)&copc_root_hier_offset);
+        stream->put64bitsLE((const U8*)&copc_root_hier_size);
+        stream->seekEnd();
       }
     }
 
     if (real_start_of_first_extended_variable_length_record != start_of_first_extended_variable_length_record)
     {
-  	  stream->seek(header_start_position+235);
-  	  stream->put64bitsLE((const U8*)&real_start_of_first_extended_variable_length_record);
+      stream->seek(header_start_position + 235);
+      stream->put64bitsLE((const U8*)&real_start_of_first_extended_variable_length_record);
       stream->seekEnd();
     }
   }
@@ -1354,12 +1357,12 @@ I64 LASwriterLAS::close(BOOL update_npoints)
         {
           number = (U32)p_count;
         }
-	      stream->seek(header_start_position+107);
-	      stream->put32bitsLE((const U8*)&number);
+        stream->seek(header_start_position + 107);
+        stream->put32bitsLE((const U8*)&number);
         if (writing_las_1_4)
         {
-  	      stream->seek(header_start_position+235+12);
-  	      stream->put64bitsLE((const U8*)&p_count);
+          stream->seek(header_start_position + 235 + 12);
+          stream->put64bitsLE((const U8*)&p_count);
         }
         stream->seekEnd();
       }

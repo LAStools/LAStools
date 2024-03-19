@@ -5250,7 +5250,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
     else if (strncmp(argv[i],"-clip_", 6) == 0)
     {
       //pre-formated multiline message
-      LASMessage(LAS_ERROR, "'%s' is no longer recognized. check documentation with '-h'.\n"  \
+      LASMessage(LAS_ERROR, "'%s' is no longer recognized. check documentation with '-h'.\n" \
                             "  rename '-clip' to '-keep_xy'.\n" \
                             "  rename '-clip_box' to '-keep_xyz'.\n" \
                             "  rename '-clip_tile' to '-keep_tile'.\n" \

@@ -426,11 +426,7 @@ static int check_header(LASreader* lasreader1, LASreader* lasreader2)
       if (lasreader1->header.evlrs[i].record_length_after_header != lasreader2->header.evlrs[i].record_length_after_header)
       {
         different_header++;
-#ifdef _WIN32
-        fprintf(stderr, "extended variable length record %d record_length_after_header field is different: %I64d %I64d\n", i, lasreader1->header.evlrs[i].record_length_after_header, lasreader2->header.evlrs[i].record_length_after_header);
-#else
         fprintf(stderr, "extended variable length record %d record_length_after_header field is different: %lld %lld\n", i, lasreader1->header.evlrs[i].record_length_after_header, lasreader2->header.evlrs[i].record_length_after_header);
-#endif
       }
       if (memcmp(lasreader1->header.evlrs[i].description, lasreader2->header.evlrs[i].description, 32) != 0)
       {
@@ -454,11 +450,7 @@ static int check_header(LASreader* lasreader1, LASreader* lasreader2)
       }
       else
       {
-#ifdef _WIN32
-        fprintf(stderr, "skipping check of extended variable length record %d due to different size (%I64d != %I64d)\n", i, lasreader1->header.evlrs[i].record_length_after_header, lasreader2->header.evlrs[i].record_length_after_header);
-#else
         fprintf(stderr, "skipping check of extended variable length record %d due to different size (%lld != %lld)\n", i, lasreader1->header.evlrs[i].record_length_after_header, lasreader2->header.evlrs[i].record_length_after_header);
-#endif
       }
     }
   }
@@ -894,7 +886,6 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
   bool gui = false;
 #endif
-  bool verbose = false;
   int random_seeks = 0;
   const CHAR* wildcard1 = 0;
   const CHAR* wildcard2 = 0;
@@ -941,7 +932,7 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
     {
-      verbose = true;
+      set_message_log_level(LAS_VERBOSE);
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
@@ -956,7 +947,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
       gui = true;
 #else
-      fprintf(stderr, "WARNING: not compiled with GUI support. ignoring '-gui' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
 #endif
     }
     else if (strcmp(argv[i],"-random_seeks") == 0)
@@ -967,7 +958,7 @@ int main(int argc, char *argv[])
     {
       if ((i+2) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 2 arguments: wildcard1 wildcard2\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: wildcard1 wildcard2", argv[i]);
         byebye(true);
       }
       wildcard1 = argv[i+1];
@@ -986,7 +977,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
       byebye(true);
     }
   }
@@ -1019,19 +1010,19 @@ int main(int argc, char *argv[])
 
     if (!lasreadopener1.active())
     {
-      fprintf (stderr, "ERROR: wildcard1 specifies no input\n");
+      LASMessage(LAS_ERROR, "wildcard1 specifies no input");
       byebye(true, argc==1);
     }
 
     if (!lasreadopener2.active())
     {
-      fprintf (stderr, "ERROR: wildcard2 specifies no input\n");
+      LASMessage(LAS_ERROR, "wildcard2 specifies no input");
       byebye(true, argc==1);
     }
 
     if (lasreadopener1.get_file_name_number() != lasreadopener2.get_file_name_number())
     {
-      fprintf (stderr, "ERROR: wildcard1 (%u) and wildcard2 (%u) specify different number of files\n", lasreadopener1.get_file_name_number(), lasreadopener2.get_file_name_number());
+      LASMessage(LAS_ERROR, "wildcard1 (%u) and wildcard2 (%u) specify different number of files", lasreadopener1.get_file_name_number(), lasreadopener2.get_file_name_number());
       byebye(true, argc==1);
     }
     
@@ -1043,18 +1034,18 @@ int main(int argc, char *argv[])
       file_name1 = LASCopyString(lasreadopener1.get_file_name());
       if (lasreader1 == 0)
       {
-        fprintf (stderr, "ERROR: cannot open '%s'\n", file_name1);
+        LASMessage(LAS_ERROR, "cannot open '%s'", file_name1);
         byebye(true, argc==1);
       }
       lasreader2 = lasreadopener2.open();
       file_name2 = LASCopyString(lasreadopener2.get_file_name());
       if (lasreader2 == 0)
       {
-        fprintf (stderr, "ERROR: cannot open '%s'\n", file_name2);
+        LASMessage(LAS_ERROR, "cannot open '%s'", file_name2);
         byebye(true, argc==1);
       }
 
-      fprintf(stderr, "checking '%s' against '%s'\n", file_name1, file_name2);
+      LASMessage(LAS_INFO, "checking '%s' against '%s'", file_name1, file_name2);
 
       // check header
 
@@ -1070,19 +1061,11 @@ int main(int argc, char *argv[])
 
       if (lasreader1->p_count == lasreader2->p_count)
       {
-  #ifdef _WIN32
-        fprintf(stderr, "both have %I64d points. took %g secs.\n", lasreader1->p_count, taketime()-start_time);
-  #else
-        fprintf(stderr, "both have %lld points. took %g secs.\n", lasreader1->p_count, taketime()-start_time);
-  #endif
+        LASMessage(LAS_INFO, "both have %lld points. took %g secs.", lasreader1->p_count, taketime()-start_time);
       }
       else
       {
-  #ifdef _WIN32
-        fprintf(stderr, "one has %I64d the other %I64d points. took %g secs.\n", lasreader1->p_count, lasreader2->p_count, taketime()-start_time);
-  #else
-        fprintf(stderr, "one has %lld the other %lld points. took %g secs.\n", lasreader1->p_count, lasreader2->p_count, taketime()-start_time);
-  #endif
+        LASMessage(LAS_INFO, "one has %lld the other %lld points. took %g secs.", lasreader1->p_count, lasreader2->p_count, taketime()-start_time);
       }
       lasreader1->close();
       delete lasreader1;
@@ -1097,7 +1080,7 @@ int main(int argc, char *argv[])
   {
     if (!lasreadopener.active())
     {
-      fprintf (stderr, "ERROR: no input specified\n");
+      LASMessage(LAS_ERROR, "no input specified");
       byebye(true, argc==1);
     }
 
@@ -1113,14 +1096,14 @@ int main(int argc, char *argv[])
         file_name1 = LASCopyString(lasreadopener.get_file_name());
         if (lasreader1 == 0)
         {
-          fprintf (stderr, "ERROR: cannot open '%s'\n", file_name1);
+          LASMessage(LAS_ERROR, "cannot open '%s'", file_name1);
           byebye(true, argc==1);
         }
         lasreader2 = lasreadopener.open();
         file_name2 = LASCopyString(lasreadopener.get_file_name());
         if (lasreader2 == 0)
         {
-          fprintf (stderr, "ERROR: cannot open '%s'\n", file_name2);
+          LASMessage(LAS_ERROR, "cannot open '%s'", file_name2);
           byebye(true, argc==1);
         }
       }
@@ -1130,7 +1113,7 @@ int main(int argc, char *argv[])
         file_name1 = LASCopyString(lasreadopener.get_file_name());
         if (lasreader1 == 0)
         {
-          fprintf (stderr, "ERROR: cannot open '%s'\n", file_name1);
+          LASMessage(LAS_ERROR, "cannot open '%s'", file_name1);
           byebye(true, argc==1);
         }
         file_name2 = LASCopyString(lasreadopener.get_file_name());
@@ -1153,7 +1136,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-          fprintf (stderr, "ERROR: file '%s' not ending in *.las or *.laz\n", file_name1);
+          LASMessage(LAS_ERROR, "file '%s' not ending in *.las or *.laz", file_name1);
           byebye(true, argc==1);
         }
         LASreadOpener lasreadopener_other;
@@ -1161,12 +1144,12 @@ int main(int argc, char *argv[])
         lasreader2 = lasreadopener_other.open();
         if (lasreader2 == 0)
         {
-          fprintf (stderr, "ERROR: cannot open '%s'\n", file_name2);
+          LASMessage(LAS_ERROR, "cannot open '%s'", file_name2);
           byebye(true, argc==1);
         }
       }
 
-      fprintf(stderr, "checking '%s' against '%s'\n", file_name1, file_name2);
+      LASMessage(LAS_INFO, "checking '%s' against '%s'", file_name1, file_name2);
 
       // check header
 
@@ -1184,15 +1167,11 @@ int main(int argc, char *argv[])
         memset(lasreader1->header.system_identifier, 0, 32);
         memset(lasreader1->header.generating_software, 0, 32);
         sprintf(lasreader1->header.system_identifier, "LAStools (c) by rapidlasso GmbH");
-  #ifdef _WIN64
-        sprintf(lasreader1->header.generating_software, "lasdiff64 (version %d)", LAS_TOOLS_VERSION);
-  #else // _WIN64
-        sprintf(lasreader1->header.generating_software, "lasdiff (version %d)", LAS_TOOLS_VERSION);
-  #endif // _WIN64
+        sprintf(lasreader1->header.generating_software, "lasdiff%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
         laswriter = laswriteopener.open(&lasreader1->header);
         if (laswriter == 0)
         {
-          fprintf (stderr, "ERROR: cannot open '%s'\n", laswriteopener.get_file_name());
+          LASMessage(LAS_ERROR, "cannot open '%s'", laswriteopener.get_file_name());
           byebye(true, argc==1);
         }
         laswriteopener.set_file_name(0);
@@ -1208,24 +1187,16 @@ int main(int argc, char *argv[])
 
       if (lasreader1->p_count == lasreader2->p_count)
       {
-  #ifdef _WIN32
-        fprintf(stderr, "both have %I64d points. took %g secs.\n", lasreader1->p_count, taketime()-start_time);
-  #else
-        fprintf(stderr, "both have %lld points. took %g secs.\n", lasreader1->p_count, taketime()-start_time);
-  #endif
+        LASMessage(LAS_INFO, "both have %lld points. took %g secs.", lasreader1->p_count, taketime()-start_time);
       }
       else
       {
-  #ifdef _WIN32
-        fprintf(stderr, "one has %I64d the other %I64d points. took %g secs.\n", lasreader1->p_count, lasreader2->p_count, taketime()-start_time);
-  #else
-        fprintf(stderr, "one has %lld the other %lld points. took %g secs.\n", lasreader1->p_count, lasreader2->p_count, taketime()-start_time);
-  #endif
+        LASMessage(LAS_INFO, "one has %lld the other %lld points. took %g secs.", lasreader1->p_count, lasreader2->p_count, taketime()-start_time);
       }
       lasreader1->close();
       delete lasreader1;
       free(file_name1);
-
+      //
       lasreader2->close();
       delete lasreader2;
       free(file_name2);

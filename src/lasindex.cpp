@@ -112,9 +112,6 @@ int main(int argc, char *argv[])
   I32 cores = 1;
   BOOL cpu64 = FALSE;
 #endif
-  BOOL quiet = FALSE;
-  BOOL verbose = FALSE;
-  BOOL very_verbose = FALSE;
   F32 tile_size = 0.0f;
   U32 threshold = 1000;
   U32 minimum_points = 100000;
@@ -163,17 +160,14 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
     {
       set_message_log_level(LAS_VERBOSE);
-      verbose = TRUE;
     }
     else if (strcmp(argv[i],"-vv") == 0 || strcmp(argv[i],"-very_verbose") == 0)
     {
       set_message_log_level(LAS_VERY_VERBOSE);
-      verbose = TRUE;
-      very_verbose = TRUE;
     }
     else if (strcmp(argv[i],"-quiet") == 0)
     {
-      quiet = TRUE;
+      set_message_log_level(LAS_QUIET);
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
@@ -188,7 +182,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
       gui = true;
 #else
-      fprintf(stderr, "WARNING: not compiled with GUI support. ignoring '-gui' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
 #endif
     }
     else if (strcmp(argv[i],"-cores") == 0)
@@ -196,7 +190,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
         usage(true);
       }
       argv[i][0] = '\0';
@@ -204,7 +198,7 @@ int main(int argc, char *argv[])
       cores = atoi(argv[i]);
       argv[i][0] = '\0';
 #else
-      fprintf(stderr, "WARNING: not compiled with multi-core batching. ignoring '-cores' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
       i++;
 #endif
     }
@@ -213,7 +207,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
       cpu64 = TRUE;
 #else
-      fprintf(stderr, "WARNING: not compiled with 64 bit support. ignoring '-cpu64' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
 #endif
       argv[i][0] = '\0';
     }
@@ -221,7 +215,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: size", argv[i]);
         byebye(true);
       }
       i++;
@@ -231,7 +225,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
         byebye(true);
       }
       i++;
@@ -241,7 +235,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
         byebye(true);
       }
       i++;
@@ -251,7 +245,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: value\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: value", argv[i]);
         byebye(true);
       }
       i++;
@@ -273,7 +267,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: file output name\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: file output name", argv[i]);
         byebye(true);
       }
       output_file = argv[i+1];
@@ -281,14 +275,14 @@ int main(int argc, char *argv[])
     }
     else
     {
-      fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
       byebye(true);
     }
   }
 
   if (lasreadopener.is_merged())
   {
-    fprintf(stderr,"ERROR: on-the-fly merged input files merged not supported by lasindex\n");
+    LASMessage(LAS_ERROR, "on-the-fly merged input files merged not supported by lasindex");
     byebye(true);
   }
 
@@ -304,7 +298,7 @@ int main(int argc, char *argv[])
   {
     if (lasreadopener.get_file_name_number() < 2)
     {
-      fprintf(stderr,"WARNING: only %u input files. ignoring '-cores %d' ...\n", lasreadopener.get_file_name_number(), cores);
+      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
     }
     else
     {
@@ -321,7 +315,7 @@ int main(int argc, char *argv[])
 
   if (!lasreadopener.active())
   {
-    fprintf(stderr,"ERROR: no input specified\n");
+    LASMessage(LAS_ERROR, "no input specified");
     byebye(true, argc==1);
   }
 
@@ -363,7 +357,7 @@ int main(int argc, char *argv[])
 
   // possibly loop over multiple input files
 
-  if (verbose && lasreadopener.get_file_name_number() > 1)
+  if (lasreadopener.get_file_name_number() > 1)
   {
     total_start_time = taketime();
   }
@@ -396,38 +390,34 @@ int main(int argc, char *argv[])
 
     if (file_meta == 0)
     {
-      fprintf(stderr,"WARNING: cannot open '%s'. skipping creation of meta index ...\n", meta_file_name);
+      LASMessage(LAS_WARNING, "cannot open '%s'. skipping creation of meta index ...", meta_file_name);
     }
     free(meta_file_name);
   }
 
   while (lasreadopener.active())
   {
-    if (verbose) start_time = taketime();
+    start_time = taketime();
 
     // open lasreader
 
     LASreader* lasreader = lasreadopener.open();
     if (lasreader == 0)
     {
-      fprintf(stderr, "ERROR: could not open lasreader\n");
+      LASMessage(LAS_ERROR, "could not open lasreader");
       byebye(true, argc==1);
     }
 
     if (file_meta)
     {
-#ifdef _WIN32
-      fprintf(file_meta, "%u,%I64d,%lf,%lf,%lf,%lf,%s\012", lasreadopener.get_file_name_current()-1, lasreader->npoints, lasreader->header.min_x, lasreader->header.min_y, lasreader->header.max_x, lasreader->header.max_y, lasreadopener.get_file_name());
-#else
       fprintf(file_meta, "%u,%lld,%lf,%lf,%lf,%lf,%s\012", lasreadopener.get_file_name_current()-1, lasreader->npoints, lasreader->header.min_x, lasreader->header.min_y, lasreader->header.max_x, lasreader->header.max_y, lasreadopener.get_file_name());
-#endif
     }
 
     if (dont_reindex)
     {
       if (lasreader->get_index())
       {
-        if (!quiet) fprintf(stderr, "skipping already indexed file '%s'\n", lasreadopener.get_file_name());
+        LASMessage(LAS_INFO, "skipping already indexed file '%s'", lasreadopener.get_file_name());
         delete lasreader;
         skipped++;
         continue;
@@ -460,7 +450,7 @@ int main(int argc, char *argv[])
       {
         t = 100000.0f;
       }
-      if (verbose) fprintf(stderr,"no tile size specified. setting it to %g ...\n", t);
+      LASMessage(LAS_VERBOSE, "no tile size specified. setting it to %g ...", t);
       lasquadtree->setup(lasreader->header.min_x, lasreader->header.max_x, lasreader->header.min_y, lasreader->header.max_y, t);
     }
     else
@@ -507,10 +497,8 @@ int main(int argc, char *argv[])
         lasindex.write(lasreadopener.get_file_name());
       }
     }
-
     indexed++;
-
-    if (!quiet) fprintf(stderr,"done with '%s'. took %g sec.\n", lasreadopener.get_file_name(), taketime()-start_time);
+    LASMessage(LAS_INFO, "done with '%s'. took %g sec.", lasreadopener.get_file_name(), taketime()-start_time);
   }
 
   if (file_meta)
@@ -519,19 +507,17 @@ int main(int argc, char *argv[])
     file_meta = 0;
   }
   
-  if (!quiet && lasreadopener.get_file_name_number() > 1)
+  if (lasreadopener.get_file_name_number() > 1)
   {
     if (dont_reindex)
     {
-      fprintf(stderr,"done with %u files. skipped %u. indexed %u. total time %g sec.\n", lasreadopener.get_file_name_number(), skipped, indexed, taketime()-total_start_time);
+      LASMessage(LAS_INFO, "done with %u files. skipped %u. indexed %u. total time %g sec.", lasreadopener.get_file_name_number(), skipped, indexed, taketime()-total_start_time);
     }
     else
     {
-      fprintf(stderr,"done with %u files. total time %g sec.\n", lasreadopener.get_file_name_number(), taketime()-total_start_time);
+      LASMessage(LAS_INFO, "done with %u files. total time %g sec.", lasreadopener.get_file_name_number(), taketime()-total_start_time);
     }
   }
-
   byebye(false, argc==1);
-
   return 0;
 }

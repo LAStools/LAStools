@@ -486,11 +486,7 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
       }
       else
       {
-#ifdef _WIN32
-        fprintf(file, "%I64d", value);
-#else
         fprintf(file, "%lld", value);
-#endif
       }
     }
   }
@@ -563,7 +559,7 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
   else
   {
     fprintf(file, "-");
-    fprintf(stderr, "WARNING: data type %d of attribute %d not implemented.\n", header->attributes[index].data_type, index);
+    LASMessage(LAS_WARNING, "data type %d of attribute %d not implemented.", header->attributes[index].data_type, index);
     return FALSE;
   }
   return TRUE;
@@ -611,7 +607,6 @@ int main(int argc, char *argv[])
   BOOL cpu64 = FALSE;
 #endif
   bool diff = false;
-  bool verbose = false;
   CHAR separator_sign = ' ';
   CHAR const* separator = "space";
   bool opts = false;
@@ -677,7 +672,7 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
     {
-      verbose = true;
+      set_message_log_level(LAS_VERBOSE);
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
@@ -692,7 +687,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
       gui = true;
 #else
-      fprintf(stderr, "WARNING: not compiled with GUI support. ignoring '-gui' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
 #endif
     }
     else if (strcmp(argv[i],"-cores") == 0)
@@ -700,7 +695,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
         usage(true);
       }
       argv[i][0] = '\0';
@@ -708,7 +703,7 @@ int main(int argc, char *argv[])
       cores = atoi(argv[i]);
       argv[i][0] = '\0';
 #else
-      fprintf(stderr, "WARNING: not compiled with multi-core batching. ignoring '-cores' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
       i++;
 #endif
     }
@@ -717,7 +712,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
       cpu64 = TRUE;
 #else
-      fprintf(stderr, "WARNING: not compiled with 64 bit support. ignoring '-cpu64' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
 #endif
       argv[i][0] = '\0';
     }
@@ -725,7 +720,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: string\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: string", argv[i]);
         usage(true);
       }
       i++;
@@ -742,7 +737,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: string\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: string", argv[i]);
         usage(true);
       }
       i++;
@@ -752,7 +747,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: separator\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: separator", argv[i]);
         usage(true);
       }
       i++;
@@ -787,7 +782,7 @@ int main(int argc, char *argv[])
       }
       else
       {
-        fprintf(stderr, "ERROR: unknown seperator '%s'\n",separator);
+        LASMessage(LAS_ERROR, "unknown seperator '%s'",separator);
         usage(true);
       }
     }
@@ -795,7 +790,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: comment\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: comment", argv[i]);
         usage(true);
       }
       i++;
@@ -829,7 +824,7 @@ int main(int argc, char *argv[])
       }
       else
       {
-        fprintf(stderr, "ERROR: unknown header comment symbol '%s'\n",argv[i]);
+        LASMessage(LAS_ERROR, "unknown header comment symbol '%s'",argv[i]);
         usage(true);
       }
     }
@@ -844,7 +839,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
       usage(true);
     }
   }
@@ -861,11 +856,11 @@ int main(int argc, char *argv[])
   {
     if (lasreadopener.get_file_name_number() < 2)
     {
-      fprintf(stderr,"WARNING: only %u input files. ignoring '-cores %d' ...\n", lasreadopener.get_file_name_number(), cores);
+      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
     }
     else if (lasreadopener.is_merged())
     {
-      fprintf(stderr,"WARNING: input files merged on-the-fly. ignoring '-cores %d' ...\n", cores);
+      LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", cores);
     }
     else
     {
@@ -882,7 +877,7 @@ int main(int argc, char *argv[])
 
   if (!lasreadopener.active())
   {
-    fprintf(stderr,"ERROR: no input specified\n");
+    LASMessage(LAS_ERROR, "no input specified");
     byebye(true, argc == 1);
   }
 
@@ -981,7 +976,7 @@ int main(int argc, char *argv[])
       case 'E':
         if (extra_string == 0)
         {
-          fprintf (stderr, "WARNING: requested 'E' but no '-extra' specified. skipping ...\n");
+          LASMessage(LAS_WARNING, "requested 'E' but no '-extra' specified. skipping ...");
           parse_string[i] = 's';
         }
         break;
@@ -1000,7 +995,7 @@ int main(int argc, char *argv[])
         decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
         break;
       default:
-        fprintf (stderr, "WARNING: requested unknown parse item '%c'. skipping ...\n", parse_string[i]);
+        LASMessage(LAS_WARNING, "requested unknown parse item '%c'. skipping ...", parse_string[i]);
         parse_string[i] = 's';
       }
       i++;
@@ -1015,14 +1010,14 @@ int main(int argc, char *argv[])
 
   while (lasreadopener.active())
   {
-    if (verbose) start_time = taketime();
+    start_time = taketime();
 
     // open lasreader
 
     LASreader* lasreader = lasreadopener.open();
     if (lasreader == 0)
     {
-      fprintf(stderr, "ERROR: could not open lasreader\n");
+      LASMessage(LAS_ERROR, "could not open lasreader");
       byebye(true, argc==1);
     }
 
@@ -1050,7 +1045,7 @@ int main(int argc, char *argv[])
       {
         if (lasreadopener.get_file_name() == 0)
         {
-          fprintf(stderr, "ERROR: no output file specified\n");
+          LASMessage(LAS_ERROR, "no output file specified");
           byebye(true, argc==1);
         }
         laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
@@ -1066,7 +1061,7 @@ int main(int argc, char *argv[])
 
       if (file_out == 0)
       {
-        fprintf(stderr, "ERROR: could not open '%s' for write\n", file_name_out);
+        LASMessage(LAS_ERROR, "could not open '%s' for write", file_name_out);
         byebye(true, argc==1);
       }
 
@@ -1095,25 +1090,21 @@ int main(int argc, char *argv[])
           }
           else if (ptsVLR)
           {
-            fprintf(stderr, "WARNING: found VLR for PTS with wrong payload size of %d.\n", ptsVLR->record_length_after_header);
+            LASMessage(LAS_WARNING, "found VLR for PTS with wrong payload size of %d.", ptsVLR->record_length_after_header);
           }
           else if (ptxVLR)
           {
-            fprintf(stderr, "WARNING: found VLR for PTX with wrong payload size of %d.\n", ptxVLR->record_length_after_header);
+            LASMessage(LAS_WARNING, "found VLR for PTX with wrong payload size of %d.", ptxVLR->record_length_after_header);
           }
         }
       }
       else
       {
-        fprintf(stderr, "WARNING: found no VLR with PTS or PTX info.\n");
+        LASMessage(LAS_WARNING, "found no VLR with PTS or PTX info.");
       }
       if (header->version_minor >= 4)
       {
-#ifdef _WIN32
-        fprintf(file_out, "%I64d       \012", header->extended_number_of_point_records);
-#else
         fprintf(file_out, "%lld       \012", header->extended_number_of_point_records);
-#endif
       }
       else
       {
@@ -1121,11 +1112,11 @@ int main(int argc, char *argv[])
       }
       if (parse_string && strcmp(parse_string, "xyz") && strcmp(parse_string, "xyzi") && strcmp(parse_string, "xyziRGB") && strcmp(parse_string, "xyzRGB"))
       {
-        fprintf(stderr, "WARNING: the parse string for PTS should be 'xyz', 'xyzi', 'xyziRGB', or 'xyzRGB'\n");
+        LASMessage(LAS_WARNING, "the parse string for PTS should be 'xyz', 'xyzi', 'xyziRGB', or 'xyzRGB'");
       }
       if (separator_sign != ' ')
       {
-        fprintf(stderr, "WARNING: the separator for PTS should be 'space' not '%s'\n", separator);
+        LASMessage(LAS_WARNING, "the separator for PTS should be 'space' not '%s'", separator);
       }
     }
     else if (optx)
@@ -1155,20 +1146,16 @@ int main(int argc, char *argv[])
       {
         if (ptxVLR)
         {
-          fprintf(stderr, "WARNING: found VLR for PTX with wrong payload size of %d.\n", ptxVLR->record_length_after_header);
+          LASMessage(LAS_WARNING, "found VLR for PTX with wrong payload size of %d.", ptxVLR->record_length_after_header);
         }
         else
         {
-          fprintf(stderr, "WARNING: found no VLR with PTX info.\n");
+          LASMessage(LAS_WARNING, "found no VLR with PTX info.");
         }
-        fprintf(stderr, "         outputting PTS instead ...\n");
+        LASMessage(LAS_INFO, "         outputting PTS instead ...");
         if (header->version_minor >= 4)
         {
-#ifdef _WIN32
-          fprintf(file_out, "%I64d       \012", header->extended_number_of_point_records);
-#else
           fprintf(file_out, "%lld       \012", header->extended_number_of_point_records);
-#endif
         }
         else
         {
@@ -1177,11 +1164,11 @@ int main(int argc, char *argv[])
       }
       if (parse_string && strcmp(parse_string, "xyz") && strcmp(parse_string, "xyzi") && strcmp(parse_string, "xyziRGB") && strcmp(parse_string, "xyzRGB"))
       {
-        fprintf(stderr, "WARNING: the parse string for PTX should be 'xyz', 'xyzi', 'xyziRGB', or 'xyzRGB'\n");
+        LASMessage(LAS_WARNING, "the parse string for PTX should be 'xyz', 'xyzi', 'xyziRGB', or 'xyzRGB'");
       }
       if (separator_sign != ' ')
       {
-        fprintf(stderr, "WARNING: the separator for PTX should be 'space' not '%s'\n", separator);
+        LASMessage(LAS_WARNING, "the separator for PTX should be 'space' not '%s'", separator);
       }
     }
     else if (header_comment_sign)
@@ -1209,13 +1196,8 @@ int main(int argc, char *argv[])
       // if LAS 1.4
       if (header->version_minor >= 4)
       {
-#ifdef _WIN32
-        fprintf(file_out, "%c extended number of point records    %I64d\012", header_comment_sign, header->extended_number_of_point_records);
-        fprintf(file_out, "%c extended number of points by return %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d %I64d\012", header_comment_sign, header->extended_number_of_points_by_return[0], header->extended_number_of_points_by_return[1], header->extended_number_of_points_by_return[2], header->extended_number_of_points_by_return[3], header->extended_number_of_points_by_return[4], header->extended_number_of_points_by_return[5], header->extended_number_of_points_by_return[6], header->extended_number_of_points_by_return[7], header->extended_number_of_points_by_return[8], header->extended_number_of_points_by_return[9], header->extended_number_of_points_by_return[10], header->extended_number_of_points_by_return[11], header->extended_number_of_points_by_return[12], header->extended_number_of_points_by_return[13], header->extended_number_of_points_by_return[14]);
-#else
         fprintf(file_out, "%c extended number of point records    %lld\012", header_comment_sign, header->extended_number_of_point_records);
         fprintf(file_out, "%c extended number of points by return %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld\012", header_comment_sign, header->extended_number_of_points_by_return[0], header->extended_number_of_points_by_return[1], header->extended_number_of_points_by_return[2], header->extended_number_of_points_by_return[3], header->extended_number_of_points_by_return[4], header->extended_number_of_points_by_return[5], header->extended_number_of_points_by_return[6], header->extended_number_of_points_by_return[7], header->extended_number_of_points_by_return[8], header->extended_number_of_points_by_return[9], header->extended_number_of_points_by_return[10], header->extended_number_of_points_by_return[11], header->extended_number_of_points_by_return[12], header->extended_number_of_points_by_return[13], header->extended_number_of_points_by_return[14]);
-#endif
       }
     }
 
@@ -1257,65 +1239,64 @@ int main(int argc, char *argv[])
         break;
       case 'l': // the (extended) scanner channe<l>
         if (lasreader->point.extended_point_type == 0)
-          fprintf (stderr, "WARNING: requested 'l' but points are not of extended type\n");
+          LASMessage(LAS_WARNING, "requested 'l' but points are not of extended type");
         break;
       case 'o': // the (extended) <o>verlap flag
         if (lasreader->point.extended_point_type == 0)
-          fprintf (stderr, "WARNING: requested 'o' but points are not of extended type\n");
+          LASMessage(LAS_WARNING, "requested 'o' but points are not of extended type");
         break;
       case '#': // diff of gps-time to prev point
       case 't': // the gps-time
         if (lasreader->point.have_gps_time == false)
-          fprintf (stderr, "WARNING: requested 't' but points do not have gps time\n");
+          LASMessage(LAS_WARNING, "requested 't' but points do not have gps time");
         break;
       case '$': // the R difference to the last point
       case '&': // the byte-wise R difference to the last point
       case 'R': // the red channel of the RGB field
         if (lasreader->point.have_rgb == false)
-          fprintf (stderr, "WARNING: requested 'R' but points do not have RGB\n");
+          LASMessage(LAS_WARNING, "requested 'R' but points do not have RGB");
         break;
       case '%': // the G difference to the last point
       case '*': // the byte-wise G difference to the last point
       case 'G': // the green channel of the RGB field
         if (lasreader->point.have_rgb == false)
-          fprintf (stderr, "WARNING: requested 'G' but points do not have RGB\n");
+          LASMessage(LAS_WARNING, "requested 'G' but points do not have RGB");
         break;
       case '^': // the B difference to the last point
       case '+': // the byte-wise B difference to the last point
       case 'B': // the blue channel of the RGB field
         if (lasreader->point.have_rgb == false)
-          fprintf (stderr, "WARNING: requested 'B' but points do not have RGB\n");
+          LASMessage(LAS_WARNING, "requested 'B' but points do not have RGB");
         break;
       case HSL:
       case HSV:
       case HSL255:
       case HSV255:
         if (lasreader->point.have_rgb == false)
-          fprintf (stderr, "WARNING: requested 'HSV' or 'HSL' but points do not have RGB\n");
+          LASMessage(LAS_WARNING, "requested 'HSV' or 'HSL' but points do not have RGB");
         break;
       case 'I': // the near infrared channel of the RGBI field
         if (lasreader->point.have_nir == false)
-          fprintf (stderr, "WARNING: requested 'I' but points do not have NIR\n");
+          LASMessage(LAS_WARNING, "requested 'I' but points do not have NIR");
         break;
       case 'w': // the wavepacket index
         if (lasreader->point.have_wavepacket == false)
-          fprintf (stderr, "WARNING: requested 'w' but points do not have wavepacket\n");
+          LASMessage(LAS_WARNING, "requested 'w' but points do not have wavepacket");
         break;
       case 'W': // all wavepacket attributes
         if (lasreader->point.have_wavepacket == false)
-          fprintf (stderr, "WARNING: requested 'W' but points do not have wavepacket\n");
+          LASMessage(LAS_WARNING, "requested 'W' but points do not have wavepacket");
         break;
       case 'V': // the waveform data
         if (laswaveform13reader == 0)
         {
-          fprintf (stderr, "WARNING: requested 'V' but no waveform data available\n");
-          fprintf (stderr, "         omitting ...\n");
+          LASMessage(LAS_WARNING, "requested 'V' but no waveform data available. omitting...");
         }
         break;
       case 'E':
         if (extra_string == 0)
         {
-          fprintf (stderr, "WARNING: requested 'E' but no '-extra' specified. skipping ...\n");
+          LASMessage(LAS_WARNING, "requested 'E' but no '-extra' specified. skipping...");
           parse_string[i] = 's';
         }
         break;
@@ -1331,7 +1312,7 @@ int main(int argc, char *argv[])
       case '9':
         if ((parse_string[i] - '0') >= lasreader->header.number_attributes)
         {
-          fprintf(stderr, "WARNING: attribute '%d' does not exist. skipping ...\n", (parse_string[i] - '0'));
+          LASMessage(LAS_WARNING, "attribute '%d' does not exist. skipping ...", (parse_string[i] - '0'));
           parse_string[i] = 's';
         }
         else
@@ -1349,7 +1330,7 @@ int main(int argc, char *argv[])
         }
         if (index >= lasreader->header.number_attributes)
         {
-          fprintf(stderr, "ERROR: attribute '%d' does not exist. skipping ...\n", index);
+          LASMessage(LAS_ERROR, "attribute '%d' does not exist. skipping ...", index);
           byebye(true);
         }
         else
@@ -1360,25 +1341,16 @@ int main(int argc, char *argv[])
       case 's':
         break;
       default:
-        fprintf (stderr, "WARNING: requested unknown parse item '%c'\n", parse_string[i]);
+        LASMessage(LAS_WARNING, "requested unknown parse item '%c'", parse_string[i]);
       }
       i++;
     }
-
     // in case diff is requested
-
     int last_XYZ[3] = {0,0,0};
     unsigned short last_RGB[4] = {0,0,0};
     double last_GPSTIME = 0;
-
     // read and convert the points to ASCII
-
-#ifdef _WIN32
-    if (verbose) fprintf(stderr,"processing %I64d points with '%s'.\n", lasreader->npoints, parse_string);
-#else
-    if (verbose) fprintf(stderr,"processing %lld points with '%s'.\n", lasreader->npoints, parse_string);
-#endif
-
+    LASMessage(LAS_VERBOSE, "processing %lld points with '%s'.", lasreader->npoints, parse_string);
     // print the column names in the first line
     if (coldesc)
     {
@@ -1569,18 +1541,10 @@ int main(int argc, char *argv[])
           fprintf(file_out, "%d", lasreader->point.rgb[3]);
           break;
         case 'm': // the index of the point (count starts at 0)
-#ifdef _WIN32
-          fprintf(file_out, "%I64d", lasreader->p_count-1);
-#else
           fprintf(file_out, "%lld", lasreader->p_count-1);
-#endif
           break;
         case 'M': // the index of the point  (count starts at 1)
-#ifdef _WIN32
-          fprintf(file_out, "%I64d", lasreader->p_count);
-#else
           fprintf(file_out, "%lld", lasreader->p_count);
-#endif
           break;
         case '_': // the raw integer X difference to the last point
           fprintf(file_out, "%d", lasreader->point.get_X()-last_XYZ[0]);
@@ -1699,32 +1663,20 @@ int main(int argc, char *argv[])
         last_RGB[2] = lasreader->point.rgb[2];
       }
     }
-
-#ifdef _WIN32
-    if (verbose) fprintf(stderr,"converting %I64d points of '%s' took %g sec.\n", lasreader->p_count, lasreadopener.get_file_name(), taketime()-start_time);
-#else
-    if (verbose) fprintf(stderr,"converting %lld points of '%s' took %g sec.\n", lasreader->p_count, lasreadopener.get_file_name(), taketime()-start_time);
-#endif
-
+    LASMessage(LAS_VERBOSE, "converting %lld points of '%s' took %g sec.", lasreader->p_count, lasreadopener.get_file_name(), taketime()-start_time);
     // close the reader
     lasreader->close();
     delete lasreader;
-
     // (maybe) close the waveform reader
     if (laswaveform13reader)
     {
       laswaveform13reader->close();
       delete laswaveform13reader;
     }
-
     // close the files
-
     if (file_out != stdout) fclose(file_out);
   }
-
   free(parse_string);
-
   byebye(false, argc==1);
-
   return 0;
 }

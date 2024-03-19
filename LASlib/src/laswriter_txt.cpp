@@ -211,13 +211,11 @@ BOOL LASwriterTXT::open(FILE* file, const LASheader* header, const CHAR* parse_s
     {
       if (ptxVLR)
       {
-        LASMessage(LAS_WARNING, "found VLR for PTX with wrong payload size of %d.\n" \
-                                "\toutputting PTS instead ...", ptxVLR->record_length_after_header);
+        LASMessage(LAS_WARNING, "found VLR for PTX with wrong payload size of %d. outputting PTS instead ...", ptxVLR->record_length_after_header);
       }
       else
       {
-        LASMessage(LAS_WARNING, "found no VLR with PTX info.\n" \
-                                "\toutputting PTS instead ...");
+        LASMessage(LAS_WARNING, "found no VLR with PTX info. outputting PTS instead ...");
       }
       if (header->version_minor >= 4)
       {

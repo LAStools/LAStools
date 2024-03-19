@@ -10,6 +10,23 @@ static LASMessageHandler message_handler = &las_default_message_handler;
 static void * message_user_data = 0;
 static LAS_MESSAGE_TYPE  las_message_level = LAS_INFO;
 
+std::string las_message_type_string(LAS_MESSAGE_TYPE in)
+{
+	switch (in)
+	{
+	case LAS_DEBUG: return "DEBUG";
+	case LAS_VERY_VERBOSE: return "VERY_VERBOSE";
+	case LAS_VERBOSE: return "VERBOSE";
+	case LAS_INFO: return "INFO";
+	case LAS_WARNING: return "WARNING";
+	case LAS_SERIOUS_WARNING: return "SERIOUS_WARNING";
+	case LAS_ERROR: return "ERROR";
+	case LAS_FATAL_ERROR: return "FATAL_ERROR";
+	case LAS_QUIET: return "QUIET";
+	default: return  "?";
+	}
+}
+
 void LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*) fmt, ...)
 {
 	assert(type <= LAS_FATAL_ERROR);		//message type must be equal lower than LAS_FATAL_ERROR (LAS_QUIET must to be used in LASMessage calls)
@@ -35,7 +52,10 @@ void LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*) fmt, ...)
 
 void LASLIB_DLL set_message_log_level(LAS_MESSAGE_TYPE loglevel)
 {
-	las_message_level = loglevel;
+	if (las_message_level != loglevel) {
+		las_message_level = loglevel;
+		LASMessage(LAS_INFO, "Log level [%s]", las_message_type_string(loglevel).c_str());
+	}
 }
 
 LAS_MESSAGE_TYPE LASLIB_DLL get_message_log_level() {
@@ -58,21 +78,24 @@ void LASLIB_DLL unset_las_message_handler()
 void format_message(std::string& messsage, unsigned multiline_ident, bool append_trailing_lf = true)
 {
 	size_t lines = messsage.find('\n');
+	if (lines == std::string::npos) {
+	    lines = 1;
+	}
 	std::string result;
 	result.reserve(messsage.size() + (lines-1)*multiline_ident + 1);
 
 	const std::string find_str = "\n\t";
-	std::string replace_str((size_t)multiline_ident + 1, ' ');	
-	replace_str[0] = '\n';
-	size_t start_pos = 0, pos = messsage.find(find_str, start_pos);
-	while (pos != std::string::npos)
-	{
+		std::string replace_str((size_t)multiline_ident + 1, ' ');
+		replace_str[0] = '\n';
+		size_t start_pos = 0, pos = messsage.find(find_str, start_pos);
+		while (pos != std::string::npos)
+		{
+			result += messsage.substr(start_pos, pos - start_pos);
+			result += replace_str;
+			start_pos = pos + find_str.size();
+			pos = messsage.find(find_str, start_pos);
+		}
 		result += messsage.substr(start_pos, pos - start_pos);
-		result += replace_str;
-		start_pos = pos + find_str.size();
-		pos = messsage.find(find_str, start_pos);
-	}
-	result += messsage.substr(start_pos, pos - start_pos);
 
 	if (append_trailing_lf)
 		result += "\n";
@@ -85,7 +108,6 @@ void las_default_message_handler(LAS_MESSAGE_TYPE type, const char* msg, void* u
 {
 	std::string prefix;
 	std::string message(msg);
-
 	switch (type)
 	{
 	case LAS_DEBUG:

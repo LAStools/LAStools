@@ -189,7 +189,6 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
   I32 cores = 1;
 #endif
-  bool verbose = false;
   bool report_diff = true;
   bool report_diff_diff = false;
   bool report_x = true;
@@ -252,7 +251,7 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
     {
-      verbose = true;
+     set_message_log_level(LAS_VERBOSE);
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
@@ -267,7 +266,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
       gui = true;
 #else
-      fprintf(stderr, "WARNING: not compiled with GUI support. ignoring '-gui' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
 #endif
     }
     else if (strcmp(argv[i],"-cores") == 0)
@@ -275,7 +274,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
         usage(true);
       }
       argv[i][0] = '\0';
@@ -283,7 +282,7 @@ int main(int argc, char *argv[])
       cores = atoi(argv[i]);
       argv[i][0] = '\0';
 #else
-      fprintf(stderr, "WARNING: not compiled with multi-core batching. ignoring '-cores' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
       i++;
 #endif
     }
@@ -316,7 +315,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: max\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: max", argv[i]);
         byebye(true);
       }
       i++;
@@ -326,7 +325,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: number\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
         byebye(true);
       }
       i++;
@@ -343,7 +342,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
       byebye(true);
     }
   }
@@ -360,11 +359,11 @@ int main(int argc, char *argv[])
   {
     if (lasreadopener.get_file_name_number() < 2)
     {
-      fprintf(stderr,"WARNING: only %u input files. ignoring '-cores %d' ...\n", lasreadopener.get_file_name_number(), cores);
+      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
     }
     else if (lasreadopener.is_merged())
     {
-      fprintf(stderr,"WARNING: input files merged on-the-fly. ignoring '-cores %d' ...\n", cores);
+      LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", cores);
     }
     else
     {
@@ -377,7 +376,7 @@ int main(int argc, char *argv[])
 
   if (!lasreadopener.active())
   {
-    fprintf(stderr, "ERROR: no input specified\n");
+    LASMessage(LAS_ERROR, "no input specified");
     byebye(true, argc==1);
   }
 
@@ -398,7 +397,7 @@ int main(int argc, char *argv[])
 
   if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
   {
-    fprintf(stderr, "ERROR: input and output file name are identical\n");
+    LASMessage(LAS_ERROR, "input and output file name are identical");
     usage(true);
   }
 
@@ -418,14 +417,14 @@ int main(int argc, char *argv[])
 
   while (lasreadopener.active())
   {
-    if (verbose) full_start_time = start_time = taketime();
+    full_start_time = start_time = taketime();
 
     // open lasreader
 
     LASreader* lasreader = lasreadopener.open();
     if (lasreader == 0)
     {
-      fprintf(stderr, "ERROR: could not open lasreader\n");
+      LASMessage(LAS_ERROR, "could not open lasreader");
       byebye(true, argc==1);
     }
 
@@ -470,7 +469,7 @@ int main(int argc, char *argv[])
 
       // do the first pass
 
-      fprintf(stderr, "loading first %u of %u points\n", array_max, (U32)lasreader->npoints);
+      LASMessage(LAS_INFO, "loading first %u of %u points", array_max, (U32)lasreader->npoints);
 
       // loop over points
 
@@ -861,7 +860,7 @@ int main(int argc, char *argv[])
       LASwriter* laswriter = laswriteopener.open(&lasreader->header);
       if (laswriter == 0)
       {
-        fprintf(stderr, "ERROR: could not open laswriter\n");
+        LASMessage(LAS_ERROR, "could not open laswriter");
         usage(argc==1);
       }
 

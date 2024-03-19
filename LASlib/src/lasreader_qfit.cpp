@@ -149,7 +149,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
   }
   else
   {
-    ENDIAN_SWAP_32((U8*)&version);
+    ENDIAN_SWAP_32_((U8*)&version);
     if (version == 40 || version == 48 || version == 56)
     {
       little_endian = FALSE;
@@ -321,24 +321,24 @@ BOOL LASreaderQFIT::read_point_default()
 
     if (endian_swap)
     {
-      ENDIAN_SWAP_32((U8*)&buffer[0]);
-      ENDIAN_SWAP_32((U8*)&buffer[1]);
-      ENDIAN_SWAP_32((U8*)&buffer[2]);
-      ENDIAN_SWAP_32((U8*)&buffer[3]);
-      ENDIAN_SWAP_32((U8*)&buffer[5]);
-      ENDIAN_SWAP_32((U8*)&buffer[6]);
-      ENDIAN_SWAP_32((U8*)&buffer[7]);
-      ENDIAN_SWAP_32((U8*)&buffer[8]);
-      ENDIAN_SWAP_32((U8*)&buffer[9]);
+      ENDIAN_SWAP_32_((U8*)&buffer[0]);
+      ENDIAN_SWAP_32_((U8*)&buffer[1]);
+      ENDIAN_SWAP_32_((U8*)&buffer[2]);
+      ENDIAN_SWAP_32_((U8*)&buffer[3]);
+      ENDIAN_SWAP_32_((U8*)&buffer[5]);
+      ENDIAN_SWAP_32_((U8*)&buffer[6]);
+      ENDIAN_SWAP_32_((U8*)&buffer[7]);
+      ENDIAN_SWAP_32_((U8*)&buffer[8]);
+      ENDIAN_SWAP_32_((U8*)&buffer[9]);
       if (version >= 48)
       {
-        ENDIAN_SWAP_32((U8*)&buffer[10]);
-        ENDIAN_SWAP_32((U8*)&buffer[11]);
+        ENDIAN_SWAP_32_((U8*)&buffer[10]);
+        ENDIAN_SWAP_32_((U8*)&buffer[11]);
       }
       if (version >= 56)
       {
-        ENDIAN_SWAP_32((U8*)&buffer[12]);
-        ENDIAN_SWAP_32((U8*)&buffer[13]);
+        ENDIAN_SWAP_32_((U8*)&buffer[12]);
+        ENDIAN_SWAP_32_((U8*)&buffer[13]);
       }
     }
 

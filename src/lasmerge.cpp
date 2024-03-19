@@ -96,7 +96,6 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
   BOOL cpu64 = FALSE;
 #endif
-  bool verbose = false;
   bool keep_lastiling = false;
   U32 chopchop = 0;
   bool projection_was_set = false;
@@ -148,7 +147,7 @@ int main(int argc, char *argv[])
     }
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
     {
-      verbose = true;
+     set_message_log_level(LAS_VERBOSE);
     }
     else if (strcmp(argv[i],"-version") == 0)
     {
@@ -163,7 +162,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
       gui = true;
 #else
-      fprintf(stderr, "WARNING: not compiled with GUI support. ignoring '-gui' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
 #endif
     }
     else if (strcmp(argv[i],"-cpu64") == 0)
@@ -171,7 +170,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
       cpu64 = TRUE;
 #else
-      fprintf(stderr, "WARNING: not compiled with 64 bit support. ignoring '-cpu64' ...\n");
+      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
 #endif
       argv[i][0] = '\0';
     }
@@ -179,7 +178,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        fprintf(stderr,"ERROR: '%s' needs 1 argument: size\n", argv[i]);
+        LASMessage(LAS_ERROR, "'%s' needs 1 argument: size", argv[i]);
         byebye(true);
       }
       i++;
@@ -196,7 +195,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      fprintf(stderr, "ERROR: cannot understand argument '%s'\n", argv[i]);
+      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
       byebye(true);
     }
   }
@@ -234,13 +233,13 @@ int main(int argc, char *argv[])
 
   if (!lasreadopener.active())
   {
-    fprintf(stderr, "ERROR: no input specified\n");
+    LASMessage(LAS_ERROR, "no input specified");
     byebye(true, argc==1);
   }
 
   if (!laswriteopener.active())
   {
-    fprintf(stderr, "ERROR: no output specified\n");
+    LASMessage(LAS_ERROR, "no output specified");
     byebye(true, argc==1);
   }
 
@@ -248,7 +247,7 @@ int main(int argc, char *argv[])
 
   if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
   {
-    fprintf(stderr, "ERROR: input and output file name are identical\n");
+    LASMessage(LAS_ERROR, "input and output file name are identical");
     usage(true);
   }
 
@@ -264,31 +263,24 @@ int main(int argc, char *argv[])
     projection_was_set = geoprojectionconverter.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params);
   }
 
-  if (verbose) start_time = taketime();
+  start_time = taketime();
 
   LASreader* lasreader = lasreadopener.open();
   if (lasreader == 0)
   {
-    fprintf(stderr, "ERROR: could not open lasreader\n");
+    LASMessage(LAS_ERROR, "could not open lasreader");
     byebye(true, argc==1);
   }
 
-#ifdef _WIN32
-  if (verbose) { fprintf(stderr,"merging headers took %g sec. there are %I64d points in total.\n", taketime()-start_time, lasreader->npoints); start_time = taketime(); }
-#else
-  if (verbose) { fprintf(stderr,"merging headers took %g sec. there are %lld points in total.\n", taketime()-start_time, lasreader->npoints); start_time = taketime(); }
-#endif
+  LASMessage(LAS_VERBOSE, "merging headers took %g sec. there are %lld points in total.", taketime()-start_time, lasreader->npoints);
+  start_time = taketime(); 
 
   // prepare the header for the surviving points
 
   strncpy(lasreader->header.system_identifier, "LAStools (c) by rapidlasso GmbH", 32);
   lasreader->header.system_identifier[31] = '\0';
   char temp[64];
-#ifdef _WIN64
-  sprintf(temp, "lasmerge64 (version %d)", LAS_TOOLS_VERSION);
-#else // _WIN64
-  sprintf(temp, "lasmerge (version %d)", LAS_TOOLS_VERSION);
-#endif // _WIN64
+  sprintf(temp, "lasmerge%s (version %d)", (IS64?"64":""), LAS_TOOLS_VERSION);
   memset(lasreader->header.generating_software, 0, 32);
   strncpy(lasreader->header.generating_software, temp, 32);
   lasreader->header.generating_software[31] = '\0';
@@ -324,7 +316,7 @@ int main(int argc, char *argv[])
         laswriter = laswriteopener.open(&lasreader->header);
         if (laswriter == 0)
         {
-          fprintf(stderr, "ERROR: could not open laswriter\n");
+          LASMessage(LAS_ERROR, "could not open laswriter");
           byebye(true, argc==1);
         }
       }
@@ -335,7 +327,8 @@ int main(int argc, char *argv[])
         // close the current writer
         laswriter->update_header(&lasreader->header, TRUE);
         laswriter->close();
-        if (verbose) { fprintf(stderr,"splitting file '%s' took %g sec.\n", laswriteopener.get_file_name(), taketime()-start_time); start_time = taketime(); }
+        LASMessage(LAS_VERBOSE, "splitting file '%s' took %g sec.", laswriteopener.get_file_name(), taketime()-start_time);
+  start_time = taketime(); 
         delete laswriter;
         laswriter = 0;
       }
@@ -345,7 +338,8 @@ int main(int argc, char *argv[])
       // close the current writer
       laswriter->update_header(&lasreader->header, TRUE);
       laswriter->close();
-      if (verbose) { fprintf(stderr,"splitting file '%s' took %g sec.\n", laswriteopener.get_file_name(), taketime()-start_time); start_time = taketime(); }
+      LASMessage(LAS_VERBOSE, "splitting file '%s' took %g sec.", laswriteopener.get_file_name(), taketime()-start_time);
+  start_time = taketime(); 
       delete laswriter;
       laswriter = 0;
     }
@@ -356,20 +350,15 @@ int main(int argc, char *argv[])
     {
       if (lasreader->header.version_minor < 4)
       {
-#ifdef _WIN32
-        fprintf(stderr, "ERROR: cannot merge %I64d points into single LAS 1.%d file. maximum is %u\n", lasreader->npoints, lasreader->header.version_minor, U32_MAX);
-#else
-        fprintf(stderr, "ERROR: cannot merge %lld points into single LAS 1.%d file. maximum is %u\n", lasreader->npoints, lasreader->header.version_minor, U32_MAX);
-#endif
+        LASMessage(LAS_ERROR, "cannot merge %lld points into single LAS 1.%d file. maximum is %u", lasreader->npoints, lasreader->header.version_minor, U32_MAX);
         byebye(true, argc==1);
       }
     }
-
     // open the writer
     LASwriter* laswriter = laswriteopener.open(&lasreader->header);
     if (laswriter == 0)
     {
-      fprintf(stderr, "ERROR: could not open laswriter\n");
+      LASMessage(LAS_ERROR, "could not open laswriter");
       byebye(true, argc==1);
     }
     // loop over the points
@@ -381,14 +370,11 @@ int main(int argc, char *argv[])
     // close the writer
     laswriter->update_header(&lasreader->header, TRUE);
     laswriter->close();
-    if (verbose) fprintf(stderr,"merging files took %g sec.\n", taketime()-start_time); 
+    LASMessage(LAS_VERBOSE, "merging files took %g sec.", taketime()-start_time); 
     delete laswriter;
   }
-
   lasreader->close();
   delete lasreader;
-
   byebye(false, argc==1);
-
   return 0;
 }

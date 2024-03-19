@@ -34,6 +34,7 @@
 
 #include "bytestreamin_array.hpp"
 #include "bytestreamout_array.hpp"
+#include "lasmessage.hpp"
 
 class LASvlrPayload
 {
