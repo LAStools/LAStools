@@ -64,8 +64,8 @@ foreach(file ${LAZ_SRC})
 endforeach(file)
 
 file(GLOB_RECURSE LAS_INCLUDES
-	${CMAKE_SOURCE_DIR}/LASzip/src/*.hpp 
-	${CMAKE_SOURCE_DIR}/LASlib/inc/*.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/../../LASzip/src/*.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/../inc/*.hpp
 )
 
 add_library(LASlib ${LAS_SRC} ${LAZ_SRC_FULL})
@@ -77,8 +77,8 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 target_include_directories(LASlib PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASlib/inc>
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASzip/src>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../inc>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../LASzip/src>
   $<INSTALL_INTERFACE:include/LASlib>
 )
 set_target_properties(LASlib PROPERTIES
@@ -114,5 +114,5 @@ else()
 		LIBRARY DESTINATION lib/LASlib
 		RUNTIME DESTINATION lib/LASlib)
 	install(EXPORT laslib-targets DESTINATION lib/cmake/LASlib)
-	install(FILES ${CMAKE_SOURCE_DIR}/LASlib/src/laslib-config.cmake DESTINATION lib/cmake/LASlib)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/laslib-config.cmake DESTINATION lib/cmake/LASlib)
 endif(MSVC)
