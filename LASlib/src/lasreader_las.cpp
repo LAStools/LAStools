@@ -1359,10 +1359,6 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
     header.point_data_format &= 127;
   }
 
-  // create the point reader
-
-  reader = new LASreadPoint(decompress_selective);
-
   // optional z replacement
   if (opener && (opener->z_from_attribute)) {
     if (opener->z_from_attribute_idx < 0) {
@@ -1380,8 +1376,12 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
     }
     if (opener->z_from_attribute_idx >= 0) {
       header.z_from_attrib = opener->z_from_attribute_idx;
+      decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     }
   }
+
+  // create the point reader
+  reader = new LASreadPoint(decompress_selective);
 
   // initialize point and the reader
   if (header.laszip)
