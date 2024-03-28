@@ -633,7 +633,7 @@ int main(int argc, char* argv[])
       if (argv[i][0] == 0x96)
         argv[i][0] = '-';
     }
-    //if (!geoprojectionconverter.parse(argc, argv)) byebye(true);
+    if (!geoprojectionconverter.parse(1, argv)) byebye(true);
     if (!lasreadopener.parse(argc, argv)) byebye(true);
     if (!laswriteopener.parse(argc, argv)) byebye(true);
   }
