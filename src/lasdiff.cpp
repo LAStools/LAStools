@@ -913,7 +913,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == 0x96) argv[i][0] = '-';
+      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
     }
     if (!lasreadopener.parse(argc, argv)) byebye(true);
     if (!laswriteopener.parse(argc, argv)) byebye(true);
@@ -999,7 +999,7 @@ int main(int argc, char *argv[])
   int different_header;
 
   // possibly loop over two wild cards
-  
+
   if (wildcard1 && wildcard2)
   {
     LASreadOpener lasreadopener1;
@@ -1025,7 +1025,7 @@ int main(int argc, char *argv[])
       LASMessage(LAS_ERROR, "wildcard1 (%u) and wildcard2 (%u) specify different number of files", lasreadopener1.get_file_name_number(), lasreadopener2.get_file_name_number());
       byebye(true, argc==1);
     }
-    
+
     // possibly multiple input files
 
     while (lasreadopener1.active())

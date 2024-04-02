@@ -2,14 +2,14 @@
 ===============================================================================
 
   FILE:  lasindex.cpp
-  
+
   CONTENTS:
-  
+
     This tool creates a *.lax file for a given *.las or *.laz file that contains
     a spatial indexing. When this LAX file is present it will be used to speed up
     access to the relevant areas of the LAS/LAZ file whenever a spatial queries
     of the type
-    
+
       -inside_tile ll_x ll_y size
       -inside_circle center_x center_y radius
       -inside_rectangle min_x min_y max_x max_y  (or simply -inside)
@@ -27,11 +27,11 @@
      indexing information in the LAX file created by lasindex.
 
   PROGRAMMERS:
-  
+
     info@rapidlasso.de  -  https://rapidlasso.de
-  
+
   COPYRIGHT:
-  
+
     (c) 2011-2019, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -40,15 +40,15 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
 
 
-    22 March 2022 -- Add -o parameter for user defined output file  
-     1 May 2017 -- 2nd example for selective decompression for new LAS 1.4 points 
+    22 March 2022 -- Add -o parameter for user defined output file
+     1 May 2017 -- 2nd example for selective decompression for new LAS 1.4 points
     17 May 2011 -- enabling batch processing with wildcards or multiple file names
     29 April 2011 -- created after cable outage during the royal wedding (-:
-  
+
 ===============================================================================
 */
 
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == 0x96) argv[i][0] = '-';
+      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
     }
     if (!lasreadopener.parse(argc, argv)) byebye(true);
   }
@@ -378,11 +378,11 @@ int main(int argc, char *argv[])
     CHAR* meta_file_name = (CHAR*)malloc(len + 9);
     if (len)
     {
-      sprintf(meta_file_name, "%s\\lax.txt", meta_file_name_base); 
+      sprintf(meta_file_name, "%s\\lax.txt", meta_file_name_base);
     }
     else
     {
-      sprintf(meta_file_name, "lax.txt"); 
+      sprintf(meta_file_name, "lax.txt");
     }
     free(meta_file_name_base);
 
@@ -463,9 +463,9 @@ int main(int argc, char *argv[])
     LASindex lasindex;
     lasindex.prepare(lasquadtree, threshold);
     while (lasreader->read_point()) lasindex.add(lasreader->point.get_x(), lasreader->point.get_y(), (U32)(lasreader->p_count-1));
-  
+
     // delete the reader
-    
+
     lasreader->close();
     delete lasreader;
 
@@ -506,7 +506,7 @@ int main(int argc, char *argv[])
     fclose(file_meta);
     file_meta = 0;
   }
-  
+
   if (lasreadopener.get_file_name_number() > 1)
   {
     if (dont_reindex)

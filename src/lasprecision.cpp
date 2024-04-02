@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  lasprecision.cpp
-  
+
   CONTENTS:
-  
+
     This tool computes statistics about the coordinates in a LAS/LAZ file that
     tell us whether the precision "advertised" in the header is really in the
     data. Often I find that the scaling factors in the header are miss-leading
@@ -28,11 +28,11 @@
      - Palm Beach Pre Hurricane.las
 
   PROGRAMMERS:
-  
+
     info@rapidlasso.de  -  https://rapidlasso.de
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-17, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -41,12 +41,12 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
-     1 May 2017 -- 3rd example for selective decompression for new LAS 1.4 points 
+
+     1 May 2017 -- 3rd example for selective decompression for new LAS 1.4 points
     30 November 2010 -- created spotting few paper cups at Starbuck's Offenbach
-  
+
 ===============================================================================
 */
 
@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == 0x96) argv[i][0] = '-';
+      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
       if (strcmp(argv[i],"-o") == 0 || strcmp(argv[i],"-olas") == 0 || strcmp(argv[i],"-olaz") == 0 || strcmp(argv[i],"-obin") == 0 || strcmp(argv[i],"-otxt") == 0 || strcmp(argv[i],"-reoffset") == 0 || strcmp(argv[i],"-rescale") == 0)
       {
         output = true;
@@ -510,7 +510,7 @@ int main(int argc, char *argv[])
       array_max = array_count;
 
       // sort values
-  
+
       if (report_x)
       {
         quicksort_for_ints(array_x, 0, array_max-1);
@@ -525,7 +525,7 @@ int main(int argc, char *argv[])
       {
         quicksort_for_ints(array_z, 0, array_max-1);
       }
-  
+
       if (report_gps && lasreader->point.have_gps_time)
       {
         quicksort_for_doubles(array_gps, 0, array_max-1);
@@ -598,7 +598,7 @@ int main(int argc, char *argv[])
       {
         quicksort_for_ints(array_z, 0, array_max-2);
       }
-  
+
       if (report_gps && lasreader->point.have_gps_time)
       {
         quicksort_for_doubles(array_gps, 0, array_max-2);
@@ -616,7 +616,7 @@ int main(int argc, char *argv[])
       // first for X & Y & Z
 
       unsigned int count_lines, array_last, array_first;
-  
+
       if (report_x)
       {
         if (report_diff) fprintf(stdout, "X differences \n");
@@ -653,7 +653,7 @@ int main(int argc, char *argv[])
           if (array_y[array_last] != array_y[array_count])
           {
             if (report_diff && (count_lines < report_lines)) { count_lines++; fprintf(stdout, " %10d : %10d   %g\n", array_y[array_last], array_count - array_last, lasreader->header.y_scale_factor*array_y[array_last]); }
-            array_y[array_first] = array_y[array_count] - array_y[array_last]; 
+            array_y[array_first] = array_y[array_count] - array_y[array_last];
             array_last = array_count;
             array_first++;
           }
@@ -681,7 +681,7 @@ int main(int argc, char *argv[])
           if (array_z[array_last] != array_z[array_count])
           {
             if (report_diff && (count_lines < report_lines)) { count_lines++; fprintf(stdout, " %10d : %10d   %g\n", array_z[array_last], array_count - array_last, lasreader->header.z_scale_factor*array_z[array_last]); }
-            array_z[array_first] = array_z[array_count] - array_z[array_last]; 
+            array_z[array_first] = array_z[array_count] - array_z[array_last];
             array_last = array_count;
             array_first++;
           }
@@ -711,7 +711,7 @@ int main(int argc, char *argv[])
           if (array_gps[array_last] != array_gps[array_count])
           {
             if (report_diff) fprintf(stdout, "  %.10g : %10d\n", array_gps[array_last], array_count - array_last);
-            array_gps[array_first] = array_gps[array_count] - array_gps[array_last]; 
+            array_gps[array_first] = array_gps[array_count] - array_gps[array_last];
             array_last = array_count;
             array_first++;
           }
@@ -741,7 +741,7 @@ int main(int argc, char *argv[])
           if (array_r[array_last] != array_r[array_count])
           {
             if (report_diff) fprintf(stdout, "  %10d : %10d\n", array_r[array_last], array_count - array_last);
-            array_r[array_first] = array_r[array_count] - array_r[array_last]; 
+            array_r[array_first] = array_r[array_count] - array_r[array_last];
             array_last = array_count;
             array_first++;
           }
@@ -766,7 +766,7 @@ int main(int argc, char *argv[])
           if (array_g[array_last] != array_g[array_count])
           {
             if (report_diff) fprintf(stdout, "  %10d : %10d\n", array_g[array_last], array_count - array_last);
-            array_g[array_first] = array_g[array_count] - array_g[array_last]; 
+            array_g[array_first] = array_g[array_count] - array_g[array_last];
             array_last = array_count;
             array_first++;
           }
@@ -791,7 +791,7 @@ int main(int argc, char *argv[])
           if (array_b[array_last] != array_b[array_count])
           {
             if (report_diff) fprintf(stdout, "  %10d : %10d\n", array_b[array_last], array_count - array_last);
-            array_b[array_first] = array_b[array_count] - array_b[array_last]; 
+            array_b[array_first] = array_b[array_count] - array_b[array_last];
             array_last = array_count;
             array_first++;
           }

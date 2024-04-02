@@ -2,19 +2,19 @@
 ===============================================================================
 
   FILE:  lasmerge.cpp
-  
+
   CONTENTS:
-  
+
     This tool merges multiple LAS file into a single LAS file and outputs it in
     the LAS format. As input the user either provides multiple LAS file names or
     a text file containing a list of LAS file names.
 
   PROGRAMMERS:
-  
+
     info@rapidlasso.de  -  https://rapidlasso.de
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-12, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -23,18 +23,18 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     20 August 2014 -- new option '-keep_lastiling' to preserve the LAStiling VLR
     20 August 2014 -- copy VLRs from empty (zero points) LAS/LAZ files to others
      5 August 2011 -- possible to add/change projection info in command line
     13 May 2011 -- moved indexing, filtering, transforming into LASreader
-    21 January 2011 -- added LASreadOpener and reading of multiple LAS files 
-     7 January 2011 -- added the LASfilter to drop or keep points 
-    12 March 2009 -- updated to ask for input if started without arguments 
+    21 January 2011 -- added LASreadOpener and reading of multiple LAS files
+     7 January 2011 -- added the LASfilter to drop or keep points
+    12 March 2009 -- updated to ask for input if started without arguments
     07 November 2007 -- created after email from luis.viveros@digimapas.cl
-  
+
 ===============================================================================
 */
 
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == 0x96) argv[i][0] = '-';
+      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
     }
     if (!geoprojectionconverter.parse(argc, argv)) byebye(true);
     if (!lasreadopener.parse(argc, argv)) byebye(true);
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
   }
 #endif
 
-  // maybe we want to keep the lastiling 
+  // maybe we want to keep the lastiling
 
   if (keep_lastiling)
   {
@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
   }
 
   LASMessage(LAS_VERBOSE, "merging headers took %g sec. there are %lld points in total.", taketime()-start_time, lasreader->npoints);
-  start_time = taketime(); 
+  start_time = taketime();
 
   // prepare the header for the surviving points
 
@@ -328,7 +328,7 @@ int main(int argc, char *argv[])
         laswriter->update_header(&lasreader->header, TRUE);
         laswriter->close();
         LASMessage(LAS_VERBOSE, "splitting file '%s' took %g sec.", laswriteopener.get_file_name(), taketime()-start_time);
-  start_time = taketime(); 
+  start_time = taketime();
         delete laswriter;
         laswriter = 0;
       }
@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
       laswriter->update_header(&lasreader->header, TRUE);
       laswriter->close();
       LASMessage(LAS_VERBOSE, "splitting file '%s' took %g sec.", laswriteopener.get_file_name(), taketime()-start_time);
-  start_time = taketime(); 
+  start_time = taketime();
       delete laswriter;
       laswriter = 0;
     }
@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
     // close the writer
     laswriter->update_header(&lasreader->header, TRUE);
     laswriter->close();
-    LASMessage(LAS_VERBOSE, "merging files took %g sec.", taketime()-start_time); 
+    LASMessage(LAS_VERBOSE, "merging files took %g sec.", taketime()-start_time);
     delete laswriter;
   }
   lasreader->close();
