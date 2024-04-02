@@ -643,7 +643,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == 0x96) argv[i][0] = '-';
+      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
       if (strcmp(argv[i],"-opts") == 0)
       {
         opts = TRUE;
@@ -1140,7 +1140,7 @@ int main(int argc, char *argv[])
         fprintf(file_out, "%g %g %g %g\012", ((F64*)payload)[18], ((F64*)payload)[19], ((F64*)payload)[20], ((F64*)payload)[21]); // r11 r12 r13 - rotation matrix
         fprintf(file_out, "%g %g %g %g\012", ((F64*)payload)[22], ((F64*)payload)[23], ((F64*)payload)[24], ((F64*)payload)[25]); // r21 r22 r23
         fprintf(file_out, "%g %g %g %g\012", ((F64*)payload)[26], ((F64*)payload)[27], ((F64*)payload)[28], ((F64*)payload)[29]); // r31 r32 r33
-        fprintf(file_out, "%g %g %g %g\012", ((F64*)payload)[30], ((F64*)payload)[31], ((F64*)payload)[32], ((F64*)payload)[33]); // tr1 tr2 tr3 - transformation 
+        fprintf(file_out, "%g %g %g %g\012", ((F64*)payload)[30], ((F64*)payload)[31], ((F64*)payload)[32], ((F64*)payload)[33]); // tr1 tr2 tr3 - transformation
       }
       else
       {

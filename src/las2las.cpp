@@ -316,7 +316,7 @@ int main(int argc, char* argv[])
 #endif
   bool error = false;
   bool force = false;
-  // fixed header changes 
+  // fixed header changes
   int set_version_major = -1;
   int set_version_minor = -1;
   int set_point_data_format = -1;
@@ -385,7 +385,7 @@ int main(int argc, char* argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == 0x96) argv[i][0] = '-';
+      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
       if (strcmp(argv[i], "-week_to_adjusted") == 0)
       {
         set_global_encoding_gps_bit = 1;
@@ -1320,14 +1320,14 @@ int main(int argc, char* argv[])
           }
           if (lasreader->header.get_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS))
           {
-            LASMessage(LAS_WARNING, "unsetting global encoding bit %d when downgrading from version 1.%d to version 1.%d", 
+            LASMessage(LAS_WARNING, "unsetting global encoding bit %d when downgrading from version 1.%d to version 1.%d",
               LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS, lasreader->header.version_minor, set_version_minor);
             lasreader->header.unset_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
           }
           if (lasreader->header.number_of_extended_variable_length_records)
           {
-            LASMessage(LAS_WARNING, "loosing %d EVLR%s when downgrading from version 1.%d to version 1.%d. attempting to move %s to the VLR section ...", 
-              lasreader->header.number_of_extended_variable_length_records, (lasreader->header.number_of_extended_variable_length_records > 1 ? "s" : ""), 
+            LASMessage(LAS_WARNING, "loosing %d EVLR%s when downgrading from version 1.%d to version 1.%d. attempting to move %s to the VLR section ...",
+              lasreader->header.number_of_extended_variable_length_records, (lasreader->header.number_of_extended_variable_length_records > 1 ? "s" : ""),
               lasreader->header.version_minor, set_version_minor, (lasreader->header.number_of_extended_variable_length_records > 1 ? "them" : "it"));
             U32 u;
             for (u = 0; u < lasreader->header.number_of_extended_variable_length_records; u++)
@@ -1699,7 +1699,7 @@ int main(int argc, char* argv[])
           }
         }
       }
-      else if (set_ogc_wkt) // maybe only set the OCG WKT 
+      else if (set_ogc_wkt) // maybe only set the OCG WKT
       {
         CHAR* ogc_wkt = set_ogc_wkt_string;
         I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);

@@ -193,10 +193,10 @@ int main(int argc, char* argv[])
   }
   else
   {
-    // need to get those before lastransform->parse() routine gets them 
+    // need to get those before lastransform->parse() routine gets them
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == 0x96) argv[i][0] = '-';
+      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
       if (strcmp(argv[i], "-scale_intensity") == 0)
       {
         if ((i + 1) >= argc)
@@ -801,7 +801,7 @@ int main(int argc, char* argv[])
       }
       lasreader->header.del_geo_ascii_params();
 
-      if (set_ogc_wkt) // maybe also set the OCG WKT 
+      if (set_ogc_wkt) // maybe also set the OCG WKT
       {
         I32 len = 0;
         CHAR* ogc_wkt = 0;

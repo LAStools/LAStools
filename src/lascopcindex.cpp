@@ -69,7 +69,7 @@
 #include "lasprogress.hpp"
 #include "geoprojectionconverter.hpp"
 
-#ifdef _MSC_VER 
+#ifdef _MSC_VER
 #define strcasecmp _stricmp
 #endif
 
@@ -301,7 +301,7 @@ struct OctantInMemory : public Octant
     occupancy.reserve(point_capacity);
   };
 
-  // No copy constructor. We don't want any copy of dynamically allocated U8* point_buffer. 
+  // No copy constructor. We don't want any copy of dynamically allocated U8* point_buffer.
   // Desallocation is performed manually with clean() at appropriate places.
 
   void insert(const U8* buffer, const I32 cell, const U16 chunk)
@@ -387,7 +387,7 @@ struct OctantOnDisk : public Octant
     occupancy.reserve(25000);
   };
 
-  // No copy constructor. We don't want any copy of dynamically allocated U8* point_buffer. 
+  // No copy constructor. We don't want any copy of dynamically allocated U8* point_buffer.
   // Desallocation is performed manually with clean() at appropriate places
 
   void insert(const U8* buffer, const I32 cell, const U16 chunk)
@@ -630,7 +630,7 @@ int main(int argc, char* argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == 0x96)
+      if ((unsigned char)argv[i][0] == 0x96)
         argv[i][0] = '-';
     }
     if (!geoprojectionconverter.parse(1, argv)) byebye(true);
