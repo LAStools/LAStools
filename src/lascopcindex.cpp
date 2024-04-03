@@ -254,7 +254,7 @@ struct VoxelRecord
 struct Octant
 {
   Octant() {};
-  ~Octant() {};
+  virtual ~Octant() = default;
 
   void sort()
   {
