@@ -33,6 +33,12 @@
 
 #include "mydefs.hpp"
 
+#include <optional>
+#include <sstream>
+#include <string>
+#include <iomanip>
+
+
 /// maximum length of
 #define LAS_MAX_MESSAGE_LENGTH 8192
 
@@ -86,6 +92,38 @@ void LASLIB_DLL set_las_message_handler(LASMessageHandler callback, void* user_d
 // restore the default laslib message handler
 void LASLIB_DLL unset_las_message_handler();
 
+// @brief Logger-Wrapper that alloes to stream to the logger.
+// @usage LASMessageStream(LAS_FATAL_ERROR) << "Pi is approximately: " << LASMessageStream().precision(2) << 3.14159 << std::endl;
+class LASMessageStream
+{
+public:
+    LASMessageStream(LAS_MESSAGE_TYPE type) : setType(type) {}
+    ~LASMessageStream() { LASMessage(setType, usedStream.str().c_str()); }
 
+    template <typename T>
+    LASMessageStream& operator<<(const T& value)
+    {
+        usedStream << value;
+        return *this;
+    }
+
+    // just in case someone streams std::endl ...
+    LASMessageStream& operator<<(std::ostream& (*func)(std::ostream&));
+    LASMessageStream& precision(int prec);
+
+private:
+    LAS_MESSAGE_TYPE setType;
+    std::ostringstream usedStream;
+};
+
+#define logdebug LASMessageStream(LAS_DEBUG)
+#define logveryverbos LASMessageStream(LAS_VERY_VERBOSE)
+#define logverbose LASMessageStream(LAS_VERBOSE)
+#define loginfo LASMessageStream(LAS_INFO)
+#define logwarning LASMessageStream(LAS_WARNING)
+#define logeriouswarning LASMessageStream(LAS_SERIOUS_WARNING)
+#define logerror LASMessageStream(LAS_ERROR)
+#define logfatalerror LASMessageStream(LAS_FATAL_ERROR)
+#define logquiet LASMessageStream(LAS_QUIET)
 
 #endif // LAS_MESSAGE_HPP

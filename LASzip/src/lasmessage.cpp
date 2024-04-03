@@ -147,3 +147,15 @@ void las_default_message_handler(LAS_MESSAGE_TYPE type, const char* msg, void* u
 		fprintf(stderr, "%s\n", message.c_str());
 	}
 }
+
+LASMessageStream& LASMessageStream::operator<<(std::ostream&(* func)(std::ostream&))
+{
+	usedStream << func;
+	return *this;
+}
+
+LASMessageStream& LASMessageStream::precision(int prec)
+{
+	usedStream << std::setprecision(prec);
+	return *this;
+}
