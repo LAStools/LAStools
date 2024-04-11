@@ -1,4 +1,4 @@
-include("${CMAKE_CURRENT_LIST_DIR}/laslib-targets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/LASlibTargets.cmake")
 add_library(LAStools::LASlib INTERFACE IMPORTED)
 target_link_libraries(LAStools::LASlib INTERFACE LASlib)
 
