@@ -32,6 +32,7 @@ set(LAS_SRC
 	lasfilter.cpp
 	lastransform.cpp
 	laskdtree.cpp
+	lascopc.cpp
 	fopen_compressed.cpp
 )
 
@@ -51,7 +52,6 @@ set(LAZ_SRC
 	arithmeticencoder.cpp
 	arithmeticmodel.cpp
 	lasindex.cpp
-	lascopc.cpp
 	lasquadtree.cpp
 	lasinterval.cpp
 	laszip.cpp

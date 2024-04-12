@@ -33,7 +33,6 @@
 
 #include "mydefs.hpp"
 
-#include <optional>
 #include <sstream>
 #include <string>
 #include <iomanip>

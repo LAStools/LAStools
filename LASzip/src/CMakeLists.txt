@@ -11,7 +11,6 @@ set(LASZIP_SOURCES
     arithmeticmodel.cpp
     integercompressor.cpp
     lasindex.cpp
-    lascopc.cpp
     lasinterval.cpp
     lasquadtree.cpp
     lasreaditemcompressed_v1.cpp

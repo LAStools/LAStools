@@ -34,7 +34,6 @@
     <ClCompile Include="src\arithmeticencoder.cpp" />
     <ClCompile Include="src\arithmeticmodel.cpp" />
     <ClCompile Include="src\integercompressor.cpp" />
-    <ClCompile Include="src\lascopc.cpp" />
     <ClCompile Include="src\lasindex.cpp" />
     <ClCompile Include="src\lasinterval.cpp" />
     <ClCompile Include="src\lasquadtree.cpp" />
@@ -68,7 +67,6 @@
     <ClInclude Include="src\bytestreamout_ostream.hpp" />
     <ClInclude Include="src\integercompressor.hpp" />
     <ClInclude Include="src\lasattributer.hpp" />
-    <ClInclude Include="src\lascopc.hpp" />
     <ClInclude Include="src\lasindex.hpp" />
     <ClInclude Include="src\lasinterval.hpp" />
     <ClInclude Include="src\laspoint.hpp" />

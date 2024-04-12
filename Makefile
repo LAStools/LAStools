@@ -1,3 +1,6 @@
+$(warning ###########################################)
+$(warning # prefer build using cmake. see README.md #)
+$(warning ###########################################)
 all:
 	cd LASlib && make
 	cd LASzip && make
