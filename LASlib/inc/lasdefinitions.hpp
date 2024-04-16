@@ -50,7 +50,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 240319
+#define LAS_TOOLS_VERSION 240415
 
 #include <stdio.h>
 #include <string.h>
