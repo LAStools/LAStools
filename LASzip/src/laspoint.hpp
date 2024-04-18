@@ -113,7 +113,7 @@ public:
 
 // for converting between x,y,z integers and scaled/translated coordinates
 
-  const LASquantizer* quantizer;
+  const LASquantizer* quantizer = nullptr;
   F64 coordinates[3];
 
 // for attributed access to the extra bytes
