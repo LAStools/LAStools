@@ -1,6 +1,36 @@
+/*
+===============================================================================
+
+  FILE:  lasmessage.cpp
+
+  CONTENTS:
+
+    see corresponding header file
+
+  PROGRAMMERS:
+
+    info@rapidlasso.de  -  https://rapidlasso.de
+
+  COPYRIGHT:
+
+    (c) 2007-2024, rapidlasso GmbH - fast tools to catch reality
+
+    This is free software; you can redistribute and/or modify it under the
+    terms of the Apache Public License 2.0 published by the Apache Software
+    Foundation. See the COPYING file for more information.
+
+    This software is distributed WITHOUT ANY WARRANTY and without even the
+    implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+  CHANGE HISTORY:
+
+    see corresponding header file
+
+===============================================================================
+*/
 #include "lasmessage.hpp"
 #include <stdio.h>
-#include <stdarg.h> 
+#include <stdarg.h>
 #include <string>
 #include <assert.h>
 
@@ -139,8 +169,8 @@ void las_default_message_handler(LAS_MESSAGE_TYPE type, const char* msg, void* u
 	if (!prefix.empty())
 	{
 		format_message(message, (unsigned)prefix.size());
-		fprintf(stderr, prefix.c_str());
-		fprintf(stderr, message.c_str());
+		fprintf(stderr, "%s", prefix.c_str());
+		fprintf(stderr, "%s", message.c_str());
 	}
 	else
 	{

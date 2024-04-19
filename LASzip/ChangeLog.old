@@ -1,0 +1,1113 @@
+This changelog is deprecated.
+Future changes will be found in CHANGES.txt
+
+2023-10-20
+  * Jochen Keil <jochen.keil@rapidlasso.de> merge (PR #92): Fix integer overflow of number_of_point_records when using laszip_update_inventory
+
+2018-03-22
+	* Howard Butler <howard@hobu.co> call vcvars (03:41:11)
+	* Howard Butler <howard@hobu.co> Merge branch 'master' of github.com:LASzip/LASzip (03:39:49)
+	* Howard Butler <howard@hobu.co> VC vars (03:39:11)
+
+2018-03-21
+	* Howard Butler <howard@hobu.co> use laszip3 as DLL name for new builds on windows (08:34:15)
+	* Howard Butler <howard@hobu.co> fix doc version (08:29:18)
+	* Howard Butler <howard@hobu.co> point to 3.2.0 release (08:25:52)
+	* Howard Butler <howard@hobu.co> fix LASZIP_VERSION_BUILD_DATE (08:21:21)
+	* Howard Butler <howard@hobu.co> configure environment (07:51:08)
+	* Howard Butler <howard@hobu.co> whitespace normalization (07:49:14)
+	* Howard Butler <howard@hobu.co> use 2017 for appveyor builds (07:48:06)
+	* Howard Butler <howard@hobu.co> remove matrix (06:04:53)
+	* Howard Butler <howard@hobu.co> appveyor builds (06:01:40)
+	* Howard Butler <howard@hobu.co> set version to 3.2.0 (06:01:30)
+	* Howard Butler <howard@hobu.co> Create README.rst (05:31:12)
+
+2018-03-19
+	* Howard Butler <howard@hobu.co> make sure to compile lasreaditemcompressed_v4.cpp laswriteitemcompressed_v4.cpp too (11:10:47)
+
+2018-02-09
+	* Martin Isenburg <martin.isenburg@gmail.com>  version increment to 3.2 (can read v4 compressed items) (03:56:42)
+	* Martin Isenburg <martin@rapidlasso.com> prepare to correct 'context switch' bug reported by Wanwannodao (03:45:51)
+	* Martin Isenburg <martin@rapidlasso.com> better WARNINGS and fix for MSVC2013 C4258 warning about shadowed 'i' value (03:35:20)
+	* Martin Isenburg <martin@rapidlasso.com> small fix in set_extended_classification() (03:27:38)
+	* Martin Isenburg <martin@rapidlasso.com> define fixes for std::unordered_map by Evon (03:26:09)
+
+2018-01-29
+	* Howard Butler <howard@hobu.co> Merge pull request #41 from pblottiere/fix_install (09:51:34)
+	* Blottiere Paul <blottiere.paul@gmail.com> Fix install of laszip_api_version.h (08:03:55)
+
+2018-01-12
+	* Howard Butler <howard@hobu.co> Merge pull request #38 from hobu/laszip-4.0-work-ticket (09:47:10)
+
+2018-01-02
+	* Howard Butler <howard@hobu.co> another include install path attempt (10:54:31)
+	* Howard Butler <howard@hobu.co> bump version to 4.0.0 (10:43:22)
+	* Howard Butler <howard@hobu.co> include install location broken (10:43:15)
+
+2017-10-19
+	* Howard Butler <howard@hobu.co> Merge pull request #33 from gadomski/load-dll-on-debian (13:02:11)
+	* Pete Gadomski <pete.gadomski@gmail.com> Load .so dll on non-apple (12:06:55)
+
+2017-10-10
+	* Howard Butler <howard@hobu.co> download link for release (14:24:34)
+	* Howard Butler <howard@hobu.co> increment versions for 3.1.1 release (14:04:35)
+	* Howard Butler <howard@hobu.co> ChangeLog refresh (13:47:49)
+
+2017-10-09
+	* Howard Butler <howard@hobu.co> Merge pull request #31 from kbevers/dk-lidar (09:38:12)
+	* Kristian Evers <kristianevers@gmail.com> Moved link to Danish LiDAR to LAZ section of data providers and updated link (09:35:22)
+
+2017-10-02
+	* Martin Isenburg <martin@rapidlasso.com> found 2 more softwares with LAZ support at INTERGEO (06:15:28)
+
+2017-09-27
+	* Martin Isenburg <martin@rapidlasso.com> found 6 new software with LAZ support at INTERGEO (03:14:28)
+
+2017-09-26
+	* Martin Isenburg <martin@rapidlasso.com> updates based on Kirk's 2nd email (another fix) (15:22:25)
+	* Martin Isenburg <martin@rapidlasso.com> updates based on Kirk's 2nd email (15:11:13)
+
+2017-09-22
+	* Martin Isenburg <martin@rapidlasso.com> updates based on Kirk's email (21:31:12)
+
+2017-09-14
+	* Martin Isenburg <martin@rapidlasso.com> NOAA now platinum sponsor (11:57:35)
+	* Howard Butler <howard@hobu.co> make sure to install binary directory laszip_version_api.h (08:49:52)
+
+2017-09-13
+	* Howard Butler <howard@hobu.co> fix download links (21:38:07)
+	* Howard Butler <howard@hobu.co> update doc ver (16:51:47)
+	* Howard Butler <howard@hobu.co> point to 3.1.0 release (15:36:06)
+	* Howard Butler <howard@hobu.co> define version near top of CMakeLists.txt (15:34:26)
+	* Howard Butler <howard@hobu.co> package creation stuff (15:13:34)
+	* Howard Butler <howard@hobu.co> check for unordered_map at configure-time and define HAVE_UNORDERED_MAP for the compilation to use it (14:41:07)
+	* Howard Butler <howard@hobu.co> cpack stuff for making distribution (14:12:51)
+	* Howard Butler <howard@hobu.co> Mergenstall branch 'master' of github.com:LASzip/LASzip (13:03:07)
+	* Howard Butler <howard@hobu.co> Merge pull request #27 from abellgithub/master (13:01:11)
+	* Andrew Bell <andrew.bell.ia@gmail.com> Fix memcpy. (12:58:54)
+	* Howard Butler <howard@hobu.co> Merge branch 'master' of github.com:LASzip/LASzip (11:43:42)
+	* Martin Isenburg <martin@rapidlasso.com> moved '#include <vector>' from laszip_api.h to laszip_dll.cpp (11:38:00)
+	* Howard Butler <howard@hobu.co> -DUNORDERED (11:36:54)
+	* Howard Butler <howard@hobu.co> cpack (11:36:47)
+	* Howard Butler <howard@hobu.co> fix memcpy call (11:36:34)
+	* Howard Butler <howard@hobu.co> put back hash_map (11:36:20)
+	* Martin Isenburg <martin@rapidlasso.com> fixed bug in memcpy call (?). uniform API interface: always pointers (11:34:43)
+	* Martin Isenburg <martin@rapidlasso.com> compile switch for hash_map vs unordered_map for MSVC60 (11:16:47)
+	* Howard Butler <howard@hobu.co> no iostream, no std::copy (08:20:47)
+
+2017-09-12
+	* Howard Butler <howard@hobu.co> no -DUNORDERED (21:09:23)
+	* Howard Butler <howard@hobu.co> wrong install path (21:05:16)
+	* Howard Butler <howard@hobu.co> check before fclose() (21:04:54)
+	* Howard Butler <howard@hobu.co> Merge remote-tracking branch 'andrew/master' into release-prep (13:08:28)
+	* Andrew Bell <andrew.bell.ia@gmail.com> Keep memory allocation/deallocation in the DLL. (12:15:26)
+
+2017-09-11
+	* Howard Butler <howard@hobu.co> release 3.1.0 preparation (17:14:36)
+	* Howard Butler <howard@hobu.co> dos2unix some config (16:06:50)
+
+2017-09-02
+	* Martin Isenburg <martin@rapidlasso.com> new #define LASZIP_API_VERSION keeps include out of my build (11:21:05)
+
+2017-08-30
+	* Martin Isenburg <martin@rapidlasso.com> undoing senseless change (once I thought about it) (20:02:04)
+	* Martin Isenburg <martin@rapidlasso.com> completing stream-based writing (with writing LAS header) (19:51:02)
+
+2017-08-28
+	* Martin Isenburg <martin@rapidlasso.com> LASzip for LAS 1.4 fix in set_classification() (16:43:33)
+	* Martin Isenburg <martin@rapidlasso.com> LAS 1.4 fixes for flags: copy_to(), copy_from(), set_xxxx_flag() functions (14:05:04)
+	* Martin Isenburg <martin@rapidlasso.com> proper 'context' variable instead of development hack (14:02:59)
+	* Martin Isenburg <martin.isenburg@gmail.com> Merge pull request #26 from abellgithub/master (10:30:58)
+
+2017-08-24
+	* Andrew Bell <andrew.bell.ia@gmail.com> Remove dead code. (10:38:54)
+	* Andrew Bell <andrew.bell.ia@gmail.com> Fixes to allow detection of version 1.1. Remove dead build code. (10:35:15)
+
+2017-08-23
+	* Martin Isenburg <martin@rapidlasso.com> minor version increment (also for turning on 'native LAS 1.4 extension' by default) and tiny bug fixes (02:51:44)
+	* Martin Isenburg <martin@rapidlasso.com> minor version increment (also for turning on 'native LAS 1.4 extension' by default (02:49:52)
+
+2017-08-22
+	* Martin Isenburg <martin.isenburg@gmail.com> Merge pull request #24 from abellgithub/master (09:58:43)
+
+2017-08-11
+	* Andrew Bell <andrew.bell.ia@gmail.com> Fix output stream for VLR header fields. (13:44:49)
+	* Andrew Bell <andrew.bell.ia@gmail.com> Merge branch 'zip4' (13:44:20)
+
+2017-08-07
+	* Andrew Bell <andrew.bell.ia@gmail.com> Allow compilation on clang. (09:40:34)
+
+2017-08-03
+	* Martin Isenburg <martin@rapidlasso.com> new 'laszip_set_point_type_and_size()' as minimal setup for ostream writer (12:18:12)
+	* Martin Isenburg <martin@rapidlasso.com> simplify C++ interface by removing point format and size from arguments (09:20:46)
+	* Martin Isenburg <martin@rapidlasso.com> simplify C++ interface by removing point format and size from arguments (09:18:54)
+	* Martin Isenburg <martin@rapidlasso.com> reuse new 'setup_laszip_items()' in C code writer (08:13:52)
+	* Martin Isenburg <martin@rapidlasso.com> added to history in header comments (05:05:19)
+	* Martin Isenburg <martin@rapidlasso.com> reuse new 'write_laszip_vlr_header()' and 'write_laszip_vlr_payload()' in C code (05:04:24)
+	* Martin Isenburg <martin@rapidlasso.com> reuse new 'laszip_vrl_payload_size()' in C code (04:52:37)
+	* Martin Isenburg <martin@rapidlasso.com> new 'laszip_create_laszip_vlr' C++ interface (for PDAL) (04:06:10)
+	* Martin Isenburg <martin@rapidlasso.com> new 'laszip_create_laszip_vlr' C++ interface (for PDAL) (04:03:41)
+
+2017-08-01
+	* Martin Isenburg <martin@rapidlasso.com> use same 'laszip_read_header' when reading from file_name or istream (07:18:23)
+
+2017-07-29
+	* Martin Isenburg <martin@rapidlasso.com> minimal C++ iostream interface (11:57:57)
+	* Martin Isenburg <martin@rapidlasso.com> revision increment for minimal C++ iostream interface (11:52:58)
+	* Martin Isenburg <martin@rapidlasso.com> minimal C++ iostream interface (11:51:02)
+	* Martin Isenburg <martin@rapidlasso.com> removal of blanks (from Andrew Bell) (04:23:03)
+	* Martin Isenburg <martin@rapidlasso.com> new '#ifdef CREATE_HISTOGRAMS' and removal of blanks (from Andrew Bell) (04:22:52)
+	* Martin Isenburg <martin@rapidlasso.com> removal of unused variable and blanks (from Andrew Bell) (04:22:40)
+	* Martin Isenburg <martin@rapidlasso.com> removal of unused variable and blanks (from Andrew Bell) (04:22:29)
+	* Martin Isenburg <martin@rapidlasso.com> ifdef NULL check (from Andrew Bell) (04:09:57)
+	* Martin Isenburg <martin@rapidlasso.com> support for selective decompression via DLL interface (03:54:57)
+	* Martin Isenburg <martin@rapidlasso.com> support for selective decompression via DLL interface (03:50:54)
+	* Martin Isenburg <martin@rapidlasso.com> support for selective decompression via DLL interface (03:45:01)
+	* Martin Isenburg <martin@rapidlasso.com> revision increment due for selective decompression and seeking bug fix (03:42:06)
+	* Martin Isenburg <martin@rapidlasso.com> tiny re-spelling of constant for consistency (03:39:05)
+	* Martin Isenburg <martin@rapidlasso.com> bug fix for seeking in compressed LAS 1.4 files and fixing spelling error in variable name (03:36:34)
+	* Martin Isenburg <martin@rapidlasso.com> tiny re-spelling of constant for consistency (03:33:43)
+	* Martin Isenburg <martin@rapidlasso.com> portability fix suggested by Marc Espie <espie@nerim.net> and better verbose output (03:31:04)
+	* Martin Isenburg <martin@rapidlasso.com> portability fix suggested by Marc Espie <espie@nerim.net> (03:29:09)
+
+2017-06-20
+	* Martin Isenburg <martin@rapidlasso.com> (U16) casting fix (02:28:40)
+
+2017-04-26
+	* Martin Isenburg <martin@rapidlasso.com> new function to enable *writing* of new LAS 1.4 point types with new native extension (20:31:44)
+	* Martin Isenburg <martin@rapidlasso.com> changes for adding native LAS 1.4 extension (20:26:30)
+	* Martin Isenburg <martin@rapidlasso.com> defines for selective LAS 1.4 decompression (20:15:21)
+	* Martin Isenburg <martin@rapidlasso.com> common defines for v3 item readers and writers (20:14:37)
+	* Martin Isenburg <martin@rapidlasso.com> new cases for native LAS 1.4 extension (if requested) (20:12:36)
+	* Martin Isenburg <martin@rapidlasso.com> new cases for native LAS 1.4 extension (if requested) (20:10:41)
+	* Martin Isenburg <martin@rapidlasso.com> added missing BigEndian function (20:07:47)
+	* Martin Isenburg <martin@rapidlasso.com> native LAS1.4 extension item writers (20:06:38)
+	* Martin Isenburg <martin@rapidlasso.com> native LAS1.4 extension item readers (20:05:45)
+	* Martin Isenburg <martin@rapidlasso.com> added missing BigEndian function (20:04:15)
+	* Martin Isenburg <martin@rapidlasso.com> fix in copy_from() and copy_to() for new point types (20:03:06)
+	* Martin Isenburg <martin@rapidlasso.com> generic function for setting the no_data value (19:58:07)
+	* Martin Isenburg <martin@rapidlasso.com> new function for 'skipping' bytes in the stream (19:54:21)
+
+2017-04-01
+	* Martin Isenburg <martin.isenburg@gmail.com> description of compression for NIR layer (08:28:49)
+	* Martin Isenburg <martin.isenburg@gmail.com> Compression of RGB, Wavepacketsm and Extra Bytes layers (08:16:56)
+	* Martin Isenburg <martin.isenburg@gmail.com> complete for compression of POINT14 layer(s) (07:46:08)
+
+2017-03-31
+	* Martin Isenburg <martin.isenburg@gmail.com> details for compression of classification/flags/intensity layers (17:09:51)
+	* Martin Isenburg <martin.isenburg@gmail.com> added actually used tables for map and level (10:25:48)
+	* Martin Isenburg <martin.isenburg@gmail.com> updating to released alpha (10:16:13)
+
+2017-02-27
+	* Martin Isenburg <martin@rapidlasso.com> Mapworks has LAZ support (22:17:27)
+
+2017-01-15
+	* Martin Isenburg <martin@rapidlasso.com> version 2.5.2 (up from 2.5.1) includes new DLL/API function to change chunk size (with tiny fix) (05:18:16)
+
+2017-01-11
+	* Martin Isenburg <martin@rapidlasso.com> version 2.5.2 (up from 2.5.1) includes new DLL/API function to change chunk size (10:13:16)
+
+2017-01-08
+	* Martin Isenburg <martin@rapidlasso.com> no side-effect name changes to prepare for native LAS 1.4 compression (13:08:58)
+	* Martin Isenburg <martin@rapidlasso.com> can be used as init dummy by native LAS 1.4 compressor (12:49:05)
+	* Martin Isenburg <martin@rapidlasso.com> new functionality used by native LAS 1.4 compressor (12:37:58)
+	* Martin Isenburg <martin@rapidlasso.com> no side-effect name changes to prepare for native LAS 1.4 compression (11:53:17)
+	* Martin Isenburg <martin@rapidlasso.com> extended_scan_angle is I16 not U16 (11:24:17)
+	* Martin Isenburg <martin@rapidlasso.com> new MACRO used for native LAS 1.4 compression (11:24:07)
+	* Martin Isenburg <martin@rapidlasso.com> minor version increment 2.5. always writing start_of_waveform_data_packet_record as zero. (08:38:27)
+	* Martin Isenburg <martin@rapidlasso.com> removing debug error fprintf (08:01:15)
+	* Martin Isenburg <martin@rapidlasso.com> new convenience macro (07:41:59)
+	* Martin Isenburg <martin@rapidlasso.com> minor version increment 2.5. fixing NIR and scanner channel copy. (07:41:30)
+	* Martin Isenburg <martin@rapidlasso.com> minor version increment 2.5. fixing large I64 seek. (07:40:43)
+	* Martin Isenburg <martin@rapidlasso.com> minor version increment 2.5. small fixs. sync laszip_dll with laszip_api for hobu (07:28:10)
+
+2016-10-29
+	* Martin Isenburg <martin@rapidlasso.com> INTERGEO: 3 more companies support LAZ (22:51:19)
+
+2016-06-29
+	* Martin Isenburg <martin.isenburg@gmail.com> intro update (14:37:51)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (14:27:11)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (14:18:41)
+	* Martin Isenburg <martin.isenburg@gmail.com> update to what is happening now (14:17:47)
+	* Martin Isenburg <martin.isenburg@gmail.com> added detail about how the GPS time is encoded (14:06:57)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (10:11:55)
+	* Martin Isenburg <martin.isenburg@gmail.com> some detail on compression of X and Y coordinates (10:06:47)
+	* Martin Isenburg <martin.isenburg@gmail.com> Adding detail about return map and return level (09:49:05)
+	* Martin Isenburg <martin.isenburg@gmail.com> create more layers for more efficient decompression (09:18:42)
+
+2016-06-21
+	* Martin Isenburg <martin.isenburg@gmail.com> exploit correlation between scan angle and GPS time changes (09:51:03)
+
+2016-06-19
+	* Martin Isenburg <martin.isenburg@gmail.com> compressing point source ID seperate makes rarely sense (09:32:41)
+
+2016-06-17
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (10:59:44)
+
+2016-06-16
+	* Martin Isenburg <martin.isenburg@gmail.com> starting to refine the compression scheme (09:29:35)
+
+2016-05-22
+	* Howard Butler <howard@hobu.co> Fix #22 -- get autotools in shape again (17:33:41)
+
+2016-04-18
+	* Howard Butler <howard@hobu.co> Build and deploy website docs when 'master' branch is built (15:18:20)
+
+2016-03-08
+	* Howard Butler <howard@hobu.co> Merge pull request #21 from micahcochran/patch-1 (13:27:24)
+	* Micah Cochran <micahcochran@users.noreply.github.com> Switch Travis to Trusty 14.04. (09:41:02)
+
+2016-02-29
+	* Howard Butler <howard@hobu.co> Merge branch 'master' of github.com:LASzip/LASzip (10:45:19)
+
+2016-02-27
+	* Martin Isenburg <martin@rapidlasso.com> forgot to deletenow undefined LASZIP_DLL (21:08:49)
+	* Howard Butler <howard@hobu.co> remove LASzipper/LASUnzipper, catch up to LASzip DLL (13:04:09)
+
+2016-02-25
+	* Howard Butler <howard@hobu.co> remove pnacl stuff which is not used (09:32:45)
+	* Martin Isenburg <martin@rapidlasso.com> updated (08:55:35)
+	* Martin Isenburg <martin@rapidlasso.com> moves from tools to example directory (08:50:33)
+	* Martin Isenburg <martin@rapidlasso.com> moves from tools to example directory (08:49:03)
+	* Martin Isenburg <martin@rapidlasso.com> moves from tools to example directory (08:48:06)
+	* Martin Isenburg <martin@rapidlasso.com> no more laszip\include directory (08:45:49)
+	* Martin Isenburg <martin@rapidlasso.com> depreciating old libLAS laszipper/lasunzipper binding (08:30:11)
+	* Martin Isenburg <martin@rapidlasso.com> moving laszippertest to example (08:26:49)
+	* Martin Isenburg <martin@rapidlasso.com> upgrading to LAS 1.4 compatibility mode (08:23:40)
+	* Martin Isenburg <martin@rapidlasso.com> depreciating old libLAS laszipper/lasunzipper binding (08:20:15)
+	* Martin Isenburg <martin@rapidlasso.com> depreciating old libLAS laszipper/lasunzipper binding (08:19:06)
+	* Martin Isenburg <martin@rapidlasso.com> depreciating old libLAS laszipper/lasunzipper binding (08:12:17)
+	* Martin Isenburg <martin@rapidlasso.com> depreciating old libLAS laszipper/lasunzipper binding (08:11:19)
+	* Martin Isenburg <martin@rapidlasso.com> zipper and unzipper now only used by laszippertest (07:59:11)
+	* Martin Isenburg <martin@rapidlasso.com> zipper and unzipper now only used by laszippertest (07:57:15)
+	* Martin Isenburg <martin@rapidlasso.com> syncing laszip.org with latest LASzip 2.4.1 (07:53:56)
+
+2016-02-23
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (04:43:27)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (04:41:59)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (04:41:03)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (04:39:22)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (04:38:46)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (04:34:26)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (04:12:53)
+
+2016-02-22
+	* Martin Isenburg <martin@rapidlasso.com> coarse outline to get started (06:57:07)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update specification.rst (03:31:07)
+	* Martin Isenburg <martin.isenburg@gmail.com> specification document for "native LAS 1.4 compression" (03:09:41)
+
+2016-01-22
+	* Martin Isenburg <martin@rapidlasso.com> SceneMark supports LAZ (07:22:57)
+
+2015-10-13
+	* Martin Isenburg <martin@rapidlasso.com> Carlson 2016 also supports LAZ (10:01:51)
+
+2015-10-06
+	* Martin Isenburg <martin@rapidlasso.com> small typos (03:47:36)
+
+2015-10-05
+	* Martin Isenburg <martin@rapidlasso.com> little typos / name fixes (03:36:19)
+
+2015-10-03
+	* Martin Isenburg <martin@rapidlasso.com> 7 more software packages with LAZ support discovered at INTERGEO (08:22:03)
+
+2015-09-06
+	* Martin Isenburg <martin@rapidlasso.com> terrasolid and LiDAR analyst add LAZ support (14:12:01)
+
+2015-08-31
+	* Martin Isenburg <martin@rapidlasso.com> Merge branch 'master' of https://github.com/LASzip/LASzip (15:26:14)
+
+2015-08-30
+	* Martin Isenburg <martin@rapidlasso.com> RIEGL becomes Silver Sponsor (15:29:08)
+
+2015-07-18
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:59:29)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:51:33)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:48:42)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:44:29)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:44:06)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:36:40)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:35:43)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:34:56)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:32:28)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:30:56)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (10:17:43)
+
+2015-07-13
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (14:52:28)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (12:27:58)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (07:24:25)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (07:03:39)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (06:48:01)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (06:42:14)
+	* Martin Isenburg <martin.isenburg@gmail.com> adding detail (06:40:47)
+	* Martin Isenburg <martin.isenburg@gmail.com> Update blueprint.rst (06:29:12)
+	* Martin Isenburg <martin.isenburg@gmail.com> objectives for "native LAS 1.4 extension" of LASzip (06:25:46)
+
+2015-07-10
+	* Martin Isenburg <martin@rapidlasso.com> Trimble becomes bronze sponsor and new open LAZ (05:39:27)
+
+2015-06-11
+	* Martin Isenburg <martin@rapidlasso.com> fixed LiMON link (09:43:13)
+
+2015-06-10
+	* Martin Isenburg <martin@rapidlasso.com> QINSy, Potree Converter, LiMON, FLAIM support LAZ (18:21:52)
+	* Martin Isenburg <martin@rapidlasso.com> Optech LMS and Leica Survey Studio support LAZ (15:32:23)
+	* Martin Isenburg <martin@rapidlasso.com> Quantum Spatial becomes bronze sponsor (15:18:24)
+
+2015-03-28
+	* Martin Isenburg <martin@rapidlasso.com> new file integrity checks that throw exceptions (21:38:52)
+	* Martin Isenburg <martin@rapidlasso.com> small fix for reading / writing uncompressed LAS 1.4 (21:31:16)
+	* Martin Isenburg <martin@rapidlasso.com> two new softwares support LAZ (21:06:30)
+
+2014-12-02
+	* Martin Isenburg <martin@rapidlasso.com> new LAZ data in Switzerland and New Zealand (01:16:10)
+
+2014-11-14
+	* Martin Isenburg <martin@rapidlasso.com> USGS bulk LAZ (09:36:44)
+
+2014-11-09
+	* Howard Butler <howard@hobu.co> Merge pull request #14 from SiggyF/makefile (09:51:39)
+
+2014-11-08
+	* Fedor Baart <fedor.baart@deltares.nl> keep Makefile.am in sync with cmake file (15:34:17)
+
+2014-10-16
+	* Martin Isenburg <martin@rapidlasso.com> typo (22:10:21)
+
+2014-10-11
+	* Martin Isenburg <martin@rapidlasso.com> added Pointfuse (16:38:03)
+	* Martin Isenburg <martin@rapidlasso.com> added plas.io (04:17:41)
+	* Martin Isenburg <martin@rapidlasso.com> CloudPro, PointCAB, DTMaster support and Gold Sponsors (04:12:21)
+
+2014-09-11
+	* Martin Isenburg <martin@rapidlasso.com> Merge branch 'master' of https://github.com/LASzip/LASzip (06:40:37)
+	* Martin Isenburg <martin@rapidlasso.com> update in (internal) struct alignment for read / write of uncompressed LAS 1.4 (06:39:49)
+
+2014-09-08
+	* Howard Butler <howard@hobu.co> Merge branch 'master' of github.com:LASzip/LASzip (09:17:18)
+	* Howard Butler <howard@hobu.co> default to osgeo4w64 for OSGEO4W_DIR (09:17:15)
+	* Howard Butler <howard@hobu.co> Merge pull request #12 from chambbj/cmake-update-entropy-encoder (08:43:55)
+	* Bradley J Chambers <brad.chambers@gmail.com> update CMakeLists, fixes #11 (07:06:21)
+
+2014-09-07
+	* Martin Isenburg <martin@rapidlasso.com> removal of (unused) EntropyEncoder and EntropyDecoder purely virtual classes (10:37:28)
+	* Martin Isenburg <martin@rapidlasso.com> removal of (unused) EntropyEncoder and EntropyDecoder purely virtual classes (10:36:24)
+	* Martin Isenburg <martin@rapidlasso.com> purely cosmetic change in comments (09:33:30)
+	* Martin Isenburg <martin@rapidlasso.com> alignment of auxiliary struct to 8 bytes (09:31:43)
+	* Martin Isenburg <martin@rapidlasso.com> cosmetic changes and consistent pack/unpack naming (09:15:20)
+	* Martin Isenburg <martin.isenburg@gmail.com> Merge pull request #7 from verma/master (07:23:28)
+
+2014-09-06
+	* Martin Isenburg <martin@rapidlasso.com> delay read of chunk table until first read() or seek() is called (12:29:14)
+
+2014-08-21
+	* Howard Butler <howard@hobu.co> Merge pull request #10 from tigerfoot/master (09:22:05)
+	* Bruno Friedmann <bruno@ioda-net.ch> Update COPYING (09:08:52)
+
+2014-07-31
+	* Martin Isenburg <martin@rapidlasso.com> added Fugroviewer and Scop++ to list of softwares (03:54:14)
+
+2014-07-27
+	* Howard Butler <hobu@hobu.co> Merge branch 'master' of https://github.com/LASzip/LASzip (23:10:29)
+	* Howard Butler <hobu@hobu.co> point at osgeo4w64 instead of osgeo4w (23:10:26)
+
+2014-07-20
+	* Martin Isenburg <martin@rapidlasso.com> critical read bug for truncated LAZ files compressed with 'adaptive chunking' (now also aborts for streaming input) (07:47:28)
+	* Martin Isenburg <martin@rapidlasso.com> critical read bug for truncated LAZ files compressed with 'adaptive chunking' (07:28:50)
+	* Martin Isenburg <martin@rapidlasso.com> Merge branch 'master' of https://github.com/LASzip/LASzip (06:06:43)
+
+2014-07-05
+	* Howard Butler <howard@hobu.co> Merge pull request #9 from mloskot/fix_copy_files_osgeo4w (20:12:12)
+
+2014-07-04
+	* Mateusz Łoskot <mateusz@loskot.net> Tweak and correct the original fix (17:37:34)
+	* Mateusz Łoskot <mateusz.loskot@cadcorp.com> Correct headers location in OSGeo4W deploying (17:11:31)
+
+2014-06-15
+	* Howard Butler <hobu.inc@gmail.com> cast to U32 to silence warning (15:51:57)
+
+2014-06-07
+	* Howard Butler <hobu@hobu.co> clean up some warnings that msvc2013 found (22:57:21)
+
+2014-06-06
+	* Howard Butler <hobu.inc@gmail.com> fix issue identified in libLAS/libLAS#9 where LASzip headers were not installing in correct location for autoconf builds (16:44:30)
+
+2014-05-29
+	* Martin Isenburg <martin@rapidlasso.com> added BLAZE as LAZ supporter (16:15:36)
+
+2014-05-23
+	* Martin Isenburg <martin@rapidlasso.com> Trimble Realworks 8.1 adds LAZ support (import/export) (10:07:55)
+
+2014-05-22
+	* Martin Isenburg <martin@rapidlasso.com> added ERDAS, La Rioja, and SonomaVeg (04:19:49)
+
+2014-05-13
+	* Howard Butler <hobu@hobu.co> #include laszipexport.hpp again (17:25:24)
+	* Howard Butler <hobu@hobu.co> add ../dll include directory (17:24:58)
+	* Howard Butler <hobu@hobu.co> Add MSVC 2012 and 2013 types (17:24:39)
+	* Howard Butler <hobu.inc@gmail.com> add missing pnacl file (11:09:26)
+
+2014-04-29
+	* Howard Butler <howard@hobu.co> Merge pull request #8 from gadomski/no-using-std-globally (09:16:46)
+
+2014-04-28
+	* Pete Gadomski <pete.gadomski@gmail.com> Remove using namespace std from global namespace (12:14:27)
+
+2014-04-12
+	* Uday Verma <uday.karan@gmail.com> Move wavepacket struct to a common header, rename make/lay functions to unpack/pack (08:55:51)
+
+2014-04-10
+	* Uday Verma <uday.karan@gmail.com> Refactor wavepacket struct and change wavepacket pointer cast to bytes packing (17:05:07)
+
+2014-04-07
+	* Howard Butler <hobu.inc@gmail.com> don't use laszip_dll unless we're windows (16:37:18)
+
+2014-03-27
+	* Martin Isenburg <martin@rapidlasso.com> preparing LAZ for integration of LAX (07:54:54)
+
+2014-03-24
+	* Howard Butler <hobu.inc@gmail.com> clean up NaCl module (11:12:21)
+	* Howard Butler <hobu.inc@gmail.com> tweak laszip_dll stuff so it builds cleanly (11:09:07)
+	* Martin Isenburg <martin@rapidlasso.com> better DLL after meeting hobu in Vienna (10:51:45)
+	* Howard Butler <hobu.inc@gmail.com> add bytestreamin_array.hpp from PulseWaves (10:34:04)
+	* Martin Isenburg <martin@rapidlasso.com> better DLL after meeting hobu in Vienna (05:38:00)
+	* Howard Butler <howard@hobu.co> Merge pull request #4 from gcasey/master (02:27:22)
+
+2014-03-22
+	* Martin Isenburg <martin@rapidlasso.com> added netherlands and espa engine (03:23:14)
+	* Martin Isenburg <martin@rapidlasso.com> Merge branch 'master' of https://github.com/LASzip/LASzip (01:09:44)
+	* Martin Isenburg <martin.isenburg@gmail.com> Merge pull request #5 from scw/patch-1 (01:09:18)
+	* Shaun Walbridge <shaun.walbridge@gmail.com> swap license to the correct one. (01:00:48)
+
+2014-03-21
+	* Martin Isenburg <martin@rapidlasso.com> Merge branch 'master' of https://github.com/LASzip/LASzip (23:49:36)
+
+2014-03-19
+	* Howard Butler <hobu.inc@gmail.com> try a different theme (13:48:43)
+
+2014-03-14
+	* Howard Butler <hobu.inc@gmail.com> rename module source file (09:44:59)
+	* Howard Butler <hobu.inc@gmail.com> add some scaffolding to be able to build LASzip in emscripten (not working) (09:35:34)
+	* Howard Butler <hobu.inc@gmail.com> add fclose() (09:35:18)
+
+2014-03-02
+	* Martin Isenburg <martin@rapidlasso.com> added laszip-cli.exe (06:53:11)
+
+2014-03-01
+	* Howard Butler <hobu.inc@gmail.com> fix up skip and start parameters (16:03:45)
+	* Martin Isenburg <martin@rapidlasso.com> website updates (06:35:32)
+
+2014-02-28
+	* Howard Butler <hobu.inc@gmail.com> rename to plasio_laszip, don't iterate off the end, return count back to reader (16:40:09)
+	* Howard Butler <hobu.inc@gmail.com> implement start, skip, and count for read() method of nacl module (13:32:07)
+	* Howard Butler <hobu.inc@gmail.com> count-based reader (09:18:47)
+
+2014-02-27
+	* Howard Butler <hobu.inc@gmail.com> use minsize build, return ArrayBuffer (22:30:00)
+	* Howard Butler <hobu.inc@gmail.com> fix up travis script now that we don't do Debug/Release binary directory (17:54:05)
+	* Howard Butler <hobu.inc@gmail.com> open our own files instead of web ones (17:39:33)
+	* Howard Butler <hobu.inc@gmail.com> it appears we're reading data (16:35:00)
+	* Howard Butler <hobu.inc@gmail.com> getheader working (14:45:13)
+	* Casey Goodlett <casey.goodlett@kitware.com> Add option to disable buildosgeo4w on windows (10:00:00)
+	* Howard Butler <hobu.inc@gmail.com> c++ example works now (09:40:51)
+
+2014-02-26
+	* Howard Butler <hobu.inc@gmail.com> cleanups. basic read of a point works (13:59:02)
+	* Howard Butler <hobu.inc@gmail.com> able to read a point from the zip file (11:35:52)
+
+2014-02-25
+	* Howard Butler <hobu.inc@gmail.com> successfully read a laszip file -- doesn't do anything useful though (13:10:14)
+
+2014-02-24
+	* Howard Butler <hobu.inc@gmail.com> fail at opening a laszip file (16:34:01)
+	* Howard Butler <hobu.inc@gmail.com> initial hello world fopen pnacl example (14:24:40)
+
+2014-01-31
+	* Martin Isenburg <martin@rapidlasso.com> update AusCover Airborne LiDAR (08:27:02)
+
+2014-01-25
+	* Martin Isenburg <martin@rapidlasso.com> LAZ in Alaska (20:54:12)
+
+2014-01-13
+	* Martin Isenburg <martin@rapidlasso.com> removing restriction (R) (04:49:55)
+
+2013-12-29
+	* Martin Isenburg <martin@rapidlasso.com> added K2Vi by AAM Group (19:06:36)
+	* Martin Isenburg <martin@rapidlasso.com> added ENVI LiDAR and GRASS GIS (11:04:01)
+
+2013-12-28
+	* Martin Isenburg <martin@rapidlasso.com> added SURE (11:55:18)
+	* Martin Isenburg <martin@rapidlasso.com> added ZEB1 (07:22:35)
+	* Martin Isenburg <martin@rapidlasso.com> added OCAD (06:39:13)
+	* Martin Isenburg <martin@rapidlasso.com> added FUSION and PDF3D (06:13:52)
+
+2013-11-02
+	* Martin Isenburg <martin@rapidlasso.com> new softwares support LAZ (22:30:39)
+
+2013-09-03
+	* Martin Isenburg <martin@rapidlasso.com> fixed a tiny bug (02:30:45)
+
+2013-08-07
+	* Howard Butler <howard@hobu.co> fix links to new release (07:21:21)
+
+2013-08-05
+	* Howard Butler <howard@hobu.co> ignore test.tmp and laszipper.log (13:05:19)
+	* Howard Butler <howard@hobu.co> add headers to SOURCES so they're included in tarball (13:04:08)
+	* Howard Butler <howard@hobu.co> increment version to 2.2.0 in preparation for release (09:21:13)
+	* Howard Butler <howard@hobu.co> add Travis configuration (09:08:46)
+	* Howard Butler <howard@hobu.co> update AUTHORS (08:56:36)
+
+2013-08-04
+	* Martin Isenburg <martin@rapidlasso.com> bug fix and update email and company name (14:44:44)
+	* Martin Isenburg <martin@rapidlasso.com> update email and company name (14:43:03)
+	* Martin Isenburg <martin@rapidlasso.com> bug fix and update email and company name (14:42:46)
+	* Martin Isenburg <martin@rapidlasso.com> incremented version to 2.1 rev 1 (14:40:56)
+	* Martin Isenburg <martin@rapidlasso.com> update email and company name (14:35:32)
+	* Martin Isenburg <martin@rapidlasso.com> removed ancient laszip.cpp and lasdiff.cpp junk (14:33:32)
+	* Martin Isenburg <martin@rapidlasso.com> removed ancient laszip.cpp and lasdiff.cpp junk (14:32:23)
+	* Martin Isenburg <martin@rapidlasso.com> removed ancient laszip.cpp and lasdiff.cpp junk (14:29:16)
+	* Martin Isenburg <martin@rapidlasso.com> more software with LAZ support (10:01:57)
+
+2013-05-08
+	* Martin Isenburg <martin.isenburg@gmail.com> added TERN AusCover LAZ data (17:02:03)
+
+2013-02-16
+	* Martin Isenburg <martin.isenburg@gmail.com> Merge https://github.com/LASzip/LASzip (06:23:36)
+	* Martin Isenburg <martin.isenburg@gmail.com> Danish, GRAFCAN, more DNR MN (06:21:33)
+
+2013-02-07
+	* Howard Butler <hobu.inc@gmail.com> Merge pull request #1 from torsti/mingw (12:03:53)
+
+2013-02-06
+	* Martin Isenburg <martin.isenburg@gmail.com> more LAS data (01:20:17)
+
+2013-02-03
+	* Martin Isenburg <martin.isenburg@gmail.com> another folder of LAZ (01:34:31)
+
+2013-01-18
+	* Martin Isenburg <martin.isenburg@gmail.com> cloud compare supports LAZ (10:17:37)
+
+2012-12-22
+	* Martin Isenburg <martin.isenburg@gmail.com> more MN LAZ (13:38:10)
+
+2012-12-07
+	* Martin Isenburg <martin.isenburg@gmail.com> more LAZ from DNR Minnesota and NOAA (09:23:42)
+	* Martin Isenburg <martin.isenburg@gmail.com> more LAZ from PSLC (06:08:52)
+
+2012-12-06
+	* Martin Isenburg <martin.isenburg@gmail.com> all LAS of puget sound LiDAR consortium converted to LAZ (11:54:30)
+
+2012-11-15
+	* Martin Isenburg <martin.isenburg@gmail.com> more LAZ in MN (07:26:12)
+
+2012-11-12
+	* Torsti Schulz <torsti.schulz@iki.fi> Support compilation with MinGW toolchain (07:17:23)
+
+2012-10-05
+	* Martin Isenburg <martin.isenburg@gmail.com> more MN LAZ (23:35:00)
+
+2012-10-03
+	* Martin Isenburg <martin.isenburg@gmail.com> added more minnesota LAZ links (17:13:56)
+
+2012-08-20
+	* Martin Isenburg <martin.isenburg@gmail.com> adding pointools news (13:32:27)
+	* Martin Isenburg <martin.isenburg@gmail.com> test of hobu's web updates (05:35:32)
+
+2012-08-13
+	* Martin Isenburg <martin.isenburg@gmail.com> more LAS (18:44:22)
+
+2012-08-12
+	* Martin Isenburg <martin.isenburg@gmail.com> new data (14:06:29)
+
+2012-08-04
+	* Martin Isenburg <martin.isenburg@gmail.com> more LAS/LAZ files (09:27:34)
+	* Howard Butler <hobu.inc@gmail.com> tweak indenting (08:32:57)
+
+2012-07-29
+	* Martin Isenburg <martin.isenburg@gmail.com> updated links (17:37:54)
+
+2012-07-09
+	* Martin Isenburg <martin.isenburg@gmail.com> more LAZ sources (06:25:13)
+
+2012-06-25
+	* Martin Isenburg <martin.isenburg@gmail.com> link more uncompressed LAS archives (17:06:19)
+
+2012-06-24
+	* Martin Isenburg <martin.isenburg@gmail.com> link some uncompressed LAS archives (18:03:00)
+	* Martin Isenburg <martin.isenburg@gmail.com> link some uncompressed LAS archives (17:28:57)
+
+2012-06-17
+	* Martin Isenburg <martin.isenburg@gmail.com> more DNR MN LAZ (06:03:24)
+
+2012-05-31
+	* Martin Isenburg <martin.isenburg@gmail.com> fixed bug for reading chunked LAZ with chunktable from stdin pipe (07:49:25)
+
+2012-05-10
+	* Martin Isenburg <martin.isenburg@gmail.com> changed version to 2.1.0 (14:23:30)
+
+2012-05-09
+	* Martin Isenburg <martin.isenburg@gmail.com> national land survey of finland (06:17:40)
+
+2012-04-28
+	* Martin Isenburg <martin.isenburg@gmail.com> win (14:37:32)
+
+2012-03-22
+	* Martin Isenburg <martin.isenburg@gmail.com> more software supports LAZ (19:20:49)
+
+2012-01-21
+	* Martin Isenburg <martin.isenburg@gmail.com> added lidar-online (10:26:19)
+
+2012-01-04
+	* Howard Butler <hobu.inc@gmail.com> point to new release (11:55:44)
+	* Howard Butler <hobu.inc@gmail.com> increment version to 2.1.0 in preparation for release (11:45:25)
+	* Howard Butler <hobu.inc@gmail.com> re-export LASitem because you are expected to use it to find out about the compression (11:31:04)
+
+2012-01-03
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:37:29)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:32:08)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:30:15)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:29:11)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:28:59)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:26:44)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:26:17)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:26:12)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:25:12)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table + LAS 1.4 stubs (13:23:46)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table + LAS 1.4 stubs (13:23:40)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table + LAS 1.4 stubs (13:17:18)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table + LAS 1.4 stubs (13:17:10)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table + LAS 1.4 stubs (13:15:20)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:11:32)
+	* Martin Isenburg <martin.isenburg@gmail.com> fix seeking without chunk table (13:11:26)
+
+2011-12-07
+	* Martin Isenburg <martin.isenburg@gmail.com> typo (05:57:59)
+
+2011-12-06
+	* Martin Isenburg <martin.isenburg@gmail.com> added paper, video, LAZ links (16:50:15)
+
+2011-11-09
+	* Howard Butler <hobu.inc@gmail.com> Revert "win32 dll fix" (09:59:27)
+
+2011-10-27
+	* Michael P. Gerlek <mpg@flaxen.com> win32 dll fix (12:52:17)
+
+2011-10-07
+	* Howard Butler <hobu.inc@gmail.com> update typos (15:36:53)
+	* Howard Butler <hobu.inc@gmail.com> point to new release (15:23:15)
+	* Howard Butler <hobu.inc@gmail.com> remove hg tags file (14:52:11)
+	* Howard Butler <hobu.inc@gmail.com> ignore git stuff when packaging (14:52:04)
+	* Howard Butler <hobu.inc@gmail.com> move .hgignore to .gitignore (14:47:10)
+	* Howard Butler <hobu.inc@gmail.com> increment versions in preparation for release (14:42:12)
+	* Howard Butler <hobu.inc@gmail.com> clean up _strdup vs strdup warnings on MSVC>1500 (14:36:24)
+	* Howard Butler <hobu.inc@gmail.com> cast to streamoff instead of streampos (14:07:03)
+	* Martin Isenburg <martin.isenburg@gmail.com> revision bump to 2.0.2. the changes: * large file support (>2GB LAZ) * ability to partly read LAZ files where the compressor was interrupted * ability to partly read LAZ files where the file transfer was interrupted (08:02:25)
+
+2011-08-23
+	* hobu <hobu.inc@gmail.com> point to new repository (09:33:56)
+
+2011-08-19
+	* Howard Butler <hobu.inc@gmail.com> merge (15:18:40)
+	* Howard Butler <hobu.inc@gmail.com> first (15:17:24)
+
+2011-06-30
+	* Howard Butler <hobu.inc@gmail.com> point to new release (11:38:33)
+	* Howard Butler <hobu.inc@gmail.com> Added tag 2.0.1 for changeset 76d7e6da5196 (11:21:06)
+	* Howard Butler <hobu.inc@gmail.com> increment versions in preparation for 2.0.1 release (11:21:01)
+
+2011-06-29
+	* Michael P. Gerlek <mpg@flaxen.com> missing DLL export (20:08:39)
+
+2011-06-28
+	* isenburg <none@none> fixed for chunked compression of 0 points (10:12:29)
+
+2011-06-27
+	* Howard Butler <hobu.inc@gmail.com> malloc demands free, not delete [] (14:39:15)
+
+2011-06-24
+	* Howard Butler <hobu.inc@gmail.com> Added tag 2.0.0 for changeset d69574ffd060 (08:34:13)
+	* Howard Butler <hobu.inc@gmail.com> update version number for website and date of release (08:33:53)
+
+2011-06-23
+	* isenburg <none@none> unused variable clean-up (18:29:05)
+	* isenburg <none@none> updates test (17:48:49)
+	* isenburg <none@none> switching on LASzip v2.0 with chunking (17:48:07)
+	* isenburg <none@none> merge (17:46:15)
+	* isenburg <none@none> formulation (17:45:21)
+	* isenburg <none@none> switching on LASzip v2.0 with chunking (17:43:36)
+	* Howard Butler <hobu.inc@gmail.com> Added tag 2.0.0 for changeset 037abfa227a0 (13:24:25)
+	* Howard Butler <hobu.inc@gmail.com> update website to point at LASzip 2.0.0 release (13:24:08)
+	* Howard Butler <hobu.inc@gmail.com> increment version to 2.0.0 (08:49:06)
+	* Howard Butler <hobu.inc@gmail.com> update notes about which version numbers to increment (08:48:00)
+
+2011-06-22
+	* isenburg <none@none> tiny bug. glad i ran another extensive test series (11:13:09)
+	* isenburg <none@none> fixed link (07:42:11)
+
+2011-06-21
+	* isenburg <none@none> more LAZ online (20:05:21)
+
+2011-06-13
+	* isenburg <none@none> proper EOF handling with throw EOF (15:34:28)
+	* isenburg <none@none> adding broken test data (12:50:05)
+	* isenburg <none@none> updated error info via const char* get_error() (12:19:15)
+	* isenburg <none@none> updated error info via const char* get_error() (12:18:18)
+	* isenburg <none@none> updated usage example again (12:17:37)
+	* isenburg <none@none> updated usage example (07:56:51)
+	* isenburg <none@none> improved GPS time compression (07:55:54)
+	* isenburg <none@none> updated error information via char* error_string (07:54:33)
+	* isenburg <none@none> updated error information via char* error_string (07:52:36)
+
+2011-05-16
+	* isenburg <none@none> compressed chunking information and better GPS time compression (10:01:23)
+	* isenburg <none@none> new test for variable chunking (10:00:05)
+
+2011-05-11
+	* isenburg <none@none> merge (18:38:59)
+	* isenburg <none@none> quitting random seek loop after 100 seeks (18:34:07)
+	* Howard Butler <hobu.inc@gmail.com> remove extra qualification (13:48:20)
+
+2011-05-10
+	* isenburg <none@none> added a test for seeking (09:35:16)
+	* isenburg <none@none> fixed a memory little bug (09:34:02)
+	* isenburg <none@none> moved all version control into LASzip (07:01:55)
+	* isenburg <none@none> moved all version control into LASzip (07:00:51)
+	* isenburg <none@none> moved all version control into LASzip (07:00:26)
+	* isenburg <none@none> further clean-up and commenting (06:59:03)
+
+2011-05-09
+	* isenburg <none@none> fixed up laszippertest to be a better example (18:28:19)
+	* isenburg <none@none> allows variable-sized chunking with explicit zipper.chunk() call when chunk_size == 0 (15:04:25)
+	* isenburg <none@none> allows variable-sized chunking with explicit zipper.chunk() call when chunk_size == 0 (15:03:25)
+
+2011-05-06
+	* isenburg <none@none> added functions to query point type and size (07:53:12)
+	* isenburg <none@none> added functions to query point type and size (07:52:24)
+
+2011-05-05
+	* isenburg <none@none> example with packing/unpacking of VLR (19:05:48)
+	* isenburg <none@none> added pack and unpack of VLRs (19:05:14)
+	* isenburg <none@none> added pack and unpack of VLRs (19:04:55)
+
+2011-04-25
+	* isenburg <none@none> the updated laszippertest. does not yet test seeking. (18:31:25)
+	* isenburg <none@none> the file i usually forget to commit (18:28:13)
+	* isenburg <none@none> point reader and writer with chunking (18:27:48)
+	* isenburg <none@none> implementation of new laszip interface (18:26:15)
+	* isenburg <none@none> updated i/o model to support seeking (18:21:18)
+	* isenburg <none@none> fixed wrong number of end bytes bug (18:20:14)
+	* isenburg <none@none> new interface for chunking (18:18:10)
+	* isenburg <none@none> new interface for chunking (18:16:45)
+
+2011-04-07
+	* isenburg <none@none> more LAZ (05:58:40)
+
+2011-04-05
+	* Howard Butler <hobu.inc@gmail.com> Added tag 1.2.0 for changeset 8144ee77b770 (11:33:47)
+	* Howard Butler <hobu.inc@gmail.com> typo on link (10:40:25)
+	* Howard Butler <hobu.inc@gmail.com> update to point at location of new release (10:31:57)
+	* Howard Butler <hobu.inc@gmail.com> missing header file for autoconf build (10:26:52)
+	* Howard Butler <hobu.inc@gmail.com> update CPACK_SOURCE_IGNORE_FILES (10:24:20)
+	* Howard Butler <hobu.inc@gmail.com> typo for CPACK_PACKAGE_VERSION_PATCH (09:50:55)
+	* Howard Butler <hobu.inc@gmail.com> increment version information to 1.2.0 in preparation for next release (08:38:35)
+
+2011-04-03
+	* isenburg <none@none> merge (07:54:21)
+	* isenburg <none@none> fix (07:53:03)
+
+2011-03-24
+	* Howard Butler <hobu.inc@gmail.com> add v2 to cmake (18:41:07)
+	* isenburg <none@none> more data (11:16:27)
+
+2011-03-23
+	* isenburg <none@none> i always forget one (17:29:02)
+	* isenburg <none@none> more LAZ and formatting (04:40:29)
+
+2011-03-22
+	* isenburg <none@none> more LAZ and formatting (16:20:22)
+	* isenburg <none@none> moving detail from and data to main page (14:12:09)
+	* isenburg <none@none> adding laszip version 2.0 (13:22:22)
+	* isenburg <none@none> adding laszip version 2.0 (13:21:12)
+	* isenburg <none@none> adding laszip version 2.0 (13:19:47)
+	* isenburg <none@none> adding laszip version 2.0 (13:07:35)
+	* isenburg <none@none> adding laszip version 2.0 (13:06:35)
+	* isenburg <none@none> adding laszip version 2.0 (12:59:57)
+	* isenburg <none@none> another webpage (12:24:29)
+	* isenburg <none@none> another webpage (09:19:21)
+
+2011-03-21
+	* isenburg <none@none> adding laszip version 2.0 (06:20:11)
+
+2011-03-18
+	* Howard Butler <hobu.inc@gmail.com> add page pointing to LASzip data available for download (08:09:25)
+
+2011-02-27
+	* isenburg <none@none> some lossless blurb (09:24:56)
+
+2011-02-20
+	* isenburg <none@none> eliminated another lurking error (11:18:17)
+
+2011-02-08
+	* Michael P. Gerlek <mpg@flaxen.com> use %u, not %d (17:24:47)
+
+2011-02-04
+	* Howard Butler <hobu.inc@gmail.com> tweak language and layout a little bit (22:19:23)
+	* isenburg <none@none> adding content to webpage (21:19:52)
+
+2011-02-01
+	* Howard Butler <hobu.inc@gmail.com> update links to new release (11:18:40)
+	* Howard Butler <hobu.inc@gmail.com> Added tag 1.0.1 for changeset a216ab3ddb11 (11:14:44)
+	* Howard Butler <hobu.inc@gmail.com> increment versions in preparation for release (08:39:26)
+	* Howard Butler <hobu.inc@gmail.com> add compile-time endianness check from libLAS and issue an #error when it's determined we're big-endian (08:26:54)
+
+2011-01-31
+	* Howard Butler <hobu.inc@gmail.com> add Sphinx makefile (16:20:49)
+	* Howard Butler <hobu.inc@gmail.com> add Sphinx dox for website (16:04:13)
+	* isenburg <none@none> small efficiency fix (15:35:44)
+	* isenburg <none@none> mean bug fix due to floating-point 'Inf' compiler differences (15:22:30)
+	* isenburg <none@none> forgot to uncomment a line. got rid of tabs. (13:28:38)
+	* isenburg <none@none> compress/decompress scan angle as U8 avoids danger (13:15:44)
+	* Michael P. Gerlek <mpg@flaxen.com> added asserts (12:17:43)
+	* Michael P. Gerlek <mpg@flaxen.com> VS2010 lint (11:47:13)
+	* Michael P. Gerlek <mpg@flaxen.com> fix vs2010 warnings; fix crlfs (11:46:22)
+	* Michael P. Gerlek <mpg@flaxen.com> added -x, to set random seed (and fix crlf) (11:42:25)
+	* isenburg <none@none> init functions return BOOL instead of I32 (10:50:56)
+
+2011-01-30
+	* isenburg <none@none> fixed messed up licensing comments (07:40:05)
+	* isenburg <none@none> fixed for windows (07:14:53)
+
+2011-01-29
+	* Howard Butler <hobu.inc@gmail.com> import, not export the dll (20:18:26)
+	* Howard Butler <hobu.inc@gmail.com> proper #ifdefs for range encoder test (20:10:43)
+
+2011-01-28
+	* isenburg <none@none> consistent (and nicer) looking licensing headers (08:53:17)
+	* isenburg <none@none> consistent (and nicer) looking licensing headers (08:52:29)
+
+2011-01-21
+	* Howard Butler <hobu.inc@gmail.com> static build option (13:29:25)
+	* Howard Butler <hobu.inc@gmail.com> rename copied symbol from liblas (12:56:49)
+	* Howard Butler <hobu.inc@gmail.com> turn off LASZIP_DLL entirely if we haven't asked for it (12:14:33)
+
+2011-01-17
+	* Howard Butler <hobu.inc@gmail.com> merge (12:08:54)
+	* Howard Butler <hobu.inc@gmail.com> increment version in preparation for release (12:05:57)
+	* Howard Butler <hobu.inc@gmail.com> move range encoder/decoder into unused directory and add to ignores list for package building (12:04:51)
+	* Howard Butler <hobu.inc@gmail.com> remove liblas-specific stuff (12:04:16)
+	* Howard Butler <hobu.inc@gmail.com> add release howto (11:58:39)
+	* Michael P. Gerlek <mpg@flaxen.com> blind fix for Hobu (10:00:09)
+
+2011-01-16
+	* Michael P. Gerlek <mpg@flaxen.com> made Settings be a singleton, added proper logging (18:38:27)
+
+2011-01-14
+	* Michael P. Gerlek <mpg@flaxen.com> added help mssg (17:06:41)
+	* Michael P. Gerlek <mpg@flaxen.com> added Settings object to hold cmd line params; added cmd line interface; added randomness (17:03:29)
+	* Howard Butler <hobu.inc@gmail.com> update my little config (12:47:28)
+
+2011-01-13
+	* Michael P. Gerlek <mpg@flaxen.com> consolidate still more, so can add infinite loop (13:20:44)
+	* Michael P. Gerlek <mpg@flaxen.com> refactor to remove triplicated code paths (12:51:08)
+
+2011-01-12
+	* Michael P. Gerlek <mpg@flaxen.com> pull-merge (15:55:19)
+	* isenburg <none@none> fixed mean bug for k == 32 (15:28:11)
+	* Howard Butler <hobu.inc@gmail.com> destroy symbolmodel for m_gpstime_0diff (14:58:35)
+	* Howard Butler <hobu.inc@gmail.com> use array delete for writers_raw and writers_compressed (14:49:33)
+	* Howard Butler <hobu.inc@gmail.com> undo r138 (14:45:51)
+	* Howard Butler <hobu.inc@gmail.com> don't leak writers_raw and writers_compressed pointers when cleaning up (14:38:41)
+	* Michael P. Gerlek <mpg@flaxen.com> put rangecoder tests under #ifdef (11:23:39)
+	* Howard Butler <hobu.inc@gmail.com> update to reflect export.hpp name change (10:37:22)
+	* Howard Butler <hobu.inc@gmail.com> actually rename export.hpp to laszipexport.hpp (09:01:15)
+	* isenburg <none@none> export.hpp name change (08:22:34)
+	* isenburg <none@none> removing rangecoder (07:34:39)
+
+2011-01-11
+	* Michael P. Gerlek <mpg@flaxen.com> "bool" is valid post-VC6 (14:45:20)
+	* Michael P. Gerlek <mpg@flaxen.com> pull-merge (10:42:14)
+
+2011-01-10
+	* Michael P. Gerlek <mpg@flaxen.com> vs2010 detritus (18:44:17)
+	* Howard Butler <hobu.inc@gmail.com> add newline (12:56:58)
+	* Howard Butler <hobu.inc@gmail.com> add newline (12:56:18)
+
+2011-01-07
+	* Howard Butler <hobu.inc@gmail.com> tweak version (14:26:42)
+	* Howard Butler <hobu.inc@gmail.com> packaging (13:58:53)
+	* Howard Butler <hobu.inc@gmail.com> update ChangeLog (13:56:34)
+	* isenburg <none@none> more efficient big endian handling (11:45:52)
+	* isenburg <none@none> more efficient big endian handling (11:42:34)
+	* Howard Butler <hobu.inc@gmail.com> turn off osgeo4w building by default (09:24:25)
+
+2011-01-06
+	* Michael P. Gerlek <mpg@flaxen.com> do need to delete martin's stream (but not ours) (15:23:42)
+	* isenburg <none@none> for testing if extra freads/fwrites affect performance (12:01:53)
+	* Howard Butler <hobu.inc@gmail.com> export LASunzipper too (11:40:14)
+
+2011-01-05
+	* Howard Butler <hobu.inc@gmail.com> add install_name for OSX (21:35:08)
+	* Howard Butler <hobu.inc@gmail.com> put LASZIP_DLL back.  Martin, please let me know your error message(s) instead of removing this as I need it for the OSGeo4W windows deployment (21:08:32)
+	* isenburg <none@none> forgot to copy & commit (11:56:48)
+
+2011-01-04
+	* isenburg <none@none> improved endianness again, renamed compression to algorithm, improved wavepacket13 compressor (17:57:54)
+	* isenburg <none@none> mpg: the LAS_ZIP_DLL does not work with my code. can you ifdef it? (17:52:11)
+	* Howard Butler <hobu.inc@gmail.com> add a few more ignores (12:02:44)
+	* Howard Butler <hobu.inc@gmail.com> simplify to a single package install for osgeo4w (09:38:56)
+
+2011-01-03
+	* Howard Butler <hobu.inc@gmail.com> fix osgeo4w dependency and add OSGEO4W_UPSTREAM_RELEASE usage (14:47:10)
+	* Howard Butler <hobu.inc@gmail.com> osgeo4w packaging (12:31:23)
+	* Howard Butler <hobu.inc@gmail.com> add osgeo4w packaging script (12:20:33)
+	* Howard Butler <hobu.inc@gmail.com> add laszip-config and laszip.pc packageconfig (12:06:27)
+	* Howard Butler <hobu.inc@gmail.com> bring in line with cmake setup (12:06:15)
+	* Howard Butler <hobu.inc@gmail.com> bring in line with cmake setup (12:06:06)
+	* Howard Butler <hobu.inc@gmail.com> ignore .lax test files and change location of laszip-config and laszip.pc package config files (12:05:51)
+	* Howard Butler <hobu.inc@gmail.com> add packaging and soname for dll (11:49:44)
+	* Howard Butler <hobu.inc@gmail.com> add a laszip-config target (11:49:29)
+	* Howard Butler <hobu.inc@gmail.com> add a few more ignores (11:48:54)
+	* Howard Butler <hobu.inc@gmail.com> these files are not used anymore according to Martin (11:30:22)
+
+2010-12-30
+	* Howard Butler <hobu.inc@gmail.com> add my base config (11:32:59)
+	* Howard Butler <hobu.inc@gmail.com> export the laszip dll items (11:32:45)
+	* Howard Butler <hobu.inc@gmail.com> fix install target to LASZIP_LIB_DIR instead of _BIN, build shared library by default (10:53:47)
+	* Howard Butler <hobu.inc@gmail.com> start adding LASZIP_DLL exports definition in preparation for shared library build/install/usage (09:10:52)
+	* Howard Butler <hobu.inc@gmail.com> add logic or setting CMAKE_BUILD_TYPE to Debug by default if not set and not in the cache (09:03:28)
+	* Howard Butler <hobu.inc@gmail.com> add some missing header files (09:02:59)
+
+2010-12-27
+	* Michael P. Gerlek <mpg@flaxen.com> explicit default param no longer needed (13:44:10)
+	* Michael P. Gerlek <mpg@flaxen.com> use an enum for the compression type, for type safety (13:35:32)
+	* Michael P. Gerlek <mpg@flaxen.com> fix err checks on open() (13:17:59)
+	* Michael P. Gerlek <mpg@flaxen.com> remove fprintf calls (13:15:58)
+	* Michael P. Gerlek <mpg@flaxen.com> remove calls to fprintf, exit (13:14:06)
+
+2010-12-23
+	* isenburg <none@none> one last optimization to compress 1.5 percent better (19:24:25)
+	* isenburg <none@none> fix of pointreader and small optimization of POINT10 compressor (12:11:19)
+	* isenburg <none@none> added test for new WAVEPACKET13 compressor (08:11:29)
+	* isenburg <none@none> added test for new WAVEPACKET13 compressor (08:02:14)
+	* isenburg <none@none> updated RGB encoding to be endian neutral (07:45:46)
+
+2010-12-22
+	* Michael P. Gerlek <mpg@flaxen.com> sync up w/ Martin's versioning (16:16:19)
+	* Michael P. Gerlek <mpg@flaxen.com> memleak (16:12:44)
+	* Michael P. Gerlek <mpg@flaxen.com> move header functions into .cpp file (15:09:56)
+	* Michael P. Gerlek <mpg@flaxen.com> sync w/ Martin's changes (13:25:03)
+	* Michael P. Gerlek <mpg@flaxen.com> pull-merge (13:18:36)
+	* Michael P. Gerlek <mpg@flaxen.com> pass streams by ref, not as pointers; return status code on open, not bool; declare items parameter as an array (12:14:01)
+
+2010-12-21
+	* isenburg <none@none> renaming to GPSTIME11, RGB12, and WAVEPACKET13 (14:25:15)
+	* isenburg <none@none> added LASzip struct to be used as VLR data (14:20:28)
+
+2010-12-20
+	* isenburg <none@none> changing functions to const (21:33:42)
+	* isenburg <none@none> changing functions to const (21:30:57)
+	* isenburg <none@none> more minor changes under the hood (12:12:32)
+	* isenburg <none@none> minor changes to finalize interface (12:08:46)
+
+2010-12-18
+	* Michael P. Gerlek <mpg@flaxen.com> pull-merge (14:29:58)
+	* Michael P. Gerlek <mpg@flaxen.com> added LASitem::set helper (14:29:41)
+	* Michael P. Gerlek <mpg@flaxen.com> comment fix (14:28:42)
+	* isenburg <none@none> merge (13:50:41)
+	* isenburg <none@none> consolidated all IO paths (13:49:15)
+	* isenburg <none@none> consolidated all IO paths (13:47:29)
+
+2010-12-17
+	* Michael P. Gerlek <mpg@flaxen.com> added VERSION constants (23:23:16)
+	* Michael P. Gerlek <mpg@flaxen.com> add cast for vs2010; consolidate byte writer path (22:12:22)
+	* isenburg <none@none> changed LASitem from struct to class (21:44:46)
+	* isenburg <none@none> updated the endian handling (21:43:02)
+	* isenburg <none@none> updated the endian handling and allow seeking (21:41:05)
+	* Michael P. Gerlek <mpg@flaxen.com> c/p error in stream creation (09:49:21)
+
+2010-12-16
+	* Michael P. Gerlek <mpg@flaxen.com> consolidated the MC6 macro usage (23:00:21)
+	* Michael P. Gerlek <mpg@flaxen.com> dead code (22:36:31)
+
+2010-12-15
+	* Howard Butler <hobu.inc@gmail.com> typo (16:36:05)
+	* Howard Butler <hobu.inc@gmail.com> a whole slug of #ifdefs for the VC6 iostream vs stl iostream stuff -- segfaults currently on OS X (16:28:14)
+	* isenburg <none@none> the (slower) rangecoder that was replaced in laszip with the (faster) arithmetic coder in january 2010 (15:58:44)
+	* isenburg <none@none> added rangecoder and improved test output (13:10:35)
+	* isenburg <none@none> added rangecoder and fixed read past write issue (13:09:47)
+	* isenburg <none@none> reinsert lost changes (10:37:53)
+	* isenburg <none@none> reinsert lost changes (10:35:42)
+	* isenburg <none@none> merging with my code (10:27:40)
+	* isenburg <none@none> merging with my code (10:26:34)
+	* isenburg <none@none> added check for input & output bytes (10:25:56)
+	* isenburg <none@none> eof instead of bad (10:08:22)
+	* isenburg <none@none> getting annoyed at hg (10:02:55)
+	* isenburg <none@none> getting annoyed at hg (10:02:04)
+	* Howard Butler <hobu.inc@gmail.com> remove all std:: explicit calls and instead put 'using namespace std;' in place to allow for usage by vc6 (08:51:42)
+	* isenburg <none@none> getting byte count (08:44:51)
+	* isenburg <none@none> getting byte count (08:43:46)
+	* Howard Butler <hobu.inc@gmail.com> merge (08:39:58)
+	* Howard Butler <hobu.inc@gmail.com> merge (08:39:18)
+	* isenburg <none@none> merge (08:38:48)
+	* isenburg <none@none> handling big endian writes and reads (07:11:54)
+
+2010-12-14
+	* Michael P. Gerlek <mpg@flaxen.com> refine MSC_VER for vc6 usage (21:35:05)
+	* isenburg <none@none> handling of raw point writing on big endian platforms (20:21:57)
+	* isenburg <none@none> it was not using streams but FILE* ... try again. i get a bug. (20:15:49)
+	* Howard Butler <hobu.inc@gmail.com> update autoconf build (10:35:09)
+	* Howard Butler <hobu.inc@gmail.com> Use explicit std:: prefix for streams, move laszippertest into the tools directory, turn off lasdiff and laszip for now, as these depend on LAStools. (10:12:41)
+	* Howard Butler <hobu.inc@gmail.com> merge (09:46:42)
+	* isenburg <none@none> missing header file (05:36:54)
+
+2010-12-13
+	* Michael P. Gerlek <mpg@flaxen.com> sync w/ Martin's changes (22:09:36)
+	* Michael P. Gerlek <mpg@flaxen.com> move win32 DEPRECATE stuff into CMake (22:08:00)
+	* isenburg <none@none> updated for new laszip sources (20:19:41)
+	* isenburg <none@none> adding refactored laszip compressor modules (20:14:08)
+	* isenburg <none@none> added optional FILE* input. iostream still broken. (20:10:44)
+	* isenburg <none@none> removing all classes that are no longer relevant (20:00:03)
+
+2010-12-12
+	* isenburg <none@none> more modular interface for liblas integration. only three headerfiles. example use given. still some missing files under the hood dur to remaining bugs (20:32:11)
+
+2010-12-11
+	* Michael P. Gerlek <mpg@flaxen.com> (testing hg config) (15:43:31)
+	* Michael P. Gerlek <mpg@lizardtech.com> stub out a stake in the ground for "liblaszip" exported interface (15:24:30)
+	* Michael P. Gerlek <mpg@lizardtech.com> VS2010 lint (15:23:59)
+	* Michael P. Gerlek <mpg@lizardtech.com> remove gzip usage; elide some windows warnings (15:03:01)
+
+2010-12-01
+	* Howard Butler <hobu.inc@gmail.com> rename all header files from .h to .hpp.  Move include files from include/ to include/laszip.  Provide CMake configuration. (09:50:10)
+
+2010-01-19
+	* Martin Isenburg <isenburg@cs.unc.edu> ran dos2unix & added lasdiff (12:44:51)
+	* Martin Isenburg <isenburg@cs.unc.edu> ran dos2unix (12:43:52)
+	* Howard Butler <hobu.inc@gmail.com> enable laszip building (12:10:21)
+	* Howard Butler <hobu.inc@gmail.com> merging (11:50:33)
+	* Martin Isenburg <isenburg@cs.unc.edu> adding an actual executable (11:53:06)
+	* Howard Butler <hobu.inc@gmail.com> use tabs instead of spaces in makefiles (11:50:13)
+	* Howard Butler <hobu.inc@gmail.com> remove extraneous ; (11:45:27)
+
+2010-01-18
+	* Martin Isenburg <isenburg@cs.unc.edu> those also needed to be changed (23:42:10)
+	* Martin Isenburg <isenburg@cs.unc.edu> added the licensing info again (23:34:52)
+	* Martin Isenburg <isenburg@cs.unc.edu> adding arithmetic coder to main branch (23:14:58)
+	* Martin Isenburg <isenburg@cs.unc.edu> adding arithmetic coder to the main branch (23:05:41)
+	* Martin Isenburg <isenburg@cs.unc.edu> alternate coder moves into main branch (22:56:45)
+
+2010-01-14
+	* Martin Isenburg <isenburg@cs.unc.edu> major overhaul of the compressor (19:19:32)
+
+2010-01-12
+	* isenburg@swan5.cs.unc.edu <isenburg@swan5.cs.unc.edu> no need for alternate coder right now (16:15:50)
+	* isenburg@swan5.cs.unc.edu <isenburg@swan5.cs.unc.edu> ull for constant (16:15:05)
+	* isenburg@swan5.cs.unc.edu <isenburg@swan5.cs.unc.edu> ull for constant (16:14:38)
+	* Howard Butler <hobu.inc@gmail.com> fix up compilation issues (10:05:53)
+	* Howard Butler <hobu.inc@gmail.com> add missing stuff so things can build (10:01:01)
+
+2010-01-04
+	* Howard Butler <hobu.inc@gmail.com> clean up warning (10:57:30)
+	* Howard Butler <hobu.inc@gmail.com> It compiles! (on os x) (08:48:28)
+

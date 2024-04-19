@@ -1,0 +1,13 @@
+CMakeFiles/
+CMakeCache.txt
+include/laszip/laszip_api_version.h
+bin/
+Makefile*
+cmake_install*
+CPackConfig.cmake
+CPackSourceConfig.cmake
+*.gz
+*.bz2
+_CPack_Packages/
+install_mainifest.txt
+

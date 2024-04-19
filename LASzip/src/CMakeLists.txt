@@ -6,6 +6,8 @@
 #
 ###############################################################################
 set(LASZIP_SOURCES
+    mydefs.cpp
+    lasmessage.cpp
     arithmeticdecoder.cpp
     arithmeticencoder.cpp
     arithmeticmodel.cpp
@@ -25,8 +27,6 @@ set(LASZIP_SOURCES
     laswritepoint.cpp
     laszip.cpp
     laszip_dll.cpp
-    mydefs.cpp
-	lasmessage.cpp
 )
 
 add_definitions(-DLASZIPDLL_EXPORTS)

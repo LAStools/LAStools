@@ -1,0 +1,36 @@
+# .travis.yml
+# Configure Travis CI service for http://github.com/LASzip
+language: cpp
+
+sudo: required
+services: docker
+dist: trusty
+
+env:
+    global:
+        - secure: "ZxsNFzAy3sDCrN6cBiMlBsIh2NYYIBuFxbPK48IAIkXiiUFkXUrh8snmduzCrwuE0vgsHKlER8RvHKA3OPZjOCiBUiFgXLEiwBJgChGoX4hk88b84hpfR4W4tGeiqAORJzwmj/DdSbX9OW1Gh4HxH76H5obE+fWI4qW+7LcX7II="
+
+        - secure: "ApVmY9Duy9/B3sOC37Fwh1utlyWe5GvGXal1eKcT0uHk2fKJIYSJVBh5sv5Qe/dF8vamaqAcakqo0z3D9sQmiQRbvs1swNtz9Pf6GwPL4D0dSc7K9Rc1rWmEwSXsNX4OV7BD/DlzJqkB1RBOIdb70k1uOld21WtZJs0l5SFFE4c="
+
+compiler:
+
+  - g++
+  - clang
+
+after_success:
+  - echo "secure travis:" "$TRAVIS_SECURE_ENV_VARS"
+  - sh -c 'if test "$TRAVIS_SECURE_ENV_VARS" = "true" -a "$TRAVIS_BRANCH" = "master" -a "$CXX" = "g++"; then echo "publish website"; ./scripts/ci/build_docs.sh; ./scripts/ci/add_deploy_key.sh; ./scripts/ci/deploy_website.sh $TRAVIS_BUILD_DIR/docs/build /tmp; fi'
+
+before_install: ./scripts/ci/docker.sh
+
+script: ./scripts/ci/script.sh
+
+notifications:
+  on_success: always # [always|never|change] # default: change
+  on_failure: always # [always|never|change] # default: always
+  irc: "chat.freenode.net#pdal"
+  # Uncomment and edit below for notifications by e-mail
+  #email:
+  #  recipients:
+  #    - howard@hobu.co
+

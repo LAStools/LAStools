@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(LASZIP CXX C)
+set(CMAKE_CXX_STANDARD 17)
 string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set(ROOT_DIR "${PROJECT_SOURCE_DIR}")

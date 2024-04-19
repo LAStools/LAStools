@@ -1,0 +1,85 @@
+       
+Steps for Making a LASzip Release
+==============================================================================
+
+:Author: Howard Butler
+:Contact: hobu.inc@gmail.com
+:Revision: $Revision$
+:Date: $Date$
+
+This document describes the process for releasing a new version of LASzip.
+
+General Notes
+------------------------------------------------------------------------------
+
+
+Release Process
+
+1) Increment Version Numbers
+ 
+  - CMakeLists.txt
+   
+    * SET(LASZIP_VERSION_MAJOR "2")
+    * SET(LASZIP_VERSION_MINOR "0")
+    * SET(LASZIP_VERSION_PATCH "0")
+    * SET(LASZIP_LIB_SOVERSION "4.0.2")
+    
+  - include/laszip/laszip.hpp
+
+    * #define LASZIP_VERSION_MAJOR    2
+    * #define LASZIP_VERSION_MINOR    0
+    * #define LASZIP_VERSION_REV      0
+
+  - configure.ac
+    
+    * m4_define([laszip_version_major], [2])
+    * m4_define([laszip_version_minor], [0])
+    * m4_define([laszip_version_micro], [0])
+
+  - Makefile.am -- see http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
+    * liblaszip_la_LDFLAGS = -version-info 6:0:0
+    
+2) Update README to include any relevant info about the release that 
+   might have changed.
+
+3) Build Windows version
+
+  - Issue nmake and nmake install commands
+  
+  ::
+      
+      nmake /f Makefile osgeo4w
+      nmake /f Makefile osgeo4w
+
+
+4) Make the source distribution
+
+  ::
+      
+      make dist
+
+       
+5) Generate MD5 sums 
+
+  ::
+      
+      md5 laszip-1.0.0.tar.bz2 > laszip-1.0.0.tar.bz2.md5
+
+6) Edit release page on http://liblas.org/zip/
+
+7) Upload to OSGeo download site
+
+8) Tag the release.  Use the ``-f`` switch if you are retagging because you 
+   missed something.
+
+  ::
+      
+      git tag 1.0.0b1
+      git push --tags
+      
+9) Write the release notes.  Place a copy of the release notes on the release 
+   page you created as well as send an email to liblas-devel announcing the 
+   new release.
+
+
+$Id$

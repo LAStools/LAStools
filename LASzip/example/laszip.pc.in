@@ -1,0 +1,12 @@
+prefix=@PKGCFG_PREFIX@
+exec_prefix=@PKGCFG_PREFIX@
+libdir=@PKGCFG_LIB_DIR@
+includedir=@PKGCFG_INC_DIR@
+
+Name: LASzip
+Description: Library (C/C++) and tools for the LAS LiDAR compression
+Requires: @PKGCFG_REQUIRES@
+Version: @PKGCFG_VERSION@
+Libs: -L${libdir} @PKGCFG_LINK_FLAGS@
+Cflags: -I${includedir}/laszip @PKGCFG_COMPILE_FLAGS@
+

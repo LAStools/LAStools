@@ -1,0 +1,75 @@
+================================================================================
+LASzip
+================================================================================
+
+3.5.0
+--------------------------------------------------------------------------------
+
+LASzip was relicensed to Apache Public License 2.0 by Rapidlasso, GmbH in 
+January 2022. This relicense corresponds to only software in the 
+LASzip GitHub repository at https://github.com/LASzip/LASzip and 
+none of the LAStools software that lives at https://github.com/LAStools/LAStools/ 
+There are duplicates of a number of files in both repositories. Developers 
+wishing to use APL versions must use the ones in the LASzip repository. 
+
+* Small memory leak https://github.com/LASzip/LASzip/pull/79
+* bug fix for signed long (I32) in set_value_as_float() 85993b506e4680a615e5beb1ec3d18dd20be8250
+* limit level_offset init loop in quadtree ff8adcac9ccc0b5ab80e4ab4b06d62a444f718f7
+* fix for uncommon zero'd chunk tables 7b18a692cb152768e30b12e18b69e83cf90591d8
+* wfopen usage on windows 933036c26581dd3b53e962d02372e1b09ada1c0e
+
+
+3.2.9 27-DEC-18
+--------------------------------------------------------------------------------
+
+* Decompression bug for PRDF 8 or 10 when the scanner channel and the NIR field are populated.
+
+
+3.2.8 19-NOV-18
+--------------------------------------------------------------------------------
+
+** NOTE: The version number is 3.2.8 to be brought in line with the patch version
+number present in LAStools, which had been incremented without being kept in sync
+with the laszip.org version. We regret the error. The following bug fixes have been
+made since 3.2.2:
+
+*    7 November 2018 -- upped to 3.2 r8 for identical legacy and extended flags check
+*   20 October 2018 -- upped to 3.2 r7 for rare bug in LASinterval::merge_intervals()
+*    5 October 2018 -- upped to 3.2 r6 for corrected 'is_empty' return value
+*   28 September 2018 -- upped to 3.2 r5 for fix in extended classification writing
+
+
+3.2.2 27-MAR-18
+--------------------------------------------------------------------------------
+
+* A version number was not properly incremented to 3.2.1, necessitating a new
+  release to eliminate confusion.
+
+3.2.1 26-MAR-18
+--------------------------------------------------------------------------------
+
+* Library SOVERSIONing for libtool to 8.0.0 https://github.com/LASzip/LASzip/issues/36
+* Update NEWS and ChangeLog
+* Library version inadvertently had major version in name (only relevant on windows)
+* Now building on AppVeyor and Travis https://ci.appveyor.com/project/hobu/laszip/history
+  https://travis-ci.org/LASzip/LASzip
+
+3.2.0 21-MAR-18
+--------------------------------------------------------------------------------
+
+* Fix install of laszip_api_version.h https://github.com/LASzip/LASzip/issues/30
+* Add LAZ V4 reader methods in preparation for a future release
+
+3.1.1 10-OCT-17
+--------------------------------------------------------------------------------
+
+* Fix packaging issue with laszip_api_version.h https://github.com/LASzip/LASzip/issues/30
+* NEWS and ChangeLog updates
+
+3.1.0 13-SEP-17
+--------------------------------------------------------------------------------
+
+* LAZ 1.4 support
+* New "DLL" API replaces previous API
+
+

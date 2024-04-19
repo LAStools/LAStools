@@ -39,6 +39,6 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES "CMakeFiles")
 list(APPEND CPACK_SOURCE_IGNORE_FILES "CTestTestfile.cmake")
 list(APPEND CPACK_SOURCE_IGNORE_FILES "/test/data/local/")
 list(APPEND CPACK_SOURCE_IGNORE_FILES "/docs")
-list(APPEND CPACK_SOURCE_IGNORE_FILES "/dll/laszip_api_version.h")
+list(APPEND CPACK_SOURCE_IGNORE_FILES "/include/laszip/laszip_api_version.h")
 
 include(CPack)
