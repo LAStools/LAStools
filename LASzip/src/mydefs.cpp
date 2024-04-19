@@ -43,4 +43,33 @@ wchar_t* UTF8toUTF16(const char* utf8)
   }
   return utf16;
 }
+
+char* UTF16toUTF8(const wchar_t* utf16)
+{
+  if (!utf16)
+    return 0;
+  int len = (int)wcslen(utf16);
+  if (!len) {
+    char* utf8 = new char[1];
+    utf8[0] = '\0';
+    return utf8;
+  }
+
+  int requiredSize = WideCharToMultiByte(CP_UTF8, 0, utf16, len, 0, 0, 0, 0);
+
+  if (!requiredSize) {
+    return 0;
+  }
+
+  char* utf8 = new char[requiredSize + 1];
+  utf8[requiredSize] = '\0';
+
+  int retval = WideCharToMultiByte(CP_UTF8, 0, utf16, len, utf8, requiredSize, 0, 0);
+  if (!retval) {
+    delete[] utf8;
+    return 0;
+  }
+
+  return utf8;
+}
 #endif

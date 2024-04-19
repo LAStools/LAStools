@@ -259,6 +259,7 @@ inline void ENDIAN_SWAP_64(const U8* from, U8* to)
 #if defined(_MSC_VER)
 #include <windows.h>
 wchar_t* UTF8toUTF16(const char* utf8);
+char* UTF16toUTF8(const wchar_t* utf16);
 #endif
 
 // 32bit/64bit detection

@@ -633,7 +633,7 @@ void LASreadOpener::reset()
 // setup to use z from attribute by default for certain tools
 void LASreadOpener::z_from_attribute_bydefault()
 {
-	if (!z_from_attribute) 
+	if (!z_from_attribute)
 	{
 		z_from_attribute = true;
 		z_from_attribute_try = true;
@@ -663,7 +663,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			lasreadermerged->set_translate_scan_angle(translate_scan_angle);
 			lasreadermerged->set_scale_scan_angle(scale_scan_angle);
 			lasreadermerged->set_io_ibuffer_size(io_ibuffer_size);
-			lasreadermerged->set_copc_stream_order(copc_stream_order); 
+			lasreadermerged->set_copc_stream_order(copc_stream_order);
 			if (file_names_ID)
 			{
 				for (file_name_current = 0; file_name_current < file_name_number; file_name_current++) lasreadermerged->add_file_name(file_names[file_name_current], file_names_ID[file_name_current]);
@@ -2954,15 +2954,61 @@ void LASreadOpener::set_file_name(const CHAR* file_name, BOOL unique)
 #ifdef _WIN32
 #include <windows.h>
 BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
+#if defined(_MSC_VER)
 {
 	BOOL r = FALSE;
 	HANDLE h;
-	WIN32_FIND_DATA info;
-	h = FindFirstFile(file_name, &info);
+	WIN32_FIND_DATAW info;
+	wchar_t* utf16_file_name = UTF8toUTF16(file_name);
+	if (utf16_file_name == 0)
+		return FALSE;
+	h = FindFirstFileW(utf16_file_name, &info);
 	if (h != INVALID_HANDLE_VALUE)
 	{
 		// find the path
-		I32 len = (I32)strlen(file_name);
+		size_t len = wcslen(utf16_file_name);
+		while (len && (utf16_file_name[len] != L'\\') && (utf16_file_name[len] != L'/') && (utf16_file_name[len] != L':')) len--;
+		if (len)
+		{
+			len++;
+			WCHAR utf16_full_file_name[512];
+			wcsncpy(utf16_full_file_name, utf16_file_name, len);
+			do
+			{
+				wcsncat(utf16_full_file_name, info.cFileName, len);
+				char* full_file_name = UTF16toUTF8(utf16_full_file_name);
+				if (full_file_name == 0)
+					continue;
+				if (add_file_name_single(full_file_name, unique)) r = TRUE;
+				delete [] full_file_name;
+			} while (FindNextFileW(h, &info));
+		}
+		else
+		{
+			do
+			{
+				char* utf8_file_name = UTF16toUTF8(info.cFileName);
+				if (utf8_file_name == 0)
+					continue;
+				if (add_file_name_single(utf8_file_name, unique)) r = TRUE;
+				delete [] utf8_file_name;
+			} while (FindNextFileW(h, &info));
+		}
+		FindClose(h);
+	}
+	delete [] utf16_file_name;
+	return r;
+}
+#else
+{
+	BOOL r = FALSE;
+	HANDLE h;
+	WIN32_FIND_DATAA info;
+	h = FindFirstFileA(file_name, &info);
+	if (h != INVALID_HANDLE_VALUE)
+	{
+		// find the path
+		size_t len = strlen(file_name);
 		while (len && (file_name[len] != '\\') && (file_name[len] != '/') && (file_name[len] != ':')) len--;
 		if (len)
 		{
@@ -2971,21 +3017,22 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
 			strncpy(full_file_name, file_name, len);
 			do
 			{
-				sprintf(&full_file_name[len], "%s", info.cFileName);
+				strncat(full_file_name, info.cFileName, len);
 				if (add_file_name_single(full_file_name, unique)) r = TRUE;
-			} while (FindNextFile(h, &info));
+			} while (FindNextFileA(h, &info));
 		}
 		else
 		{
 			do
 			{
 				if (add_file_name_single(info.cFileName, unique)) r = TRUE;
-			} while (FindNextFile(h, &info));
+			} while (FindNextFileA(h, &info));
 		}
 		FindClose(h);
 	}
 	return r;
 }
+#endif
 #endif
 
 #ifdef _WIN32
@@ -3411,15 +3458,61 @@ BOOL LASreadOpener::set_file_name_current(U32 file_name_id)
 #ifdef _WIN32
 #include <windows.h>
 BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL unique)
+#if defined(_MSC_VER)
 {
 	BOOL r = FALSE;
 	HANDLE h;
-	WIN32_FIND_DATA info;
-	h = FindFirstFile(neighbor_file_name, &info);
+	WIN32_FIND_DATAW info;
+	wchar_t* utf16_neighbor_file_name = UTF8toUTF16(neighbor_file_name);
+	if (utf16_neighbor_file_name == 0)
+		return FALSE;
+	h = FindFirstFileW(utf16_neighbor_file_name, &info);
 	if (h != INVALID_HANDLE_VALUE)
 	{
 		// find the path
-		I32 len = (I32)strlen(neighbor_file_name);
+		size_t len = wcslen(utf16_neighbor_file_name);
+		while (len && (utf16_neighbor_file_name[len] != L'\\') && (utf16_neighbor_file_name[len] != L'/') && (utf16_neighbor_file_name[len] != L':')) len--;
+		if (len)
+		{
+			len++;
+			WCHAR utf16_full_neighbor_file_name[512];
+			wcsncpy(utf16_full_neighbor_file_name, utf16_neighbor_file_name, len);
+			do
+			{
+				wcsncat(utf16_full_neighbor_file_name, info.cFileName, len);
+				char* full_neighbor_file_name = UTF16toUTF8(utf16_full_neighbor_file_name);
+				if (full_neighbor_file_name == 0)
+					continue;
+				if (add_neighbor_file_name_single(full_neighbor_file_name, unique)) r = TRUE;
+				delete [] full_neighbor_file_name;
+			} while (FindNextFileW(h, &info));
+		}
+		else
+		{
+			do
+			{
+				char* utf8_neighbor_file_name = UTF16toUTF8(info.cFileName);
+				if (utf8_neighbor_file_name == 0)
+					continue;
+				if (add_neighbor_file_name_single(utf8_neighbor_file_name, unique)) r = TRUE;
+				delete [] utf8_neighbor_file_name;
+			} while (FindNextFileW(h, &info));
+		}
+		FindClose(h);
+	}
+	delete [] utf16_neighbor_file_name;
+	return r;
+}
+#else
+{
+	BOOL r = FALSE;
+	HANDLE h;
+	WIN32_FIND_DATAA info;
+	h = FindFirstFileA(neighbor_file_name, &info);
+	if (h != INVALID_HANDLE_VALUE)
+	{
+		// find the path
+		size_t len = strlen(neighbor_file_name);
 		while (len && (neighbor_file_name[len] != '\\') && (neighbor_file_name[len] != '/') && (neighbor_file_name[len] != ':')) len--;
 		if (len)
 		{
@@ -3428,21 +3521,22 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
 			strncpy(full_neighbor_file_name, neighbor_file_name, len);
 			do
 			{
-				sprintf(&full_neighbor_file_name[len], "%s", info.cFileName);
+				strncat(full_neighbor_file_name, info.cFileName, len);
 				if (add_neighbor_file_name_single(full_neighbor_file_name, unique)) r = TRUE;
-			} while (FindNextFile(h, &info));
+			} while (FindNextFileA(h, &info));
 		}
 		else
 		{
 			do
 			{
 				if (add_neighbor_file_name_single(info.cFileName, unique)) r = TRUE;
-			} while (FindNextFile(h, &info));
+			} while (FindNextFileA(h, &info));
 		}
 		FindClose(h);
 	}
 	return r;
 }
+#endif
 #endif
 
 #ifdef _WIN32
