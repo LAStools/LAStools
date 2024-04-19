@@ -59,7 +59,7 @@ std::string las_message_type_string(LAS_MESSAGE_TYPE in)
 
 void LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*) fmt, ...)
 {
-	assert(type <= LAS_FATAL_ERROR);		//message type must be equal lower than LAS_FATAL_ERROR (LAS_QUIET must to be used in LASMessage calls)
+	assert(type <= LAS_FATAL_ERROR);		//message type must be less than or equal to LAS_FATAL_ERROR (LAS_QUIET must not be used in LASMessage calls)
 
 	if (type < las_message_level)
 		return;
@@ -91,7 +91,6 @@ void LASLIB_DLL set_message_log_level(LAS_MESSAGE_TYPE loglevel)
 LAS_MESSAGE_TYPE LASLIB_DLL get_message_log_level() {
 	return las_message_level;
 }
-
 
 void LASLIB_DLL set_las_message_handler(LASMessageHandler callback, void* user_data /*= 0*/)
 {
@@ -132,7 +131,6 @@ void format_message(std::string& messsage, unsigned multiline_ident, bool append
 
 	messsage = result;
 }
-
 
 void las_default_message_handler(LAS_MESSAGE_TYPE type, const char* msg, void* user_data)
 {

@@ -97,7 +97,7 @@ class LASMessageStream
 {
 public:
     LASMessageStream(LAS_MESSAGE_TYPE type) : setType(type) {}
-    ~LASMessageStream() { LASMessage(setType, usedStream.str().c_str()); }
+    ~LASMessageStream() { if (setType != LAS_QUIET) LASMessage(setType, usedStream.str().c_str()); }
 
     template <typename T>
     LASMessageStream& operator<<(const T& value)
@@ -120,7 +120,7 @@ private:
 #define logverbose LASMessageStream(LAS_VERBOSE)
 #define loginfo LASMessageStream(LAS_INFO)
 #define logwarning LASMessageStream(LAS_WARNING)
-#define logeriouswarning LASMessageStream(LAS_SERIOUS_WARNING)
+#define logseriouswarning LASMessageStream(LAS_SERIOUS_WARNING)
 #define logerror LASMessageStream(LAS_ERROR)
 #define logfatalerror LASMessageStream(LAS_FATAL_ERROR)
 #define logquiet LASMessageStream(LAS_QUIET)
