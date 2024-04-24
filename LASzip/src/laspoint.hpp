@@ -284,7 +284,7 @@ public:
     // switch over the point types we know
     if (!LASzip().setup(&num_items, &items, point_type, point_size, LASZIP_COMPRESSOR_NONE))
     {
-      LASMessage(LAS_ERROR, "unknown point type %d with point size %d", (I32)point_type, (I32)point_size);
+      laserror("unknown point type %d with point size %d", (I32)point_type, (I32)point_size);
       return FALSE;
     }
 

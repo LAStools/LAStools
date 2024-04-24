@@ -2,11 +2,11 @@
 ===============================================================================
 
   FILE:  lasfilter.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
 
     info@rapidlasso.de  -  https://rapidlasso.de
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasfilter.hpp"
@@ -110,7 +110,7 @@ public:
   inline const CHAR* name() const { return "keep_tile"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g %g ", name(), ll_x, ll_y, tile_size); };
   inline BOOL filter(const LASpoint* point) { return (!point->inside_tile(ll_x, ll_y, ur_x, ur_y)); };
-  LAScriterionKeepTile(F32 ll_x, F32 ll_y, F32 tile_size) { this->ll_x = ll_x; this->ll_y = ll_y; this->ur_x = ll_x+tile_size; this->ur_y = ll_y+tile_size; this->tile_size = tile_size; };
+  LAScriterionKeepTile(F32 ll_x, F32 ll_y, F32 tile_size) { this->ll_x = ll_x; this->ll_y = ll_y; this->ur_x = ll_x + tile_size; this->ur_y = ll_y + tile_size; this->tile_size = tile_size; };
 private:
   F32 ll_x, ll_y, ur_x, ur_y, tile_size;
 };
@@ -121,7 +121,7 @@ public:
   inline const CHAR* name() const { return "keep_circle"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf %lf ", name(), center_x, center_y, radius); };
   inline BOOL filter(const LASpoint* point) { return (!point->inside_circle(center_x, center_y, radius_squared)); };
-  LAScriterionKeepCircle(F64 x, F64 y, F64 radius) { this->center_x = x; this->center_y = y; this->radius = radius; this->radius_squared = radius*radius; };
+  LAScriterionKeepCircle(F64 x, F64 y, F64 radius) { this->center_x = x; this->center_y = y; this->radius = radius; this->radius_squared = radius * radius; };
 private:
   F64 center_x, center_y, radius, radius_squared;
 };
@@ -153,7 +153,7 @@ public:
     F64 ry = y1 - y0;
 
     F64 divisor = ((-vy) * ry) - (rx * vx);
-          
+
     F64 d = divisor / divider;
 
     if ((d < -wm) || (wm < d))
@@ -165,7 +165,7 @@ public:
       F64 rxm = xm - x0;
       F64 rym = ym - y0;
 
-      F64 divisorm = (-vx * rym) - (rxm * (-vy));         
+      F64 divisorm = (-vx * rym) - (rxm * (-vy));
       F64 dm = divisorm / divider;
 
       if ((dm < -dividerm) || (dividerm < dm))
@@ -193,10 +193,10 @@ public:
     xm = (p1_x + p2_x) / 2.0;
     ym = (p1_y + p2_y) / 2.0;
 
-    vx =  (p2_y - p1_y);
+    vx = (p2_y - p1_y);
     vy = -(p2_x - p1_x);
-    
-    divider = sqrt( (vx * vx) + (vy * vy) );
+
+    divider = sqrt((vx * vx) + (vy * vy));
     dividerm = divider / 2.0;
   };
 private:
@@ -568,7 +568,7 @@ class LAScriterionKeepSecondLast : public LAScriterion
 public:
   inline const CHAR* name() const { return "keep_second_last"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns <= 1) || (point->return_number != (point->number_of_returns-1))); };
+  inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns <= 1) || (point->return_number != (point->number_of_returns - 1))); };
 };
 
 class LAScriterionDropFirstReturn : public LAScriterion
@@ -616,14 +616,14 @@ class LAScriterionDropSecondLast : public LAScriterion
 public:
   inline const CHAR* name() const { return "drop_second_last"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns > 1) && (point->return_number == (point->number_of_returns-1))); };
+  inline BOOL filter(const LASpoint* point) { return ((point->number_of_returns > 1) && (point->return_number == (point->number_of_returns - 1))); };
 };
 
 class LAScriterionKeepReturns : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_return_mask"; };
-  inline I32 get_command(CHAR* string) const { 
+  inline I32 get_command(CHAR* string) const {
     U32 i;
     U32 n = sprintf(string, "-keep_return ");
     U16 keep_return_mask = ~drop_return_mask;
@@ -641,7 +641,7 @@ class LAScriterionDropReturns : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_return_mask"; };
-  inline I32 get_command(CHAR* string) const { 
+  inline I32 get_command(CHAR* string) const {
     U32 i;
     U32 n = sprintf(string, "-drop_return ");
     for (i = 0; i < 16; i++) if ((1 << i) & drop_return_mask) n += sprintf(string + n, "%u ", i);
@@ -736,7 +736,7 @@ class LAScriterionKeepRGB : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_RGB"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))),  below_RGB, above_RGB); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))), below_RGB, above_RGB); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline BOOL filter(const LASpoint* point) { return ((point->rgb[channel] < below_RGB) || (above_RGB < point->rgb[channel])); };
   LAScriterionKeepRGB(I32 below_RGB, I32 above_RGB, I32 channel) { if (above_RGB < below_RGB) { this->below_RGB = above_RGB; this->above_RGB = below_RGB; } else { this->below_RGB = below_RGB; this->above_RGB = above_RGB; }; this->channel = channel; };
@@ -748,7 +748,7 @@ class LAScriterionKeepRGBgreenness : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_RGB_greenness"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(),  below_RGB, above_RGB); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d %d ", name(), below_RGB, above_RGB); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline BOOL filter(const LASpoint* point) { I32 greenness = 2 * point->get_G() - point->get_R() - point->get_B(); return ((greenness < below_RGB) || (above_RGB < greenness)); };
   LAScriterionKeepRGBgreenness(I32 below_RGB, I32 above_RGB) { if (above_RGB < below_RGB) { this->below_RGB = above_RGB; this->above_RGB = below_RGB; } else { this->below_RGB = below_RGB; this->above_RGB = above_RGB; }; };
@@ -760,7 +760,7 @@ class LAScriterionDropRGB : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_RGB"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))),  below_RGB, above_RGB); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s_%s %d %d ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))), below_RGB, above_RGB); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline BOOL filter(const LASpoint* point)
   {
@@ -1008,10 +1008,10 @@ class LAScriterionKeepNDVI : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_NDVI"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s%s %g %g ", name(), (NIR == 3 ? "" : (NIR == 1 ? "_green_is_NIR" : "_blue_is_NIR")),  below_NDVI, above_NDVI); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s%s %g %g ", name(), (NIR == 3 ? "" : (NIR == 1 ? "_green_is_NIR" : "_blue_is_NIR")), below_NDVI, above_NDVI); };
   inline U32 get_decompress_selective() const { if (NIR == 3) return LASZIP_DECOMPRESS_SELECTIVE_RGB | LASZIP_DECOMPRESS_SELECTIVE_NIR; else return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline BOOL filter(const LASpoint* point)
-  { 
+  {
     F32 NDVI = ((F32)(point->rgb[NIR] - point->get_R())) / ((F32)(point->rgb[NIR] + point->get_R()));
     return (NDVI < below_NDVI) || (above_NDVI < NDVI);
   };
@@ -1025,10 +1025,10 @@ class LAScriterionKeepNDVIfromCIR : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_NDVI_from_CIR"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(),  below_NDVI, above_NDVI); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_NDVI, above_NDVI); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB; };
   inline BOOL filter(const LASpoint* point)
-  { 
+  {
     F32 NDVI = ((F32)(point->get_R() - point->get_G())) / ((F32)(point->get_R() + point->get_G()));
     return (NDVI < below_NDVI) || (above_NDVI < NDVI);
   };
@@ -1041,10 +1041,10 @@ class LAScriterionKeepNDVIintensityIsNIR : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_NDVI_intensity_is_NIR"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(),  below_NDVI, above_NDVI); };
+  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g %g ", name(), below_NDVI, above_NDVI); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_RGB | LASZIP_DECOMPRESS_SELECTIVE_INTENSITY; };
   inline BOOL filter(const LASpoint* point)
-  { 
+  {
     F32 NDVI = ((F32)(point->get_intensity() - point->get_R())) / ((F32)(point->get_intensity() + point->get_R()));
     return (NDVI < below_NDVI) || (above_NDVI < NDVI);
   };
@@ -1177,7 +1177,7 @@ class LAScriterionKeepClassifications : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_classification_mask"; };
-  inline I32 get_command(CHAR* string) const { 
+  inline I32 get_command(CHAR* string) const {
     U32 i;
     U32 n = sprintf(string, "-keep_class ");
     U32 keep_classification_mask = ~drop_classification_mask;
@@ -1213,7 +1213,7 @@ class LAScriterionDropClassifications : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "drop_classification_mask"; };
-  inline I32 get_command(CHAR* string) const { 
+  inline I32 get_command(CHAR* string) const {
     U32 i;
     U32 n = sprintf(string, "-drop_class ");
     for (i = 0; i < 32; i++) if ((1 << i) & drop_classification_mask) n += sprintf(string + n, "%u ", i);
@@ -1394,7 +1394,7 @@ public:
   inline const CHAR* name() const { return "drop_user_data_below"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), below_user_data); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA; };
-  inline BOOL filter(const LASpoint* point) { return (point->user_data < below_user_data) ; };
+  inline BOOL filter(const LASpoint* point) { return (point->user_data < below_user_data); };
   LAScriterionDropUserDataBelow(U8 below_user_data) { this->below_user_data = below_user_data; };
 private:
   U8 below_user_data;
@@ -1454,7 +1454,7 @@ public:
   inline const CHAR* name() const { return "drop_point_source"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), point_source_id); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
-  inline BOOL filter(const LASpoint* point) { return (point->get_point_source_ID() == point_source_id) ; };
+  inline BOOL filter(const LASpoint* point) { return (point->get_point_source_ID() == point_source_id); };
   LAScriterionDropPointSource(U16 point_source_id) { this->point_source_id = point_source_id; };
 private:
   U16 point_source_id;
@@ -1466,7 +1466,7 @@ public:
   inline const CHAR* name() const { return "drop_point_source_below"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %d ", name(), below_point_source_id); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE; };
-  inline BOOL filter(const LASpoint* point) { return (point->get_point_source_ID() < below_point_source_id) ; };
+  inline BOOL filter(const LASpoint* point) { return (point->get_point_source_ID() < below_point_source_id); };
   LAScriterionDropPointSourceBelow(U16 below_point_source_id) { this->below_point_source_id = below_point_source_id; };
 private:
   U16 below_point_source_id;
@@ -1681,7 +1681,7 @@ public:
   {
     srand(seed);
     seed = rand();
-    return ((F32)seed/(F32)RAND_MAX) > fraction;
+    return ((F32)seed / (F32)RAND_MAX) > fraction;
   };
   void reset() { seed = requested_seed; };
   LAScriterionKeepRandomFraction(F32 fraction) { requested_seed = seed = 0; this->fraction = fraction; };
@@ -1698,7 +1698,7 @@ public:
   inline const CHAR* name() const { return "thin_with_grid"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %g ", name(), (grid_spacing > 0 ? grid_spacing : -grid_spacing)); };
   inline BOOL filter(const LASpoint* point)
-  { 
+  {
     if (grid_spacing < 0)
     {
       grid_spacing = -grid_spacing;
@@ -1771,18 +1771,18 @@ public:
     // maybe grow banded grid in y direction
     if ((U32)pos_y >= *array_size)
     {
-      U32 array_size_new = ((pos_y/1024)+1)*1024;
+      U32 array_size_new = ((pos_y / 1024) + 1) * 1024;
       if (*array_size)
       {
-        if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)realloc(*ankers, array_size_new*sizeof(I32));
-        *array = (U32**)realloc(*array, array_size_new*sizeof(U32*));
-        *array_sizes = (U16*)realloc(*array_sizes, array_size_new*sizeof(U16));
+        if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)realloc(*ankers, array_size_new * sizeof(I32));
+        *array = (U32**)realloc(*array, array_size_new * sizeof(U32*));
+        *array_sizes = (U16*)realloc(*array_sizes, array_size_new * sizeof(U16));
       }
       else
       {
-        if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)malloc(array_size_new*sizeof(I32));
-        *array = (U32**)malloc(array_size_new*sizeof(U32*));
-        *array_sizes = (U16*)malloc(array_size_new*sizeof(U16));
+        if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)malloc(array_size_new * sizeof(I32));
+        *array = (U32**)malloc(array_size_new * sizeof(U32*));
+        *array_sizes = (U16*)malloc(array_size_new * sizeof(U16));
       }
       for (U32 i = *array_size; i < array_size_new; i++)
       {
@@ -1798,17 +1798,17 @@ public:
       pos_x = 0;
     }
     // maybe grow banded grid in x direction
-    U32 pos_x_pos = pos_x/32;
+    U32 pos_x_pos = pos_x / 32;
     if (pos_x_pos >= (*array_sizes)[pos_y])
     {
-      U32 array_sizes_new = ((pos_x_pos/256)+1)*256;
+      U32 array_sizes_new = ((pos_x_pos / 256) + 1) * 256;
       if ((*array_sizes)[pos_y])
       {
-        (*array)[pos_y] = (U32*)realloc((*array)[pos_y], array_sizes_new*sizeof(U32));
+        (*array)[pos_y] = (U32*)realloc((*array)[pos_y], array_sizes_new * sizeof(U32));
       }
       else
       {
-        (*array)[pos_y] = (U32*)malloc(array_sizes_new*sizeof(U32));
+        (*array)[pos_y] = (U32*)malloc(array_sizes_new * sizeof(U32));
       }
       for (U16 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
       {
@@ -1816,7 +1816,7 @@ public:
       }
       (*array_sizes)[pos_y] = array_sizes_new;
     }
-    U32 pos_x_bit = 1 << (pos_x%32);
+    U32 pos_x_bit = 1 << (pos_x % 32);
     if ((*array)[pos_y][pos_x_pos] & pos_x_bit) return TRUE;
     (*array)[pos_y][pos_x_pos] |= pos_x_bit;
     return FALSE;
@@ -1910,7 +1910,7 @@ public:
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline BOOL filter(const LASpoint* point)
-  { 
+  {
     I64 pos_t = I64_FLOOR(point->get_gps_time() / time_spacing);
     my_I64_F64_map::iterator map_element = times.find(pos_t);
     if (map_element == times.end())
@@ -1948,7 +1948,7 @@ public:
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), (time_spacing > 0 ? time_spacing : -time_spacing)); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
   inline BOOL filter(const LASpoint* point)
-  { 
+  {
     I64 pos_t = I64_FLOOR(point->get_gps_time() / time_spacing);
     my_I64_set::iterator map_element = times.find(pos_t);
     if (map_element == times.end())
@@ -1982,8 +1982,8 @@ void LASfilter::clean()
   {
     delete criteria[i];
   }
-  if (criteria) delete [] criteria;
-  if (counters) delete [] counters;
+  if (criteria) delete[] criteria;
+  if (counters) delete[] counters;
   alloc_criteria = 0;
   num_criteria = 0;
   criteria = 0;
@@ -1994,118 +1994,118 @@ void LASfilter::usage() const
 {
   //pre-formated multiline message
   LASMessage(LAS_INFO, "Filter points based on their coordinates.\n" \
-                       "  -keep_tile 631000 4834000 1000 (ll_x ll_y size)\n" \
-                       "  -keep_circle 630250.00 4834750.00 100 (x y radius)\n" \
-                       "  -keep_xy 630000 4834000 631000 4836000 (min_x min_y max_x max_y)\n" \
-                       "  -drop_xy 630000 4834000 631000 4836000 (min_x min_y max_x max_y)\n" \
-                       "  -keep_x 631500.50 631501.00 (min_x max_x)\n" \
-                       "  -drop_x 631500.50 631501.00 (min_x max_x)\n" \
-                       "  -drop_x_below 630000.50 (min_x)\n" \
-                       "  -drop_x_above 630500.50 (max_x)\n" \
-                       "  -keep_y 4834500.25 4834550.25 (min_y max_y)\n" \
-                       "  -drop_y 4834500.25 4834550.25 (min_y max_y)\n" \
-                       "  -drop_y_below 4834500.25 (min_y)\n" \
-                       "  -drop_y_above 4836000.75 (max_y)\n" \
-                       "  -keep_z 11.125 130.725 (min_z max_z)\n" \
-                       "  -drop_z 11.125 130.725 (min_z max_z)\n" \
-                       "  -drop_z_below 11.125 (min_z)\n" \
-                       "  -drop_z_above 130.725 (max_z)\n" \
-                       "  -keep_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)\n" \
-                       "  -drop_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)\n" \
-                       "Filter points based on their return numbering.\n" \
-                       "  -keep_first -first_only -drop_first\n" \
-                       "  -keep_last -last_only -drop_last\n" \
-                       "  -keep_second_last -drop_second_last\n" \
-                       "  -keep_first_of_many -keep_last_of_many\n" \
-                       "  -drop_first_of_many -drop_last_of_many\n" \
-                       "  -keep_middle -drop_middle\n" \
-                       "  -keep_return 1 2 3\n" \
-                       "  -drop_return 3 4\n" \
-                       "  -keep_single -drop_single\n" \
-                       "  -keep_double -drop_double\n" \
-                       "  -keep_triple -drop_triple\n" \
-                       "  -keep_quadruple -drop_quadruple\n" \
-                       "  -keep_number_of_returns 5\n" \
-                       "  -drop_number_of_returns 0\n" \
-                       "Filter points based on the scanline flags.\n" \
-                       "  -drop_scan_direction 0\n" \
-                       "  -keep_scan_direction_change\n" \
-                       "  -keep_edge_of_flight_line\n" \
-                       "Filter points based on their intensity.\n" \
-                       "  -keep_intensity 20 380\n" \
-                       "  -drop_intensity_below 20\n" \
-                       "  -drop_intensity_above 380\n" \
-                       "  -drop_intensity_between 4000 5000\n" \
-                       "Filter points based on classifications or flags.\n" \
-                       "  -keep_class 1 3 7\n" \
-                       "  -drop_class 4 2\n" \
-                       "  -keep_extended_class 43\n" \
-                       "  -drop_extended_class 129 135\n" \
-                       "  -drop_synthetic -keep_synthetic\n" \
-                       "  -drop_keypoint -keep_keypoint\n" \
-                       "  -drop_withheld -keep_withheld\n" \
-                       "  -drop_overlap -keep_overlap\n" \
-                       "Filter points based on their user data.\n" \
-                       "  -keep_user_data 1\n" \
-                       "  -drop_user_data 255\n" \
-                       "  -keep_user_data_below 50\n" \
-                       "  -keep_user_data_above 150\n" \
-                       "  -keep_user_data_between 10 20\n" \
-                       "  -drop_user_data_below 1\n" \
-                       "  -drop_user_data_above 100\n" \
-                       "  -drop_user_data_between 10 40\n" \
-                       "Filter points based on their point source ID.\n" \
-                       "  -keep_point_source 3\n" \
-                       "  -keep_point_source_between 2 6\n" \
-                       "  -drop_point_source 27\n" \
-                       "  -drop_point_source_below 6\n" \
-                       "  -drop_point_source_above 15\n" \
-                       "  -drop_point_source_between 17 21\n" \
-                       "Filter points based on their scan angle.\n" \
-                       "  -keep_scan_angle -15 15\n" \
-                       "  -drop_abs_scan_angle_above 15\n" \
-                       "  -drop_abs_scan_angle_below 1\n" \
-                       "  -drop_scan_angle_below -15\n" \
-                       "  -drop_scan_angle_above 15\n" \
-                       "  -drop_scan_angle_between -25 -23\n" \
-                       "Filter points based on their gps time.\n" \
-                       "  -keep_gps_time 11.125 130.725\n" \
-                       "  -drop_gps_time_below 11.125\n" \
-                       "  -drop_gps_time_above 130.725\n" \
-                       "  -drop_gps_time_between 22.0 48.0\n" \
-                       "Filter points based on their RGB/CIR/NIR channels.\n" \
-                       "  -keep_RGB_red 1 1\n" \
-                       "  -drop_RGB_red 5000 20000\n" \
-                       "  -keep_RGB_green 30 100\n" \
-                       "  -drop_RGB_green 2000 10000\n" \
-                       "  -keep_RGB_blue 0 0\n" \
-                       "  -keep_RGB_nir 64 127\n" \
-                       "  -keep_RGB_greenness 200 65535\n" \
-                       "  -keep_NDVI 0.2 0.7 -keep_NDVI_from_CIR -0.1 0.5\n" \
-                       "  -keep_NDVI_intensity_is_NIR 0.4 0.8 -keep_NDVI_green_is_NIR -0.2 0.2\n" \
-                       "  -keep_HSV 120d 130d 0.4 0.5 0 1\n" \
-                       "  -keep_HSV_hue 0.2 0.3\n" \
-                       "  -drop_HSV_saturation 0.25 0.7\n" \
-                       "  -keep_HSV_value 0 0.3\n" \
-                       "  -keep_HSL 0.3 0.4 40p 50p 0 1\n" \
-                       "  -drop_HSL_hue 0 0.5\n" \
-                       "  -keep_HSL_saturation 0.1 0.25\n" \
-                       "  -drop_HSL_lightness 0.1 0.2\n" \
-                       "Filter points based on their wavepacket.\n" \
-                       "  -keep_wavepacket 0\n" \
-                       "  -drop_wavepacket 3\n" \
-                       "Filter points based on extra attributes.\n" \
-                       "  -keep_attribute_above 0 5.0\n" \
-                       "  -drop_attribute_below 1 1.5\n" \
-                       "Filter points with simple thinning.\n" \
-                       "  -keep_every_nth 2 -drop_every_nth 3\n" \
-                       "  -keep_random_fraction 0.1\n" \
-                       "  -keep_random_fraction 0.1 4711\n" \
-                       "  -thin_with_grid 1.0\n" \
-                       "  -thin_pulses_with_time 0.0001\n" \
-                       "  -thin_points_with_time 0.000001\n" \
-                       "Boolean combination of filters.\n" \
-                       "  -filter_and");
+    "  -keep_tile 631000 4834000 1000 (ll_x ll_y size)\n" \
+    "  -keep_circle 630250.00 4834750.00 100 (x y radius)\n" \
+    "  -keep_xy 630000 4834000 631000 4836000 (min_x min_y max_x max_y)\n" \
+    "  -drop_xy 630000 4834000 631000 4836000 (min_x min_y max_x max_y)\n" \
+    "  -keep_x 631500.50 631501.00 (min_x max_x)\n" \
+    "  -drop_x 631500.50 631501.00 (min_x max_x)\n" \
+    "  -drop_x_below 630000.50 (min_x)\n" \
+    "  -drop_x_above 630500.50 (max_x)\n" \
+    "  -keep_y 4834500.25 4834550.25 (min_y max_y)\n" \
+    "  -drop_y 4834500.25 4834550.25 (min_y max_y)\n" \
+    "  -drop_y_below 4834500.25 (min_y)\n" \
+    "  -drop_y_above 4836000.75 (max_y)\n" \
+    "  -keep_z 11.125 130.725 (min_z max_z)\n" \
+    "  -drop_z 11.125 130.725 (min_z max_z)\n" \
+    "  -drop_z_below 11.125 (min_z)\n" \
+    "  -drop_z_above 130.725 (max_z)\n" \
+    "  -keep_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)\n" \
+    "  -drop_xyz 620000 4830000 100 621000 4831000 200 (min_x min_y min_z max_x max_y max_z)\n" \
+    "Filter points based on their return numbering.\n" \
+    "  -keep_first -first_only -drop_first\n" \
+    "  -keep_last -last_only -drop_last\n" \
+    "  -keep_second_last -drop_second_last\n" \
+    "  -keep_first_of_many -keep_last_of_many\n" \
+    "  -drop_first_of_many -drop_last_of_many\n" \
+    "  -keep_middle -drop_middle\n" \
+    "  -keep_return 1 2 3\n" \
+    "  -drop_return 3 4\n" \
+    "  -keep_single -drop_single\n" \
+    "  -keep_double -drop_double\n" \
+    "  -keep_triple -drop_triple\n" \
+    "  -keep_quadruple -drop_quadruple\n" \
+    "  -keep_number_of_returns 5\n" \
+    "  -drop_number_of_returns 0\n" \
+    "Filter points based on the scanline flags.\n" \
+    "  -drop_scan_direction 0\n" \
+    "  -keep_scan_direction_change\n" \
+    "  -keep_edge_of_flight_line\n" \
+    "Filter points based on their intensity.\n" \
+    "  -keep_intensity 20 380\n" \
+    "  -drop_intensity_below 20\n" \
+    "  -drop_intensity_above 380\n" \
+    "  -drop_intensity_between 4000 5000\n" \
+    "Filter points based on classifications or flags.\n" \
+    "  -keep_class 1 3 7\n" \
+    "  -drop_class 4 2\n" \
+    "  -keep_extended_class 43\n" \
+    "  -drop_extended_class 129 135\n" \
+    "  -drop_synthetic -keep_synthetic\n" \
+    "  -drop_keypoint -keep_keypoint\n" \
+    "  -drop_withheld -keep_withheld\n" \
+    "  -drop_overlap -keep_overlap\n" \
+    "Filter points based on their user data.\n" \
+    "  -keep_user_data 1\n" \
+    "  -drop_user_data 255\n" \
+    "  -keep_user_data_below 50\n" \
+    "  -keep_user_data_above 150\n" \
+    "  -keep_user_data_between 10 20\n" \
+    "  -drop_user_data_below 1\n" \
+    "  -drop_user_data_above 100\n" \
+    "  -drop_user_data_between 10 40\n" \
+    "Filter points based on their point source ID.\n" \
+    "  -keep_point_source 3\n" \
+    "  -keep_point_source_between 2 6\n" \
+    "  -drop_point_source 27\n" \
+    "  -drop_point_source_below 6\n" \
+    "  -drop_point_source_above 15\n" \
+    "  -drop_point_source_between 17 21\n" \
+    "Filter points based on their scan angle.\n" \
+    "  -keep_scan_angle -15 15\n" \
+    "  -drop_abs_scan_angle_above 15\n" \
+    "  -drop_abs_scan_angle_below 1\n" \
+    "  -drop_scan_angle_below -15\n" \
+    "  -drop_scan_angle_above 15\n" \
+    "  -drop_scan_angle_between -25 -23\n" \
+    "Filter points based on their gps time.\n" \
+    "  -keep_gps_time 11.125 130.725\n" \
+    "  -drop_gps_time_below 11.125\n" \
+    "  -drop_gps_time_above 130.725\n" \
+    "  -drop_gps_time_between 22.0 48.0\n" \
+    "Filter points based on their RGB/CIR/NIR channels.\n" \
+    "  -keep_RGB_red 1 1\n" \
+    "  -drop_RGB_red 5000 20000\n" \
+    "  -keep_RGB_green 30 100\n" \
+    "  -drop_RGB_green 2000 10000\n" \
+    "  -keep_RGB_blue 0 0\n" \
+    "  -keep_RGB_nir 64 127\n" \
+    "  -keep_RGB_greenness 200 65535\n" \
+    "  -keep_NDVI 0.2 0.7 -keep_NDVI_from_CIR -0.1 0.5\n" \
+    "  -keep_NDVI_intensity_is_NIR 0.4 0.8 -keep_NDVI_green_is_NIR -0.2 0.2\n" \
+    "  -keep_HSV 120d 130d 0.4 0.5 0 1\n" \
+    "  -keep_HSV_hue 0.2 0.3\n" \
+    "  -drop_HSV_saturation 0.25 0.7\n" \
+    "  -keep_HSV_value 0 0.3\n" \
+    "  -keep_HSL 0.3 0.4 40p 50p 0 1\n" \
+    "  -drop_HSL_hue 0 0.5\n" \
+    "  -keep_HSL_saturation 0.1 0.25\n" \
+    "  -drop_HSL_lightness 0.1 0.2\n" \
+    "Filter points based on their wavepacket.\n" \
+    "  -keep_wavepacket 0\n" \
+    "  -drop_wavepacket 3\n" \
+    "Filter points based on extra attributes.\n" \
+    "  -keep_attribute_above 0 5.0\n" \
+    "  -drop_attribute_below 1 1.5\n" \
+    "Filter points with simple thinning.\n" \
+    "  -keep_every_nth 2 -drop_every_nth 3\n" \
+    "  -keep_random_fraction 0.1\n" \
+    "  -keep_random_fraction 0.1 4711\n" \
+    "  -thin_with_grid 1.0\n" \
+    "  -thin_pulses_with_time 0.0001\n" \
+    "  -thin_points_with_time 0.000001\n" \
+    "Boolean combination of filters.\n" \
+    "  -filter_and");
 }
 
 BOOL LASfilter::parse(int argc, char* argv[])
@@ -2113,8 +2113,8 @@ BOOL LASfilter::parse(int argc, char* argv[])
   int i;
 
   BOOL using_keep_class_filter = FALSE;
-  U32 keep_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-  U32 drop_extended_classification_mask[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  U32 keep_extended_classification_mask[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+  U32 drop_extended_classification_mask[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
   for (i = 1; i < argc; i++)
   {
@@ -2122,84 +2122,88 @@ BOOL LASfilter::parse(int argc, char* argv[])
     {
       continue;
     }
-    else if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i],"-help") == 0)
+    else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0)
+    {
+      return TRUE;
+    }
+    else if (strcmp(argv[i], "-hh") == 0)
     {
       usage();
       return TRUE;
     }
-    else if (strncmp(argv[i],"-keep_", 6) == 0)
+    else if (strncmp(argv[i], "-keep_", 6) == 0)
     {
-      if (strncmp(argv[i],"-keep_first", 11) == 0)
+      if (strncmp(argv[i], "-keep_first", 11) == 0)
       {
-        if (strcmp(argv[i],"-keep_first") == 0)
+        if (strcmp(argv[i], "-keep_first") == 0)
         {
           add_criterion(new LAScriterionKeepFirstReturn());
-          *argv[i]='\0';
+          *argv[i] = '\0';
         }
-        else if (strcmp(argv[i],"-keep_first_of_many") == 0)
+        else if (strcmp(argv[i], "-keep_first_of_many") == 0)
         {
           add_criterion(new LAScriterionKeepFirstOfManyReturn());
-          *argv[i]='\0';
+          *argv[i] = '\0';
         }
       }
-      else if (strncmp(argv[i],"-keep_last", 10) == 0)
+      else if (strncmp(argv[i], "-keep_last", 10) == 0)
       {
-        if (strcmp(argv[i],"-keep_last") == 0)
+        if (strcmp(argv[i], "-keep_last") == 0)
         {
           add_criterion(new LAScriterionKeepLastReturn());
-          *argv[i]='\0';
+          *argv[i] = '\0';
         }
-        else if (strcmp(argv[i],"-keep_last_of_many") == 0)
+        else if (strcmp(argv[i], "-keep_last_of_many") == 0)
         {
           add_criterion(new LAScriterionKeepLastOfManyReturn());
-          *argv[i]='\0';
+          *argv[i] = '\0';
         }
       }
-      else if (strcmp(argv[i],"-keep_middle") == 0)
+      else if (strcmp(argv[i], "-keep_middle") == 0)
       {
         add_criterion(new LAScriterionKeepMiddleReturn());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_second_last") == 0)
+      else if (strcmp(argv[i], "-keep_second_last") == 0)
       {
         add_criterion(new LAScriterionKeepSecondLast());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strncmp(argv[i],"-keep_class", 11) == 0)
+      else if (strncmp(argv[i], "-keep_class", 11) == 0)
       {
-        if (strcmp(argv[i],"-keep_classification") == 0 || strcmp(argv[i],"-keep_class") == 0)
+        if (strcmp(argv[i], "-keep_classification") == 0 || strcmp(argv[i], "-keep_class") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: classification", argv[i]);
+            laserror("'%s' needs at least 1 argument: classification", argv[i]);
             return FALSE;
           }
           int i_in = i;
-          *argv[i]='\0';
-          i+=1;
+          *argv[i] = '\0';
+          i += 1;
           U32 classification;
           U32 keep_classification_mask = 0;
           do
           {
             if (sscanf(argv[i], "%u", &classification) != 1)
             {
-              LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: classification but '%s' is no valid classification", argv[i_in], argv[i]);
+              laserror("'%s' needs at least 1 argument: classification but '%s' is no valid classification", argv[i_in], argv[i]);
               return FALSE;
             }
             if (classification > 31)
             {
-              LASMessage(LAS_ERROR, "'%s' needs arguments between 0 and 31 but '%u' is out of range", argv[i_in], classification);
+              laserror("'%s' needs arguments between 0 and 31 but '%u' is out of range", argv[i_in], classification);
               return FALSE;
             }
             keep_classification_mask |= (1u << classification);
-            *argv[i]='\0';
-            i+=1;
+            *argv[i] = '\0';
+            i += 1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-          i-=1;
+          i -= 1;
           // if last criteria was also keep_class filter then combine them
-          if (num_criteria && (strcmp(criteria[num_criteria-1]->name(), "keep_classification_mask") == 0))
+          if (num_criteria && (strcmp(criteria[num_criteria - 1]->name(), "keep_classification_mask") == 0))
           {
-            LAScriterionKeepClassifications* criterion = (LAScriterionKeepClassifications*)(criteria[num_criteria-1]);
+            LAScriterionKeepClassifications* criterion = (LAScriterionKeepClassifications*)(criteria[num_criteria - 1]);
             num_criteria--;
             keep_classification_mask |= criterion->get_keep_classification_mask();
             delete criterion;
@@ -2207,675 +2211,675 @@ BOOL LASfilter::parse(int argc, char* argv[])
           using_keep_class_filter = TRUE;
           add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
         }
-        else if (strcmp(argv[i],"-keep_classification_mask") == 0)
+        else if (strcmp(argv[i], "-keep_classification_mask") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: mask", argv[i]);
+            laserror("'%s' needs 1 argument: mask", argv[i]);
             return FALSE;
           }
           U32 keep_classification_mask;
-          if (sscanf(argv[i+1], "%u", &keep_classification_mask) != 1)
+          if (sscanf(argv[i + 1], "%u", &keep_classification_mask) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: mask but '%s' is no valid mask", argv[i], argv[i+1]);
+            laserror("'%s' needs at least 1 argument: mask but '%s' is no valid mask", argv[i], argv[i + 1]);
             return FALSE;
           }
           using_keep_class_filter = TRUE;
           add_criterion(new LAScriterionKeepClassifications(keep_classification_mask));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-keep_extended_", 15) == 0)
+      else if (strncmp(argv[i], "-keep_extended_", 15) == 0)
       {
-        if (strcmp(argv[i],"-keep_extended_classification") == 0 || strcmp(argv[i],"-keep_extended_class") == 0)
+        if (strcmp(argv[i], "-keep_extended_classification") == 0 || strcmp(argv[i], "-keep_extended_class") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least a argument: classification", argv[i]);
+            laserror("'%s' needs at least a argument: classification", argv[i]);
             return FALSE;
           }
-          *argv[i]='\0';
-          i+=1;
+          *argv[i] = '\0';
+          i += 1;
           U32 extended_classification;
           do
           {
             if (sscanf(argv[i], "%u", &extended_classification) != 1)
             {
-              LASMessage(LAS_ERROR, "'-keep_extended_classification' needs at least 1 argument: classification but '%s' is no valid classification", argv[i]);
+              laserror("'-keep_extended_classification' needs at least 1 argument: classification but '%s' is no valid classification", argv[i]);
               return FALSE;
             }
             if (extended_classification > 255)
             {
-              LASMessage(LAS_ERROR, "cannot keep extended classification %u because it is larger than 255", extended_classification);
+              laserror("cannot keep extended classification %u because it is larger than 255", extended_classification);
               return FALSE;
             }
-            keep_extended_classification_mask[extended_classification/32] |= (1u << (extended_classification%32));
-            *argv[i]='\0';
-            i+=1;
+            keep_extended_classification_mask[extended_classification / 32] |= (1u << (extended_classification % 32));
+            *argv[i] = '\0';
+            i += 1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-          i-=1;
+          i -= 1;
         }
       }
-      else if (strncmp(argv[i],"-keep_x", 7) == 0)
+      else if (strncmp(argv[i], "-keep_x", 7) == 0)
       {
-        if (strcmp(argv[i],"-keep_xy") == 0)
+        if (strcmp(argv[i], "-keep_xy") == 0)
         {
-          if ((i+4) >= argc)
+          if ((i + 4) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y", argv[i]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y", argv[i]);
             return FALSE;
           }
           F64 min_x;
-          if (sscanf(argv[i+1], "%lf", &min_x) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid min_x", argv[i], argv[i+1]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid min_x", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 min_y;
-          if (sscanf(argv[i+2], "%lf", &min_y) != 1)
+          if (sscanf(argv[i + 2], "%lf", &min_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid min_y", argv[i], argv[i+2]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid min_y", argv[i], argv[i + 2]);
             return FALSE;
           }
           F64 max_x;
-          if (sscanf(argv[i+3], "%lf", &max_x) != 1)
+          if (sscanf(argv[i + 3], "%lf", &max_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid max_x", argv[i], argv[i+3]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid max_x", argv[i], argv[i + 3]);
             return FALSE;
           }
           F64 max_y;
-          if (sscanf(argv[i+4], "%lf", &max_y) != 1)
+          if (sscanf(argv[i + 4], "%lf", &max_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid max_y", argv[i], argv[i+4]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid max_y", argv[i], argv[i + 4]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepxy(min_x, min_y, max_x, max_y));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; *argv[i + 4] = '\0'; i += 4;
         }
-        else if (strcmp(argv[i],"-keep_xyz") == 0)
+        else if (strcmp(argv[i], "-keep_xyz") == 0)
         {
-          if ((i+6) >= argc)
+          if ((i + 6) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z", argv[i]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z", argv[i]);
             return FALSE;
           }
           F64 min_x;
-          if (sscanf(argv[i+1], "%lf", &min_x) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_x", argv[i], argv[i+1]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_x", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 min_y;
-          if (sscanf(argv[i+2], "%lf", &min_y) != 1)
+          if (sscanf(argv[i + 2], "%lf", &min_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_y", argv[i], argv[i+2]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_y", argv[i], argv[i + 2]);
             return FALSE;
           }
           F64 min_z;
-          if (sscanf(argv[i+3], "%lf", &min_z) != 1)
+          if (sscanf(argv[i + 3], "%lf", &min_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_z", argv[i], argv[i+3]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_z", argv[i], argv[i + 3]);
             return FALSE;
           }
           F64 max_x;
-          if (sscanf(argv[i+4], "%lf", &max_x) != 1)
+          if (sscanf(argv[i + 4], "%lf", &max_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_x", argv[i], argv[i+4]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_x", argv[i], argv[i + 4]);
             return FALSE;
           }
           F64 max_y;
-          if (sscanf(argv[i+5], "%lf", &max_y) != 1)
+          if (sscanf(argv[i + 5], "%lf", &max_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_y", argv[i], argv[i+5]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_y", argv[i], argv[i + 5]);
             return FALSE;
           }
           F64 max_z;
-          if (sscanf(argv[i+6], "%lf", &max_z) != 1)
+          if (sscanf(argv[i + 6], "%lf", &max_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_z", argv[i], argv[i+6]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_z", argv[i], argv[i + 6]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepxyz(min_x, min_y, min_z, max_x, max_y, max_z));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; i+=6; 
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; *argv[i + 4] = '\0'; *argv[i + 5] = '\0'; *argv[i + 6] = '\0'; i += 6;
         }
-        else if (strcmp(argv[i],"-keep_x") == 0)
+        else if (strcmp(argv[i], "-keep_x") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_x max_x", argv[i]);
+            laserror("'%s' needs 2 arguments: min_x max_x", argv[i]);
             return FALSE;
           }
           F64 min_x;
-          if (sscanf(argv[i+1], "%lf", &min_x) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_x max_x but '%s' is no valid min_x", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_x max_x but '%s' is no valid min_x", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 max_x;
-          if (sscanf(argv[i+2], "%lf", &max_x) != 1)
+          if (sscanf(argv[i + 2], "%lf", &max_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_x max_x but '%s' is no valid max_x", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_x max_x but '%s' is no valid max_x", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepx(min_x, max_x));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strcmp(argv[i],"-keep_y") == 0)
+      else if (strcmp(argv[i], "-keep_y") == 0)
       {
-        if ((i+2) >= argc)
+        if ((i + 2) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_y max_y", argv[i]);
+          laserror("'%s' needs 2 arguments: min_y max_y", argv[i]);
           return FALSE;
         }
         F64 min_y;
-        if (sscanf(argv[i+1], "%lf", &min_y) != 1)
+        if (sscanf(argv[i + 1], "%lf", &min_y) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_y max_y but '%s' is no valid min_y", argv[i], argv[i+1]);
+          laserror("'%s' needs 2 arguments: min_y max_y but '%s' is no valid min_y", argv[i], argv[i + 1]);
           return FALSE;
         }
         F64 max_y;
-        if (sscanf(argv[i+2], "%lf", &max_y) != 1)
+        if (sscanf(argv[i + 2], "%lf", &max_y) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_y max_y but '%s' is no valid max_y", argv[i], argv[i+2]);
+          laserror("'%s' needs 2 arguments: min_y max_y but '%s' is no valid max_y", argv[i], argv[i + 2]);
           return FALSE;
         }
         add_criterion(new LAScriterionKeepy(min_y, max_y));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
       }
-      else if (strncmp(argv[i],"-keep_z", 7) == 0)
+      else if (strncmp(argv[i], "-keep_z", 7) == 0)
       {
-        if (strcmp(argv[i],"-keep_z") == 0)
+        if (strcmp(argv[i], "-keep_z") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_z max_z", argv[i]);
+            laserror("'%s' needs 2 arguments: min_z max_z", argv[i]);
             return FALSE;
           }
           F64 min_z;
-          if (sscanf(argv[i+1], "%lf", &min_z) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_z max_z but '%s' is no valid min_z", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_z max_z but '%s' is no valid min_z", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 max_z;
-          if (sscanf(argv[i+2], "%lf", &max_z) != 1)
+          if (sscanf(argv[i + 2], "%lf", &max_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_z max_z but '%s' is no valid max_z", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_z max_z but '%s' is no valid max_z", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepz(min_z, max_z));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-keep_z_above") == 0)
+        else if (strcmp(argv[i], "-keep_z_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_z", argv[i]);
+            laserror("'%s' needs 1 argument: min_z", argv[i]);
             return FALSE;
           }
           F64 min_z;
-          if (sscanf(argv[i+1], "%lf", &min_z) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_z but '%s' is no valid min_z", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_z but '%s' is no valid min_z", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropzBelow(min_z));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-keep_z_below") == 0)
+        else if (strcmp(argv[i], "-keep_z_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_z", argv[i]);
+            laserror("'%s' needs 1 argument: max_z", argv[i]);
             return FALSE;
           }
           F64 max_z;
-          if (sscanf(argv[i+1], "%lf", &max_z) != 1)
+          if (sscanf(argv[i + 1], "%lf", &max_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_z but '%s' is no valid max_z", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_z but '%s' is no valid max_z", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropzAbove(max_z));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-keep_X", 7) == 0)
+      else if (strncmp(argv[i], "-keep_X", 7) == 0)
       {
-        if (strcmp(argv[i],"-keep_XY") == 0)
+        if (strcmp(argv[i], "-keep_XY") == 0)
         {
-          if ((i+4) >= argc)
+          if ((i + 4) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_X min_Y max_X max_Y", argv[i]);
+            laserror("'%s' needs 4 arguments: min_X min_Y max_X max_Y", argv[i]);
             return FALSE;
           }
           I32 min_X;
-          if (sscanf(argv[i+1], "%d", &min_X) != 1)
+          if (sscanf(argv[i + 1], "%d", &min_X) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_X min_Y max_X max_Y but '%s' is no valid min_X", argv[i], argv[i+1]);
+            laserror("'%s' needs 4 arguments: min_X min_Y max_X max_Y but '%s' is no valid min_X", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 min_Y;
-          if (sscanf(argv[i+2], "%d", &min_Y) != 1)
+          if (sscanf(argv[i + 2], "%d", &min_Y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_X min_Y max_X max_Y but '%s' is no valid min_Y", argv[i], argv[i+2]);
+            laserror("'%s' needs 4 arguments: min_X min_Y max_X max_Y but '%s' is no valid min_Y", argv[i], argv[i + 2]);
             return FALSE;
           }
           I32 max_X;
-          if (sscanf(argv[i+3], "%d", &max_X) != 1)
+          if (sscanf(argv[i + 3], "%d", &max_X) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_X min_Y max_X max_Y but '%s' is no valid max_X", argv[i], argv[i+3]);
+            laserror("'%s' needs 4 arguments: min_X min_Y max_X max_Y but '%s' is no valid max_X", argv[i], argv[i + 3]);
             return FALSE;
           }
           I32 max_Y;
-          if (sscanf(argv[i+4], "%d", &max_Y) != 1)
+          if (sscanf(argv[i + 4], "%d", &max_Y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_X min_Y max_X max_Y but '%s' is no valid max_Y", argv[i], argv[i+4]);
+            laserror("'%s' needs 4 arguments: min_X min_Y max_X max_Y but '%s' is no valid max_Y", argv[i], argv[i + 4]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepXY(min_X, min_Y, max_X, max_Y));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; *argv[i + 4] = '\0'; i += 4;
         }
-        else if (strcmp(argv[i],"-keep_X") == 0)
+        else if (strcmp(argv[i], "-keep_X") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_X max_X", argv[i]);
+            laserror("'%s' needs 2 arguments: min_X max_X", argv[i]);
             return FALSE;
           }
           I32 min_X;
-          if (sscanf(argv[i+1], "%d", &min_X) != 1)
+          if (sscanf(argv[i + 1], "%d", &min_X) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_X max_X but '%s' is no valid min_X", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_X max_X but '%s' is no valid min_X", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 max_X;
-          if (sscanf(argv[i+2], "%d", &max_X) != 1)
+          if (sscanf(argv[i + 2], "%d", &max_X) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_X max_X but '%s' is no valid max_X", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_X max_X but '%s' is no valid max_X", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepX(min_X, max_X));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strcmp(argv[i],"-keep_Y") == 0)
+      else if (strcmp(argv[i], "-keep_Y") == 0)
       {
-        if ((i+2) >= argc)
+        if ((i + 2) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Y max_Y", argv[i]);
+          laserror("'%s' needs 2 arguments: min_Y max_Y", argv[i]);
           return FALSE;
         }
         I32 min_Y;
-        if (sscanf(argv[i+1], "%d", &min_Y) != 1)
+        if (sscanf(argv[i + 1], "%d", &min_Y) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Y max_Y but '%s' is no valid min_Y", argv[i], argv[i+1]);
+          laserror("'%s' needs 2 arguments: min_Y max_Y but '%s' is no valid min_Y", argv[i], argv[i + 1]);
           return FALSE;
         }
         I32 max_Y;
-        if (sscanf(argv[i+2], "%d", &max_Y) != 1)
+        if (sscanf(argv[i + 2], "%d", &max_Y) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Y max_Y but '%s' is no valid max_Y", argv[i], argv[i+2]);
+          laserror("'%s' needs 2 arguments: min_Y max_Y but '%s' is no valid max_Y", argv[i], argv[i + 2]);
           return FALSE;
         }
         add_criterion(new LAScriterionKeepY(min_Y, max_Y));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
       }
-      else if (strncmp(argv[i],"-keep_Z", 7) == 0)
+      else if (strncmp(argv[i], "-keep_Z", 7) == 0)
       {
-        if (strcmp(argv[i],"-keep_Z") == 0)
+        if (strcmp(argv[i], "-keep_Z") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Z max_Z", argv[i]);
+            laserror("'%s' needs 2 arguments: min_Z max_Z", argv[i]);
             return FALSE;
           }
           I32 min_Z;
-          if (sscanf(argv[i+1], "%d", &min_Z) != 1)
+          if (sscanf(argv[i + 1], "%d", &min_Z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Z max_Z but '%s' is no valid min_Z", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_Z max_Z but '%s' is no valid min_Z", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 max_Z;
-          if (sscanf(argv[i+2], "%d", &max_Z) != 1)
+          if (sscanf(argv[i + 2], "%d", &max_Z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Z max_Z but '%s' is no valid max_Z", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_Z max_Z but '%s' is no valid max_Z", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepZ(min_Z, max_Z));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2; 
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-keep_Z_above") == 0)
+        else if (strcmp(argv[i], "-keep_Z_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_Z", argv[i]);
+            laserror("'%s' needs 1 argument: min_Z", argv[i]);
             return FALSE;
           }
           I32 min_Z;
-          if (sscanf(argv[i+1], "%d", &min_Z) != 1)
+          if (sscanf(argv[i + 1], "%d", &min_Z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_Z but '%s' is no valid min_Z", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_Z but '%s' is no valid min_Z", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropZBelow(min_Z));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-keep_Z_below") == 0)
+        else if (strcmp(argv[i], "-keep_Z_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_Z", argv[i]);
+            laserror("'%s' needs 1 argument: max_Z", argv[i]);
             return FALSE;
           }
           I32 max_Z;
-          if (sscanf(argv[i+1], "%d", &max_Z) != 1)
+          if (sscanf(argv[i + 1], "%d", &max_Z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_Z but '%s' is no valid max_Z", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_Z but '%s' is no valid max_Z", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropZAbove(max_Z));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strcmp(argv[i],"-keep_tile") == 0)
+      else if (strcmp(argv[i], "-keep_tile") == 0)
       {
-        if ((i+3) >= argc)
+        if ((i + 3) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: llx lly size", argv[i]);
+          laserror("'%s' needs 3 arguments: llx lly size", argv[i]);
           return FALSE;
         }
         F32 llx;
-        if (sscanf(argv[i+1], "%f", &llx) != 1)
+        if (sscanf(argv[i + 1], "%f", &llx) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: llx lly size but '%s' is no valid llx", argv[i], argv[i+1]);
+          laserror("'%s' needs 3 arguments: llx lly size but '%s' is no valid llx", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 lly;
-        if (sscanf(argv[i+2], "%f", &lly) != 1)
+        if (sscanf(argv[i + 2], "%f", &lly) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: llx lly size but '%s' is no valid lly", argv[i], argv[i+2]);
+          laserror("'%s' needs 3 arguments: llx lly size but '%s' is no valid lly", argv[i], argv[i + 2]);
           return FALSE;
         }
         F32 size;
-        if (sscanf(argv[i+3], "%f", &size) != 1)
+        if (sscanf(argv[i + 3], "%f", &size) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: llx lly size but '%s' is no valid size", argv[i], argv[i+3]);
+          laserror("'%s' needs 3 arguments: llx lly size but '%s' is no valid size", argv[i], argv[i + 3]);
           return FALSE;
         }
         add_criterion(new LAScriterionKeepTile(llx, lly, size));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3; 
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; i += 3;
       }
-      else if (strcmp(argv[i],"-keep_circle") == 0)
+      else if (strcmp(argv[i], "-keep_circle") == 0)
       {
-        if ((i+3) >= argc)
+        if ((i + 3) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: center_x center_y radius", argv[i]);
+          laserror("'%s' needs 3 arguments: center_x center_y radius", argv[i]);
           return FALSE;
         }
         F64 center_x;
-        if (sscanf(argv[i+1], "%lf", &center_x) != 1)
+        if (sscanf(argv[i + 1], "%lf", &center_x) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: center_x center_y radius but '%s' is no valid center_x", argv[i], argv[i+1]);
+          laserror("'%s' needs 3 arguments: center_x center_y radius but '%s' is no valid center_x", argv[i], argv[i + 1]);
           return FALSE;
         }
         F64 center_y;
-        if (sscanf(argv[i+2], "%lf", &center_y) != 1)
+        if (sscanf(argv[i + 2], "%lf", &center_y) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: center_x center_y radius but '%s' is no valid center_y", argv[i], argv[i+2]);
+          laserror("'%s' needs 3 arguments: center_x center_y radius but '%s' is no valid center_y", argv[i], argv[i + 2]);
           return FALSE;
         }
         F64 radius;
-        if (sscanf(argv[i+3], "%lf", &radius) != 1)
+        if (sscanf(argv[i + 3], "%lf", &radius) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 3 arguments: center_x center_y radius but '%s' is no valid radius", argv[i], argv[i+3]);
+          laserror("'%s' needs 3 arguments: center_x center_y radius but '%s' is no valid radius", argv[i], argv[i + 3]);
           return FALSE;
         }
         add_criterion(new LAScriterionKeepCircle(center_x, center_y, radius));
-        *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; i += 3;
       }
-      else if (strncmp(argv[i],"-keep_return", 12) == 0)
+      else if (strncmp(argv[i], "-keep_return", 12) == 0)
       {
-        if (strcmp(argv[i],"-keep_return") == 0)
+        if (strcmp(argv[i], "-keep_return") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: return_number", argv[i]);
+            laserror("'%s' needs at least 1 argument: return_number", argv[i]);
             return FALSE;
           }
-          *argv[i]='\0';
-          i+=1;
+          *argv[i] = '\0';
+          i += 1;
           U32 return_number;
           U16 keep_return_mask = 0;
           do
           {
             if (sscanf(argv[i], "%u", &return_number) != 1)
             {
-              LASMessage(LAS_ERROR, "'-keep_return' needs at least 1 argument: return_number but '%s' is no valid return_number", argv[i]);
+              laserror("'-keep_return' needs at least 1 argument: return_number but '%s' is no valid return_number", argv[i]);
               return FALSE;
             }
             if (return_number > 15)
             {
-              LASMessage(LAS_ERROR, "cannot keep return_number %u because it is larger than 15", return_number);
+              laserror("cannot keep return_number %u because it is larger than 15", return_number);
               return FALSE;
             }
             keep_return_mask |= (1u << return_number);
-            *argv[i]='\0';
-            i+=1;
+            *argv[i] = '\0';
+            i += 1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-          i-=1;
+          i -= 1;
           // if last criteria was also keep_return filter then combine them
-          if (num_criteria && (strcmp(criteria[num_criteria-1]->name(), "keep_return_mask") == 0))
+          if (num_criteria && (strcmp(criteria[num_criteria - 1]->name(), "keep_return_mask") == 0))
           {
-            LAScriterionKeepReturns* criterion = (LAScriterionKeepReturns*)(criteria[num_criteria-1]);
+            LAScriterionKeepReturns* criterion = (LAScriterionKeepReturns*)(criteria[num_criteria - 1]);
             num_criteria--;
             keep_return_mask |= criterion->get_keep_return_mask();
             delete criterion;
           }
           add_criterion(new LAScriterionKeepReturns(keep_return_mask));
         }
-        else if (strcmp(argv[i],"-keep_return_mask") == 0)
+        else if (strcmp(argv[i], "-keep_return_mask") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: return_mask", argv[i]);
+            laserror("'%s' needs 1 argument: return_mask", argv[i]);
             return FALSE;
           }
           U32 keep_return_mask;
-          if (sscanf(argv[i+1], "%u", &keep_return_mask) != 1)
+          if (sscanf(argv[i + 1], "%u", &keep_return_mask) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: return_mask but '%s' is no valid return_mask", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: return_mask but '%s' is no valid return_mask", argv[i], argv[i + 1]);
             return FALSE;
           }
           if (keep_return_mask > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "'%s' needs a return_mask between 0 and %u but return_mask is %u", argv[i], U16_MAX, keep_return_mask);
+            laserror("'%s' needs a return_mask between 0 and %u but return_mask is %u", argv[i], U16_MAX, keep_return_mask);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepReturns((U16)keep_return_mask));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strcmp(argv[i],"-keep_number_of_returns") == 0)
+      else if (strcmp(argv[i], "-keep_number_of_returns") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number_of_returns", argv[i]);
+          laserror("'%s' needs 1 argument: number_of_returns", argv[i]);
           return FALSE;
         }
         U32 number_of_returns;
-        if (sscanf(argv[i+1], "%u", &number_of_returns) != 1)
+        if (sscanf(argv[i + 1], "%u", &number_of_returns) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number_of_returns but '%s' is no valid number_of_returns", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument: number_of_returns but '%s' is no valid number_of_returns", argv[i], argv[i + 1]);
           return FALSE;
         }
         add_criterion(new LAScriterionKeepSpecificNumberOfReturns(number_of_returns));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
-      else if (strcmp(argv[i],"-keep_single") == 0)
+      else if (strcmp(argv[i], "-keep_single") == 0)
       {
         add_criterion(new LAScriterionKeepSpecificNumberOfReturns(1));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_double") == 0)
+      else if (strcmp(argv[i], "-keep_double") == 0)
       {
         add_criterion(new LAScriterionKeepSpecificNumberOfReturns(2));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_triple") == 0)
+      else if (strcmp(argv[i], "-keep_triple") == 0)
       {
         add_criterion(new LAScriterionKeepSpecificNumberOfReturns(3));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_quadruple") == 0)
+      else if (strcmp(argv[i], "-keep_quadruple") == 0)
       {
         add_criterion(new LAScriterionKeepSpecificNumberOfReturns(4));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_quintuple") == 0)
+      else if (strcmp(argv[i], "-keep_quintuple") == 0)
       {
         add_criterion(new LAScriterionKeepSpecificNumberOfReturns(5));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strncmp(argv[i],"-keep_intensity", 15) == 0)
+      else if (strncmp(argv[i], "-keep_intensity", 15) == 0)
       {
-        if (strcmp(argv[i],"-keep_intensity") == 0)
+        if (strcmp(argv[i], "-keep_intensity") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+            laserror("'%s' needs 2 arguments: min max", argv[i]);
             return FALSE;
           }
           U32 min;
-          if (sscanf(argv[i+1], "%u", &min) != 1)
+          if (sscanf(argv[i + 1], "%u", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           U32 max;
-          if (sscanf(argv[i+2], "%u", &max) != 1)
+          if (sscanf(argv[i + 2], "%u", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
             return FALSE;
           }
           if (min > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "cannot keep intensity because min of %u is larger than %u", min, U16_MAX);
+            laserror("cannot keep intensity because min of %u is larger than %u", min, U16_MAX);
             return FALSE;
           }
           if (max > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "cannot keep intensity because max of %u is larger than %u", max, U16_MAX);
+            laserror("cannot keep intensity because max of %u is larger than %u", max, U16_MAX);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepIntensity((U16)min, (U16)max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-keep_intensity_above") == 0)
+        else if (strcmp(argv[i], "-keep_intensity_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max", argv[i]);
+            laserror("'%s' needs 1 argument: max", argv[i]);
             return FALSE;
           }
           U32 max;
-          if (sscanf(argv[i+1], "%u", &max) != 1)
+          if (sscanf(argv[i + 1], "%u", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max but '%s' is no valid max", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max but '%s' is no valid max", argv[i], argv[i + 1]);
             return FALSE;
           }
           if (max > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "cannot keep intensity above max of %u because it is larger than %u", max, U16_MAX);
+            laserror("cannot keep intensity above max of %u because it is larger than %u", max, U16_MAX);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepIntensityAbove((U16)max));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-keep_intensity_below") == 0)
+        else if (strcmp(argv[i], "-keep_intensity_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min", argv[i]);
+            laserror("'%s' needs 1 argument: min", argv[i]);
             return FALSE;
           }
           U32 min;
-          if (sscanf(argv[i+1], "%u", &min) != 1)
+          if (sscanf(argv[i + 1], "%u", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           if (min > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "cannot keep intensity below min of %u because it is larger than %u", min, U16_MAX);
+            laserror("cannot keep intensity below min of %u because it is larger than %u", min, U16_MAX);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepIntensityBelow((U16)min));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-keep_RGB_", 10) == 0)
+      else if (strncmp(argv[i], "-keep_RGB_", 10) == 0)
       {
-        if ((i+2) >= argc)
+        if ((i + 2) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+          laserror("'%s' needs 2 arguments: min max", argv[i]);
           return FALSE;
         }
         I32 min;
-        if (sscanf(argv[i+1], "%d", &min) != 1)
+        if (sscanf(argv[i + 1], "%d", &min) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
           return FALSE;
         }
         I32 max;
-        if (sscanf(argv[i+2], "%d", &max) != 1)
+        if (sscanf(argv[i + 2], "%d", &max) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
           return FALSE;
         }
-        if (strcmp(argv[i]+10,"red") == 0)
+        if (strcmp(argv[i] + 10, "red") == 0)
         {
           add_criterion(new LAScriterionKeepRGB(min, max, 0));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"green") == 0)
+        else if (strcmp(argv[i] + 10, "green") == 0)
         {
           add_criterion(new LAScriterionKeepRGB(min, max, 1));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"blue") == 0)
+        else if (strcmp(argv[i] + 10, "blue") == 0)
         {
           add_criterion(new LAScriterionKeepRGB(min, max, 2));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"nir") == 0)
+        else if (strcmp(argv[i] + 10, "nir") == 0)
         {
           add_criterion(new LAScriterionKeepRGB(min, max, 3));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"greenness") == 0)
+        else if (strcmp(argv[i] + 10, "greenness") == 0)
         {
           add_criterion(new LAScriterionKeepRGBgreenness(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
       else if (strcmp(argv[i], "-keep_HSV") == 0)
       {
         if ((i + 6) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max", argv[i]);
+          laserror("'%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max", argv[i]);
           return FALSE;
         }
         F32 h_min;
         if (strToFloatDegPcFail(argv[i + 1], &h_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument h_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument h_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 h_max;
         if (strToFloatDegPcFail(argv[i + 2], &h_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument h_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument h_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &h_min, &h_max, (F32)0.0, (F32)1.0))
@@ -2885,13 +2889,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
         F32 s_min;
         if (strToFloatDegPcFail(argv[i + 3], &s_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument s_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument s_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 s_max;
         if (strToFloatDegPcFail(argv[i + 4], &s_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument s_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument s_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &s_min, &s_max, (F32)0.0, (F32)1.0))
@@ -2901,13 +2905,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
         F32 v_min;
         if (strToFloatDegPcFail(argv[i + 5], &v_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument v_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument v_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 v_max;
         if (strToFloatDegPcFail(argv[i + 6], &v_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument v_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument v_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &v_min, &v_max, (F32)0.0, (F32)1.0))
@@ -2922,19 +2926,19 @@ BOOL LASfilter::parse(int argc, char* argv[])
       {
         if ((i + 2) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+          laserror("'%s' needs 2 arguments: min max", argv[i]);
           return FALSE;
         }
         F32 min;
         if (strToFloatDegPcFail(argv[i + 1], &min))
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 max;
         if (strToFloatDegPcFail(argv[i + 2], &max))
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &min, &max, (F32)0.0, (F32)1.0))
@@ -2970,19 +2974,19 @@ BOOL LASfilter::parse(int argc, char* argv[])
       {
         if ((i + 6) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max", argv[i]);
+          laserror("'%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max", argv[i]);
           return FALSE;
         }
         F32 h_min;
         if (strToFloatDegPcFail(argv[i + 1], &h_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument h_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument h_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 h_max;
         if (strToFloatDegPcFail(argv[i + 2], &h_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument h_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument h_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &h_min, &h_max, (F32)0.0, (F32)1.0))
@@ -2992,13 +2996,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
         F32 s_min;
         if (strToFloatDegPcFail(argv[i + 3], &s_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument s_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument s_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 s_max;
         if (strToFloatDegPcFail(argv[i + 4], &s_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument s_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument s_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &s_min, &s_max, (F32)0.0, (F32)1.0))
@@ -3008,13 +3012,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
         F32 v_min;
         if (strToFloatDegPcFail(argv[i + 5], &v_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument v_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument v_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 v_max;
         if (strToFloatDegPcFail(argv[i + 6], &v_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument v_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument v_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &v_min, &v_max, (F32)0.0, (F32)1.0))
@@ -3029,19 +3033,19 @@ BOOL LASfilter::parse(int argc, char* argv[])
       {
         if ((i + 2) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+          laserror("'%s' needs 2 arguments: min max", argv[i]);
           return FALSE;
         }
         F32 min;
         if (strToFloatDegPcFail(argv[i + 1], &min))
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 max;
         if (strToFloatDegPcFail(argv[i + 2], &max))
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &min, &max, (F32)0.0, (F32)1.0))
@@ -3073,1365 +3077,1365 @@ BOOL LASfilter::parse(int argc, char* argv[])
           i += 2;
         }
       }
-      else if (strncmp(argv[i],"-keep_NDVI", 10) == 0)
+      else if (strncmp(argv[i], "-keep_NDVI", 10) == 0)
       {
-        if ((i+2) >= argc)
+        if ((i + 2) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+          laserror("'%s' needs 2 arguments: min max", argv[i]);
           return FALSE;
         }
         F32 min;
-        if (sscanf(argv[i+1], "%f", &min) != 1)
+        if (sscanf(argv[i + 1], "%f", &min) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 max;
-        if (sscanf(argv[i+2], "%f", &max) != 1)
+        if (sscanf(argv[i + 2], "%f", &max) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
           return FALSE;
         }
-        if (strcmp(argv[i]+10,"") == 0)
+        if (strcmp(argv[i] + 10, "") == 0)
         {
           add_criterion(new LAScriterionKeepNDVI(min, max, 3));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"_from_CIR") == 0)
+        else if (strcmp(argv[i] + 10, "_from_CIR") == 0)
         {
           add_criterion(new LAScriterionKeepNDVIfromCIR(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"_green_is_NIR") == 0)
+        else if (strcmp(argv[i] + 10, "_green_is_NIR") == 0)
         {
           add_criterion(new LAScriterionKeepNDVI(min, max, 1));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"_blue_is_NIR") == 0)
+        else if (strcmp(argv[i] + 10, "_blue_is_NIR") == 0)
         {
           add_criterion(new LAScriterionKeepNDVI(min, max, 2));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"_intensity_is_NIR") == 0)
+        else if (strcmp(argv[i] + 10, "_intensity_is_NIR") == 0)
         {
           add_criterion(new LAScriterionKeepNDVIintensityIsNIR(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strncmp(argv[i],"-keep_scan_angle", 16) == 0)
+      else if (strncmp(argv[i], "-keep_scan_angle", 16) == 0)
       {
-        if ((strcmp(argv[i],"-keep_scan_angle") == 0) || (strcmp(argv[i],"-keep_scan_angle_between") == 0))
+        if ((strcmp(argv[i], "-keep_scan_angle") == 0) || (strcmp(argv[i], "-keep_scan_angle_between") == 0))
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+            laserror("'%s' needs 2 arguments: min max", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+2], "%d", &max) != 1)
+          if (sscanf(argv[i + 2], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepScanAngle(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strcmp(argv[i],"-keep_synthetic") == 0)
+      else if (strcmp(argv[i], "-keep_synthetic") == 0)
       {
         add_criterion(new LAScriterionKeepSynthetic());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_keypoint") == 0)
+      else if (strcmp(argv[i], "-keep_keypoint") == 0)
       {
         add_criterion(new LAScriterionKeepKeypoint());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_withheld") == 0)
+      else if (strcmp(argv[i], "-keep_withheld") == 0)
       {
         add_criterion(new LAScriterionKeepWithheld());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_overlap") == 0)
+      else if (strcmp(argv[i], "-keep_overlap") == 0)
       {
         add_criterion(new LAScriterionKeepOverlap());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_wavepacket") == 0)
+      else if (strcmp(argv[i], "-keep_wavepacket") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+          laserror("'%s' needs 1 argument: index", argv[i]);
           return FALSE;
         }
-        *argv[i]='\0';
-        i+=1;
+        *argv[i] = '\0';
+        i += 1;
         add_criterion(new LAScriterionKeepWavepacket(atoi(argv[i])));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strncmp(argv[i],"-keep_user_data", 15) == 0)
+      else if (strncmp(argv[i], "-keep_user_data", 15) == 0)
       {
-        if (strcmp(argv[i],"-keep_user_data") == 0)
+        if (strcmp(argv[i], "-keep_user_data") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: value", argv[i]);
+            laserror("'%s' needs 1 argument: value", argv[i]);
             return FALSE;
           }
           I32 value;
-          if (sscanf(argv[i+1], "%d", &value) != 1)
+          if (sscanf(argv[i + 1], "%d", &value) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepUserData(value));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-keep_user_data_below") == 0)
+        else if (strcmp(argv[i], "-keep_user_data_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: value", argv[i]);
+            laserror("'%s' needs 1 argument: value", argv[i]);
             return FALSE;
           }
           I32 value;
-          if (sscanf(argv[i+1], "%d", &value) != 1)
+          if (sscanf(argv[i + 1], "%d", &value) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepUserDataBelow(value));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-keep_user_data_above") == 0)
+        else if (strcmp(argv[i], "-keep_user_data_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: value", argv[i]);
+            laserror("'%s' needs 1 argument: value", argv[i]);
             return FALSE;
           }
           I32 value;
-          if (sscanf(argv[i+1], "%d", &value) != 1)
+          if (sscanf(argv[i + 1], "%d", &value) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepUserDataAbove(value));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-keep_user_data_between") == 0)
+        else if (strcmp(argv[i], "-keep_user_data_between") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+            laserror("'%s' needs 2 arguments: min max", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+2], "%d", &max) != 1)
+          if (sscanf(argv[i + 2], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepUserDataBetween(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strncmp(argv[i],"-keep_p", 7) == 0)
+      else if (strncmp(argv[i], "-keep_p", 7) == 0)
       {
-        if (strncmp(argv[i],"-keep_point_source", 18) == 0)
+        if (strncmp(argv[i], "-keep_point_source", 18) == 0)
         {
-          if (strcmp(argv[i],"-keep_point_source") == 0)
+          if (strcmp(argv[i], "-keep_point_source") == 0)
           {
-            if ((i+1) >= argc)
+            if ((i + 1) >= argc)
             {
-              LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: ID", argv[i]);
+              laserror("'%s' needs at least 1 argument: ID", argv[i]);
               return FALSE;
             }
             U32 ID;
-            if (sscanf(argv[i+1], "%u", &ID) != 1)
+            if (sscanf(argv[i + 1], "%u", &ID) != 1)
             {
-              LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: ID but '%s' is no valid ID", argv[i], argv[i+1]);
+              laserror("'%s' needs at least 1 argument: ID but '%s' is no valid ID", argv[i], argv[i + 1]);
               return FALSE;
             }
             if (ID > U16_MAX)
             {
-              LASMessage(LAS_ERROR, "cannot keep_point_source ID %u because it is larger than %u", ID, U16_MAX);
+              laserror("cannot keep_point_source ID %u because it is larger than %u", ID, U16_MAX);
               return FALSE;
             }
             add_criterion(new LAScriterionKeepPointSource(ID));
-            while (((i+2) < argc) && ('0' <= argv[i+2][0]) && (argv[i+2][0] <= '9'))
+            while (((i + 2) < argc) && ('0' <= argv[i + 2][0]) && (argv[i + 2][0] <= '9'))
             {
-              *argv[i]='\0';
+              *argv[i] = '\0';
               if (sscanf(argv[i + 2], "%u", &ID) != 1)
               {
-                LASMessage(LAS_ERROR, "'-keep_point_source' takes one or more IDs but '%s' is no valid ID", argv[i+2]);
+                laserror("'-keep_point_source' takes one or more IDs but '%s' is no valid ID", argv[i + 2]);
                 return FALSE;
               }
               if (ID > U16_MAX)
               {
-                LASMessage(LAS_ERROR, "cannot keep_point_source ID %u because it is larger than %u", ID, U16_MAX);
+                laserror("cannot keep_point_source ID %u because it is larger than %u", ID, U16_MAX);
                 return FALSE;
               }
               add_criterion(new LAScriterionKeepPointSource(ID));
-              LAScriterion* filter_criterion = new LAScriterionAnd(criteria[num_criteria-2], criteria[num_criteria-1]);
+              LAScriterion* filter_criterion = new LAScriterionAnd(criteria[num_criteria - 2], criteria[num_criteria - 1]);
               num_criteria--;
               criteria[num_criteria] = 0;
               num_criteria--;
               criteria[num_criteria] = 0;
               add_criterion(filter_criterion);
-              i+=1;
-            } 
-            *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+              i += 1;
+            }
+            *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
           }
-          else if (strcmp(argv[i],"-keep_point_source_between") == 0)
+          else if (strcmp(argv[i], "-keep_point_source_between") == 0)
           {
-            if ((i+2) >= argc)
+            if ((i + 2) >= argc)
             {
-              LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_ID max_ID", argv[i]);
+              laserror("'%s' needs 2 arguments: min_ID max_ID", argv[i]);
               return FALSE;
             }
             U32 min_ID;
-            if (sscanf(argv[i+1], "%u", &min_ID) != 1)
+            if (sscanf(argv[i + 1], "%u", &min_ID) != 1)
             {
-              LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_ID max_ID but '%s' is no valid min_ID", argv[i], argv[i+1]);
+              laserror("'%s' needs 2 arguments: min_ID max_ID but '%s' is no valid min_ID", argv[i], argv[i + 1]);
               return FALSE;
             }
             U32 max_ID;
-            if (sscanf(argv[i+2], "%u", &max_ID) != 1)
+            if (sscanf(argv[i + 2], "%u", &max_ID) != 1)
             {
-              LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_ID max_ID but '%s' is no valid max_ID", argv[i], argv[i+2]);
+              laserror("'%s' needs 2 arguments: min_ID max_ID but '%s' is no valid max_ID", argv[i], argv[i + 2]);
               return FALSE;
             }
             if (min_ID > U16_MAX)
             {
-              LASMessage(LAS_ERROR, "cannot keep point source because min_ID of %u is larger than %u", min_ID, U16_MAX);
+              laserror("cannot keep point source because min_ID of %u is larger than %u", min_ID, U16_MAX);
               return FALSE;
             }
             if (max_ID > U16_MAX)
             {
-              LASMessage(LAS_ERROR, "cannot keep point source because max_ID of %u is larger than %u", max_ID, U16_MAX);
+              laserror("cannot keep point source because max_ID of %u is larger than %u", max_ID, U16_MAX);
               return FALSE;
             }
             add_criterion(new LAScriterionKeepPointSourceBetween((U16)min_ID, (U16)max_ID));
-            *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+            *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
           }
         }
-        else if (strcmp(argv[i],"-keep_profile") == 0)
+        else if (strcmp(argv[i], "-keep_profile") == 0)
         {
-          if ((i+5) >= argc)
+          if ((i + 5) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width", argv[i]);
+            laserror("'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width", argv[i]);
             return FALSE;
           }
           F64 p1_x;
-          if (sscanf(argv[i+1], "%lf", &p1_x) != 1)
+          if (sscanf(argv[i + 1], "%lf", &p1_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p1_x", argv[i], argv[i+1]);
+            laserror("'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p1_x", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 p1_y;
-          if (sscanf(argv[i+2], "%lf", &p1_y) != 1)
+          if (sscanf(argv[i + 2], "%lf", &p1_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p1_y", argv[i], argv[i+2]);
+            laserror("'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p1_y", argv[i], argv[i + 2]);
             return FALSE;
           }
           F64 p2_x;
-          if (sscanf(argv[i+3], "%lf", &p2_x) != 1)
+          if (sscanf(argv[i + 3], "%lf", &p2_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p2_x", argv[i], argv[i+3]);
+            laserror("'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p2_x", argv[i], argv[i + 3]);
             return FALSE;
           }
           F64 p2_y;
-          if (sscanf(argv[i+4], "%lf", &p2_y) != 1)
+          if (sscanf(argv[i + 4], "%lf", &p2_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p2_y", argv[i], argv[i+4]);
+            laserror("'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid p2_y", argv[i], argv[i + 4]);
             return FALSE;
           }
           F64 width;
-          if (sscanf(argv[i+5], "%lf", &width) != 1)
+          if (sscanf(argv[i + 5], "%lf", &width) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid width", argv[i], argv[i+5]);
+            laserror("'%s' needs 5 arguments: p1_x p1_y p2_x p2_y width but '%s' is no valid width", argv[i], argv[i + 5]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepProfile(p1_x, p1_y, p2_x, p2_y, width));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; i+=5; 
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; *argv[i + 4] = '\0'; *argv[i + 5] = '\0'; i += 5;
         }
       }
-      else if (strncmp(argv[i],"-keep_gps", 9) == 0)
+      else if (strncmp(argv[i], "-keep_gps", 9) == 0)
       {
-        if (strcmp(argv[i],"-keep_gps_time") == 0 || strcmp(argv[i],"-keep_gpstime") == 0 || strcmp(argv[i],"-keep_gps_time_between") == 0 || strcmp(argv[i],"-keep_gpstime_between") == 0)
+        if (strcmp(argv[i], "-keep_gps_time") == 0 || strcmp(argv[i], "-keep_gpstime") == 0 || strcmp(argv[i], "-keep_gps_time_between") == 0 || strcmp(argv[i], "-keep_gpstime_between") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start end", argv[i]);
+            laserror("'%s' needs 2 arguments: start end", argv[i]);
             return FALSE;
           }
           F64 start = 0.0;
-          if (sscanf(argv[i+1], "%lf", &start) != 1)
+          if (sscanf(argv[i + 1], "%lf", &start) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start end but '%s' is no valid start", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: start end but '%s' is no valid start", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 end = 0.0;
-          if (sscanf(argv[i+2], "%lf", &end) != 1)
+          if (sscanf(argv[i + 2], "%lf", &end) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start end but '%s' is no valid end", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: start end but '%s' is no valid end", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepGpsTime(start, end));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-keep_gps_time_above") == 0 || strcmp(argv[i],"-keep_gpstime_above") == 0)
+        else if (strcmp(argv[i], "-keep_gps_time_above") == 0 || strcmp(argv[i], "-keep_gpstime_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: time", argv[i]);
+            laserror("'%s' needs 1 argument: time", argv[i]);
             return FALSE;
           }
           F64 time = 0.0;
-          if (sscanf(argv[i+1], "%lf", &time) != 1)
+          if (sscanf(argv[i + 1], "%lf", &time) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: time but '%s' is no valid time", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: time but '%s' is no valid time", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropGpsTimeBelow(time));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-         }
-        else if (strcmp(argv[i],"-keep_gps_time_below") == 0 || strcmp(argv[i],"-keep_gpstime_below") == 0)
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
+        }
+        else if (strcmp(argv[i], "-keep_gps_time_below") == 0 || strcmp(argv[i], "-keep_gpstime_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: time", argv[i]);
+            laserror("'%s' needs 1 argument: time", argv[i]);
             return FALSE;
           }
           F64 time = 0.0;
-          if (sscanf(argv[i+1], "%lf", &time) != 1)
+          if (sscanf(argv[i + 1], "%lf", &time) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: time but '%s' is no valid time", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: time but '%s' is no valid time", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropGpsTimeAbove(time));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-keep_attribute", 15) == 0)
+      else if (strncmp(argv[i], "-keep_attribute", 15) == 0)
       {
-        if (strcmp(argv[i],"-keep_attribute_below") == 0)
+        if (strcmp(argv[i], "-keep_attribute_below") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value", argv[i]);
+            laserror("'%s' needs 2 arguments: index value", argv[i]);
             return FALSE;
           }
           I32 index;
-          if (sscanf(argv[i+1], "%d", &index) != 1)
+          if (sscanf(argv[i + 1], "%d", &index) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 value;
-          if (sscanf(argv[i+2], "%lf", &value) != 1)
+          if (sscanf(argv[i + 2], "%lf", &value) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid value", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid value", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepAttributeBelow(index, value));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-keep_attribute_above") == 0)
+        else if (strcmp(argv[i], "-keep_attribute_above") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value", argv[i]);
+            laserror("'%s' needs 2 arguments: index value", argv[i]);
             return FALSE;
           }
           I32 index;
-          if (sscanf(argv[i+1], "%d", &index) != 1)
+          if (sscanf(argv[i + 1], "%d", &index) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 value;
-          if (sscanf(argv[i+2], "%lf", &value) != 1)
+          if (sscanf(argv[i + 2], "%lf", &value) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid value", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid value", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepAttributeAbove(index, value));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-keep_attribute_between") == 0)
+        else if (strcmp(argv[i], "-keep_attribute_between") == 0)
         {
-          if ((i+3) >= argc)
+          if ((i + 3) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 3 arguments: index min max", argv[i]);
+            laserror("'%s' needs 3 arguments: index min max", argv[i]);
             return FALSE;
           }
           I32 index;
-          if (sscanf(argv[i+1], "%d", &index) != 1)
+          if (sscanf(argv[i + 1], "%d", &index) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 3 arguments: index min max but '%s' is no valid index", argv[i], argv[i+1]);
+            laserror("'%s' needs 3 arguments: index min max but '%s' is no valid index", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 min;
-          if (sscanf(argv[i+2], "%lf", &min) != 1)
+          if (sscanf(argv[i + 2], "%lf", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 3 arguments: index min max but '%s' is no valid min", argv[i], argv[i+2]);
+            laserror("'%s' needs 3 arguments: index min max but '%s' is no valid min", argv[i], argv[i + 2]);
             return FALSE;
           }
           F64 max;
-          if (sscanf(argv[i+3], "%lf", &max) != 1)
+          if (sscanf(argv[i + 3], "%lf", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 3 arguments: index min max but '%s' is no valid max", argv[i], argv[i+3]);
+            laserror("'%s' needs 3 arguments: index min max but '%s' is no valid max", argv[i], argv[i + 3]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepAttributeBetween(index, min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; i += 3;
         }
       }
-      else if (strcmp(argv[i],"-keep_every_nth") == 0)
+      else if (strcmp(argv[i], "-keep_every_nth") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: nth", argv[i]);
+          laserror("'%s' needs 1 argument: nth", argv[i]);
           return FALSE;
         }
         U32 nth;
-        if (sscanf(argv[i+1], "%u", &nth) != 1)
+        if (sscanf(argv[i + 1], "%u", &nth) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: nth but '%s' is no valid nth", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument: nth but '%s' is no valid nth", argv[i], argv[i + 1]);
           return FALSE;
         }
         if (nth == 0)
         {
-          LASMessage(LAS_ERROR, "%u is no valid nth for '%s'", nth, argv[i]);
+          laserror("%u is no valid nth for '%s'", nth, argv[i]);
           return FALSE;
         }
         add_criterion(new LAScriterionKeepEveryNth(nth));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
-      else if (strcmp(argv[i],"-keep_random_fraction") == 0)
+      else if (strcmp(argv[i], "-keep_random_fraction") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: fraction", argv[i]);
+          laserror("'%s' needs 1 argument: fraction", argv[i]);
           return FALSE;
         }
         F32 fraction;
-        if (sscanf(argv[i+1], "%f", &fraction) != 1)
+        if (sscanf(argv[i + 1], "%f", &fraction) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: fraction [seed] but '%s' is no valid fraction", argv[i], argv[i+1]);
+          laserror("'%s' needs at least 1 argument: fraction [seed] but '%s' is no valid fraction", argv[i], argv[i + 1]);
           return FALSE;
         }
-        if (((i+2) < argc) && ('0' <= argv[i+2][0]) && (argv[i+2][0] <= '9')) // maybe a seed was specified
+        if (((i + 2) < argc) && ('0' <= argv[i + 2][0]) && (argv[i + 2][0] <= '9')) // maybe a seed was specified
         {
           U32 seed;
-          if (sscanf(argv[i+2], "%u", &seed) != 1)
+          if (sscanf(argv[i + 2], "%u", &seed) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' takes seed as second argument but '%s' is no valid seed", argv[i], argv[i+2]);
+            laserror("'%s' takes seed as second argument but '%s' is no valid seed", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepRandomFraction(seed, fraction));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
         else // no seed was specified
         {
           add_criterion(new LAScriterionKeepRandomFraction(fraction));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strcmp(argv[i],"-keep_scan_direction_change") == 0)
+      else if (strcmp(argv[i], "-keep_scan_direction_change") == 0)
       {
         add_criterion(new LAScriterionKeepScanDirectionChange());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_edge_of_flight_line") == 0)
+      else if (strcmp(argv[i], "-keep_edge_of_flight_line") == 0)
       {
         add_criterion(new LAScriterionKeepEdgeOfFlightLine());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-keep_scanner_channel") == 0)
+      else if (strcmp(argv[i], "-keep_scanner_channel") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
+          laserror("'%s' needs 1 argument: number", argv[i]);
           return FALSE;
         }
         I32 number;
-        if (sscanf(argv[i+1], "%d", &number) != 1)
+        if (sscanf(argv[i + 1], "%d", &number) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number but '%s' is no valid number", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument: number but '%s' is no valid number", argv[i], argv[i + 1]);
           return FALSE;
         }
         if ((number < 0) || (number > 3))
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number between 0 and 3 so '%s' is not valid", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument: number between 0 and 3 so '%s' is not valid", argv[i], argv[i + 1]);
           return FALSE;
         }
         add_criterion(new LAScriterionKeepScannerChannel(number));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
     }
-    else if (strncmp(argv[i],"-drop_", 6) == 0)
+    else if (strncmp(argv[i], "-drop_", 6) == 0)
     {
-      if (strncmp(argv[i],"-drop_first", 11) == 0)
+      if (strncmp(argv[i], "-drop_first", 11) == 0)
       {
-        if (strcmp(argv[i],"-drop_first") == 0)
+        if (strcmp(argv[i], "-drop_first") == 0)
         {
           add_criterion(new LAScriterionDropFirstReturn());
-          *argv[i]='\0';
+          *argv[i] = '\0';
         }
-        else if (strcmp(argv[i],"-drop_first_of_many") == 0)
+        else if (strcmp(argv[i], "-drop_first_of_many") == 0)
         {
           add_criterion(new LAScriterionDropFirstOfManyReturn());
-          *argv[i]='\0';
+          *argv[i] = '\0';
         }
       }
-      else if (strncmp(argv[i],"-drop_last", 10) == 0)
+      else if (strncmp(argv[i], "-drop_last", 10) == 0)
       {
-        if (strcmp(argv[i],"-drop_last") == 0)
+        if (strcmp(argv[i], "-drop_last") == 0)
         {
           add_criterion(new LAScriterionDropLastReturn());
-          *argv[i]='\0';
+          *argv[i] = '\0';
         }
-        else if (strcmp(argv[i],"-drop_last_of_many") == 0)
+        else if (strcmp(argv[i], "-drop_last_of_many") == 0)
         {
           add_criterion(new LAScriterionDropLastOfManyReturn());
-          *argv[i]='\0';
+          *argv[i] = '\0';
         }
       }
-      else if (strcmp(argv[i],"-drop_middle") == 0)
+      else if (strcmp(argv[i], "-drop_middle") == 0)
       {
         add_criterion(new LAScriterionDropMiddleReturn());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_second_last") == 0)
+      else if (strcmp(argv[i], "-drop_second_last") == 0)
       {
         add_criterion(new LAScriterionDropSecondLast());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strncmp(argv[i],"-drop_class", 11) == 0)
+      else if (strncmp(argv[i], "-drop_class", 11) == 0)
       {
-        if (strcmp(argv[i],"-drop_classification") == 0 || strcmp(argv[i],"-drop_class") == 0)
+        if (strcmp(argv[i], "-drop_classification") == 0 || strcmp(argv[i], "-drop_class") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: classification", argv[i]);
+            laserror("'%s' needs at least 1 argument: classification", argv[i]);
             return FALSE;
           }
-          *argv[i]='\0';
-          i+=1;
+          *argv[i] = '\0';
+          i += 1;
           U32 classification;
           U32 drop_classification_mask = 0;
           do
           {
             if (sscanf(argv[i], "%u", &classification) != 1)
             {
-              LASMessage(LAS_ERROR, "'-drop_classification' needs at least 1 argument: classification but '%s' is no valid classification", argv[i]);
+              laserror("'-drop_classification' needs at least 1 argument: classification but '%s' is no valid classification", argv[i]);
               return FALSE;
             }
             if (classification > 31)
             {
-              LASMessage(LAS_ERROR, "cannot drop classification %u because it is larger than 31", classification);
+              laserror("cannot drop classification %u because it is larger than 31", classification);
               return FALSE;
             }
             drop_classification_mask |= (1u << classification);
-            *argv[i]='\0';
-            i+=1;
+            *argv[i] = '\0';
+            i += 1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-          i-=1;
+          i -= 1;
           // if last criteria was also drop_class filter then combine them
-          if (num_criteria && (strcmp(criteria[num_criteria-1]->name(), "drop_classification_mask") == 0))
+          if (num_criteria && (strcmp(criteria[num_criteria - 1]->name(), "drop_classification_mask") == 0))
           {
-            LAScriterionDropClassifications* criterion = (LAScriterionDropClassifications*)(criteria[num_criteria-1]);
+            LAScriterionDropClassifications* criterion = (LAScriterionDropClassifications*)(criteria[num_criteria - 1]);
             num_criteria--;
             drop_classification_mask |= criterion->get_drop_classification_mask();
             delete criterion;
           }
           add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
         }
-        else if (strcmp(argv[i],"-drop_classification_mask") == 0)
+        else if (strcmp(argv[i], "-drop_classification_mask") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: mask", argv[i]);
+            laserror("'%s' needs 1 argument: mask", argv[i]);
             return FALSE;
           }
           U32 drop_classification_mask;
-          if (sscanf(argv[i+1], "%u", &drop_classification_mask) != 1)
+          if (sscanf(argv[i + 1], "%u", &drop_classification_mask) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: mask but '%s' is no valid mask", argv[i], argv[i+1]);
+            laserror("'%s' needs at least 1 argument: mask but '%s' is no valid mask", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropClassifications(drop_classification_mask));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-drop_extended_", 15) == 0)
+      else if (strncmp(argv[i], "-drop_extended_", 15) == 0)
       {
-        if (strcmp(argv[i],"-drop_extended_classification") == 0 || strcmp(argv[i],"-drop_extended_class") == 0)
+        if (strcmp(argv[i], "-drop_extended_classification") == 0 || strcmp(argv[i], "-drop_extended_class") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: classification", argv[i]);
+            laserror("'%s' needs at least 1 argument: classification", argv[i]);
             return FALSE;
           }
-          *argv[i]='\0';
-          i+=1;
+          *argv[i] = '\0';
+          i += 1;
           U32 extended_classification;
           do
           {
             if (sscanf(argv[i], "%u", &extended_classification) != 1)
             {
-              LASMessage(LAS_ERROR, "'-drop_extended_classification' needs at least 1 argument: classification but '%s' is no valid classification", argv[i]);
+              laserror("'-drop_extended_classification' needs at least 1 argument: classification but '%s' is no valid classification", argv[i]);
               return FALSE;
             }
             if (extended_classification > 255)
             {
-              LASMessage(LAS_ERROR, "cannot drop extended classification %u because it is larger than 255", extended_classification);
+              laserror("cannot drop extended classification %u because it is larger than 255", extended_classification);
               return FALSE;
             }
-            drop_extended_classification_mask[extended_classification/32] |= (1u << (extended_classification%32));
-            *argv[i]='\0';
-            i+=1;
+            drop_extended_classification_mask[extended_classification / 32] |= (1u << (extended_classification % 32));
+            *argv[i] = '\0';
+            i += 1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-          i-=1;
+          i -= 1;
         }
-        else if (strcmp(argv[i],"-drop_extended_classification_mask") == 0)
+        else if (strcmp(argv[i], "-drop_extended_classification_mask") == 0)
         {
-          if ((i+8) >= argc)
+          if ((i + 8) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0", argv[i]);
+            laserror("'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0", argv[i]);
             return FALSE;
           }
-          if (sscanf(argv[i+1], "%u", &(drop_extended_classification_mask[7])) != 1)
+          if (sscanf(argv[i + 1], "%u", &(drop_extended_classification_mask[7])) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
-                                  "\tbut '%s' is a bad argument for mask7", argv[i], argv[i+1]);
+            laserror("'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
+              "\tbut '%s' is a bad argument for mask7", argv[i], argv[i + 1]);
             return FALSE;
           }
-          if (sscanf(argv[i+2], "%u", &(drop_extended_classification_mask[6])) != 1)
+          if (sscanf(argv[i + 2], "%u", &(drop_extended_classification_mask[6])) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
-                                  "\tbut '%s' is a bad argument for mask6", argv[i], argv[i+2]);
+            laserror("'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
+              "\tbut '%s' is a bad argument for mask6", argv[i], argv[i + 2]);
             return FALSE;
           }
-          if (sscanf(argv[i+3], "%u", &(drop_extended_classification_mask[5])) != 1)
+          if (sscanf(argv[i + 3], "%u", &(drop_extended_classification_mask[5])) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
-                                  "\tbut '%s' is a bad argument for mask5", argv[i], argv[i+3]);
+            laserror("'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
+              "\tbut '%s' is a bad argument for mask5", argv[i], argv[i + 3]);
             return FALSE;
           }
-          if (sscanf(argv[i+4], "%u", &(drop_extended_classification_mask[4])) != 1)
+          if (sscanf(argv[i + 4], "%u", &(drop_extended_classification_mask[4])) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
-                                  "\tbut '%s' is a bad argument for mask4", argv[i], argv[i+4]);
+            laserror("'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
+              "\tbut '%s' is a bad argument for mask4", argv[i], argv[i + 4]);
             return FALSE;
           }
-          if (sscanf(argv[i+5], "%u", &(drop_extended_classification_mask[3])) != 1)
+          if (sscanf(argv[i + 5], "%u", &(drop_extended_classification_mask[3])) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
-                                  "\tbut '%s' is a bad argument for mask3", argv[i], argv[i+5]);
+            laserror("'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
+              "\tbut '%s' is a bad argument for mask3", argv[i], argv[i + 5]);
             return FALSE;
           }
-          if (sscanf(argv[i+6], "%u", &(drop_extended_classification_mask[2])) != 1)
+          if (sscanf(argv[i + 6], "%u", &(drop_extended_classification_mask[2])) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
-                                  "\tbut '%s' is a bad argument for mask2", argv[i], argv[i+6]);
+            laserror("'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
+              "\tbut '%s' is a bad argument for mask2", argv[i], argv[i + 6]);
             return FALSE;
           }
-          if (sscanf(argv[i+7], "%u", &(drop_extended_classification_mask[1])) != 1)
+          if (sscanf(argv[i + 7], "%u", &(drop_extended_classification_mask[1])) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
-                                  "\tbut '%s' is a bad argument for mask1", argv[i], argv[i+7]);
+            laserror("'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
+              "\tbut '%s' is a bad argument for mask1", argv[i], argv[i + 7]);
             return FALSE;
           }
-          if (sscanf(argv[i+8], "%u", &(drop_extended_classification_mask[0])) != 1)
+          if (sscanf(argv[i + 8], "%u", &(drop_extended_classification_mask[0])) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
-                                  "\tbut '%s' is a bad argument for mask0", argv[i], argv[i+8]);
+            laserror("'%s' needs 8 arguments: mask7 mask6 mask5 mask4 mask3 mask2 mask1 mask0\n" \
+              "\tbut '%s' is a bad argument for mask0", argv[i], argv[i + 8]);
             return FALSE;
           }
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; *argv[i+7]='\0'; *argv[i+8]='\0'; i+=8;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; *argv[i + 4] = '\0'; *argv[i + 5] = '\0'; *argv[i + 6] = '\0'; *argv[i + 7] = '\0'; *argv[i + 8] = '\0'; i += 8;
         }
       }
-      else if (strncmp(argv[i],"-drop_x", 7) == 0)
+      else if (strncmp(argv[i], "-drop_x", 7) == 0)
       {
-        if (strcmp(argv[i],"-drop_xy") == 0)
+        if (strcmp(argv[i], "-drop_xy") == 0)
         {
-          if ((i+4) >= argc)
+          if ((i + 4) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y", argv[i]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y", argv[i]);
             return FALSE;
           }
           F64 min_x;
-          if (sscanf(argv[i+1], "%lf", &min_x) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid min_x", argv[i], argv[i+1]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid min_x", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 min_y;
-          if (sscanf(argv[i+2], "%lf", &min_y) != 1)
+          if (sscanf(argv[i + 2], "%lf", &min_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid min_y", argv[i], argv[i+2]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid min_y", argv[i], argv[i + 2]);
             return FALSE;
           }
           F64 max_x;
-          if (sscanf(argv[i+3], "%lf", &max_x) != 1)
+          if (sscanf(argv[i + 3], "%lf", &max_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid max_x", argv[i], argv[i+3]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid max_x", argv[i], argv[i + 3]);
             return FALSE;
           }
           F64 max_y;
-          if (sscanf(argv[i+4], "%lf", &max_y) != 1)
+          if (sscanf(argv[i + 4], "%lf", &max_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid max_y", argv[i], argv[i+4]);
+            laserror("'%s' needs 4 arguments: min_x min_y max_x max_y but '%s' is no valid max_y", argv[i], argv[i + 4]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropxy(min_x, min_y, max_x, max_y));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; i+=4; 
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; *argv[i + 4] = '\0'; i += 4;
         }
-        else if (strcmp(argv[i],"-drop_xyz") == 0)
+        else if (strcmp(argv[i], "-drop_xyz") == 0)
         {
-          if ((i+6) >= argc)
+          if ((i + 6) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z", argv[i]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z", argv[i]);
             return FALSE;
           }
           F64 min_x;
-          if (sscanf(argv[i+1], "%lf", &min_x) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_x", argv[i], argv[i+1]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_x", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 min_y;
-          if (sscanf(argv[i+2], "%lf", &min_y) != 1)
+          if (sscanf(argv[i + 2], "%lf", &min_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_y", argv[i], argv[i+2]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_y", argv[i], argv[i + 2]);
             return FALSE;
           }
           F64 min_z;
-          if (sscanf(argv[i+3], "%lf", &min_z) != 1)
+          if (sscanf(argv[i + 3], "%lf", &min_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_z", argv[i], argv[i+3]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid min_z", argv[i], argv[i + 3]);
             return FALSE;
           }
           F64 max_x;
-          if (sscanf(argv[i+4], "%lf", &max_x) != 1)
+          if (sscanf(argv[i + 4], "%lf", &max_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_x", argv[i], argv[i+4]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_x", argv[i], argv[i + 4]);
             return FALSE;
           }
           F64 max_y;
-          if (sscanf(argv[i+5], "%lf", &max_y) != 1)
+          if (sscanf(argv[i + 5], "%lf", &max_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_y", argv[i], argv[i+5]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_y", argv[i], argv[i + 5]);
             return FALSE;
           }
           F64 max_z;
-          if (sscanf(argv[i+6], "%lf", &max_z) != 1)
+          if (sscanf(argv[i + 6], "%lf", &max_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_z", argv[i], argv[i+6]);
+            laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z but '%s' is no valid max_z", argv[i], argv[i + 6]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropxyz(min_x, min_y, min_z, max_x, max_y, max_z));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; *argv[i+4]='\0'; *argv[i+5]='\0'; *argv[i+6]='\0'; i+=6; 
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; *argv[i + 4] = '\0'; *argv[i + 5] = '\0'; *argv[i + 6] = '\0'; i += 6;
         }
-        else if (strcmp(argv[i],"-drop_x") == 0)
+        else if (strcmp(argv[i], "-drop_x") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_x max_x", argv[i]);
+            laserror("'%s' needs 2 arguments: min_x max_x", argv[i]);
             return FALSE;
           }
           F64 min_x;
-          if (sscanf(argv[i+1], "%lf", &min_x) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_x max_x but '%s' is no valid min_x", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_x max_x but '%s' is no valid min_x", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 max_x;
-          if (sscanf(argv[i+2], "%lf", &max_x) != 1)
+          if (sscanf(argv[i + 2], "%lf", &max_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_x max_x but '%s' is no valid max_x", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_x max_x but '%s' is no valid max_x", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropx(min_x, max_x));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-drop_x_below") == 0)
+        else if (strcmp(argv[i], "-drop_x_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_x", argv[i]);
+            laserror("'%s' needs 1 argument: min_x", argv[i]);
             return FALSE;
           }
           F64 min_x;
-          if (sscanf(argv[i+1], "%lf", &min_x) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_x but '%s' is no valid min_x", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_x but '%s' is no valid min_x", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropxBelow(min_x));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_x_above") == 0)
+        else if (strcmp(argv[i], "-drop_x_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_x", argv[i]);
+            laserror("'%s' needs 1 argument: max_x", argv[i]);
             return FALSE;
           }
           F64 max_x;
-          if (sscanf(argv[i+1], "%lf", &max_x) != 1)
+          if (sscanf(argv[i + 1], "%lf", &max_x) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_x but '%s' is no valid max_x", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_x but '%s' is no valid max_x", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropxAbove(max_x));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-drop_y", 7) == 0)
+      else if (strncmp(argv[i], "-drop_y", 7) == 0)
       {
-        if (strcmp(argv[i],"-drop_y") == 0)
+        if (strcmp(argv[i], "-drop_y") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_y max_y", argv[i]);
+            laserror("'%s' needs 2 arguments: min_y max_y", argv[i]);
             return FALSE;
           }
           F64 min_y;
-          if (sscanf(argv[i+1], "%lf", &min_y) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_y max_y but '%s' is no valid min_y", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_y max_y but '%s' is no valid min_y", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 max_y;
-          if (sscanf(argv[i+2], "%lf", &max_y) != 1)
+          if (sscanf(argv[i + 2], "%lf", &max_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_y max_y but '%s' is no valid max_y", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_y max_y but '%s' is no valid max_y", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropy(min_y, max_y));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-drop_y_below") == 0)
+        else if (strcmp(argv[i], "-drop_y_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_y", argv[i]);
+            laserror("'%s' needs 1 argument: min_y", argv[i]);
             return FALSE;
           }
           F64 min_y;
-          if (sscanf(argv[i+1], "%lf", &min_y) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_y but '%s' is no valid min_y", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_y but '%s' is no valid min_y", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropyBelow(min_y));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_y_above") == 0)
+        else if (strcmp(argv[i], "-drop_y_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_y", argv[i]);
+            laserror("'%s' needs 1 argument: max_y", argv[i]);
             return FALSE;
           }
           F64 max_y;
-          if (sscanf(argv[i+1], "%lf", &max_y) != 1)
+          if (sscanf(argv[i + 1], "%lf", &max_y) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_y but '%s' is no valid max_y", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_y but '%s' is no valid max_y", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropyAbove(max_y));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-drop_z", 7) == 0)
+      else if (strncmp(argv[i], "-drop_z", 7) == 0)
       {
-        if (strcmp(argv[i],"-drop_z") == 0)
+        if (strcmp(argv[i], "-drop_z") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_z max_z", argv[i]);
+            laserror("'%s' needs 2 arguments: min_z max_z", argv[i]);
             return FALSE;
           }
           F64 min_z;
-          if (sscanf(argv[i+1], "%lf", &min_z) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_z max_z but '%s' is no valid min_z", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_z max_z but '%s' is no valid min_z", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 max_z;
-          if (sscanf(argv[i+2], "%lf", &max_z) != 1)
+          if (sscanf(argv[i + 2], "%lf", &max_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_z max_z but '%s' is no valid max_z", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_z max_z but '%s' is no valid max_z", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropz(min_z, max_z));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-drop_z_below") == 0)
+        else if (strcmp(argv[i], "-drop_z_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_z", argv[i]);
+            laserror("'%s' needs 1 argument: min_z", argv[i]);
             return FALSE;
           }
           F64 min_z;
-          if (sscanf(argv[i+1], "%lf", &min_z) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_z but '%s' is no valid min_z", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_z but '%s' is no valid min_z", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropzBelow(min_z));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_z_above") == 0)
+        else if (strcmp(argv[i], "-drop_z_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_z", argv[i]);
+            laserror("'%s' needs 1 argument: max_z", argv[i]);
             return FALSE;
           }
           F64 max_z;
-          if (sscanf(argv[i+1], "%lf", &max_z) != 1)
+          if (sscanf(argv[i + 1], "%lf", &max_z) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_z but '%s' is no valid max_z", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_z but '%s' is no valid max_z", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropzAbove(max_z));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-drop_X", 7) == 0)
+      else if (strncmp(argv[i], "-drop_X", 7) == 0)
       {
-        if (strcmp(argv[i],"-drop_X") == 0)
+        if (strcmp(argv[i], "-drop_X") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_X max_X", argv[i]);
+            laserror("'%s' needs 2 arguments: min_X max_X", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_X max_X but '%s' is no valid min_X", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_X max_X but '%s' is no valid min_X", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+2], "%d", &max) != 1)
+          if (sscanf(argv[i + 2], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_X max_X but '%s' is no valid max_X", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_X max_X but '%s' is no valid max_X", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropX(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-drop_X_below") == 0)
+        else if (strcmp(argv[i], "-drop_X_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_X", argv[i]);
+            laserror("'%s' needs 1 argument: min_X", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_X but '%s' is no valid min_X", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_X but '%s' is no valid min_X", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropXBelow(min));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_X_above") == 0)
+        else if (strcmp(argv[i], "-drop_X_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_X", argv[i]);
+            laserror("'%s' needs 1 argument: max_X", argv[i]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+1], "%d", &max) != 1)
+          if (sscanf(argv[i + 1], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_X but '%s' is no valid max_X", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_X but '%s' is no valid max_X", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropXAbove(max));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-drop_Y", 7) == 0)
+      else if (strncmp(argv[i], "-drop_Y", 7) == 0)
       {
-        if (strcmp(argv[i],"-drop_Y") == 0)
+        if (strcmp(argv[i], "-drop_Y") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Y max_Y", argv[i]);
+            laserror("'%s' needs 2 arguments: min_Y max_Y", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Y max_Y but '%s' is no valid min_Y", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_Y max_Y but '%s' is no valid min_Y", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+2], "%d", &max) != 1)
+          if (sscanf(argv[i + 2], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Y max_Y but '%s' is no valid max_Y", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_Y max_Y but '%s' is no valid max_Y", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropY(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-drop_Y_below") == 0)
+        else if (strcmp(argv[i], "-drop_Y_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_Y", argv[i]);
+            laserror("'%s' needs 1 argument: min_Y", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_Y but '%s' is no valid min_Y", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_Y but '%s' is no valid min_Y", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropYBelow(min));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_Y_above") == 0)
+        else if (strcmp(argv[i], "-drop_Y_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_Y", argv[i]);
+            laserror("'%s' needs 1 argument: max_Y", argv[i]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+1], "%d", &max) != 1)
+          if (sscanf(argv[i + 1], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_Y but '%s' is no valid max_Y", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_Y but '%s' is no valid max_Y", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropYAbove(max));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-drop_Z", 7) == 0)
+      else if (strncmp(argv[i], "-drop_Z", 7) == 0)
       {
-        if (strcmp(argv[i],"-drop_Z") == 0)
+        if (strcmp(argv[i], "-drop_Z") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Z max_Z", argv[i]);
+            laserror("'%s' needs 2 arguments: min_Z max_Z", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Z max_Z but '%s' is no valid min_Z", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_Z max_Z but '%s' is no valid min_Z", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+2], "%d", &max) != 1)
+          if (sscanf(argv[i + 2], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_Z max_Z but '%s' is no valid max_Z", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_Z max_Z but '%s' is no valid max_Z", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropZ(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-drop_Z_below") == 0)
+        else if (strcmp(argv[i], "-drop_Z_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_Z", argv[i]);
+            laserror("'%s' needs 1 argument: min_Z", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_Z but '%s' is no valid min_Z", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_Z but '%s' is no valid min_Z", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropZBelow(min));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_Z_above") == 0)
+        else if (strcmp(argv[i], "-drop_Z_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_Z", argv[i]);
+            laserror("'%s' needs 1 argument: max_Z", argv[i]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+1], "%d", &max) != 1)
+          if (sscanf(argv[i + 1], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_Z but '%s' is no valid max_Z", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_Z but '%s' is no valid max_Z", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropZAbove(max));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-drop_return", 12) == 0)
+      else if (strncmp(argv[i], "-drop_return", 12) == 0)
       {
-        if (strcmp(argv[i],"-drop_return") == 0)
+        if (strcmp(argv[i], "-drop_return") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: return_number", argv[i]);
+            laserror("'%s' needs at least 1 argument: return_number", argv[i]);
             return FALSE;
           }
-          *argv[i]='\0';
-          i+=1;
+          *argv[i] = '\0';
+          i += 1;
           U32 return_number;
           U16 drop_return_mask = 0;
           do
           {
             if (sscanf(argv[i], "%u", &return_number) != 1)
             {
-              LASMessage(LAS_ERROR, "'-drop_return' needs at least 1 argument: return_number but '%s' is no valid return_number", argv[i]);
+              laserror("'-drop_return' needs at least 1 argument: return_number but '%s' is no valid return_number", argv[i]);
               return FALSE;
             }
             if (return_number > 15)
             {
-              LASMessage(LAS_ERROR, "cannot drop return_number %u because it is larger than 15", return_number);
+              laserror("cannot drop return_number %u because it is larger than 15", return_number);
               return FALSE;
             }
             drop_return_mask |= (1u << return_number);
-            *argv[i]='\0';
-            i+=1;
+            *argv[i] = '\0';
+            i += 1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-          i-=1;
+          i -= 1;
           // if last criteria was also drop_return filter then combine them
-          if (num_criteria && (strcmp(criteria[num_criteria-1]->name(), "drop_return_mask") == 0))
+          if (num_criteria && (strcmp(criteria[num_criteria - 1]->name(), "drop_return_mask") == 0))
           {
-            LAScriterionDropReturns* criterion = (LAScriterionDropReturns*)(criteria[num_criteria-1]);
+            LAScriterionDropReturns* criterion = (LAScriterionDropReturns*)(criteria[num_criteria - 1]);
             num_criteria--;
             drop_return_mask |= criterion->get_drop_return_mask();
             delete criterion;
           }
           add_criterion(new LAScriterionDropReturns(drop_return_mask));
         }
-        else if (strcmp(argv[i],"-drop_return_mask") == 0)
+        else if (strcmp(argv[i], "-drop_return_mask") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: return_mask", argv[i]);
+            laserror("'%s' needs 1 argument: return_mask", argv[i]);
             return FALSE;
           }
           U32 drop_return_mask;
-          if (sscanf(argv[i+1], "%u", &drop_return_mask) != 1)
+          if (sscanf(argv[i + 1], "%u", &drop_return_mask) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: return_mask but '%s' is no valid return_mask", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: return_mask but '%s' is no valid return_mask", argv[i], argv[i + 1]);
             return FALSE;
           }
           if (drop_return_mask > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "'%s' needs a return_mask between 0 and %u but return_mask is %u", argv[i], U16_MAX, drop_return_mask);
+            laserror("'%s' needs a return_mask between 0 and %u but return_mask is %u", argv[i], U16_MAX, drop_return_mask);
             return FALSE;
           }
           add_criterion(new LAScriterionDropReturns((U16)drop_return_mask));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strcmp(argv[i],"-drop_number_of_returns") == 0)
+      else if (strcmp(argv[i], "-drop_number_of_returns") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number of returns", argv[i]);
+          laserror("'%s' needs 1 argument: number of returns", argv[i]);
           return FALSE;
         }
         U32 number_of_returns;
-        if (sscanf(argv[i+1], "%u", &number_of_returns) != 1)
+        if (sscanf(argv[i + 1], "%u", &number_of_returns) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number of returns but '%s' is no valid value", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument: number of returns but '%s' is no valid value", argv[i], argv[i + 1]);
           return FALSE;
         }
         if (number_of_returns > 15)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number of returns but '%u' is no valid value", argv[i], number_of_returns);
+          laserror("'%s' needs 1 argument: number of returns but '%u' is no valid value", argv[i], number_of_returns);
           return FALSE;
         }
         add_criterion(new LAScriterionDropSpecificNumberOfReturns(number_of_returns));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
-      else if (strcmp(argv[i],"-drop_single") == 0)
+      else if (strcmp(argv[i], "-drop_single") == 0)
       {
         add_criterion(new LAScriterionDropSpecificNumberOfReturns(1));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_double") == 0)
+      else if (strcmp(argv[i], "-drop_double") == 0)
       {
         add_criterion(new LAScriterionDropSpecificNumberOfReturns(2));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_triple") == 0)
+      else if (strcmp(argv[i], "-drop_triple") == 0)
       {
         add_criterion(new LAScriterionDropSpecificNumberOfReturns(3));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_quadruple") == 0)
+      else if (strcmp(argv[i], "-drop_quadruple") == 0)
       {
         add_criterion(new LAScriterionDropSpecificNumberOfReturns(4));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_quintuple") == 0)
+      else if (strcmp(argv[i], "-drop_quintuple") == 0)
       {
         add_criterion(new LAScriterionDropSpecificNumberOfReturns(5));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_scan_direction") == 0)
+      else if (strcmp(argv[i], "-drop_scan_direction") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: scan direction", argv[i]);
+          laserror("'%s' needs 1 argument: scan direction", argv[i]);
           return FALSE;
         }
         U32 scan_direction;
-        if (sscanf(argv[i+1], "%u", &scan_direction) != 1)
+        if (sscanf(argv[i + 1], "%u", &scan_direction) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: scan direction but '%s' is no valid value", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument: scan direction but '%s' is no valid value", argv[i], argv[i + 1]);
           return FALSE;
         }
         if (scan_direction > 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: scan direction but '%u' is no valid value", argv[i], scan_direction);
+          laserror("'%s' needs 1 argument: scan direction but '%u' is no valid value", argv[i], scan_direction);
           return FALSE;
         }
         add_criterion(new LAScriterionDropScanDirection(scan_direction));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
-      else if (strncmp(argv[i],"-drop_intensity",15) == 0)
+      else if (strncmp(argv[i], "-drop_intensity", 15) == 0)
       {
-        if (strcmp(argv[i],"-drop_intensity_above") == 0)
+        if (strcmp(argv[i], "-drop_intensity_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max", argv[i]);
+            laserror("'%s' needs 1 argument: max", argv[i]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+1], "%d", &max) != 1)
+          if (sscanf(argv[i + 1], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max but '%s' is no valid max", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max but '%s' is no valid max", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropIntensityAbove(max));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_intensity_below") == 0)
+        else if (strcmp(argv[i], "-drop_intensity_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min", argv[i]);
+            laserror("'%s' needs 1 argument: min", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropIntensityBelow(min));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_intensity_between") == 0)
+        else if (strcmp(argv[i], "-drop_intensity_between") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+            laserror("'%s' needs 2 arguments: min max", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+2], "%d", &max) != 1)
+          if (sscanf(argv[i + 2], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropIntensityBetween(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strncmp(argv[i],"-drop_RGB_", 10) == 0)
+      else if (strncmp(argv[i], "-drop_RGB_", 10) == 0)
       {
-        if ((i+2) >= argc)
+        if ((i + 2) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+          laserror("'%s' needs 2 arguments: min max", argv[i]);
           return FALSE;
         }
         I32 min;
-        if (sscanf(argv[i+1], "%d", &min) != 1)
+        if (sscanf(argv[i + 1], "%d", &min) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
           return FALSE;
         }
         I32 max;
-        if (sscanf(argv[i+2], "%d", &max) != 1)
+        if (sscanf(argv[i + 2], "%d", &max) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
           return FALSE;
         }
-        if (strcmp(argv[i]+10,"red") == 0)
+        if (strcmp(argv[i] + 10, "red") == 0)
         {
           add_criterion(new LAScriterionDropRGB(min, max, 0));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"green") == 0)
+        else if (strcmp(argv[i] + 10, "green") == 0)
         {
           add_criterion(new LAScriterionDropRGB(min, max, 1));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"blue") == 0)
+        else if (strcmp(argv[i] + 10, "blue") == 0)
         {
           add_criterion(new LAScriterionDropRGB(min, max, 2));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i]+10,"nir") == 0)
+        else if (strcmp(argv[i] + 10, "nir") == 0)
         {
           add_criterion(new LAScriterionDropRGB(min, max, 3));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
       else if (strcmp(argv[i], "-drop_HSV") == 0)
       {
         if ((i + 6) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max", argv[i]);
+          laserror("'%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max", argv[i]);
           return FALSE;
         }
         F32 h_min;
         if (strToFloatDegPcFail(argv[i + 1], &h_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument h_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument h_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 h_max;
         if (strToFloatDegPcFail(argv[i + 2], &h_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument h_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument h_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &h_min, &h_max, (F32)0.0, (F32)1.0))
@@ -4441,13 +4445,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
         F32 s_min;
         if (strToFloatDegPcFail(argv[i + 3], &s_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument s_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument s_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 s_max;
         if (strToFloatDegPcFail(argv[i + 4], &s_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument s_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument s_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &s_min, &s_max, (F32)0.0, (F32)1.0))
@@ -4457,13 +4461,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
         F32 v_min;
         if (strToFloatDegPcFail(argv[i + 5], &v_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument v_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument v_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 v_max;
         if (strToFloatDegPcFail(argv[i + 6], &v_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument v_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument v_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &v_min, &v_max, (F32)0.0, (F32)1.0))
@@ -4478,19 +4482,19 @@ BOOL LASfilter::parse(int argc, char* argv[])
       {
         if ((i + 2) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+          laserror("'%s' needs 2 arguments: min max", argv[i]);
           return FALSE;
         }
         F32 min;
         if (strToFloatDegPcFail(argv[i + 1], &min))
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 max;
         if (strToFloatDegPcFail(argv[i + 2], &max))
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &min, &max, (F32)0.0, (F32)1.0))
@@ -4526,19 +4530,19 @@ BOOL LASfilter::parse(int argc, char* argv[])
       {
         if ((i + 6) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max", argv[i]);
+          laserror("'%s' needs 6 arguments: h_min h_max s_min s_max v_min v_max", argv[i]);
           return FALSE;
         }
         F32 h_min;
         if (strToFloatDegPcFail(argv[i + 1], &h_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument h_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument h_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 h_max;
         if (strToFloatDegPcFail(argv[i + 2], &h_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument h_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument h_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &h_min, &h_max, (F32)0.0, (F32)1.0))
@@ -4548,13 +4552,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
         F32 s_min;
         if (strToFloatDegPcFail(argv[i + 3], &s_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument s_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument s_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 s_max;
         if (strToFloatDegPcFail(argv[i + 4], &s_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument s_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument s_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &s_min, &s_max, (F32)0.0, (F32)1.0))
@@ -4564,13 +4568,13 @@ BOOL LASfilter::parse(int argc, char* argv[])
         F32 v_min;
         if (strToFloatDegPcFail(argv[i + 5], &v_min))
         {
-          LASMessage(LAS_ERROR, "'%s' argument v_min is not valid: '%s'", argv[i], argv[i + 1]);
+          laserror("'%s' argument v_min is not valid: '%s'", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 v_max;
         if (strToFloatDegPcFail(argv[i + 6], &v_max))
         {
-          LASMessage(LAS_ERROR, "'%s' argument v_max is not valid: '%s'", argv[i], argv[i + 2]);
+          laserror("'%s' argument v_max is not valid: '%s'", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &v_min, &v_max, (F32)0.0, (F32)1.0))
@@ -4585,19 +4589,19 @@ BOOL LASfilter::parse(int argc, char* argv[])
       {
         if ((i + 2) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+          laserror("'%s' needs 2 arguments: min max", argv[i]);
           return FALSE;
         }
         F32 min;
         if (strToFloatDegPcFail(argv[i + 1], &min))
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
           return FALSE;
         }
         F32 max;
         if (strToFloatDegPcFail(argv[i + 2], &max))
         {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
+          laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
           return FALSE;
         }
         if (!rangeValidate(argv[i], &min, &max, (F32)0.0, (F32)1.0))
@@ -4629,635 +4633,635 @@ BOOL LASfilter::parse(int argc, char* argv[])
           i += 2;
         }
       }
-      else if (strncmp(argv[i],"-drop_abs_scan_angle_",21) == 0)
+      else if (strncmp(argv[i], "-drop_abs_scan_angle_", 21) == 0)
       {
-        if (strcmp(argv[i],"-drop_abs_scan_angle_above") == 0)
+        if (strcmp(argv[i], "-drop_abs_scan_angle_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max", argv[i]);
+            laserror("'%s' needs 1 argument: max", argv[i]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+1], "%d", &max) != 1)
+          if (sscanf(argv[i + 1], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max but '%s' is no valid max", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max but '%s' is no valid max", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionKeepScanAngle(-max, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_abs_scan_angle_below") == 0)
+        else if (strcmp(argv[i], "-drop_abs_scan_angle_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min", argv[i]);
+            laserror("'%s' needs 1 argument: min", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
-          add_criterion(new LAScriterionDropScanAngleBetween(-min+1, min-1));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          add_criterion(new LAScriterionDropScanAngleBetween(-min + 1, min - 1));
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
       }
-      else if (strncmp(argv[i],"-drop_scan_angle_",17) == 0)
+      else if (strncmp(argv[i], "-drop_scan_angle_", 17) == 0)
       {
-        if (strcmp(argv[i],"-drop_scan_angle_above") == 0)
+        if (strcmp(argv[i], "-drop_scan_angle_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max", argv[i]);
+            laserror("'%s' needs 1 argument: max", argv[i]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+1], "%d", &max) != 1)
+          if (sscanf(argv[i + 1], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max but '%s' is no valid max", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max but '%s' is no valid max", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropScanAngleAbove(max));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_scan_angle_below") == 0)
+        else if (strcmp(argv[i], "-drop_scan_angle_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min", argv[i]);
+            laserror("'%s' needs 1 argument: min", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropScanAngleBelow(min));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
-        }    
-        else if (strcmp(argv[i],"-drop_scan_angle_between") == 0)
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
+        }
+        else if (strcmp(argv[i], "-drop_scan_angle_between") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+            laserror("'%s' needs 2 arguments: min max", argv[i]);
             return FALSE;
           }
           I32 min;
-          if (sscanf(argv[i+1], "%d", &min) != 1)
+          if (sscanf(argv[i + 1], "%d", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           I32 max;
-          if (sscanf(argv[i+2], "%d", &max) != 1)
+          if (sscanf(argv[i + 2], "%d", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropScanAngleBetween(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strcmp(argv[i],"-drop_synthetic") == 0)
+      else if (strcmp(argv[i], "-drop_synthetic") == 0)
       {
         add_criterion(new LAScriterionDropSynthetic());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_keypoint") == 0)
+      else if (strcmp(argv[i], "-drop_keypoint") == 0)
       {
         add_criterion(new LAScriterionDropKeypoint());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_withheld") == 0)
+      else if (strcmp(argv[i], "-drop_withheld") == 0)
       {
         add_criterion(new LAScriterionDropWithheld());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_overlap") == 0)
+      else if (strcmp(argv[i], "-drop_overlap") == 0)
       {
         add_criterion(new LAScriterionDropOverlap());
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-drop_wavepacket") == 0)
+      else if (strcmp(argv[i], "-drop_wavepacket") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+          laserror("'%s' needs 1 argument: index", argv[i]);
           return FALSE;
         }
-        *argv[i]='\0';
-        i+=1;
+        *argv[i] = '\0';
+        i += 1;
         add_criterion(new LAScriterionDropWavepacket(atoi(argv[i])));
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strncmp(argv[i],"-drop_user_data", 15) == 0)
+      else if (strncmp(argv[i], "-drop_user_data", 15) == 0)
       {
-        if (strcmp(argv[i],"-drop_user_data") == 0)
+        if (strcmp(argv[i], "-drop_user_data") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: value", argv[i]);
+            laserror("'%s' needs at least 1 argument: value", argv[i]);
             return FALSE;
           }
-          *argv[i]='\0';
-          i+=1;
+          *argv[i] = '\0';
+          i += 1;
           do
           {
             U32 user_data;
             if (sscanf(argv[i], "%u", &user_data) != 1)
             {
-              LASMessage(LAS_ERROR, "'-drop_user_data' needs at least 1 argument: value but '%s' is no valid value", argv[i]);
+              laserror("'-drop_user_data' needs at least 1 argument: value but '%s' is no valid value", argv[i]);
               return FALSE;
             }
             if (user_data > 255)
             {
-              LASMessage(LAS_ERROR, "cannot drop user data %u because it is larger than 255", user_data);
+              laserror("cannot drop user data %u because it is larger than 255", user_data);
               return FALSE;
             }
             add_criterion(new LAScriterionDropUserData(user_data));
-            *argv[i]='\0';
-            i+=1;
+            *argv[i] = '\0';
+            i += 1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-          i-=1;
+          i -= 1;
         }
-        else if (strcmp(argv[i],"-drop_user_data_below") == 0)
+        else if (strcmp(argv[i], "-drop_user_data_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: below", argv[i]);
+            laserror("'%s' needs 1 argument: below", argv[i]);
             return FALSE;
           }
           U32 min;
-          if (sscanf(argv[i+1], "%u", &min) != 1)
+          if (sscanf(argv[i + 1], "%u", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: below but '%s' is no valid value", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: below but '%s' is no valid value", argv[i], argv[i + 1]);
             return FALSE;
           }
           if (min > 255)
           {
-            LASMessage(LAS_ERROR, "cannot drop user data below %u because it is larger than 255", min);
+            laserror("cannot drop user data below %u because it is larger than 255", min);
             return FALSE;
           }
           add_criterion(new LAScriterionDropUserDataBelow(min));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_user_data_above") == 0)
+        else if (strcmp(argv[i], "-drop_user_data_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: above", argv[i]);
+            laserror("'%s' needs 1 argument: above", argv[i]);
             return FALSE;
           }
           U32 max;
-          if (sscanf(argv[i+1], "%u", &max) != 1)
+          if (sscanf(argv[i + 1], "%u", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: above but '%s' is no valid value", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: above but '%s' is no valid value", argv[i], argv[i + 1]);
             return FALSE;
           }
           if (max > 255)
           {
-            LASMessage(LAS_ERROR, "cannot drop user data above %u because it is larger than 255", max);
+            laserror("cannot drop user data above %u because it is larger than 255", max);
             return FALSE;
           }
           add_criterion(new LAScriterionDropUserDataAbove(max));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_user_data_between") == 0)
+        else if (strcmp(argv[i], "-drop_user_data_between") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+            laserror("'%s' needs 2 arguments: min max", argv[i]);
             return FALSE;
           }
           U32 min;
-          if (sscanf(argv[i+1], "%u", &min) != 1)
+          if (sscanf(argv[i + 1], "%u", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           if (min > 255)
           {
-            LASMessage(LAS_ERROR, "cannot drop user data between min and max because min of %u is larger than 255", min);
+            laserror("cannot drop user data between min and max because min of %u is larger than 255", min);
             return FALSE;
           }
           U32 max;
-          if (sscanf(argv[i+2], "%u", &max) != 1)
+          if (sscanf(argv[i + 2], "%u", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
             return FALSE;
           }
           if (max > 255)
           {
-            LASMessage(LAS_ERROR, "cannot drop user data between min and max because max of %u is larger than 255", max);
+            laserror("cannot drop user data between min and max because max of %u is larger than 255", max);
             return FALSE;
           }
           add_criterion(new LAScriterionDropUserDataBetween(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strncmp(argv[i],"-drop_point_source", 18) == 0)
+      else if (strncmp(argv[i], "-drop_point_source", 18) == 0)
       {
-        if (strcmp(argv[i],"-drop_point_source") == 0)
+        if (strcmp(argv[i], "-drop_point_source") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: ID", argv[i]);
+            laserror("'%s' needs at least 1 argument: ID", argv[i]);
             return FALSE;
           }
-          *argv[i]='\0';
-          i+=1;
+          *argv[i] = '\0';
+          i += 1;
           do
           {
             U32 ID;
             if (sscanf(argv[i], "%u", &ID) != 1)
             {
-              LASMessage(LAS_ERROR, "'-drop_point_source' needs at least 1 argument: ID but '%s' is no valid ID", argv[i]);
+              laserror("'-drop_point_source' needs at least 1 argument: ID but '%s' is no valid ID", argv[i]);
               return FALSE;
             }
             if (ID > U16_MAX)
             {
-              LASMessage(LAS_ERROR, "cannot drop_point_source ID %u because it is larger than %u", ID, U16_MAX);
+              laserror("cannot drop_point_source ID %u because it is larger than %u", ID, U16_MAX);
               return FALSE;
             }
             add_criterion(new LAScriterionDropPointSource(ID));
-            *argv[i]='\0';
-            i+=1;
+            *argv[i] = '\0';
+            i += 1;
           } while ((i < argc) && ('0' <= *argv[i]) && (*argv[i] <= '9'));
-          i-=1;
+          i -= 1;
         }
-        else if (strcmp(argv[i],"-drop_point_source_below") == 0)
+        else if (strcmp(argv[i], "-drop_point_source_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_ID", argv[i]);
+            laserror("'%s' needs 1 argument: min_ID", argv[i]);
             return FALSE;
           }
           U32 min_ID;
-          if (sscanf(argv[i+1], "%u", &min_ID) != 1)
+          if (sscanf(argv[i + 1], "%u", &min_ID) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_ID max_ID but '%s' is no valid min_ID", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_ID max_ID but '%s' is no valid min_ID", argv[i], argv[i + 1]);
             return FALSE;
           }
           if (min_ID > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "cannot drop point source below min_ID of %u because it is larger than %u", min_ID, U16_MAX);
+            laserror("cannot drop point source below min_ID of %u because it is larger than %u", min_ID, U16_MAX);
             return FALSE;
           }
           add_criterion(new LAScriterionDropPointSourceBelow((U16)min_ID));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_point_source_above") == 0)
+        else if (strcmp(argv[i], "-drop_point_source_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_ID", argv[i]);
+            laserror("'%s' needs 1 argument: max_ID", argv[i]);
             return FALSE;
           }
           U32 max_ID;
-          if (sscanf(argv[i+1], "%u", &max_ID) != 1)
+          if (sscanf(argv[i + 1], "%u", &max_ID) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_ID but '%s' is no valid max_ID", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_ID but '%s' is no valid max_ID", argv[i], argv[i + 1]);
             return FALSE;
           }
           if (max_ID > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "cannot drop point source above max_ID of %u because it is larger than %u", max_ID, U16_MAX);
+            laserror("cannot drop point source above max_ID of %u because it is larger than %u", max_ID, U16_MAX);
             return FALSE;
           }
           add_criterion(new LAScriterionDropPointSourceAbove((U16)max_ID));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_point_source_between") == 0)
+        else if (strcmp(argv[i], "-drop_point_source_between") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_ID max_ID", argv[i]);
+            laserror("'%s' needs 2 arguments: min_ID max_ID", argv[i]);
             return FALSE;
           }
           U32 min_ID;
-          if (sscanf(argv[i+1], "%u", &min_ID) != 1)
+          if (sscanf(argv[i + 1], "%u", &min_ID) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_ID max_ID but '%s' is no valid min_ID", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min_ID max_ID but '%s' is no valid min_ID", argv[i], argv[i + 1]);
             return FALSE;
           }
           U32 max_ID;
           if (sscanf(argv[i + 2], "%u", &max_ID) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min_ID max_ID but '%s' is no valid max_ID", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min_ID max_ID but '%s' is no valid max_ID", argv[i], argv[i + 2]);
             return FALSE;
           }
           if (min_ID > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "cannot drop point source because min_ID of %u is larger than %u", min_ID, U16_MAX);
+            laserror("cannot drop point source because min_ID of %u is larger than %u", min_ID, U16_MAX);
             return FALSE;
           }
           if (max_ID > U16_MAX)
           {
-            LASMessage(LAS_ERROR, "cannot drop point source because max_ID of %u is larger than %u", max_ID, U16_MAX);
+            laserror("cannot drop point source because max_ID of %u is larger than %u", max_ID, U16_MAX);
             return FALSE;
           }
           add_criterion(new LAScriterionDropPointSourceBetween((U16)min_ID, (U16)max_ID));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strncmp(argv[i],"-drop_gps", 9) == 0)
+      else if (strncmp(argv[i], "-drop_gps", 9) == 0)
       {
-        if (strcmp(argv[i],"-drop_gps_time_above") == 0 || strcmp(argv[i],"-drop_gpstime_above") == 0)
+        if (strcmp(argv[i], "-drop_gps_time_above") == 0 || strcmp(argv[i], "-drop_gpstime_above") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_gps_time", argv[i]);
+            laserror("'%s' needs 1 argument: max_gps_time", argv[i]);
             return FALSE;
           }
           F64 max_gps_time;
-          if (sscanf(argv[i+1], "%lf", &max_gps_time) != 1)
+          if (sscanf(argv[i + 1], "%lf", &max_gps_time) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: max_gps_time but '%s' is no valid max_gps_time", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: max_gps_time but '%s' is no valid max_gps_time", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropGpsTimeAbove(max_gps_time));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_gps_time_below") == 0 || strcmp(argv[i],"-drop_gpstime_below") == 0)
+        else if (strcmp(argv[i], "-drop_gps_time_below") == 0 || strcmp(argv[i], "-drop_gpstime_below") == 0)
         {
-          if ((i+1) >= argc)
+          if ((i + 1) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_gps_time", argv[i]);
+            laserror("'%s' needs 1 argument: min_gps_time", argv[i]);
             return FALSE;
           }
           F64 min_gps_time;
-          if (sscanf(argv[i+1], "%lf", &min_gps_time) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min_gps_time) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: min_gps_time but '%s' is no valid min_gps_time", argv[i], argv[i+1]);
+            laserror("'%s' needs 1 argument: min_gps_time but '%s' is no valid min_gps_time", argv[i], argv[i + 1]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropGpsTimeBelow(min_gps_time));
-          *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
         }
-        else if (strcmp(argv[i],"-drop_gps_time_between") == 0 || strcmp(argv[i],"-drop_gpstime_between") == 0)
+        else if (strcmp(argv[i], "-drop_gps_time_between") == 0 || strcmp(argv[i], "-drop_gpstime_between") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max", argv[i]);
+            laserror("'%s' needs 2 arguments: min max", argv[i]);
             return FALSE;
           }
           F64 min;
-          if (sscanf(argv[i+1], "%lf", &min) != 1)
+          if (sscanf(argv[i + 1], "%lf", &min) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid min", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 max;
-          if (sscanf(argv[i+2], "%lf", &max) != 1)
+          if (sscanf(argv[i + 2], "%lf", &max) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: min max but '%s' is no valid max", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropGpsTimeBetween(min, max));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
       }
-      else if (strncmp(argv[i],"-drop_attribute", 15) == 0)
+      else if (strncmp(argv[i], "-drop_attribute", 15) == 0)
       {
-        if (strcmp(argv[i],"-drop_attribute_below") == 0)
+        if (strcmp(argv[i], "-drop_attribute_below") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value", argv[i]);
+            laserror("'%s' needs 2 arguments: index value", argv[i]);
             return FALSE;
           }
           U32 index;
-          if (sscanf(argv[i+1], "%u", &index) != 1)
+          if (sscanf(argv[i + 1], "%u", &index) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 value;
-          if (sscanf(argv[i+2], "%lf", &value) != 1)
+          if (sscanf(argv[i + 2], "%lf", &value) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value '%s' is no valid value", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: index value '%s' is no valid value", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropAttributeBelow(index, value));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-drop_attribute_above") == 0)
+        else if (strcmp(argv[i], "-drop_attribute_above") == 0)
         {
-          if ((i+2) >= argc)
+          if ((i + 2) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value", argv[i]);
+            laserror("'%s' needs 2 arguments: index value", argv[i]);
             return FALSE;
           }
           U32 index;
-          if (sscanf(argv[i+1], "%u", &index) != 1)
+          if (sscanf(argv[i + 1], "%u", &index) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i+1]);
+            laserror("'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 value;
-          if (sscanf(argv[i+2], "%lf", &value) != 1)
+          if (sscanf(argv[i + 2], "%lf", &value) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value '%s' is no valid value", argv[i], argv[i+2]);
+            laserror("'%s' needs 2 arguments: index value '%s' is no valid value", argv[i], argv[i + 2]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropAttributeAbove(index, value));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; i+=2;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; i += 2;
         }
-        else if (strcmp(argv[i],"-drop_attribute_between") == 0)
+        else if (strcmp(argv[i], "-drop_attribute_between") == 0)
         {
-          if ((i+3) >= argc)
+          if ((i + 3) >= argc)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 3 arguments: index below above", argv[i]);
+            laserror("'%s' needs 3 arguments: index below above", argv[i]);
             return FALSE;
           }
           U32 index;
-          if (sscanf(argv[i+1], "%u", &index) != 1)
+          if (sscanf(argv[i + 1], "%u", &index) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 3 arguments: index below above but '%s' is no valid index", argv[i], argv[i+1]);
+            laserror("'%s' needs 3 arguments: index below above but '%s' is no valid index", argv[i], argv[i + 1]);
             return FALSE;
           }
           F64 below;
-          if (sscanf(argv[i+2], "%lf", &below) != 1)
+          if (sscanf(argv[i + 2], "%lf", &below) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 3 arguments: index below above but '%s' is no valid below", argv[i], argv[i+2]);
+            laserror("'%s' needs 3 arguments: index below above but '%s' is no valid below", argv[i], argv[i + 2]);
             return FALSE;
           }
           F64 above;
-          if (sscanf(argv[i+3], "%lf", &above) != 1)
+          if (sscanf(argv[i + 3], "%lf", &above) != 1)
           {
-            LASMessage(LAS_ERROR, "'%s' needs 3 arguments: index below above but '%s' is no valid above", argv[i], argv[i+3]);
+            laserror("'%s' needs 3 arguments: index below above but '%s' is no valid above", argv[i], argv[i + 3]);
             return FALSE;
           }
           add_criterion(new LAScriterionDropAttributeBetween(index, below, above));
-          *argv[i]='\0'; *argv[i+1]='\0'; *argv[i+2]='\0'; *argv[i+3]='\0'; i+=3;
+          *argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; i += 3;
         }
       }
-      else if (strcmp(argv[i],"-drop_every_nth") == 0)
+      else if (strcmp(argv[i], "-drop_every_nth") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: nth", argv[i]);
+          laserror("'%s' needs 1 argument: nth", argv[i]);
           return FALSE;
         }
         U32 nth;
-        if (sscanf(argv[i+1], "%u", &nth) != 1)
+        if (sscanf(argv[i + 1], "%u", &nth) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument nth but '%s' is no valid nth", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument nth but '%s' is no valid nth", argv[i], argv[i + 1]);
           return FALSE;
         }
         if (nth == 0)
         {
-          LASMessage(LAS_ERROR, "%u is no valid nth for '%s'", nth, argv[i]);
+          laserror("%u is no valid nth for '%s'", nth, argv[i]);
           return FALSE;
         }
         add_criterion(new LAScriterionDropEveryNth(nth));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
-      else if (strcmp(argv[i],"-drop_scanner_channel") == 0)
+      else if (strcmp(argv[i], "-drop_scanner_channel") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
+          laserror("'%s' needs 1 argument: number", argv[i]);
           return FALSE;
         }
         U32 scanner_channel;
-        if (sscanf(argv[i+1], "%u", &scanner_channel) != 1)
+        if (sscanf(argv[i + 1], "%u", &scanner_channel) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument channel but '%s' is no valid value", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument channel but '%s' is no valid value", argv[i], argv[i + 1]);
           return FALSE;
         }
         if (scanner_channel > 3)
         {
-          LASMessage(LAS_ERROR, "%u is no valid value for '%s'", scanner_channel, argv[i]);
+          laserror("%u is no valid value for '%s'", scanner_channel, argv[i]);
           return FALSE;
         }
         add_criterion(new LAScriterionDropScannerChannel(scanner_channel));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
     }
-    else if (strcmp(argv[i],"-first_only") == 0)
+    else if (strcmp(argv[i], "-first_only") == 0)
     {
       add_criterion(new LAScriterionKeepFirstReturn());
-      *argv[i]='\0';
+      *argv[i] = '\0';
     }
-    else if (strcmp(argv[i],"-last_only") == 0)
+    else if (strcmp(argv[i], "-last_only") == 0)
     {
       add_criterion(new LAScriterionKeepLastReturn());
-      *argv[i]='\0';
+      *argv[i] = '\0';
     }
-    else if (strncmp(argv[i],"-thin_", 6) == 0)
+    else if (strncmp(argv[i], "-thin_", 6) == 0)
     {
-      if (strcmp(argv[i],"-thin_with_grid") == 0)
+      if (strcmp(argv[i], "-thin_with_grid") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: grid spacing", argv[i]);
+          laserror("'%s' needs 1 argument: grid spacing", argv[i]);
           return FALSE;
         }
         F32 step;
-        if (sscanf(argv[i+1], "%f", &step) != 1)
+        if (sscanf(argv[i + 1], "%f", &step) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: grid spacing but '%s' is no valid value", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument: grid spacing but '%s' is no valid value", argv[i], argv[i + 1]);
           return FALSE;
         }
         if (step <= 0.0f)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: grid spacing but '%g' is no valid value", argv[i], step);
+          laserror("'%s' needs 1 argument: grid spacing but '%g' is no valid value", argv[i], step);
           return FALSE;
         }
         add_criterion(new LAScriterionThinWithGrid(step));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
-      else if (strcmp(argv[i],"-thin_pulses_with_time") == 0 || strcmp(argv[i],"-thin_with_time") == 0)
+      else if (strcmp(argv[i], "-thin_pulses_with_time") == 0 || strcmp(argv[i], "-thin_with_time") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: time spacing", argv[i]);
+          laserror("'%s' needs 1 argument: time spacing", argv[i]);
           return FALSE;
         }
         F64 step;
-        if (sscanf(argv[i+1], "%lf", &step) != 1)
+        if (sscanf(argv[i + 1], "%lf", &step) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: time spacing but '%s' is no valid value", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument: time spacing but '%s' is no valid value", argv[i], argv[i + 1]);
           return FALSE;
         }
         if (step <= 0.0)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: time spacing but '%g' is no valid value", argv[i], step);
+          laserror("'%s' needs 1 argument: time spacing but '%g' is no valid value", argv[i], step);
           return FALSE;
         }
         add_criterion(new LAScriterionThinPulsesWithTime(step));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
-      else if (strcmp(argv[i],"-thin_points_with_time") == 0)
+      else if (strcmp(argv[i], "-thin_points_with_time") == 0)
       {
-        if ((i+1) >= argc)
+        if ((i + 1) >= argc)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: time spacing", argv[i]);
+          laserror("'%s' needs 1 argument: time spacing", argv[i]);
           return FALSE;
         }
         F64 step;
-        if (sscanf(argv[i+1], "%lf", &step) != 1)
+        if (sscanf(argv[i + 1], "%lf", &step) != 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: time spacing but '%s' is no valid value", argv[i], argv[i+1]);
+          laserror("'%s' needs 1 argument: time spacing but '%s' is no valid value", argv[i], argv[i + 1]);
           return FALSE;
         }
         if (step <= 0.0)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: time spacing but '%g' is no valid value", argv[i], step);
+          laserror("'%s' needs 1 argument: time spacing but '%g' is no valid value", argv[i], step);
           return FALSE;
         }
         add_criterion(new LAScriterionThinPointsWithTime(step));
-        *argv[i]='\0'; *argv[i+1]='\0'; i+=1;
+        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
       }
     }
-    else if (strncmp(argv[i],"-filter_", 8) == 0)
+    else if (strncmp(argv[i], "-filter_", 8) == 0)
     {
-      if (strcmp(argv[i],"-filter_and") == 0)
+      if (strcmp(argv[i], "-filter_and") == 0)
       {
         if (num_criteria < 2)
         {
-          LASMessage(LAS_ERROR, "'%s' needs to be preceeded by at least two filters", argv[i]);
+          laserror("'%s' needs to be preceeded by at least two filters", argv[i]);
           return FALSE;
         }
-        LAScriterion* filter_criterion = new LAScriterionAnd(criteria[num_criteria-2], criteria[num_criteria-1]);
+        LAScriterion* filter_criterion = new LAScriterionAnd(criteria[num_criteria - 2], criteria[num_criteria - 1]);
         num_criteria--;
         criteria[num_criteria] = 0;
         num_criteria--;
         criteria[num_criteria] = 0;
         add_criterion(filter_criterion);
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-filter_or") == 0)
+      else if (strcmp(argv[i], "-filter_or") == 0)
       {
         if (num_criteria < 2)
         {
-          LASMessage(LAS_ERROR, "'%s' needs to be preceeded by at least two filters", argv[i]);
+          laserror("'%s' needs to be preceeded by at least two filters", argv[i]);
           return FALSE;
         }
-        LAScriterion* filter_criterion = new LAScriterionOr(criteria[num_criteria-2], criteria[num_criteria-1]);
+        LAScriterion* filter_criterion = new LAScriterionOr(criteria[num_criteria - 2], criteria[num_criteria - 1]);
         num_criteria--;
         criteria[num_criteria] = 0;
         num_criteria--;
         criteria[num_criteria] = 0;
         add_criterion(filter_criterion);
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
     }
-    else if (strncmp(argv[i],"-clip_", 6) == 0)
+    else if (strncmp(argv[i], "-clip_", 6) == 0)
     {
       //pre-formated multiline message
-      LASMessage(LAS_ERROR, "'%s' is no longer recognized. check documentation with '-h'.\n" \
-                            "  rename '-clip' to '-keep_xy'.\n" \
-                            "  rename '-clip_box' to '-keep_xyz'.\n" \
-                            "  rename '-clip_tile' to '-keep_tile'.\n" \
-                            "  rename '-clip_z_below' to '-drop_z_below'.\n" \
-                            "  rename '-clip_z_above' to '-drop_z_above'.\n" \
-                            "  rename '-clip_z_between' to '-drop_z'.\n" \
-                            "  etc ...\n", argv[i]);
+      laserror("'%s' is no longer recognized. check documentation with '-h'.\n" \
+        "  rename '-clip' to '-keep_xy'.\n" \
+        "  rename '-clip_box' to '-keep_xyz'.\n" \
+        "  rename '-clip_tile' to '-keep_tile'.\n" \
+        "  rename '-clip_z_below' to '-drop_z_below'.\n" \
+        "  rename '-clip_z_above' to '-drop_z_above'.\n" \
+        "  rename '-clip_z_between' to '-drop_z'.\n" \
+        "  etc ...\n", argv[i]);
       return FALSE;
     }
   }
@@ -5266,7 +5270,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
   {
     if (drop_extended_classification_mask[0] || drop_extended_classification_mask[1] || drop_extended_classification_mask[2] || drop_extended_classification_mask[3] || drop_extended_classification_mask[4] || drop_extended_classification_mask[5] || drop_extended_classification_mask[6] || drop_extended_classification_mask[7])
     {
-      LASMessage(LAS_ERROR, "cannot use '-drop_extended_class' and '-keep_extended_class' simultaneously");
+      laserror("cannot use '-drop_extended_class' and '-keep_extended_class' simultaneously");
       return FALSE;
     }
     else
@@ -5286,7 +5290,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
     if (using_keep_class_filter)
     {
       LASMessage(LAS_WARNING, "cannot combine '-keep_class' together with '-keep_extended_class'. use\n" \
-                              "\texclusively 'extended' filters for filtering points with classes above 31");
+        "\texclusively 'extended' filters for filtering points with classes above 31");
     }
     else
     {
@@ -5400,7 +5404,7 @@ void LASfilter::add_criterion(LAScriterion* filter_criterion)
   {
     U32 i;
     alloc_criteria += 16;
-    LAScriterion** temp_criteria = new LAScriterion*[alloc_criteria];
+    LAScriterion** temp_criteria = new LAScriterion * [alloc_criteria];
     int* temp_counters = new int[alloc_criteria];
     if (criteria)
     {
@@ -5409,8 +5413,8 @@ void LASfilter::add_criterion(LAScriterion* filter_criterion)
         temp_criteria[i] = criteria[i];
         temp_counters[i] = counters[i];
       }
-      delete [] criteria;
-      delete [] counters;
+      delete[] criteria;
+      delete[] counters;
     }
     criteria = temp_criteria;
     counters = temp_counters;

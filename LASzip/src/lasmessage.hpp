@@ -31,37 +31,13 @@
 #ifndef LAS_MESSAGE_HPP
 #define LAS_MESSAGE_HPP
 
-#include "mydefs.hpp"
-
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include "mydefs.hpp"
+#include "laszip_common.h"
 
-
-/// maximum length of
-#define LAS_MAX_MESSAGE_LENGTH 8192
-
-enum LAS_MESSAGE_TYPE {
-    LAS_DEBUG = 0,
-    LAS_VERY_VERBOSE,
-    LAS_VERBOSE,
-    LAS_INFO,
-    LAS_WARNING,
-    LAS_SERIOUS_WARNING,
-    LAS_ERROR,
-    LAS_FATAL_ERROR,
-    LAS_QUIET             //this is not supposed to be used in LASMessage, but in set_message_log_level for disabling any message
-};
-
-#if defined(_MSC_VER)
-#include <sal.h>
-/** activate printf-like format check for logging */
-#  define LAS_FORMAT_STRING(arg) _Printf_format_string_ arg
-#else
-/** wrap the format argument of a printf-like function */
-# define LAS_FORMAT_STRING(arg) arg
-#endif
-
+extern long lasmessage_cnt[LAS_QUIET];
 
 // central las message function
 void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*), ...);
@@ -81,7 +57,6 @@ void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*)
 void LASLIB_DLL set_message_log_level(LAS_MESSAGE_TYPE loglevel);
 // get log level of default laslib message handler
 LAS_MESSAGE_TYPE LASLIB_DLL get_message_log_level();
-
 
 // callback function type for overwriting the default laslib message handler
 typedef void  (*LASMessageHandler)(LAS_MESSAGE_TYPE type, const char* msg, void* user_data);
@@ -116,7 +91,7 @@ private:
 };
 
 #define logdebug LASMessageStream(LAS_DEBUG)
-#define logveryverbos LASMessageStream(LAS_VERY_VERBOSE)
+#define logveryverbose LASMessageStream(LAS_VERY_VERBOSE)
 #define logverbose LASMessageStream(LAS_VERBOSE)
 #define loginfo LASMessageStream(LAS_INFO)
 #define logwarning LASMessageStream(LAS_WARNING)

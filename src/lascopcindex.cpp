@@ -68,6 +68,7 @@
 #include "lascopc.hpp"
 #include "lasprogress.hpp"
 #include "geoprojectionconverter.hpp"
+#include "lastool.hpp"
 
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
@@ -86,37 +87,26 @@ I32 MAX_FOPEN = 500;
 I32 MAX_FOPEN = 1000;
 #endif
 
-static void usage(bool error = false, bool wait = false)
+class LasTool_lascopcindex : public LasTool
 {
-  fprintf(stderr, "usage:\n");
-  fprintf(stderr, "lascopcindex in.las\n");
-  fprintf(stderr, "lascopcindex -i *.laz\n");
-  fprintf(stderr, "lascopcindex -i *.laz -first_only\n");
-  fprintf(stderr, "lascopcindex -merged -i *.las -drop_return 4 5\n");
-  fprintf(stderr, "lascopcindex -merged -lof file_list.txt -o out.copc.laz\n");
-  fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -progress\n");
-  fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -max_depth 5\n");
-  fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -root_light\n");
-  fprintf(stderr, "lascopcindex tls.laz -tls\n");
-  fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -ondisk -verbose\n");
-  fprintf(stderr, "lascopcindex -h\n");
-  if (wait)
+private:
+public:
+  void usage() override
   {
-    fprintf(stderr, "<press ENTER>\n");
-    getc(stdin);
-  }
-  exit(error);
-}
-
-static void byebye(bool error = false, bool wait = false)
-{
-  if (wait)
-  {
-    fprintf(stderr, "<press ENTER>\n");
-    getc(stdin);
-  }
-  exit(error);
-}
+    fprintf(stderr, "usage:\n");
+    fprintf(stderr, "lascopcindex in.las\n");
+    fprintf(stderr, "lascopcindex -i *.laz\n");
+    fprintf(stderr, "lascopcindex -i *.laz -first_only\n");
+    fprintf(stderr, "lascopcindex -merged -i *.las -drop_return 4 5\n");
+    fprintf(stderr, "lascopcindex -merged -lof file_list.txt -o out.copc.laz\n");
+    fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -progress\n");
+    fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -max_depth 5\n");
+    fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -root_light\n");
+    fprintf(stderr, "lascopcindex tls.laz -tls\n");
+    fprintf(stderr, "lascopcindex -merged -i *.las -o out.copc.laz -ondisk -verbose\n");
+    fprintf(stderr, "lascopcindex -h\n");
+  };
+};
 
 static U64 taketime()
 {
@@ -259,7 +249,7 @@ struct VoxelRecord
   I32 posid; // The position of the point in the array
   VoxelRecord() { bufid = 0; posid = 0; };
   VoxelRecord(U16 buf, I32 pos) { bufid = buf; posid = pos; };
-  };
+};
 
 struct Octant
 {
@@ -453,7 +443,7 @@ struct OctantOnDisk : public Octant
       FILE* f = fopen(filename_octant, "rb");
       if (f == 0)
       {
-        LASMessage(LAS_ERROR, "cannot open file '%s': %s", filename_octant, strerror(errno));
+        laserror("cannot open file '%s': %s", filename_octant, strerror(errno));
         throw std::runtime_error("Unexpected I/O error.");
       }
       while (fread(&cell, sizeof(I32), 1, f))
@@ -478,7 +468,7 @@ struct OctantOnDisk : public Octant
       FILE* f = fopen(filename_octant, "wb");
       if (f == 0)
       {
-        LASMessage(LAS_ERROR, "cannot open file '%s': %s", filename_octant, strerror(errno));
+        laserror("cannot open file '%s': %s", filename_octant, strerror(errno));
         throw std::runtime_error("Unexpected I/O error.");
       }
       for (const auto& e : occupancy)
@@ -541,7 +531,7 @@ struct OctantOnDisk : public Octant
       fp = fopen(filename_points, mode);
       if (fp == 0)
       {
-        LASMessage(LAS_ERROR, "cannot open file '%s': %s", filename_points, strerror(errno));
+        laserror("cannot open file '%s': %s", filename_points, strerror(errno));
         throw std::runtime_error("Unexpected I/O error.");
       }
       fseek(fp, 0, SEEK_END);
@@ -569,12 +559,13 @@ typedef std::unordered_map<EPTkey, std::unique_ptr<Octant>, EPTKeyHasher> Regist
 
 int main(int argc, char* argv[])
 {
+  LasTool_lascopcindex lastool;
+  lastool.init(argc, argv, "lascopcindex");
   /*#ifdef COMPILE_WITH_GUI
     bool gui = false;
   #endif*/
 
   // Program options
-  BOOL verbose = FALSE;
   BOOL progress = FALSE;
   BOOL shuffle = TRUE;
   BOOL swap = TRUE;
@@ -614,6 +605,7 @@ int main(int argc, char* argv[])
     /*#ifdef COMPILE_WITH_GUI
         return lascopcindex_gui(argc, argv, 0);
     #else*/
+    wait_on_exit = true;
     fprintf(stderr, "%s is better run in the command line\n", argv[0]);
     char file_name[256];
     fprintf(stderr, "enter input file: ");
@@ -630,62 +622,15 @@ int main(int argc, char* argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if ((unsigned char)argv[i][0] == 0x96)
-        argv[i][0] = '-';
+      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
     }
-    if (!geoprojectionconverter.parse(1, argv)) byebye(true);
-    if (!lasreadopener.parse(argc, argv)) byebye(true);
-    if (!laswriteopener.parse(argc, argv)) byebye(true);
+    geoprojectionconverter.parse(1, argv);
+    lasreadopener.parse(argc, argv);
+    laswriteopener.parse(argc, argv);
   }
 
-  for (i = 1; i < argc; i++)
-  {
-    if (argv[i][0] == '\0')
-    {
-      continue;
-    }
-    else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0)
-    {
-      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
-      usage();
-    }
-    else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-verbose") == 0)
-    {
-      verbose = true;
-      set_message_log_level(LAS_VERBOSE);
-    }
-    else if (strcmp(argv[i], "-vv") == 0 || strcmp(argv[i], "-very_verbose") == 0)
-    {
-      verbose = true;
-      set_message_log_level(LAS_VERY_VERBOSE);
-    }
-    else if (strcmp(argv[i], "-version") == 0)
-    {
-      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
-      byebye();
-    }
-    else if (strcmp(argv[i], "-fail") == 0)
-    {
-    }
-    else if (strcmp(argv[i], "-gui") == 0)
-    {
-      /*#ifdef COMPILE_WITH_GUI
-            gui = true;
-      #else*/
-      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
-      // #endif
-    }
-    else if (strcmp(argv[i], "-cores") == 0)
-    {
-      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
-      i++;
-    }
-    else if (strcmp(argv[i], "-cpu64") == 0)
-    {
-      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
-      argv[i][0] = '\0';
-    }
-    else if (strcmp(argv[i], "-progress") == 0)
+  auto arg_local = [&](int& i) -> bool {
+    if (strcmp(argv[i], "-progress") == 0)
     {
       progress = TRUE;
     }
@@ -739,7 +684,7 @@ int main(int argc, char* argv[])
       if (_setmaxstdio(MAX_FOPEN) == -1)
       {
         LASMessage(LAS_WARNING, "the operating system cannot open %d files and is limited to %d", MAX_FOPEN, _getmaxstdio());
-        byebye(true);
+        byebye();
       }
       MAX_FOPEN = _getmaxstdio();
       max_files_opened = (I32)(0.5 * MAX_FOPEN);
@@ -759,13 +704,11 @@ int main(int argc, char* argv[])
     {
       if ((i + 1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: depth", argv[i]);
-        byebye(true);
+        laserror("'%s' needs 1 argument: depth", argv[i]);
       }
       if (sscanf(argv[i + 1], "%d", &max_depth) != 1)
       {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-        usage(true);
+        laserror("cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
       }
       if (max_depth > limit_depth || max_depth < 0)
         max_depth = -1;
@@ -775,13 +718,11 @@ int main(int argc, char* argv[])
     {
       if ((i + 1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: num", argv[i]);
-        byebye(true);
+        laserror("'%s' needs 1 argument: num", argv[i]);
       }
       if (sscanf(argv[i + 1], "%d", &MAX_FOPEN) != 1)
       {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-        usage(true);
+        laserror("cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
       }
       max_files_opened = (I32)(0.5 * MAX_FOPEN);
       i += 1;
@@ -790,13 +731,11 @@ int main(int argc, char* argv[])
     {
       if ((i + 1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: seed", argv[i]);
-        byebye(true);
+        laserror("'%s' needs 1 argument: seed", argv[i]);
       }
       if (sscanf(argv[i + 1], "%u", &seed) != 1)
       {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-        usage(true);
+        laserror("cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
       }
       i += 1;
     }
@@ -804,7 +743,7 @@ int main(int argc, char* argv[])
     {
       if ((i + 1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: directory", argv[i]);
+        laserror("'%s' needs at least 1 argument: directory", argv[i]);
         return FALSE;
       }
       i += 1;
@@ -817,12 +756,14 @@ int main(int argc, char* argv[])
     }
     else
     {
-      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-      usage(true);
+      return false;
     }
-  }
+    return true;
+  };
 
-  if (verbose) progress = FALSE;
+  lastool.parse(arg_local);
+
+  // if (verbose) progress = FALSE; -- why?
 
   /*#ifdef COMPILE_WITH_GUI
     if (gui)
@@ -835,26 +776,22 @@ int main(int argc, char* argv[])
 
   if (!lasreadopener.active())
   {
-    LASMessage(LAS_ERROR, "no input specified");
-    usage(true, argc == 1);
+    laserror("no input specified");
   }
 
   if (lasreadopener.get_file_name_number() > 1 && unordered)
   {
     LASMessage(LAS_INFO, "Memory optimization for spatially unordered files is supported only for a single file.");
-    usage(true, argc == 1);
   }
 
   if (lasreadopener.is_stored())
   {
     LASMessage(LAS_INFO, "LASreaderStored is not supported for lascopcindex.");
-    usage(true, argc == 1);
   }
 
   if (lasreadopener.is_piped())
   {
     LASMessage(LAS_INFO, "LASreaderPipon is not supported for lascopcindex.");
-    usage(true, argc == 1);
   }
 
   while (lasreadopener.active())
@@ -864,8 +801,7 @@ int main(int argc, char* argv[])
 
     if (lasreader == 0)
     {
-      LASMessage(LAS_ERROR, "could not open lasreader");
-      usage(true, argc == 1);
+      laserror("could not open lasreader");
     }
 
     if (!lasreader->point.have_gps_time)
@@ -879,8 +815,7 @@ int main(int argc, char* argv[])
     {
       if (lasreadopener.get_file_name() == 0)
       {
-        LASMessage(LAS_ERROR, "no output file specified");
-        byebye(true, argc == 1);
+        laserror("no output file specified");
       }
       laswriteopener.set_appendix(".copc");
       laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
@@ -888,8 +823,7 @@ int main(int argc, char* argv[])
 
     if (!laswriteopener.active())
     {
-      LASMessage(LAS_ERROR, "no output specified");
-      usage(true, argc == 1);
+      laserror("no output specified");
     }
 
     // check and fix correctness of file extension
@@ -931,8 +865,7 @@ int main(int argc, char* argv[])
 
     if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
     {
-      LASMessage(LAS_ERROR, "input and output file name are identical: '%s'", lasreadopener.get_file_name());
-      usage(true);
+      laserror("input and output file name are identical: '%s'", lasreadopener.get_file_name());
     }
 
     LASheader* lasheader = &lasreader->header;
@@ -950,9 +883,8 @@ int main(int argc, char* argv[])
 
       if (weird_z && longlat_extent && accurate_coordinates)
       {
-        LASMessage(LAS_ERROR, "long/lat coordinates detected. COPC indexing supports only projected coordinates. If this is a false positive please use -m or -ft to provide the coordinates units.");
+        laserror("long/lat coordinates detected. COPC indexing supports only projected coordinates. If this is a false positive please use -m or -ft to provide the coordinates units.");
         delete lasreader;
-        usage(true, argc == 1);
       }
     }
 
@@ -981,7 +913,7 @@ int main(int argc, char* argv[])
       }
 
       LASprogress progressbar(lasreader);
-      progressbar.set_display(verbose || progress);
+      progressbar.set_display(progress);
 
       LASfinalizer lasfinalizer(lasheader, 2 << tmp_max_depth);
       LASinventory* lasinventory = new LASinventory;
@@ -1034,7 +966,7 @@ int main(int argc, char* argv[])
       delete lasinventory;
 
       U64 t1 = taketime();
-      if (verbose) {
+      if (get_message_log_level() >= LAS_VERBOSE) {
         LASMessage(LAS_VERBOSE, "Area covered: %.0lf", area);
         LASMessage(LAS_VERBOSE, "Number of points: %llu", num_points);
         LASMessage(LAS_VERBOSE, "Density of points: %.1lf", density);
@@ -1103,8 +1035,7 @@ int main(int argc, char* argv[])
         }
         if (num_extra_bytes < 0)
         {
-          LASMessage(LAS_ERROR, "point record length has %d fewer bytes than needed", num_extra_bytes);
-          byebye(true);
+          laserror("point record length has %d fewer bytes than needed", num_extra_bytes);
         }
 
         lasreader->header.clean_laszip();
@@ -1188,8 +1119,7 @@ int main(int argc, char* argv[])
 
       if (laswriter == 0)
       {
-        LASMessage(LAS_ERROR, "could not open laswriter");
-        usage(true, argc == 1);
+        laserror("could not open laswriter");
       }
 
       // =============================================================================================
@@ -1449,7 +1379,7 @@ int main(int argc, char* argv[])
           id_buffer++;
           buffer_size = 0;
 
-          if (verbose)
+          if (get_message_log_level() >= LAS_VERBOSE)
           {
             F32 million = (F32)((U64)num_points_buffer * id_buffer / 1000000.0);
             fprintf(stderr, "[%.0lf%%] Processed %.1f million points | LAZ chunks written: %u", progressbar.get_progress(), million, (U32)entries.size());
@@ -1483,7 +1413,7 @@ int main(int argc, char* argv[])
       lasreader->close();
 
       if (laswriter->npoints != num_points)
-        LASMessage(LAS_ERROR, "Different number of points in input and output. Something went wrong. Please report this error.");
+        laserror("Different number of points in input and output. Something went wrong. Please report this error.");
 
       delete lasreader;
       delete laswriter;
@@ -1493,7 +1423,7 @@ int main(int argc, char* argv[])
       free(tmpdir);
 
       U64 t5 = taketime();
-      if (verbose)
+      if (get_message_log_level() >= LAS_VERBOSE)
       {
         U32 num_chunks = (U32)entries.size();
         U32 num_chunks_few_points = 0;
@@ -1516,19 +1446,15 @@ int main(int argc, char* argv[])
     }
     catch (std::exception& e)
     {
-      LASMessage(LAS_ERROR, "%s", e.what());
+      laserror("%s", e.what());
       error = true;
     }
     catch (...)
     {
-      LASMessage(LAS_INFO, "ERROR processing file '%s'. maybe file is corrupt?", lasreadopener.get_file_name());
-      error = true;
-
+      LASMessage(LAS_ERROR, "processing file '%s'. maybe file is corrupt?", lasreadopener.get_file_name());
       laswriteopener.set_file_name(0);
     }
   }
-
-  byebye(error, argc == 1);
-
+  byebye();
   return 0;
 }

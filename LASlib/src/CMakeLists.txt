@@ -79,6 +79,7 @@ endif()
 target_include_directories(LASlib PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASlib/inc>
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASzip/src>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASzip/include/laszip>
   $<INSTALL_INTERFACE:include/LASlib>
 )
 set_target_properties(LASlib PROPERTIES

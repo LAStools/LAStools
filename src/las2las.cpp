@@ -66,6 +66,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "lastool.hpp"
 #include "lasreader.hpp"
 #include "laswriter.hpp"
 #include "lastransform.hpp"
@@ -73,42 +74,31 @@
 #include "bytestreamout_file.hpp"
 #include "bytestreamin_file.hpp"
 
-static void usage(bool error = false, bool wait = false)
+class LasTool_las2las : public LasTool
 {
-  fprintf(stderr, "usage:\n");
-  fprintf(stderr, "las2las -i *.las -utm 13N\n");
-  fprintf(stderr, "las2las -i *.laz -first_only -olaz\n");
-  fprintf(stderr, "las2las -i *.las -drop_return 4 5 -olaz\n");
-  fprintf(stderr, "las2las -latlong -target_utm 12T -i in.las -o out.las\n");
-  fprintf(stderr, "las2las -i in.laz -target_epsg 2972 -o out.laz\n");
-  fprintf(stderr, "las2las -set_point_type 0 -lof file_list.txt -merged -o out.las\n");
-  fprintf(stderr, "las2las -remove_vlr 2 -scale_rgb_up -i in.las -o out.las\n");
-  fprintf(stderr, "las2las -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las\n");
-  fprintf(stderr, "las2las -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt\n");
-  fprintf(stderr, "las2las -i in.las -remove_padding -keep_scan_angle -15 15 -o out.las\n");
-  fprintf(stderr, "las2las -i in.las -rescale 0.01 0.01 0.01 -reoffset 0 300000 0 -o out.las\n");
-  fprintf(stderr, "las2las -i in.las -set_version 1.2 -keep_gpstime 46.5 47.5 -o out.las\n");
-  fprintf(stderr, "las2las -i in.las -drop_intensity_below 10 -olaz -stdout > out.laz\n");
-  fprintf(stderr, "las2las -i in.las -last_only -drop_gpstime_below 46.75 -otxt -oparse xyzt -stdout > out.txt\n");
-  fprintf(stderr, "las2las -i in.las -remove_all_vlrs -keep_class 2 3 4 -olas -stdout > out.las\n");
-  fprintf(stderr, "las2las -h\n");
-  if (wait)
+private:
+public:
+  void usage() override
   {
-    fprintf(stderr, "<press ENTER>\n");
-    getc(stdin);
-  }
-  exit(error);
-}
-
-static void byebye(bool error = false, bool wait = false)
-{
-  if (wait)
-  {
-    fprintf(stderr, "<press ENTER>\n");
-    getc(stdin);
-  }
-  exit(error);
-}
+    fprintf(stderr, "usage:\n");
+    fprintf(stderr, "las2las -i *.las -utm 13N\n");
+    fprintf(stderr, "las2las -i *.laz -first_only -olaz\n");
+    fprintf(stderr, "las2las -i *.las -drop_return 4 5 -olaz\n");
+    fprintf(stderr, "las2las -latlong -target_utm 12T -i in.las -o out.las\n");
+    fprintf(stderr, "las2las -i in.laz -target_epsg 2972 -o out.laz\n");
+    fprintf(stderr, "las2las -set_point_type 0 -lof file_list.txt -merged -o out.las\n");
+    fprintf(stderr, "las2las -remove_vlr 2 -scale_rgb_up -i in.las -o out.las\n");
+    fprintf(stderr, "las2las -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las\n");
+    fprintf(stderr, "las2las -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt\n");
+    fprintf(stderr, "las2las -i in.las -remove_padding -keep_scan_angle -15 15 -o out.las\n");
+    fprintf(stderr, "las2las -i in.las -rescale 0.01 0.01 0.01 -reoffset 0 300000 0 -o out.las\n");
+    fprintf(stderr, "las2las -i in.las -set_version 1.2 -keep_gpstime 46.5 47.5 -o out.las\n");
+    fprintf(stderr, "las2las -i in.las -drop_intensity_below 10 -olaz -stdout > out.laz\n");
+    fprintf(stderr, "las2las -i in.las -last_only -drop_gpstime_below 46.75 -otxt -oparse xyzt -stdout > out.txt\n");
+    fprintf(stderr, "las2las -i in.las -remove_all_vlrs -keep_class 2 3 4 -olas -stdout > out.las\n");
+    fprintf(stderr, "las2las -h\n");
+  };
+};
 
 static double taketime()
 {
@@ -131,36 +121,30 @@ static bool save_vlrs_to_file(const LASheader* header)
   // write number of VLRs
   if (!out->put32bitsLE((U8*)&(header->number_of_variable_length_records)))
   {
-    LASMessage(LAS_ERROR, "writing header->number_of_variable_length_records");
-    return false;
+    laserror("writing header->number_of_variable_length_records");
   }
   // loop over VLRs
   for (i = 0; i < header->number_of_variable_length_records; i++)
   {
     if (!out->put16bitsLE((U8*)&(header->vlrs[i].reserved)))
     {
-      LASMessage(LAS_ERROR, "writing header->vlrs[%d].reserved", i);
-      return false;
+      laserror("writing header->vlrs[%d].reserved", i);
     }
     if (!out->putBytes((U8*)header->vlrs[i].user_id, 16))
     {
-      LASMessage(LAS_ERROR, "writing header->vlrs[%d].user_id", i);
-      return false;
+      laserror("writing header->vlrs[%d].user_id", i);
     }
     if (!out->put16bitsLE((U8*)&(header->vlrs[i].record_id)))
     {
-      LASMessage(LAS_ERROR, "writing header->vlrs[%d].record_id", i);
-      return false;
+      laserror("writing header->vlrs[%d].record_id", i);
     }
     if (!out->put16bitsLE((U8*)&(header->vlrs[i].record_length_after_header)))
     {
-      LASMessage(LAS_ERROR, "writing header->vlrs[%d].record_length_after_header", i);
-      return false;
+      laserror("writing header->vlrs[%d].record_length_after_header", i);
     }
     if (!out->putBytes((U8*)header->vlrs[i].description, 32))
     {
-      LASMessage(LAS_ERROR, "writing header->vlrs[%d].description", i);
-      return false;
+      laserror("writing header->vlrs[%d].description", i);
     }
 
     // write the data following the header of the variable length record
@@ -171,14 +155,12 @@ static bool save_vlrs_to_file(const LASheader* header)
       {
         if (!out->putBytes((U8*)header->vlrs[i].data, header->vlrs[i].record_length_after_header))
         {
-          LASMessage(LAS_ERROR, "writing %d bytes of data from header->vlrs[%d].data", header->vlrs[i].record_length_after_header, i);
-          return false;
+          laserror("writing %d bytes of data from header->vlrs[%d].data", header->vlrs[i].record_length_after_header, i);
         }
       }
       else
       {
-        LASMessage(LAS_ERROR, "there should be %d bytes of data in header->vlrs[%d].data", header->vlrs[i].record_length_after_header, i);
-        return false;
+        laserror("there should be %d bytes of data in header->vlrs[%d].data", header->vlrs[i].record_length_after_header, i);
       }
     }
   }
@@ -207,8 +189,7 @@ static bool load_vlrs_from_file(LASheader* header)
   }
   catch (...)
   {
-    LASMessage(LAS_ERROR, "reading number_of_variable_length_records");
-    return false;
+    laserror("reading number_of_variable_length_records");
   }
   // loop over VLRs
   LASvlr vlr;
@@ -219,40 +200,35 @@ static bool load_vlrs_from_file(LASheader* header)
     }
     catch (...)
     {
-      LASMessage(LAS_ERROR, "reading vlr.reserved");
-      return false;
+      laserror("reading vlr.reserved");
     }
     try {
       in->getBytes((U8*)vlr.user_id, 16);
     }
     catch (...)
     {
-      LASMessage(LAS_ERROR, "reading vlr.user_id");
-      return false;
+      laserror("reading vlr.user_id");
     }
     try {
       in->get16bitsLE((U8*)&(vlr.record_id));
     }
     catch (...)
     {
-      LASMessage(LAS_ERROR, "reading vlr.record_id");
-      return false;
+      laserror("reading vlr.record_id");
     }
     try {
       in->get16bitsLE((U8*)&(vlr.record_length_after_header));
     }
     catch (...)
     {
-      LASMessage(LAS_ERROR, "reading vlr.record_length_after_header");
-      return false;
+      laserror("reading vlr.record_length_after_header");
     }
     try {
       in->getBytes((U8*)vlr.description, 32);
     }
     catch (...)
     {
-      LASMessage(LAS_ERROR, "reading vlr.description");
-      return false;
+      laserror("reading vlr.description");
     }
 
     // write the data following the header of the variable length record
@@ -265,8 +241,7 @@ static bool load_vlrs_from_file(LASheader* header)
       }
       catch (...)
       {
-        LASMessage(LAS_ERROR, "reading %d bytes into vlr.data", vlr.record_length_after_header);
-        return false;
+        laserror("reading %d bytes into vlr.data", vlr.record_length_after_header);
       }
     }
     else
@@ -306,16 +281,9 @@ extern int las2las_multi_core(int argc, char* argv[], GeoProjectionConverter* ge
 
 int main(int argc, char* argv[])
 {
+  LasTool_las2las lastool;
+  lastool.init(argc, argv, "las2las");
   int i;
-#ifdef COMPILE_WITH_GUI
-  bool gui = false;
-#endif
-#ifdef COMPILE_WITH_MULTI_CORE
-  I32 cores = 1;
-  BOOL cpu64 = FALSE;
-#endif
-  bool error = false;
-  bool force = false;
   // fixed header changes
   int set_version_major = -1;
   int set_version_minor = -1;
@@ -371,6 +339,7 @@ int main(int argc, char* argv[])
 #ifdef COMPILE_WITH_GUI
     return las2las_gui(argc, argv, 0);
 #else
+    wait_on_exit = true;
     fprintf(stderr, "%s is better run in the command line\n", argv[0]);
     char file_name[256];
     fprintf(stderr, "enter input file: "); fgets(file_name, 256, stdin);
@@ -395,124 +364,40 @@ int main(int argc, char* argv[])
         set_global_encoding_gps_bit = 0;
       }
     }
-    if (!geoprojectionconverter.parse(argc, argv)) byebye(true);
-    if (!lasreadopener.parse(argc, argv)) byebye(true);
-    if (!laswriteopener.parse(argc, argv)) byebye(true);
+    geoprojectionconverter.parse(argc, argv);
+    lasreadopener.parse(argc, argv);
+    laswriteopener.parse(argc, argv);
   }
 
-  for (i = 1; i < argc; i++)
-  {
-    if (argv[i][0] == '\0')
+  auto arg_local = [&](int& i) -> bool {
+    if (strcmp(argv[i], "-subseq") == 0)
     {
-      continue;
-    }
-    else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0)
-    {
-      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
-      usage();
-    }
-    else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-verbose") == 0)
-    {
-      set_message_log_level(LAS_VERBOSE);
-    }
-    else if (strcmp(argv[i], "-vv") == 0 || strcmp(argv[i], "-very_verbose") == 0)
-    {
-      set_message_log_level(LAS_VERY_VERBOSE);
-    }
-    else if (strcmp(argv[i], "-version") == 0)
-    {
-      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
-      byebye();
-    }
-    else if (strcmp(argv[i], "-fail") == 0)
-    {
-    }
-    else if (strcmp(argv[i], "-gui") == 0)
-    {
-#ifdef COMPILE_WITH_GUI
-      gui = true;
-#else
-      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
-#endif
-    }
-    else if (strcmp(argv[i], "-cores") == 0)
-    {
-#ifdef COMPILE_WITH_MULTI_CORE
-      if ((i + 1) >= argc)
-      {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
-        usage(true);
-      }
-      if (sscanf(argv[i + 1], "%u", &cores) != 1)
-      {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-        usage(true);
-      }
-      argv[i][0] = '\0';
-      i++;
-      argv[i][0] = '\0';
-#else
-      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
-      i++;
-#endif
-    }
-    else if (strcmp(argv[i], "-cpu64") == 0)
-    {
-#ifdef COMPILE_WITH_MULTI_CORE
-      cpu64 = TRUE;
-#else
-      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
-#endif
-      argv[i][0] = '\0';
-    }
-    else if (strcmp(argv[i], "-force") == 0)
-    {
-      force = true;
-    }
-    else if (strcmp(argv[i], "-subseq") == 0)
-    {
-      if ((i + 2) >= argc)
-      {
-        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start stop", argv[i]);
-        byebye(true);
-      }
+      lastool.parse_arg_cnt_check(i, 2, "start stop");
       if (sscanf(argv[i + 1], "%lld", &subsequence_start) != 1)
       {
-        LASMessage(LAS_ERROR, "cannot understand first argument '%s' for '%s'", argv[i + 1], argv[i]);
-        usage(true);
+        lastool.error_parse_arg_n_invalid(i, 1);
       }
       if (sscanf(argv[i + 2], "%lld", &subsequence_stop) != 1)
       {
-        LASMessage(LAS_ERROR, "cannot understand second argument '%s' for '%s'", argv[i + 2], argv[i]);
-        usage(true);
+        lastool.error_parse_arg_n_invalid(i, 2);
       }
       i += 2;
     }
     else if (strcmp(argv[i], "-start_at_point") == 0)
     {
-      if ((i + 1) >= argc)
-      {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of start point", argv[i]);
-        byebye(true);
-      }
+      lastool.parse_arg_cnt_check(i, 1, "index of start point");
       if (sscanf(argv[i + 1], "%lld", &subsequence_start) != 1)
       {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-        usage(true);
+        lastool.error_parse_arg_n_invalid(i, 1);
       }
       i += 1;
     }
     else if (strcmp(argv[i], "-stop_at_point") == 0)
     {
-      if ((i + 1) >= argc)
-      {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of stop point", argv[i]);
-        byebye(true);
-      }
+      lastool.parse_arg_cnt_check(i, 1, "index of stop point");
       if (sscanf(argv[i + 1], "%lld", &subsequence_stop) != 1)
       {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-        usage(true);
+        lastool.error_parse_arg_n_invalid(i, 1);
       }
       i += 1;
     }
@@ -522,110 +407,73 @@ int main(int argc, char* argv[])
       {
         if (strcmp(argv[i], "-set_point_type") == 0 || strcmp(argv[i], "-set_point_data_format") == 0)
         {
-          if ((i + 1) >= argc)
-          {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: type", argv[i]);
-            byebye(true);
-          }
+          lastool.parse_arg_cnt_check(i, 1, "type");
           if (sscanf(argv[i + 1], "%u", &set_point_data_format) != 1)
           {
-            LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-            usage(true);
+            lastool.error_parse_arg_n_invalid(i, 1);
           }
           i++;
         }
         else if (strcmp(argv[i], "-set_point_data_record_length") == 0 || strcmp(argv[i], "-set_point_size") == 0)
         {
-          if ((i + 1) >= argc)
-          {
-            LASMessage(LAS_ERROR, "'%s' needs 1 argument: size", argv[i]);
-            byebye(true);
-          }
+          lastool.parse_arg_cnt_check(i, 1, "size");
           if (sscanf(argv[i + 1], "%u", &set_point_data_record_length) != 1)
           {
-            LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-            usage(true);
+            lastool.error_parse_arg_n_invalid(i, 1);
           }
           i++;
         }
         else
         {
-          LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-          usage(true);
+          lastool.parse_arg_invalid_n(i);
         }
       }
       else if (strcmp(argv[i], "-set_global_encoding_gps_bit") == 0)
       {
-        if ((i + 1) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: 0 or 1", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "0 or 1");
         if (sscanf(argv[i + 1], "%u", &set_global_encoding_gps_bit) != 1)
         {
-          LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-          usage(true);
+          lastool.error_parse_arg_n_invalid(i, 1);
         }
         i += 1;
       }
       else if (strcmp(argv[i], "-set_version") == 0)
       {
-        if ((i + 1) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: major.minor", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "major.minor");
         if (sscanf(argv[i + 1], "%u.%u", &set_version_major, &set_version_minor) != 2)
         {
-          LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-          usage(true);
+          lastool.error_parse_arg_n_invalid(i, 1);
         }
         i += 1;
       }
       else if (strcmp(argv[i], "-set_version_major") == 0)
       {
-        if ((i + 1) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: major", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "major");
         if (sscanf(argv[i + 1], "%u", &set_version_major) != 1)
         {
-          LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-          usage(true);
+          lastool.error_parse_arg_n_invalid(i, 1);
         }
         i += 1;
       }
       else if (strcmp(argv[i], "-set_version_minor") == 0)
       {
-        if ((i + 1) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: minor", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "minor");
         if (sscanf(argv[i + 1], "%u", &set_version_minor) != 1)
         {
-          LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-          usage(true);
+          lastool.error_parse_arg_n_invalid(i, 1);
         }
         i += 1;
       }
       else if (strcmp(argv[i], "-set_lastiling_buffer_flag") == 0)
       {
-        if ((i + 1) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: 0 or 1", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "0 or 1");
         if (sscanf(argv[i + 1], "%u", &set_lastiling_buffer_flag) != 1)
         {
-          LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-          usage(true);
+          lastool.error_parse_arg_n_invalid(i, 1);
         }
         if (set_lastiling_buffer_flag > 1)
         {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: 0 or 1", argv[i]);
-          byebye(true);
+          lastool.parse_arg_cnt_check(i, 1, "0 or 1");
         }
         i += 1;
       }
@@ -643,8 +491,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-          LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-          usage(true);
+          lastool.parse_arg_invalid_n(i);
         }
         if ((i + 1) < argc)
         {
@@ -657,63 +504,48 @@ int main(int argc, char* argv[])
       }
       else if (strcmp(argv[i], "-set_attribute_scale") == 0)
       {
-        if ((i + 2) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 2, "index scale");
         if (set_attribute_scales < 5)
         {
           if (sscanf(argv[i + 1], "%u", &(set_attribute_scale_index[set_attribute_scales])) != 1)
           {
-            LASMessage(LAS_ERROR, "cannot understand first argument '%s' for '%s'", argv[i + 1], argv[i]);
-            usage(true);
+            lastool.error_parse_arg_n_invalid(i, 1);
           }
           if (sscanf(argv[i + 2], "%lf", &(set_attribute_scale_scale[set_attribute_scales])) != 1)
           {
-            LASMessage(LAS_ERROR, "cannot understand second argument '%s' for '%s'", argv[i + 2], argv[i]);
-            usage(true);
+            lastool.error_parse_arg_n_invalid(i, 2);
           }
           set_attribute_scales++;
         }
         else
         {
-          LASMessage(LAS_ERROR, "cannot '%s' more than 5 times", argv[i]);
-          byebye(true);
+          laserror("cannot '%s' more than 5 times", argv[i]);
         }
         i += 2;
       }
       else if (strcmp(argv[i], "-set_attribute_offset") == 0)
       {
-        if ((i + 2) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index offset", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 2, "index offset");
         if (set_attribute_offsets < 5)
         {
           if (sscanf(argv[i + 1], "%u", &(set_attribute_offset_index[set_attribute_offsets])) != 1)
           {
-            LASMessage(LAS_ERROR, "cannot understand first argument '%s' for '%s'", argv[i + 1], argv[i]);
-            usage(true);
+            lastool.error_parse_arg_n_invalid(i, 1);
           }
           if (sscanf(argv[i + 2], "%lf", &(set_attribute_offset_offset[set_attribute_offsets])) != 1)
           {
-            LASMessage(LAS_ERROR, "cannot understand second argument '%s' for '%s'", argv[i + 2], argv[i]);
-            usage(true);
+            lastool.error_parse_arg_n_invalid(i, 2);
           }
         }
         else
         {
-          LASMessage(LAS_ERROR, "cannot '%s' more than 5 times", argv[i]);
-          byebye(true);
+          laserror("cannot '%s' more than 5 times", argv[i]);
         }
         i += 2;
       }
       else
       {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-        usage(true);
+        lastool.parse_arg_invalid_n(i);
       }
     }
     else if (strncmp(argv[i], "-remove_", 8) == 0)
@@ -728,11 +560,7 @@ int main(int argc, char* argv[])
       }
       else if (strcmp(argv[i], "-remove_vlr") == 0)
       {
-        if ((i + 1) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "number");
         remove_variable_length_record = atoi(argv[i + 1]);
         remove_variable_length_record_from = -1;
         remove_variable_length_record_to = -1;
@@ -740,11 +568,7 @@ int main(int argc, char* argv[])
       }
       else if (strcmp(argv[i], "-remove_vlrs_from_to") == 0)
       {
-        if ((i + 2) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start end", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "start end");
         remove_variable_length_record = -1;
         remove_variable_length_record_from = atoi(argv[i + 1]);
         remove_variable_length_record_to = atoi(argv[i + 2]);
@@ -756,11 +580,7 @@ int main(int argc, char* argv[])
       }
       else if (strcmp(argv[i], "-remove_evlr") == 0)
       {
-        if ((i + 1) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "number");
         remove_extended_variable_length_record = atoi(argv[i + 1]);
         remove_extended_variable_length_record_from = -1;
         remove_extended_variable_length_record_to = -1;
@@ -768,11 +588,7 @@ int main(int argc, char* argv[])
       }
       else if (strcmp(argv[i], "-remove_evlrs_from_to") == 0)
       {
-        if ((i + 2) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 2 arguments: start end", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 2, "start end");
         remove_extended_variable_length_record = -1;
         remove_extended_variable_length_record_from = atoi(argv[i + 1]);
         remove_extended_variable_length_record_to = atoi(argv[i + 2]);
@@ -788,19 +604,14 @@ int main(int argc, char* argv[])
       }
       else
       {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-        usage(true);
+        lastool.parse_arg_invalid_n(i);
       }
     }
     else if (strncmp(argv[i], "-add_", 5) == 0)
     {
       if (strcmp(argv[i], "-add_attribute") == 0)
       {
-        if ((i + 3) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs at least 3 arguments: data_type name description", argv[i]);
-          usage(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "data_type name description ...");
         if (((i + 4) < argc) && (atof(argv[i + 4]) != 0.0))
         {
           if (((i + 5) < argc) && ((atof(argv[i + 5]) != 0.0) || (strcmp(argv[i + 5], "0") == 0) || (strcmp(argv[i + 5], "0.0") == 0)))
@@ -830,11 +641,7 @@ int main(int argc, char* argv[])
       }
       else if (strcmp(argv[i], "-add_empty_vlr") == 0)
       {
-        if ((i + 2) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs at least 2 arguments: user_ID and record_ID", argv[i]);
-          usage(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "user_ID record_ID ...");
         add_empty_vlr_user_ID = argv[i + 1];
         add_empty_vlr_record_ID = atoi(argv[i + 2]);
         i += 2;
@@ -846,62 +653,48 @@ int main(int argc, char* argv[])
       }
       else
       {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-        usage(true);
+        lastool.parse_arg_invalid_n(i);
       }
     }
     else if (strncmp(argv[i], "-unset_", 7) == 0)
     {
       if (strcmp(argv[i], "-unset_attribute_scale") == 0)
       {
-        if ((i + 1) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "index");
         if (unset_attribute_scales < 5)
         {
           if (sscanf(argv[i + 1], "%u", &(unset_attribute_scale_index[unset_attribute_scales])) != 1)
           {
-            LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-            usage(true);
+            lastool.error_parse_arg_n_invalid(i, 1);
           }
           unset_attribute_scales++;
         }
         else
         {
-          LASMessage(LAS_ERROR, "cannot '%s' more than 5 times", argv[i]);
-          byebye(true);
+          laserror("cannot '%s' more than 5 times", argv[i]);
         }
         i += 1;
       }
       else if (strcmp(argv[i], "-unset_attribute_offset") == 0)
       {
-        if ((i + 1) >= argc)
-        {
-          LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
-          byebye(true);
-        }
+        lastool.parse_arg_cnt_check(i, 1, "index");
         if (unset_attribute_offsets < 5)
         {
           if (sscanf(argv[i + 1], "%u", &(unset_attribute_offset_index[unset_attribute_offsets])) != 1)
           {
-            LASMessage(LAS_ERROR, "cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
-            usage(true);
+            lastool.error_parse_arg_n_invalid(i, 1);
           }
           unset_attribute_offsets++;
         }
         else
         {
-          LASMessage(LAS_ERROR, "cannot '%s' more than 5 times", argv[i]);
-          byebye(true);
+          laserror("cannot '%s' more than 5 times", argv[i]);
         }
         i += 1;
       }
       else
       {
-        LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-        usage(true);
+        lastool.parse_arg_invalid_n(i);
       }
     }
     else if (strcmp(argv[i], "-move_evlrs_to_vlrs") == 0)
@@ -918,12 +711,7 @@ int main(int argc, char* argv[])
     }
     else if (strcmp(argv[i], "-load_ogc_wkt") == 0)
     {
-      if ((i + 1) >= argc)
-      {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: file name", argv[i]);
-        byebye(true);
-      }
-
+      lastool.parse_arg_cnt_check(i, 1, "file name");
       if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0'))
       {
         FILE* file = fopen(argv[i + 1], "r");
@@ -953,13 +741,12 @@ int main(int argc, char* argv[])
         }
         else
         {
-          LASMessage(LAS_ERROR, "cannot open file '%s' for read", argv[i + 1]);
+          laserror("cannot open file '%s' for read", argv[i + 1]);
         }
       }
       else
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: file name", argv[i]);
-        byebye(true);
+        lastool.parse_arg_cnt_check(i, 1, "file name");
       }
     }
     else if (strcmp(argv[i], "-dont_remove_empty_files") == 0)
@@ -978,10 +765,12 @@ int main(int argc, char* argv[])
     }
     else
     {
-      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-      usage(true);
+      return false;
     }
-  }
+    return true;
+  };
+
+  lastool.parse(arg_local);
 
 #ifdef COMPILE_WITH_GUI
   if (gui)
@@ -991,22 +780,22 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-  if (cores > 1)
+  if (lastool.cores > 1)
   {
     if (lasreadopener.get_file_name_number() < 2)
     {
-      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
+      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), lastool.cores);
     }
     else if (lasreadopener.is_merged())
     {
-      LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", cores);
+      LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", lastool.cores);
     }
     else
     {
-      return las2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, cores, cpu64);
+      return las2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
     }
   }
-  if (cpu64)
+  if (lastool.cpu64)
   {
     return las2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, 1, TRUE);
   }
@@ -1016,8 +805,7 @@ int main(int argc, char* argv[])
 
   if (!lasreadopener.active())
   {
-    LASMessage(LAS_ERROR, "no input specified");
-    usage(true, argc == 1);
+    laserror("no input specified");
   }
 
   BOOL extra_pass = laswriteopener.is_piped();
@@ -1038,8 +826,7 @@ int main(int argc, char* argv[])
   {
     if (lasreadopener.is_piped())
     {
-      LASMessage(LAS_ERROR, "input and output cannot both be piped");
-      usage(true);
+      laserror("input and output cannot both be piped");
     }
   }
 
@@ -1047,8 +834,7 @@ int main(int argc, char* argv[])
 
   if (save_vlrs && load_vlrs)
   {
-    LASMessage(LAS_ERROR, "cannot save and load VLRs at the same time");
-    usage(true);
+    laserror("cannot save and load VLRs at the same time");
   }
 
   // possibly loop over multiple input files
@@ -1065,8 +851,7 @@ int main(int argc, char* argv[])
 
       if (lasreader == 0)
       {
-        LASMessage(LAS_ERROR, "could not open lasreader");
-        usage(true, argc == 1);
+        laserror("could not open lasreader");
       }
 
       // store the inventory for the header
@@ -1085,11 +870,7 @@ int main(int argc, char* argv[])
         {
           if ((lasreader->header.global_encoding & 1) == 0)
           {
-            LASMessage(LAS_WARNING, "global encoding indicates file already in GPS week time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
-            if (!force)
-            {
-              byebye(true);
-            }
+            lastool.laswarnforce("global encoding indicates file already in GPS week time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
           }
           else
           {
@@ -1100,11 +881,7 @@ int main(int argc, char* argv[])
         {
           if ((lasreader->header.global_encoding & 1) == 1)
           {
-            LASMessage(LAS_WARNING, "global encoding indicates file already in Adjusted Standard GPS time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
-            if (!force)
-            {
-              byebye(true);
-            }
+            lastool.laswarnforce("global encoding indicates file already in Adjusted Standard GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
           }
           else
           {
@@ -1129,7 +906,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-              LASMessage(LAS_ERROR, "attribute index %d out-of-range. only %d attributes in file. ignoring ... ", set_attribute_scale_index[i], lasreader->header.number_attributes);
+              laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", set_attribute_scale_index[i], lasreader->header.number_attributes);
             }
           }
         }
@@ -1147,7 +924,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-              LASMessage(LAS_ERROR, "attribute index %d out-of-range. only %d attributes in file. ignoring ... ", set_attribute_offset_index[i], lasreader->header.number_attributes);
+              laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", set_attribute_offset_index[i], lasreader->header.number_attributes);
             }
           }
         }
@@ -1165,7 +942,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-              LASMessage(LAS_ERROR, "attribute index %d out-of-range. only %d attributes in file. ignoring ... ", unset_attribute_scale_index[i], lasreader->header.number_attributes);
+              laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", unset_attribute_scale_index[i], lasreader->header.number_attributes);
             }
           }
         }
@@ -1183,7 +960,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-              LASMessage(LAS_ERROR, "attribute index %d out-of-range. only %d attributes in file. ignoring ... ", unset_attribute_offset_index[i], lasreader->header.number_attributes);
+              laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", unset_attribute_offset_index[i], lasreader->header.number_attributes);
             }
           }
         }
@@ -1206,8 +983,7 @@ int main(int argc, char* argv[])
       {
         if (set_version_major != 1)
         {
-          LASMessage(LAS_ERROR, "unknown version_major %d", set_version_major);
-          byebye(true);
+          laserror("unknown version_major %d", set_version_major);
         }
         lasreader->header.version_major = (U8)set_version_major;
       }
@@ -1216,8 +992,7 @@ int main(int argc, char* argv[])
       {
         if (set_version_minor > 4)
         {
-          LASMessage(LAS_ERROR, "unknown version_minor %d", set_version_minor);
-          byebye(true);
+          laserror("unknown version_minor %d", set_version_minor);
         }
         if (set_version_minor < 3)
         {
@@ -1312,8 +1087,7 @@ int main(int argc, char* argv[])
               lasreader->header.point_data_record_length -= 4;
               break;
             default:
-              LASMessage(LAS_ERROR, "unknown point_data_format %d", lasreader->header.point_data_format);
-              byebye(true);
+              laserror("unknown point_data_format %d", lasreader->header.point_data_format);
             }
             point = new LASpoint;
             lasreader->header.clean_laszip();
@@ -1355,8 +1129,7 @@ int main(int argc, char* argv[])
       {
         if (set_point_data_format < 0 || set_point_data_format > 10)
         {
-          LASMessage(LAS_ERROR, "unknown point_data_format %d", set_point_data_format);
-          byebye(true);
+          laserror("unknown point_data_format %d", set_point_data_format);
         }
         // depending on the conversion we may need to copy the point
         if (convert_point_type_from_to[lasreader->header.point_data_format][set_point_data_format])
@@ -1403,8 +1176,7 @@ int main(int argc, char* argv[])
         }
         if (num_extra_bytes < 0)
         {
-          LASMessage(LAS_ERROR, "point record length has %d fewer bytes than needed", -num_extra_bytes);
-          byebye(true);
+          laserror("point record length has %d fewer bytes than needed", -num_extra_bytes);
         }
         lasreader->header.point_data_format = (U8)set_point_data_format;
         lasreader->header.clean_laszip();
@@ -1489,8 +1261,7 @@ int main(int argc, char* argv[])
         }
         if (num_extra_bytes < 0)
         {
-          LASMessage(LAS_ERROR, "point_data_format %d needs record length of at least %d", lasreader->header.point_data_format, set_point_data_record_length - num_extra_bytes);
-          byebye(true);
+          laserror("point_data_format %d needs record length of at least %d", lasreader->header.point_data_format, set_point_data_record_length - num_extra_bytes);
         }
         if (lasreader->header.point_data_record_length < set_point_data_record_length)
         {
@@ -1525,8 +1296,7 @@ int main(int argc, char* argv[])
             lasreader->header.add_attribute(attribute);
           }
           catch (...) {
-            LASMessage(LAS_ERROR, "initializing attribute %s", lasreadopener.get_attribute_name(i));
-            byebye(true);
+            laserror("initializing attribute %s", lasreadopener.get_attribute_name(i));
           }
         }
         I32 attibutes_after_size = lasreader->header.get_attributes_size();
@@ -1859,8 +1629,7 @@ int main(int argc, char* argv[])
       {
         if (lasreadopener.is_piped())
         {
-          LASMessage(LAS_ERROR, "input and output cannot both be piped");
-          usage(true);
+          laserror("input and output cannot both be piped");
         }
         LASMessage(LAS_VERBOSE, "extra pass for piped output: reading %lld points ...", lasreader->npoints);
         // maybe seek to start position
@@ -1892,7 +1661,7 @@ int main(int argc, char* argv[])
         lasinventory.update_header(&lasreader->header);
 
         LASMessage(LAS_VERBOSE, "extra pass took %g sec.", taketime() - start_time);
-  start_time = taketime();
+        start_time = taketime();
         LASMessage(LAS_VERBOSE, "piped output: reading %lld and writing %lld points ...", lasreader->npoints, lasinventory.extended_number_of_point_records);
       }
       else
@@ -1919,8 +1688,7 @@ int main(int argc, char* argv[])
 
         if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
         {
-          LASMessage(LAS_ERROR, "input and output file name are identical: '%s'", lasreadopener.get_file_name());
-          usage(true);
+          laserror("input and output file name are identical: '%s'", lasreadopener.get_file_name());
         }
       }
 
@@ -1940,8 +1708,7 @@ int main(int argc, char* argv[])
 
       if (laswriter == 0)
       {
-        LASMessage(LAS_ERROR, "could not open laswriter");
-        byebye(true, argc == 1);
+        laserror("could not open laswriter");
       }
 
       // for piped output we need to re-open the input file
@@ -1950,8 +1717,7 @@ int main(int argc, char* argv[])
       {
         if (!lasreadopener.reopen(lasreader))
         {
-          LASMessage(LAS_ERROR, "could not re-open lasreader");
-          byebye(true);
+          laserror("could not re-open lasreader");
         }
       }
       else
@@ -2054,12 +1820,9 @@ int main(int argc, char* argv[])
     }
     catch (...)
     {
-      LASMessage(LAS_ERROR, "processing file '%s'. maybe file is corrupt?", lasreadopener.get_file_name());
-      error = true;
-
       laswriteopener.set_file_name(0);
+      laserror("processing file '%s'. maybe file is corrupt?", lasreadopener.get_file_name());
     }
   }
-  byebye(error, argc == 1);
-  return 0;
+  byebye();
 }

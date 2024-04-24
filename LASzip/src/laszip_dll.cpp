@@ -55,9 +55,6 @@
 #define _HAS_STD_BYTE 0
 
 #include <limits>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <vector>
 
 #include "../dll/laszip_api.h"
@@ -74,11 +71,12 @@
 #include "lasquadtree.hpp"
 #include "lasindex.hpp"
 #include "lasmessage.hpp"
+#undef max
 
 class laszip_dll_inventory
 {
 public:
-  BOOL active() const { return (first == FALSE); };
+  BOOL active() const { return (first == FALSE); }
   U64 number_of_point_records;
   U64 number_of_points_by_return[16];
   I32 max_X;

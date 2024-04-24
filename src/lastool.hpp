@@ -1,0 +1,267 @@
+/*
+===============================================================================
+
+  FILE:  lastool.hpp
+
+  CONTENTS:
+
+    common lastool content
+
+  PROGRAMMERS:
+
+    info@rapidlasso.de
+
+  COPYRIGHT:
+
+    (c) 2009-2024, rapidlasso GmbH - fast tools to catch reality
+
+    This software is distributed WITHOUT ANY WARRANTY and without even the
+    implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+  CHANGE HISTORY:
+
+    01 Mai 2024 - initial
+
+===============================================================================
+*/
+#ifndef LASTOOL_HPP
+#define LASTOOL_HPP
+
+#include <stdio.h>
+#include <string.h>
+#include <string>
+#include "mydefs.hpp"
+#include "lasmessage.hpp"
+#include "lasdefinitions.hpp"
+
+class LasTool
+{
+private:
+  bool header_printed_once = false;
+public:
+  int argc = 0;
+  char** argv;
+  bool force = false; // force continuation on serious_warnings
+  bool blast = false;
+#ifdef COMPILE_WITH_GUI
+  bool gui = false;
+#endif
+#ifdef COMPILE_WITH_MULTI_CORE
+  I32 cores = 1;
+  BOOL cpu64 = FALSE;
+#endif
+  std::string name;
+  void init(int argc, char** argv, std::string name) {
+    this->argc = argc;
+    this->argv = argv;
+    this->name = name;
+  };
+
+  virtual std::string sBlast() {
+    return (blast ? " BLAST" : "");
+  };
+
+  virtual void lastitle(LAS_MESSAGE_TYPE type, std::string info = "") {
+    if (info == "")
+    {
+      info = laslicinfo();
+    }
+    if (!header_printed_once) 
+    {
+      LASMessage(type, "LAStools%s %s (by info@rapidlasso.de) version %d%s\n",
+        sBlast().c_str(), name.c_str(), LAS_TOOLS_VERSION, info.c_str());
+      header_printed_once = type >= get_message_log_level();
+    }
+  };
+
+  virtual std::string laslicinfo() {
+    return "";
+  };
+
+  void laserrorusage(LAS_FORMAT_STRING(const char*) fmt, ...) {
+    laserror(fmt);
+    usage();
+    byebye();
+  };
+
+  void laswarnforce(LAS_FORMAT_STRING(const char*) fmt, ...) {
+    LASMessage(LAS_SERIOUS_WARNING, fmt);
+    if (!force)
+    {
+      byebye();
+    }
+  };
+
+  virtual void usage() {
+    // optional: general print usage of filter/transformation classes
+    return;
+  };
+
+  template <typename parseitm>
+  void parse(parseitm x) 
+  {
+    // 1st parse
+    int i = 1;
+    while (i < argc)
+    {
+      if (argv[i][0] != '\0')
+      {
+        parse_pre(i);
+      }
+      i++;
+    }
+    // print title in verbose mode
+    lastitle(LAS_VERBOSE);
+    // 2nd parse
+    i = 1;
+    while (i < argc)
+    {
+      if (argv[i][0] != '\0')
+      {
+        if (!x(i) && !parse_base(i))
+        {
+          laserror("cannot understand argument '%s'. use '-h' or see %s_README.md to get help.", argv[i], name.c_str());
+        }
+      }
+      i++;
+    }
+    force_check();
+  };
+
+  virtual void parse_pre(int& i)
+  {
+    if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-verbose") == 0)
+    {
+      set_message_log_level(LAS_VERBOSE);
+      *argv[i] = 0;
+    }
+    else if (strcmp(argv[i], "-vv") == 0 || strcmp(argv[i], "-very_verbose") == 0)
+    {
+      set_message_log_level(LAS_VERY_VERBOSE);
+      *argv[i] = 0;
+    }
+    else if (strcmp(argv[i], "-quiet") == 0)
+    {
+      set_message_log_level(LAS_QUIET);
+      *argv[i] = 0;
+    }
+    else if (strcmp(argv[i], "-silent") == 0)
+    {
+      set_message_log_level(LAS_WARNING);
+      *argv[i] = 0;
+    }
+    else if (strcmp(argv[i], "-errors_ignore") == 0)
+    {
+      halt_on_error = false;
+      *argv[i] = 0;
+    }
+    else if (strcmp(argv[i], "-force") == 0)
+    {
+      force = true;
+      *argv[i] = 0;
+    }
+    else if (strcmp(argv[i], "-print_log_stats") == 0)
+    {
+      print_log_stats = true;
+      *argv[i] = 0;
+    };
+    // all new arguments in parse_pre: set to "0" to avoid "cannot understand argument" in main parse!
+    //   *argv[i] = 0;
+    return;
+  };
+  virtual bool parse_base(int& i)
+  {
+    if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-hh") == 0 || strcmp(argv[i], "-help") == 0)
+    {
+      lastitle(LAS_INFO);
+      usage();
+      if (strcmp(argv[i], "-hh") != 0)
+      {
+        LASMessage(LAS_INFO, "use '-hh' or see %s_README.md to get extended help\n", name.c_str());
+      }
+      byebye();
+    }
+    else if (strcmp(argv[i], "-version") == 0)
+    {
+      lastitle(LAS_INFO);
+      byebye();
+    }
+    else if (strcmp(argv[i], "-gui") == 0)
+    {
+#ifdef COMPILE_WITH_GUI
+      gui = true;
+#else
+      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
+#endif
+    }
+    else if (strcmp(argv[i], "-cores") == 0)
+    {
+#ifdef COMPILE_WITH_MULTI_CORE
+      if ((i + 1) >= argc)
+      {
+        laserrorusage("'%s' needs 1 argument: number", argv[i]);
+      }
+      if (sscanf(argv[i + 1], "%u", &cores) != 1)
+      {
+        laserror("cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
+        usage();
+        byebye();
+      }
+      argv[i][0] = '\0';
+      i++;
+      argv[i][0] = '\0';
+#else
+      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
+      i++;
+#endif
+    }
+    else if (strcmp(argv[i], "-cpu64") == 0)
+    {
+#ifdef COMPILE_WITH_MULTI_CORE
+      cpu64 = TRUE;
+#else
+      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
+#endif
+      argv[i][0] = '\0';
+    }
+    else
+    {
+      return false;
+    }
+    return true;
+  };
+  void laserrorinfo(std::string pre)
+  {
+    laserror("%s. use '-h' or see %s_README.md to get help.", pre.c_str(), name.c_str());
+  };
+  void parse_arg_invalid(char* argv) {
+    std::ostringstream s;
+    s << "cannot understand argument '" << std::string(argv) << "'";
+    laserrorinfo(s.str());
+  };
+  void parse_arg_invalid_n(int n) {
+    std::ostringstream s;
+    s << "cannot understand argument [" << n << "]='" << std::string(argv[n]) << "'";
+    laserrorinfo(s.str());
+  };
+  void error_parse_arg_n_invalid(int i, int n) {
+    std::ostringstream s;
+    s << "cannot understand argument [" << n << "]=[" << std::string(argv[i + n]) << "] for [" << std::string(argv[i]) << "]";
+    laserrorinfo(s.str());
+  };
+  void parse_arg_cnt_check(int i, int cnt, const char* desc) {
+    if ((i + cnt) >= argc)
+    {
+      laserror("'%s' needs [%d] argument%s%s%s", argv[i], cnt, (cnt > 1 ? "s" : ""), (desc == "" ? "" : ": "), desc);
+    }
+  };
+  void force_check() {
+    if (force) return;
+    if (lasmessage_cnt[LAS_SERIOUS_WARNING] > 0)
+    {
+      byebye();
+    }
+  };
+};
+
+#endif LASTOOL_HPP

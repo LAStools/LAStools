@@ -14,7 +14,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>src;inc;..\LASlib\inc;..\LASlib\src;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;inc;..\LASlib\inc;..\LASlib\src;include\laszip</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
@@ -30,6 +30,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\mydefs.cpp" />
     <ClCompile Include="src\arithmeticdecoder.cpp" />
     <ClCompile Include="src\arithmeticencoder.cpp" />
     <ClCompile Include="src\arithmeticmodel.cpp" />
@@ -48,9 +49,11 @@
     <ClCompile Include="src\laswriteitemcompressed_v4.cpp" />
     <ClCompile Include="src\laswritepoint.cpp" />
     <ClCompile Include="src\laszip.cpp" />
-    <ClCompile Include="src\mydefs.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\laszip\laszip_common.h" />
+    <ClInclude Include="include\laszip\laszip_api_version.h" />
+    <ClInclude Include="src\mydefs.hpp" />
     <ClInclude Include="src\arithmeticdecoder.hpp" />
     <ClInclude Include="src\arithmeticencoder.hpp" />
     <ClInclude Include="src\arithmeticmodel.hpp" />
@@ -91,7 +94,6 @@
     <ClInclude Include="src\laszip_common_v2.hpp" />
     <ClInclude Include="src\laszip_common_v3.hpp" />
     <ClInclude Include="src\laszip_decompress_selective_v3.hpp" />
-    <ClInclude Include="src\mydefs.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

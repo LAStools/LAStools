@@ -46,14 +46,14 @@ BOOL LASreaderPLY::open(const CHAR* file_name, U8 point_type, BOOL populate_head
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
   FILE* file = fopen_compressed(file_name, "rb", &piped);
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
+    laserror("cannot open file '%s'", file_name);
     return FALSE;
   }
 
@@ -71,7 +71,7 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
 
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "file pointer is zero");
+    laserror("file pointer is zero");
     return FALSE;
   }
 
@@ -250,7 +250,7 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
         header.add_attribute(attribute);
       }
       catch(...) {
-        LASMessage(LAS_ERROR, "initializing attribute %s", attribute_descriptions[i]);
+        laserror("initializing attribute %s", attribute_descriptions[i]);
         return FALSE;
       }
     }
@@ -296,7 +296,7 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
 
       if (!found)
       {
-        LASMessage(LAS_ERROR, "could not parse any lines with '%s'", parse_string);
+        laserror("could not parse any lines with '%s'", parse_string);
         fclose(file);
         file = 0;
         return FALSE;
@@ -423,7 +423,7 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
     file = fopen_compressed(file_name, "rb", &piped);
     if (file == 0)
     {
-      LASMessage(LAS_ERROR, "could not open '%s' for second pass", file_name);
+      laserror("could not open '%s' for second pass", file_name);
       return FALSE;
     }
 
@@ -473,7 +473,7 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
 
     if (i != 1)
     {
-      LASMessage(LAS_ERROR, "could not parse any lines with '%s'", parse_string);
+      laserror("could not parse any lines with '%s'", parse_string);
       fclose(this->file);
       this->file = 0;
       free(parse_string);
@@ -612,7 +612,7 @@ BOOL LASreaderPLY::seek(const I64 p_index)
     // did we manage to parse a line
     if (i != 1)
     {
-      LASMessage(LAS_ERROR, "could not parse any lines with '%s'", parse_string);
+      laserror("could not parse any lines with '%s'", parse_string);
       fclose(file);
       file = 0;
       free(parse_string);
@@ -735,14 +735,14 @@ BOOL LASreaderPLY::reopen(const char* file_name)
 
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
   file = fopen_compressed(file_name, "r", &piped);
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot reopen file '%s'", file_name);
+    laserror("cannot reopen file '%s'", file_name);
     return FALSE;
   }
 
@@ -773,7 +773,7 @@ BOOL LASreaderPLY::reopen(const char* file_name)
 
   if (i != 1)
   {
-    LASMessage(LAS_ERROR, "could not parse any lines with '%s'", parse_string);
+    laserror("could not parse any lines with '%s'", parse_string);
     fclose(file);
     file = 0;
     return FALSE;
@@ -1171,7 +1171,7 @@ BOOL LASreaderPLY::read_binary_point()
     }
     else
     {
-      LASMessage(LAS_ERROR, "unknown symbol '%c' in parse string", p[0]);
+      laserror("unknown symbol '%c' in parse string", p[0]);
     }
     p++;
     t++;
@@ -1507,7 +1507,7 @@ BOOL LASreaderPLY::parse(const char* parse_string)
     }
     else
     {
-      LASMessage(LAS_ERROR, "unknown symbol '%c' in parse string", p[0]);
+      laserror("unknown symbol '%c' in parse string", p[0]);
     }
     p++;
   }
@@ -1568,7 +1568,7 @@ BOOL LASreaderPLY::parse_header()
       }
       else
       {
-        LASMessage(LAS_WARNING, "format: %s not implemented. contact info@rapidlasso.de", &line[7]);
+        laserrorm("format: %s not implemented", &line[7]);
         return FALSE;
       }
     }
@@ -1586,7 +1586,7 @@ BOOL LASreaderPLY::parse_header()
       {
         if (sscanf(&line[15], "%lld", &npoints) != 1)
         {
-          LASMessage(LAS_WARNING, "element vertex: %scannot parse number of points. contact info@rapidlasso.de", &line[15]);
+          laserrorm("element vertex: %s cannot parse number of points", &line[15]);
           return FALSE;
         }
       }
@@ -1810,13 +1810,13 @@ BOOL LASreaderPLY::parse_header()
       }
       else
       {     
-        LASMessage(LAS_WARNING, "unknown property type: %snot implemented. contact info@rapidlasso.de", &line[9]);
+        laserrorm("unknown property type: %snot implemented", &line[9]);
         return FALSE;
       }
     }
     else
     {
-      LASMessage(LAS_WARNING, "unknown header item: %snot implemented. contact info@rapidlasso.de", line);
+      laserrorm("unknown header item: %snot implemented", line);
     }
 
     LASMessage(LAS_VERBOSE, "parsed: %s", line);

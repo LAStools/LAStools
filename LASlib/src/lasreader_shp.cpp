@@ -107,7 +107,7 @@ BOOL LASreaderSHP::open(const char* file_name)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
@@ -116,7 +116,7 @@ BOOL LASreaderSHP::open(const char* file_name)
   file = fopen_compressed(file_name, "rb", &piped);
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
+    laserror("cannot open file '%s'", file_name);
     return FALSE;
   }
 
@@ -160,7 +160,7 @@ BOOL LASreaderSHP::open(const char* file_name)
   from_big_endian(&int_input); 
   if (int_input != 9994)
   {
-    LASMessage(LAS_ERROR, "wrong shapefile code %d != 9994", int_input);
+    laserror("wrong shapefile code %d != 9994", int_input);
     return FALSE;
   }
   if (fread(&int_input, sizeof(int), 1, file) != 1) return false; // unused (BIG)
@@ -175,7 +175,7 @@ BOOL LASreaderSHP::open(const char* file_name)
   from_little_endian(&int_input); 
   if (int_input != 1000)
   {
-    LASMessage(LAS_ERROR, "wrong shapefile version %d != 1000", int_input);
+    laserror("wrong shapefile version %d != 1000", int_input);
     return FALSE;
   }
   if (fread(&int_input, sizeof(int), 1, file) != 1) return false; // shape type (LITTLE)
@@ -183,7 +183,7 @@ BOOL LASreaderSHP::open(const char* file_name)
   shape_type = int_input;
   if (shape_type != 1 && shape_type != 11 && shape_type != 21 && shape_type != 8 && shape_type != 18 && shape_type != 28)
   {
-    LASMessage(LAS_ERROR, "wrong shape type %d != 1,11,21,8,18,28", shape_type);
+    laserror("wrong shape type %d != 1,11,21,8,18,28", shape_type);
     return FALSE;
   }
   double double_input;
@@ -418,14 +418,14 @@ BOOL LASreaderSHP::reopen(const char* file_name)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
   file = fopen_compressed(file_name, "rb", &piped);
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot reopen file '%s'", file_name);
+    laserror("cannot reopen file '%s'", file_name);
     return FALSE;
   }
 

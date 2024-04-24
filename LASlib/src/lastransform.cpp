@@ -2739,6 +2739,10 @@ BOOL LAStransform::parse(int argc, char* argv[])
 		}
 		else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0)
 		{
+			return TRUE;
+		}
+		else if (strcmp(argv[i], "-hh")  == 0)
+		{
 			usage();
 			return TRUE;
 		}
@@ -2753,13 +2757,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset", argv[i]);
+					laserror("'%s' needs 1 argument: offset", argv[i]);
 					return FALSE;
 				}
 				F64 offset;
 				if (sscanf(argv[i + 1], "%lf", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: offset but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -2770,13 +2774,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset", argv[i]);
+					laserror("'%s' needs 1 argument: offset", argv[i]);
 					return FALSE;
 				}
 				F64 offset;
 				if (sscanf(argv[i + 1], "%lf", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: offset but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Y_COORDINATE;
@@ -2787,13 +2791,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset", argv[i]);
+					laserror("'%s' needs 1 argument: offset", argv[i]);
 					return FALSE;
 				}
 				F64 offset;
 				if (sscanf(argv[i + 1], "%lf", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: offset but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -2804,25 +2808,25 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: offset_x offset_y offset_z", argv[i]);
+					laserror("'%s' needs 3 arguments: offset_x offset_y offset_z", argv[i]);
 					return FALSE;
 				}
 				F64 offset_x;
 				if (sscanf(argv[i + 1], "%lf", &offset_x) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 offset_y;
 				if (sscanf(argv[i + 2], "%lf", &offset_y) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number", argv[i], argv[i + 2]);
+					laserror("'%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				F64 offset_z;
 				if (sscanf(argv[i + 3], "%lf", &offset_z) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number", argv[i], argv[i + 3]);
+					laserror("'%s' needs 3 arguments: offset_x offset_y offset_z but '%s' is no valid number", argv[i], argv[i + 3]);
 					return FALSE;
 				}
 				if (offset_x) transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -2835,19 +2839,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale", argv[i]);
+					laserror("'%s' needs 2 arguments: offset scale", argv[i]);
 					return FALSE;
 				}
 				F64 offset;
 				if (sscanf(argv[i + 1], "%lf", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 scale;
 				if (sscanf(argv[i + 2], "%lf", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -2858,19 +2862,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale", argv[i]);
+					laserror("'%s' needs 2 arguments: offset scale", argv[i]);
 					return FALSE;
 				}
 				F64 offset;
 				if (sscanf(argv[i + 1], "%lf", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 scale;
 				if (sscanf(argv[i + 2], "%lf", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Y_COORDINATE;
@@ -2881,19 +2885,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale", argv[i]);
+					laserror("'%s' needs 2 arguments: offset scale", argv[i]);
 					return FALSE;
 				}
 				F64 offset;
 				if (sscanf(argv[i + 1], "%lf", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 scale;
 				if (sscanf(argv[i + 2], "%lf", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid number", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -2906,13 +2910,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: raw_offset", argv[i]);
+						laserror("'%s' needs 1 argument: raw_offset", argv[i]);
 						return FALSE;
 					}
 					I32 raw_offset;
 					if (sscanf(argv[i + 1], "%d", &raw_offset) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -2923,13 +2927,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: raw_offset", argv[i]);
+						laserror("'%s' needs 1 argument: raw_offset", argv[i]);
 						return FALSE;
 					}
 					I32 raw_offset;
 					if (sscanf(argv[i + 1], "%d", &raw_offset) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_Y_COORDINATE;
@@ -2940,13 +2944,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: raw_offset", argv[i]);
+						laserror("'%s' needs 1 argument: raw_offset", argv[i]);
 						return FALSE;
 					}
 					I32 raw_offset;
 					if (sscanf(argv[i + 1], "%d", &raw_offset) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: raw_offset but '%s' is no valid raw_offset", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -2957,25 +2961,25 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 3) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z", argv[i]);
+						laserror("'%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z", argv[i]);
 						return FALSE;
 					}
 					I32 raw_offset_x;
 					if (sscanf(argv[i + 1], "%d", &raw_offset_x) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_x", argv[i], argv[i + 1]);
+						laserror("'%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_x", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					I32 raw_offset_y;
 					if (sscanf(argv[i + 2], "%d", &raw_offset_y) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_y", argv[i], argv[i + 2]);
+						laserror("'%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_y", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					I32 raw_offset_z;
 					if (sscanf(argv[i + 3], "%d", &raw_offset_z) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_z", argv[i], argv[i + 3]);
+						laserror("'%s' needs 3 arguments: raw_offset_x raw_offset_y raw_offset_z but '%s' is no valid raw_offset_z", argv[i], argv[i + 3]);
 						return FALSE;
 					}
 					if (raw_offset_x) transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -2988,19 +2992,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 2) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y", argv[i]);
+						laserror("'%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y", argv[i]);
 						return FALSE;
 					}
 					I32 max_raw_offset_x;
 					if (sscanf(argv[i + 1], "%d", &max_raw_offset_x) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y but '%s' is no valid max_raw_offset_x", argv[i], argv[i + 1]);
+						laserror("'%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y but '%s' is no valid max_raw_offset_x", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					I32 max_raw_offset_y;
 					if (sscanf(argv[i + 2], "%d", &max_raw_offset_y) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y but '%s' is no valid max_raw_offset_y", argv[i], argv[i + 2]);
+						laserror("'%s' needs 2 arguments: max_raw_offset_x max_raw_offset_y but '%s' is no valid max_raw_offset_y", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					if (max_raw_offset_x) transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -3013,13 +3017,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset", argv[i]);
+					laserror("'%s' needs 1 argument: offset", argv[i]);
 					return FALSE;
 				}
 				F32 offset;
 				if (sscanf(argv[i + 1], "%f", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset but '%s' is no valid offset", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: offset but '%s' is no valid offset", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				add_operation(new LASoperationTranslateIntensity(offset));
@@ -3029,19 +3033,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale", argv[i]);
+					laserror("'%s' needs 2 arguments: offset scale", argv[i]);
 					return FALSE;
 				}
 				F32 offset;
 				if (sscanf(argv[i + 1], "%f", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid offset", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid offset", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F32 scale;
 				if (sscanf(argv[i + 2], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid scale", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid scale", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				add_operation(new LASoperationTranslateThenScaleIntensity(offset, scale));
@@ -3051,13 +3055,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset", argv[i]);
+					laserror("'%s' needs 1 argument: offset", argv[i]);
 					return FALSE;
 				}
 				F32 offset;
 				if (sscanf(argv[i + 1], "%f", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset but '%s' is no valid offset", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: offset but '%s' is no valid offset", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				add_operation(new LASoperationTranslateScanAngle(offset));
@@ -3067,19 +3071,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale", argv[i]);
+					laserror("'%s' needs 2 arguments: offset scale", argv[i]);
 					return FALSE;
 				}
 				F32 offset;
 				if (sscanf(argv[i + 1], "%f", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid offset", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid offset", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F32 scale;
 				if (sscanf(argv[i + 2], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: offset scale but '%s' is no valid scale", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: offset scale but '%s' is no valid scale", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				add_operation(new LASoperationTranslateThenScaleScanAngle(offset, scale));
@@ -3089,13 +3093,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset", argv[i]);
+					laserror("'%s' needs 1 argument: offset", argv[i]);
 					return FALSE;
 				}
 				F64 offset;
 				if (sscanf(argv[i + 1], "%lf", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: offset but '%s' is no valid offset", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: offset but '%s' is no valid offset", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				add_operation(new LASoperationTranslateGpsTime(offset));
@@ -3105,19 +3109,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index offset", argv[i]);
+					laserror("'%s' needs 2 arguments: index offset", argv[i]);
 					return FALSE;
 				}
 				U32 index;
 				if (sscanf(argv[i + 1], "%u", &index) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index offset but '%s' is no valid index", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: index offset but '%s' is no valid index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 offset;
 				if (sscanf(argv[i + 2], "%lf", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index offset but '%s' is no valid offset", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: index offset but '%s' is no valid offset", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				add_operation(new LASoperationTranslateAttribute(index, offset));
@@ -3127,19 +3131,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index offset", argv[i]);
+					laserror("'%s' needs 2 arguments: index offset", argv[i]);
 					return FALSE;
 				}
 				U32 index;
 				if (sscanf(argv[i + 1], "%u", &index) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index offset but '%s' is no valid index", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: index offset but '%s' is no valid index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 offset;
 				if (sscanf(argv[i + 2], "%lf", &offset) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index offset but '%s' is no valid offset", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: index offset but '%s' is no valid offset", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				add_operation(new LASoperationTranslateRegister(registers, index, offset));
@@ -3152,30 +3156,30 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_y", argv[i]);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_y", argv[i]);
 					return FALSE;
 				}
 				F64 angle;
 				if (sscanf(argv[i + 1], "%lf", &angle) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid angle", argv[i], argv[i + 1]);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid angle", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (angle == 0.0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_y but %g is no valid angle", argv[i], angle);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_y but %g is no valid angle", argv[i], angle);
 					return FALSE;
 				}
 				F64 rot_center_x;
 				if (sscanf(argv[i + 2], "%lf", &rot_center_x) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid rot_center_x", argv[i], argv[i + 2]);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid rot_center_x", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				F64 rot_center_y;
 				if (sscanf(argv[i + 3], "%lf", &rot_center_y) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid rot_center_y", argv[i], argv[i + 3]);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_y but '%s' is no valid rot_center_y", argv[i], argv[i + 3]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -3187,30 +3191,30 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_z", argv[i]);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_z", argv[i]);
 					return FALSE;
 				}
 				F64 angle;
 				if (sscanf(argv[i + 1], "%lf", &angle) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid angle", argv[i], argv[i + 1]);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid angle", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (angle == 0.0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_y but %g is no valid angle", argv[i], angle);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_y but %g is no valid angle", argv[i], angle);
 					return FALSE;
 				}
 				F64 rot_center_x;
 				if (sscanf(argv[i + 2], "%lf", &rot_center_x) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid rot_center_x", argv[i], argv[i + 2]);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid rot_center_x", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				F64 rot_center_z;
 				if (sscanf(argv[i + 3], "%lf", &rot_center_z) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid rot_center_z", argv[i], argv[i + 3]);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_z but '%s' is no valid rot_center_z", argv[i], argv[i + 3]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -3222,30 +3226,30 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_y rot_center_z", argv[i]);
+					laserror("'%s' needs 3 arguments: angle rot_center_y rot_center_z", argv[i]);
 					return FALSE;
 				}
 				F64 angle;
 				if (sscanf(argv[i + 1], "%lf", &angle) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid angle", argv[i], argv[i + 1]);
+					laserror("'%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid angle", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (angle == 0.0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_x rot_center_y but %g is no valid angle", argv[i], angle);
+					laserror("'%s' needs 3 arguments: angle rot_center_x rot_center_y but %g is no valid angle", argv[i], angle);
 					return FALSE;
 				}
 				F64 rot_center_y;
 				if (sscanf(argv[i + 2], "%lf", &rot_center_y) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid rot_center_y", argv[i], argv[i + 2]);
+					laserror("'%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid rot_center_y", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				F64 rot_center_z;
 				if (sscanf(argv[i + 3], "%lf", &rot_center_z) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid rot_center_z", argv[i], argv[i + 3]);
+					laserror("'%s' needs 3 arguments: angle rot_center_y rot_center_z but '%s' is no valid rot_center_z", argv[i], argv[i + 3]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Y_COORDINATE;
@@ -3260,19 +3264,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: below above", argv[i]);
+					laserror("'%s' needs 2 arguments: below above", argv[i]);
 					return FALSE;
 				}
 				F64 below;
 				if (sscanf(argv[i + 1], "%lf", &below) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: below above but '%s' is no valid below value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: below above but '%s' is no valid below value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 above;
 				if (sscanf(argv[i + 2], "%lf", &above) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: below above but '%s' is no valid above value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: below above but '%s' is no valid above value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -3283,13 +3287,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: below", argv[i]);
+					laserror("'%s' needs 1 argument: below", argv[i]);
 					return FALSE;
 				}
 				F64 below;
 				if (sscanf(argv[i + 1], "%lf", &below) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: below but '%s' is no valid below value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: below but '%s' is no valid below value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -3300,13 +3304,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: above", argv[i]);
+					laserror("'%s' needs 1 argument: above", argv[i]);
 					return FALSE;
 				}
 				F64 above;
 				if (sscanf(argv[i + 1], "%lf", &above) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: above but '%s' is no valid above value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: above but '%s' is no valid above value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -3323,29 +3327,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: below above", argv[i]);
+					laserror("'%s' needs 2 arguments: below above", argv[i]);
 					return FALSE;
 				}
 				U32 below;
 				if (sscanf(argv[i + 1], "%u", &below) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: below above but '%s' is no valid below value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: below above but '%s' is no valid below value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				U32 above;
 				if (sscanf(argv[i + 2], "%u", &above) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: below above but '%s' is no valid above value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: below above but '%s' is no valid above value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (below > U16_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot clamp intensity because below value of %u is larger than %u", below, U16_MAX);
+					laserror("cannot clamp intensity because below value of %u is larger than %u", below, U16_MAX);
 					return FALSE;
 				}
 				if (above > U16_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot clamp intensity because above value of %u is larger than %u", above, U16_MAX);
+					laserror("cannot clamp intensity because above value of %u is larger than %u", above, U16_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationClampIntensity((U16)below, (U16)above));
@@ -3355,18 +3359,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: below", argv[i]);
+					laserror("'%s' needs 1 argument: below", argv[i]);
 					return FALSE;
 				}
 				U32 below;
 				if (sscanf(argv[i + 1], "%u", &below) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: below but '%s' is no valid below value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: below but '%s' is no valid below value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (below > U16_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot clamp intensity because below value of %u is larger than %u", below, U16_MAX);
+					laserror("cannot clamp intensity because below value of %u is larger than %u", below, U16_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationClampIntensityBelow((U16)below));
@@ -3376,18 +3380,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: above", argv[i]);
+					laserror("'%s' needs 1 argument: above", argv[i]);
 					return FALSE;
 				}
 				U32 above;
 				if (sscanf(argv[i + 1], "%u", &above) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: above but '%s' is no valid above value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: above but '%s' is no valid above value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (above > U16_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot clamp intensity because above value of %u is larger than %u", above, U16_MAX);
+					laserror("cannot clamp intensity because above value of %u is larger than %u", above, U16_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationClampIntensityAbove((U16)above));
@@ -3397,19 +3401,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: below above", argv[i]);
+					laserror("'%s' needs 2 arguments: below above", argv[i]);
 					return FALSE;
 				}
 				I32 below;
 				if (sscanf(argv[i + 1], "%d", &below) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: below above but '%s' is no valid below value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: below above but '%s' is no valid below value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				I32 above;
 				if (sscanf(argv[i + 2], "%d", &above) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: below above but '%s' is no valid above value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: below above but '%s' is no valid above value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -3425,13 +3429,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -3442,13 +3446,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_Y_COORDINATE;
@@ -3459,13 +3463,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -3476,13 +3480,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyAttributeIntoUserData(index));
@@ -3492,13 +3496,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyAttributeIntoIntensity(index));
@@ -3508,13 +3512,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyAttributeIntoPointSource(index));
@@ -3524,13 +3528,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyAttributeIntoRGBNIR(index, 0));
@@ -3540,13 +3544,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyAttributeIntoRGBNIR(index, 1));
@@ -3556,13 +3560,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyAttributeIntoRGBNIR(index, 2));
@@ -3572,13 +3576,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+						laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyAttributeIntoRGBNIR(index, 3));
@@ -3588,24 +3592,24 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 2) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index of attribute, index of register", argv[i]);
+						laserror("'%s' needs 2 arguments: index of attribute, index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index_attribute;
 					if (sscanf(argv[i + 1], "%u", &index_attribute) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' 1st of 2 arguments index of attribute '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' 1st of 2 arguments index of attribute '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					U32 index_register;
 					if (sscanf(argv[i + 2], "%u", &index_register) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' 2nd of 2 arguments index of register '%s' is no valid index", argv[i], argv[i + 2]);
+						laserror("'%s' 2nd of 2 arguments index of register '%s' is no valid index", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					if (index_register >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' 2nd of 2 arguments index of register %u is out of valid [0,15] range", argv[i], index_register);
+						laserror("'%s' 2nd of 2 arguments index of register %u is out of valid [0,15] range", argv[i], index_register);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyAttributeIntoRegister(index_attribute, registers, index_register));
@@ -3618,18 +3622,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -3640,18 +3644,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_Y_COORDINATE;
@@ -3662,18 +3666,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -3684,18 +3688,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRegisterIntoUserData(registers, index));
@@ -3705,18 +3709,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRegisterIntoIntensity(registers, index));
@@ -3726,18 +3730,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRegisterIntoPointSource(registers, index));
@@ -3747,18 +3751,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRegisterIntoRGBNIR(registers, index, 0));
@@ -3768,18 +3772,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRegisterIntoRGBNIR(registers, index, 1));
@@ -3789,18 +3793,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRegisterIntoRGBNIR(registers, index, 2));
@@ -3810,18 +3814,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register", argv[i]);
+						laserror("'%s' needs 1 argument: index of register", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index of register but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRegisterIntoRGBNIR(registers, index, 3));
@@ -3831,24 +3835,24 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 2) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index of register, index of attribute", argv[i]);
+						laserror("'%s' needs 2 arguments: index of register, index of attribute", argv[i]);
 						return FALSE;
 					}
 					U32 index_register;
 					if (sscanf(argv[i + 1], "%u", &index_register) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' 1st of 2 arguments index of register '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' 1st of 2 arguments index of register '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index_register >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' 1st of 2 arguments index of register %u is out of valid [0,15] range", argv[i], index_register);
+						laserror("'%s' 1st of 2 arguments index of register %u is out of valid [0,15] range", argv[i], index_register);
 						return FALSE;
 					}
 					U32 index_attribute;
 					if (sscanf(argv[i + 2], "%u", &index_attribute) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' 2nd of 2 arguments index of attribute '%s' is no valid index", argv[i], argv[i + 2]);
+						laserror("'%s' 2nd of 2 arguments index of attribute '%s' is no valid index", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRegisterIntoAttribute(registers, index_register, index_attribute));
@@ -3881,13 +3885,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyUserDataIntoAttribute(index));
@@ -3897,18 +3901,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyUserDataIntoRegister(registers, index));
@@ -3921,18 +3925,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyPointSourceIntoRegister(registers, index));
@@ -3958,18 +3962,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRBGNIRintoRegister(0, registers, index));
@@ -3997,18 +4001,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRBGNIRintoRegister(1, registers, index));
@@ -4031,18 +4035,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRBGNIRintoRegister(2, registers, index));
@@ -4065,18 +4069,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyRBGNIRintoRegister(3, registers, index));
@@ -4110,13 +4114,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyIntensityIntoAttribute(index));
@@ -4126,18 +4130,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (index >= 16)
 					{
-						LASMessage(LAS_ERROR, "'%s' index of register %u is out of valid [0,15] range", argv[i], index);
+						laserror("'%s' index of register %u is out of valid [0,15] range", argv[i], index);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyIntensityIntoRegister(registers, index));
@@ -4163,13 +4167,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
+						laserror("'%s' needs 1 argument: index", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationCopyZIntoAttribute(index));
@@ -4183,18 +4187,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: classification", argv[i]);
+					laserror("'%s' needs 1 argument: classification", argv[i]);
 					return FALSE;
 				}
 				U32 classification;
 				if (sscanf(argv[i + 1], "%u", &classification) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: classification but '%s' is no valid classification", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: classification but '%s' is no valid classification", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (classification > 255)
 				{
-					LASMessage(LAS_ERROR, "cannot set classification because classification of %u is larger than 255", classification);
+					laserror("cannot set classification because classification of %u is larger than 255", classification);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetClassification((U8)classification));
@@ -4204,18 +4208,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value", argv[i]);
+					laserror("'%s' needs 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > U16_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot set intensity because value of %u is larger than %u", value, U16_MAX);
+					laserror("cannot set intensity because value of %u is larger than %u", value, U16_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetIntensity(U16_CLAMP(value)));
@@ -4225,18 +4229,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: value", argv[i]);
+					laserror("'%s' need 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > 1)
 				{
-					LASMessage(LAS_ERROR, "cannot set withheld flag because value %u is larger than 1", value);
+					laserror("cannot set withheld flag because value %u is larger than 1", value);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetWithheldFlag((U8)value));
@@ -4246,18 +4250,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: value", argv[i]);
+					laserror("'%s' need 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > 1)
 				{
-					LASMessage(LAS_ERROR, "cannot set synthetic flag because value %u is larger than 1", value);
+					laserror("cannot set synthetic flag because value %u is larger than 1", value);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetSyntheticFlag((U8)value));
@@ -4267,18 +4271,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: value", argv[i]);
+					laserror("'%s' need 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > 1)
 				{
-					LASMessage(LAS_ERROR, "cannot set keypoint flag because value %u is larger than 1", value);
+					laserror("cannot set keypoint flag because value %u is larger than 1", value);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetKeypointFlag((U8)value));
@@ -4288,18 +4292,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: value", argv[i]);
+					laserror("'%s' need 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > 1)
 				{
-					LASMessage(LAS_ERROR, "cannot set overlap flag because value %u is larger than 1", value);
+					laserror("cannot set overlap flag because value %u is larger than 1", value);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetExtendedOverlapFlag((U8)value));
@@ -4309,18 +4313,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: value", argv[i]);
+					laserror("'%s' need 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > 3)
 				{
-					LASMessage(LAS_ERROR, "cannot set scanner channel because value %u is larger than 3", value);
+					laserror("cannot set scanner channel because value %u is larger than 3", value);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetExtendedScannerChannel((U8)value));
@@ -4330,18 +4334,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: value", argv[i]);
+					laserror("'%s' need 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > U8_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot set user data because value %u is larger than %d", value, U8_MAX);
+					laserror("cannot set user data because value %u is larger than %d", value, U8_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetUserData((U8)value));
@@ -4351,23 +4355,23 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: value", argv[i]);
+					laserror("'%s' need 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				F32 value;
 				if (sscanf(argv[i + 1], "%g", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value < -180.0f)
 				{
-					LASMessage(LAS_ERROR, "cannot set scan angle because value %g is smaller than -180", value);
+					laserror("cannot set scan angle because value %g is smaller than -180", value);
 					return FALSE;
 				}
 				else if (value > 180.0f)
 				{
-					LASMessage(LAS_ERROR, "cannot set scan angle rank because value %g is larger than 180", value);
+					laserror("cannot set scan angle rank because value %g is larger than 180", value);
 					return FALSE;
 				}
 
@@ -4378,18 +4382,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: psid", argv[i]);
+					laserror("'%s' need 1 argument: psid", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > U16_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot set point source ID because value %u is larger than %d", value, U16_MAX);
+					laserror("cannot set point source ID because value %u is larger than %d", value, U16_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetPointSource((U16)value));
@@ -4399,18 +4403,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: return_number", argv[i]);
+					laserror("'%s' needs 1 argument: return_number", argv[i]);
 					return FALSE;
 				}
 				U32 return_number;
 				if (sscanf(argv[i + 1], "%u", &return_number) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: return_number but '%s' is no valid return_number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: return_number but '%s' is no valid return_number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (return_number > 7)
 				{
-					LASMessage(LAS_ERROR, "cannot set return_number because %u is larger than 7", return_number);
+					laserror("cannot set return_number because %u is larger than 7", return_number);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetReturnNumber((U8)return_number));
@@ -4420,18 +4424,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: extended_return_number", argv[i]);
+					laserror("'%s' needs 1 argument: extended_return_number", argv[i]);
 					return FALSE;
 				}
 				U32 extended_return_number;
 				if (sscanf(argv[i + 1], "%u", &extended_return_number) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: extended_return_number but '%s' is no valid extended_return_number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: extended_return_number but '%s' is no valid extended_return_number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (extended_return_number > 15)
 				{
-					LASMessage(LAS_ERROR, "cannot set extended_return_number because %u is larger than 15", extended_return_number);
+					laserror("cannot set extended_return_number because %u is larger than 15", extended_return_number);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetExtendedReturnNumber((U8)extended_return_number));
@@ -4441,18 +4445,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: number_of_returns", argv[i]);
+					laserror("'%s' needs 1 argument: number_of_returns", argv[i]);
 					return FALSE;
 				}
 				U32 number_of_returns;
 				if (sscanf(argv[i + 1], "%u", &number_of_returns) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: number_of_returns but '%s' is no valid number_of_returns", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: number_of_returns but '%s' is no valid number_of_returns", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (number_of_returns > 7)
 				{
-					LASMessage(LAS_ERROR, "cannot set number_of_returns because %u is larger than 7", number_of_returns);
+					laserror("cannot set number_of_returns because %u is larger than 7", number_of_returns);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetNumberOfReturns((U8)number_of_returns));
@@ -4462,18 +4466,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: extended_number_of_returns", argv[i]);
+					laserror("'%s' needs 1 argument: extended_number_of_returns", argv[i]);
 					return FALSE;
 				}
 				U32 extended_number_of_returns;
 				if (sscanf(argv[i + 1], "%u", &extended_number_of_returns) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: extended_number_of_returns but '%s' is no valid extended_return_number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: extended_number_of_returns but '%s' is no valid extended_return_number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (extended_number_of_returns > 15)
 				{
-					LASMessage(LAS_ERROR, "cannot set extended_number_of_returns because %u is larger than 15", extended_number_of_returns);
+					laserror("cannot set extended_number_of_returns because %u is larger than 15", extended_number_of_returns);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetExtendedNumberOfReturns((U8)extended_number_of_returns));
@@ -4483,13 +4487,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: gps_time", argv[i]);
+					laserror("'%s' needs 1 argument: gps_time", argv[i]);
 					return FALSE;
 				}
 				F64 gps_time;
 				if (sscanf(argv[i + 1], "%lf", &gps_time) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: gps_time but '%s' is no valid gps_time", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: gps_time but '%s' is no valid gps_time", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetGpsTime(gps_time));
@@ -4499,19 +4503,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value", argv[i]);
+					laserror("'%s' needs 2 arguments: index value", argv[i]);
 					return FALSE;
 				}
 				U32 index;
 				if (sscanf(argv[i + 1], "%u", &index) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 value;
 				if (sscanf(argv[i + 2], "%lf", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value but '%s' is no valid value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: index value but '%s' is no valid value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetAttribute(index, value));
@@ -4521,19 +4525,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value", argv[i]);
+					laserror("'%s' needs 2 arguments: index value", argv[i]);
 					return FALSE;
 				}
 				U32 index;
 				if (sscanf(argv[i + 1], "%u", &index) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: index value but '%s' is no valid index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 value;
 				if (sscanf(argv[i + 2], "%lf", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index value but '%s' is no valid value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: index value but '%s' is no valid value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetRegister(registers, index, value));
@@ -4545,40 +4549,40 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 3) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: R G B", argv[i]);
+						laserror("'%s' needs 3 arguments: R G B", argv[i]);
 						return FALSE;
 					}
 					U32 R;
 					if (sscanf(argv[i + 1], "%u", &R) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: R G B but '%s' is no valid R", argv[i], argv[i + 1]);
+						laserror("'%s' needs 3 arguments: R G B but '%s' is no valid R", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (R > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot set RGB because R is %u, which is larger than %u", R, U16_MAX);
+						laserror("cannot set RGB because R is %u, which is larger than %u", R, U16_MAX);
 						return FALSE;
 					}
 					U32 G;
 					if (sscanf(argv[i + 2], "%u", &G) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: R G B but '%s' is no valid G", argv[i], argv[i + 2]);
+						laserror("'%s' needs 3 arguments: R G B but '%s' is no valid G", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					if (G > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot set RGB because G is %u, which is larger than %u", G, U16_MAX);
+						laserror("cannot set RGB because G is %u, which is larger than %u", G, U16_MAX);
 						return FALSE;
 					}
 					U32 B;
 					if (sscanf(argv[i + 3], "%u", &B) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: R G B but '%s' is no valid B", argv[i], argv[i + 3]);
+						laserror("'%s' needs 3 arguments: R G B but '%s' is no valid B", argv[i], argv[i + 3]);
 						return FALSE;
 					}
 					if (B > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot set RGB because B is %u, which is larger than %u", B, U16_MAX);
+						laserror("cannot set RGB because B is %u, which is larger than %u", B, U16_MAX);
 						return FALSE;
 					}
 					add_operation(new LASoperationSetRGB((U16)R, (U16)G, (U16)B));
@@ -4588,51 +4592,51 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 4) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: classification R G B", argv[i]);
+						laserror("'%s' needs 4 arguments: classification R G B", argv[i]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 1], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: classification R G B but '%s' is no valid classification", argv[i], argv[i + 1]);
+						laserror("'%s' needs 4 arguments: classification R G B but '%s' is no valid classification", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					if (classification > U8_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot set RGB because classification is %u, which is larger than %u", classification, U8_MAX);
+						laserror("cannot set RGB because classification is %u, which is larger than %u", classification, U8_MAX);
 						return FALSE;
 					}
 					U32 R;
 					if (sscanf(argv[i + 2], "%u", &R) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: classification R G B but '%s' is no valid R", argv[i], argv[i + 2]);
+						laserror("'%s' needs 4 arguments: classification R G B but '%s' is no valid R", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					if (R > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot set RGB because R is %u, which is larger than %u", R, U16_MAX);
+						laserror("cannot set RGB because R is %u, which is larger than %u", R, U16_MAX);
 						return FALSE;
 					}
 					U32 G;
 					if (sscanf(argv[i + 3], "%u", &G) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: classification R G B but '%s' is no valid G", argv[i], argv[i + 3]);
+						laserror("'%s' needs 4 arguments: classification R G B but '%s' is no valid G", argv[i], argv[i + 3]);
 						return FALSE;
 					}
 					if (G > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot set RGB because G is %u, which is larger than %u", G, U16_MAX);
+						laserror("cannot set RGB because G is %u, which is larger than %u", G, U16_MAX);
 						return FALSE;
 					}
 					U32 B;
 					if (sscanf(argv[i + 4], "%u", &B) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: classification R G B but '%s' is no valid B", argv[i], argv[i + 4]);
+						laserror("'%s' needs 4 arguments: classification R G B but '%s' is no valid B", argv[i], argv[i + 4]);
 						return FALSE;
 					}
 					if (B > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot set RGB because B is %u, which is larger than %u", B, U16_MAX);
+						laserror("cannot set RGB because B is %u, which is larger than %u", B, U16_MAX);
 						return FALSE;
 					}
 					if (classification < 32)
@@ -4650,18 +4654,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value", argv[i]);
+					laserror("'%s' needs 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is not valid", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is not valid", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > U16_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot set NIR because value is %u, which is larger than %u", value, U16_MAX);
+					laserror("cannot set NIR because value is %u, which is larger than %u", value, U16_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetNIR((U16)value));
@@ -4671,18 +4675,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: value", argv[i]);
+					laserror("'%s' need 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > 1)
 				{
-					LASMessage(LAS_ERROR, "cannot set scan direction flag because value %u is larger than 1", value);
+					laserror("cannot set scan direction flag because value %u is larger than 1", value);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetScanDirectionFlag((U8)value));
@@ -4692,18 +4696,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' need 1 argument: value", argv[i]);
+					laserror("'%s' need 1 argument: value", argv[i]);
 					return FALSE;
 				}
 				U32 value;
 				if (sscanf(argv[i + 1], "%u", &value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: value but '%s' is no valid flag", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (value > 1)
 				{
-					LASMessage(LAS_ERROR, "cannot set edge of flight line because value %u is larger than 1", value);
+					laserror("cannot set edge of flight line because value %u is larger than 1", value);
 					return FALSE;
 				}
 				add_operation(new LASoperationSetEdgeOfFlightLine((U8)value));
@@ -4716,29 +4720,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value", argv[i]);
+					laserror("'%s' needs 2 arguments: from_value to_value", argv[i]);
 					return FALSE;
 				}
 				U32 from_value;
 				if (sscanf(argv[i + 1], "%u", &from_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (from_value > U8_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot change classification because from_value %u is larger than %u", from_value, U8_MAX);
+					laserror("cannot change classification because from_value %u is larger than %u", from_value, U8_MAX);
 					return FALSE;
 				}
 				U32 to_value;
 				if (sscanf(argv[i + 2], "%u", &to_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (to_value > U8_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot change classification because to_value %u is larger than %u", to_value, U8_MAX);
+					laserror("cannot change classification because to_value %u is larger than %u", to_value, U8_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationChangeClassificationFromTo((U8)from_value, (U8)to_value));
@@ -4748,29 +4752,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value", argv[i]);
+					laserror("'%s' needs 2 arguments: from_value to_value", argv[i]);
 					return FALSE;
 				}
 				U32 from_value;
 				if (sscanf(argv[i + 1], "%u", &from_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (from_value > U8_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot change classification because from_value %u is larger than %u", from_value, U8_MAX);
+					laserror("cannot change classification because from_value %u is larger than %u", from_value, U8_MAX);
 					return FALSE;
 				}
 				U32 to_value;
 				if (sscanf(argv[i + 2], "%u", &to_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (to_value > U8_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot change classification because to_value %u is larger than %u", to_value, U8_MAX);
+					laserror("cannot change classification because to_value %u is larger than %u", to_value, U8_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationChangeUserDataFromTo(from_value, to_value));
@@ -4780,29 +4784,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value", argv[i]);
+					laserror("'%s' needs 2 arguments: from_value to_value", argv[i]);
 					return FALSE;
 				}
 				U32 from_value;
 				if (sscanf(argv[i + 1], "%u", &from_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (from_value > U16_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot change classification because from_value %u is larger than %u", from_value, U16_MAX);
+					laserror("cannot change classification because from_value %u is larger than %u", from_value, U16_MAX);
 					return FALSE;
 				}
 				U32 to_value;
 				if (sscanf(argv[i + 2], "%u", &to_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (to_value > U16_MAX)
 				{
-					LASMessage(LAS_ERROR, "cannot change classification because to_value %u is larger than %u", to_value, U16_MAX);
+					laserror("cannot change classification because to_value %u is larger than %u", to_value, U16_MAX);
 					return FALSE;
 				}
 				add_operation(new LASoperationChangePointSourceFromTo((U16)from_value, (U16)to_value));
@@ -4812,29 +4816,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value", argv[i]);
+					laserror("'%s' needs 2 arguments: from_value to_value", argv[i]);
 					return FALSE;
 				}
 				U32 from_value;
 				if (sscanf(argv[i + 1], "%u", &from_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (from_value > 7)
 				{
-					LASMessage(LAS_ERROR, "cannot change return_number because from_value %u is larger than %u", from_value, 7);
+					laserror("cannot change return_number because from_value %u is larger than %u", from_value, 7);
 					return FALSE;
 				}
 				U32 to_value;
 				if (sscanf(argv[i + 2], "%u", &to_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (to_value > 7)
 				{
-					LASMessage(LAS_ERROR, "cannot change return_number because to_value %u is larger than %u", to_value, 7);
+					laserror("cannot change return_number because to_value %u is larger than %u", to_value, 7);
 					return FALSE;
 				}
 				add_operation(new LASoperationChangeReturnNumberFromTo((U8)from_value, (U8)to_value));
@@ -4844,29 +4848,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value", argv[i]);
+					laserror("'%s' needs 2 arguments: from_value to_value", argv[i]);
 					return FALSE;
 				}
 				U32 from_value;
 				if (sscanf(argv[i + 1], "%u", &from_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (from_value > 7)
 				{
-					LASMessage(LAS_ERROR, "cannot change number_of_returns because from_value %u is larger than %u", from_value, 7);
+					laserror("cannot change number_of_returns because from_value %u is larger than %u", from_value, 7);
 					return FALSE;
 				}
 				U32 to_value;
 				if (sscanf(argv[i + 2], "%u", &to_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (to_value > 7)
 				{
-					LASMessage(LAS_ERROR, "cannot change number_of_returns because to_value %u is larger than %u", to_value, 7);
+					laserror("cannot change number_of_returns because to_value %u is larger than %u", to_value, 7);
 					return FALSE;
 				}
 				add_operation(new LASoperationChangeNumberOfReturnsFromTo((U8)from_value, (U8)to_value));
@@ -4876,29 +4880,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value", argv[i]);
+					laserror("'%s' needs 2 arguments: from_value to_value", argv[i]);
 					return FALSE;
 				}
 				U32 from_value;
 				if (sscanf(argv[i + 1], "%u", &from_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (from_value > 15)
 				{
-					LASMessage(LAS_ERROR, "cannot change extended_return_number because from_value %u is larger than %u", from_value, 15);
+					laserror("cannot change extended_return_number because from_value %u is larger than %u", from_value, 15);
 					return FALSE;
 				}
 				U32 to_value;
 				if (sscanf(argv[i + 2], "%u", &to_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (to_value > 15)
 				{
-					LASMessage(LAS_ERROR, "cannot change extended_return_number because to_value %u is larger than %u", to_value, 15);
+					laserror("cannot change extended_return_number because to_value %u is larger than %u", to_value, 15);
 					return FALSE;
 				}
 				add_operation(new LASoperationChangeExtendedReturnNumberFromTo((U8)from_value, (U8)to_value));
@@ -4908,29 +4912,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value", argv[i]);
+					laserror("'%s' needs 2 arguments: from_value to_value", argv[i]);
 					return FALSE;
 				}
 				U32 from_value;
 				if (sscanf(argv[i + 1], "%u", &from_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid from_value", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (from_value > 15)
 				{
-					LASMessage(LAS_ERROR, "cannot change extended_number_of_returns because from_value %u is larger than %u", from_value, 15);
+					laserror("cannot change extended_number_of_returns because from_value %u is larger than %u", from_value, 15);
 					return FALSE;
 				}
 				U32 to_value;
 				if (sscanf(argv[i + 2], "%u", &to_value) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: from_value to_value but '%s' is no valid to_value", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (to_value > 15)
 				{
-					LASMessage(LAS_ERROR, "cannot change extended_number_of_returns because to_value %u is larger than %u", to_value, 15);
+					laserror("cannot change extended_number_of_returns because to_value %u is larger than %u", to_value, 15);
 					return FALSE;
 				}
 				add_operation(new LASoperationChangeExtendedNumberOfReturnsFromTo((U8)from_value, (U8)to_value));
@@ -4945,24 +4949,24 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 2) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: z_value classification", argv[i]);
+						laserror("'%s' needs 2 arguments: z_value classification", argv[i]);
 						return FALSE;
 					}
 					F64 z_value;
 					if (sscanf(argv[i + 1], "%lf", &z_value) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: z_value classification but '%s' is no valid z_value", argv[i], argv[i + 1]);
+						laserror("'%s' needs 2 arguments: z_value classification but '%s' is no valid z_value", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 2], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: z_value classification but '%s' is no valid classification", argv[i], argv[i + 2]);
+						laserror("'%s' needs 2 arguments: z_value classification but '%s' is no valid classification", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					if (classification > 255)
 					{
-						LASMessage(LAS_ERROR, "cannot classify z_value because classification of %u is larger than 255", classification);
+						laserror("cannot classify z_value because classification of %u is larger than 255", classification);
 						return FALSE;
 					}
 					add_operation(new LASoperationClassifyZbelowAs(z_value, U8_CLAMP(classification)));
@@ -4972,24 +4976,24 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 2) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: z_value classification", argv[i]);
+						laserror("'%s' needs 2 arguments: z_value classification", argv[i]);
 						return FALSE;
 					}
 					F64 z_value;
 					if (sscanf(argv[i + 1], "%lf", &z_value) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: z_value classification but '%s' is no valid z_value", argv[i], argv[i + 1]);
+						laserror("'%s' needs 2 arguments: z_value classification but '%s' is no valid z_value", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 2], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: z_value classification but '%s' is no valid classification", argv[i], argv[i + 2]);
+						laserror("'%s' needs 2 arguments: z_value classification but '%s' is no valid classification", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					if (classification > 255)
 					{
-						LASMessage(LAS_ERROR, "cannot classify z_value because classification of %u is larger than 255", classification);
+						laserror("cannot classify z_value because classification of %u is larger than 255", classification);
 						return FALSE;
 					}
 					add_operation(new LASoperationClassifyZaboveAs(z_value, U8_CLAMP(classification)));
@@ -4999,30 +5003,30 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 3) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: z_min z_max classification", argv[i]);
+						laserror("'%s' needs 3 arguments: z_min z_max classification", argv[i]);
 						return FALSE;
 					}
 					F64 z_min;
 					if (sscanf(argv[i + 1], "%lf", &z_min) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: z_min z_max classification but '%s' is no valid z_min", argv[i], argv[i + 1]);
+						laserror("'%s' needs 3 arguments: z_min z_max classification but '%s' is no valid z_min", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					F64 z_max;
 					if (sscanf(argv[i + 2], "%lf", &z_max) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: z_min z_max classification but '%s' is no valid z_max", argv[i], argv[i + 2]);
+						laserror("'%s' needs 3 arguments: z_min z_max classification but '%s' is no valid z_max", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 3], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: z_min z_max classification but '%s' is no valid classification", argv[i], argv[i + 3]);
+						laserror("'%s' needs 3 arguments: z_min z_max classification but '%s' is no valid classification", argv[i], argv[i + 3]);
 						return FALSE;
 					}
 					if (classification > 255)
 					{
-						LASMessage(LAS_ERROR, "cannot classify z_value because classification of %u is larger than 255", classification);
+						laserror("cannot classify z_value because classification of %u is larger than 255", classification);
 						return FALSE;
 					}
 					add_operation(new LASoperationClassifyZbetweenAs(z_min, z_max, U8_CLAMP(classification)));
@@ -5035,29 +5039,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 2) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: value classification", argv[i]);
+						laserror("'%s' needs 2 arguments: value classification", argv[i]);
 						return FALSE;
 					}
 					U32 value;
 					if (sscanf(argv[i + 1], "%u", &value) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: value classification but '%s' is no valid value", argv[i], argv[i + 1]);
+						laserror("'%s' needs 2 arguments: value classification but '%s' is no valid value", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 2], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: value classification but '%s' is no valid classification", argv[i], argv[i + 2]);
+						laserror("'%s' needs 2 arguments: value classification but '%s' is no valid classification", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					if (value > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot classify intensity because value of %u is larger than %u", value, U16_MAX);
+						laserror("cannot classify intensity because value of %u is larger than %u", value, U16_MAX);
 						return FALSE;
 					}
 					if (classification > 255)
 					{
-						LASMessage(LAS_ERROR, "cannot classify intensity because classification of %u is larger than 255", classification);
+						laserror("cannot classify intensity because classification of %u is larger than 255", classification);
 						return FALSE;
 					}
 					add_operation(new LASoperationClassifyIntensityBelowAs(value, classification));
@@ -5067,29 +5071,29 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 2) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: value classification", argv[i]);
+						laserror("'%s' needs 2 arguments: value classification", argv[i]);
 						return FALSE;
 					}
 					U32 value;
 					if (sscanf(argv[i + 1], "%u", &value) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: value classification but '%s' is no valid value", argv[i], argv[i + 1]);
+						laserror("'%s' needs 2 arguments: value classification but '%s' is no valid value", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 2], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: value classification but '%s' is no valid classification", argv[i], argv[i + 2]);
+						laserror("'%s' needs 2 arguments: value classification but '%s' is no valid classification", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					if (value > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot classify intensity because value of %u is larger than %u", value, U16_MAX);
+						laserror("cannot classify intensity because value of %u is larger than %u", value, U16_MAX);
 						return FALSE;
 					}
 					if (classification > 255)
 					{
-						LASMessage(LAS_ERROR, "cannot classify intensity because classification of %u is larger than 255", classification);
+						laserror("cannot classify intensity because classification of %u is larger than 255", classification);
 						return FALSE;
 					}
 					add_operation(new LASoperationClassifyIntensityAboveAs(value, classification));
@@ -5099,40 +5103,40 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 3) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: min_value max_value classification", argv[i]);
+						laserror("'%s' needs 3 arguments: min_value max_value classification", argv[i]);
 						return FALSE;
 					}
 					U32 min_value;
 					if (sscanf(argv[i + 1], "%u", &min_value) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: min_value max_value classification but '%s' is no valid min_value", argv[i], argv[i + 1]);
+						laserror("'%s' needs 3 arguments: min_value max_value classification but '%s' is no valid min_value", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					U32 max_value;
 					if (sscanf(argv[i + 2], "%u", &max_value) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: min_value max_value classification but '%s' is no valid max_value", argv[i], argv[i + 2]);
+						laserror("'%s' needs 3 arguments: min_value max_value classification but '%s' is no valid max_value", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 3], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: min_value max_value classification but '%s' is no valid classification", argv[i], argv[i + 3]);
+						laserror("'%s' needs 3 arguments: min_value max_value classification but '%s' is no valid classification", argv[i], argv[i + 3]);
 						return FALSE;
 					}
 					if (min_value > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot classify intensity because min_value of %u is larger than %u", min_value, U16_MAX);
+						laserror("cannot classify intensity because min_value of %u is larger than %u", min_value, U16_MAX);
 						return FALSE;
 					}
 					if (max_value > U16_MAX)
 					{
-						LASMessage(LAS_ERROR, "cannot classify intensity because max_value of %u is larger than %u", max_value, U16_MAX);
+						laserror("cannot classify intensity because max_value of %u is larger than %u", max_value, U16_MAX);
 						return FALSE;
 					}
 					if (classification > 255)
 					{
-						LASMessage(LAS_ERROR, "cannot classify intensity because classification of %u is larger than 255", classification);
+						laserror("cannot classify intensity because classification of %u is larger than 255", classification);
 						return FALSE;
 					}
 					add_operation(new LASoperationClassifyIntensityBetweenAs(min_value, max_value, classification));
@@ -5145,30 +5149,30 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 3) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: attribute_index value classification", argv[i]);
+						laserror("'%s' needs 3 arguments: attribute_index value classification", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					F64 value;
 					if (sscanf(argv[i + 2], "%lf", &value) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid value", argv[i], argv[i + 2]);
+						laserror("'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid value", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 3], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid classification", argv[i], argv[i + 3]);
+						laserror("'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid classification", argv[i], argv[i + 3]);
 						return FALSE;
 					}
 					if (classification > 255)
 					{
-						LASMessage(LAS_ERROR, "cannot classify attribute below because classification of %u is larger than 255", classification);
+						laserror("cannot classify attribute below because classification of %u is larger than 255", classification);
 						return FALSE;
 					}
 					add_operation(new LASoperationClassifyAttributeBelowAs(index, value, U8_CLAMP(classification)));
@@ -5178,30 +5182,30 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 3) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: attribute_index value classification", argv[i]);
+						laserror("'%s' needs 3 arguments: attribute_index value classification", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					F64 value;
 					if (sscanf(argv[i + 2], "%lf", &value) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid value", argv[i], argv[i + 2]);
+						laserror("'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid value", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 3], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid classification", argv[i], argv[i + 3]);
+						laserror("'%s' needs 3 arguments: attribute_index value classification but '%s' is no valid classification", argv[i], argv[i + 3]);
 						return FALSE;
 					}
 					if (classification > 255)
 					{
-						LASMessage(LAS_ERROR, "cannot classify attribute above because classification of %u is larger than 255", classification);
+						laserror("cannot classify attribute above because classification of %u is larger than 255", classification);
 						return FALSE;
 					}
 					add_operation(new LASoperationClassifyAttributeAboveAs(index, value, U8_CLAMP(classification)));
@@ -5211,36 +5215,36 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 4) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: attribute_index min max classification", argv[i]);
+						laserror("'%s' needs 4 arguments: attribute_index min max classification", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					F64 min;
 					if (sscanf(argv[i + 2], "%lf", &min) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid min", argv[i], argv[i + 2]);
+						laserror("'%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid min", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					F64 max;
 					if (sscanf(argv[i + 3], "%lf", &max) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid max", argv[i], argv[i + 3]);
+						laserror("'%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid max", argv[i], argv[i + 3]);
 						return FALSE;
 					}
 					U32 classification;
 					if (sscanf(argv[i + 4], "%u", &classification) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid classification", argv[i], argv[i + 4]);
+						laserror("'%s' needs 4 arguments: attribute_index min max classification but '%s' is no valid classification", argv[i], argv[i + 4]);
 						return FALSE;
 					}
 					if (classification > 255)
 					{
-						LASMessage(LAS_ERROR, "cannot classify attribute between because classification of %u is larger than 255", classification);
+						laserror("cannot classify attribute between because classification of %u is larger than 255", classification);
 						return FALSE;
 					}
 					add_operation(new LASoperationClassifyAttributeBetweenAs(index, min, max, U8_CLAMP(classification)));
@@ -5254,13 +5258,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale", argv[i]);
+					laserror("'%s' needs 1 argument: scale", argv[i]);
 					return FALSE;
 				}
 				F64 scale_x;
 				if (sscanf(argv[i + 1], "%lf", &scale_x) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale_x but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: scale_x but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (scale_x != 1.0) transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -5271,13 +5275,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale", argv[i]);
+					laserror("'%s' needs 1 argument: scale", argv[i]);
 					return FALSE;
 				}
 				F64 scale_y;
 				if (sscanf(argv[i + 1], "%lf", &scale_y) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale_y but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: scale_y but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (scale_y != 1.0) transformed_fields |= LASTRANSFORM_Y_COORDINATE;
@@ -5288,13 +5292,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale", argv[i]);
+					laserror("'%s' needs 1 argument: scale", argv[i]);
 					return FALSE;
 				}
 				F64 scale_z;
 				if (sscanf(argv[i + 1], "%lf", &scale_z) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale_z but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: scale_z but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (scale_z != 1.0) transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -5305,25 +5309,25 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: scale_x scale_y scale_z", argv[i]);
+					laserror("'%s' needs 3 arguments: scale_x scale_y scale_z", argv[i]);
 					return FALSE;
 				}
 				F64 scale_x;
 				if (sscanf(argv[i + 1], "%lf", &scale_x) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F64 scale_y;
 				if (sscanf(argv[i + 2], "%lf", &scale_y) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number", argv[i], argv[i + 2]);
+					laserror("'%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				F64 scale_z;
 				if (sscanf(argv[i + 3], "%lf", &scale_z) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number", argv[i], argv[i + 3]);
+					laserror("'%s' needs 3 arguments: scale_x scale_y scale_z but '%s' is no valid number", argv[i], argv[i + 3]);
 					return FALSE;
 				}
 				if (scale_x != 1.0) transformed_fields |= LASTRANSFORM_X_COORDINATE;
@@ -5336,13 +5340,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale", argv[i]);
+					laserror("'%s' needs 1 argument: scale", argv[i]);
 					return FALSE;
 				}
 				F32 scale;
 				if (sscanf(argv[i + 1], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: scale but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				add_operation(new LASoperationScaleIntensity(scale));
@@ -5352,13 +5356,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale", argv[i]);
+					laserror("'%s' needs 1 argument: scale", argv[i]);
 					return FALSE;
 				}
 				F32 scale;
 				if (sscanf(argv[i + 1], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: scale but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				add_operation(new LASoperationScaleScanAngle(scale));
@@ -5368,13 +5372,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale", argv[i]);
+					laserror("'%s' needs 1 argument: scale", argv[i]);
 					return FALSE;
 				}
 				F32 scale;
 				if (sscanf(argv[i + 1], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but '%s' is no valid number", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: scale but '%s' is no valid number", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				add_operation(new LASoperationScaleUserData(scale));
@@ -5386,25 +5390,25 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 3) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: scale_R scale_G scale_B", argv[i]);
+						laserror("'%s' needs 3 arguments: scale_R scale_G scale_B", argv[i]);
 						return FALSE;
 					}
 					F32 scale_R;
 					if (sscanf(argv[i + 1], "%f", &scale_R) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: scale_R scale_G scale_B but '%s' is no valid number", argv[i], argv[i + 1]);
+						laserror("'%s' needs 3 arguments: scale_R scale_G scale_B but '%s' is no valid number", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					F32 scale_G;
 					if (sscanf(argv[i + 2], "%f", &scale_G) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: scale_R scale_G scale_B but '%s' is no valid number", argv[i], argv[i + 2]);
+						laserror("'%s' needs 3 arguments: scale_R scale_G scale_B but '%s' is no valid number", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					F32 scale_B;
 					if (sscanf(argv[i + 3], "%f", &scale_B) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: scale_R scale_G scale_B but '%s' is no valid number", argv[i], argv[i + 3]);
+						laserror("'%s' needs 3 arguments: scale_R scale_G scale_B but '%s' is no valid number", argv[i], argv[i + 3]);
 						return FALSE;
 					}
 					add_operation(new LASoperationScaleRGB(scale_R, scale_G, scale_B));
@@ -5437,13 +5441,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 1) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale_NIR", argv[i]);
+						laserror("'%s' needs 1 argument: scale_NIR", argv[i]);
 						return FALSE;
 					}
 					F32 scale_NIR;
 					if (sscanf(argv[i + 1], "%f", &scale_NIR) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale_NIR but '%s' is no valid number", argv[i], argv[i + 1]);
+						laserror("'%s' needs 1 argument: scale_NIR but '%s' is no valid number", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					add_operation(new LASoperationScaleNIR(scale_NIR));
@@ -5474,19 +5478,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale", argv[i]);
+					laserror("'%s' needs 2 arguments: index scale", argv[i]);
 					return FALSE;
 				}
 				U32 index;
 				if (sscanf(argv[i + 1], "%u", &index) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale but '%s' is no valid index", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: index scale but '%s' is no valid index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F32 scale;
 				if (sscanf(argv[i + 2], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale but '%s' is no valid scale", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: index scale but '%s' is no valid scale", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				add_operation(new LASoperationScaleAttribute(index, scale));
@@ -5496,19 +5500,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale", argv[i]);
+					laserror("'%s' needs 2 arguments: index scale", argv[i]);
 					return FALSE;
 				}
 				U32 index;
 				if (sscanf(argv[i + 1], "%u", &index) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale but '%s' is no valid index", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: index scale but '%s' is no valid index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				F32 scale;
 				if (sscanf(argv[i + 2], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale but '%s' is no valid scale", argv[i], argv[i + 2]);
+					laserror("'%s' needs 2 arguments: index scale but '%s' is no valid scale", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				add_operation(new LASoperationScaleRegister(registers, index, scale));
@@ -5564,18 +5568,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: bin_size", argv[i]);
+					laserror("'%s' needs 1 argument: bin_size", argv[i]);
 					return FALSE;
 				}
 				U32 bin_size;
 				if (sscanf(argv[i + 1], "%u", &bin_size) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: bin_size but '%s' is no valid bin_size", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: bin_size but '%s' is no valid bin_size", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (bin_size == 0)
 				{
-					LASMessage(LAS_ERROR, "%u is no valid bin_size for '%s'", bin_size, argv[i]);
+					laserror("%u is no valid bin_size for '%s'", bin_size, argv[i]);
 					return FALSE;
 				}
 				add_operation(new LASoperationBinZintoPointSource(bin_size));
@@ -5585,18 +5589,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: bin_size", argv[i]);
+					laserror("'%s' needs 1 argument: bin_size", argv[i]);
 					return FALSE;
 				}
 				F32 bin_size;
 				if (sscanf(argv[i + 1], "%f", &bin_size) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: bin_size but '%s' is no valid bin_size", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: bin_size but '%s' is no valid bin_size", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (bin_size <= 0.0f)
 				{
-					LASMessage(LAS_ERROR, "%f is no valid bin_size for '%s'", bin_size, argv[i]);
+					laserror("%f is no valid bin_size for '%s'", bin_size, argv[i]);
 					return FALSE;
 				}
 				add_operation(new LASoperationBinAbsScanAngleIntoPointSource(bin_size));
@@ -5606,18 +5610,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: bin_size", argv[i]);
+					laserror("'%s' needs 1 argument: bin_size", argv[i]);
 					return FALSE;
 				}
 				F64 bin_size;
 				if (sscanf(argv[i + 1], "%lf", &bin_size) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: bin_size but '%s' is no valid bin_size", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: bin_size but '%s' is no valid bin_size", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (bin_size <= 0.0)
 				{
-					LASMessage(LAS_ERROR, "%g is no valid bin_size for '%s'", bin_size, argv[i]);
+					laserror("%g is no valid bin_size for '%s'", bin_size, argv[i]);
 					return FALSE;
 				}
 				add_operation(new LASoperationBinGpsTimeIntoIntensity(bin_size));
@@ -5627,18 +5631,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: bin_size", argv[i]);
+					laserror("'%s' needs 1 argument: bin_size", argv[i]);
 					return FALSE;
 				}
 				F64 bin_size;
 				if (sscanf(argv[i + 1], "%lf", &bin_size) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: bin_size but '%s' is no valid bin_size", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: bin_size but '%s' is no valid bin_size", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (bin_size <= 0.0)
 				{
-					LASMessage(LAS_ERROR, "%g is no valid bin_size for '%s'", bin_size, argv[i]);
+					laserror("%g is no valid bin_size for '%s'", bin_size, argv[i]);
 					return FALSE;
 				}
 				add_operation(new LASoperationBinGpsTimeIntoPointSource(bin_size));
@@ -5651,13 +5655,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: map_file_name.txt", argv[i]);
+					laserror("'%s' needs 1 argument: map_file_name.txt", argv[i]);
 					return FALSE;
 				}
 				FILE* file = fopen(argv[i + 1], "r");
 				if (file == 0)
 				{
-					LASMessage(LAS_ERROR, "cannot '%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 1]);
+					laserror("cannot '%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				else
@@ -5671,13 +5675,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: map_file_name.txt", argv[i]);
+					laserror("'%s' needs 1 argument: map_file_name.txt", argv[i]);
 					return FALSE;
 				}
 				FILE* file = fopen(argv[i + 1], "r");
 				if (file == 0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 1]);
+					laserror("'%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				else
@@ -5691,13 +5695,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: map_file_name.txt", argv[i]);
+					laserror("'%s' needs 1 argument: map_file_name.txt", argv[i]);
 					return FALSE;
 				}
 				FILE* file = fopen(argv[i + 1], "r");
 				if (file == 0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 1]);
+					laserror("'%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				else
@@ -5711,19 +5715,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: attribute_index map_file_name.txt", argv[i]);
+					laserror("'%s' needs 2 arguments: attribute_index map_file_name.txt", argv[i]);
 					return FALSE;
 				}
 				U32 index;
 				if (sscanf(argv[i + 1], "%u", &index) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: attribute_index map_file_name.txt but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: attribute_index map_file_name.txt but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				FILE* file = fopen(argv[i + 2], "r");
 				if (file == 0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 2]);
+					laserror("'%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				else
@@ -5740,19 +5744,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: attribute_index attribute_file_name.txt", argv[i]);
+					laserror("'%s' needs 2 arguments: attribute_index attribute_file_name.txt", argv[i]);
 					return FALSE;
 				}
 				U32 index;
 				if (sscanf(argv[i + 1], "%u", &index) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 arguments: attribute_index attribute_file_name.txt but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
+					laserror("'%s' needs 2 arguments: attribute_index attribute_file_name.txt but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				FILE* file = fopen(argv[i + 2], "r");
 				if (file == 0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs text file with attribute values but '%s' cannot be opened", argv[i], argv[i + 2]);
+					laserror("'%s' needs text file with attribute values but '%s' cannot be opened", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				else
@@ -5769,7 +5773,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: 3 or 7 comma separated parameters", argv[i]);
+					laserror("'%s' needs 1 argument: 3 or 7 comma separated parameters", argv[i]);
 					return FALSE;
 				}
 				F64 dx, dy, dz, rx, ry, rz, m, dummy;
@@ -5784,7 +5788,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				}
 				else
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 or 7 comma separated parameters as argument", argv[i]);
+					laserror("'%s' needs 3 or 7 comma separated parameters as argument", argv[i]);
 					return FALSE;
 				}
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -5793,7 +5797,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: 4 comma separated parameters", argv[i]);
+					laserror("'%s' needs 1 argument: 4 comma separated parameters", argv[i]);
 					return FALSE;
 				}
 				F64 k, w, tx, ty, dummy;
@@ -5804,7 +5808,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				}
 				else
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 4 comma separated parameters as argument", argv[i]);
+					laserror("'%s' needs 4 comma separated parameters as argument", argv[i]);
 					return FALSE;
 				}
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -5813,7 +5817,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 4 arguments: 4 x 3 comma separated values", argv[i]);
+					laserror("'%s' needs 4 arguments: 4 x 3 comma separated values", argv[i]);
 					return FALSE;
 				}
 				F64 r11, r12, r13, r21, r22, r23, r31, r32, r33, tr1, tr2, tr3, dummy;
@@ -5827,7 +5831,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				}
 				else
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 4 arguments: 4 x 3 comma separated values", argv[i]);
+					laserror("'%s' needs 4 arguments: 4 x 3 comma separated values", argv[i]);
 					return FALSE;
 				}
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; *argv[i + 4] = '\0'; i += 4;
@@ -5867,13 +5871,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 		{
 			if ((i + 1) >= argc)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: week", argv[i]);
+				laserror("'%s' needs 1 argument: week", argv[i]);
 				return FALSE;
 			}
 			U32 week;
 			if (sscanf(argv[i + 1], "%u", &week) != 1)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: week but '%s' is no valid week", argv[i], argv[i + 1]);
+				laserror("'%s' needs 1 argument: week but '%s' is no valid week", argv[i], argv[i + 1]);
 				return FALSE;
 			}
 			add_operation(new LASoperationConvertWeekToAdjustedGps(week));
@@ -5890,40 +5894,40 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output", argv[i]);
+					laserror("'%s' needs 3 arguments: input1 input2 output", argv[i]);
 					return FALSE;
 				}
 				U32 input1;
 				if (sscanf(argv[i + 1], "%u", &input1) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1", argv[i], argv[i + 1]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (input1 > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1", argv[i], input1);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1", argv[i], input1);
 					return FALSE;
 				}
 				U32 input2;
 				if (sscanf(argv[i + 2], "%u", &input2) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2", argv[i], argv[i + 2]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (input2 > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2", argv[i], input2);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2", argv[i], input2);
 					return FALSE;
 				}
 				U32 output;
 				if (sscanf(argv[i + 3], "%u", &output) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3", argv[i], argv[i + 3]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3", argv[i], argv[i + 3]);
 					return FALSE;
 				}
 				if (output > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output", argv[i], output);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output", argv[i], output);
 					return FALSE;
 				}
 				add_operation(new LASoperationAddRegisters(registers, input1, input2, output));
@@ -5935,24 +5939,24 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 2) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale", argv[i]);
+						laserror("'%s' needs 2 arguments: index scale", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 2 arguments: index scale but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					F32 scale;
 					if (sscanf(argv[i + 2], "%f", &scale) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale but '%s' is no valid scale", argv[i], argv[i + 2]);
+						laserror("'%s' needs 2 arguments: index scale but '%s' is no valid scale", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					if (scale == 0.0f)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale but '%g' is no valid scale", argv[i], scale);
+						laserror("'%s' needs 2 arguments: index scale but '%g' is no valid scale", argv[i], scale);
 						return FALSE;
 					}
 					transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -5963,19 +5967,19 @@ BOOL LAStransform::parse(int argc, char* argv[])
 				{
 					if ((i + 2) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale", argv[i]);
+						laserror("'%s' needs 2 arguments: index scale", argv[i]);
 						return FALSE;
 					}
 					U32 index;
 					if (sscanf(argv[i + 1], "%u", &index) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale but '%s' is no valid index", argv[i], argv[i + 1]);
+						laserror("'%s' needs 2 arguments: index scale but '%s' is no valid index", argv[i], argv[i + 1]);
 						return FALSE;
 					}
 					F32 scale;
 					if (sscanf(argv[i + 2], "%f", &scale) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 2 arguments: index scale but '%s' is no valid scale", argv[i], argv[i + 2]);
+						laserror("'%s' needs 2 arguments: index scale but '%s' is no valid scale", argv[i], argv[i + 2]);
 						return FALSE;
 					}
 					add_operation(new LASoperationAddScaledAttributeToUserData(index, scale));
@@ -5986,13 +5990,13 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute", argv[i]);
+					laserror("'%s' needs 1 argument: index of attribute", argv[i]);
 					return FALSE;
 				}
 				U32 index;
 				if (sscanf(argv[i + 1], "%u", &index) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: index of attribute but '%s' is no valid index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				transformed_fields |= LASTRANSFORM_Z_COORDINATE;
@@ -6006,40 +6010,40 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output", argv[i]);
+					laserror("'%s' needs 3 arguments: input1 input2 output", argv[i]);
 					return FALSE;
 				}
 				U32 input1;
 				if (sscanf(argv[i + 1], "%u", &input1) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1", argv[i], argv[i + 1]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (input1 > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1", argv[i], input1);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1", argv[i], input1);
 					return FALSE;
 				}
 				U32 input2;
 				if (sscanf(argv[i + 2], "%u", &input2) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2", argv[i], argv[i + 2]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (input2 > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2", argv[i], input2);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2", argv[i], input2);
 					return FALSE;
 				}
 				U32 output;
 				if (sscanf(argv[i + 3], "%u", &output) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3", argv[i], argv[i + 3]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3", argv[i], argv[i + 3]);
 					return FALSE;
 				}
 				if (output > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output", argv[i], output);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output", argv[i], output);
 					return FALSE;
 				}
 				add_operation(new LASoperationMultiplyRegisters(registers, input1, input2, output));
@@ -6049,18 +6053,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale", argv[i]);
+					laserror("'%s' needs 1 argument: scale", argv[i]);
 					return FALSE;
 				}
 				F32 scale;
 				if (sscanf(argv[i + 1], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but '%s' is no valid scale", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: scale but '%s' is no valid scale", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (scale == 0.0f)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but '%g' is no valid scale", argv[i], scale);
+					laserror("'%s' needs 1 argument: scale but '%g' is no valid scale", argv[i], scale);
 					return FALSE;
 				}
 				if (strcmp(argv[i] + 36, "red") == 0)
@@ -6092,18 +6096,18 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: divisor ", argv[i]);
+					laserror("'%s' needs 1 argument: divisor ", argv[i]);
 					return FALSE;
 				}
 				F32 divisor;
 				if (sscanf(argv[i + 1], "%f", &divisor) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but '%s' is no valid divisor", argv[i], argv[i + 1]);
+					laserror("'%s' needs 1 argument: scale but '%s' is no valid divisor", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (divisor == 0.0f)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but '%g' is no valid divisor", argv[i], divisor);
+					laserror("'%s' needs 1 argument: scale but '%g' is no valid divisor", argv[i], divisor);
 					return FALSE;
 				}
 				F32 scale = 1.0f / divisor;
@@ -6139,40 +6143,40 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output", argv[i]);
+					laserror("'%s' needs 3 arguments: input1 input2 output", argv[i]);
 					return FALSE;
 				}
 				U32 input1;
 				if (sscanf(argv[i + 1], "%u", &input1) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1", argv[i], argv[i + 1]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (input1 > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1", argv[i], input1);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1", argv[i], input1);
 					return FALSE;
 				}
 				U32 input2;
 				if (sscanf(argv[i + 2], "%u", &input2) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2", argv[i], argv[i + 2]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (input2 > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2", argv[i], input2);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2", argv[i], input2);
 					return FALSE;
 				}
 				U32 output;
 				if (sscanf(argv[i + 3], "%u", &output) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3", argv[i], argv[i + 3]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3", argv[i], argv[i + 3]);
 					return FALSE;
 				}
 				if (output > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output", argv[i], output);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output", argv[i], output);
 					return FALSE;
 				}
 				add_operation(new LASoperationSubtractRegisters(registers, input1, input2, output));
@@ -6185,40 +6189,40 @@ BOOL LAStransform::parse(int argc, char* argv[])
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output", argv[i]);
+					laserror("'%s' needs 3 arguments: input1 input2 output", argv[i]);
 					return FALSE;
 				}
 				U32 input1;
 				if (sscanf(argv[i + 1], "%u", &input1) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1", argv[i], argv[i + 1]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input1", argv[i], argv[i + 1]);
 					return FALSE;
 				}
 				if (input1 > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1", argv[i], input1);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input1", argv[i], input1);
 					return FALSE;
 				}
 				U32 input2;
 				if (sscanf(argv[i + 2], "%u", &input2) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2", argv[i], argv[i + 2]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input2", argv[i], argv[i + 2]);
 					return FALSE;
 				}
 				if (input2 > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2", argv[i], input2);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for input2", argv[i], input2);
 					return FALSE;
 				}
 				U32 output;
 				if (sscanf(argv[i + 3], "%u", &output) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3", argv[i], argv[i + 3]);
+					laserror("'%s' needs 3 arguments: input1 input2 output but '%s' is no valid input3", argv[i], argv[i + 3]);
 					return FALSE;
 				}
 				if (output > 15)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output", argv[i], output);
+					laserror("'%s' needs 3 arguments: input1 input2 output but %u is out-of-range for output", argv[i], output);
 					return FALSE;
 				}
 				add_operation(new LASoperationDivideRegisters(registers, input1, input2, output));

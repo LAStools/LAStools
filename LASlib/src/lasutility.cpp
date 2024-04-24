@@ -485,8 +485,8 @@ void LASbin::add_to_bin(I32 bin)
         bins_pos = (U32*)malloc(sizeof(U32)*size_pos);
         if (bins_pos == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u pos bins", size_pos);
-          exit(1);
+          laserror("allocating %u pos bins", size_pos);
+          byebye();
         }
         for (i = 0; i < size_pos; i++) bins_pos[i] = 0;
       }
@@ -496,8 +496,8 @@ void LASbin::add_to_bin(I32 bin)
         bins_pos = (U32*)realloc(bins_pos, sizeof(U32)*new_size);
         if (bins_pos == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u pos bins", new_size);
-          exit(1);
+          laserror("reallocating %u pos bins", new_size);
+          byebye();
         }
         for (i = size_pos; i < new_size; i++) bins_pos[i] = 0;
         size_pos = new_size;
@@ -517,8 +517,8 @@ void LASbin::add_to_bin(I32 bin)
         bins_neg = (U32*)malloc(sizeof(U32)*size_neg);
         if (bins_neg == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u neg bins", size_neg);
-          exit(1);
+          laserror("allocating %u neg bins", size_neg);
+          byebye();
         }
         for (i = 0; i < size_neg; i++) bins_neg[i] = 0;
       }
@@ -528,8 +528,8 @@ void LASbin::add_to_bin(I32 bin)
         bins_neg = (U32*)realloc(bins_neg, sizeof(U32)*new_size);
         if (bins_neg == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u neg bins", new_size);
-          exit(1);
+          laserror("reallocating %u neg bins", new_size);
+          byebye();
         }
         for (i = size_neg; i < new_size; i++) bins_neg[i] = 0;
         size_neg = new_size;
@@ -562,13 +562,13 @@ void LASbin::add(I32 item, I32 value)
         values_pos = (F64*)malloc(sizeof(F64)*size_pos);
         if (bins_pos == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u pos bins", size_pos);
-          exit(1);
+          laserror("allocating %u pos bins", size_pos);
+          byebye();
         }
         if (values_pos == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u pos values", size_pos);
-          exit(1);
+          laserror("allocating %u pos values", size_pos);
+          byebye();
         }
         for (i = 0; i < size_pos; i++) { bins_pos[i] = 0; values_pos[i] = 0; }
       }
@@ -579,13 +579,13 @@ void LASbin::add(I32 item, I32 value)
         values_pos = (F64*)realloc(values_pos, sizeof(F64)*new_size);
         if (bins_pos == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u pos bins", new_size);
-          exit(1);
+          laserror("reallocating %u pos bins", new_size);
+          byebye();
         }
         if (values_pos == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u pos values", new_size);
-          exit(1);
+          laserror("reallocating %u pos values", new_size);
+          byebye();
         }
         for (i = size_pos; i < new_size; i++) { bins_pos[i] = 0; values_pos[i] = 0; }
         size_pos = new_size;
@@ -607,13 +607,13 @@ void LASbin::add(I32 item, I32 value)
         values_neg = (F64*)malloc(sizeof(F64)*size_neg);
         if (bins_neg == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u neg bins", size_neg);
-          exit(1);
+          laserror("allocating %u neg bins", size_neg);
+          byebye();
         }
         if (values_neg == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u neg values", size_neg);
-          exit(1);
+          laserror("allocating %u neg values", size_neg);
+          byebye();
         }
         for (i = 0; i < size_neg; i++) { bins_neg[i] = 0; values_neg[i] = 0; }
       }
@@ -624,13 +624,13 @@ void LASbin::add(I32 item, I32 value)
         values_neg = (F64*)realloc(values_neg, sizeof(F64)*new_size);
         if (bins_neg == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u neg bins", new_size);
-          exit(1);
+          laserror("reallocating %u neg bins", new_size);
+          byebye();
         }
         if (values_neg == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u neg values", new_size);
-          exit(1);
+          laserror("reallocating %u neg values", new_size);
+          byebye();
         }
         for (i = size_neg; i < new_size; i++) { bins_neg[i] = 0; values_neg[i] = 0; }
         size_neg = new_size;
@@ -664,13 +664,13 @@ void LASbin::add(F64 item, F64 value)
         values_pos = (F64*)malloc(sizeof(F64)*size_pos);
         if (bins_pos == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u pos bins", size_pos);
-          exit(1);
+          laserror("allocating %u pos bins", size_pos);
+          byebye();
         }
         if (values_pos == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u pos values", size_pos);
-          exit(1);
+          laserror("allocating %u pos values", size_pos);
+          byebye();
         }
         for (i = 0; i < size_pos; i++) { bins_pos[i] = 0; values_pos[i] = 0; }
       }
@@ -681,13 +681,13 @@ void LASbin::add(F64 item, F64 value)
         values_pos = (F64*)realloc(values_pos, sizeof(F64)*new_size);
         if (bins_pos == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u pos bins", new_size);
-          exit(1);
+          laserror("reallocating %u pos bins", new_size);
+          byebye();
         }
         if (values_pos == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u pos values", new_size);
-          exit(1);
+          laserror("reallocating %u pos values", new_size);
+          byebye();
         }
         for (i = size_pos; i < new_size; i++) { bins_pos[i] = 0; values_pos[i] = 0; }
         size_pos = new_size;
@@ -709,13 +709,13 @@ void LASbin::add(F64 item, F64 value)
         values_neg = (F64*)malloc(sizeof(F64)*size_neg);
         if (bins_neg == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u neg bins", size_neg);
-          exit(1);
+          laserror("allocating %u neg bins", size_neg);
+          byebye();
         }
         if (values_neg == 0)
         {
-          LASMessage(LAS_ERROR, "allocating %u neg values", size_neg);
-          exit(1);
+          laserror("allocating %u neg values", size_neg);
+          byebye();
         }
         for (i = 0; i < size_neg; i++) { bins_neg[i] = 0; values_neg[i] = 0; }
       }
@@ -726,13 +726,13 @@ void LASbin::add(F64 item, F64 value)
         values_neg = (F64*)realloc(values_neg, sizeof(F64)*new_size);
         if (bins_neg == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u neg bins", new_size);
-          exit(1);
+          laserror("reallocating %u neg bins", new_size);
+          byebye();
         }
         if (values_neg == 0)
         {
-          LASMessage(LAS_ERROR, "reallocating %u neg values", new_size);
-          exit(1);
+          laserror("reallocating %u neg values", new_size);
+          byebye();
         }
         for (i = size_neg; i < new_size; i++) { bins_neg[i] = 0; values_neg[i] = 0; }
         size_neg = new_size;
@@ -980,7 +980,7 @@ BOOL LAShistogram::parse(int argc, char* argv[])
     {
       continue;
     }
-    else if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i],"-help") == 0)
+    else if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i], "-hh") == 0 || strcmp(argv[i],"-help") == 0)
     {
       return TRUE;
     }
@@ -988,13 +988,13 @@ BOOL LAShistogram::parse(int argc, char* argv[])
     {
       if ((i+2) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: name step", argv[i]);
+        laserror("'%s' needs 2 arguments: name step", argv[i]);
         return FALSE;
       }
       F64 step = 0.0;
       if (sscanf(argv[i+2], "%lf", &step) != 1)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 2 arguments: name step but '%s' is no valid step", argv[i], argv[i+2]);
+        laserror("'%s' needs 2 arguments: name step but '%s' is no valid step", argv[i], argv[i+2]);
         return FALSE;
       }
       if (!histo(argv[i+1], step)) return FALSE;
@@ -1004,13 +1004,13 @@ BOOL LAShistogram::parse(int argc, char* argv[])
     {
       if ((i+3) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 3 arguments: name step name_avg", argv[i]);
+        laserror("'%s' needs 3 arguments: name step name_avg", argv[i]);
         return FALSE;
       }
       F64 step = 0.0;
       if (sscanf(argv[i+2], "%lf", &step) != 1)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 3 arguments: name step name_avg but '%s' is no valid step", argv[i], argv[i+2]);
+        laserror("'%s' needs 3 arguments: name step name_avg but '%s' is no valid step", argv[i], argv[i+2]);
         return FALSE;
       }
       if (!histo_avg(argv[i+1], step, argv[i+3])) return FALSE;
@@ -1132,7 +1132,7 @@ BOOL LAShistogram::histo(const CHAR* name, F64 step)
     wavepacket_location_bin = new LASbin(step);
   else
   {
-    LASMessage(LAS_ERROR, "histogram of '%s' not implemented", name);
+    laserror("histogram of '%s' not implemented", name);
     return FALSE;
   }
   is_active = TRUE;
@@ -1149,7 +1149,7 @@ BOOL LAShistogram::histo_avg(const CHAR* name, F64 step, const CHAR* name_avg)
       classification_bin_scan_angle = new LASbin(step);
     else
     {
-      LASMessage(LAS_ERROR, "histogram of '%s' with '%s' averages not implemented", name, name_avg);
+      laserror("histogram of '%s' with '%s' averages not implemented", name, name_avg);
       return FALSE;
     }
   }
@@ -1163,7 +1163,7 @@ BOOL LAShistogram::histo_avg(const CHAR* name, F64 step, const CHAR* name_avg)
       scan_angle_bin_intensity = new LASbin(step);
     else
     {
-      LASMessage(LAS_ERROR, "histogram of '%s' with '%s' averages not implemented", name, name_avg);
+      laserror("histogram of '%s' with '%s' averages not implemented", name, name_avg);
       return FALSE;
     }
   }
@@ -1173,13 +1173,13 @@ BOOL LAShistogram::histo_avg(const CHAR* name, F64 step, const CHAR* name_avg)
       return_map_bin_intensity = new LASbin(1);
     else
     {
-      LASMessage(LAS_ERROR, "histogram of '%s' with '%s' averages not implemented", name, name_avg);
+      laserror("histogram of '%s' with '%s' averages not implemented", name, name_avg);
       return FALSE;
     }
   }
   else
   {
-    LASMessage(LAS_ERROR, "histogram of '%s' not implemented", name);
+    laserror("histogram of '%s' not implemented", name);
     return FALSE;
   }
   is_active = TRUE;

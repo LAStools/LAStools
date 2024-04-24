@@ -427,40 +427,40 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
   const LASvlr* compatibility_vlr = header->get_vlr("lascompatible", 22204);
   if (compatibility_vlr == 0)
   {
-    LASMessage(LAS_ERROR, "no compatibility VLR in header"); 
+    laserror("no compatibility VLR in header"); 
     return FALSE;
   }
   // the compatibility VLR must have the right length
   if (compatibility_vlr->record_length_after_header != (2+2+4+148))
   {
-    LASMessage(LAS_ERROR, "compatibility VLR has %u instead of %u bytes in payload", compatibility_vlr->record_length_after_header, 2+2+4+148);
+    laserror("compatibility VLR has %u instead of %u bytes in payload", compatibility_vlr->record_length_after_header, 2+2+4+148);
     return FALSE;
   }
   I32 index_scan_angle = header->get_attribute_index("LAS 1.4 scan angle");
   if (index_scan_angle == -1)
   {
-    LASMessage(LAS_ERROR, "attribute \"LAS 1.4 scan angle\" is not in EXTRA_BYTES");
+    laserror("attribute \"LAS 1.4 scan angle\" is not in EXTRA_BYTES");
     return FALSE;
   }
   start_scan_angle = header->get_attribute_start(index_scan_angle);
   I32 index_extended_returns = header->get_attribute_index("LAS 1.4 extended returns");
   if (index_extended_returns == -1)
   {
-    LASMessage(LAS_ERROR, "attribute \"LAS 1.4 extended returns\" is not in EXTRA_BYTES");
+    laserror("attribute \"LAS 1.4 extended returns\" is not in EXTRA_BYTES");
     return FALSE;
   }
   start_extended_returns = header->get_attribute_start(index_extended_returns);
   I32 index_classification = header->get_attribute_index("LAS 1.4 classification");
   if (index_classification == -1)
   {
-    LASMessage(LAS_ERROR, "attribute \"LAS 1.4 classification\" is not in EXTRA_BYTES");
+    laserror("attribute \"LAS 1.4 classification\" is not in EXTRA_BYTES");
     return FALSE;
   }
   start_classification = header->get_attribute_start(index_classification);
   I32 index_flags_and_channel = header->get_attribute_index("LAS 1.4 flags and channel");
   if (index_scan_angle == -1)
   {
-    LASMessage(LAS_ERROR, "attribute \"LAS 1.4 flags and channel\" is not in EXTRA_BYTES");
+    laserror("attribute \"LAS 1.4 flags and channel\" is not in EXTRA_BYTES");
     return FALSE;
   }
   start_flags_and_channel = header->get_attribute_start(index_flags_and_channel); 
@@ -506,7 +506,7 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
   in->get16bitsLE((U8*)&compatible_version);
   if (compatible_version != 3)
   {
-    LASMessage(LAS_ERROR, "compatibility mode version %u not implemented", compatible_version);
+    laserror("compatibility mode version %u not implemented", compatible_version);
     return FALSE;
   }
   U32 unused;

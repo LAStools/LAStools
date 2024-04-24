@@ -35,6 +35,7 @@
 #define LAS_ATTRIBUTER_HPP
 
 #include "mydefs.hpp"
+#include <cstring>
 
 #define LAS_ATTRIBUTE_U8  0
 #define LAS_ATTRIBUTE_I8  1

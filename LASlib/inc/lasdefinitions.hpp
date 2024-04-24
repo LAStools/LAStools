@@ -50,12 +50,12 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 240415
+#define LAS_TOOLS_VERSION 240522
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <cassert>
 
 #include "mydefs.hpp"
 #include "lasvlr.hpp"
@@ -486,7 +486,7 @@ public:
   {
     if (strncmp(file_signature, "LASF", 4) != 0)
     {
-      LASMessage(LAS_ERROR, "wrong file signature '%4s'", file_signature);
+      laserror("wrong file signature '%4s'", file_signature);
       return FALSE;
     }
     if ((version_major != 1) || (version_minor > 4))
@@ -495,12 +495,12 @@ public:
     }
     if (header_size < 227)
     {
-      LASMessage(LAS_ERROR, "header size is %d but should be at least 227", header_size);
+      laserror("header size is %d but should be at least 227", header_size);
       return FALSE;
     }
     if (offset_to_point_data < header_size)
     {
-      LASMessage(LAS_ERROR, "offset to point data %d is smaller than header size %d", offset_to_point_data, header_size);
+      laserror("offset to point data %d is smaller than header size %d", offset_to_point_data, header_size);
       return FALSE;
     }
     if (x_scale_factor == 0)

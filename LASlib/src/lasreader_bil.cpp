@@ -44,7 +44,7 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
@@ -56,7 +56,7 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
 
   if (!read_hdr_file(file_name))
   {
-    LASMessage(LAS_ERROR, "reading the *.hdr file for '%s'", file_name);
+    laserror("reading the *.hdr file for '%s'", file_name);
     return FALSE;
   }
 
@@ -98,7 +98,7 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
   file = fopen(file_name, "rb");
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
+    laserror("cannot open file '%s'", file_name);
     return FALSE;
   }
 
@@ -363,7 +363,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
@@ -376,7 +376,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
 
   if ((len == 0) && (file_name_hdr[len] != '.'))
   {
-    LASMessage(LAS_ERROR, "file name '%s' is not a valid BIL file", file_name);
+    laserror("file name '%s' is not a valid BIL file", file_name);
     return FALSE;
   }
 
@@ -398,7 +398,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     if (file == 0)
     {
       file_name_hdr[len] = '\0';
-      LASMessage(LAS_ERROR, "cannot open files '%s.hdr' or '%s.HDR'", file_name_hdr, file_name_hdr);
+      laserror("cannot open files '%s.hdr' or '%s.HDR'", file_name_hdr, file_name_hdr);
       return FALSE;
     }
   }
@@ -537,7 +537,7 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
@@ -550,7 +550,7 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
 
   if ((len == 0) && (file_name_bwl[len] != '.'))
   {
-    LASMessage(LAS_ERROR, "file name '%s' is not a valid BIL file", file_name);
+    laserror("file name '%s' is not a valid BIL file", file_name);
     return FALSE;
   }
 
@@ -804,14 +804,14 @@ BOOL LASreaderBIL::reopen(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
   file = fopen(file_name, "rb");
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot reopen file '%s'", file_name);
+    laserror("cannot reopen file '%s'", file_name);
     return FALSE;
   }
 

@@ -1,8 +1,30 @@
 ﻿# lascopy
 
-This tool copies selected attributes from LiDAR points from a
-source to a target LAS/LAZ file using the GPS-time stamp and
-the return number as a reference.
+This tool copies selected attributes (values) from LiDAR points
+from a source to a target LAS/LAZ file.
+
+Merging the data is done by a match key.
+The key is GPS time and return number by default
+but can be also other or a combination of fields.
+See the -match... arguments.
+
+Samples of copy operations
+(a,b = key)
+(1,2 = value)
+
+    File1 File2 Target
+    a 1    a 4    a 1  
+    b 2    
+           c 3    c 3
+    d 4    d 1    d 4
+    
+With argument -zero:
+    
+    File1 File2 Target
+    a 1    a 4    a 1  
+    b 2       
+           c 2    c 0
+    d 4    d 1    d 4
 
 By default the selected attributes of the source points are
 copied to all target points if the two share the exact same
@@ -22,32 +44,56 @@ copies the requested attribute in the order the point are in.
 
 ## Examples
 
-lascopy64 -h  
-lascopy64 -i source.las -i target.las -o result.las  
-lascopy64 -i source.laz -i target.laz -o result.laz  
-lascopy64 -i source.laz -i target.laz -odix _copied -olaz  
-lascopy64 -i source.laz -i target.laz -classification -o result.laz  
-lascopy64 -i source.laz -i target.laz -classification -zero -o result.laz
+    lascopy64 -i source.laz -i target.laz -o result.laz
+
+Copies all classifications from source.laz to target.laz where
+gps time and return number matches.
+
+    lascopy64 -i source.laz -i target.laz -o result.laz -match_point_source_id
+
+Copies all classifications from source.laz to target.laz where
+gps time and point_source_id matches.
+      
+    lascopy64 -i source.laz -i target.laz -o result.laz -match_xy 0.5 -elevation -zero
+
+Copies all z-values from source.laz to target.laz where a matching point 
+within 0.5 units in source exists. Set all other z-values to 0.
 
 
 ## lascopy specific arguments
 
--classification       : copy classification attribute (default)  
--elevation            : copy elevation attribute (z-value)  
--withheld_flag        : copy withheld flag to target  
--intensity            : copy intensity attribute  
--keypoint_flag        : copy keypoint flag to target  
--overlap_flag         : copy overlap flag to target  
--synthetic_flag       : copy synthetic flag to target  
--switch_G_B           : switch green and blue value  
--unmatched            : copy attributes from source to target by point order  
--week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
+-match_gps_time         : uses gps time to match data point (default)
+-match_number_of_return : uses number of returns to match data point (default)
+-match_classification : uses classification for point matching
+-match_intensity      : uses intensity for point matching
+-match_point_source_id: uses point source for point matching
+-match_scanner_channel: uses scanner channel for point matching
+-match_xy [dist]      : Matches point by x-y coordinates and the specified maximum distance
+-match_xyz [dist]     : Matches point by x-y-z coordinates and the specified maximum distance
+-match_xyz_warn [n]   : Issues warning if more than n points are considered for matching for a single point. This may hint to using a smaller matching distance for improved performance.
+-copy_classification  : copy classification attribute (default)  
+-copy_elevation       : copy elevation attribute  
+-copy_intensity       : copy intensity attribute  
+-copy_keypoint_flag   : copy keypoint flag to target  
+-copy_overlap_flag    : copy overlap flag to target  
+-copy_synthetic_flag  : copy synthetic flag to target  
+-copy_withheld_flag   : copy withheld flag to target  
+-classification       : Deprecated: copy classification attribute (may be removed in futrue - replaced by copy_classification)  
+-elevation            : Deprecated: copy elevation attribute (may be removed in futrue - replaced by copy_elevation)  
+-intensity            : Deprecated: copy intensity attribute (may be removed in futrue - replaced by copy_intensity)  
+-keypoint_flag        : Deprecated: copy keypoint flag to target (may be removed in futrue - replaced by copy_keypoint_flag)   
+-overlap_flag         : Deprecated: copy overlap flag to target (may be removed in futrue - replaced by copy_overlap_flag)   
+-synthetic_flag       : Deprecated: copy synthetic flag to target (may be removed in futrue - replaced by copy_synthetic_flag)   
+-withheld_flag        : Deprecated: copy withheld flag to target (may be removed in futrue - replaced by copy_ithheld_flag)   
 -zero                 : set attribute of points to zero if not found in source  
+-unmatched            : copy attributes from source to target by point order  
 -ilay [n]             : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]          : look for corresponding *.lay file in directory [n]  
+-switch_G_B           : switch green and blue value  
+-week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cores [n]            : process multiple inputs on [n] cores in parallel  
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

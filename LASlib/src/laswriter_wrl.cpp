@@ -40,7 +40,7 @@ BOOL LASwriterWRL::open(const CHAR* file_name, const LASheader* header, const CH
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
@@ -48,7 +48,7 @@ BOOL LASwriterWRL::open(const CHAR* file_name, const LASheader* header, const CH
 
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
+    laserror("cannot open file '%s'", file_name);
     return FALSE;
   }
 
@@ -61,7 +61,7 @@ BOOL LASwriterWRL::open(FILE* file, const LASheader* header, const CHAR* parse_s
 {
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "file pointer is zero");
+    laserror("file pointer is zero");
     return FALSE;
   }
 

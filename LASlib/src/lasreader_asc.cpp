@@ -46,7 +46,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
@@ -56,7 +56,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
   file = fopen_compressed(file_name, "r", &piped);
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
+    laserror("cannot open file '%s'", file_name);
     return FALSE;
   }
 
@@ -216,7 +216,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
 
   if (!complete)
   {
-    LASMessage(LAS_ERROR, "was not able to find header");
+    laserror("was not able to find header");
     return FALSE;
   }
 
@@ -475,14 +475,14 @@ BOOL LASreaderASC::reopen(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
   file = fopen_compressed(file_name, "r", &piped);
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot reopen file '%s'", file_name);
+    laserror("cannot reopen file '%s'", file_name);
     return FALSE;
   }
 

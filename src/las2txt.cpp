@@ -62,71 +62,61 @@
 #include "laszip_decompress_selective_v3.hpp"
 #include "laswaveform13reader.hpp"
 #include "laswriter.hpp"
+#include "lastool.hpp"
 
-void usage(bool error=false, bool wait=false)
+class LasTool_las2txt : public LasTool
 {
-  fprintf(stderr,"usage:\n");
-  fprintf(stderr,"las2txt -i test.las -parse Mxyzrna -stdout | more\n");
-  fprintf(stderr,"las2txt -i *.las -parse xyzt\n");
-  fprintf(stderr,"las2txt -i flight1*.las flight2*.las -parse xyziarn\n");
-  fprintf(stderr,"las2txt -i *.las -parse xyzrn -sep comma -verbose\n");
-  fprintf(stderr,"las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt\n");
-  fprintf(stderr,"las2txt -h\n");
-  fprintf(stderr,"---------------------------------------------\n");
-  fprintf(stderr,"The '-parse txyz' flag specifies how to format each\n");
-  fprintf(stderr,"each line of the ASCII file. For example, 'txyzia'\n");
-  fprintf(stderr,"means that the first number of each line should be the\n");
-  fprintf(stderr,"gpstime, the next three numbers should be the x, y, and\n");
-  fprintf(stderr,"z coordinate, the next number should be the intensity\n");
-  fprintf(stderr,"and the next number should be the scan angle.\n");
-  fprintf(stderr,"The supported entries are a - scan angle, i - intensity,\n");
-  fprintf(stderr,"n - number of returns for given pulse, r - number of\n");
-  fprintf(stderr,"this return, t - gpstime, c - classification, u - user data,\n");
-  fprintf(stderr,"p - point source ID, e - edge of flight line flag, and\n");
-  fprintf(stderr,"d - direction of scan flag, l - extended scanner channel,\n");
-  fprintf(stderr,"h - withheld flag, k - keypoint flag, g - synthetic flag,\n");
-  fprintf(stderr,"o - extended overlap flag, R - red channel of RGB color,\n");
-  fprintf(stderr,"G - green channel of RGB color, B - blue channel of RGB color,\n");
-  fprintf(stderr,"I - NIR channel, m - count for each point (starting at zero),\n");
-  fprintf(stderr,"M - count for each point (starting at one),\n");
-  fprintf(stderr,"X, Y, and Z - the unscaled, raw LAS integer coordinates\n");
-  fprintf(stderr,"w and W - for the wavepacket information (LAS 1.3 only)\n");
-  fprintf(stderr,"V - for the waVeform from the *.wdp file (LAS 1.3 only)\n");
-  fprintf(stderr,"E - for an extra string. specify it with '-extra <string>'\n");
-  fprintf(stderr,"0 through 9 - for additional attributes stored as extra bytes\n");
-  fprintf(stderr,"Additionnal strings (HSV), (HSL), (hsv) and (hsl) convert RGB\n");
-	fprintf(stderr,"into HSV or HSL colors models in range [0..360/100] or [0..1]\n");
-  fprintf(stderr,"---------------------------------------------\n");
-  fprintf(stderr,"The '-sep space' flag specifies what separator to use. The\n");
-  fprintf(stderr,"default is a space but 'tab', 'comma', 'colon', 'hyphen',\n");
-  fprintf(stderr,"'dot', or 'semicolon' are other possibilities.\n");
-  fprintf(stderr,"---------------------------------------------\n");
-  fprintf(stderr,"The '-header pound' flag results in the header information\n");
-  fprintf(stderr,"being printed at the beginning of the ASCII file in form of\n");
-  fprintf(stderr,"a comment that starts with the special character '#'. Also\n");
-  fprintf(stderr,"possible are 'percent', 'dollar', 'comma', 'star',\n");
-  fprintf(stderr,"'colon', or 'semicolon' as that special character.\n");
-  if (wait)
+private:
+public:
+  void usage() override
   {
-    fprintf(stderr,"<press ENTER>\n");
-    getc(stdin);
-  }
-  exit(error);
-}
-
-static void byebye(bool error=false, bool wait=false)
-{
-  if (wait)
-  {
-    fprintf(stderr,"<press ENTER>\n");
-    getc(stdin);
-  }
-  exit(error);
-}
+    fprintf(stderr, "usage:\n");
+    fprintf(stderr, "las2txt -i test.las -parse Mxyzrna -stdout | more\n");
+    fprintf(stderr, "las2txt -i *.las -parse xyzt\n");
+    fprintf(stderr, "las2txt -i flight1*.las flight2*.las -parse xyziarn\n");
+    fprintf(stderr, "las2txt -i *.las -parse xyzrn -sep comma -verbose\n");
+    fprintf(stderr, "las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt\n");
+    fprintf(stderr, "las2txt -h\n");
+    fprintf(stderr, "---------------------------------------------\n");
+    fprintf(stderr, "The '-parse txyz' flag specifies how to format each\n");
+    fprintf(stderr, "each line of the ASCII file. For example, 'txyzia'\n");
+    fprintf(stderr, "means that the first number of each line should be the\n");
+    fprintf(stderr, "gpstime, the next three numbers should be the x, y, and\n");
+    fprintf(stderr, "z coordinate, the next number should be the intensity\n");
+    fprintf(stderr, "and the next number should be the scan angle.\n");
+    fprintf(stderr, "The supported entries are a - scan angle, i - intensity,\n");
+    fprintf(stderr, "n - number of returns for given pulse, r - number of\n");
+    fprintf(stderr, "this return, t - gpstime, c - classification, u - user data,\n");
+    fprintf(stderr, "p - point source ID, e - edge of flight line flag, and\n");
+    fprintf(stderr, "d - direction of scan flag, l - extended scanner channel,\n");
+    fprintf(stderr, "h - withheld flag, k - keypoint flag, g - synthetic flag,\n");
+    fprintf(stderr, "o - extended overlap flag, R - red channel of RGB color,\n");
+    fprintf(stderr, "G - green channel of RGB color, B - blue channel of RGB color,\n");
+    fprintf(stderr, "I - NIR channel, m - count for each point (starting at zero),\n");
+    fprintf(stderr, "M - count for each point (starting at one),\n");
+    fprintf(stderr, "X, Y, and Z - the unscaled, raw LAS integer coordinates\n");
+    fprintf(stderr, "w and W - for the wavepacket information (LAS 1.3 only)\n");
+    fprintf(stderr, "V - for the waVeform from the *.wdp file (LAS 1.3 only)\n");
+    fprintf(stderr, "E - for an extra string. specify it with '-extra <string>'\n");
+    fprintf(stderr, "0 through 9 - for additional attributes stored as extra bytes\n");
+    fprintf(stderr, "Additionnal strings (HSV), (HSL), (hsv) and (hsl) convert RGB\n");
+    fprintf(stderr, "into HSV or HSL colors models in range [0..360/100] or [0..1]\n");
+    fprintf(stderr, "---------------------------------------------\n");
+    fprintf(stderr, "The '-sep space' flag specifies what separator to use. The\n");
+    fprintf(stderr, "default is a space but 'tab', 'comma', 'colon', 'hyphen',\n");
+    fprintf(stderr, "'dot', or 'semicolon' are other possibilities.\n");
+    fprintf(stderr, "---------------------------------------------\n");
+    fprintf(stderr, "The '-header pound' flag results in the header information\n");
+    fprintf(stderr, "being printed at the beginning of the ASCII file in form of\n");
+    fprintf(stderr, "a comment that starts with the special character '#'. Also\n");
+    fprintf(stderr, "possible are 'percent', 'dollar', 'comma', 'star',\n");
+    fprintf(stderr, "'colon', or 'semicolon' as that special character.\n");
+  };
+};
 
 static double taketime()
 {
-  return (double)(clock())/CLOCKS_PER_SEC;
+  return (double)(clock()) / CLOCKS_PER_SEC;
 }
 
 static void lidardouble2string(CHAR* string, double value)
@@ -230,13 +220,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*value;
+        F64 temp_d = header->attributes[index].scale[0] * value;
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -263,13 +253,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*value;
+        F64 temp_d = header->attributes[index].scale[0] * value;
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -296,13 +286,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*value;
+        F64 temp_d = header->attributes[index].scale[0] * value;
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -329,13 +319,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*value;
+        F64 temp_d = header->attributes[index].scale[0] * value;
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -362,13 +352,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*value;
+        F64 temp_d = header->attributes[index].scale[0] * value;
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -395,13 +385,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*value;
+        F64 temp_d = header->attributes[index].scale[0] * value;
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -428,13 +418,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*((I64)value) + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * ((I64)value) + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*((I64)value);
+        F64 temp_d = header->attributes[index].scale[0] * ((I64)value);
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -465,13 +455,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*value;
+        F64 temp_d = header->attributes[index].scale[0] * value;
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -498,13 +488,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*value;
+        F64 temp_d = header->attributes[index].scale[0] * value;
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -531,13 +521,13 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     {
       if (header->attributes[index].has_offset())
       {
-        F64 temp_d = header->attributes[index].scale[0]*value + header->attributes[index].offset[0];
+        F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
       else
       {
-        F64 temp_d = header->attributes[index].scale[0]*value;
+        F64 temp_d = header->attributes[index].scale[0] * value;
         lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
@@ -565,17 +555,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
   return TRUE;
 }
 
-enum extended_flags{HSV = -1, HSL = -2, HSV255 = -3, HSL255 = -4};
+enum extended_flags { HSV = -1, HSL = -2, HSV255 = -3, HSL255 = -4 };
 
-static void parse_extended_flags(char *parse_string)
+static void parse_extended_flags(char* parse_string)
 {
-  const char *extended_flags[] = {"(HSV)", "(HSL)", "(hsv)", "(hsl)"};
-  const char replacement_codes[] = {HSV255, HSL255, HSV, HSL};
+  const char* extended_flags[] = { "(HSV)", "(HSL)", "(hsv)", "(hsl)" };
+  const char replacement_codes[] = { HSV255, HSL255, HSV, HSL };
   I32 nflags = (I32)(sizeof(extended_flags) / sizeof(char*));
 
   for (I32 i = 0; i < nflags; i++)
   {
-    char *found = strstr(parse_string, extended_flags[i]);
+    char* found = strstr(parse_string, extended_flags[i]);
 
     while (found)
     {
@@ -589,23 +579,18 @@ static void parse_extended_flags(char *parse_string)
 }
 
 #ifdef COMPILE_WITH_GUI
-extern int las2txt_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
+extern int las2txt_gui(int argc, char* argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int las2txt_multi_core(int argc, char *argv[], LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
+extern int las2txt_multi_core(int argc, char* argv[], LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
 #endif
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
+  LasTool_las2txt lastool;
+  lastool.init(argc, argv, "las2txt");
   int i;
-#ifdef COMPILE_WITH_GUI
-  bool gui = false;
-#endif
-#ifdef COMPILE_WITH_MULTI_CORE
-  I32 cores = 1;
-  BOOL cpu64 = FALSE;
-#endif
   bool diff = false;
   CHAR separator_sign = ' ';
   CHAR const* separator = "space";
@@ -629,13 +614,14 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
     return las2txt_gui(argc, argv, 0);
 #else
-    fprintf(stderr,"%s is better run in the command line\n", argv[0]);
+    wait_on_exit = true;
+    fprintf(stderr, "%s is better run in the command line\n", argv[0]);
     CHAR file_name[256];
-    fprintf(stderr,"enter input file: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name)-1] = '\0';
+    fprintf(stderr, "enter input file: "); fgets(file_name, 256, stdin);
+    file_name[strlen(file_name) - 1] = '\0';
     lasreadopener.set_file_name(file_name);
-    fprintf(stderr,"enter output file: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name)-1] = '\0';
+    fprintf(stderr, "enter output file: "); fgets(file_name, 256, stdin);
+    file_name[strlen(file_name) - 1] = '\0';
     laswriteopener.set_file_name(file_name);
 #endif
   }
@@ -644,191 +630,129 @@ int main(int argc, char *argv[])
     for (i = 1; i < argc; i++)
     {
       if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
-      if (strcmp(argv[i],"-opts") == 0)
+      if (strcmp(argv[i], "-opts") == 0)
       {
         opts = TRUE;
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
-      else if (strcmp(argv[i],"-optx") == 0)
+      else if (strcmp(argv[i], "-optx") == 0)
       {
         optx = TRUE;
-        *argv[i]='\0';
+        *argv[i] = '\0';
       }
     }
-    if (!lasreadopener.parse(argc, argv)) byebye(true);
-    if (!laswriteopener.parse(argc, argv)) byebye(true);
+    lasreadopener.parse(argc, argv);
+    laswriteopener.parse(argc, argv);
   }
 
-  for (i = 1; i < argc; i++)
-  {
-    if (argv[i][0] == '\0')
+  auto arg_local = [&](int& i) -> bool {
+    if (strcmp(argv[i], "-parse") == 0)
     {
-      continue;
-    }
-    else if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i],"-help") == 0)
-    {
-      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
-      usage();
-    }
-    else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
-    {
-      set_message_log_level(LAS_VERBOSE);
-    }
-    else if (strcmp(argv[i],"-version") == 0)
-    {
-      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
-      byebye();
-    }
-    else if (strcmp(argv[i],"-fail") == 0)
-    {
-    }
-    else if (strcmp(argv[i],"-gui") == 0)
-    {
-#ifdef COMPILE_WITH_GUI
-      gui = true;
-#else
-      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
-#endif
-    }
-    else if (strcmp(argv[i],"-cores") == 0)
-    {
-#ifdef COMPILE_WITH_MULTI_CORE
-      if ((i+1) >= argc)
+      if ((i + 1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
-        usage(true);
-      }
-      argv[i][0] = '\0';
-      i++;
-      cores = atoi(argv[i]);
-      argv[i][0] = '\0';
-#else
-      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
-      i++;
-#endif
-    }
-    else if (strcmp(argv[i],"-cpu64") == 0)
-    {
-#ifdef COMPILE_WITH_MULTI_CORE
-      cpu64 = TRUE;
-#else
-      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
-#endif
-      argv[i][0] = '\0';
-    }
-    else if (strcmp(argv[i],"-parse") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: string", argv[i]);
-        usage(true);
+        laserror("'%s' needs 1 argument: string", argv[i]);
       }
       i++;
       if (parse_string) free(parse_string);
       parse_string = LASCopyString(argv[i]);
       parse_extended_flags(parse_string);
     }
-    else if (strcmp(argv[i],"-parse_all") == 0)
+    else if (strcmp(argv[i], "-parse_all") == 0)
     {
       if (parse_string) free(parse_string);
       parse_string = LASCopyString("txyzirndecaup");
     }
-    else if (strcmp(argv[i],"-extra") == 0)
+    else if (strcmp(argv[i], "-extra") == 0)
     {
-      if ((i+1) >= argc)
+      if ((i + 1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: string", argv[i]);
-        usage(true);
+        laserror("'%s' needs 1 argument: string", argv[i]);
       }
       i++;
       extra_string = argv[i];
     }
-    else if (strcmp(argv[i],"-sep") == 0)
+    else if (strcmp(argv[i], "-sep") == 0)
     {
-      if ((i+1) >= argc)
+      if ((i + 1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: separator", argv[i]);
-        usage(true);
+        laserror("'%s' needs 1 argument: separator", argv[i]);
       }
       i++;
       separator = argv[i];
-      if (strcmp(separator,"comma") == 0 || strcmp(separator,"komma") == 0)
+      if (strcmp(separator, "comma") == 0 || strcmp(separator, "komma") == 0)
       {
         separator_sign = ',';
       }
-      else if (strcmp(separator,"tab") == 0)
+      else if (strcmp(separator, "tab") == 0)
       {
         separator_sign = '\t';
       }
-      else if (strcmp(separator,"dot") == 0 || strcmp(separator,"period") == 0)
+      else if (strcmp(separator, "dot") == 0 || strcmp(separator, "period") == 0)
       {
         separator_sign = '.';
       }
-      else if (strcmp(separator,"colon") == 0)
+      else if (strcmp(separator, "colon") == 0)
       {
         separator_sign = ':';
       }
-      else if (strcmp(separator,"semicolon") == 0)
+      else if (strcmp(separator, "semicolon") == 0)
       {
         separator_sign = ';';
       }
-      else if (strcmp(separator,"hyphen") == 0 || strcmp(separator,"minus") == 0)
+      else if (strcmp(separator, "hyphen") == 0 || strcmp(separator, "minus") == 0)
       {
         separator_sign = '-';
       }
-      else if (strcmp(separator,"space") == 0)
+      else if (strcmp(separator, "space") == 0)
       {
         separator_sign = ' ';
       }
       else
       {
-        LASMessage(LAS_ERROR, "unknown seperator '%s'",separator);
-        usage(true);
+        laserror("unknown seperator '%s'", separator);
       }
     }
-    else if (strcmp(argv[i],"-header") == 0)
+    else if (strcmp(argv[i], "-header") == 0)
     {
-      if ((i+1) >= argc)
+      if ((i + 1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: comment", argv[i]);
-        usage(true);
+        laserror("'%s' needs 1 argument: comment", argv[i]);
       }
       i++;
-      if (strcmp(argv[i],"comma") == 0 || strcmp(argv[i],"komma") == 0)
+      if (strcmp(argv[i], "comma") == 0 || strcmp(argv[i], "komma") == 0)
       {
         header_comment_sign = ',';
       }
-      else if (strcmp(argv[i],"colon") == 0)
+      else if (strcmp(argv[i], "colon") == 0)
       {
         header_comment_sign = ':';
       }
-      else if (strcmp(argv[i],"scolon") == 0 || strcmp(argv[i],"semicolon") == 0)
+      else if (strcmp(argv[i], "scolon") == 0 || strcmp(argv[i], "semicolon") == 0)
       {
         header_comment_sign = ';';
       }
-      else if (strcmp(argv[i],"pound") == 0 || strcmp(argv[i],"hash") == 0)
+      else if (strcmp(argv[i], "pound") == 0 || strcmp(argv[i], "hash") == 0)
       {
         header_comment_sign = '#';
       }
-      else if (strcmp(argv[i],"percent") == 0)
+      else if (strcmp(argv[i], "percent") == 0)
       {
         header_comment_sign = '%';
       }
-      else if (strcmp(argv[i],"dollar") == 0)
+      else if (strcmp(argv[i], "dollar") == 0)
       {
         header_comment_sign = '$';
       }
-      else if (strcmp(argv[i],"star") == 0)
+      else if (strcmp(argv[i], "star") == 0)
       {
         header_comment_sign = '*';
       }
       else
       {
-        LASMessage(LAS_ERROR, "unknown header comment symbol '%s'",argv[i]);
-        usage(true);
+        laserror("unknown header comment symbol '%s'", argv[i]);
       }
     }
-    else if (strcmp(argv[i],"-coldesc") == 0)
+    else if (strcmp(argv[i], "-coldesc") == 0)
     {
       coldesc = true;
     }
@@ -839,10 +763,12 @@ int main(int argc, char *argv[])
     }
     else
     {
-      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-      usage(true);
+      return false;
     }
-  }
+    return true;
+  };
+
+  lastool.parse(arg_local);
 
 #ifdef COMPILE_WITH_GUI
   if (gui)
@@ -852,22 +778,22 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-  if (cores > 1)
+  if (lastool.cores > 1)
   {
     if (lasreadopener.get_file_name_number() < 2)
     {
-      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
+      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), lastool.cores);
     }
     else if (lasreadopener.is_merged())
     {
-      LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", cores);
+      LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", lastool.cores);
     }
     else
     {
-      return las2txt_multi_core(argc, argv, &lasreadopener, &laswriteopener, cores, cpu64);
+      return las2txt_multi_core(argc, argv, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
     }
   }
-  if (cpu64)
+  if (lastool.cpu64)
   {
     return las2txt_multi_core(argc, argv, &lasreadopener, &laswriteopener, 1, TRUE);
   }
@@ -877,8 +803,7 @@ int main(int argc, char *argv[])
 
   if (!lasreadopener.active())
   {
-    LASMessage(LAS_ERROR, "no input specified");
-    byebye(true, argc == 1);
+    laserror("no input specified");
   }
 
   // what layers do we need (for selective LAS 1.4 decompression)
@@ -1017,8 +942,7 @@ int main(int argc, char *argv[])
     LASreader* lasreader = lasreadopener.open();
     if (lasreader == 0)
     {
-      LASMessage(LAS_ERROR, "could not open lasreader");
-      byebye(true, argc==1);
+      laserror("could not open lasreader");
     }
 
     // (maybe) open laswaveform13reader
@@ -1045,8 +969,7 @@ int main(int argc, char *argv[])
       {
         if (lasreadopener.get_file_name() == 0)
         {
-          LASMessage(LAS_ERROR, "no output file specified");
-          byebye(true, argc==1);
+          laserror("no output file specified");
         }
         laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
       }
@@ -1061,8 +984,7 @@ int main(int argc, char *argv[])
 
       if (file_out == 0)
       {
-        LASMessage(LAS_ERROR, "could not open '%s' for write", file_name_out);
-        byebye(true, argc==1);
+        laserror("could not open '%s' for write", file_name_out);
       }
 
       laswriteopener.set_file_name(0);
@@ -1325,13 +1247,12 @@ int main(int argc, char *argv[])
         i++;
         while (parse_string[i] && ('0' <= parse_string[i]) && (parse_string[i] <= '9'))
         {
-          index = 10*index + (parse_string[i] - '0');
+          index = 10 * index + (parse_string[i] - '0');
           i++;
         }
         if (index >= lasreader->header.number_attributes)
         {
-          LASMessage(LAS_ERROR, "attribute '%d' does not exist. skipping ...", index);
-          byebye(true);
+          laserror("attribute '%d' does not exist. skipping ...", index);
         }
         else
         {
@@ -1346,8 +1267,8 @@ int main(int argc, char *argv[])
       i++;
     }
     // in case diff is requested
-    int last_XYZ[3] = {0,0,0};
-    unsigned short last_RGB[4] = {0,0,0};
+    int last_XYZ[3] = { 0,0,0 };
+    unsigned short last_RGB[4] = { 0,0,0 };
     double last_GPSTIME = 0;
     // read and convert the points to ASCII
     LASMessage(LAS_VERBOSE, "processing %lld points with '%s'.", lasreader->npoints, parse_string);
@@ -1452,7 +1373,7 @@ int main(int argc, char *argv[])
           else if (optx)
           {
             int len;
-            len = sprintf(printstring, "%.3f", 1.0f/4095.0f * lasreader->point.get_intensity()) - 1;
+            len = sprintf(printstring, "%.3f", 1.0f / 4095.0f * lasreader->point.get_intensity()) - 1;
             while (printstring[len] == '0') len--;
             if (printstring[len] != '.') len++;
             printstring[len] = '\0';
@@ -1541,40 +1462,40 @@ int main(int argc, char *argv[])
           fprintf(file_out, "%d", lasreader->point.rgb[3]);
           break;
         case 'm': // the index of the point (count starts at 0)
-          fprintf(file_out, "%lld", lasreader->p_count-1);
+          fprintf(file_out, "%lld", lasreader->p_count - 1);
           break;
         case 'M': // the index of the point  (count starts at 1)
           fprintf(file_out, "%lld", lasreader->p_count);
           break;
         case '_': // the raw integer X difference to the last point
-          fprintf(file_out, "%d", lasreader->point.get_X()-last_XYZ[0]);
+          fprintf(file_out, "%d", lasreader->point.get_X() - last_XYZ[0]);
           break;
         case '!': // the raw integer Y difference to the last point
-          fprintf(file_out, "%d", lasreader->point.get_Y()-last_XYZ[1]);
+          fprintf(file_out, "%d", lasreader->point.get_Y() - last_XYZ[1]);
           break;
         case '@': // the raw integer Z difference to the last point
-          fprintf(file_out, "%d", lasreader->point.get_Z()-last_XYZ[2]);
+          fprintf(file_out, "%d", lasreader->point.get_Z() - last_XYZ[2]);
           break;
         case '#': // the gps-time difference to the last point
-          lidardouble2string(printstring,lasreader->point.gps_time-last_GPSTIME); fprintf(file_out, "%s", printstring);
+          lidardouble2string(printstring, lasreader->point.gps_time - last_GPSTIME); fprintf(file_out, "%s", printstring);
           break;
         case '$': // the R difference to the last point
-          fprintf(file_out, "%d", lasreader->point.rgb[0]-last_RGB[0]);
+          fprintf(file_out, "%d", lasreader->point.rgb[0] - last_RGB[0]);
           break;
         case '%': // the G difference to the last point
-          fprintf(file_out, "%d", lasreader->point.rgb[1]-last_RGB[1]);
+          fprintf(file_out, "%d", lasreader->point.rgb[1] - last_RGB[1]);
           break;
         case '^': // the B difference to the last point
-          fprintf(file_out, "%d", lasreader->point.rgb[2]-last_RGB[2]);
+          fprintf(file_out, "%d", lasreader->point.rgb[2] - last_RGB[2]);
           break;
         case '&': // the byte-wise R difference to the last point
-          fprintf(file_out, "%d%c%d", (lasreader->point.rgb[0]>>8)-(last_RGB[0]>>8), separator_sign, (lasreader->point.rgb[0]&255)-(last_RGB[0]&255));
+          fprintf(file_out, "%d%c%d", (lasreader->point.rgb[0] >> 8) - (last_RGB[0] >> 8), separator_sign, (lasreader->point.rgb[0] & 255) - (last_RGB[0] & 255));
           break;
         case '*': // the byte-wise G difference to the last point
-          fprintf(file_out, "%d%c%d", (lasreader->point.rgb[1]>>8)-(last_RGB[1]>>8), separator_sign, (lasreader->point.rgb[1]&255)-(last_RGB[1]&255));
+          fprintf(file_out, "%d%c%d", (lasreader->point.rgb[1] >> 8) - (last_RGB[1] >> 8), separator_sign, (lasreader->point.rgb[1] & 255) - (last_RGB[1] & 255));
           break;
         case '+': // the byte-wise B difference to the last point
-          fprintf(file_out, "%d%c%d", (lasreader->point.rgb[2]>>8)-(last_RGB[2]>>8), separator_sign, (lasreader->point.rgb[2]&255)-(last_RGB[2]&255));
+          fprintf(file_out, "%d%c%d", (lasreader->point.rgb[2] >> 8) - (last_RGB[2] >> 8), separator_sign, (lasreader->point.rgb[2] & 255) - (last_RGB[2] & 255));
           break;
         case 'w': // the wavepacket index
           fprintf(file_out, "%d", lasreader->point.wavepacket.getIndex());
@@ -1598,7 +1519,7 @@ int main(int argc, char *argv[])
         case HSV255: { // the HSV representation of RGB
           F32 hsv[3];
           lasreader->point.get_hsv(hsv);
-          fprintf(file_out, "%d%c%d%c%d", (U16)(hsv[0]*360), separator_sign, (U8)(hsv[1]*100), separator_sign, (U8)(hsv[2]*100));
+          fprintf(file_out, "%d%c%d%c%d", (U16)(hsv[0] * 360), separator_sign, (U8)(hsv[1] * 100), separator_sign, (U8)(hsv[2] * 100));
           break;
         }
         case HSV: { // the HSV representation of RGB
@@ -1610,7 +1531,7 @@ int main(int argc, char *argv[])
         case HSL255: { // the HSL representation of RGB
           F32 hsl[3];
           lasreader->point.get_hsl(hsl);
-          fprintf(file_out, "%d%c%d%c%d", (U16)(hsl[0]*360), separator_sign, (U8)(hsl[1]*100), separator_sign, (U8)(hsl[2]*100));
+          fprintf(file_out, "%d%c%d%c%d", (U16)(hsl[0] * 360), separator_sign, (U8)(hsl[1] * 100), separator_sign, (U8)(hsl[2] * 100));
           break;
         }
         case HSL: { // the HSL representation of RGB
@@ -1629,14 +1550,14 @@ int main(int argc, char *argv[])
         case '7': // the extra attributes
         case '8': // the extra attributes
         case '9': // the extra attributes
-          print_attribute(file_out, &lasreader->header, &lasreader->point, (I32)(parse_string[i]-'0'), printstring);
+          print_attribute(file_out, &lasreader->header, &lasreader->point, (I32)(parse_string[i] - '0'), printstring);
           break;
         default:
           index = 0;
           i++;
           while (parse_string[i] && ('0' <= parse_string[i]) && (parse_string[i] <= '9'))
           {
-            index = 10*index + (parse_string[i] - '0');
+            index = 10 * index + (parse_string[i] - '0');
             i++;
           }
           print_attribute(file_out, &lasreader->header, &lasreader->point, index, printstring);
@@ -1663,7 +1584,7 @@ int main(int argc, char *argv[])
         last_RGB[2] = lasreader->point.rgb[2];
       }
     }
-    LASMessage(LAS_VERBOSE, "converting %lld points of '%s' took %g sec.", lasreader->p_count, lasreadopener.get_file_name(), taketime()-start_time);
+    LASMessage(LAS_VERBOSE, "converting %lld points of '%s' took %g sec.", lasreader->p_count, lasreadopener.get_file_name(), taketime() - start_time);
     // close the reader
     lasreader->close();
     delete lasreader;
@@ -1677,6 +1598,6 @@ int main(int argc, char *argv[])
     if (file_out != stdout) fclose(file_out);
   }
   free(parse_string);
-  byebye(false, argc==1);
+  byebye();
   return 0;
 }

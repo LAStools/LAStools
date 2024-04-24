@@ -36,7 +36,8 @@ Each line will be parsed according to the parameters of the
 "-parse" argument.
 If the input file contains a column description in the first line the 
 parse string can be generated automatic by this line.
-A column description can be created by las2txt command. 
+A column description can be created manually or by las2txt command.
+See "column descriptions" section below for valid column descriptions. 
 See "parse" section below for valid parse tokens.
 
 It is important to set the required scale using '-set_scale'.
@@ -125,7 +126,7 @@ option. These are unsigned integers numbers so no scale value is required.
 -add_attribute [m] [n] [o] [p] [q] [r] [s] [t]: adds a new "extra_byte" attribute of data_type [m] name [n] description [o]; optional: scale[p] offset [q] pre_scale [r] pre_offset [s] no_data_value [t]  
 -add_extra [m] [n] [o] [p] [q] [r] [s] [t]: adds a new "extra_byte" attribute of data_type [m] name [n] description [o]; optional: scale[p] offset [q] pre_scale [r] pre_offset [s] no_data_value [t]  
 -cores [n]                          : process multiple inputs on [n] cores in parallel  
--parse [xyz]                        : in case the input file is ascii use parse string [xyz] to access point values  
+-parse [xyz]                        : in case the input file is ascii use parse string [xyz] to access point values. See table below for details.  
 -point_type [n]                     : use point type [n]{1-10} of LAS 1.4 instead of point type 1 of LAS 1.2  
 -progress [n]                       : report progress every [n] points  
 -scale_intensity [n]                : multiply intensity by [n]  
@@ -744,6 +745,9 @@ option. These are unsigned integers numbers so no scale value is required.
 -target_ecef     : output is geocentric (Earth-centered Earth-fixed)  
 -temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
+
+## Appendix
+
 ### add_attribute
 The '-add_attribute' argument allow as first parameter the datatype
 out of this values:  
@@ -817,7 +821,8 @@ file's own description.
 
 ### column descriptions
 Possible column descriptions in the first line to generate the parse format.
-This descriptions can be generated using las2txt with -coldesc argument.
+This descriptions can be also generated using las2txt with -coldesc argument.
+
   Column description  Resulting parse character 
   x                   x coordinate
   y                   y coordinate
@@ -858,7 +863,6 @@ This descriptions can be generated using las2txt with -coldesc argument.
   HSL_l                                     luminance [0..1] 
 
 Other header descriptions will output a warning and the column will be skipped during import.
-
 
 ### output separator
 The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.

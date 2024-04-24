@@ -279,7 +279,7 @@ public:
 
   // parse command line arguments
 
-  bool parse(int argc, char* argv[]);
+  void parse(int argc, char* argv[]);
   int unparse(char* string) const;
 
   // set & get current projection

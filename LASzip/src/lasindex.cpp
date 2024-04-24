@@ -65,12 +65,11 @@
 typedef unordered_map<I32,U32> my_cell_hash;
 #elif defined(LZ_WIN32_VC6)
 #include <hash_map>
-using namespace std;
-typedef hash_map<I32,U32> my_cell_hash;
+typedef std::hash_map<I32,U32> my_cell_hash;
 #else
 #include <unordered_map>
-using namespace std;
-typedef unordered_map<I32, U32> my_cell_hash;
+
+typedef std::unordered_map<I32, U32> my_cell_hash;
 #endif
 
 LASindex::LASindex()
@@ -351,7 +350,7 @@ BOOL LASindex::read(const char* file_name)
   }
   if (!read(file))
   {
-    LASMessage(LAS_ERROR, "(LASindex): cannot read '%s'", name);
+    laserror("(LASindex): cannot read '%s'", name);
     fclose(file);
     free(name);
     return FALSE;
@@ -385,7 +384,7 @@ BOOL LASindex::append(const char* file_name) const
   FILE* file = _wfopen(utf16_file_name, L"rb");
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot open file '%ws'", utf16_file_name);
+    laserror("cannot open file '%ws'", utf16_file_name);
   }
   delete [] utf16_file_name;
 #else
@@ -424,7 +423,7 @@ BOOL LASindex::append(const char* file_name) const
       CHAR user_id[16];
       try { bytestreamin->getBytes((U8*)user_id, 16); } catch(...)
       {
-        LASMessage(LAS_ERROR, "reading header.vlrs[%d].user_id", u);
+        laserror("reading header.vlrs[%d].user_id", u);
         return FALSE;
       }
       if (strcmp(user_id, "laszip encoded") == 0)
@@ -435,13 +434,13 @@ BOOL LASindex::append(const char* file_name) const
       U16 record_id;
       try { bytestreamin->get16bitsLE((U8*)&record_id); } catch(...)
       {
-        LASMessage(LAS_ERROR, "reading header.vlrs[%d].record_id", u);
+        laserror("reading header.vlrs[%d].record_id", u);
         return FALSE;
       }
       U16 record_length_after_header;
       try { bytestreamin->get16bitsLE((U8*)&record_length_after_header); } catch(...)
       {
-        LASMessage(LAS_ERROR, "reading header.vlrs[%d].record_length_after_header", u);
+        laserror("reading header.vlrs[%d].record_length_after_header", u);
         return FALSE;
       }
       total += (54 + record_length_after_header);
@@ -459,7 +458,7 @@ BOOL LASindex::append(const char* file_name) const
   file = _wfopen(utf16_file_name, L"rb+");
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot open file '%ws'", utf16_file_name);
+    laserror("cannot open file '%ws'", utf16_file_name);
   }
   delete [] utf16_file_name;
 #else
@@ -484,7 +483,7 @@ BOOL LASindex::append(const char* file_name) const
 
   if (!write(bytestreamout))
   {
-    LASMessage(LAS_ERROR, "(LASindex): cannot append LAX to '%s'", file_name);
+    laserror("(LASindex): cannot append LAX to '%s'", file_name);
     delete bytestreamout;
     fclose(file);
     delete lasreader;
@@ -543,7 +542,7 @@ BOOL LASindex::write(const char* file_name) const
   FILE* file = _wfopen(utf16_file_name, L"wb");
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "(LASindex): cannot open file '%ws' for write", utf16_file_name);
+    laserror("(LASindex): cannot open file '%ws' for write", utf16_file_name);
   }
   delete [] utf16_file_name;
 #else
@@ -551,13 +550,13 @@ BOOL LASindex::write(const char* file_name) const
 #endif
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "(LASindex): cannot open file '%s' for write", name);
+    laserror("(LASindex): cannot open file '%s' for write", name);
     free(name);
     return FALSE;
   }
   if (!write(file))
   {
-    LASMessage(LAS_ERROR, "(LASindex): cannot write file '%s'", name);
+    laserror("(LASindex): cannot write file '%s'", name);
     fclose(file);
     free(name);
     return FALSE;
@@ -582,32 +581,32 @@ BOOL LASindex::read(ByteStreamIn* stream)
   char signature[4];
   try { stream->getBytes((U8*)signature, 4); } catch (...)
   {
-    LASMessage(LAS_ERROR, "(LASindex): reading signature");
+    laserror("(LASindex): reading signature");
     return FALSE;
   }
   if (strncmp(signature, "LASX", 4) != 0)
   {
-    LASMessage(LAS_ERROR, "(LASindex): wrong signature %4s instead of 'LASX'", signature);
+    laserror("(LASindex): wrong signature %4s instead of 'LASX'", signature);
     return FALSE;
   }
   U32 version;
   try { stream->get32bitsLE((U8*)&version); } catch (...)
   {
-    LASMessage(LAS_ERROR, "(LASindex): reading version");
+    laserror("(LASindex): reading version");
     return FALSE;
   }
   // read spatial quadtree
   spatial = new LASquadtree();
   if (!spatial->read(stream))
   {
-    LASMessage(LAS_ERROR, "(LASindex): cannot read LASspatial (LASquadtree)");
+    laserror("(LASindex): cannot read LASspatial (LASquadtree)");
     return FALSE;
   }
   // read interval
   interval = new LASinterval();
   if (!interval->read(stream))
   {
-    LASMessage(LAS_ERROR, "(LASindex): reading LASinterval");
+    laserror("(LASindex): reading LASinterval");
     return FALSE;
   }
   // tell spatial about the existing cells
@@ -623,25 +622,25 @@ BOOL LASindex::write(ByteStreamOut* stream) const
 {
   if (!stream->putBytes((const U8*)"LASX", 4))
   {
-    LASMessage(LAS_ERROR, "(LASindex): writing signature");
+    laserror("(LASindex): writing signature");
     return FALSE;
   }
   U32 version = 0;
   if (!stream->put32bitsLE((const U8*)&version))
   {
-    LASMessage(LAS_ERROR, "(LASindex): writing version");
+    laserror("(LASindex): writing version");
     return FALSE;
   }
   // write spatial quadtree
   if (!spatial->write(stream))
   {
-    LASMessage(LAS_ERROR, "(LASindex): cannot write LASspatial (LASquadtree)");
+    laserror("(LASindex): cannot write LASspatial (LASquadtree)");
     return FALSE;
   }
   // write interval
   if (!interval->write(stream))
   {
-    LASMessage(LAS_ERROR, "(LASindex): writing LASinterval");
+    laserror("(LASindex): writing LASinterval");
     return FALSE;
   }
   return TRUE;

@@ -32,7 +32,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string>
-#include <assert.h>
+#include <cassert>
+
+long lasmessage_cnt[LAS_QUIET];
 
 void las_default_message_handler(LAS_MESSAGE_TYPE type, const char* msg, void* user_data);
 
@@ -61,6 +63,8 @@ void LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*) fmt, ...)
 {
 	assert(type <= LAS_FATAL_ERROR);		//message type must be less than or equal to LAS_FATAL_ERROR (LAS_QUIET must not be used in LASMessage calls)
 
+	lasmessage_cnt[type]++;
+
 	if (type < las_message_level)
 		return;
 
@@ -70,7 +74,7 @@ void LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*) fmt, ...)
 	int len = vsnprintf(buffer, LAS_MAX_MESSAGE_LENGTH, fmt, args);
 	va_end(args);
 
-	//remove trailing line feed
+	// remove trailing line feed
 	while (len > 0 && buffer[len-1] == '\n')
 	{
 		buffer[len-1] = '\0';
@@ -84,11 +88,12 @@ void LASLIB_DLL set_message_log_level(LAS_MESSAGE_TYPE loglevel)
 {
 	if (las_message_level != loglevel) {
 		las_message_level = loglevel;
-		LASMessage(LAS_INFO, "Log level [%s]", las_message_type_string(loglevel).c_str());
+		LASMessage(LAS_VERY_VERBOSE, "Log level [%s]", las_message_type_string(loglevel).c_str());
 	}
 }
 
-LAS_MESSAGE_TYPE LASLIB_DLL get_message_log_level() {
+LAS_MESSAGE_TYPE LASLIB_DLL get_message_log_level() 
+{
 	return las_message_level;
 }
 

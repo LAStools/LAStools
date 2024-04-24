@@ -6,6 +6,10 @@
   CONTENTS:
 
     Version information for LASzip API interface
+    
+  NOTE:
+    laszip_api_version.h will be generated dynamic out of laszip_api_version.h.in by cmake build.
+    The file laszip_api_version.h is static in the repository to allow also a *.sln build.  
 
   PROGRAMMERS:
 

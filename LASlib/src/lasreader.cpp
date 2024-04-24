@@ -674,7 +674,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			}
 			if (!lasreadermerged->open())
 			{
-				LASMessage(LAS_ERROR, "cannot open lasreadermerged with %d file names", file_name_number);
+				laserror("cannot open lasreadermerged with %d file names", file_name_number);
 				delete lasreadermerged;
 				return 0;
 			}
@@ -693,7 +693,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreaderStored* lasreaderstored = new LASreaderStored(this);
 				if (!lasreaderstored->open(lasreadermerged))
 				{
-					LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreadermerged");
+					laserror("could not open lasreaderstored with lasreadermerged");
 					delete lasreaderstored;
 					return 0;
 				}
@@ -708,7 +708,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 				if (!lasreaderpipeon->open(lasreader))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreadermerged");
+					laserror("cannot open lasreaderpipeon with lasreadermerged");
 					delete lasreaderpipeon;
 					return 0;
 				}
@@ -831,7 +831,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			if (ignore) lasreaderbuffered->set_ignore(ignore);
 			if (!lasreaderbuffered->open())
 			{
-				LASMessage(LAS_ERROR, "cannot open lasreaderbuffered with %d file names", file_name_number + neighbor_file_name_number);
+				laserror("cannot open lasreaderbuffered with %d file names", file_name_number + neighbor_file_name_number);
 				delete lasreaderbuffered;
 				return 0;
 			}
@@ -844,7 +844,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreaderStored* lasreaderstored = new LASreaderStored(this);
 				if (!lasreaderstored->open(lasreaderbuffered))
 				{
-					LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderbuffered");
+					laserror("could not open lasreaderstored with lasreaderbuffered");
 					delete lasreaderstored;
 					return 0;
 				}
@@ -859,7 +859,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 				if (!lasreaderpipeon->open(lasreader))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderbuffered");
+					laserror("cannot open lasreaderpipeon with lasreaderbuffered");
 					delete lasreaderpipeon;
 					return 0;
 				}
@@ -914,7 +914,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				lasreaderlas->set_keep_copc(keep_copc);
 				if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderlas with file name '%s'", file_name);
+					laserror("cannot open lasreaderlas with file name '%s'", file_name);
 					delete lasreaderlas;
 					return 0;
 				}
@@ -964,7 +964,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				{
 					if (!lasreaderlas->get_copcindex())
 					{
-						LASMessage(LAS_ERROR, "queries with a depth limit are restrited to COPC files.");
+						laserror("queries with a depth limit are restrited to COPC files.");
 						delete lasreaderlas;
 						return 0;
 					}
@@ -978,7 +978,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderlas))
 					{
-						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderlas");
+						laserror("could not open lasreaderstored with lasreaderlas");
 						delete lasreaderstored;
 						return 0;
 					}
@@ -993,7 +993,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
-						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderlas");
+						laserror("cannot open lasreaderpipeon with lasreaderlas");
 						delete lasreaderpipeon;
 						return 0;
 					}
@@ -1017,7 +1017,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					lasreaderbin = new LASreaderBINrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderbin->open(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderbin with file name '%s'", file_name);
+					laserror("cannot open lasreaderbin with file name '%s'", file_name);
 					delete lasreaderbin;
 					return 0;
 				}
@@ -1039,7 +1039,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderbin))
 					{
-						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderbin");
+						laserror("could not open lasreaderstored with lasreaderbin");
 						delete lasreaderstored;
 						return 0;
 					}
@@ -1054,7 +1054,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
-						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderbin");
+						laserror("cannot open lasreaderpipeon with lasreaderbin");
 						delete lasreaderpipeon;
 						return 0;
 					}
@@ -1078,7 +1078,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					lasreadershp = new LASreaderSHPrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreadershp->open(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreadershp with file name '%s'", file_name);
+					laserror("cannot open lasreadershp with file name '%s'", file_name);
 					delete lasreadershp;
 					return 0;
 				}
@@ -1095,7 +1095,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreadershp))
 					{
-						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreadershp");
+						laserror("could not open lasreaderstored with lasreadershp");
 						delete lasreaderstored;
 						return 0;
 					}
@@ -1110,7 +1110,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
-						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreadershp");
+						laserror("cannot open lasreaderpipeon with lasreadershp");
 						delete lasreaderpipeon;
 						return 0;
 					}
@@ -1134,7 +1134,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					lasreaderasc = new LASreaderASCrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderasc->open(file_name, comma_not_point))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderasc with file name '%s'", file_name);
+					laserror("cannot open lasreaderasc with file name '%s'", file_name);
 					delete lasreaderasc;
 					return 0;
 				}
@@ -1151,7 +1151,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderasc))
 					{
-						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderasc");
+						laserror("could not open lasreaderstored with lasreaderasc");
 						delete lasreaderstored;
 						return 0;
 					}
@@ -1166,7 +1166,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
-						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderasc");
+						laserror("cannot open lasreaderpipeon with lasreaderasc");
 						delete lasreaderpipeon;
 						return 0;
 					}
@@ -1190,7 +1190,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					lasreaderbil = new LASreaderBILrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderbil->open(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderbil with file name '%s'", file_name);
+					laserror("cannot open lasreaderbil with file name '%s'", file_name);
 					delete lasreaderbil;
 					return 0;
 				}
@@ -1207,7 +1207,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderbil))
 					{
-						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderbil");
+						laserror("could not open lasreaderstored with lasreaderbil");
 						delete lasreaderstored;
 						return 0;
 					}
@@ -1222,7 +1222,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
-						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderbil");
+						laserror("cannot open lasreaderpipeon with lasreaderbil");
 						delete lasreaderpipeon;
 						return 0;
 					}
@@ -1246,7 +1246,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					lasreaderdtm = new LASreaderDTMrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderdtm->open(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderdtm with file name '%s'", file_name);
+					laserror("cannot open lasreaderdtm with file name '%s'", file_name);
 					delete lasreaderdtm;
 					return 0;
 				}
@@ -1263,7 +1263,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderdtm))
 					{
-						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderdtm");
+						laserror("could not open lasreaderstored with lasreaderdtm");
 						delete lasreaderstored;
 						return 0;
 					}
@@ -1278,7 +1278,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
-						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderdtm");
+						laserror("cannot open lasreaderpipeon with lasreaderdtm");
 						delete lasreaderpipeon;
 						return 0;
 					}
@@ -1298,7 +1298,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				lasreaderply->set_offset(offset);
 				if (!lasreaderply->open(file_name, point_type, populate_header))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderply with file name '%s'", file_name);
+					laserror("cannot open lasreaderply with file name '%s'", file_name);
 					delete lasreaderply;
 					return 0;
 				}
@@ -1315,7 +1315,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderply))
 					{
-						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderply");
+						laserror("could not open lasreaderstored with lasreaderply");
 						delete lasreaderstored;
 						return 0;
 					}
@@ -1330,7 +1330,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
-						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderply");
+						laserror("cannot open lasreaderpipeon with lasreaderply");
 						delete lasreaderpipeon;
 						return 0;
 					}
@@ -1354,7 +1354,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					lasreaderqfit = new LASreaderQFITrescalereoffset(this,scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 				if (!lasreaderqfit->open(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderqfit with file name '%s'", file_name);
+					laserror("cannot open lasreaderqfit with file name '%s'", file_name);
 					delete lasreaderqfit;
 					return 0;
 				}
@@ -1376,7 +1376,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreaderqfit))
 					{
-						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderqfit");
+						laserror("could not open lasreaderstored with lasreaderqfit");
 						delete lasreaderstored;
 						return 0;
 					}
@@ -1391,7 +1391,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
-						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderqfit");
+						laserror("cannot open lasreaderpipeon with lasreaderqfit");
 						delete lasreaderpipeon;
 						return 0;
 					}
@@ -1425,7 +1425,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				}
 				if (!lasreadertxt->open(file_name, point_type, parse_string, skip_lines, populate_header))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreadertxt with file name '%s'", file_name);
+					laserror("cannot open lasreadertxt with file name '%s'", file_name);
 					delete lasreadertxt;
 					return 0;
 				}
@@ -1448,7 +1448,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderStored* lasreaderstored = new LASreaderStored(this);
 					if (!lasreaderstored->open(lasreadertxt))
 					{
-						LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreadertxt");
+						laserror("could not open lasreaderstored with lasreadertxt");
 						delete lasreaderstored;
 						return 0;
 					}
@@ -1463,7 +1463,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 					if (!lasreaderpipeon->open(lasreader))
 					{
-						LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreadertxt");
+						laserror("cannot open lasreaderpipeon with lasreadertxt");
 						delete lasreaderpipeon;
 						return 0;
 					}
@@ -1502,7 +1502,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			}
 			if (!lasreadertxt->open(stdin, 0, point_type, parse_string, skip_lines, FALSE))
 			{
-				LASMessage(LAS_ERROR, "cannot open lasreadertxt with file name '%s'", file_name);
+				laserror("cannot open lasreadertxt with file name '%s'", file_name);
 				delete lasreadertxt;
 				return 0;
 			}
@@ -1519,7 +1519,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreaderStored* lasreaderstored = new LASreaderStored(this);
 				if (!lasreaderstored->open(lasreadertxt))
 				{
-					LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreadertxt");
+					laserror("could not open lasreaderstored with lasreadertxt");
 					delete lasreaderstored;
 					return 0;
 				}
@@ -1534,7 +1534,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 				if (!lasreaderpipeon->open(lasreader))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreadertxt");
+					laserror("cannot open lasreaderpipeon with lasreadertxt");
 					delete lasreaderpipeon;
 					return 0;
 				}
@@ -1558,7 +1558,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				lasreaderlas = new LASreaderLASrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 			if (!lasreaderlas->open(stdin))
 			{
-				LASMessage(LAS_ERROR, "cannot open lasreaderlas from stdin ");
+				laserror("cannot open lasreaderlas from stdin ");
 				delete lasreaderlas;
 				return 0;
 			}
@@ -1575,7 +1575,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreaderStored* lasreaderstored = new LASreaderStored(this);
 				if (!lasreaderstored->open(lasreaderlas))
 				{
-					LASMessage(LAS_ERROR, "could not open lasreaderstored with lasreaderlas");
+					laserror("could not open lasreaderstored with lasreaderlas");
 					delete lasreaderstored;
 					return 0;
 				}
@@ -1590,7 +1590,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				LASreaderPipeOn* lasreaderpipeon = new LASreaderPipeOn(this);
 				if (!lasreaderpipeon->open(lasreader))
 				{
-					LASMessage(LAS_ERROR, "cannot open lasreaderpipeon with lasreaderlas from stdin");
+					laserror("cannot open lasreaderpipeon with lasreaderlas from stdin");
 					delete lasreaderpipeon;
 					return 0;
 				}
@@ -1612,7 +1612,8 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 {
 	if (lasreader == 0)
 	{
-		LASMessage(LAS_ERROR, "pointer to LASreader is NULL");
+		LASMessage(LAS_WARNING, "pointer to LASreader is NULL");
+		return FALSE;
 	}
 
 	// make sure the LASreader was closed
@@ -1634,7 +1635,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 		LASreaderStored* lasreaderstored = (LASreaderStored*)lasreader;
 		if (!lasreaderstored->reopen())
 		{
-			LASMessage(LAS_ERROR, "could not reopen lasreaderstored for stored input");
+			LASMessage(LAS_WARNING, "could not reopen lasreaderstored for stored input");
 			return FALSE;
 		}
 		return TRUE;
@@ -1646,7 +1647,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 			LASreaderMerged* lasreadermerged = (LASreaderMerged*)lasreader;
 			if (!lasreadermerged->reopen())
 			{
-				LASMessage(LAS_ERROR, "cannot reopen lasreadermerged");
+				LASMessage(LAS_WARNING, "cannot reopen lasreadermerged");
 				return FALSE;
 			}
 			if (inside_rectangle || inside_tile || inside_circle)
@@ -1664,7 +1665,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 			LASreaderBuffered* lasreaderbuffered = (LASreaderBuffered*)lasreader;
 			if (!lasreaderbuffered->reopen())
 			{
-				LASMessage(LAS_ERROR, "cannot reopen lasreaderbuffered");
+				laserror("cannot reopen lasreaderbuffered");
 				return FALSE;
 			}
 			if (inside_rectangle || inside_tile || inside_circle)
@@ -1686,7 +1687,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				LASreaderLAS* lasreaderlas = (LASreaderLAS*)lasreader;
 				if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
 				{
-					LASMessage(LAS_ERROR, "cannot reopen lasreaderlas with file name '%s'", file_name);
+					laserror("cannot reopen lasreaderlas with file name '%s'", file_name);
 					return FALSE;
 				}
 				if (inside_rectangle || inside_tile || inside_circle)
@@ -1704,7 +1705,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				LASreaderBIN* lasreaderbin = (LASreaderBIN*)lasreader;
 				if (!lasreaderbin->open(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot reopen lasreaderbin with file name '%s'", file_name);
+					laserror("cannot reopen lasreaderbin with file name '%s'", file_name);
 					return FALSE;
 				}
 				if (inside_rectangle || inside_tile || inside_circle)
@@ -1721,7 +1722,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				LASreaderSHP* lasreadershp = (LASreaderSHP*)lasreader;
 				if (!lasreadershp->reopen(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot reopen lasreadershp with file name '%s'", file_name);
+					laserror("cannot reopen lasreadershp with file name '%s'", file_name);
 					return FALSE;
 				}
 				if (inside_rectangle || inside_tile || inside_circle)
@@ -1738,7 +1739,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				LASreaderQFIT* lasreaderqfit = (LASreaderQFIT*)lasreader;
 				if (!lasreaderqfit->reopen(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot reopen lasreaderqfit with file name '%s'", file_name);
+					laserror("cannot reopen lasreaderqfit with file name '%s'", file_name);
 					return FALSE;
 				}
 				if (inside_rectangle || inside_tile || inside_circle)
@@ -1755,7 +1756,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				LASreaderASC* lasreaderasc = (LASreaderASC*)lasreader;
 				if (!lasreaderasc->reopen(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot reopen lasreaderasc with file name '%s'", file_name);
+					laserror("cannot reopen lasreaderasc with file name '%s'", file_name);
 					return FALSE;
 				}
 				if (inside_rectangle || inside_tile || inside_circle)
@@ -1772,7 +1773,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				LASreaderBIL* lasreaderbil = (LASreaderBIL*)lasreader;
 				if (!lasreaderbil->reopen(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot reopen lasreaderbil with file name '%s'", file_name);
+					laserror("cannot reopen lasreaderbil with file name '%s'", file_name);
 					return FALSE;
 				}
 				if (inside_rectangle || inside_tile || inside_circle)
@@ -1789,7 +1790,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				LASreaderDTM* lasreaderdtm = (LASreaderDTM*)lasreader;
 				if (!lasreaderdtm->reopen(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot reopen lasreaderdtm with file name '%s'", file_name);
+					laserror("cannot reopen lasreaderdtm with file name '%s'", file_name);
 					return FALSE;
 				}
 				if (inside_rectangle || inside_tile || inside_circle)
@@ -1806,7 +1807,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				LASreaderTXT* lasreadertxt = (LASreaderTXT*)lasreader;
 				if (!lasreadertxt->reopen(file_name))
 				{
-					LASMessage(LAS_ERROR, "cannot reopen lasreadertxt with file name '%s'", file_name);
+					laserror("cannot reopen lasreadertxt with file name '%s'", file_name);
 					return FALSE;
 				}
 				if (inside_rectangle || inside_tile || inside_circle)
@@ -1822,7 +1823,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 	}
 	else
 	{
-		LASMessage(LAS_ERROR, "no lasreader input specified");
+		laserror("no lasreader input specified");
 		return FALSE;
 	}
 }
@@ -1882,7 +1883,7 @@ void LASreadOpener::usage() const
 											 "  -resolution 0.1");
 }
 
-BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
+void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 {
 	int i;
 	for (i = 1; i < argc; i++)
@@ -1891,13 +1892,17 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 		{
 			continue;
 		}
-		else if (strcmp(argv[i], "-h") == 0)
+		else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-help") == 0)
+		{
+			return;
+		}
+		else if (strcmp(argv[i], "-hh") == 0)
 		{
 			LASfilter().usage();
 			LAStransform().usage();
 			LASignore().usage();
 			usage();
-			return TRUE;
+			return;
 		}
 		else if (strncmp(argv[i], "-i", 2) == 0)
 		{
@@ -1905,8 +1910,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: file_name or wild_card", argv[i]);
-					return FALSE;
+					laserror("'%s' needs at least 1 argument: file_name or wild_card", argv[i]);
 				}
 				*argv[i] = '\0';
 				i += 1;
@@ -1930,13 +1934,12 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 					{
 						delete ignore;
 						ignore = 0;
-						return FALSE;
+						return;
 					}
 				}
 				else
 				{
-					LASMessage(LAS_ERROR, "this tool does not process '-ignore_xxxx' options");
-					return FALSE;
+					laserror("this tool does not process '-ignore_xxxx' options");
 				}
 			}
 			else if (strncmp(argv[i], "-inside", 7) == 0)
@@ -1945,31 +1948,26 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 				{
 					if ((i + 3) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: ll_x ll_y size", argv[i]);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: ll_x ll_y size", argv[i]);
 					}
 					F32 ll_x;
 					if (sscanf(argv[i + 1], "%f", &ll_x) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: ll_x ll_y size, but '%s' is not a valid ll_x.", argv[i], argv[i + 1]);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: ll_x ll_y size, but '%s' is not a valid ll_x.", argv[i], argv[i + 1]);
 					}
 					F32 ll_y;
 					if (sscanf(argv[i + 2], "%f", &ll_y) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: ll_x ll_y size, but '%s' is not a valid ll_y.", argv[i], argv[i + 2]);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: ll_x ll_y size, but '%s' is not a valid ll_y.", argv[i], argv[i + 2]);
 					}
 					F32 size;
 					if (sscanf(argv[i + 3], "%f", &size) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: ll_x ll_y size, but '%s' is not a valid size.", argv[i], argv[i + 3]);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: ll_x ll_y size, but '%s' is not a valid size.", argv[i], argv[i + 3]);
 					}
 					if (size <= 0.0f)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: ll_x ll_y size, but %f is not valid a size.", argv[i], size);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: ll_x ll_y size, but %f is not valid a size.", argv[i], size);
 					}
 					set_inside_tile(ll_x, ll_y, size);
 					*argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; i += 3;
@@ -1978,31 +1976,26 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 				{
 					if ((i + 3) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: center_x center_y radius", argv[i]);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: center_x center_y radius", argv[i]);
 					}
 					F64 center_x;
 					if (sscanf(argv[i + 1], "%lf", &center_x) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: center_x center_y radius, but '%s' is not a valid center_x.", argv[i], argv[i + 1]);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: center_x center_y radius, but '%s' is not a valid center_x.", argv[i], argv[i + 1]);
 					}
 					F64 center_y;
 					if (sscanf(argv[i + 2], "%lf", &center_y) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: center_x center_y radius, but '%s' is not a valid center_y.", argv[i], argv[i + 2]);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: center_x center_y radius, but '%s' is not a valid center_y.", argv[i], argv[i + 2]);
 					}
 					F64 radius;
 					if (sscanf(argv[i + 3], "%lf", &radius) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: center_x center_y radius, but '%s' is not a valid radius.", argv[i], argv[i + 3]);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: center_x center_y radius, but '%s' is not a valid radius.", argv[i], argv[i + 3]);
 					}
 					if (radius <= 0.0f)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 3 arguments: center_x center_y radius, but %lf is not valid a radius.", argv[i], radius);
-						return FALSE;
+						laserror("'%s' needs 3 arguments: center_x center_y radius, but %lf is not valid a radius.", argv[i], radius);
 					}
 					set_inside_circle(center_x, center_y, radius);
 					*argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; i += 3;
@@ -2011,58 +2004,49 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 				{
 					if ((i + 4) >= argc)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y", argv[i]);
-						return FALSE;
+						laserror("'%s' needs 4 arguments: min_x min_y max_x max_y", argv[i]);
 					}
 					F64 min_x;
 					if (sscanf(argv[i + 1], "%lf", &min_x) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid min_x.", argv[i], argv[i + 1]);
-						return FALSE;
+						laserror("'%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid min_x.", argv[i], argv[i + 1]);
 					}
 					F64 min_y;
 					if (sscanf(argv[i + 2], "%lf", &min_y) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid min_y.", argv[i], argv[i + 2]);
-						return FALSE;
+						laserror("'%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid min_y.", argv[i], argv[i + 2]);
 					}
 					F64 max_x;
 					if (sscanf(argv[i + 3], "%lf", &max_x) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid max_x.", argv[i], argv[i + 3]);
-						return FALSE;
+						laserror("'%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid max_x.", argv[i], argv[i + 3]);
 					}
 					F64 max_y;
 					if (sscanf(argv[i + 4], "%lf", &max_y) != 1)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid max_y.", argv[i], argv[i + 4]);
-						return FALSE;
+						laserror("'%s' needs 4 arguments: min_x min_y max_x max_y, but '%s' is not a valid max_y.", argv[i], argv[i + 4]);
 					}
 					if (min_x >= max_x)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y, but %lf / %lf are not a valid min_x / max_x pair.", argv[i], min_x, max_x);
-						return FALSE;
+						laserror("'%s' needs 4 arguments: min_x min_y max_x max_y, but %lf / %lf are not a valid min_x / max_x pair.", argv[i], min_x, max_x);
 					}
 					if (min_y >= max_y)
 					{
-						LASMessage(LAS_ERROR, "'%s' needs 4 arguments: min_x min_y max_x max_y, but %lf / %lf are not a valid min_y / max_y pair.", argv[i], min_y, max_y);
-						return FALSE;
+						laserror("'%s' needs 4 arguments: min_x min_y max_x max_y, but %lf / %lf are not a valid min_y / max_y pair.", argv[i], min_y, max_y);
 					}
 					set_inside_rectangle(min_x, min_y, max_x, max_y);
 					*argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; *argv[i + 4] = '\0'; i += 4;
 				}
 				else
 				{
-					LASMessage(LAS_ERROR, "unknown '-inside' option '%s'", argv[i]);
-					return FALSE;
+					laserror("unknown '-inside' option '%s'", argv[i]);
 				}
 			}
 			else if (strcmp(argv[i], "-iadd_extra") == 0 || strcmp(argv[i], "-iadd_attribute") == 0)
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: data_type name description", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: data_type name description", argv[i]);
 				}
 				if (((i + 4) < argc) && (atof(argv[i + 4]) != 0.0))
 				{
@@ -2111,8 +2095,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: string", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: string", argv[i]);
 				}
 				set_parse_string(argv[i + 1]);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2121,19 +2104,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: number_of_lines", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: number_of_lines", argv[i]);
 				}
 				U32 number_of_lines;
 				if (sscanf(argv[i + 1], "%u", &number_of_lines) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: number_of_lines but '%s' is not a valid number.", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: number_of_lines but '%s' is not a valid number.", argv[i], argv[i + 1]);
 				}
 				if (number_of_lines == 0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: number_of_lines but %u is not valid.", argv[i], number_of_lines);
-					return FALSE;
+					laserror("'%s' needs 1 argument: number_of_lines but %u is not valid.", argv[i], number_of_lines);
 				}
 				set_skip_lines(number_of_lines);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2142,19 +2122,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: size", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: size", argv[i]);
 				}
 				U32 buffer_size;
 				if (sscanf(argv[i + 1], "%u", &buffer_size) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: size but '%s' is not a valid size.", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: size but '%s' is not a valid size.", argv[i], argv[i + 1]);
 				}
 				if (buffer_size == 0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: size but %u is not valid.", argv[i], buffer_size);
-					return FALSE;
+					laserror("'%s' needs 1 argument: size but %u is not valid.", argv[i], buffer_size);
 				}
 				set_io_ibuffer_size(buffer_size);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2163,19 +2140,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: translation", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: translation", argv[i]);
 				}
 				F32 translation;
 				if (sscanf(argv[i + 1], "%f", &translation) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: translation but '%s' is not valid.", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: translation but '%s' is not valid.", argv[i], argv[i + 1]);
 				}
 				if (translation == 0.0f)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: translation but %f is not valid.", argv[i], translation);
-					return FALSE;
+					laserror("'%s' needs 1 argument: translation but %f is not valid.", argv[i], translation);
 				}
 				set_translate_intensity(translation);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2184,19 +2158,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: scale", argv[i]);
 				}
 				F32 scale;
 				if (sscanf(argv[i + 1], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but '%s' is not valid.", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: scale but '%s' is not valid.", argv[i], argv[i + 1]);
 				}
 				if (scale == 0.0f)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but %f is not valid.", argv[i], scale);
-					return FALSE;
+					laserror("'%s' needs 1 argument: scale but %f is not valid.", argv[i], scale);
 				}
 				set_scale_intensity(scale);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2205,19 +2176,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: translation", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: translation", argv[i]);
 				}
 				F32 translation;
 				if (sscanf(argv[i + 1], "%f", &translation) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: translation but '%s' is not valid.", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: translation but '%s' is not valid.", argv[i], argv[i + 1]);
 				}
 				if (translation == 0.0f)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: translation but %f is not valid.", argv[i], translation);
-					return FALSE;
+					laserror("'%s' needs 1 argument: translation but %f is not valid.", argv[i], translation);
 				}
 				set_translate_scan_angle(translation);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2226,19 +2194,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: scale", argv[i]);
 				}
 				F32 scale;
 				if (sscanf(argv[i + 1], "%f", &scale) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but '%s' is not valid.", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: scale but '%s' is not valid.", argv[i], argv[i + 1]);
 				}
 				if (scale == 0.0f)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: scale but %f is not valid.", argv[i], scale);
-					return FALSE;
+					laserror("'%s' needs 1 argument: scale but %f is not valid.", argv[i], scale);
 				}
 				set_scale_scan_angle(scale);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2273,39 +2238,32 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y rescale_z", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y rescale_z", argv[i]);
 				}
 				F64 scale_factor[3];
 				if (sscanf(argv[i + 1], "%lf", &(scale_factor[0])) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_x", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_x", argv[i], argv[i + 1]);
 				}
 				if (scale_factor[0] == 0.0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_x", argv[i], scale_factor[0]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_x", argv[i], scale_factor[0]);
 				}
 				if (sscanf(argv[i + 2], "%lf", &(scale_factor[1])) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_y", argv[i], argv[i + 2]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_y", argv[i], argv[i + 2]);
 				}
 				if (scale_factor[1] == 0.0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_y", argv[i], scale_factor[1]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_y", argv[i], scale_factor[1]);
 				}
 				if (sscanf(argv[i + 3], "%lf", &(scale_factor[2])) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_z", argv[i], argv[i + 3]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but '%s' is not a valid rescale_z", argv[i], argv[i + 3]);
 				}
 				if (scale_factor[2] == 0.0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_z", argv[i], scale_factor[2]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y rescale_z, but %lf is not a valid rescale_z", argv[i], scale_factor[2]);
 				}
 				set_scale_factor(scale_factor);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; i += 3;
@@ -2314,29 +2272,24 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 2) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 2 argument: rescale_x rescale_y", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 2 argument: rescale_x rescale_y", argv[i]);
 				}
 				F64 scale_factor[3];
 				if (sscanf(argv[i + 1], "%lf", &(scale_factor[0])) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y, but '%s' is not a valid rescale_x", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y, but '%s' is not a valid rescale_x", argv[i], argv[i + 1]);
 				}
 				if (scale_factor[0] == 0.0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y, but %lf is not a valid rescale_x", argv[i], scale_factor[0]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y, but %lf is not a valid rescale_x", argv[i], scale_factor[0]);
 				}
 				if (sscanf(argv[i + 2], "%lf", &(scale_factor[1])) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y, but '%s' is not a valid rescale_y", argv[i], argv[i + 2]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y, but '%s' is not a valid rescale_y", argv[i], argv[i + 2]);
 				}
 				if (scale_factor[1] == 0.0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: rescale_x rescale_y, but %lf is not a valid rescale_y", argv[i], scale_factor[1]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: rescale_x rescale_y, but %lf is not a valid rescale_y", argv[i], scale_factor[1]);
 				}
 				scale_factor[2] = 0.0;
 				set_scale_factor(scale_factor);
@@ -2346,21 +2299,18 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: rescale_z", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: rescale_z", argv[i]);
 				}
 				F64 scale_factor[3];
 				scale_factor[0] = 0.0;
 				scale_factor[1] = 0.0;
 				if (sscanf(argv[i + 1], "%lf", &(scale_factor[2])) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: rescale_z, but '%s' is not a valid rescale_z", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: rescale_z, but '%s' is not a valid rescale_z", argv[i], argv[i + 1]);
 				}
 				if (scale_factor[2] == 0.0)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: rescale_z, but %lf is not a valid rescale_z", argv[i], scale_factor[2]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: rescale_z, but %lf is not a valid rescale_z", argv[i], scale_factor[2]);
 				}
 				set_scale_factor(scale_factor);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2369,24 +2319,20 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 3) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z", argv[i]);
 				}
 				F64 offset[3];
 				if (sscanf(argv[i + 1], "%lf", &(offset[0])) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_x", argv[i], argv[i + 1]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_x", argv[i], argv[i + 1]);
 				}
 				if (sscanf(argv[i + 2], "%lf", &(offset[1])) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_y", argv[i], argv[i + 2]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_y", argv[i], argv[i + 2]);
 				}
 				if (sscanf(argv[i + 3], "%lf", &(offset[2])) != 1)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_z", argv[i], argv[i + 3]);
-					return FALSE;
+					laserror("'%s' needs 3 arguments: reoffset_x, reoffset_y, reoffset_z, but '%s' is not a valid reoffset_z", argv[i], argv[i + 3]);
 				}
 				set_offset(offset);
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; *argv[i + 2] = '\0'; *argv[i + 3] = '\0'; i += 3;
@@ -2395,19 +2341,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i+1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: resolution", argv[i]);
-				  	return FALSE;
+					laserror("'%s' needs 1 argument: resolution", argv[i]);
 				}
 				F32 resolution;
 				if (sscanf(argv[i+1], "%f", &(resolution)) != 1)
 				{
-				  	LASMessage(LAS_ERROR, "'%s' needs 1 argument: resolution, but '%s' is not a valid resolution", argv[i], argv[i+1]);
-				  	return FALSE;
+				  	laserror("'%s' needs 1 argument: resolution, but '%s' is not a valid resolution", argv[i], argv[i+1]);
 				}
 				if (resolution <= 0)
 				{
-				  	LASMessage(LAS_ERROR, "'%s' needs 1 argument: resolution, but %lf is not a valid resolution", argv[i], resolution);
-				  	return FALSE;
+				  	laserror("'%s' needs 1 argument: resolution, but %lf is not a valid resolution", argv[i], resolution);
 				}
 
 				set_resolution(resolution);
@@ -2456,13 +2399,11 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 		{
 			if ((i + 1) >= argc)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: list_of_files", argv[i]);
-				return FALSE;
+				laserror("'%s' needs 1 argument: list_of_files", argv[i]);
 			}
 			if (!add_list_of_files(argv[i + 1], unique))
 			{
-				LASMessage(LAS_ERROR, "cannot load list of files '%s'", argv[i + 1]);
-				return FALSE;
+				laserror("cannot load list of files '%s'", argv[i + 1]);
 			}
 			*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
 		}
@@ -2498,8 +2439,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs 1 argument: index", argv[i]);
-					return FALSE;
+					laserror("'%s' needs 1 argument: index", argv[i]);
 				}
 				set_files_are_flightlines_index(atoi(argv[i + 1]));
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2514,19 +2454,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 		{
 			if ((i + 1) >= argc)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: buffer_size", argv[i]);
-				return FALSE;
+				laserror("'%s' needs 1 argument: buffer_size", argv[i]);
 			}
 			F32 buffer_size;
 			if (sscanf(argv[i + 1], "%f", &buffer_size) != 1)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: buffer_size. but '%s' is not a valid buffer_size", argv[i], argv[i + 1]);
-				return FALSE;
+				laserror("'%s' needs 1 argument: buffer_size. but '%s' is not a valid buffer_size", argv[i], argv[i + 1]);
 			}
 			if (buffer_size <= 0.0f)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: buffer_size, but %f is not valid", argv[i], buffer_size);
-				return FALSE;
+				laserror("'%s' needs 1 argument: buffer_size, but %f is not valid", argv[i], buffer_size);
 			}
 			set_buffer_size(buffer_size);
 			*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2535,8 +2472,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 		{
 			if ((i + 1) >= argc)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: base name", argv[i]);
-				return FALSE;
+				laserror("'%s' needs 1 argument: base name", argv[i]);
 			}
 			temp_file_base = LASCopyString(argv[i + 1]);
 			*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
@@ -2547,8 +2483,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: file_name or wild_card", argv[i]);
-					return FALSE;
+					laserror("'%s' needs at least 1 argument: file_name or wild_card", argv[i]);
 				}
 				*argv[i] = '\0';
 				i += 1;
@@ -2564,13 +2499,11 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 			{
 				if ((i + 1) >= argc)
 				{
-					LASMessage(LAS_ERROR, "'%s' needs at least 1 argument: file_name", argv[i]);
-					return FALSE;
+					laserror("'%s' needs at least 1 argument: file_name", argv[i]);
 				}
 				if (!add_neighbor_list_of_files(argv[i + 1], unique))
 				{
-					LASMessage(LAS_ERROR, "cannot load neighbor list of files '%s'", argv[i + 1]);
-					return FALSE;
+					laserror("cannot load neighbor list of files '%s'", argv[i + 1]);
 				}
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
 			}
@@ -2597,19 +2530,16 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 		{
 			if ((i + 1) >= argc)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: depth", argv[i]);
-				return FALSE;
+				laserror("'%s' needs 1 argument: depth", argv[i]);
 			}
 			I32 depth;
 			if (sscanf(argv[i + 1], "%d", &(depth)) != 1)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: depth, but '%s' is not a valid depth", argv[i], argv[i + 1]);
-				return FALSE;
+				laserror("'%s' needs 1 argument: depth, but '%s' is not a valid depth", argv[i], argv[i + 1]);
 			}
 			if (depth < 0)
 			{
-				LASMessage(LAS_ERROR, "'%s' needs 1 argument: depth, but %d is not a valid depth", argv[i], depth);
-				return FALSE;
+				laserror("'%s' needs 1 argument: depth, but %d is not a valid depth", argv[i], depth);
 			}
 			set_max_depth(depth);
 			*argv[i] = '\0';
@@ -2636,13 +2566,11 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 	{
 		if (file_name_number > 1)
 		{
-			LASMessage(LAS_ERROR, "neighbors only supported for one buffered input file, not for %d", file_name_number);
-			return FALSE;
+			laserror("neighbors only supported for one buffered input file, not for %d", file_name_number);
 		}
 		if (buffer_size == 0.0f)
 		{
-			LASMessage(LAS_ERROR, "neighbors only make sense when used with '-buffered 50' or similar");
-			return FALSE;
+			laserror("neighbors only make sense when used with '-buffered 50' or similar");
 		}
 	}
 
@@ -2652,7 +2580,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 	{
 		delete filter;
 		filter = 0;
-		return FALSE;
+		return;
 	}
 	if (!filter->active())
 	{
@@ -2666,7 +2594,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 	{
 		delete transform;
 		transform = 0;
-		return FALSE;
+		return;
 	}
 	if (!transform->active())
 	{
@@ -2696,7 +2624,7 @@ BOOL LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 		transform->setPointSource(0);
 	}
 
-	return TRUE;
+	return;
 }
 
 U32 LASreadOpener::get_file_name_number() const
@@ -3019,7 +2947,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
 		}
 		if (file_names == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names pointer array failed at %d", file_name_allocated);
+			laserror("alloc for file_names pointer array failed at %d", file_name_allocated);
 		}
 	}
 	file_names[file_name_number] = LASCopyString(file_name);
@@ -3056,12 +2984,12 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, BOOL unique)
 		}
 		if (file_names == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names pointer array failed at %d", file_name_allocated);
+			laserror("alloc for file_names pointer array failed at %d", file_name_allocated);
 			return FALSE;
 		}
 		if (file_names_ID == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names_ID array failed at %d", file_name_allocated);
+			laserror("alloc for file_names_ID array failed at %d", file_name_allocated);
 			return FALSE;
 		}
 	}
@@ -3112,7 +3040,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, I64 npoints, F6
 				kdtree_rectangles = new LASkdtreeRectangles();
 				if (kdtree_rectangles == 0)
 				{
-					LASMessage(LAS_ERROR, "alloc for LASkdtreeRectangles failed");
+					laserror("alloc for LASkdtreeRectangles failed");
 					return FALSE;
 				}
 			}
@@ -3120,37 +3048,37 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, I64 npoints, F6
 		}
 		if (file_names == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names pointer array failed at %d", file_name_allocated);
+			laserror("alloc for file_names pointer array failed at %d", file_name_allocated);
 			return FALSE;
 		}
 		if (file_names_ID == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names_ID array failed at %d", file_name_allocated);
+			laserror("alloc for file_names_ID array failed at %d", file_name_allocated);
 			return FALSE;
 		}
 		if (file_names_npoints == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names_npoints array failed at %d", file_name_allocated);
+			laserror("alloc for file_names_npoints array failed at %d", file_name_allocated);
 			return FALSE;
 		}
 		if (file_names_min_x == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names_min_x array failed at %d", file_name_allocated);
+			laserror("alloc for file_names_min_x array failed at %d", file_name_allocated);
 			return FALSE;
 		}
 		if (file_names_min_y == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names_min_y array failed at %d", file_name_allocated);
+			laserror("alloc for file_names_min_y array failed at %d", file_name_allocated);
 			return FALSE;
 		}
 		if (file_names_max_x == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names_max_x array failed at %d", file_name_allocated);
+			laserror("alloc for file_names_max_x array failed at %d", file_name_allocated);
 			return FALSE;
 		}
 		if (file_names_max_y == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for file_names_max_y array failed at %d", file_name_allocated);
+			laserror("alloc for file_names_max_y array failed at %d", file_name_allocated);
 			return FALSE;
 		}
 	}
@@ -3171,7 +3099,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
 	FILE* file = fopen(list_of_files, "r");
 	if (file == 0)
 	{
-		LASMessage(LAS_ERROR, "cannot open '%s'", list_of_files);
+		laserror("cannot open '%s'", list_of_files);
 		return FALSE;
 	}
 	CHAR line[2048];
@@ -3279,7 +3207,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, I64 n
 				neighbor_kdtree_rectangles = new LASkdtreeRectangles();
 				if (neighbor_kdtree_rectangles == 0)
 				{
-					LASMessage(LAS_ERROR, "alloc for neighbor LASkdtreeRectangles failed");
+					laserror("alloc for neighbor LASkdtreeRectangles failed");
 					return FALSE;
 				}
 			}
@@ -3287,27 +3215,27 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, I64 n
 		}
 		if (neighbor_file_names == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for neighbor_file_names pointer array failed at %d", neighbor_file_name_allocated);
+			laserror("alloc for neighbor_file_names pointer array failed at %d", neighbor_file_name_allocated);
 			return FALSE;
 		}
 		if (neighbor_file_names_min_x == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for neighbor_file_names_min_x array failed at %d", neighbor_file_name_allocated);
+			laserror("alloc for neighbor_file_names_min_x array failed at %d", neighbor_file_name_allocated);
 			return FALSE;
 		}
 		if (neighbor_file_names_min_y == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for neighbor_file_names_min_y array failed at %d", neighbor_file_name_allocated);
+			laserror("alloc for neighbor_file_names_min_y array failed at %d", neighbor_file_name_allocated);
 			return FALSE;
 		}
 		if (neighbor_file_names_max_x == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for neighbor_file_names_max_x array failed at %d", neighbor_file_name_allocated);
+			laserror("alloc for neighbor_file_names_max_x array failed at %d", neighbor_file_name_allocated);
 			return FALSE;
 		}
 		if (neighbor_file_names_max_y == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for neighbor_file_names_max_y array failed at %d", neighbor_file_name_allocated);
+			laserror("alloc for neighbor_file_names_max_y array failed at %d", neighbor_file_name_allocated);
 			return FALSE;
 		}
 	}
@@ -3327,7 +3255,7 @@ BOOL LASreadOpener::add_neighbor_list_of_files(const CHAR* neighbor_list_of_file
 	FILE* file = fopen(neighbor_list_of_files, "r");
 	if (file == 0)
 	{
-		LASMessage(LAS_ERROR, "cannot open '%s'", neighbor_list_of_files);
+		laserror("cannot open '%s'", neighbor_list_of_files);
 		return FALSE;
 	}
 	CHAR line[2048];
@@ -3476,7 +3404,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
 		}
 		if (neighbor_file_names == 0)
 		{
-			LASMessage(LAS_ERROR, "alloc for neighbor_file_names pointer array failed at %d", neighbor_file_name_allocated);
+			laserror("alloc for neighbor_file_names pointer array failed at %d", neighbor_file_name_allocated);
 		}
 	}
 	neighbor_file_names[neighbor_file_name_number] = LASCopyString(neighbor_file_name);

@@ -97,14 +97,14 @@ BOOL LASreaderBuffered::set_file_name(const char* file_name)
   // do we have a file name
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is NULL");
+    laserror("file name pointer is NULL");
     return FALSE;
   }
   // does the file exist
   FILE* file = fopen(file_name, "r");
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "file '%s' cannot be opened", file_name);
+    laserror("file '%s' cannot be opened", file_name);
     return FALSE;
   }
   fclose(file);
@@ -118,14 +118,14 @@ BOOL LASreaderBuffered::add_neighbor_file_name(const char* file_name)
   // do we have a file name
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is NULL");
+    laserror("file name pointer is NULL");
     return FALSE;
   }
   // does the file exist
   FILE* file = fopen(file_name, "r");
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "file '%s' cannot be opened", file_name);
+    laserror("file '%s' cannot be opened", file_name);
     return FALSE;
   }
   fclose(file);
@@ -143,7 +143,7 @@ BOOL LASreaderBuffered::open()
 {
   if (!lasreadopener.active())
   {
-    LASMessage(LAS_ERROR, "no input name");
+    laserror("no input name");
     return FALSE;
   }
 
@@ -152,7 +152,7 @@ BOOL LASreaderBuffered::open()
   lasreader = lasreadopener.open();
   if (lasreader == 0)
   {
-    LASMessage(LAS_ERROR, "opening '%s'", lasreadopener.get_file_name());
+    laserror("opening '%s'", lasreadopener.get_file_name());
     return FALSE;
   }
 
@@ -205,7 +205,7 @@ BOOL LASreaderBuffered::open()
     LASreader* lasreader_neighbor = lasreadopener_neighbors.open();
     if (lasreader_neighbor == 0)
     {
-      LASMessage(LAS_ERROR, "opening neighbor '%s'", lasreadopener_neighbors.get_file_name());
+      laserror("opening neighbor '%s'", lasreadopener_neighbors.get_file_name());
       return FALSE;
     }
 

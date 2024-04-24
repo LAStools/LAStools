@@ -74,7 +74,7 @@ BOOL LASignore::parse(int& i, int argc, char *argv[])
   {
     if ((i+1) >= argc)
     {
-      LASMessage(LAS_ERROR, "'%s' needs 1 at least argument: classification", argv[i]);
+      laserror("'%s' needs 1 at least argument: classification", argv[i]);
       return FALSE;
     }
     int i_in = i;
@@ -85,12 +85,12 @@ BOOL LASignore::parse(int& i, int argc, char *argv[])
       U32 classification;
       if (sscanf(argv[i], "%u", &classification) != 1)
       {
-        LASMessage(LAS_ERROR, "'%s' needs arguments between 0 and 255 but '%s' is no valid code", argv[i_in], argv[i]);
+        laserror("'%s' needs arguments between 0 and 255 but '%s' is no valid code", argv[i_in], argv[i]);
         return FALSE;
       }
       if (classification > 255)
       {
-        LASMessage(LAS_ERROR, "'%s' needs arguments between 0 and 255 but '%u' is out of range", argv[i_in], classification);
+        laserror("'%s' needs arguments between 0 and 255 but '%u' is out of range", argv[i_in], classification);
         return FALSE;
       }
       ignore_mask |= (1u << (classification >> 5));
@@ -104,23 +104,23 @@ BOOL LASignore::parse(int& i, int argc, char *argv[])
   {
     if ((i+1) >= argc)
     {
-      LASMessage(LAS_ERROR, "'%s' needs 1 argument: mask", argv[i]);
+      laserror("'%s' needs 1 argument: mask", argv[i]);
       return FALSE;
     }
     U32 classification_mask;
     if (sscanf(argv[i+1], "%u", &classification_mask) != 1)
     {
-      LASMessage(LAS_ERROR, "'%s' needs argument between 0x00000000 and 0xFFFFFFFF but '%s' is no valid mask", argv[i], argv[i+1]);
+      laserror("'%s' needs argument between 0x00000000 and 0xFFFFFFFF but '%s' is no valid mask", argv[i], argv[i+1]);
       return FALSE;
     }
     if (classification_mask == 0x00000000)
     {
-      LASMessage(LAS_ERROR, "'%s' needs argument between 0x00000000 and 0xFFFFFFFF but %u makes no sense", argv[i], classification_mask);
+      laserror("'%s' needs argument between 0x00000000 and 0xFFFFFFFF but %u makes no sense", argv[i], classification_mask);
       return FALSE;
     }
     if (classification_mask == 0xFFFFFFFF)
     {
-      LASMessage(LAS_ERROR, "'%s' needs argument between 0x00000000 and 0xFFFFFFFF but %u makes no sense", argv[i], classification_mask);
+      laserror("'%s' needs argument between 0x00000000 and 0xFFFFFFFF but %u makes no sense", argv[i], classification_mask);
       return FALSE;
     }
     ignore_mask |= 1;
@@ -181,7 +181,7 @@ BOOL LASignore::parse(int& i, int argc, char *argv[])
   }
   else
   {
-    LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
+    laserror("cannot understand argument '%s'", argv[i]);
     return FALSE;
   }
   return TRUE;

@@ -590,33 +590,33 @@ BOOL LASquadtree::read(ByteStreamIn* stream)
   char signature[4];
   try { stream->getBytes((U8*)signature, 4); } catch(...)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): reading LASspatial signature");
+    laserror("(LASquadtree): reading LASspatial signature");
     return FALSE;
   }
   if (strncmp(signature, "LASS", 4) != 0)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): wrong LASspatial signature %4s instead of 'LASS'", signature);
+    laserror("(LASquadtree): wrong LASspatial signature %4s instead of 'LASS'", signature);
     return FALSE;
   }
   U32 type;
   try { stream->getBytes((U8*)&type, 4); } catch(...)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): reading LASspatial type");
+    laserror("(LASquadtree): reading LASspatial type");
     return 0;
   }
   if (type != LAS_SPATIAL_QUAD_TREE)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): unknown LASspatial type %u", type);
+    laserror("(LASquadtree): unknown LASspatial type %u", type);
     return 0;
   }
   try { stream->getBytes((U8*)signature, 4); } catch(...)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): reading signature");
+    laserror("(LASquadtree): reading signature");
     return FALSE;
   }
   if (strncmp(signature, "LASQ", 4) != 0)
   {
-//    LASMessage(LAS_ERROR, "(LASquadtree): wrong signature %4s instead of 'LASV'", signature);
+//    laserror("(LASquadtree): wrong signature %4s instead of 'LASV'", signature);
 //    return FALSE;
     levels = ((U32*)signature)[0];
   }
@@ -625,45 +625,45 @@ BOOL LASquadtree::read(ByteStreamIn* stream)
     U32 version;
     try { stream->get32bitsLE((U8*)&version); } catch(...)
     {
-      LASMessage(LAS_ERROR, "(LASquadtree): reading version");
+      laserror("(LASquadtree): reading version");
       return FALSE;
     }
     try { stream->get32bitsLE((U8*)&levels); } catch(...)
     {
-      LASMessage(LAS_ERROR, "(LASquadtree): reading levels");
+      laserror("(LASquadtree): reading levels");
       return FALSE;
     }
   }
   U32 level_index;
   try { stream->get32bitsLE((U8*)&level_index); } catch(...)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): reading level_index");
+    laserror("(LASquadtree): reading level_index");
     return FALSE;
   }
   U32 implicit_levels;
   try { stream->get32bitsLE((U8*)&implicit_levels); } catch(...)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): reading implicit_levels");
+    laserror("(LASquadtree): reading implicit_levels");
     return FALSE;
   }
   try { stream->get32bitsLE((U8*)&min_x); } catch(...)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): reading min_x");
+    laserror("(LASquadtree): reading min_x");
     return FALSE;
   }
   try { stream->get32bitsLE((U8*)&max_x); } catch(...)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): reading max_x");
+    laserror("(LASquadtree): reading max_x");
     return FALSE;
   }
   try { stream->get32bitsLE((U8*)&min_y); } catch(...)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): reading min_y");
+    laserror("(LASquadtree): reading min_y");
     return FALSE;
   }
   try { stream->get32bitsLE((U8*)&max_y); } catch(...)
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): reading max_y");
+    laserror("(LASquadtree): reading max_y");
     return FALSE;
   }
   return TRUE;
@@ -683,65 +683,65 @@ BOOL LASquadtree::write(ByteStreamOut* stream) const
 
   if (!stream->putBytes((const U8*)"LASS", 4))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing LASspatial signature");
+    laserror("(LASquadtree): writing LASspatial signature");
     return FALSE;
   }
 
   U32 type = LAS_SPATIAL_QUAD_TREE;
   if (!stream->put32bitsLE((U8*)&type))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing LASspatial type %u", type);
+    laserror("(LASquadtree): writing LASspatial type %u", type);
     return FALSE;
   }
 
   if (!stream->putBytes((const U8*)"LASQ", 4))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing signature");
+    laserror("(LASquadtree): writing signature");
     return FALSE;
   }
 
   U32 version = 0;
   if (!stream->put32bitsLE((const U8*)&version))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing version");
+    laserror("(LASquadtree): writing version");
     return FALSE;
   }
 
   if (!stream->put32bitsLE((const U8*)&levels))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing levels %u", levels);
+    laserror("(LASquadtree): writing levels %u", levels);
     return FALSE;
   }
   U32 level_index = 0;
   if (!stream->put32bitsLE((const U8*)&level_index))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing level_index %u", level_index);
+    laserror("(LASquadtree): writing level_index %u", level_index);
     return FALSE;
   }
   U32 implicit_levels = 0;
   if (!stream->put32bitsLE((const U8*)&implicit_levels))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing implicit_levels %u", implicit_levels);
+    laserror("(LASquadtree): writing implicit_levels %u", implicit_levels);
     return FALSE;
   }
   if (!stream->put32bitsLE((const U8*)&min_x))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing min_x %g", min_x);
+    laserror("(LASquadtree): writing min_x %g", min_x);
     return FALSE;
   }
   if (!stream->put32bitsLE((const U8*)&max_x))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing max_x %g", max_x);
+    laserror("(LASquadtree): writing max_x %g", max_x);
     return FALSE;
   }
   if (!stream->put32bitsLE((const U8*)&min_y))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing min_y %g", min_y);
+    laserror("(LASquadtree): writing min_y %g", min_y);
     return FALSE;
   }
   if (!stream->put32bitsLE((const U8*)&max_y))
   {
-    LASMessage(LAS_ERROR, "(LASquadtree): writing max_y %g", max_y);
+    laserror("(LASquadtree): writing max_y %g", max_y);
     return FALSE;
   }
   return TRUE;
@@ -1533,7 +1533,7 @@ BOOL LASquadtree::setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, 
 
   if (cells_x == 0 || cells_y == 0)
   {
-    LASMessage(LAS_ERROR, "cells_x %d cells_y %d", cells_x, cells_y);
+    laserror("cells_x %d cells_y %d", cells_x, cells_y);
     return FALSE;
   }
 
@@ -1584,7 +1584,7 @@ BOOL LASquadtree::setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, 
 
   if (cells_x == 0 || cells_y == 0)
   {
-    LASMessage(LAS_ERROR, "cells_x %d cells_y %d", cells_x, cells_y);
+    laserror("cells_x %d cells_y %d", cells_x, cells_y);
     return FALSE;
   }
 

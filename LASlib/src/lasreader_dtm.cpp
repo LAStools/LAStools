@@ -292,7 +292,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
@@ -305,7 +305,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
   file = fopen(file_name, "rb");
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
+    laserror("cannot open file '%s'", file_name);
     return FALSE;
   }
 
@@ -319,7 +319,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
   CHAR signature[21];
   if (fread(signature, 1, 21, file) != 21)
   {
-    LASMessage(LAS_ERROR, "reading 21 byte signature for '%s'", file_name);
+    laserror("reading 21 byte signature for '%s'", file_name);
     return FALSE;
   }
 
@@ -327,7 +327,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
 
   if (strncmp(signature, "PLANS-PC BINARY .DTM", 21) != 0)
   {
-    LASMessage(LAS_ERROR, "cannot open DTM file '%s', wrong signature '%21s'", file_name, signature);
+    laserror("cannot open DTM file '%s', wrong signature '%21s'", file_name, signature);
     return FALSE;
   }
 
@@ -336,7 +336,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
   CHAR description[61];
   if (fread(description, 1, 61, file) != 61)
   {
-    LASMessage(LAS_ERROR, "reading 61 byte description for '%s'", file_name);
+    laserror("reading 61 byte description for '%s'", file_name);
     return FALSE;
   }
 
@@ -345,7 +345,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
   F32 version;
   if (fread(&version, 4, 1, file) != 1)
   {
-    LASMessage(LAS_ERROR, "reading 4 byte version for '%s'", file_name);
+    laserror("reading 4 byte version for '%s'", file_name);
     return FALSE;
   }
 
@@ -429,43 +429,43 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
 
   if (fread(&horizontal_units, 2, 1, file) != 1)
   {
-    LASMessage(LAS_ERROR, "reading 2 byte horizontal_units for '%s'", file_name);
+    laserror("reading 2 byte horizontal_units for '%s'", file_name);
     return FALSE;
   }
 
   if (fread(&vertical_units, 2, 1, file) != 1)
   {
-    LASMessage(LAS_ERROR, "reading 2 byte vertical_units for '%s'", file_name);
+    laserror("reading 2 byte vertical_units for '%s'", file_name);
     return FALSE;
   }
 
   if (fread(&data_type, 2, 1, file) != 1)
   {
-    LASMessage(LAS_ERROR, "reading 2 byte data_type for '%s'", file_name);
+    laserror("reading 2 byte data_type for '%s'", file_name);
     return FALSE;
   }
 
   if (fread(&coordinate_system, 2, 1, file) != 1)
   {
-    LASMessage(LAS_ERROR, "reading 2 byte horizontal_units for '%s'", file_name);
+    laserror("reading 2 byte horizontal_units for '%s'", file_name);
     return FALSE;
   }
 
   if (fread(&coordinate_zone, 2, 1, file) != 1)
   {
-    LASMessage(LAS_ERROR, "reading 2 byte coordinate_zone for '%s'", file_name);
+    laserror("reading 2 byte coordinate_zone for '%s'", file_name);
     return FALSE;
   }
 
   if (fread(&horizontal_datum, 2, 1, file) != 1)
   {
-    LASMessage(LAS_ERROR, "reading 2 byte horizontal_datum for '%s'", file_name);
+    laserror("reading 2 byte horizontal_datum for '%s'", file_name);
     return FALSE;
   }
 
   if (fread(&vertical_datum, 2, 1, file) != 1)
   {
-    LASMessage(LAS_ERROR, "reading 2 byte vertical_datum for '%s'", file_name);
+    laserror("reading 2 byte vertical_datum for '%s'", file_name);
     return FALSE;
   }
 
@@ -484,7 +484,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
       }
       else
       {
-        LASMessage(LAS_ERROR, "UTM zone %d for NAD27 out-of-range", (int)coordinate_zone);
+        laserror("UTM zone %d for NAD27 out-of-range", (int)coordinate_zone);
       }
     }
     else if (horizontal_datum == 2) // GEO_DATUM_NAD83
@@ -499,7 +499,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
       }
       else
       {
-        LASMessage(LAS_ERROR, "UTM zone %d for NAD83 out-of-range", (int)coordinate_zone);
+        laserror("UTM zone %d for NAD83 out-of-range", (int)coordinate_zone);
       }
     }
     else if (horizontal_datum == 3) // GEO_DATUM_WGS84
@@ -1137,7 +1137,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
   }
   else
   {
-    LASMessage(LAS_ERROR, "unknown data type %d", (I32)data_type);
+    laserror("unknown data type %d", (I32)data_type);
     return FALSE;
   }
 
@@ -1279,7 +1279,7 @@ BOOL LASreaderDTM::read_point_default()
     }
     else
     {
-      LASMessage(LAS_ERROR, "unknown data type %d", (I32)data_type);
+      laserror("unknown data type %d", (I32)data_type);
       return FALSE;
     }
 
@@ -1342,7 +1342,7 @@ BOOL LASreaderDTM::reopen(const CHAR* file_name)
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
@@ -1357,7 +1357,7 @@ BOOL LASreaderDTM::reopen(const CHAR* file_name)
   file = fopen(file_name, "rb");
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot reopen file '%s'", file_name);
+    laserror("cannot reopen file '%s'", file_name);
     return FALSE;
   }
 

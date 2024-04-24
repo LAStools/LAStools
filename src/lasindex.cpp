@@ -62,32 +62,22 @@
 #include "lasindex.hpp"
 #include "lasquadtree.hpp"
 #include "lasmessage.hpp"
+#include "lastool.hpp"
 
-void usage(bool error=false, bool wait=false)
+class LasTool_lasindex : public LasTool
 {
-  fprintf(stderr,"usage:\n");
-  fprintf(stderr,"lasindex lidar.las\n");
-  fprintf(stderr,"lasindex *.las\n");
-  fprintf(stderr,"lasindex flight1*.las flight2*.las -verbose\n");
-  fprintf(stderr,"lasindex lidar.las -tile_size 2 -maximum -50\n");
-  fprintf(stderr,"lasindex -h\n");
-  if (wait)
+private:
+public:
+  void usage() override
   {
-    fprintf(stderr,"<press ENTER>\n");
-    getc(stdin);
-  }
-  exit(error);
-}
-
-static void byebye(bool error=false, bool wait=false)
-{
-  if (wait)
-  {
-    fprintf(stderr,"<press ENTER>\n");
-    getc(stdin);
-  }
-  exit(error);
-}
+    fprintf(stderr, "usage:\n");
+    fprintf(stderr, "lasindex lidar.las\n");
+    fprintf(stderr, "lasindex *.las\n");
+    fprintf(stderr, "lasindex flight1*.las flight2*.las -verbose\n");
+    fprintf(stderr, "lasindex lidar.las -tile_size 2 -maximum -50\n");
+    fprintf(stderr, "lasindex -h\n");
+  };
+};
 
 static F64 taketime()
 {
@@ -104,14 +94,9 @@ extern int lasindex_multi_core(int argc, char *argv[], LASreadOpener* lasreadope
 
 int main(int argc, char *argv[])
 {
+  LasTool_lasindex lastool;
+  lastool.init(argc, argv, "lasindex");
   int i;
-#ifdef COMPILE_WITH_GUI
-  bool gui = false;
-#endif
-#ifdef COMPILE_WITH_MULTI_CORE
-  I32 cores = 1;
-  BOOL cpu64 = FALSE;
-#endif
   F32 tile_size = 0.0f;
   U32 threshold = 1000;
   U32 minimum_points = 100000;
@@ -130,6 +115,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
     return lasindex_gui(argc, argv, 0);
 #else
+    wait_on_exit = true;
     fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     char file_name[256];
     fprintf(stderr,"enter input file: "); fgets(file_name, 256, stdin);
@@ -143,80 +129,15 @@ int main(int argc, char *argv[])
     {
       if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
     }
-    if (!lasreadopener.parse(argc, argv)) byebye(true);
+    lasreadopener.parse(argc, argv);
   }
 
-  for (i = 1; i < argc; i++)
-  {
-    if (argv[i][0] == '\0')
-    {
-      continue;
-    }
-    else if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i],"-help") == 0)
-    {
-      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
-      usage();
-    }
-    else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"-verbose") == 0)
-    {
-      set_message_log_level(LAS_VERBOSE);
-    }
-    else if (strcmp(argv[i],"-vv") == 0 || strcmp(argv[i],"-very_verbose") == 0)
-    {
-      set_message_log_level(LAS_VERY_VERBOSE);
-    }
-    else if (strcmp(argv[i],"-quiet") == 0)
-    {
-      set_message_log_level(LAS_QUIET);
-    }
-    else if (strcmp(argv[i],"-version") == 0)
-    {
-      fprintf(stderr, "LAStools (by info@rapidlasso.de) version %d\n", LAS_TOOLS_VERSION);
-      byebye();
-    }
-    else if (strcmp(argv[i],"-fail") == 0)
-    {
-    }
-    else if (strcmp(argv[i],"-gui") == 0)
-    {
-#ifdef COMPILE_WITH_GUI
-      gui = true;
-#else
-      LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
-#endif
-    }
-    else if (strcmp(argv[i],"-cores") == 0)
-    {
-#ifdef COMPILE_WITH_MULTI_CORE
-      if ((i+1) >= argc)
-      {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
-        usage(true);
-      }
-      argv[i][0] = '\0';
-      i++;
-      cores = atoi(argv[i]);
-      argv[i][0] = '\0';
-#else
-      LASMessage(LAS_WARNING, "not compiled with multi-core batching. ignoring '-cores' ...");
-      i++;
-#endif
-    }
-    else if (strcmp(argv[i],"-cpu64") == 0)
-    {
-#ifdef COMPILE_WITH_MULTI_CORE
-      cpu64 = TRUE;
-#else
-      LASMessage(LAS_WARNING, "not compiled with 64 bit support. ignoring '-cpu64' ...");
-#endif
-      argv[i][0] = '\0';
-    }
-    else if (strcmp(argv[i],"-tile_size") == 0)
+  auto arg_local = [&](int& i) -> bool {
+    if (strcmp(argv[i],"-tile_size") == 0)
     {
       if ((i+1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: size", argv[i]);
-        byebye(true);
+        laserror("'%s' needs 1 argument: size", argv[i]);
       }
       i++;
       tile_size = (F32)atof(argv[i]);
@@ -225,8 +146,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
-        byebye(true);
+        laserror("'%s' needs 1 argument: number", argv[i]);
       }
       i++;
       maximum_intervals = atoi(argv[i]);
@@ -235,8 +155,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: number", argv[i]);
-        byebye(true);
+        laserror("'%s' needs 1 argument: number", argv[i]);
       }
       i++;
       minimum_points = atoi(argv[i]);
@@ -245,8 +164,7 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: value", argv[i]);
-        byebye(true);
+        laserror("'%s' needs 1 argument: value", argv[i]);
       }
       i++;
       threshold = atoi(argv[i]);
@@ -267,23 +185,23 @@ int main(int argc, char *argv[])
     {
       if ((i+1) >= argc)
       {
-        LASMessage(LAS_ERROR, "'%s' needs 1 argument: file output name", argv[i]);
-        byebye(true);
+        laserror("'%s' needs 1 argument: file output name", argv[i]);
       }
       output_file = argv[i+1];
       i++;
     }
     else
     {
-      LASMessage(LAS_ERROR, "cannot understand argument '%s'", argv[i]);
-      byebye(true);
+      return false;
     }
-  }
+    return true;
+  };
+
+  lastool.parse(arg_local);
 
   if (lasreadopener.is_merged())
   {
-    LASMessage(LAS_ERROR, "on-the-fly merged input files merged not supported by lasindex");
-    byebye(true);
+    laserror("on-the-fly merged input files merged not supported by lasindex");
   }
 
 #ifdef COMPILE_WITH_GUI
@@ -294,18 +212,18 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-  if (cores > 1)
+  if (lastool.cores > 1)
   {
     if (lasreadopener.get_file_name_number() < 2)
     {
-      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
+      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), lastool.cores);
     }
     else
     {
-      return lasindex_multi_core(argc, argv, &lasreadopener, cores, cpu64);
+      return lasindex_multi_core(argc, argv, &lasreadopener, lastool.cores, lastool.cpu64);
     }
   }
-  if (cpu64)
+  if (lastool.cpu64)
   {
     return lasindex_multi_core(argc, argv, &lasreadopener, 1, TRUE);
   }
@@ -315,8 +233,7 @@ int main(int argc, char *argv[])
 
   if (!lasreadopener.active())
   {
-    LASMessage(LAS_ERROR, "no input specified");
-    byebye(true, argc==1);
+    laserror("no input specified");
   }
 
   // only decompress the one layer we need (for new LAS 1.4 point types only)
@@ -404,8 +321,7 @@ int main(int argc, char *argv[])
     LASreader* lasreader = lasreadopener.open();
     if (lasreader == 0)
     {
-      LASMessage(LAS_ERROR, "could not open lasreader");
-      byebye(true, argc==1);
+      laserror("could not open lasreader");
     }
 
     if (file_meta)
@@ -518,6 +434,6 @@ int main(int argc, char *argv[])
       LASMessage(LAS_INFO, "done with %u files. total time %g sec.", lasreadopener.get_file_name_number(), taketime()-total_start_time);
     }
   }
-  byebye(false, argc==1);
+  byebye();
   return 0;
 }

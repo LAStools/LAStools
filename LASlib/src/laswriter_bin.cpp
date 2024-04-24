@@ -90,7 +90,7 @@ BOOL LASwriterBIN::open(const char* file_name, const LASheader* header, const ch
 {
   if (file_name == 0)
   {
-    LASMessage(LAS_ERROR, "file name pointer is zero");
+    laserror("file name pointer is zero");
     return FALSE;
   }
 
@@ -98,7 +98,7 @@ BOOL LASwriterBIN::open(const char* file_name, const LASheader* header, const ch
 
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "cannot open file '%s'", file_name);
+    laserror("cannot open file '%s'", file_name);
     return FALSE;
   }
 
@@ -120,7 +120,7 @@ BOOL LASwriterBIN::open(FILE* file, const LASheader* header, const char* version
 {
   if (file == 0)
   {
-    LASMessage(LAS_ERROR, "file pointer is zero");
+    laserror("file pointer is zero");
     return FALSE;
   }
 
@@ -129,7 +129,7 @@ BOOL LASwriterBIN::open(FILE* file, const LASheader* header, const char* version
   {
     if(_setmode( _fileno( stdout ), _O_BINARY ) == -1 )
     {
-      LASMessage(LAS_ERROR, "cannot set stdout to binary (untranslated) mode");
+      laserror("cannot set stdout to binary (untranslated) mode");
     }
   }
 #endif
@@ -147,14 +147,14 @@ BOOL LASwriterBIN::open(ByteStreamOut* stream, const LASheader* header, const ch
 {
   if (stream == 0)
   {
-    LASMessage(LAS_ERROR, "ByteStreamOut pointer is zero");
+    laserror("ByteStreamOut pointer is zero");
     return FALSE;
   }
   this->stream = stream;
 
   if (header == 0)
   {
-    LASMessage(LAS_ERROR, "LASheader pointer is zero");
+    laserror("LASheader pointer is zero");
     return FALSE;
   }
 
@@ -258,7 +258,7 @@ I64 LASwriterBIN::close(BOOL update_npoints)
     {
       if (!stream->isSeekable())
       {
-        LASMessage(LAS_ERROR, "stream not seekable. cannot update header from %lld to %lld points.", npoints, p_count);
+        laserror("stream not seekable. cannot update header from %lld to %lld points.", npoints, p_count);
       }
       else
       {

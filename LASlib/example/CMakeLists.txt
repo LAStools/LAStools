@@ -2,7 +2,7 @@ if (!MSVC)
 	add_compile_options(-Wno-unused-result)
 endif()
 
-include_directories(../../LASzip/src ../inc)
+include_directories(../../LASzip/src ../../LASzip/include/laszip ../inc)
 
 set(TARGETS
 	lasexample

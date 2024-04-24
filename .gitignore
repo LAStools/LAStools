@@ -43,3 +43,17 @@ src/laszip
 src/txt2las
 src/lascopcindex
 /x64
+bin64
+LASlib/src/CMakeFiles
+LASzip/CMakeFiles
+LASzip/dll/CMakeFiles
+LASzip/src/CMakeFiles
+src/CMakeFiles
+*.dll
+LASzip/CMakeCache.txt
+src/Makefile
+Makefile
+CMakeFiles
+CMakeCache.txt
+*.log
+*.user

@@ -45,6 +45,15 @@
 #endif
 #endif // _WIN32
 
+#include <stdlib.h>
+#include <cstdio>
+#include <exception>
+#include <stdexcept>
+#include "laszip_common.h"
+#include "lasmessage.hpp"
+
+extern void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*), ...);
+
 typedef char               CHAR;
 
 typedef int                I32;
@@ -260,6 +269,60 @@ inline void ENDIAN_SWAP_64(const U8* from, U8* to)
 #include <windows.h>
 wchar_t* UTF8toUTF16(const char* utf8);
 #endif
+
+/// <summary>
+/// exception within a file loop to proceed next file
+/// </summary>
+class exception_file_loop : public std::runtime_error
+{
+public:
+  explicit exception_file_loop(char const* const _Message) noexcept : std::runtime_error(_Message) {};
+};
+
+/// <summary>
+/// file loop exception on too less points to proceed
+/// </summary>
+class pnt_cnt_error : public exception_file_loop
+{
+public:
+  explicit pnt_cnt_error() noexcept : exception_file_loop("too less points") {};
+};
+
+extern bool wait_on_exit;
+extern bool halt_on_error;
+extern bool print_log_stats;
+
+enum LAS_EXIT_CODE { LAS_EXIT_OK = 0, LAS_EXIT_ERROR, LAS_EXIT_WARNING };
+
+LAS_EXIT_CODE las_exit_code(bool error);
+
+// void byebye(LAS_EXIT_CODE code = LAS_EXIT_OK);
+void byebye();
+
+// las error message function which leads to an immediate program stop by default
+template<typename... Args>
+void laserror(LAS_FORMAT_STRING(const char*) fmt, Args... args)
+{
+  LASMessage(LAS_ERROR, fmt, args...);
+  if (halt_on_error)
+  {
+    byebye();
+  }
+  return;
+};
+
+// extended message with additional user info in console mode
+template<typename... Args>
+void laserrorm(LAS_FORMAT_STRING(const char*) fmt, Args... args)
+{
+  LASMessage(LAS_ERROR, fmt, args...);
+  LASMessage(LAS_INFO, "\tcontact info@rapidlasso.de for support\n");
+  if (halt_on_error)
+  {
+    byebye();
+  }
+  return;
+};
 
 // 32bit/64bit detection
 #ifdef _WIN64
