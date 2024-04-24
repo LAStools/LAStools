@@ -55,5 +55,3 @@ src/Makefile
 Makefile
 CMakeFiles
 CMakeCache.txt
-*.log
-*.user
