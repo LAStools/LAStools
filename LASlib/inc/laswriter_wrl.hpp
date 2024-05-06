@@ -35,7 +35,7 @@
 
 #include <stdio.h>
 
-class LASwriterWRL : public LASwriter
+class LASLIB_DLL LASwriterWRL : public LASwriter
 {
 public:
 
