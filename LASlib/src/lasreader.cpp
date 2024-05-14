@@ -2975,7 +2975,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
 			wcsncpy(utf16_full_file_name, utf16_file_name, len);
 			do
 			{
-				wcsncat(utf16_full_file_name, info.cFileName, len);
+				swprintf(&utf16_full_file_name[len], 511 - len, L"%s", info.cFileName);
 				char* full_file_name = UTF16toUTF8(utf16_full_file_name);
 				if (full_file_name == 0)
 					continue;
@@ -3017,7 +3017,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
 			strncpy(full_file_name, file_name, len);
 			do
 			{
-				strncat(full_file_name, info.cFileName, len);
+				sprintf(&full_file_name[len], "%s", info.cFileName);
 				if (add_file_name_single(full_file_name, unique)) r = TRUE;
 			} while (FindNextFileA(h, &info));
 		}
@@ -3479,7 +3479,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
 			wcsncpy(utf16_full_neighbor_file_name, utf16_neighbor_file_name, len);
 			do
 			{
-				wcsncat(utf16_full_neighbor_file_name, info.cFileName, len);
+				swprintf(&utf16_full_neighbor_file_name[len], 511 - len, L"%s", info.cFileName);
 				char* full_neighbor_file_name = UTF16toUTF8(utf16_full_neighbor_file_name);
 				if (full_neighbor_file_name == 0)
 					continue;
@@ -3521,7 +3521,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
 			strncpy(full_neighbor_file_name, neighbor_file_name, len);
 			do
 			{
-				strncat(full_neighbor_file_name, info.cFileName, len);
+				sprintf(&full_neighbor_file_name[len], "%s", info.cFileName);
 				if (add_neighbor_file_name_single(full_neighbor_file_name, unique)) r = TRUE;
 			} while (FindNextFileA(h, &info));
 		}
