@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  laswriter_las.hpp
-  
+
   CONTENTS:
-  
+
     Writes LiDAR points to the LAS format (Version 1.x).
 
   PROGRAMMERS:
@@ -21,7 +21,7 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
     04 August 2023 -- set default of VLR header "reserved" to 0 instead of 0xAABB
     29 March 2017 -- read and write support "native LAS 1.4 extension" for LASzip
@@ -33,9 +33,9 @@
     23 April 2011 -- added additional open parameters to support chunking
     21 January 2011 -- adapted from laswriter to create abstract reader class
     3 December 2010 -- updated to (somewhat) support LAS format 1.3
-    7 September 2008 -- updated to support LAS format 1.2 
+    7 September 2008 -- updated to support LAS format 1.2
     21 February 2007 -- created after eating Sarah's veggies with peanutsauce
-  
+
 ===============================================================================
 */
 #ifndef LAS_WRITER_LAS_HPP
@@ -55,7 +55,7 @@
 class ByteStreamOut;
 class LASwritePoint;
 
-class LASwriterLAS : public LASwriter
+class LASLIB_DLL LASwriterLAS : public LASwriter
 {
 public:
 
