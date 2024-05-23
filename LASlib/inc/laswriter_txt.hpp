@@ -36,7 +36,7 @@
 
 #include <stdio.h>
 
-class LASwriterTXT : public LASwriter
+class LASLIB_DLL LASwriterTXT : public LASwriter
 {
 public:
 
