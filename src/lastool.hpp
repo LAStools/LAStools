@@ -264,4 +264,4 @@ public:
   };
 };
 
-#endif LASTOOL_HPP
+#endif
