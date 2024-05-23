@@ -65,8 +65,6 @@ void LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*) fmt, ...)
 
 	lasmessage_cnt[type]++;
 
-	lasmessage_cnt[type]++;
-
 	if (type < las_message_level)
 		return;
 
