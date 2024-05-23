@@ -30,6 +30,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\lasmessage.cpp" />
     <ClCompile Include="src\mydefs.cpp" />
     <ClCompile Include="src\arithmeticdecoder.cpp" />
     <ClCompile Include="src\arithmeticencoder.cpp" />
@@ -53,6 +54,7 @@
   <ItemGroup>
     <ClInclude Include="include\laszip\laszip_common.h" />
     <ClInclude Include="include\laszip\laszip_api_version.h" />
+    <ClInclude Include="src\lasmessage.hpp" />
     <ClInclude Include="src\mydefs.hpp" />
     <ClInclude Include="src\arithmeticdecoder.hpp" />
     <ClInclude Include="src\arithmeticencoder.hpp" />

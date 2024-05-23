@@ -7,10 +7,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\LASzip\src\lasmessage.cpp" />
     <ClCompile Include="geoprojectionconverter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="geoprojectionconverter.hpp" />
+    <ClInclude Include="..\LASzip\src\lasmessage.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -43,7 +44,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>..\LASzip\include\laszip;..\LASzip\src;..\LASlib\inc;..\LASlib\src;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\LASzip\src;..\LASzip\include\laszip;..\LASlib\inc;..\LASlib\src;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>

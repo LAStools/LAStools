@@ -61,7 +61,7 @@ std::string las_message_type_string(LAS_MESSAGE_TYPE in)
 
 void LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*) fmt, ...)
 {
-	assert(type <= LAS_FATAL_ERROR);		//message type must be less than or equal to LAS_FATAL_ERROR (LAS_QUIET must not be used in LASMessage calls)
+	assert(type <= LAS_FATAL_ERROR); // message type must be less than or equal to LAS_FATAL_ERROR (LAS_QUIET must not be used in LASMessage calls)
 
 	lasmessage_cnt[type]++;
 
@@ -166,6 +166,8 @@ void las_default_message_handler(LAS_MESSAGE_TYPE type, const char* msg, void* u
 		break;
 	case LAS_FATAL_ERROR:
 		prefix = "FATAL ERROR: ";
+		break;
+	case LAS_QUIET:
 		break;
 	}
 

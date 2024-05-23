@@ -40,6 +40,9 @@
 extern long lasmessage_cnt[LAS_QUIET];
 
 // central las message function
+#if defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+#endif
 void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*), ...);
 
 // special debug message function that will be removed in release mode

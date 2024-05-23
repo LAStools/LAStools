@@ -2,7 +2,7 @@
 ===============================================================================
 
   FILE:  laszip_dll.cpp
-
+  
   CONTENTS:
 
     see corresponding header file
@@ -689,7 +689,7 @@ laszip_set_header(
     {
       if (header->user_data_in_header == 0)
       {
-        sprintf(laszip_dll->error, "header->user_data_in_header_size is %d but header->user_data_in_header is NULL", header->user_data_in_header_size);
+        sprintf(laszip_dll->error, "header->user_data_in_header_size is %lu but header->user_data_in_header is NULL", header->user_data_in_header_size);
         return 1;
       }
       laszip_dll->header.user_data_in_header = new U8[header->user_data_in_header_size];
@@ -722,7 +722,7 @@ laszip_set_header(
         {
           if (header->vlrs[i].data == 0)
           {
-            sprintf(laszip_dll->error, "header->vlrs[%d].record_length_after_header is %d but header->vlrs[%d].data is NULL", i, header->vlrs[i].record_length_after_header, i);
+            sprintf(laszip_dll->error, "header->vlrs[%d].record_length_after_header is %d but header->vlrs[%u].data is NULL", i, header->vlrs[i].record_length_after_header, i);
             return 1;
           }
           laszip_dll->header.vlrs[i].data = new U8[header->vlrs[i].record_length_after_header];
@@ -761,7 +761,7 @@ laszip_set_header(
     {
       if (header->user_data_after_header == 0)
       {
-        sprintf(laszip_dll->error, "header->user_data_after_header_size is %d but header->user_data_after_header is NULL", header->user_data_after_header_size);
+        sprintf(laszip_dll->error, "header->user_data_after_header_size is %lu but header->user_data_after_header is NULL", header->user_data_after_header_size);
         return 1;
       }
       laszip_dll->header.user_data_after_header = new U8[header->user_data_after_header_size];
@@ -1035,7 +1035,7 @@ laszip_set_point(
         }
         else
         {
-          sprintf(laszip_dll->error, "target point has %d extra bytes but source point has %d", laszip_dll->point.num_extra_bytes, point->num_extra_bytes);
+          sprintf(laszip_dll->error, "target point has %ld extra bytes but source point has %ld", laszip_dll->point.num_extra_bytes, point->num_extra_bytes);
           return 1;
         }
       }
@@ -1198,7 +1198,7 @@ laszip_set_geokeys(
     laszip_geokey_struct* key_entries_plus_one = new laszip_geokey_struct[number+1];
     if (key_entries_plus_one == 0)
     {
-      sprintf(laszip_dll->error, "allocating laszip_geokey_struct[%u] array", number+1);
+      sprintf(laszip_dll->error, "allocating laszip_geokey_struct[%lu] array", number+1);
       return 1;
     }
     key_entries_plus_one[0].key_id = 1;            // aka key_directory_version
@@ -1211,7 +1211,7 @@ laszip_set_geokeys(
 
     if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34735, (laszip_U16)(8 + number*8), 0, (laszip_U8*)key_entries_plus_one))
     {
-      sprintf(laszip_dll->error, "setting %u geodouble_params", number);
+      sprintf(laszip_dll->error, "setting %lu geodouble_params", number);
       delete [] key_entries_plus_one;
       return 1;
     }
@@ -1268,7 +1268,7 @@ laszip_set_geodouble_params(
 
     if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34736, (laszip_U16)(number*8), 0, (const laszip_U8*)geodouble_params))
     {
-      sprintf(laszip_dll->error, "setting %u geodouble_params", number);
+      sprintf(laszip_dll->error, "setting %lu geodouble_params", number);
       return 1;
     }
   }
@@ -1323,7 +1323,7 @@ laszip_set_geoascii_params(
 
     if (laszip_add_vlr(laszip_dll, "LASF_Projection", 34737, (laszip_U16)(number), 0, (const laszip_U8*)geoascii_params))
     {
-      sprintf(laszip_dll->error, "setting %u geoascii_params", number);
+      sprintf(laszip_dll->error, "setting %lu geoascii_params", number);
       return 1;
     }
   }
@@ -1355,7 +1355,7 @@ laszip_add_attribute(
   {
     if (type > LAS_ATTRIBUTE_F64)
     {
-      sprintf(laszip_dll->error, "laszip_U32 'type' is %u but needs to be between %d and %d", type, LAS_ATTRIBUTE_U8, LAS_ATTRIBUTE_F64);
+      sprintf(laszip_dll->error, "laszip_U32 'type' is %lu but needs to be between %d and %d", type, LAS_ATTRIBUTE_U8, LAS_ATTRIBUTE_F64);
       return 1;
     }
 
@@ -1483,7 +1483,7 @@ laszip_add_vlr(
         laszip_dll->header.vlrs = (laszip_vlr_struct*)realloc(laszip_dll->header.vlrs, sizeof(laszip_vlr_struct)*laszip_dll->header.number_of_variable_length_records);
         if (laszip_dll->header.vlrs == 0)
         {
-          sprintf(laszip_dll->error, "reallocating vlrs[%u] array", laszip_dll->header.number_of_variable_length_records);
+          sprintf(laszip_dll->error, "reallocating vlrs[%lu] array", laszip_dll->header.number_of_variable_length_records);
           return 1;
         }
       }
@@ -1590,7 +1590,7 @@ laszip_remove_vlr(
             laszip_dll->header.vlrs = (laszip_vlr_struct*)realloc(laszip_dll->header.vlrs, sizeof(laszip_vlr_struct)*laszip_dll->header.number_of_variable_length_records);
             if (laszip_dll->header.vlrs == 0)
             {
-              sprintf(laszip_dll->error, "reallocating vlrs[%u] array", laszip_dll->header.number_of_variable_length_records);
+              sprintf(laszip_dll->error, "reallocating vlrs[%lu] array", laszip_dll->header.number_of_variable_length_records);
               return 1;
             }
           }
@@ -1605,7 +1605,7 @@ laszip_remove_vlr(
       }
       if (i != U32_MAX)
       {
-        sprintf(laszip_dll->error, "cannot find VLR with user_id '%s' and record_id %d among the %u VLRs in the header", user_id, (I32)record_id, laszip_dll->header.number_of_variable_length_records);
+        sprintf(laszip_dll->error, "cannot find VLR with user_id '%s' and record_id %d among the %lu VLRs in the header", user_id, (I32)record_id, laszip_dll->header.number_of_variable_length_records);
         return 1;
       }
     }
@@ -1857,7 +1857,7 @@ laszip_prepare_header_for_write(
     {
       if (laszip_dll->header.number_of_point_records != 0)
       {
-        sprintf(laszip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %llu", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
+        sprintf(laszip_dll->error, "inconsistent number_of_point_records %lu and extended_number_of_point_records %llu", laszip_dll->header.number_of_point_records, laszip_dll->header.extended_number_of_point_records);
         return 1;
       }
       else if (laszip_dll->header.extended_number_of_point_records <= U32_MAX)
@@ -1871,7 +1871,7 @@ laszip_prepare_header_for_write(
       {
         if (laszip_dll->header.number_of_points_by_return[i] != 0)
         {
-          sprintf(laszip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %llu", i, laszip_dll->header.number_of_points_by_return[i], i, laszip_dll->header.extended_number_of_points_by_return[i]);
+          sprintf(laszip_dll->error, "inconsistent number_of_points_by_return[%u] %lu and extended_number_of_points_by_return[%u] %llu", i, laszip_dll->header.number_of_points_by_return[i], i, laszip_dll->header.extended_number_of_points_by_return[i]);
           return 1;
         }
         else if (laszip_dll->header.extended_number_of_points_by_return[i] <= U32_MAX)
@@ -2186,7 +2186,7 @@ laszip_prepare_vlrs_for_write(
   {
     if (laszip_dll->header.vlrs == 0)
     {
-      sprintf(laszip_dll->error, "number_of_variable_length_records is %u but vlrs pointer is zero", laszip_dll->header.number_of_variable_length_records);
+      sprintf(laszip_dll->error, "number_of_variable_length_records is %lu but vlrs pointer is zero", laszip_dll->header.number_of_variable_length_records);
       return 1;
     }
 
@@ -2207,7 +2207,7 @@ laszip_prepare_vlrs_for_write(
 
   if ((vlrs_size + laszip_dll->header.header_size + laszip_dll->header.user_data_after_header_size) != laszip_dll->header.offset_to_point_data)
   {
-    sprintf(laszip_dll->error,"header_size (%u) plus vlrs_size (%u) plus user_data_after_header_size (%u) does not equal offset_to_point_data (%u)", (U32)laszip_dll->header.header_size, vlrs_size, laszip_dll->header.user_data_after_header_size, laszip_dll->header.offset_to_point_data);
+    sprintf(laszip_dll->error,"header_size (%u) plus vlrs_size (%u) plus user_data_after_header_size (%lu) does not equal offset_to_point_data (%lu)", (U32)laszip_dll->header.header_size, vlrs_size, laszip_dll->header.user_data_after_header_size, laszip_dll->header.offset_to_point_data);
     return 1;
   }
 
@@ -2635,7 +2635,7 @@ laszip_write_header(
   {
     try { laszip_dll->streamout->putBytes((const U8*)laszip_dll->header.user_data_in_header, laszip_dll->header.user_data_in_header_size); } catch(...)
     {
-      sprintf(laszip_dll->error, "writing %d bytes of data into header.user_data_in_header", laszip_dll->header.user_data_in_header_size);
+      sprintf(laszip_dll->error, "writing %lu bytes of data into header.user_data_in_header", laszip_dll->header.user_data_in_header_size);
       return 1;
     }
   }
@@ -2713,7 +2713,7 @@ laszip_write_header(
   {
     try { laszip_dll->streamout->putBytes((const U8*)laszip_dll->header.user_data_after_header, laszip_dll->header.user_data_after_header_size); } catch(...)
     {
-      sprintf(laszip_dll->error, "writing %u bytes of data into header.user_data_after_header", laszip_dll->header.user_data_after_header_size);
+      sprintf(laszip_dll->error, "writing %lu bytes of data into header.user_data_after_header", laszip_dll->header.user_data_after_header_size);
       return 1;
     }
   }
@@ -3670,7 +3670,7 @@ laszip_read_header(
 
     try { laszip_dll->streamin->getBytes((U8*)laszip_dll->header.user_data_in_header, laszip_dll->header.user_data_in_header_size); } catch(...)
     {
-      sprintf(laszip_dll->error, "reading %u bytes of data into header.user_data_in_header", laszip_dll->header.user_data_in_header_size);
+      sprintf(laszip_dll->error, "reading %lu bytes of data into header.user_data_in_header", laszip_dll->header.user_data_in_header_size);
       return 1;
     }
   }
@@ -3688,7 +3688,7 @@ laszip_read_header(
 
     if (laszip_dll->header.vlrs == 0)
     {
-      sprintf(laszip_dll->error, "allocating %u VLRs", laszip_dll->header.number_of_variable_length_records);
+      sprintf(laszip_dll->error, "allocating %lu VLRs", laszip_dll->header.number_of_variable_length_records);
       return 1;
     }
 
@@ -3698,7 +3698,7 @@ laszip_read_header(
 
       if (((int)laszip_dll->header.offset_to_point_data - vlrs_size - laszip_dll->header.header_size) < 54)
       {
-        sprintf(laszip_dll->warning, "only %d bytes until point block after reading %d of %d vlrs. skipping remaining vlrs ...", (int)laszip_dll->header.offset_to_point_data - vlrs_size - laszip_dll->header.header_size, i, laszip_dll->header.number_of_variable_length_records);
+        sprintf(laszip_dll->warning, "only %d bytes until point block after reading %d of %ld vlrs. skipping remaining vlrs ...", (int)laszip_dll->header.offset_to_point_data - vlrs_size - laszip_dll->header.header_size, i, laszip_dll->header.number_of_variable_length_records);
         laszip_dll->header.number_of_variable_length_records = i;
         break;
       }
@@ -3916,7 +3916,7 @@ laszip_read_header(
 
     try { laszip_dll->streamin->getBytes((U8*)laszip_dll->header.user_data_after_header, laszip_dll->header.user_data_after_header_size); } catch(...)
     {
-      sprintf(laszip_dll->error, "reading %u bytes of data into header.user_data_after_header", laszip_dll->header.user_data_after_header_size);
+      sprintf(laszip_dll->error, "reading %lu bytes of data into header.user_data_after_header", laszip_dll->header.user_data_after_header_size);
       return 1;
     }
   }
