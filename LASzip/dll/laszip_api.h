@@ -80,9 +80,12 @@ extern "C"
 /*---------------------------------------------------------------------------*/
 /*--------------- DLL variables to pass data to/from LASzip -----------------*/
 /*---------------------------------------------------------------------------*/
-
-#ifdef _WIN32
 typedef int                laszip_BOOL;
+typedef char               laszip_CHAR;
+typedef float              laszip_F32;
+typedef double             laszip_F64;
+typedef void* laszip_POINTER;
+#ifdef _WIN32
 typedef unsigned char      laszip_U8;
 typedef unsigned short     laszip_U16;
 typedef unsigned int       laszip_U32;
@@ -91,25 +94,16 @@ typedef char               laszip_I8;
 typedef short              laszip_I16;
 typedef int                laszip_I32;
 typedef __int64            laszip_I64;
-typedef char               laszip_CHAR;
-typedef float              laszip_F32;
-typedef double             laszip_F64;
-typedef void*              laszip_POINTER;
 #else
 #include <stdint.h>
-typedef int                laszip_BOOL;
 typedef uint8_t            laszip_U8;
 typedef uint16_t           laszip_U16;
-typedef unsigned long      laszip_U32;
-typedef unsigned long long laszip_U64;
+typedef uint32_t           laszip_U32;
+typedef uint64_t           laszip_U64;
 typedef int8_t             laszip_I8;
 typedef int16_t            laszip_I16;
-typedef long int           laszip_I32;
-typedef long long int      laszip_I64;
-typedef char               laszip_CHAR;
-typedef float              laszip_F32;
-typedef double             laszip_F64;
-typedef void*              laszip_POINTER;
+typedef int32_t            laszip_I32;
+typedef int64_t            laszip_I64;
 #endif
 
 typedef struct laszip_geokey
