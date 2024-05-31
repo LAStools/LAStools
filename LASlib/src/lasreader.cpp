@@ -1883,7 +1883,7 @@ void LASreadOpener::usage() const
 											 "  -resolution 0.1");
 }
 
-void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
+void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppress_ignore)
 {
 	int i;
 	for (i = 1; i < argc; i++)
@@ -1937,9 +1937,9 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore)
 						return;
 					}
 				}
-				else
+				else if (!suppress_ignore)
 				{
-					laserror("this tool does not process '-ignore_xxxx' options");
+					LASMessage(LAS_WARNING, "this tool does not process '-ignore_xxxx' options");
 				}
 			}
 			else if (strncmp(argv[i], "-inside", 7) == 0)

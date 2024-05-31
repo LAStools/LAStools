@@ -252,7 +252,7 @@ public:
 	void set_inside_rectangle(const F64 min_x, const F64 min_y, const F64 max_x, const F64 max_y);
 	void set_max_depth(const I32 max_depth);
 	void set_resolution(const F32 resolution);
-	void parse(int argc, char* argv[], BOOL parse_ignore = FALSE);
+	void parse(int argc, char* argv[], BOOL parse_ignore = FALSE, BOOL suppress_ignore = FALSE);
 	BOOL is_piped() const;
 	BOOL is_buffered() const;
 	BOOL is_header_populated() const;
