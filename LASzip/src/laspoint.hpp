@@ -592,7 +592,19 @@ public:
 
   inline BOOL set_x(const F64 x) { I64 X = quantizer->get_X(x); this->X = (I32)(X); return I32_FITS_IN_RANGE(X); };
   inline BOOL set_y(const F64 y) { I64 Y = quantizer->get_Y(y); this->Y = (I32)(Y); return I32_FITS_IN_RANGE(Y); };
-  inline BOOL set_z(const F64 z) { I64 Z = quantizer->get_Z(z); this->Z = (I32)(Z); return I32_FITS_IN_RANGE(Z); };
+  inline BOOL set_z(const F64 z) { 
+    if ((quantizer == nullptr) || (quantizer->z_from_attrib < 0)) {
+      I64 Z = quantizer->get_Z(z);
+      this->Z = (I32)(Z);
+      return I32_FITS_IN_RANGE(Z);
+    }
+    else
+    {
+      // set Z in extrabyte - scaled to I32
+      set_attribute_as_float(quantizer->z_from_attrib, z);
+      return TRUE;
+    }
+  };
 
   inline BOOL is_extended_point_type() const { return extended_point_type; };
 
