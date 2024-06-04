@@ -32,10 +32,6 @@
 #ifndef LASZIP_COMMON_H
 #define LASZIP_COMMON_H
 
-#include <sstream>
-#include <string>
-#include <iomanip>
-
 /// maximum length of
 #define LAS_MAX_MESSAGE_LENGTH 8192
 
