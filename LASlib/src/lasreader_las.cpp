@@ -1362,6 +1362,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
       // argument number not given - try to get by name
       opener->z_from_attribute_idx = header.get_attribute_index("height above ground");
       if (opener->z_from_attribute_idx < 0) {
+        opener->z_from_attribute = -1;
         if (!opener->z_from_attribute_try) {
           LASMessage(LAS_WARNING, "\"height above ground\" not found in extra bytes. using Z\n");
         }
