@@ -16,6 +16,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>src;inc;..\LASlib\inc;..\LASlib\src;include\laszip</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>..\$(Platform)\$(Configuration)\laslib64.lib;..\$(Platform)\$(Configuration)\lassrclib64.lib;%(AdditionalDependencies)</AdditionalDependencies>

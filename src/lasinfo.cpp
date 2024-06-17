@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
       {
         laserror("'%s' needs 2 arguments: start stop", argv[i]);
       }
-      if (sscanf(argv[i+1], "%lld", &subsequence_start) != 1)
+      if (sscanf_las(argv[i+1], "%lld", &subsequence_start) != 1)
       {
         laserror("'%s' needs 2 arguments: start stop but '%s' is not a valid start", argv[i], argv[i+1]);
       }
@@ -377,7 +377,7 @@ int main(int argc, char *argv[])
       {
         laserror("'%s' needs 2 arguments: start stop but '%lld' is not a valid start", argv[i], subsequence_start);
       }
-      if (sscanf(argv[i+2], "%lld", &subsequence_stop) != 1)
+      if (sscanf_las(argv[i+2], "%lld", &subsequence_stop) != 1)
       {
         laserror("'%s' needs 2 arguments: start stop but '%s' is not a valid stop", argv[i], argv[i+2]);
       }
@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
       {
         laserror("'%s' needs 1 argument: start", argv[i]);
       }
-      if (sscanf(argv[i+1], "%lld", &subsequence_start) != 1)
+      if (sscanf_las(argv[i+1], "%lld", &subsequence_start) != 1)
       {
         laserror("'%s' needs 1 argument: start but '%s' is not a valid start", argv[i], argv[i+1]);
       }
@@ -413,7 +413,7 @@ int main(int argc, char *argv[])
       {
         laserror("'%s' needs 1 argument: stop", argv[i]);
       }
-      if (sscanf(argv[i+1], "%lld", &subsequence_stop) != 1)
+      if (sscanf_las(argv[i+1], "%lld", &subsequence_stop) != 1)
       {
         laserror("'%s' needs 1 argument: start but '%s' is not a valid stop", argv[i], argv[i+1]);
       }
@@ -455,7 +455,7 @@ int main(int argc, char *argv[])
         {
           laserror("'%s' needs 1 argument: index", argv[i]);
         }
-        if (sscanf(argv[i+1], "%u", &set_file_source_ID) != 1)
+        if (sscanf_las(argv[i+1], "%u", &set_file_source_ID) != 1)
         {
           laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i+1]);
         }
@@ -479,9 +479,9 @@ int main(int argc, char *argv[])
         }
 			  i++;
 #ifdef _WIN32
-        if (sscanf(argv[i], "%I64x-%x-%x-%x-%I64x", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
+        if (sscanf_las(argv[i], "%I64x-%x-%x-%x-%I64x", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
 #else
-        if (sscanf(argv[i], "%llx-%x-%x-%x-%llx", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
+        if (sscanf_las(argv[i], "%llx-%x-%x-%x-%llx", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
 #endif
         {
           if ((i+1) >= argc)
@@ -500,7 +500,7 @@ int main(int argc, char *argv[])
 			  i++;
 			  set_system_identifier = new I8[32];
         memset(set_system_identifier, 0, 32);
-        strncpy(set_system_identifier, argv[i], 32);
+        strncpy_las(set_system_identifier, 32, argv[i], 32);
         edit_header = true;
 		  }
       else if (strcmp(argv[i],"-set_generating_software") == 0)
@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
 			  i++;
 			  set_generating_software = new I8[32];
         memset(set_generating_software, 0, 32);
-        strncpy(set_generating_software, argv[i], 32);
+        strncpy_las(set_generating_software, 32, argv[i], 32);
         edit_header = true;
 		  }
       else if (strcmp(argv[i],"-set_bb") == 0 || strcmp(argv[i],"-set_bounding_box") == 0)
@@ -585,7 +585,7 @@ int main(int argc, char *argv[])
         i++;
         int major;
         int minor;
-        if (sscanf(argv[i],"%d.%d",&major,&minor) != 2)
+        if (sscanf_las(argv[i],"%d.%d",&major,&minor) != 2)
         {
           laserror("cannot understand argument '%s' of '%s'", argv[i], argv[i-1]);
         }
@@ -699,7 +699,7 @@ int main(int argc, char *argv[])
         {
           laserror("'%s' needs 2 arguments: index user_id", argv[i]);
         }
-        if (sscanf(argv[i+1], "%d", &set_vlr_user_id_index) != 1)
+        if (sscanf_las(argv[i+1], "%d", &set_vlr_user_id_index) != 1)
         {
           laserror("'%s' needs 2 arguments: index user_ID but '%s' is no valid index", argv[i], argv[i+1]);
         }
@@ -718,7 +718,7 @@ int main(int argc, char *argv[])
         {
           laserror("'%s' needs 2 arguments: index record_ID", argv[i]);
         }
-        if (sscanf(argv[i+1], "%d", &set_vlr_record_id_index) != 1)
+        if (sscanf_las(argv[i+1], "%d", &set_vlr_record_id_index) != 1)
         {
           laserror("'%s' needs 2 arguments: index record_ID but '%s' is no valid index", argv[i], argv[i+1]);
         }
@@ -726,7 +726,7 @@ int main(int argc, char *argv[])
         {
           laserror("'%s' needs 2 arguments: index record_ID, but index %d is out of range", argv[i], set_vlr_record_id_index);
         }
-        if (sscanf(argv[i+2], "%d", &set_vlr_record_id) != 1)
+        if (sscanf_las(argv[i+2], "%d", &set_vlr_record_id) != 1)
         {
           laserror("'%s' needs 2 arguments: index record_ID but '%s' is no valid record ID", argv[i], argv[i+2]);
         }
@@ -744,7 +744,7 @@ int main(int argc, char *argv[])
         {
           laserror("'%s' needs 2 arguments: index description", argv[i]);
         }
-        if (sscanf(argv[i+1], "%d", &set_vlr_description_index) != 1)
+        if (sscanf_las(argv[i+1], "%d", &set_vlr_description_index) != 1)
         {
           laserror("'%s' needs 2 arguments: index description but '%s' is no valid index", argv[i], argv[i+1]);
         }
@@ -784,7 +784,7 @@ int main(int argc, char *argv[])
         {
           laserror("'%s' needs 1 argument: code", argv[i]);
         }
-        if (sscanf(argv[i+1], "%u", &set_geotiff_epsg) != 1)
+        if (sscanf_las(argv[i+1], "%u", &set_geotiff_epsg) != 1)
         {
           laserror("'%s' needs 1 argument: code but '%s' is no valid code", argv[i], argv[i+1]);
         }
@@ -858,7 +858,7 @@ int main(int argc, char *argv[])
       {
         laserror("'%s' needs 1 argument: every", argv[i]);
       }
-      if (sscanf(argv[i+1], "%u", &progress) != 1)
+      if (sscanf_las(argv[i+1], "%u", &progress) != 1)
       {
         laserror("'%s' needs 1 argument: every but '%s' is no valid number", argv[i], argv[i+1]);
       }
@@ -1129,7 +1129,7 @@ int main(int argc, char *argv[])
         lasreader->close();
         delete lasreader;
       }
-      FILE* file = fopen(file_name, "rb+");
+      FILE* file = LASfopen(file_name, "rb+");
       if (file == 0)
       {
         laserror("could not open file '%s' for edit of header", file_name);
@@ -1416,7 +1416,7 @@ int main(int argc, char *argv[])
         lasreader->close();
 
         char command[2048];
-        sprintf(command, "del \"%s\"", lasreadopener.get_file_name());
+        snprintf(command, sizeof(command), "del \"%s\"", lasreadopener.get_file_name());
         LASMessage(LAS_VERBOSE, "executing '%s'", command);
 
         if (system(command) != 0)
@@ -1448,11 +1448,11 @@ int main(int argc, char *argv[])
       char command[2048];
       if (strlen(base_name))
       {
-        sprintf(command, "rename \"%s\" \"%s_%d_%d.xxx\"", lasreadopener.get_file_name(), base_name, I32_QUANTIZE(lasheader->min_x), I32_QUANTIZE(lasheader->min_y));
+        snprintf(command, sizeof(command), "rename \"%s\" \"%s_%d_%d.xxx\"", lasreadopener.get_file_name(), base_name, I32_QUANTIZE(lasheader->min_x), I32_QUANTIZE(lasheader->min_y));
       }
       else
       {
-        sprintf(command, "rename \"%s\" \"%d_%d.xxx\"", lasreadopener.get_file_name(), I32_QUANTIZE(lasheader->min_x), I32_QUANTIZE(lasheader->min_y));
+        snprintf(command,sizeof(command), "rename \"%s\" \"%d_%d.xxx\"", lasreadopener.get_file_name(), I32_QUANTIZE(lasheader->min_x), I32_QUANTIZE(lasheader->min_y));
       }
       int len1 = (int)strlen(lasreadopener.get_file_name());
       int len2 = (int)strlen(command);
@@ -1503,7 +1503,7 @@ int main(int argc, char *argv[])
         laserror("input and output file name for '%s' are identical", lasreadopener.get_file_name());
       }
       // open the text output file
-      file_out = fopen(laswriteopener.get_file_name(), "w");
+      file_out = LASfopen(laswriteopener.get_file_name(), "w");
       if (file_out == 0)
       {
         LASMessage(LAS_WARNING, "could not open output text file '%s'", laswriteopener.get_file_name());
@@ -1661,7 +1661,7 @@ int main(int argc, char *argv[])
                   if (lasreader->header.vlr_geo_ascii_params)
                   {
                     char dummy[256];
-                    strncpy(dummy, &(lasreader->header.vlr_geo_ascii_params[lasreader->header.vlr_geo_key_entries[j].value_offset]), lasreader->header.vlr_geo_key_entries[j].count);
+                    strncpy_las(dummy, sizeof(dummy), &(lasreader->header.vlr_geo_ascii_params[lasreader->header.vlr_geo_key_entries[j].value_offset]), lasreader->header.vlr_geo_key_entries[j].count);
                     dummy[lasreader->header.vlr_geo_key_entries[j].count-1] = '\0';
                     fprintf(file_out, "GTCitationGeoKey: %s\012",dummy);
                   }
@@ -1794,7 +1794,7 @@ int main(int argc, char *argv[])
                   if (lasreader->header.vlr_geo_ascii_params)
                   {
                     char dummy[256];
-                    strncpy(dummy, &(lasreader->header.vlr_geo_ascii_params[lasreader->header.vlr_geo_key_entries[j].value_offset]), lasreader->header.vlr_geo_key_entries[j].count);
+                    strncpy_las(dummy, sizeof(dummy), &(lasreader->header.vlr_geo_ascii_params[lasreader->header.vlr_geo_key_entries[j].value_offset]), lasreader->header.vlr_geo_key_entries[j].count);
                     dummy[lasreader->header.vlr_geo_key_entries[j].count-1] = '\0';
                     fprintf(file_out, "GeogCitationGeoKey: %s\012",dummy);
                   }
@@ -2206,7 +2206,7 @@ int main(int argc, char *argv[])
                   if (lasreader->header.vlr_geo_ascii_params)
                   {
                     char dummy[256];
-                    strncpy(dummy, &(lasreader->header.vlr_geo_ascii_params[lasreader->header.vlr_geo_key_entries[j].value_offset]), lasreader->header.vlr_geo_key_entries[j].count);
+                    strncpy_las(dummy, sizeof(dummy), &(lasreader->header.vlr_geo_ascii_params[lasreader->header.vlr_geo_key_entries[j].value_offset]), lasreader->header.vlr_geo_key_entries[j].count);
                     dummy[lasreader->header.vlr_geo_key_entries[j].count-1] = '\0';
                     fprintf(file_out, "PCSCitationGeoKey: %s\012",dummy);
                   }
@@ -3573,7 +3573,7 @@ int main(int argc, char *argv[])
                   if (lasreader->header.vlr_geo_ascii_params)
                   {
                     char dummy[256];
-                    strncpy(dummy, &(lasreader->header.vlr_geo_ascii_params[lasreader->header.vlr_geo_key_entries[j].value_offset]), lasreader->header.vlr_geo_key_entries[j].count);
+                    strncpy_las(dummy, sizeof(dummy), &(lasreader->header.vlr_geo_ascii_params[lasreader->header.vlr_geo_key_entries[j].value_offset]), lasreader->header.vlr_geo_key_entries[j].count);
                     dummy[lasreader->header.vlr_geo_key_entries[j].count-1] = '\0';
                     fprintf(file_out, "VerticalCitationGeoKey: %s\012",dummy);
                   }
@@ -4214,7 +4214,7 @@ int main(int argc, char *argv[])
         laserror("can only repair header for LAS or LAZ files, not for '%s'", lasreadopener.get_file_name());
         repair_bb = repair_counters = false;
       }
-      file = fopen(lasreadopener.get_file_name(), "rb+");
+      file = LASfopen(lasreadopener.get_file_name(), "rb+");
       if (file == 0)
       {
         laserror("could not reopen file '%s' for repair of header", lasreadopener.get_file_name());

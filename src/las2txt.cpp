@@ -973,15 +973,12 @@ int main(int argc, char* argv[])
         }
         laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
       }
-
       const CHAR* file_name_out = laswriteopener.get_file_name();
 
       // open output file
-
-      file_out = fopen(file_name_out, "w");
+      file_out = LASfopen(file_name_out, "w");
 
       // fail if output file does not open
-
       if (file_out == 0)
       {
         laserror("could not open '%s' for write", file_name_out);

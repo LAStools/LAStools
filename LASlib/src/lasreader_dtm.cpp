@@ -301,8 +301,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
   clean();
 
   // open the DTM file
-
-  file = fopen(file_name, "rb");
+  file = LASfopen(file_name, "rb");
   if (file == 0)
   {
     laserror("cannot open file '%s'", file_name);
@@ -997,8 +996,8 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
 
   // populate the header as much as it makes sense
 
-  sprintf(header.system_identifier, "LAStools (c) by rapidlasso GmbH");
-  sprintf(header.generating_software, "via LASreaderDTM (%d)", LAS_TOOLS_VERSION);
+  snprintf(header.system_identifier, sizeof(header.system_identifier), "LAStools (c) by rapidlasso GmbH");
+  snprintf(header.generating_software, sizeof(header.generating_software), "via LASreaderDTM (%d)", LAS_TOOLS_VERSION);
 
   // maybe set creation date
 
@@ -1354,7 +1353,7 @@ BOOL LASreaderDTM::reopen(const CHAR* file_name)
     file = 0;
   }
 
-  file = fopen(file_name, "rb");
+  file = LASfopen(file_name, "rb");
   if (file == 0)
   {
     laserror("cannot reopen file '%s'", file_name);

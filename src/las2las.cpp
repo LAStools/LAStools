@@ -108,10 +108,9 @@ static double taketime()
 static bool save_vlrs_to_file(const LASheader* header)
 {
   U32 i;
-  FILE* file = fopen("vlrs.vlr", "wb");
-  if (file == 0)
-  {
-    return false;
+  FILE* file =  LASfopen("vlrs.vlr", "wb");
+  if (file == 0) {
+      return false;
   }
   ByteStreamOut* out;
   if (IS_LITTLE_ENDIAN())
@@ -172,10 +171,9 @@ static bool save_vlrs_to_file(const LASheader* header)
 static bool load_vlrs_from_file(LASheader* header)
 {
   U32 i;
-  FILE* file = fopen("vlrs.vlr", "rb");
-  if (file == 0)
-  {
-    return false;
+  FILE* file = LASfopen("vlrs.vlr", "rb");
+  if (file == 0) {
+      return false;
   }
   ByteStreamIn* in;
   if (IS_LITTLE_ENDIAN())
@@ -373,11 +371,11 @@ int main(int argc, char* argv[])
     if (strcmp(argv[i], "-subseq") == 0)
     {
       lastool.parse_arg_cnt_check(i, 2, "start stop");
-      if (sscanf(argv[i + 1], "%lld", &subsequence_start) != 1)
+      if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1)
       {
         lastool.error_parse_arg_n_invalid(i, 1);
       }
-      if (sscanf(argv[i + 2], "%lld", &subsequence_stop) != 1)
+      if (sscanf_las(argv[i + 2], "%lld", &subsequence_stop) != 1)
       {
         lastool.error_parse_arg_n_invalid(i, 2);
       }
@@ -386,7 +384,7 @@ int main(int argc, char* argv[])
     else if (strcmp(argv[i], "-start_at_point") == 0)
     {
       lastool.parse_arg_cnt_check(i, 1, "index of start point");
-      if (sscanf(argv[i + 1], "%lld", &subsequence_start) != 1)
+      if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1)
       {
         lastool.error_parse_arg_n_invalid(i, 1);
       }
@@ -395,7 +393,7 @@ int main(int argc, char* argv[])
     else if (strcmp(argv[i], "-stop_at_point") == 0)
     {
       lastool.parse_arg_cnt_check(i, 1, "index of stop point");
-      if (sscanf(argv[i + 1], "%lld", &subsequence_stop) != 1)
+      if (sscanf_las(argv[i + 1], "%lld", &subsequence_stop) != 1)
       {
         lastool.error_parse_arg_n_invalid(i, 1);
       }
@@ -408,7 +406,7 @@ int main(int argc, char* argv[])
         if (strcmp(argv[i], "-set_point_type") == 0 || strcmp(argv[i], "-set_point_data_format") == 0)
         {
           lastool.parse_arg_cnt_check(i, 1, "type");
-          if (sscanf(argv[i + 1], "%u", &set_point_data_format) != 1)
+          if (sscanf_las(argv[i + 1], "%u", &set_point_data_format) != 1)
           {
             lastool.error_parse_arg_n_invalid(i, 1);
           }
@@ -417,7 +415,7 @@ int main(int argc, char* argv[])
         else if (strcmp(argv[i], "-set_point_data_record_length") == 0 || strcmp(argv[i], "-set_point_size") == 0)
         {
           lastool.parse_arg_cnt_check(i, 1, "size");
-          if (sscanf(argv[i + 1], "%u", &set_point_data_record_length) != 1)
+          if (sscanf_las(argv[i + 1], "%u", &set_point_data_record_length) != 1)
           {
             lastool.error_parse_arg_n_invalid(i, 1);
           }
@@ -431,7 +429,7 @@ int main(int argc, char* argv[])
       else if (strcmp(argv[i], "-set_global_encoding_gps_bit") == 0)
       {
         lastool.parse_arg_cnt_check(i, 1, "0 or 1");
-        if (sscanf(argv[i + 1], "%u", &set_global_encoding_gps_bit) != 1)
+        if (sscanf_las(argv[i + 1], "%u", &set_global_encoding_gps_bit) != 1)
         {
           lastool.error_parse_arg_n_invalid(i, 1);
         }
@@ -440,7 +438,7 @@ int main(int argc, char* argv[])
       else if (strcmp(argv[i], "-set_version") == 0)
       {
         lastool.parse_arg_cnt_check(i, 1, "major.minor");
-        if (sscanf(argv[i + 1], "%u.%u", &set_version_major, &set_version_minor) != 2)
+        if (sscanf_las(argv[i + 1], "%u.%u", &set_version_major, &set_version_minor) != 2)
         {
           lastool.error_parse_arg_n_invalid(i, 1);
         }
@@ -449,7 +447,7 @@ int main(int argc, char* argv[])
       else if (strcmp(argv[i], "-set_version_major") == 0)
       {
         lastool.parse_arg_cnt_check(i, 1, "major");
-        if (sscanf(argv[i + 1], "%u", &set_version_major) != 1)
+        if (sscanf_las(argv[i + 1], "%u", &set_version_major) != 1)
         {
           lastool.error_parse_arg_n_invalid(i, 1);
         }
@@ -458,7 +456,7 @@ int main(int argc, char* argv[])
       else if (strcmp(argv[i], "-set_version_minor") == 0)
       {
         lastool.parse_arg_cnt_check(i, 1, "minor");
-        if (sscanf(argv[i + 1], "%u", &set_version_minor) != 1)
+        if (sscanf_las(argv[i + 1], "%u", &set_version_minor) != 1)
         {
           lastool.error_parse_arg_n_invalid(i, 1);
         }
@@ -467,7 +465,7 @@ int main(int argc, char* argv[])
       else if (strcmp(argv[i], "-set_lastiling_buffer_flag") == 0)
       {
         lastool.parse_arg_cnt_check(i, 1, "0 or 1");
-        if (sscanf(argv[i + 1], "%u", &set_lastiling_buffer_flag) != 1)
+        if (sscanf_las(argv[i + 1], "%u", &set_lastiling_buffer_flag) != 1)
         {
           lastool.error_parse_arg_n_invalid(i, 1);
         }
@@ -507,11 +505,11 @@ int main(int argc, char* argv[])
         lastool.parse_arg_cnt_check(i, 2, "index scale");
         if (set_attribute_scales < 5)
         {
-          if (sscanf(argv[i + 1], "%u", &(set_attribute_scale_index[set_attribute_scales])) != 1)
+          if (sscanf_las(argv[i + 1], "%u", &(set_attribute_scale_index[set_attribute_scales])) != 1)
           {
             lastool.error_parse_arg_n_invalid(i, 1);
           }
-          if (sscanf(argv[i + 2], "%lf", &(set_attribute_scale_scale[set_attribute_scales])) != 1)
+          if (sscanf_las(argv[i + 2], "%lf", &(set_attribute_scale_scale[set_attribute_scales])) != 1)
           {
             lastool.error_parse_arg_n_invalid(i, 2);
           }
@@ -528,11 +526,11 @@ int main(int argc, char* argv[])
         lastool.parse_arg_cnt_check(i, 2, "index offset");
         if (set_attribute_offsets < 5)
         {
-          if (sscanf(argv[i + 1], "%u", &(set_attribute_offset_index[set_attribute_offsets])) != 1)
+          if (sscanf_las(argv[i + 1], "%u", &(set_attribute_offset_index[set_attribute_offsets])) != 1)
           {
             lastool.error_parse_arg_n_invalid(i, 1);
           }
-          if (sscanf(argv[i + 2], "%lf", &(set_attribute_offset_offset[set_attribute_offsets])) != 1)
+          if (sscanf_las(argv[i + 2], "%lf", &(set_attribute_offset_offset[set_attribute_offsets])) != 1)
           {
             lastool.error_parse_arg_n_invalid(i, 2);
           }
@@ -663,7 +661,7 @@ int main(int argc, char* argv[])
         lastool.parse_arg_cnt_check(i, 1, "index");
         if (unset_attribute_scales < 5)
         {
-          if (sscanf(argv[i + 1], "%u", &(unset_attribute_scale_index[unset_attribute_scales])) != 1)
+          if (sscanf_las(argv[i + 1], "%u", &(unset_attribute_scale_index[unset_attribute_scales])) != 1)
           {
             lastool.error_parse_arg_n_invalid(i, 1);
           }
@@ -680,7 +678,7 @@ int main(int argc, char* argv[])
         lastool.parse_arg_cnt_check(i, 1, "index");
         if (unset_attribute_offsets < 5)
         {
-          if (sscanf(argv[i + 1], "%u", &(unset_attribute_offset_index[unset_attribute_offsets])) != 1)
+          if (sscanf_las(argv[i + 1], "%u", &(unset_attribute_offset_index[unset_attribute_offsets])) != 1)
           {
             lastool.error_parse_arg_n_invalid(i, 1);
           }
@@ -714,7 +712,7 @@ int main(int argc, char* argv[])
       lastool.parse_arg_cnt_check(i, 1, "file name");
       if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0'))
       {
-        FILE* file = fopen(argv[i + 1], "r");
+        FILE* file = LASfopen(argv[i + 1], "r");
 
         if (file)
         {
@@ -1694,12 +1692,12 @@ int main(int argc, char* argv[])
 
       // prepare the header for the surviving points
 
-      strncpy(lasreader->header.system_identifier, "LAStools (c) by rapidlasso GmbH", 32);
+      strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), "LAStools (c) by rapidlasso GmbH", 32);
       lasreader->header.system_identifier[31] = '\0';
       char temp[64];
-      sprintf(temp, "las2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
+      snprintf(temp, sizeof(temp), "las2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
       memset(lasreader->header.generating_software, 0, 32);
-      strncpy(lasreader->header.generating_software, temp, 32);
+      strncpy_las(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), temp, 32);
       lasreader->header.generating_software[31] = '\0';
 
       // open laswriter

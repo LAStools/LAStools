@@ -64,7 +64,7 @@ BOOL LASwriterTXT::open(const CHAR* file_name, const LASheader* header, const CH
     return FALSE;
   }
 
-  file = fopen(file_name, "w");
+  file = LASfopen(file_name, "w");
 
   if (file == 0)
   {
@@ -443,8 +443,7 @@ BOOL LASwriterTXT::write_point(const LASpoint* point)
         fprintf(file, "%d", -2048 + point->get_intensity());
       else if (optx)
       {
-        int len;
-        len = sprintf(printstring, "%.3f", 1.0f/4095.0f * point->get_intensity()) - 1;
+        int len = snprintf(printstring, sizeof(printstring), "%.3f", 1.0f/4095.0f * point->get_intensity()) - 1;
         while (printstring[len] == '0') len--;
         if (printstring[len] != '.') len++;
         printstring[len] = '\0';

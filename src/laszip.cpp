@@ -863,7 +863,7 @@ int main(int argc, char *argv[])
         {
           wave_form_file_name = LASCopyString("wave_form.wdp");
         }
-        FILE* file = fopen(wave_form_file_name, "wb");
+        FILE* file = LASfopen(wave_form_file_name, "wb");
         if (file)
         {
           LASMessage(LAS_VERBOSE, "writing waveforms to '%s'", wave_form_file_name);

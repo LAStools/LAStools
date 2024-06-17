@@ -740,7 +740,7 @@ public:
 		{
 			map[u] = u;
 		}
-		FILE* file = fopen(file_name, "r");
+		FILE* file = LASfopen(file_name, "r");
 		if (file)
 		{
 			U32 from, to;
@@ -1538,7 +1538,7 @@ public:
 		{
 			map[u] = u;
 		}
-		FILE* file = fopen(file_name, "r");
+		FILE* file = LASfopen(file_name, "r");
 		if (file)
 		{
 			U32 from, to;
@@ -1691,7 +1691,7 @@ public:
 		{
 			map[u] = u;
 		}
-		FILE* file = fopen(file_name, "r");
+		FILE* file = LASfopen(file_name, "r");
 		if (file)
 		{
 			U32 from, to;
@@ -2137,7 +2137,7 @@ public:
 		F64 value;
 		U32 R, G, B;
 		CHAR line[256];
-		FILE* file = fopen(file_name, "r");
+		FILE* file = LASfopen(file_name, "r");
 		size = 0;
 		if (file)
 		{
@@ -2160,7 +2160,7 @@ public:
 			Rs = new U8[size];
 			Gs = new U8[size];
 			Bs = new U8[size];
-			file = fopen(file_name, "r");
+			file = LASfopen(file_name, "r");
 			while (fgets(line, 256, file))
 			{
 				if (sscanf(line, "%lf %u %u %u", &value, &R, &G, &B) == 4)
@@ -2214,12 +2214,12 @@ public:
 			file = 0;
 		}
 	};
-	void reset() { if (file) fclose(file); file = fopen(file_name, "r"); };
+	void reset() { if (file) fclose(file); file = LASfopen(file_name, "r"); };
 	LASoperationLoadAttributeFromText(const U32 index, const CHAR* file_name)
 	{
 		this->index = index;
 		this->file_name = LASCopyString(file_name);
-		file = fopen(this->file_name, "r");
+		file = LASfopen(this->file_name, "r");
 	};
 	~LASoperationLoadAttributeFromText() { if (file) fclose(file); if (file_name) free(file_name); };
 private:
@@ -5658,7 +5658,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 					laserror("'%s' needs 1 argument: map_file_name.txt", argv[i]);
 					return FALSE;
 				}
-				FILE* file = fopen(argv[i + 1], "r");
+				FILE* file = LASfopen(argv[i + 1], "r");
 				if (file == 0)
 				{
 					laserror("cannot '%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 1]);
@@ -5678,7 +5678,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 					laserror("'%s' needs 1 argument: map_file_name.txt", argv[i]);
 					return FALSE;
 				}
-				FILE* file = fopen(argv[i + 1], "r");
+				FILE* file = LASfopen(argv[i + 1], "r");
 				if (file == 0)
 				{
 					laserror("'%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 1]);
@@ -5698,7 +5698,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 					laserror("'%s' needs 1 argument: map_file_name.txt", argv[i]);
 					return FALSE;
 				}
-				FILE* file = fopen(argv[i + 1], "r");
+				FILE* file = LASfopen(argv[i + 1], "r");
 				if (file == 0)
 				{
 					laserror("'%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 1]);
@@ -5724,7 +5724,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 					laserror("'%s' needs 2 arguments: attribute_index map_file_name.txt but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
-				FILE* file = fopen(argv[i + 2], "r");
+				FILE* file = LASfopen(argv[i + 2], "r");
 				if (file == 0)
 				{
 					laserror("'%s' needs text file with map but '%s' cannot be opened", argv[i], argv[i + 2]);
@@ -5753,7 +5753,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
 					laserror("'%s' needs 2 arguments: attribute_index attribute_file_name.txt but '%s' is no valid attribute_index", argv[i], argv[i + 1]);
 					return FALSE;
 				}
-				FILE* file = fopen(argv[i + 2], "r");
+				FILE* file = LASfopen(argv[i + 2], "r");
 				if (file == 0)
 				{
 					laserror("'%s' needs text file with attribute values but '%s' cannot be opened", argv[i], argv[i + 2]);

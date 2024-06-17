@@ -84,7 +84,9 @@ class LASoperationTransformMatrix : public LASoperation
 {
 public:
 	inline const CHAR* name() const { return "transform_matrix"; };
-	inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf,%lf,%lf %lf,%lf,%lf %lf,%lf,%lf %lf,%lf,%lf", name(), r11, r12, r13, r21, r22, r23, r31, r32, r33, tr1, tr2, tr3); };
+	inline I32 get_command(CHAR* string) const { 
+		constexpr size_t buffer_size = 330; //Maximum expected length for 12xF64(double), name() + safety margin
+		return snprintf(string, buffer_size, "-%s %lf,%lf,%lf %lf,%lf,%lf %lf,%lf,%lf %lf,%lf,%lf", name(), r11, r12, r13, r21, r22, r23, r31, r32, r33, tr1, tr2, tr3); };
 	inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
 	inline void transform(LASpoint* point) {
 		F64 x = point->get_x();

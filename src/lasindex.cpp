@@ -295,15 +295,15 @@ int main(int argc, char *argv[])
     CHAR* meta_file_name = (CHAR*)malloc(len + 9);
     if (len)
     {
-      sprintf(meta_file_name, "%s\\lax.txt", meta_file_name_base);
+      snprintf(meta_file_name, len + 9, "%s\\lax.txt", meta_file_name_base);
     }
     else
     {
-      sprintf(meta_file_name, "lax.txt");
+      snprintf(meta_file_name, 9, "lax.txt");
     }
     free(meta_file_name_base);
 
-    file_meta = fopen(meta_file_name, "w");
+    file_meta = LASfopen(meta_file_name, "w");
 
     if (file_meta == 0)
     {

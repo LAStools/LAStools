@@ -336,13 +336,8 @@ BOOL LASindex::read(const char* file_name)
     name[strlen(name)-2] = 'a';
     name[strlen(name)-1] = 'x';
   }
-#ifdef _MSC_VER
-  wchar_t* utf16_name = UTF8toUTF16(name);
-  FILE* file = _wfopen(utf16_name, L"rb");
-  delete[] utf16_name;
-#else
-  FILE* file = fopen(name, "rb");
-#endif
+  FILE* file = LASfopen(name, "rb");
+
   if (file == 0)
   {
     free(name);
@@ -379,17 +374,8 @@ BOOL LASindex::append(const char* file_name) const
 
   lasreader->close();
 
-#ifdef _MSC_VER
-  wchar_t* utf16_file_name = UTF8toUTF16(file_name);
-  FILE* file = _wfopen(utf16_file_name, L"rb");
-  if (file == 0)
-  {
-    laserror("cannot open file '%ws'", utf16_file_name);
-  }
-  delete [] utf16_file_name;
-#else
-  FILE* file = fopen(file_name, "rb");
-#endif
+  FILE* file = LASfopen(file_name, "rb");
+
   ByteStreamIn* bytestreamin = 0;
   if (IS_LITTLE_ENDIAN())
     bytestreamin = new ByteStreamInFileLE(file);
@@ -453,17 +439,8 @@ BOOL LASindex::append(const char* file_name) const
   fclose(file);
 
   ByteStreamOut* bytestreamout;
-#ifdef _MSC_VER
-  utf16_file_name = UTF8toUTF16(file_name);
-  file = _wfopen(utf16_file_name, L"rb+");
-  if (file == 0)
-  {
-    laserror("cannot open file '%ws'", utf16_file_name);
-  }
-  delete [] utf16_file_name;
-#else
-  file = fopen(file_name, "rb+");
-#endif
+  file = LASfopen(file_name, "rb+");
+
   if (IS_LITTLE_ENDIAN())
     bytestreamout = new ByteStreamOutFileLE(file);
   else
@@ -471,9 +448,9 @@ BOOL LASindex::append(const char* file_name) const
   bytestreamout->seek(offset_to_special_evlrs);
 
   LASevlr lax_evlr;
-  sprintf(lax_evlr.user_id, "LAStools");
+  snprintf(lax_evlr.user_id, sizeof(lax_evlr.user_id), "LAStools");
   lax_evlr.record_id = 30;
-  sprintf(lax_evlr.description, "LAX spatial indexing (LASindex)");
+  snprintf(lax_evlr.description, sizeof(lax_evlr.description), "LAX spatial indexing (LASindex)");
 
   bytestreamout->put16bitsLE((const U8*)&(lax_evlr.reserved));
   bytestreamout->putBytes((const U8*)lax_evlr.user_id, 16);
@@ -537,17 +514,8 @@ BOOL LASindex::write(const char* file_name) const
     name[strlen(name)-2] = 'a';
     name[strlen(name)-1] = 'x';
   }
-#ifdef _MSC_VER
-  wchar_t* utf16_file_name = UTF8toUTF16(name);
-  FILE* file = _wfopen(utf16_file_name, L"wb");
-  if (file == 0)
-  {
-    laserror("(LASindex): cannot open file '%ws' for write", utf16_file_name);
-  }
-  delete [] utf16_file_name;
-#else
-  FILE* file = fopen(name, "wb");
-#endif
+  FILE* file = LASfopen(name, "wb");
+
   if (file == 0)
   {
     laserror("(LASindex): cannot open file '%s' for write", name);

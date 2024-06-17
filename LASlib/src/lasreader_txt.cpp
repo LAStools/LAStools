@@ -154,8 +154,8 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
   }
 
   // populate the header as much as it makes sense
-  sprintf(header.system_identifier, "LAStools (c) by rapidlasso GmbH");
-  sprintf(header.generating_software, "via LASreaderTXT (%d)", LAS_TOOLS_VERSION);
+  snprintf(header.system_identifier, sizeof(header.system_identifier), "LAStools (c) by rapidlasso GmbH");
+  snprintf(header.generating_software, sizeof(header.generating_software), "via LASreaderTXT (%d)", LAS_TOOLS_VERSION);
 
   // maybe set creation date
 #ifdef _WIN32
@@ -1103,7 +1103,7 @@ void LASreaderTXT::add_attribute(I32 data_type, const char* name, const char* de
   else
   {
     char temp[32];
-    sprintf(temp, "attribute %d", number_attributes);
+    snprintf(temp, sizeof(temp), "attribute %d", number_attributes);
     attribute_names[number_attributes] = LASCopyString(temp);
   }
   if (description)

@@ -361,15 +361,19 @@ struct OctantOnDisk : public Octant
     fp = 0;
     char suffix[32];
 
-    filename_points = (char*)malloc((strlen(dir) + 32) * sizeof(char));
-    strcpy(filename_points, dir);
-    sprintf(suffix, "points-%d-%d-%d-%d.bin", key.x, key.y, key.z, key.d);
-    strcat(filename_points, suffix);
-
-    filename_octant = (char*)malloc((strlen(dir) + 32) * sizeof(char));
-    strcpy(filename_octant, dir);
-    sprintf(suffix, "octant-%d-%d-%d-%d.bin", key.x, key.y, key.z, key.d);
-    strcat(filename_octant, suffix);
+    size_t buffer_size = (strlen(dir) + 32) * sizeof(char);
+    filename_points = (char*)malloc(buffer_size);
+    if (filename_points != 0) {
+      strcpy_las(filename_points, buffer_size, dir);
+      snprintf(suffix, sizeof(suffix), "points-%d-%d-%d-%d.bin", key.x, key.y, key.z, key.d);
+      strcat_las(filename_points, buffer_size, suffix);
+    }
+    filename_octant = (char*)malloc(buffer_size);
+    if (filename_octant != nullptr) {
+      strcpy_las(filename_octant, buffer_size, dir);
+      snprintf(suffix, sizeof(suffix), "octant-%d-%d-%d-%d.bin", key.x, key.y, key.z, key.d);
+      strcat_las(filename_octant, buffer_size, suffix);
+    }
 
     open("w+b");
     close();
@@ -440,7 +444,7 @@ struct OctantOnDisk : public Octant
       I32 cell;
       U16 buffid;
       I32 posid;
-      FILE* f = fopen(filename_octant, "rb");
+      FILE* f = LASfopen(filename_octant, "rb");
       if (f == 0)
       {
         laserror("cannot open file '%s': %s", filename_octant, strerror(errno));
@@ -465,7 +469,7 @@ struct OctantOnDisk : public Octant
     if (active)
     {
       // write occupancy map on disk
-      FILE* f = fopen(filename_octant, "wb");
+      FILE* f = LASfopen(filename_octant, "wb");
       if (f == 0)
       {
         laserror("cannot open file '%s': %s", filename_octant, strerror(errno));
@@ -528,7 +532,7 @@ struct OctantOnDisk : public Octant
   {
     if (fp == 0)
     {
-      fp = fopen(filename_points, mode);
+      fp = LASfopen(filename_points, mode);
       if (fp == 0)
       {
         laserror("cannot open file '%s': %s", filename_points, strerror(errno));
@@ -706,7 +710,7 @@ int main(int argc, char* argv[])
       {
         laserror("'%s' needs 1 argument: depth", argv[i]);
       }
-      if (sscanf(argv[i + 1], "%d", &max_depth) != 1)
+      if (sscanf_las(argv[i + 1], "%d", &max_depth) != 1)
       {
         laserror("cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
       }
@@ -720,7 +724,7 @@ int main(int argc, char* argv[])
       {
         laserror("'%s' needs 1 argument: num", argv[i]);
       }
-      if (sscanf(argv[i + 1], "%d", &MAX_FOPEN) != 1)
+      if (sscanf_las(argv[i + 1], "%d", &MAX_FOPEN) != 1)
       {
         laserror("cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
       }
@@ -733,7 +737,7 @@ int main(int argc, char* argv[])
       {
         laserror("'%s' needs 1 argument: seed", argv[i]);
       }
-      if (sscanf(argv[i + 1], "%u", &seed) != 1)
+      if (sscanf_las(argv[i + 1], "%u", &seed) != 1)
       {
         laserror("cannot understand argument '%s' for '%s'", argv[i + 1], argv[i]);
       }
@@ -852,12 +856,15 @@ int main(int argc, char* argv[])
         const char* file_name_base = laswriteopener.get_file_name_base();
         char* file_name;
         const char* extension = ".copc.laz";
-        file_name = (char*)malloc((strlen(file_name_base) + 10) * sizeof(char));
-        strcpy(file_name, file_name_base);
-        strcat(file_name, extension);
-        laswriteopener.set_file_name(file_name);
-        LASMessage(LAS_WARNING, "output was renamed '%s'", laswriteopener.get_file_name_only());
-        free(file_name);
+        size_t buffer_size = (strlen(file_name_base) + 10) * sizeof(char);
+        file_name = (char*)malloc(buffer_size);
+        if (file_name != 0) {
+          strcpy_las(file_name, buffer_size, file_name_base);
+          strcat_las(file_name, buffer_size, extension);
+          laswriteopener.set_file_name(file_name);
+          LASMessage(LAS_WARNING, "output was renamed '%s'", laswriteopener.get_file_name_only());
+          free(file_name);
+        }
       }
     }
 
@@ -973,7 +980,7 @@ int main(int argc, char* argv[])
         LASMessage(LAS_VERBOSE, "Maximum depth of the octree: %d", max_depth);
         if (swap)
         {
-          LASMessage(LAS_VERBOSE, "Swap probabilities per level: "); for (i = 0; i <= max_depth; i++) fprintf(stderr, "%.4lf ", swap_probabilities[i]); fprintf(stderr, "");
+          LASMessage(LAS_VERBOSE, "Swap probabilities per level: "); for (i = 0; i <= max_depth; i++) fprintf(stderr, "%.4lf ", swap_probabilities[i]); fprintf(stderr, "\n");
         }
         LASMessage(LAS_VERBOSE, "Pass 1 took %u sec.", (U32)(t1 - t0));
       }
@@ -1101,15 +1108,15 @@ int main(int argc, char* argv[])
         for (U32 i = lasreader->header.number_of_variable_length_records - 1; i > 0; i--) lasreader->header.vlrs[i] = lasreader->header.vlrs[i - 1];
         memset((void*)&(lasreader->header.vlrs[0]), 0, sizeof(LASvlr));
         lasreader->header.vlrs[0].reserved = 0;
-        strncpy(lasreader->header.vlrs[0].user_id, "copc", sizeof(lasreader->header.vlrs[0].user_id));
+        strncpy_las(lasreader->header.vlrs[0].user_id, sizeof(lasreader->header.vlrs[0].user_id), "copc", sizeof(lasreader->header.vlrs[0].user_id));
         lasreader->header.vlrs[0].record_id = 1;
         lasreader->header.vlrs[0].record_length_after_header = sizeof(LASvlr_copc_info);
         lasreader->header.offset_to_point_data += lasreader->header.vlrs[0].record_length_after_header;
-        sprintf(lasreader->header.vlrs[0].description, "%.31s", "copc info");
+        snprintf(lasreader->header.vlrs[0].description, sizeof(lasreader->header.vlrs[0].description), "%.31s", "copc info");
         lasreader->header.vlrs[0].data = (U8*)info;
       }
 
-      strncpy(lasreader->header.system_identifier, "LAStools (c) by rapidlasso GmbH", 32);
+      strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), "LAStools (c) by rapidlasso GmbH", 32);
 
       // Placeholder to write a proper header. The actual content is resolved when closing the writer.
       lasreader->header.add_evlr("copc", 1000, 1, new U8[1], FALSE, "EPT hierarchy");

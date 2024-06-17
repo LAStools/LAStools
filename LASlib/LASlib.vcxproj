@@ -10,6 +10,7 @@
     <ClCompile>
       <AdditionalIncludeDirectories>src;inc;..\LASzip\inc;..\LASzip\src;..\LASzip\include\laszip;</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>

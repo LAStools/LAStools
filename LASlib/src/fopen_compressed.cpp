@@ -155,7 +155,7 @@ static FILE* fopenGzipped(const char* filename, const char* mode)
 	if (mode[0] == 'r')
 	{
 		// open input file
-		FILE* gzipInput = fopen(filename, mode);
+		FILE* gzipInput = LASfopen(filename, mode);
 		if (!gzipInput) return NULL;
 
 		// create the pipe
@@ -378,7 +378,7 @@ FILE* fopen_compressed(const char* filename, const char* mode, bool* piped)
   }
   else
   {
-    file = fopen(filename, mode);
+		file = LASfopen(filename, mode);
     if (piped) *piped = false;
   }
   return file;
