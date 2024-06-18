@@ -97,78 +97,53 @@ public:
     return;
   };
 
-  template <typename parseitm>
-  void parse(parseitm x) 
-  {
-    // 1st parse
-    int i = 1;
-    while (i < argc)
-    {
-      if (argv[i][0] != '\0')
-      {
-        parse_pre(i);
-      }
-      i++;
-    }
-    // print title in verbose mode
-    lastitle(LAS_VERBOSE);
-    // 2nd parse
-    i = 1;
-    while (i < argc)
-    {
-      if (argv[i][0] != '\0')
-      {
-        if (!x(i) && !parse_base(i))
-        {
-          laserror("cannot understand argument '%s'. use '-h' or see %s_README.md to get help.", argv[i], name.c_str());
-        }
-      }
-      i++;
-    }
-    force_check();
-  };
-
-  virtual void parse_pre(int& i)
+  /// <summary>
+  /// handles the argument[i], first step (arguments which maybe influences other arguments or general behaviour)
+  /// optional passive mode: just check, if the argument is valid
+  /// </summary>
+  /// <param name="i">argument index</param>
+  /// <returns>true: argument[i] valid; false: argument[i] not defined</returns>
+  virtual bool parse_pre(int& i, bool active)
   {
     if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-verbose") == 0)
     {
-      set_message_log_level(LAS_VERBOSE);
-      *argv[i] = 0;
+      if (active) set_message_log_level(LAS_VERBOSE);
     }
     else if (strcmp(argv[i], "-vv") == 0 || strcmp(argv[i], "-very_verbose") == 0)
     {
-      set_message_log_level(LAS_VERY_VERBOSE);
-      *argv[i] = 0;
+      if (active) set_message_log_level(LAS_VERY_VERBOSE);
     }
     else if (strcmp(argv[i], "-quiet") == 0)
     {
-      set_message_log_level(LAS_QUIET);
-      *argv[i] = 0;
+      if (active) set_message_log_level(LAS_QUIET);
     }
     else if (strcmp(argv[i], "-silent") == 0)
     {
-      set_message_log_level(LAS_WARNING);
-      *argv[i] = 0;
+      if (active) set_message_log_level(LAS_WARNING);
     }
     else if (strcmp(argv[i], "-errors_ignore") == 0)
     {
-      halt_on_error = false;
-      *argv[i] = 0;
+      if (active) halt_on_error = false;
     }
     else if (strcmp(argv[i], "-force") == 0)
     {
-      force = true;
-      *argv[i] = 0;
+      if (active) force = true;
     }
     else if (strcmp(argv[i], "-print_log_stats") == 0)
     {
-      print_log_stats = true;
-      *argv[i] = 0;
-    };
-    // all new arguments in parse_pre: set to "0" to avoid "cannot understand argument" in main parse!
-    //   *argv[i] = 0;
-    return;
+      if (active) print_log_stats = true;
+    }
+    else
+    {
+      return false;
+    }
+    return true;
   };
+  /// <summary>
+  /// handles the argument[i]
+  /// </summary>
+  /// <param name="i">argument index</param>
+  /// <returns>true: argument[i] valid; false: argument[i] not defined</returns>
   virtual bool parse_base(int& i)
   {
     if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "-hh") == 0 || strcmp(argv[i], "-help") == 0)
@@ -229,6 +204,36 @@ public:
       return false;
     }
     return true;
+  };
+  template <typename parseitm>
+  void parse(parseitm x)
+  {
+    // 1st parse
+    int i = 1;
+    while (i < argc)
+    {
+      if (argv[i][0] != '\0')
+      {
+        parse_pre(i, true);
+      }
+      i++;
+    }
+    // print title in verbose mode
+    lastitle(LAS_VERBOSE);
+    // 2nd parse
+    i = 1;
+    while (i < argc)
+    {
+      if (argv[i][0] != '\0')
+      {
+        if (!x(i) && !parse_base(i) && !parse_pre(i, false))
+        {
+          laserror("cannot understand argument '%s'. use '-h' or see %s_README.md to get help.", argv[i], name.c_str());
+        }
+      }
+      i++;
+    }
+    force_check();
   };
   void laserrorinfo(std::string pre)
   {

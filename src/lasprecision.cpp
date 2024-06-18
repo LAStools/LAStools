@@ -167,7 +167,7 @@ extern int lasprecision_gui(int argc, char *argv[], LASreadOpener* lasreadopener
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int lasprecision_multi_core(int argc, char *argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, int cores);
+extern int lasprecision_multi_core(int argc, char* argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
 #endif
 
 int main(int argc, char *argv[])
@@ -310,7 +310,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      return lasprecision_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, lastool.cores);
+      return lasprecision_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
     }
   }
 #endif
