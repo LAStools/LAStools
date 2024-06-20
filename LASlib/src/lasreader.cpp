@@ -912,7 +912,11 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 					lasreaderlas = new LASreaderLASrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
 
 				lasreaderlas->set_keep_copc(keep_copc);
-				if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
+				if (lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective))
+				{
+					LASMessage(LAS_VERY_VERBOSE, "open file '%s'", file_name);
+				}
+				else
 				{
 					laserror("cannot open lasreaderlas with file name '%s'", file_name);
 					delete lasreaderlas;
