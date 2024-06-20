@@ -107,7 +107,9 @@ public:
   {
     if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-verbose") == 0)
     {
-      if (active) set_message_log_level(LAS_VERBOSE);
+      if ((active) && (get_message_log_level() > LAS_VERBOSE)) {
+        set_message_log_level(LAS_VERBOSE);
+      }
     }
     else if (strcmp(argv[i], "-vv") == 0 || strcmp(argv[i], "-very_verbose") == 0)
     {
