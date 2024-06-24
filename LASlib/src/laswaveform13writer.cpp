@@ -146,7 +146,7 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
     file_name_temp[len-2] = 'd';
     file_name_temp[len-1] = (compressed ? 'z' : 'p');
   }
-  file = fopen(file_name_temp, "wb");
+  file = LASfopen(file_name_temp, "wb");
 
   if (file == 0)
   {
@@ -197,7 +197,7 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
   }
   I8 description[32];
   memset(description, 0, 32);
-  sprintf(description, "%s by LAStools (%d)", (compressed ? "compressed" : "created"), LAS_TOOLS_VERSION);
+  snprintf(description, sizeof(description), "%s by LAStools (%d)", (compressed ? "compressed" : "created"), LAS_TOOLS_VERSION);
   if (!stream->putBytes((U8*)description, 32))
   {
     laserror("writing EVLR description");
@@ -207,7 +207,7 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
   // write waveform descriptor cross-check
 
   char magic[25];
-  sprintf(magic, "LAStools waveform %d", LAS_TOOLS_VERSION);
+  snprintf(magic, sizeof(magic), "LAStools waveform %d", LAS_TOOLS_VERSION);
 
   if (!stream->putBytes((U8*)magic, 24))
   {

@@ -53,18 +53,7 @@ BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_onl
     laserror("file name pointer is zero");
     return FALSE;
   }
-
-#ifdef _MSC_VER
-  wchar_t* utf16_file_name = UTF8toUTF16(file_name);
-  file = _wfopen(utf16_file_name, L"rb");
-  if (file == 0)
-  {
-    laserror("cannot open file '%ws' for read", utf16_file_name);
-  }
-  delete [] utf16_file_name;
-#else
-  file = fopen(file_name, "rb");
-#endif
+  file = LASfopen(file_name, "rb");
 
   if (file == 0)
   {

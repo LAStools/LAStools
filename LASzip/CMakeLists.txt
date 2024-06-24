@@ -6,6 +6,11 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set(ROOT_DIR "${PROJECT_SOURCE_DIR}")
 
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-security -Wno-format-truncation")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-format-truncation")
+endif()
+
 # the next line is the ONLY place in the entire laszip system where
 # the version info is hard-coded
 set(LASZIP_API_VERSION_STRING "3.5.1" CACHE STRING "LASzip version" FORCE)

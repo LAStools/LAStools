@@ -56,7 +56,7 @@ BOOL LASwriterQFIT::open(const char* file_name, const LASheader* header, I32 ver
     return FALSE;
   }
 
-  file = fopen(file_name, "wb");
+  file = LASfopen(file_name, "wb");
 
   if (file == 0)
   {
@@ -182,7 +182,7 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
   // populate some ASCII into the remainder of first header record
 
   memset(buffer, 0, 48);
-  sprintf((char*)buffer, "via LASwriterQFIT (version %d)", LAS_TOOLS_VERSION);
+  snprintf((char*)buffer, sizeof(buffer), "via LASwriterQFIT (version %d)", LAS_TOOLS_VERSION);
 
   if (!stream->putBytes((U8*)buffer, version-4))
   {
@@ -209,7 +209,7 @@ BOOL LASwriterQFIT::open(ByteStreamOut* stream, const LASheader* header, I32 ver
   // populate some ASCII into the remainder of second header record
 
   memset(buffer, 0, 48);
-  sprintf((char*)buffer, "LAStools by rapidlasso GmbH");
+  snprintf((char*)buffer, sizeof(buffer), "LAStools by rapidlasso GmbH");
   if (!stream->putBytes((U8*)buffer, version-8))
   {
     laserror("writing second header record of QFIT header");

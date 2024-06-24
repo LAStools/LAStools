@@ -1,3 +1,7 @@
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-security -Wno-format-truncation")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-format-truncation")
+endif()
 if (!MSVC)
 add_compile_options(-Wno-deprecated -Wno-write-strings -Wno-unused-result)
 endif()

@@ -101,7 +101,7 @@ BOOL LASreaderBuffered::set_file_name(const char* file_name)
     return FALSE;
   }
   // does the file exist
-  FILE* file = fopen(file_name, "r");
+  FILE* file = LASfopen(file_name, "r");
   if (file == 0)
   {
     laserror("file '%s' cannot be opened", file_name);
@@ -122,7 +122,7 @@ BOOL LASreaderBuffered::add_neighbor_file_name(const char* file_name)
     return FALSE;
   }
   // does the file exist
-  FILE* file = fopen(file_name, "r");
+  FILE* file = LASfopen(file_name, "r");
   if (file == 0)
   {
     laserror("file '%s' cannot be opened", file_name);

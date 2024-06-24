@@ -188,6 +188,30 @@ typedef union I64U32I32F32 { I64 i64; U32 u32[2]; I32 i32[2]; F32 f32[2]; } I64U
 #define NULL    0
 #endif
 
+#ifdef _MSC_VER
+#define strncpy_las(dest, destsz, src, count) strncpy_s((dest), (destsz), (src), (count))
+#else
+#define strncpy_las(dest, destsz, src, count) strncpy((dest), (src), (count)) 
+#endif
+
+#ifdef _MSC_VER
+#define strcpy_las(dest, destsz, src) strcpy_s((dest), (destsz), (src))
+#else
+#define strcpy_las(dest, destsz, src) strcpy((dest), (src))
+#endif
+
+#ifdef _MSC_VER
+#define sscanf_las(buf, format, ...) sscanf_s((buf), (format), __VA_ARGS__)
+#else
+#define sscanf_las(buf, format, ...) sscanf((buf), (format), __VA_ARGS__)
+#endif
+
+#ifdef _MSC_VER
+#define strcat_las(dest, destsz, src) strcat_s((dest), (destsz), (src))
+#else
+#define strcat_las(dest, destsz, src) strcat((dest), (src))
+#endif
+
 inline BOOL IS_LITTLE_ENDIAN()
 {
   const U32 i = 1;
@@ -268,6 +292,7 @@ inline void ENDIAN_SWAP_64(const U8* from, U8* to)
 #if defined(_MSC_VER)
 #include <windows.h>
 wchar_t* UTF8toUTF16(const char* utf8);
+wchar_t* ANSItoUTF16(const char* ansi);
 #endif
 
 /// <summary>
@@ -298,6 +323,15 @@ LAS_EXIT_CODE las_exit_code(bool error);
 
 // void byebye(LAS_EXIT_CODE code = LAS_EXIT_OK);
 void byebye();
+
+#if 0
+  // Non Windows - specific conversion ANSI to UTF-8
+  char* ANSItoUTF8(const char* ansi);
+#endif
+// Validates whether a given string is UTF-8 encoded.
+bool validate_utf8(const char* utf8) noexcept;
+// Opens a file with the specified filename and mode, converting filename and mode to UTF-16 on Windows.
+FILE* LASfopen(const char* const filename, const char* const mode);
 
 // las error message function which leads to an immediate program stop by default
 template<typename... Args>

@@ -53,7 +53,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     return FALSE;
   }
   // does the file exist
-  FILE* file = fopen(file_name, "r");
+  FILE* file = LASfopen(file_name, "r");
   if (file == 0)
   {
     laserror("file '%s' cannot be opened", file_name);

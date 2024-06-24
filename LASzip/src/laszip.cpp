@@ -197,7 +197,7 @@ bool LASzip::return_error(const char* error)
 #define CopyString strdup
 #endif
   char err[256];
-  sprintf(err, "%s (LASzip v%d.%dr%d)", error, LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION);
+  snprintf(err, sizeof(err), "%s (LASzip v%d.%dr%d)", error, LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION);
   if (error_string) free(error_string);
   error_string = CopyString(err);
   return false;
@@ -207,7 +207,7 @@ bool LASzip::check_compressor(const U16 compressor)
 {
   if (compressor < LASZIP_COMPRESSOR_TOTAL_NUMBER_OF) return true;
   char error[64];
-  sprintf(error, "compressor %d not supported", compressor);
+  snprintf(error, sizeof(error), "compressor %d not supported", compressor);
   return return_error(error);
 }
 
@@ -215,7 +215,7 @@ bool LASzip::check_coder(const U16 coder)
 {
   if (coder < LASZIP_CODER_TOTAL_NUMBER_OF) return true;
   char error[64];
-  sprintf(error, "coder %d not supported", coder);
+  snprintf(error, sizeof(error), "coder %d not supported", coder);
   return return_error(error);
 }
 
@@ -267,7 +267,7 @@ bool LASzip::check_item(const LASitem* item)
     if (1)
     {
       char error[64];
-      sprintf(error, "item unknown (%d,%d,%d)", item->type, item->size, item->version);
+      snprintf(error, sizeof(error), "item unknown (%d,%d,%d)", item->type, item->size, item->version);
       return return_error(error);
     }
   }
@@ -288,7 +288,7 @@ bool LASzip::check_items(const U16 num_items, const LASitem* items, const U16 po
   if (point_size && (point_size != size))
   {
     CHAR temp[66];
-    sprintf(temp, "point has size of %d but items only add up to %d bytes", point_size, size);
+    snprintf(temp, sizeof(temp), "point has size of %d but items only add up to %d bytes", point_size, size);
     return return_error(temp);
   }
   return true;
@@ -490,7 +490,7 @@ bool LASzip::setup(U16* num_items, LASitem** items, const U8 point_type, const U
     if (1)
     {
       char error[64];
-      sprintf(error, "point type %d unknown", point_type);
+      snprintf(error, sizeof(error), "point type %d unknown", point_type);
       return return_error(error);
     }
   }

@@ -65,17 +65,7 @@ BOOL LASwriterLAS::open(const char* file_name, const LASheader* header, U32 comp
     return FALSE;
   }
 
-#ifdef _MSC_VER
-  wchar_t* utf16_file_name = UTF8toUTF16(file_name);
-  file = _wfopen(utf16_file_name, L"wb");
-  if (file == 0)
-  {
-    laserror("cannot open file '%ws' for write", utf16_file_name);
-  }
-  delete[] utf16_file_name;
-#else
-  file = fopen(file_name, "wb");
-#endif
+  file = LASfopen(file_name, "wb");
 
   if (file == 0)
   {
@@ -604,7 +594,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     }
     char description[32];
     memset(description, 0, 32);
-    sprintf(description, "by laszip of LAStools (%d)", LAS_TOOLS_VERSION);
+    snprintf(description, sizeof(description), "by laszip of LAStools (%d)", LAS_TOOLS_VERSION);
     if (!stream->putBytes((const U8*)description, 32))
     {
       laserror("writing description %s", description);
@@ -730,7 +720,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
       return FALSE;
     }
     CHAR description[33] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-    sprintf(description, "tile %s buffer %s", (header->vlr_lastiling->buffer ? "with" : "without"), (header->vlr_lastiling->reversible ? ", reversible" : ""));
+    snprintf(description, sizeof(description), "tile %s buffer %s", (header->vlr_lastiling->buffer ? "with" : "without"), (header->vlr_lastiling->reversible ? ", reversible" : ""));
     if (!stream->putBytes((const U8*)description, 32))
     {
       laserror("writing description %s", description);

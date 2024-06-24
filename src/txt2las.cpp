@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
       }
       i++;
       I32 point_type;
-      if (sscanf(argv[i], "%d", &point_type) != 1)
+      if (sscanf_las(argv[i], "%d", &point_type) != 1)
       {
         laserror("cannot understand argument '%s' of '%s'", argv[i], argv[i - 1]);
       }
@@ -271,17 +271,17 @@ int main(int argc, char* argv[])
       }
       F64 scale_factor[3];
       i++;
-      if (sscanf(argv[i], "%lf", &(scale_factor[0])) != 1)
+      if (sscanf_las(argv[i], "%lf", &(scale_factor[0])) != 1)
       {
         laserror("'%s' needs 3 arguments: x y z", argv[i - 1]);
       }
       i++;
-      if (sscanf(argv[i], "%lf", &(scale_factor[1])) != 1)
+      if (sscanf_las(argv[i], "%lf", &(scale_factor[1])) != 1)
       {
         laserror("'%s' needs 3 arguments: x y z", argv[i - 2]);
       }
       i++;
-      if (sscanf(argv[i], "%lf", &(scale_factor[2])) != 1)
+      if (sscanf_las(argv[i], "%lf", &(scale_factor[2])) != 1)
       {
         laserror("'%s' needs 3 arguments: x y z", argv[i - 3]);
       }
@@ -295,17 +295,17 @@ int main(int argc, char* argv[])
       }
       F64 offset[3];
       i++;
-      if (sscanf(argv[i], "%lf", &(offset[0])) != 1)
+      if (sscanf_las(argv[i], "%lf", &(offset[0])) != 1)
       {
         laserror("'%s' needs 3 arguments: x y z", argv[i - 1]);
       }
       i++;
-      if (sscanf(argv[i], "%lf", &(offset[1])) != 1)
+      if (sscanf_las(argv[i], "%lf", &(offset[1])) != 1)
       {
         laserror("'%s' needs 3 arguments: x y z", argv[i - 2]);
       }
       i++;
-      if (sscanf(argv[i], "%lf", &(offset[2])) != 1)
+      if (sscanf_las(argv[i], "%lf", &(offset[2])) != 1)
       {
         laserror("'%s' needs 3 arguments: x y z", argv[i - 3]);
       }
@@ -367,12 +367,12 @@ int main(int argc, char* argv[])
         laserror("'%s' needs 2 arguments: day year", argv[i]);
       }
       i++;
-      if (sscanf(argv[i], "%d", &file_creation_day) != 1)
+      if (sscanf_las(argv[i], "%d", &file_creation_day) != 1)
       {
         laserror("'%s' needs 2 arguments: day year", argv[i - 1]);
       }
       i++;
-      if (sscanf(argv[i], "%d", &file_creation_year) != 1)
+      if (sscanf_las(argv[i], "%d", &file_creation_year) != 1)
       {
         laserror("'%s' needs 2 arguments: day year", argv[i - 2]);
       }
@@ -384,7 +384,7 @@ int main(int argc, char* argv[])
         laserror("'%s' needs 1 argument: value", argv[i]);
       }
       i++;
-      if (sscanf(argv[i], "%d", &set_global_encoding) != 1)
+      if (sscanf_las(argv[i], "%d", &set_global_encoding) != 1)
       {
         laserror("'%s' needs 1 argument: value", argv[i - 1]);
       }
@@ -418,7 +418,7 @@ int main(int argc, char* argv[])
         laserror("'%s' needs 1 argument: major.minor", argv[i]);
       }
       i++;
-      if (sscanf(argv[i], "%d.%d", &set_version_major, &set_version_minor) != 2)
+      if (sscanf_las(argv[i], "%d.%d", &set_version_major, &set_version_minor) != 2)
       {
         laserror("cannot understand argument '%s' of '%s'", argv[i], argv[i - 1]);
       }
@@ -437,7 +437,7 @@ int main(int argc, char* argv[])
       {
         laserror("'%s' needs 1 argument: every", argv[i]);
       }
-      if (sscanf(argv[i + 1], "%u", &progress) != 1)
+      if (sscanf_las(argv[i + 1], "%u", &progress) != 1)
       {
         laserror("'%s' needs 1 argument: every but '%s' is no valid number", argv[i], argv[i + 1]);
       }
@@ -568,25 +568,24 @@ int main(int argc, char* argv[])
 
     if (set_system_identifier)
     {
-      strncpy(lasreader->header.system_identifier, set_system_identifier, 32);
-      lasreader->header.system_identifier[31] = '\0';
+      strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), set_system_identifier, 32);
     }
     else
     {
-      strncpy(lasreader->header.system_identifier, "LAStools (c) by rapidlasso GmbH", 32);
-      lasreader->header.system_identifier[31] = '\0';
+      strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), "LAStools (c) by rapidlasso GmbH", 32);
     }
+    lasreader->header.system_identifier[31] = '\0';
 
     memset(lasreader->header.generating_software, 0, 32);
     if (set_generating_software)
     {
-      strncpy(lasreader->header.generating_software, set_generating_software, 32);
+      strncpy_las(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), set_generating_software, 32);
     }
     else
     {
       char temp[64];
-      sprintf(temp, "txt2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
-      strncpy(lasreader->header.generating_software, temp, 32);
+      snprintf(temp, sizeof(temp), "txt2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
+      strncpy_las(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), temp, 32);
     }
     lasreader->header.generating_software[31] = '\0';
 

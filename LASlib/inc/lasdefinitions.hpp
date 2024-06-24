@@ -595,7 +595,7 @@ public:
     }
     memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
     vlrs[i].reserved = 0; // used to be 0xAABB
-    strncpy(vlrs[i].user_id, user_id, 16);
+    strncpy_las(vlrs[i].user_id, sizeof(vlrs[i].user_id), user_id, 16);
     vlrs[i].record_id = record_id;
     vlrs[i].record_length_after_header = record_length_after_header;
     if (keep_description && found_description)
@@ -604,11 +604,11 @@ public:
     }
     else if (description)
     {
-      sprintf(vlrs[i].description, "%.31s", description);
+      snprintf(vlrs[i].description, sizeof(vlrs[i].description), "%.31s", description);
     }
     else
     {
-      sprintf(vlrs[i].description, "by LAStools of rapidlasso GmbH");
+      snprintf(vlrs[i].description, sizeof(vlrs[i].description), "by LAStools of rapidlasso GmbH");
     }
     if (record_length_after_header)
     {
@@ -720,7 +720,7 @@ public:
       evlrs = (LASevlr*)malloc(sizeof(LASevlr)*number_of_extended_variable_length_records);
     }
     evlrs[i].reserved = 0; // used to be 0xAABB
-    strncpy(evlrs[i].user_id, user_id, 16);
+    strncpy_las(evlrs[i].user_id, sizeof(evlrs[i].user_id), user_id, 16);
     evlrs[i].record_id = record_id;
     evlrs[i].record_length_after_header = record_length_after_header;
     if (keep_description && found_description)
@@ -729,11 +729,11 @@ public:
     }
     else if (description)
     {
-      sprintf(evlrs[i].description, "%.31s", description);
+      snprintf(evlrs[i].description, sizeof(evlrs[i].description), "%.31s", description);
     }
     else
     {
-      sprintf(evlrs[i].description, "by LAStools of rapidlasso GmbH");
+      snprintf(evlrs[i].description, sizeof(evlrs[i].description), "by LAStools of rapidlasso GmbH");
     }
     if (record_length_after_header)
     {

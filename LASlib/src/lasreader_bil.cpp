@@ -94,8 +94,7 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
   }
 
   // open the BIL file
-
-  file = fopen(file_name, "rb");
+  file = LASfopen(file_name, "rb");
   if (file == 0)
   {
     laserror("cannot open file '%s'", file_name);
@@ -109,8 +108,8 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
 
   // populate the header as much as it makes sense
 
-  sprintf(header.system_identifier, "LAStools (c) by rapidlasso GmbH");
-  sprintf(header.generating_software, "via LASreaderBIL (%d)", LAS_TOOLS_VERSION);
+  snprintf(header.system_identifier, sizeof(header.system_identifier), "LAStools (c) by rapidlasso GmbH");
+  snprintf(header.generating_software, sizeof(header.generating_software), "via LASreaderBIL (%d)", LAS_TOOLS_VERSION);
 
   // maybe set creation date
 
@@ -384,7 +383,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
   file_name_hdr[len+2] = 'd';
   file_name_hdr[len+3] = 'r';
 
-  FILE* file = fopen(file_name_hdr, "r");
+  FILE* file = LASfopen(file_name_hdr, "r");
 
   if (file == 0)
   {
@@ -392,7 +391,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     file_name_hdr[len+2] = 'D';
     file_name_hdr[len+3] = 'R';
 
-    file = fopen(file_name_hdr, "r");
+    file = LASfopen(file_name_hdr, "r");
     free(file_name_hdr);
 
     if (file == 0)
@@ -558,7 +557,7 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
   file_name_bwl[len+2] = 'l';
   file_name_bwl[len+3] = 'w';
 
-  FILE* file = fopen(file_name_bwl, "r");
+  FILE* file = LASfopen(file_name_bwl, "r");
 
   if (file == 0)
   {
@@ -566,7 +565,7 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
     file_name_bwl[len+2] = 'L';
     file_name_bwl[len+3] = 'W';
 
-    file = fopen(file_name_bwl, "r");
+    file = LASfopen(file_name_bwl, "r");
 
     if (file == 0)
     {
@@ -808,7 +807,7 @@ BOOL LASreaderBIL::reopen(const CHAR* file_name)
     return FALSE;
   }
 
-  file = fopen(file_name, "rb");
+  file = LASfopen(file_name, "rb");
   if (file == 0)
   {
     laserror("cannot reopen file '%s'", file_name);

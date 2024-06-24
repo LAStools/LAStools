@@ -2896,10 +2896,11 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
 		{
 			len++;
 			CHAR full_file_name[512];
-			strncpy(full_file_name, file_name, len);
+			strncpy_las(full_file_name, sizeof(full_file_name), file_name, len);
+			size_t remaining_size = (sizeof(full_file_name) > len) ? (sizeof(full_file_name) - len) : 0;
 			do
 			{
-				sprintf(&full_file_name[len], "%s", info.cFileName);
+				snprintf(&full_file_name[len], remaining_size, "%s", info.cFileName);
 				if (add_file_name_single(full_file_name, unique)) r = TRUE;
 			} while (FindNextFile(h, &info));
 		}
@@ -3096,7 +3097,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, I64 npoints, F6
 
 BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique)
 {
-	FILE* file = fopen(list_of_files, "r");
+	FILE* file = LASfopen(list_of_files, "r");
 	if (file == 0)
 	{
 		laserror("cannot open '%s'", list_of_files);
@@ -3252,7 +3253,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, I64 n
 
 BOOL LASreadOpener::add_neighbor_list_of_files(const CHAR* neighbor_list_of_files, BOOL unique)
 {
-	FILE* file = fopen(neighbor_list_of_files, "r");
+	FILE* file = LASfopen(neighbor_list_of_files, "r");
 	if (file == 0)
 	{
 		laserror("cannot open '%s'", neighbor_list_of_files);
@@ -3353,10 +3354,11 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
 		{
 			len++;
 			CHAR full_neighbor_file_name[512];
-			strncpy(full_neighbor_file_name, neighbor_file_name, len);
+			strncpy_las(full_neighbor_file_name, sizeof(full_neighbor_file_name), neighbor_file_name, len);
+			size_t remaining_size = (sizeof(full_neighbor_file_name) > len) ? (sizeof(full_neighbor_file_name) - len) : 0;
 			do
 			{
-				sprintf(&full_neighbor_file_name[len], "%s", info.cFileName);
+				snprintf(&full_neighbor_file_name[len], remaining_size, "%s", info.cFileName);
 				if (add_neighbor_file_name_single(full_neighbor_file_name, unique)) r = TRUE;
 			} while (FindNextFile(h, &info));
 		}

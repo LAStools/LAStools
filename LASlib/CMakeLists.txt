@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 set(CMAKE_SUPPRESS_REGENERATION true)
 project("LASlib")
-
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-security -Wno-format-truncation")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-format-truncation")
+endif()
 if (!MSVC)
 	add_compile_options(-O3 -Wall -Wno-strict-aliasing)
 else()

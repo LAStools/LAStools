@@ -773,12 +773,11 @@ int main(int argc, char *argv[])
       }
 
       // prepare the header for the surviving points
-
-      strncpy(lasreader->header.system_identifier, "LAStools (c) by rapidlasso GmbH", 32);
+      strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), "LAStools (c) by rapidlasso GmbH", 32);
       lasreader->header.system_identifier[31] = '\0';
       char temp[64];
-      sprintf(temp, "lasprecision (%d)", LAS_TOOLS_VERSION);
-      strncpy(lasreader->header.generating_software, temp, 32);
+      snprintf(temp, sizeof(temp), "lasprecision (%d)", LAS_TOOLS_VERSION);
+      strncpy_las(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), temp, 32);
       lasreader->header.generating_software[31] = '\0';
 
       if (projection_was_set)
