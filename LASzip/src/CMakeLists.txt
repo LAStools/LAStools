@@ -7,25 +7,69 @@
 ###############################################################################
 set(LASZIP_SOURCES
     mydefs.cpp
+    mydefs.hpp
     lasmessage.cpp
+    lasmessage.hpp
     arithmeticdecoder.cpp
+    arithmeticdecoder.hpp
     arithmeticencoder.cpp
+    arithmeticencoder.hpp
     arithmeticmodel.cpp
+    arithmeticmodel.hpp
+    bytestreamin.hpp
+    bytestreamin_array.hpp
+    bytestreamin_file.hpp
+    bytestreamin_istream.hpp
+    bytestreaminout.hpp
+    bytestreaminout_file.hpp
+    bytestreamout.hpp
+    bytestreamout_array.hpp
+    bytestreamout_file.hpp
+    bytestreamout_nil.hpp
+    bytestreamout_ostream.hpp
+    endian.hpp
     integercompressor.cpp
+    integercompressor.hpp
+    lasattributer.hpp
     lasindex.cpp
+    lasindex.hpp
     lasinterval.cpp
+    lasinterval.hpp
+    laspoint.hpp
     lasquadtree.cpp
+    lasquadtree.hpp
+    lasquantizer.hpp
+    lasreaditem.hpp
     lasreaditemcompressed_v1.cpp
+    lasreaditemcompressed_v1.hpp
     lasreaditemcompressed_v2.cpp
+    lasreaditemcompressed_v2.hpp
     lasreaditemcompressed_v3.cpp
+    lasreaditemcompressed_v3.hpp
     lasreaditemcompressed_v4.cpp
+    lasreaditemcompressed_v4.hpp
+    lasreaditemraw.hpp
     lasreadpoint.cpp
+    lasreadpoint.hpp
+    laswriteitem.hpp
     laswriteitemcompressed_v1.cpp
+    laswriteitemcompressed_v1.hpp
     laswriteitemcompressed_v2.cpp
+    laswriteitemcompressed_v2.hpp
     laswriteitemcompressed_v3.cpp
+    laswriteitemcompressed_v3.hpp
     laswriteitemcompressed_v4.cpp
+    laswriteitemcompressed_v4.hpp
+    laswriteitemraw.hpp
     laswritepoint.cpp
+    laswritepoint.hpp
     laszip.cpp
+    laszip.hpp
+    laszip_common_v1.hpp
+    laszip_common_v2.hpp
+    laszip_common_v3.hpp
+    laszip_decompress_selective_v3.hpp
+    ../include/laszip/laszip_common.h
     laszip_dll.cpp
 )
 

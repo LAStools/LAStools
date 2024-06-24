@@ -1,4 +1,5 @@
 set(LASZIP_API_SOURCES
+    laszip_api.h
     laszip_api.c
 )
 
