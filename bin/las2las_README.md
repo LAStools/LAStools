@@ -227,6 +227,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.las
 -feet                               : use feet  
 -force                              : force a GPS week conversion even if conversion is suspect.  
 -load_vlrs                          : loads all VLRs from a file called vlrs.vlr and adds them to each processed file  
+-load_vlr [i] [u] [r] [f]           : loads a single VLR specified by index [i] (default = 0) or user ID [u] and record ID [r] from the file [f] (default: save.vlr) and adds it to each processed file header
 -load_ogc_wkt [f]                   : loads the first single-string from file [f] and puts it into the place of the OGC WKT  
 -move_evlrs_to_vlrs                 : move all EVLRs with small enough payload to VLR section  
 -remove_all_evlrs                   : remove all EVLRs  
@@ -241,6 +242,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.las
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -save_vlrs                          : saves all VLRs to a file called vlrs.vlr so they can be loaded into another file  
+-save_vlr [i] [u] [r] [f]           : saves a single VLR specified by index [i] (default = 0) or user ID [u] and record ID [r] to the file [f] (default: save.vlr) so it can be loaded into another file header
 -set_attribute_offset [m] [n]       : set offset of the attribute [m]{0-based} in the extra bytes to [n]  
 -set_attribute_scale [m] [n]        : set scale of the attribute [m]{0-based} in the extra bytes to [n]  
 -set_classification [n]             : set classification to [n]  

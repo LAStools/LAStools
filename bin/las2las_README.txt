@@ -224,7 +224,9 @@ other commandline arguments are
 -unset_attribute_offset 1      : unsets the offset of the *second* attribute in the extra bytes
 -move_evlrs_to_vlrs            : move all EVLRs with small enough payload to VLR section
 -save_vlrs                     : saves all VLRs to a file called vlrs.vlr so they can be loaded into another file
+-save_vlr 0 LASF_Projection 34735 sample.vlr : saves a single VLR specified by index (default = 0) or user ID and record ID to the file (default: save.vlr) so it can be loaded into another file header
 -load_vlrs                     : loads all VLRs from a file called vlrs.vlr and adds them to each processed file
+-load_vlr 0 LASF_Projection 34735 sample.vlr : loads a single VLR specified by index (default = 0) or user ID and record ID from the file (default: save.vlr) and adds it to each processed file header
 -dont_remove_empty_files       : does not remove files that have zero points remaining from disk
 -clip_to_bounding_box          : kicks out all points not inside the bounding box specified by the LAS header
 -week_to_adjusted              : converts time stamps from GPS week to Adjusted Standard GPS 
