@@ -253,273 +253,6 @@ static bool load_vlrs_from_file(LASheader* header)
   return true;
 }
 
-/// Checks if the specified filename has a ".vlr" extension.
-static bool has_vlr_extension(const CHAR* filename) {
-  const CHAR* extension = ".vlr";
-  const CHAR* dot = strrchr(filename, '.'); // Last occurrence of '.' in the filename
-
-  if (dot != nullptr) {
-    if (strcmp(dot, extension) == 0) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Validating and determining the VLR index and the parameters
-static U32 determine_vlr_index(const LASheader* header, const int& vlr_index, const CHAR* vlr_user_id, const int& vlr_record_id) {
-  U32 index = -1;
-
-  if (vlr_user_id == nullptr && vlr_record_id == -1) {
-    //Using index for '-save_vlr'
-    if (vlr_index != -1) {
-      if (vlr_index < 0 || static_cast<unsigned int>(vlr_index) >= header->number_of_variable_length_records) {  //HIER NOCHMAL KONTROLLIEREN ' >= '
-        laserror("Invalid index: The specified index '%d' for '-save_vlr' is out of range", vlr_index);
-      }
-      index = vlr_index;
-    }
-    //Default to index = 0 if no parameters are specified when using '-save_vlr'
-    else {
-      index = 0;
-    }
-  }
-  else if (vlr_index == -1 && vlr_user_id != nullptr && vlr_record_id != -1) {
-    //Using user ID and record ID for '-save_vlr'
-    for (U32 idx = 0; idx < header->number_of_variable_length_records; idx++)
-    {
-      if (strcmp(header->vlrs[idx].user_id, vlr_user_id) == 0 && header->vlrs[idx].record_id == vlr_record_id)
-      {
-        index = idx;
-        break;
-      }
-    }
-    if (index == -1) {
-      laserror("The specified user ID '%s' or record ID '%d' could not be found when using '-save_vlr'", vlr_user_id, vlr_record_id);
-    }
-  } 
-  else {
-    laserror("Invalid parameters: Either specify an index, or specify both user ID and record ID for '-save_vlr'");
-  }
-  return index;
-}
-
-/// Saves a single VLR from a LAS header to a specified or default file, ensuring data integrity and file format validation.
-static bool save_single_vlr_to_file(const LASheader* header, const int& vlr_index, const CHAR* vlr_user_id, const int& vlr_record_id, const CHAR* vlr_output_filename)
-{
-  U32 i = -1;
-  FILE* file  = nullptr;
-  // Save VLR to specified or default filename
-  if (vlr_output_filename == nullptr) {
-    file = LASfopen("save.vlr", "wb");
-  }
-  else {
-    if (has_vlr_extension(vlr_output_filename))
-      file = LASfopen(vlr_output_filename, "wb");
-    else
-      laserror("Invalid file format: The specified file must have a .vlr extension");
-  }
-  if (file == nullptr) {
-    return false;
-  }
-  // validating and determining the vlr index and the parameters
-  i = determine_vlr_index(header, vlr_index, vlr_user_id, vlr_record_id);
-
-  ByteStreamOut* out;
-  if (IS_LITTLE_ENDIAN())
-    out = new ByteStreamOutFileLE(file);
-  else
-    out = new ByteStreamOutFileBE(file);
-
-  U32 number_of_single_variable_length_records = 1;
-  // write number of VLRs
-  if (!out->put32bitsLE((U8*)&(number_of_single_variable_length_records)))
-  {
-    laserror("writing number_of_single_variable_length_records in -save_vlr");
-  }
-
-  if (i >= 0) {
-    // using specified vlr [i]
-    if (!out->put16bitsLE((U8*)&(header->vlrs[i].reserved)))
-    {
-      laserror("writing header->vlrs[%d].reserved", i);
-    }
-    if (!out->putBytes((U8*)header->vlrs[i].user_id, 16))
-    {
-      laserror("writing header->vlrs[%d].user_id", i);
-    }
-    if (!out->put16bitsLE((U8*)&(header->vlrs[i].record_id)))
-    {
-      laserror("writing header->vlrs[%d].record_id", i);
-    }
-    if (!out->put16bitsLE((U8*)&(header->vlrs[i].record_length_after_header)))
-    {
-      laserror("writing header->vlrs[%d].record_length_after_header", i);
-    }
-    if (!out->putBytes((U8*)header->vlrs[i].description, 32))
-    {
-      laserror("writing header->vlrs[%d].description", i);
-    }
-
-    // write the data following the header of the variable length record
-    if (header->vlrs[i].record_length_after_header)
-    {
-      if (header->vlrs[i].data)
-      {
-        if (!out->putBytes((U8*)header->vlrs[i].data, header->vlrs[i].record_length_after_header))
-        {
-          laserror("writing %d bytes of data from header->vlrs[%d].data", header->vlrs[i].record_length_after_header, i);
-        }
-      }
-      else
-      {
-        laserror("there should be %d bytes of data in header->vlrs[%d].data", header->vlrs[i].record_length_after_header, i);
-      }
-    }
-  }
-  else {
-    laserror("specified vlr could not be located");
-  }
-  delete out;
-  fclose(file);
-  return true;
-}
-
-/// Loads a single VLR from a specified vlr file based on index or user ID and record ID, and adds it to the LAS header.
-static bool load_single_vlr_from_file(LASheader* header, const int& vlr_index, const CHAR* vlr_user_id, const int& vlr_record_id, const CHAR* vlr_input_filename)
-{
-  U32 i;
-  FILE* file = nullptr;
-  
-  if (vlr_input_filename == nullptr) {
-    //try to open default save.vlr file
-    file = LASfopen("save.vlr", "rb");
-  }
-  else {
-    file = LASfopen(vlr_input_filename, "rb");
-  }
-  if (file == nullptr) {
-    laserror("VLR file '%s' could not be found", vlr_input_filename);
-  }
-  ByteStreamIn* in;
-  if (IS_LITTLE_ENDIAN())
-    in = new ByteStreamInFileLE(file);
-  else
-    in = new ByteStreamInFileBE(file);
-  // read number of VLRs
-  U32 number_of_variable_length_records;
-  try {
-    in->get32bitsLE((U8*)&number_of_variable_length_records);
-  }
-  catch (...)
-  {
-    laserror("reading number_of_variable_length_records");
-  } 
-  // Check whether the specified index is valid
-  if (vlr_index >= 0 && vlr_index >= number_of_variable_length_records) {
-    laserror("specified vlr index '%d' is out of range", vlr_index);
-  }
-  // loop over VLRs
-  LASvlr vlr;
-  for (i = 0; i < number_of_variable_length_records; i++)
-  {
-    try {
-      in->get16bitsLE((U8*)&(vlr.reserved));
-    }
-    catch (...)
-    {
-      laserror("reading vlr.reserved");
-    }
-    try {
-      in->getBytes((U8*)vlr.user_id, 16);
-    }
-    catch (...)
-    {
-      laserror("reading vlr.user_id");
-    }
-    try {
-      in->get16bitsLE((U8*)&(vlr.record_id));
-    }
-    catch (...)
-    {
-      laserror("reading vlr.record_id");
-    }
-    try {
-      in->get16bitsLE((U8*)&(vlr.record_length_after_header));
-    }
-    catch (...)
-    {
-      laserror("reading vlr.record_length_after_header");
-    }
-    try {
-      in->getBytes((U8*)vlr.description, 32);
-    }
-    catch (...)
-    {
-      laserror("reading vlr.description");
-    }
-
-    // write the data following the header of the variable length record
-    if (vlr.record_length_after_header)
-    {
-      vlr.data = new U8[vlr.record_length_after_header];
-      try {
-        in->getBytes((U8*)vlr.data, vlr.record_length_after_header);
-      }
-      catch (...)
-      {
-        laserror("reading %d bytes into vlr.data", vlr.record_length_after_header);
-      }
-    }
-    else
-    {
-      vlr.data = 0;
-    }
-
-    if (vlr_index >= 0 && i == vlr_index) {
-      header->add_vlr(vlr.user_id, vlr.record_id, vlr.record_length_after_header, vlr.data, TRUE, vlr.description);
-      break;
-    }
-    else if (vlr_user_id != nullptr && vlr_record_id >= 0 &&
-             strcmp(vlr.user_id, vlr_user_id) == 0 && vlr.record_id == vlr_record_id)
-    {
-        header->add_vlr(vlr.user_id, vlr.record_id, vlr.record_length_after_header, vlr.data, TRUE, vlr.description);
-        break;
-    }
-  }
-  delete in;
-  fclose(file);
-  return true;
-}
-
-/// Parse and handle arguments for -save_vlr or -load_vlr, based on specified vlr index or user ID and record ID and optional output filename
-static void parse_save_load_vlr_args(int& i, int argc, char* argv[], bool& save_vlr, int& vlr_index, char*& vlr_user_id, int& vlr_record_id, char*& vlr_filename) {
-  if (i + 1 >= argc) {
-    vlr_index = 0; // Default value if no arguments are provided
-  }
-  // Check for user ID and record ID
-  else if (i + 2 < argc && argv[i + 1][0] != '-' && isalnum(argv[i + 1][0]) && argv[i + 2][0] != '-' && isdigit(argv[i + 2][0])) {
-    vlr_user_id = argv[++i];
-    vlr_record_id = atoi(argv[++i]);
-    // Optional output filename
-    if (i + 1 < argc && argv[i + 1][0] != '-') {
-      vlr_filename = argv[++i];
-    }
-  }
-  // Check for numeric index
-  else if (i + 1 < argc && argv[i + 1][0] != '-' && isdigit(argv[i + 1][0])) {
-    vlr_index = atoi(argv[++i]);
-    // Optional output filename
-    if (i + 1 < argc && argv[i + 1][0] != '-') {
-      vlr_filename = argv[++i];
-    }
-  }
-  //Only filename arguments is provided
-  else if (i + 1 < argc && argv[i + 1][0] != '-') {
-    vlr_index = 0; // Default value if just filename arguments is provided
-    vlr_filename = argv[++i];
-  }
-}
-
 // for point type conversions
 const U8 convert_point_type_from_to[11][11] =
 {
@@ -575,12 +308,6 @@ int main(int argc, char* argv[])
   bool move_evlrs_to_vlrs = false;
   bool save_vlrs = false;
   bool load_vlrs = false;
-  bool save_vlr = false;
-  bool load_vlr = false;
-  int vlr_index = -1;
-  int vlr_record_id = -1;
-  CHAR* vlr_user_id = nullptr;
-  CHAR* vlr_filename = nullptr;
   int set_attribute_scales = 0;
   int set_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
   double set_attribute_scale_scale[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
@@ -980,16 +707,6 @@ int main(int argc, char* argv[])
     {
       load_vlrs = true;
     }
-    else if (strcmp(argv[i], "-save_vlr") == 0)
-    {
-      save_vlr = true;
-      parse_save_load_vlr_args(i, argc, argv, save_vlr, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
-    }
-    else if (strcmp(argv[i], "-load_vlr") == 0)
-    {
-      load_vlr = true;
-      parse_save_load_vlr_args(i, argc, argv, save_vlr, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
-    }
     else if (strcmp(argv[i], "-load_ogc_wkt") == 0)
     {
       lastool.parse_arg_cnt_check(i, 1, "file name");
@@ -1110,28 +827,17 @@ int main(int argc, char* argv[])
       laserror("input and output cannot both be piped");
     }
   }
-    // only save or load
-    if (save_vlrs && load_vlrs)
+
+  // only save or load
+
+  if (save_vlrs && load_vlrs)
   {
     laserror("cannot save and load VLRs at the same time");
   }
-  if (save_vlr && load_vlr)
-  {
-    laserror("cannot save and load VLR at the same time");
-  }
-
-  // only save/load a single vlr or multible vlrs
-    if (save_vlrs && save_vlr)
-  {
-    laserror("cannot save a single VLR and multiple VLRs at the same time");
-  }
-  if (load_vlrs && load_vlr)
-  {
-    laserror("cannot load a single VLR and multiple VLRs at the same time");
-  }
 
   // possibly loop over multiple input files
-    while (lasreadopener.active())
+
+  while (lasreadopener.active())
   {
     try
     {
@@ -1896,18 +1602,6 @@ int main(int argc, char* argv[])
         load_vlrs_from_file(&lasreader->header);
       }
 
-      if (save_vlr)
-      {
-        save_single_vlr_to_file(&lasreader->header, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
-        save_vlr = false;
-      }
-
-      if (load_vlr)
-      {
-        load_single_vlr_from_file(&lasreader->header, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
-        load_vlr = false;
-      }
-
       if (add_empty_vlr_user_ID != 0)
       {
         lasreader->header.add_vlr(add_empty_vlr_user_ID, add_empty_vlr_record_ID, 0, 0, (add_empty_vlr_description ? FALSE : TRUE), add_empty_vlr_description);
@@ -2130,4 +1824,3 @@ int main(int argc, char* argv[])
   }
   byebye();
 }
-
