@@ -30,7 +30,7 @@
      7 November 2018 -- assure identical legacy and extended flags in laszip_write_point()
     20 October 2018 -- changed (U8*) to (const U8*) for all out->put___() calls
      5 October 2018 -- corrected 'is_empty' return value in laszip_inside_rectangle()
-    29 September 2018 -- laszip_prepare_point_for_write() sets extended_point_type 
+    29 September 2018 -- laszip_prepare_point_for_write() sets extended_point_type
     19 September 2018 -- removed tuples and triple support from attributes
      7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
      6 April 2018 -- added zero() function to laszip_dll struct to fix memory leak
@@ -129,7 +129,14 @@ private:
   BOOL first;
 };
 
-typedef struct laszip_dll {
+typedef struct laszip_message_callback_data
+{
+  laszip_message_handler callback;
+  void* user_data;
+} laszip_message_callback_data_struct;
+
+typedef struct laszip_dll
+{
   laszip_header_struct header;
   I64 p_count;
   I64 npoints;
@@ -165,6 +172,7 @@ typedef struct laszip_dll {
   I32 start_NIR_band;
   laszip_dll_inventory* inventory;
   std::vector<void *> buffers;
+  laszip_message_callback_data_struct* message_callback_data;
 
   void zero()
   {
@@ -202,6 +210,7 @@ typedef struct laszip_dll {
     start_flags_and_channel = 0;
     start_NIR_band = 0;
     inventory = NULL;
+    message_callback_data = NULL;
   };
 } laszip_dll_struct;
 
@@ -223,6 +232,135 @@ laszip_get_version(
   }
   catch (...)
   {
+    return 1;
+  }
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+static void
+laszip_message_func(
+    LAS_MESSAGE_TYPE                   type
+    , const char*                      msg
+    , void*                            user_data
+)
+{
+  if (user_data == 0) return;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)user_data;
+  if (laszip_dll->message_callback_data == 0) return;
+  if (laszip_dll->message_callback_data->callback == 0) return;
+
+  laszip_dll->message_callback_data->callback(
+    type, msg, laszip_dll->message_callback_data->user_data);
+}
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_set_error_handler(
+    laszip_POINTER                     pointer
+    , laszip_message_handler           callback
+    , void*                            user_data
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+
+  try
+  {
+    if (laszip_dll->message_callback_data)
+    {
+      free(laszip_dll->message_callback_data);
+    }
+    laszip_dll->message_callback_data = new laszip_message_callback_data_struct;
+    if (laszip_dll->message_callback_data == 0)
+    {
+      sprintf(laszip_dll->error, "memory allocation error in laszip_set_error_handler");
+      return 1;
+    }
+    laszip_dll->message_callback_data->callback = callback;
+    laszip_dll->message_callback_data->user_data = user_data;
+    set_las_message_handler(laszip_message_func, pointer);
+  }
+  catch (...)
+  {
+    sprintf(laszip_dll->error, "internal error in laszip_set_error_handler");
+    return 1;
+  }
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_unset_las_message_handler
+(
+    laszip_POINTER                     pointer
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+  try
+  {
+    unset_las_message_handler();
+    if (laszip_dll->message_callback_data)
+    {
+      free(laszip_dll->message_callback_data);
+      laszip_dll->message_callback_data = NULL;
+    }
+  }
+  catch (...)
+  {
+    sprintf(laszip_dll->error, "internal error in laszip_unset_las_message_handler");
+    return 1;
+  }
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_set_las_message_log_level
+(
+    laszip_POINTER                     pointer
+    , enum LAS_MESSAGE_TYPE            type
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+
+  try
+  {
+    set_message_log_level(type);
+  }
+  catch (...)
+  {
+    sprintf(laszip_dll->error, "internal error in laszip_set_las_message_log_level");
+    return 1;
+  }
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*/
+LASZIP_API laszip_I32
+laszip_get_las_message_log_level
+(
+    laszip_POINTER                     pointer
+    , enum LAS_MESSAGE_TYPE*           type
+)
+{
+  if (pointer == 0) return 1;
+  laszip_dll_struct* laszip_dll = (laszip_dll_struct*)pointer;
+  if (type == 0) return 1;
+
+  try
+  {
+    *type = get_message_log_level();
+  }
+  catch (...)
+  {
+    sprintf(laszip_dll->error, "internal error in laszip_get_las_message_log_level");
     return 1;
   }
 
@@ -441,6 +579,13 @@ laszip_clean(
         free(laszip_dll->buffers[i]);
       }
       laszip_dll->buffers.clear();
+    }
+
+    // dealloc message callback data
+
+    if (laszip_dll->message_callback_data)
+    {
+      free(laszip_dll->message_callback_data);
     }
 
     // zero every field of the laszip_dll struct
@@ -2165,7 +2310,7 @@ laszip_prepare_point_for_write(
     // must *not* be set for the old point type 5 or lower
 
     laszip_dll->point.extended_point_type = 0;
-    
+
     // we are *not* operating in compatibility mode
 
     laszip_dll->compatibility_mode = FALSE;
@@ -2906,7 +3051,7 @@ laszip_open_writer(
     laszip_dll->file = _wfopen(utf16_file_name, L"wb");
     delete [] utf16_file_name;
 #else
-	laszip_dll->file = fopen(file_name, "wb");
+    laszip_dll->file = fopen(file_name, "wb");
 #endif
 
     if (laszip_dll->file == 0)
@@ -2978,13 +3123,13 @@ laszip_open_writer(
 
     if (laszip_dll->lax_create)
     {
-	    // create spatial indexing information using cell_size = 100.0f and threshold = 1000
+      // create spatial indexing information using cell_size = 100.0f and threshold = 1000
 
-	    LASquadtree* lasquadtree = new LASquadtree;
-	    lasquadtree->setup(laszip_dll->header.min_x, laszip_dll->header.max_x, laszip_dll->header.min_y, laszip_dll->header.max_y, 100.0f);
+      LASquadtree* lasquadtree = new LASquadtree;
+      lasquadtree->setup(laszip_dll->header.min_x, laszip_dll->header.max_x, laszip_dll->header.min_y, laszip_dll->header.max_y, 100.0f);
 
-	    laszip_dll->lax_index = new LASindex;
-	    laszip_dll->lax_index->prepare(lasquadtree, 1000);
+      laszip_dll->lax_index = new LASindex;
+      laszip_dll->lax_index->prepare(lasquadtree, 1000);
 
       // copy the file name for later
 
@@ -3330,7 +3475,7 @@ laszip_close_writer(
     delete laszip_dll->streamout;
     laszip_dll->streamout = 0;
 
-	  if (laszip_dll->file)
+    if (laszip_dll->file)
     {
       fclose(laszip_dll->file);
       laszip_dll->file = 0;
@@ -3963,7 +4108,7 @@ laszip_read_header(
   }
 
   // create point's item pointers
-  
+
   if (laszip_dll->point_items)
   {
     delete [] laszip_dll->point_items;
@@ -4298,7 +4443,7 @@ laszip_open_reader(
     laszip_dll->file = _wfopen(utf16_file_name, L"rb");
     delete [] utf16_file_name;
 #else
-	laszip_dll->file = fopen(file_name, "rb");
+    laszip_dll->file = fopen(file_name, "rb");
 #endif
 
     if (laszip_dll->file == 0)
@@ -4696,7 +4841,7 @@ laszip_close_reader(
       laszip_dll->lax_index = 0;
     }
 
-  	if (laszip_dll->file)
+    if (laszip_dll->file)
     {
       fclose(laszip_dll->file);
       laszip_dll->file = 0;

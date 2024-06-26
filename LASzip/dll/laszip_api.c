@@ -106,6 +106,90 @@ laszip_clean
 };
 
 /*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_set_error_handler_def)
+(
+    laszip_POINTER                     pointer
+    , laszip_message_handler           callback
+    , void*                            user_data
+);
+laszip_set_error_handler_def laszip_set_error_handler_ptr = 0;
+LASZIP_API laszip_I32
+laszip_set_error_handler
+(
+    laszip_POINTER                     pointer
+    , laszip_message_handler           callback
+    , void*                            user_data
+)
+{
+  if (laszip_set_error_handler_ptr)
+  {
+    return (*laszip_set_error_handler_ptr)(pointer, callback, user_data);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_unset_las_message_handler_def)
+(
+    laszip_POINTER                     pointer
+);
+laszip_unset_las_message_handler_def laszip_unset_las_message_handler_ptr = 0;
+LASZIP_API laszip_I32
+laszip_unset_las_message_handler
+(
+    laszip_POINTER                     pointer
+)
+{
+  if (laszip_unset_las_message_handler_ptr)
+  {
+    return (*laszip_unset_las_message_handler_ptr)(pointer);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_set_las_message_log_level_def)
+(
+    laszip_POINTER                     pointer
+    , enum LAS_MESSAGE_TYPE            type
+);
+laszip_set_las_message_log_level_def laszip_set_las_message_log_level_ptr = 0;
+LASZIP_API laszip_I32
+laszip_set_las_message_log_level
+(
+    laszip_POINTER                     pointer
+    , enum LAS_MESSAGE_TYPE            type
+)
+{
+  if (laszip_set_las_message_log_level_ptr)
+  {
+    return (*laszip_set_las_message_log_level)(pointer, type);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
+typedef laszip_I32 (*laszip_get_las_message_log_level_def)
+(
+    laszip_POINTER                     pointer
+    , enum LAS_MESSAGE_TYPE*           type
+);
+laszip_get_las_message_log_level_def laszip_get_las_message_log_level_ptr = 0;
+LASZIP_API laszip_I32
+laszip_get_las_message_log_level
+(
+    laszip_POINTER                     pointer
+    , enum LAS_MESSAGE_TYPE*           type
+)
+{
+  if (laszip_get_las_message_log_level_ptr)
+  {
+    return (*laszip_get_las_message_log_level_ptr)(pointer, type);
+  }
+  return 1;
+};
+
+/*---------------------------------------------------------------------------*/
 typedef laszip_I32 (*laszip_get_error_def)
 (
     laszip_POINTER                     pointer

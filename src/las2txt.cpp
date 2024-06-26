@@ -560,7 +560,7 @@ enum extended_flags { HSV = -1, HSL = -2, HSV255 = -3, HSL255 = -4 };
 static void parse_extended_flags(char* parse_string)
 {
   const char* extended_flags[] = { "(HSV)", "(HSL)", "(hsv)", "(hsl)" };
-  const char replacement_codes[] = { HSV255, HSL255, HSV, HSL };
+  const signed char replacement_codes[] = { HSV255, HSL255, HSV, HSL };
   I32 nflags = (I32)(sizeof(extended_flags) / sizeof(char*));
 
   for (I32 i = 0; i < nflags; i++)
@@ -571,7 +571,7 @@ static void parse_extended_flags(char* parse_string)
     {
       int len_flag = (int)strlen(extended_flags[i]);
       int len_remaining = (int)strlen(found + len_flag);
-      *found = replacement_codes[i];
+      *found = (char)replacement_codes[i];
       memmove(found + 1, found + len_flag, len_remaining + 1);
       found = strstr(parse_string, extended_flags[i]);
     }
