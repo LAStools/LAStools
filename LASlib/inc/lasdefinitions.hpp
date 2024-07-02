@@ -582,9 +582,12 @@ public:
       }
       if (i == number_of_variable_length_records)
       {
+#pragma warning(push)
+#pragma warning(disable : 6308)
         number_of_variable_length_records++;
         offset_to_point_data += 54;
         vlrs = (LASvlr*)realloc(vlrs, sizeof(LASvlr)*number_of_variable_length_records);
+#pragma warning(pop)
       }
     }
     else
@@ -660,8 +663,11 @@ public:
         number_of_variable_length_records--;
         if (number_of_variable_length_records)
         {
+#pragma warning(push)
+#pragma warning(disable : 6308)
           vlrs[i] = vlrs[number_of_variable_length_records];
           vlrs = (LASvlr*)realloc(vlrs, sizeof(LASvlr)*number_of_variable_length_records);
+#pragma warning(pop)
         }
         else
         {
@@ -718,8 +724,11 @@ public:
       }
       if (i == number_of_extended_variable_length_records)
       {
+#pragma warning(push)
+#pragma warning(disable : 6308)
         number_of_extended_variable_length_records++;
         evlrs = (LASevlr*)realloc(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
+#pragma warning(pop)
       }
     }
     else
@@ -773,8 +782,11 @@ public:
         number_of_extended_variable_length_records--;
         if (number_of_extended_variable_length_records)
         {
+#pragma warning(push)
+#pragma warning(disable : 6308)
           evlrs[i] = evlrs[number_of_extended_variable_length_records];
           evlrs = (LASevlr*)realloc(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
+#pragma warning(pop)
         }
         else
         {
@@ -904,18 +916,21 @@ public:
 
   BOOL set_geo_keys(const I32 number_of_keys, const LASvlr_key_entry* geo_keys)
   {
-    if ((sizeof(LASvlr_geo_keys)*(number_of_keys+1)) > U16_MAX)
+    // Convert number_of_keys to size_t for the calculation
+    size_t num_keys = static_cast<size_t>(number_of_keys);
+
+    if ((sizeof(LASvlr_geo_keys) * (num_keys + 1)) > U16_MAX)
 		{
 			return FALSE;
 		}
-    vlr_geo_keys = new LASvlr_geo_keys[number_of_keys+1];
+        vlr_geo_keys = new LASvlr_geo_keys[num_keys + 1];
     vlr_geo_keys->key_directory_version = 1;
     vlr_geo_keys->key_revision = 1;
     vlr_geo_keys->minor_revision = 0;
-    vlr_geo_keys->number_of_keys = number_of_keys;
+    vlr_geo_keys->number_of_keys = num_keys;
     vlr_geo_key_entries = (LASvlr_key_entry*)&vlr_geo_keys[1];
-    memcpy(vlr_geo_key_entries, geo_keys, sizeof(LASvlr_key_entry)*number_of_keys);
-    return add_vlr("LASF_Projection", 34735, (U16)(sizeof(LASvlr_geo_keys)*(number_of_keys+1)), (U8*)vlr_geo_keys);
+    memcpy(vlr_geo_key_entries, geo_keys, sizeof(LASvlr_key_entry) * num_keys);
+    return add_vlr("LASF_Projection", 34735, (U16)(sizeof(LASvlr_geo_keys) * (num_keys + 1)), (U8*)vlr_geo_keys);
   }
 
   BOOL set_geo_double_params(const I32 num_geo_double_params, const F64* geo_double_params)
@@ -960,19 +975,21 @@ public:
 
   void set_geo_wkt_ogc_math(const I32 num_geo_wkt_ogc_math, const CHAR* geo_wkt_ogc_math)
   {
+    // Convert num_geo_wkt_ogc_math to size_t for the calculation
+    size_t num_geo_wkt = static_cast<size_t>(num_geo_wkt_ogc_math);
     I32 null_terminator = 0;
-    if (geo_wkt_ogc_math[num_geo_wkt_ogc_math-1] == '\0')
+    if (geo_wkt_ogc_math[num_geo_wkt - 1] == '\0')
     {
-      vlr_geo_ogc_wkt_math = new CHAR[num_geo_wkt_ogc_math];
+      vlr_geo_ogc_wkt_math = new CHAR[num_geo_wkt];
     }
     else
     {
       null_terminator = 1;
-      vlr_geo_ogc_wkt_math = new CHAR[num_geo_wkt_ogc_math+1];
-      vlr_geo_ogc_wkt_math[num_geo_wkt_ogc_math] = '\0';
+      vlr_geo_ogc_wkt_math = new CHAR[num_geo_wkt + 1];
+      vlr_geo_ogc_wkt_math[num_geo_wkt] = '\0';
     }
-    memcpy(vlr_geo_ogc_wkt_math, geo_wkt_ogc_math, sizeof(CHAR)*num_geo_wkt_ogc_math);
-    add_vlr("LASF_Projection", 2111, (U16)(sizeof(CHAR)*(num_geo_wkt_ogc_math+null_terminator)), (U8*)vlr_geo_ogc_wkt_math);
+    memcpy(vlr_geo_ogc_wkt_math, geo_wkt_ogc_math, sizeof(CHAR) * num_geo_wkt);
+    add_vlr("LASF_Projection", 2111, (U16)(sizeof(CHAR)*(num_geo_wkt + null_terminator)), (U8*)vlr_geo_ogc_wkt_math);
   }
 
   void del_geo_wkt_ogc_math()
@@ -1003,25 +1020,27 @@ public:
 
   void set_geo_ogc_wkt(const I32 num_geo_ogc_wkt, const CHAR* geo_ogc_wkt, BOOL in_evlr=FALSE)
   {
+    // Convert num_geo_ogc_wkt to size_t for the calculation
+    size_t num_wkt = static_cast<size_t>(num_geo_ogc_wkt);
     I32 null_terminator = 0;
-    if (geo_ogc_wkt[num_geo_ogc_wkt-1] == '\0')
+    if (geo_ogc_wkt[num_wkt - 1] == '\0')
     {
-      vlr_geo_ogc_wkt = new CHAR[num_geo_ogc_wkt];
+      vlr_geo_ogc_wkt = new CHAR[num_wkt];
     }
     else
     {
       null_terminator = 1;
-      vlr_geo_ogc_wkt = new CHAR[num_geo_ogc_wkt+1];
-      vlr_geo_ogc_wkt[num_geo_ogc_wkt] = '\0';
+      vlr_geo_ogc_wkt = new CHAR[num_wkt + 1];
+      vlr_geo_ogc_wkt[num_wkt] = '\0';
     }
-    memcpy(vlr_geo_ogc_wkt, geo_ogc_wkt, sizeof(CHAR)*num_geo_ogc_wkt);
+    memcpy(vlr_geo_ogc_wkt, geo_ogc_wkt, sizeof(CHAR)*num_wkt);
     if (in_evlr)
     {
-      add_evlr("LASF_Projection", 2112, sizeof(CHAR)*(num_geo_ogc_wkt+null_terminator), (U8*)vlr_geo_ogc_wkt);
+      add_evlr("LASF_Projection", 2112, sizeof(CHAR)*(num_wkt + null_terminator), (U8*)vlr_geo_ogc_wkt);
     }
     else
     {
-      add_vlr("LASF_Projection", 2112, (U16)(sizeof(CHAR)*(num_geo_ogc_wkt+null_terminator)), (U8*)vlr_geo_ogc_wkt);
+      add_vlr("LASF_Projection", 2112, (U16)(sizeof(CHAR)*(num_wkt + null_terminator)), (U8*)vlr_geo_ogc_wkt);
     }
   }
 

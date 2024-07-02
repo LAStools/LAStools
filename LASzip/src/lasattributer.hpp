@@ -376,7 +376,6 @@ public:
 
   BOOL init_attributes(U32 number_attributes, LASattribute* attributes)
   {
-    U32 i;
     clean_attributes();
     this->number_attributes = number_attributes;
     this->attributes = (LASattribute*)malloc(sizeof(LASattribute)*number_attributes);
@@ -385,23 +384,30 @@ public:
       return FALSE;
     }
     memcpy(this->attributes, attributes, sizeof(LASattribute)*number_attributes);
-    attribute_starts = (I32*)malloc(sizeof(I32)*number_attributes);
+    attribute_starts = (I32*)malloc(sizeof(I32) * number_attributes);
     if (attribute_starts == 0)
     {
+      free(this->attributes);
       return FALSE;
     }
-    attribute_sizes = (I32*)malloc(sizeof(I32)*number_attributes);
+    attribute_sizes = (I32*)malloc(sizeof(I32) * number_attributes);
     if (attribute_sizes == 0)
     {
+      free(this->attributes);
+      free(attribute_starts);
       return FALSE;
     }
     attribute_starts[0] = 0;
     attribute_sizes[0] = attributes[0].get_size();
-    for (i = 1; i < number_attributes; i++)
+#pragma warning(push)
+#pragma warning(disable : 6385)
+#pragma warning(disable : 6386)
+    for (U32 i = 1; i < number_attributes; i++)
     {
       attribute_starts[i] = attribute_starts[i-1] + attribute_sizes[i-1];
       attribute_sizes[i] = attributes[i].get_size();
     }
+#pragma warning(pop)
     return TRUE;
   };
 
@@ -411,6 +417,9 @@ public:
     {
       if (attributes)
       {
+#pragma warning(push)
+#pragma warning(disable : 6001)
+#pragma warning(disable : 6308)
         number_attributes++;
         attributes = (LASattribute*)realloc(attributes, sizeof(LASattribute)*number_attributes);
         if (attributes == 0)
@@ -428,8 +437,9 @@ public:
           return -1;
         }
         attributes[number_attributes-1] = attribute;
-        attribute_starts[number_attributes-1] = attribute_starts[number_attributes-2] + attribute_sizes[number_attributes-2];
+        attribute_starts[number_attributes - 1] = attribute_starts[number_attributes - 2] + attribute_sizes[number_attributes - 2];
         attribute_sizes[number_attributes-1] = attributes[number_attributes-1].get_size();
+#pragma warning(pop)
       }
       else
       {
@@ -538,9 +548,12 @@ public:
     number_attributes--;
     if (number_attributes)
     {
+#pragma warning(push)
+#pragma warning(disable : 6308)
       attributes = (LASattribute*)realloc(attributes, sizeof(LASattribute)*number_attributes);
       attribute_starts = (I32*)realloc(attribute_starts, sizeof(I32)*number_attributes);
       attribute_sizes = (I32*)realloc(attribute_sizes, sizeof(I32)*number_attributes);
+#pragma warning(pop)
     }
     else
     {

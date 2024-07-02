@@ -49,7 +49,7 @@ public:
       bit_buffer = bit_buffer | (((U64)input_bits) << num_buffer);
       num_buffer = num_buffer + 32;
     }
-    U32 new_bits = (U32)(bit_buffer & ((1 << num_bits) - 1));
+    U32 new_bits = (U32)(bit_buffer & ((1ULL << num_bits) - 1));
     bit_buffer = bit_buffer >> num_bits;
     num_buffer = num_buffer - num_bits;
     return new_bits;

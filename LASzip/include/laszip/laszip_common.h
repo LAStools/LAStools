@@ -44,7 +44,7 @@
 # define LAS_FORMAT_STRING(arg) arg
 #endif
 
-enum LAS_MESSAGE_TYPE
+enum class LAS_MESSAGE_TYPE
 {
   LAS_DEBUG = 0,
   LAS_VERY_VERBOSE,

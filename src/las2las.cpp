@@ -718,7 +718,7 @@ int main(int argc, char* argv[])
         {
           set_ogc_wkt = true;
           set_ogc_wkt_in_evlr = false;
-          U32 buff_size = 5; I32 c = 0; U32 k = 0;
+          size_t buff_size = 5; I32 c = 0; U32 k = 0;
           set_ogc_wkt_string = (CHAR*)calloc(buff_size, sizeof(CHAR));
 
           if (set_ogc_wkt_string != nullptr)
@@ -728,7 +728,10 @@ int main(int argc, char* argv[])
               c = fgetc(file);
 
               if (k == buff_size)
+#pragma warning(push)
+#pragma warning(disable : 6308)
                   set_ogc_wkt_string = (CHAR*)realloc(set_ogc_wkt_string, (buff_size *= 2) * sizeof(CHAR));
+#pragma warning(pop)
 
               if (c == EOF || c == '\n')
                   set_ogc_wkt_string[k] = '\0';
