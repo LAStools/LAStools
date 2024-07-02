@@ -37,8 +37,7 @@
 #include "mydefs.hpp"
 #include "laszip_common.h"
 
-constexpr int LAS_QUIET_INDEX = static_cast<int>(LAS_MESSAGE_TYPE::LAS_QUIET);
-extern long lasmessage_cnt[LAS_QUIET_INDEX];
+extern long lasmessage_cnt[LAS_QUIET];
 
 // central las message function
 #if defined(__GNUC__)
@@ -75,8 +74,11 @@ void LASLIB_DLL unset_las_message_handler();
 class LASMessageStream
 {
 public:
+#pragma warning(push)
+#pragma warning(disable:26812)
     LASMessageStream(LAS_MESSAGE_TYPE type) : setType(type) {}
-    ~LASMessageStream() { if (setType != LAS_MESSAGE_TYPE::LAS_QUIET) LASMessage(setType, usedStream.str().c_str()); }
+    ~LASMessageStream() { if (setType != LAS_QUIET) LASMessage(setType, usedStream.str().c_str()); }
+#pragma warning(pop)
 
     template <typename T>
     LASMessageStream& operator<<(const T& value)

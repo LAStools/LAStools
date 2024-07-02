@@ -923,11 +923,11 @@ public:
 		{
 			return FALSE;
 		}
-        vlr_geo_keys = new LASvlr_geo_keys[num_keys + 1];
+    vlr_geo_keys = new LASvlr_geo_keys[num_keys + 1];
     vlr_geo_keys->key_directory_version = 1;
     vlr_geo_keys->key_revision = 1;
     vlr_geo_keys->minor_revision = 0;
-    vlr_geo_keys->number_of_keys = num_keys;
+    vlr_geo_keys->number_of_keys = static_cast<U16>(num_keys);
     vlr_geo_key_entries = (LASvlr_key_entry*)&vlr_geo_keys[1];
     memcpy(vlr_geo_key_entries, geo_keys, sizeof(LASvlr_key_entry) * num_keys);
     return add_vlr("LASF_Projection", 34735, (U16)(sizeof(LASvlr_geo_keys) * (num_keys + 1)), (U8*)vlr_geo_keys);
