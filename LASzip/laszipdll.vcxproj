@@ -53,8 +53,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>$(SolutionDir)$(Platform)\$(Configuration)\laszip64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>
-      </OutputFile>
+      <OutputFile>$(SolutionDir)\bin\LASzip64.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
