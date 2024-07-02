@@ -82,7 +82,7 @@ public:
 /* read 64 bit big-endian field                              */
   void get64bitsBE(U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8]{};
 };
 
 class ByteStreamInFileBE : public ByteStreamInFile
@@ -102,7 +102,7 @@ public:
 /* read 64 bit big-endian field                              */
   void get64bitsBE(U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8]{};
 };
 
 inline ByteStreamInFile::ByteStreamInFile(FILE* file)

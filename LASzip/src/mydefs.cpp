@@ -87,7 +87,7 @@ void byebye()
   if (wait_on_exit)
   {
     std::fprintf(stderr, "<press ENTER>\n");
-    std::getc(stdin);
+    (void)std::getc(stdin);
   }
   //
   int code = 0;

@@ -291,9 +291,9 @@ public:
       }
       else
       {
-        x_offset = ((I32)((min_x + max_x)/200000))*100000;
-        y_offset = ((I32)((min_y + max_y)/200000))*100000;
-        z_offset = ((I32)((min_z + max_z)/200000))*100000;
+        x_offset = ((I32)((min_x + max_x)/200000.0))*100000.0;
+        y_offset = ((I32)((min_y + max_y)/200000.0))*100000.0;
+        z_offset = ((I32)((min_z + max_z)/200000.0))*100000.0;
       }
     }
     this->min_x = x_offset + x_scale_factor*I32_QUANTIZE((min_x-x_offset)/x_scale_factor);
@@ -593,33 +593,41 @@ public:
       offset_to_point_data += 54;
       vlrs = (LASvlr*)malloc(sizeof(LASvlr));
     }
-    memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
-    vlrs[i].reserved = 0; // used to be 0xAABB
-    strncpy_las(vlrs[i].user_id, sizeof(vlrs[i].user_id), user_id, 16);
-    vlrs[i].record_id = record_id;
-    vlrs[i].record_length_after_header = record_length_after_header;
-    if (keep_description && found_description)
+
+    if (vlrs)
     {
-      // do nothing
-    }
-    else if (description)
-    {
-      snprintf(vlrs[i].description, sizeof(vlrs[i].description), "%.31s", description);
+      memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
+      vlrs[i].reserved = 0;  // used to be 0xAABB
+      strncpy_las(vlrs[i].user_id, sizeof(vlrs[i].user_id), user_id, 16);
+      vlrs[i].record_id = record_id;
+      vlrs[i].record_length_after_header = record_length_after_header;
+      if (keep_description && found_description)
+      {
+          // do nothing
+      }
+      else if (description)
+      {
+          snprintf(vlrs[i].description, sizeof(vlrs[i].description), "%.31s", description);
+      }
+      else
+      {
+          snprintf(vlrs[i].description, sizeof(vlrs[i].description), "by LAStools of rapidlasso GmbH");
+      }
+      if (record_length_after_header)
+      {
+          offset_to_point_data += record_length_after_header;
+          vlrs[i].data = data;
+      }
+      else
+      {
+          vlrs[i].data = 0;
+      }
+      return TRUE;
     }
     else
     {
-      snprintf(vlrs[i].description, sizeof(vlrs[i].description), "by LAStools of rapidlasso GmbH");
+        return FALSE;
     }
-    if (record_length_after_header)
-    {
-      offset_to_point_data += record_length_after_header;
-      vlrs[i].data = data;
-    }
-    else
-    {
-      vlrs[i].data = 0;
-    }
-		return TRUE;
   };
 
   const LASvlr* get_vlr(const CHAR* user_id, U16 record_id) const
@@ -719,29 +727,33 @@ public:
       number_of_extended_variable_length_records = 1;
       evlrs = (LASevlr*)malloc(sizeof(LASevlr)*number_of_extended_variable_length_records);
     }
-    evlrs[i].reserved = 0; // used to be 0xAABB
-    strncpy_las(evlrs[i].user_id, sizeof(evlrs[i].user_id), user_id, 16);
-    evlrs[i].record_id = record_id;
-    evlrs[i].record_length_after_header = record_length_after_header;
-    if (keep_description && found_description)
+
+    if (evlrs)
     {
-      // do nothing
-    }
-    else if (description)
-    {
-      snprintf(evlrs[i].description, sizeof(evlrs[i].description), "%.31s", description);
-    }
-    else
-    {
-      snprintf(evlrs[i].description, sizeof(evlrs[i].description), "by LAStools of rapidlasso GmbH");
-    }
-    if (record_length_after_header)
-    {
-      evlrs[i].data = data;
-    }
-    else
-    {
-      evlrs[i].data = 0;
+      evlrs[i].reserved = 0;  // used to be 0xAABB
+      strncpy_las(evlrs[i].user_id, sizeof(evlrs[i].user_id), user_id, 16);
+      evlrs[i].record_id = record_id;
+      evlrs[i].record_length_after_header = record_length_after_header;
+      if (keep_description && found_description)
+      {
+          // do nothing
+      }
+      else if (description)
+      {
+          snprintf(evlrs[i].description, sizeof(evlrs[i].description), "%.31s", description);
+      }
+      else
+      {
+          snprintf(evlrs[i].description, sizeof(evlrs[i].description), "by LAStools of rapidlasso GmbH");
+      }
+      if (record_length_after_header)
+      {
+          evlrs[i].data = data;
+      }
+      else
+      {
+          evlrs[i].data = 0;
+      }
     }
   };
 

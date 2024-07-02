@@ -190,7 +190,7 @@ class LASLIB_DLL LASreadOpener
 {
 public:
 	BOOL z_from_attribute = false; // z from attribute requested
-	BOOL z_from_attribute_try; // z from attribute can be tried
+	BOOL z_from_attribute_try = false; // z from attribute can be tried
 	I16 z_from_attribute_idx = -1;
 	void z_from_attribute_bydefault();
 	void set_io_ibuffer_size(const U32 buffer_size);

@@ -292,7 +292,7 @@ int main(int argc, char* argv[])
   // variable header changes
   bool set_ogc_wkt = false;
   bool set_ogc_wkt_in_evlr = false;
-  CHAR* set_ogc_wkt_string = 0;
+  CHAR* set_ogc_wkt_string = nullptr;
   bool remove_header_padding = false;
   bool remove_all_variable_length_records = false;
   int remove_variable_length_record = -1;
@@ -721,19 +721,21 @@ int main(int argc, char* argv[])
           U32 buff_size = 5; I32 c = 0; U32 k = 0;
           set_ogc_wkt_string = (CHAR*)calloc(buff_size, sizeof(CHAR));
 
-          while (c != EOF && c != '\n')
+          if (set_ogc_wkt_string != nullptr)
           {
-            c = fgetc(file);
+            while (c != EOF && c != '\n')
+            {
+              c = fgetc(file);
 
-            if (k == buff_size)
-              set_ogc_wkt_string = (CHAR*)realloc(set_ogc_wkt_string, (buff_size *= 2) * sizeof(CHAR));
+              if (k == buff_size)
+                  set_ogc_wkt_string = (CHAR*)realloc(set_ogc_wkt_string, (buff_size *= 2) * sizeof(CHAR));
 
-            if (c == EOF || c == '\n')
-              set_ogc_wkt_string[k] = '\0';
-            else
-              set_ogc_wkt_string[k++] = (CHAR)c;
+              if (c == EOF || c == '\n')
+                  set_ogc_wkt_string[k] = '\0';
+              else
+                  set_ogc_wkt_string[k++] = (CHAR)c;
+            }
           }
-
           fclose(file);
           i++;
         }

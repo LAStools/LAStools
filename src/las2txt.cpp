@@ -824,6 +824,8 @@ int main(int argc, char* argv[])
     i = 0;
     while (parse_string[i])
     {
+#pragma warning(push)
+#pragma warning(disable : 26819)  // fallthrough warning
       switch (parse_string[i])
       {
       case '_': // diff of unscaled raw integer X to prev point
@@ -923,6 +925,7 @@ int main(int argc, char* argv[])
         LASMessage(LAS_WARNING, "requested unknown parse item '%c'. skipping ...", parse_string[i]);
         parse_string[i] = 's';
       }
+#pragma warning(pop)
       i++;
     }
   }

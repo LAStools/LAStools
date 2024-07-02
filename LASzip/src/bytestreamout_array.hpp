@@ -85,7 +85,7 @@ public:
 /* write 64 bit big-endian field                             */
   BOOL put64bitsBE(const U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8]{};
 };
 
 class ByteStreamOutArrayBE : public ByteStreamOutArray
@@ -105,7 +105,7 @@ public:
 /* write 64 bit big-endian field                             */
   BOOL put64bitsBE(const U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8]{};
 };
 
 inline ByteStreamOutArray::ByteStreamOutArray(I64 alloc)

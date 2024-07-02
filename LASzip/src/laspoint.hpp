@@ -295,6 +295,8 @@ public:
     for (i = 0; i < num_items; i++)
     {
       total_point_size += items[i].size;
+#pragma warning(push)
+#pragma warning(disable : 26819)  // fallthrough warning
       switch (items[i].type)
       {
       case LASitem::POINT14:
@@ -330,6 +332,7 @@ public:
       default:
         return FALSE;
       }
+#pragma warning(pop)
     }
     this->quantizer = quantizer;
     this->attributer = attributer;
@@ -352,6 +355,8 @@ public:
     {
       this->items[i] = items[i];
       total_point_size += items[i].size;
+#pragma warning(push)
+#pragma warning(disable : 26819)  // fallthrough warning
       switch (items[i].type)
       {
       case LASitem::POINT14:
@@ -387,6 +392,7 @@ public:
       default:
         return FALSE;
       }
+#pragma warning(pop)
     }
     this->quantizer = quantizer;
     this->attributer = attributer;
@@ -593,7 +599,8 @@ public:
   inline BOOL set_x(const F64 x) { I64 X = quantizer->get_X(x); this->X = (I32)(X); return I32_FITS_IN_RANGE(X); };
   inline BOOL set_y(const F64 y) { I64 Y = quantizer->get_Y(y); this->Y = (I32)(Y); return I32_FITS_IN_RANGE(Y); };
   inline BOOL set_z(const F64 z) { 
-    if ((quantizer == nullptr) || (quantizer->z_from_attrib < 0)) {
+    if (quantizer->z_from_attrib >= 0)
+    {
       I64 Z = quantizer->get_Z(z);
       this->Z = (I32)(Z);
       return I32_FITS_IN_RANGE(Z);
@@ -601,8 +608,9 @@ public:
     else
     {
       // set Z in extrabyte - scaled to I32
-      set_attribute_as_float(quantizer->z_from_attrib, z);
-      return TRUE;
+      if (quantizer != nullptr)
+        set_attribute_as_float(quantizer->z_from_attrib, z);
+        return TRUE;
     }
   };
 
@@ -750,7 +758,9 @@ public:
     F32 s = hsv[1];
     F32 v = hsv[2];
 
-    F32 r, g, b;
+    F32 r = 0.0;
+    F32 g = 0.0;
+    F32 b = 0.0;
 
     I32 i = (I32)(h * 6);
 	  F32 f = h * 6 - i;
@@ -768,9 +778,9 @@ public:
       case 5: r = v, g = p, b = q; break;
     }
     
-    rgb[0] = (U16)(r * 65535);
-    rgb[1] = (U16)(g * 65535);
-    rgb[2] = (U16)(b * 65535);
+    rgb[0] = (U16)(r * 65535.0);
+    rgb[1] = (U16)(g * 65535.0);
+    rgb[2] = (U16)(b * 65535.0);
   };
 
   inline void compute_coordinates()

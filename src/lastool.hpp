@@ -42,7 +42,7 @@ class LasTool
 
    public:
     int argc = 0;
-    char** argv;
+    char** argv = nullptr;
     bool force = false;  // force continuation on serious_warnings
     bool blast = false;
 #ifdef COMPILE_WITH_GUI

@@ -350,9 +350,9 @@ public:
   {
     attributes_linked = TRUE;
     number_attributes = 0;
-    attributes = 0;
-    attribute_starts = 0;
-    attribute_sizes = 0;
+    attributes = nullptr;
+    attribute_starts = nullptr;
+    attribute_sizes = nullptr;
   };
 
   ~LASattributer()

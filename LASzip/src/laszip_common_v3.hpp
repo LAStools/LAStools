@@ -40,44 +40,41 @@
 class LAScontextPOINT14
 {
 public:
-  BOOL unused;
+  BOOL unused = false;
 
-  U8 last_item[128];
-  U16 last_intensity[8];
-  StreamingMedian5 last_X_diff_median5[12];
-  StreamingMedian5 last_Y_diff_median5[12];
-  I32 last_Z[8];
+  U8 last_item[128]{};
+  U16 last_intensity[8]{};
+  StreamingMedian5 last_X_diff_median5[12]{};
+  StreamingMedian5 last_Y_diff_median5[12]{};
+  I32 last_Z[8]{};
 
-  ArithmeticModel* m_changed_values[8];
-  ArithmeticModel* m_scanner_channel;
-  ArithmeticModel* m_number_of_returns[16];
-  ArithmeticModel* m_return_number_gps_same;
-  ArithmeticModel* m_return_number[16];
-  IntegerCompressor* ic_dX;
-  IntegerCompressor* ic_dY;
-  IntegerCompressor* ic_Z;
+  ArithmeticModel* m_changed_values[8]{};
+  ArithmeticModel* m_scanner_channel = nullptr;
+  ArithmeticModel* m_number_of_returns[16]{};
+  ArithmeticModel* m_return_number_gps_same = nullptr;
+  ArithmeticModel* m_return_number[16]{};
+  IntegerCompressor* ic_dX = nullptr;
+  IntegerCompressor* ic_dY = nullptr;
+  IntegerCompressor* ic_Z = nullptr;
 
-  ArithmeticModel* m_classification[64];
+  ArithmeticModel* m_classification[64]{};
+  ArithmeticModel* m_flags[64]{};
+  ArithmeticModel* m_user_data[64]{};
 
-  ArithmeticModel* m_flags[64];
-
-  ArithmeticModel* m_user_data[64];
-
-  IntegerCompressor* ic_intensity;
-
-  IntegerCompressor* ic_scan_angle;
-
-  IntegerCompressor* ic_point_source_ID;
+  IntegerCompressor* ic_intensity = nullptr;
+  IntegerCompressor* ic_scan_angle = nullptr;
+  IntegerCompressor* ic_point_source_ID = nullptr;
 
   // GPS time stuff
-  U32 last, next;
-  U64I64F64 last_gpstime[4];
-  I32 last_gpstime_diff[4];
-  I32 multi_extreme_counter[4];
+  U32 last = 0;
+  U32 next = 0;
+  U64I64F64 last_gpstime[4]{};
+  I32 last_gpstime_diff[4]{};
+  I32 multi_extreme_counter[4]{};
 
-  ArithmeticModel* m_gpstime_multi;
-  ArithmeticModel* m_gpstime_0diff;
-  IntegerCompressor* ic_gpstime;
+  ArithmeticModel* m_gpstime_multi = nullptr;
+  ArithmeticModel* m_gpstime_0diff = nullptr;
+  IntegerCompressor* ic_gpstime = nullptr;
 };
 
 class LAScontextRGB14

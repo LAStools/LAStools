@@ -3667,6 +3667,7 @@ LASreadOpener::LASreadOpener()
 	inside_tile = 0;
 	inside_circle = 0;
 	inside_rectangle = 0;
+  index = 0;
 	filter = 0;
 	transform = 0;
 	ignore = 0;
