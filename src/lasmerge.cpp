@@ -215,8 +215,10 @@ int main(int argc, char *argv[])
   {
     laserror("could not open lasreader");
   }
-
+#pragma warning(push)
+#pragma warning(disable : 6011
   LASMessage(LAS_VERBOSE, "merging headers took %g sec. there are %lld points in total.", taketime()-start_time, lasreader->npoints);
+#pragma warning(pop)
   start_time = taketime();
 
   // prepare the header for the surviving points
@@ -263,6 +265,8 @@ int main(int argc, char *argv[])
           laserror("could not open laswriter");
         }
       }
+#pragma warning(push)
+#pragma warning(disable : 6011
       laswriter->write_point(&lasreader->point);
       laswriter->update_inventory(&lasreader->point);
       if (laswriter->p_count == chopchop)
@@ -275,6 +279,7 @@ int main(int argc, char *argv[])
         delete laswriter;
         laswriter = 0;
       }
+#pragma warning(pop)
     }
     if (laswriter && laswriter->p_count)
     {

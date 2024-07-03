@@ -805,7 +805,7 @@ public:
   };
 private:
   F32 h_min, h_max, s_min, s_max, v_min, v_max;
-  F32 hsl[3];
+  F32 hsl[3]{};
 };
 
 class LAScriterionDropHSLA : public LAScriterion
@@ -830,7 +830,7 @@ public:
   };
 private:
   F32 h_min, h_max, s_min, s_max, v_min, v_max;
-  F32 hsl[3];
+  F32 hsl[3]{};
 };
 
 class LAScriterionKeepHSL : public LAScriterion
@@ -860,7 +860,7 @@ public:
 private:
   F32 below_HSL, above_HSL;
   I32 channel;
-  F32 hsl[3];
+  F32 hsl[3]{};
 };
 
 class LAScriterionDropHSL : public LAScriterion
@@ -890,7 +890,7 @@ public:
 private:
   F32 below_HSL, above_HSL;
   I32 channel;
-  F32 hsl[3];
+  F32 hsl[3]{};
 };
 
 class LAScriterionKeepHSVA : public LAScriterion
@@ -915,7 +915,7 @@ public:
   };
 private:
   F32 h_min, h_max, s_min, s_max, v_min, v_max;
-  F32 hsv[3];
+  F32 hsv[3]{};
 };
 
 class LAScriterionDropHSVA : public LAScriterion
@@ -940,7 +940,7 @@ public:
   };
 private:
   F32 h_min, h_max, s_min, s_max, v_min, v_max;
-  F32 hsv[3];
+  F32 hsv[3]{};
 };
 
 class LAScriterionKeepHSV : public LAScriterion
@@ -970,7 +970,7 @@ public:
 private:
   F32 below_HSV, above_HSV;
   I32 channel;
-  F32 hsv[3];
+  F32 hsv[3]{};
 };
 
 class LAScriterionDropHSV : public LAScriterion
@@ -1000,7 +1000,7 @@ public:
 private:
   F32 below_HSV, above_HSV;
   I32 channel;
-  F32 hsv[3];
+  F32 hsv[3]{};
 };
 
 
@@ -1882,6 +1882,7 @@ public:
     plus_plus_size = 0;
     plus_plus = 0;
     plus_plus_sizes = 0;
+    anker = 0;
   };
   ~LAScriterionThinWithGrid() { reset(); };
 private:

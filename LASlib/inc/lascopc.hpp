@@ -115,21 +115,21 @@ struct LASLIB_DLL EPToctant : public EPTkey
 inline bool spatial_order(const EPToctant& a, const EPToctant& b)
 {
   // 2D spatial order
-  F64 dx_a = (F64)a.x/(1 << a.d);
-  F64 dx_b = (F64)b.x/(1 << b.d);
+  F64 dx_a = static_cast<F64>(a.x)/(1ULL << a.d);
+  F64 dx_b = static_cast<F64>(b.x)/(1ULL << b.d);
   if (dx_a < dx_b) return true;
   if (dx_a > dx_b) return false;
 
-  F64 dy_a = (F64)a.y/(1 << a.d);
-  F64 dy_b = (F64)b.y/(1 << b.d);
+  F64 dy_a = static_cast<F64>(a.y)/(1ULL << a.d);
+  F64 dy_b = static_cast<F64>(b.y)/(1ULL << b.d);
   if (dy_a < dy_b) return true;
   if (dy_a > dy_b) return false;
 
   if (a.d < b.d) return true;
   if (a.d > b.d) return false;
 
-  F64 dz_a = (F64)a.z/(1 << a.d);
-  F64 dz_b = (F64)b.z/(1 << b.d);
+  F64 dz_a = static_cast<F64>(a.z)/(1ULL << a.d);
+  F64 dz_b = static_cast<F64>(b.z)/(1ULL << b.d);
   if (dz_a < dz_b) return true;
   if (dz_a > dz_b) return false;
 

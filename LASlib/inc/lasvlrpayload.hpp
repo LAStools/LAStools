@@ -39,7 +39,7 @@
 class LASvlrPayload
 {
 public:
-  CHAR user_id[16]; 
+  CHAR user_id[16]{}; 
   virtual U16 get_record_id() const = 0;
   virtual const CHAR* get_user_id() const = 0;
   virtual I64 get_payload_size() const = 0;

@@ -122,7 +122,7 @@ public:
             previous_percentage = percentage;
             I32 completed = (I32)(width * percentage);
             I32 remaining = (I32)(width - completed);
-            fprintf(stderr, "[%.*s%*s] %.1lf%%\r", completed, LASPROGRESSSYMBOL, remaining, "", percentage * 100);
+            fprintf(stderr, "[%.*s%*s] %.1lf%%\r", completed, LASPROGRESSSYMBOL, remaining, "", percentage * 100.0);
             fflush(stderr);
         }
     };

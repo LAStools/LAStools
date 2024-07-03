@@ -108,7 +108,8 @@ private:
   U8* endbuffer;
   U8* outbyte;
   U8* endbyte;
-  U32 base, length;
+  U32 base;
+  U32 length;
 };
 
 #endif

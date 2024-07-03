@@ -104,6 +104,10 @@
 
 ArithmeticEncoder::ArithmeticEncoder()
 {
+  outbyte = nullptr;
+  endbyte = nullptr;
+  base = 0;
+  length = 0;
   outstream = 0;
 
   outbuffer = (U8*)malloc(sizeof(U8)*2*AC_BUFFER_SIZE);

@@ -69,7 +69,10 @@ bool halt_on_error = true;
 
 LAS_EXIT_CODE las_exit_code(bool error)
 {
+#pragma warning(push)
+#pragma warning(disable : 26812)
   return (error ? LAS_EXIT_ERROR : LAS_EXIT_OK);
+#pragma warning(pop)
 }
 
 void byebye()

@@ -253,7 +253,12 @@ struct VoxelRecord
 
 struct Octant
 {
-  Octant() {};
+    Octant(){
+        point_buffer = nullptr;
+        point_count = 0;
+        point_size = 0;
+        point_capacity = 0;
+    };
   ~Octant() {};
 
   void sort()
@@ -302,7 +307,8 @@ struct OctantInMemory : public Octant
       point_buffer = (U8*)realloc(point_buffer, point_capacity * point_size);
     }
 
-    memcpy(point_buffer + point_count * point_size, buffer, point_size);
+    if (point_buffer)
+        memcpy(point_buffer + point_count * point_size, buffer, point_size);
 
     // cell = -1 means that recording the location of the point is useless (save memory)
     if (cell >= 0) occupancy.insert({ cell, VoxelRecord(chunk, point_count) });
@@ -329,10 +335,13 @@ struct OctantInMemory : public Octant
   void swap(LASpoint* laspoint, const I32 pos)
   {
     U8* tmp = (U8*)malloc(point_size);
-    laspoint->copy_to(tmp);
-    laspoint->copy_from(point_buffer + pos * point_size);
-    memcpy(point_buffer + pos * point_size, tmp, point_size);
-    free(tmp);
+    if (tmp)
+    {
+      laspoint->copy_to(tmp);
+      laspoint->copy_from(point_buffer + pos * point_size);
+      memcpy(point_buffer + pos * point_size, tmp, point_size);
+      free(tmp);
+    }
   };
 
   void clean()
@@ -404,10 +413,12 @@ struct OctantOnDisk : public Octant
     reactivate("r+b");
 
     U8* buffer = (U8*)malloc(point_size);
-    laspoint->copy_to(buffer);
-    fwrite(buffer, point_size, 1, fp);
-    free(buffer);
-
+    if (buffer)
+    {
+      laspoint->copy_to(buffer);
+      fwrite(buffer, point_size, 1, fp);
+      free(buffer);
+    }
     // cell = -1 means that recording the location of the point is useless (save memory)
     if (cell >= 0)
       occupancy.insert({ cell, VoxelRecord(chunk, point_count) });
@@ -423,15 +434,18 @@ struct OctantOnDisk : public Octant
 
     U8* buffer1 = (U8*)malloc(point_size);
     U8* buffer2 = (U8*)malloc(point_size);
-    fseek(fp, pos * point_size, SEEK_SET);
-    fread(buffer1, point_size, 1, fp);
-    laspoint->copy_to(buffer2);
-    laspoint->copy_from(buffer1);
-    fseek(fp, pos * point_size, SEEK_SET);
-    fwrite(buffer2, point_size, 1, fp);
-    fseek(fp, 0, SEEK_END);
-    free(buffer1);
-    free(buffer2);
+    if (buffer1 && buffer2)
+    {
+      fseek(fp, pos * point_size, SEEK_SET);
+      fread(buffer1, point_size, 1, fp);
+      laspoint->copy_to(buffer2);
+      laspoint->copy_from(buffer1);
+      fseek(fp, pos * point_size, SEEK_SET);
+      fwrite(buffer2, point_size, 1, fp);
+      fseek(fp, 0, SEEK_END);
+      free(buffer1);
+      free(buffer2);
+    }
 
     close();
   };
@@ -501,8 +515,11 @@ struct OctantOnDisk : public Octant
     reactivate("r+b");
 
     point_buffer = (U8*)malloc(point_count * point_size);
-    fseek(fp, 0, SEEK_SET);
-    fread(point_buffer, point_size, point_count, fp);
+    if (point_buffer)
+    {
+      fseek(fp, 0, SEEK_SET);
+      fread(point_buffer, point_size, point_count, fp);
+    }
 
     close();
   };
@@ -958,7 +975,7 @@ int main(int argc, char* argv[])
       }
 
       // Estimate the binomial probabilities for point swapping. See algorithm implementation details
-      F64 area = occupancy_resolution * occupancy_resolution * lasoccupancygrid->get_num_occupied();
+      F64 area = static_cast<F64>(occupancy_resolution) * occupancy_resolution * lasoccupancygrid->get_num_occupied();
       F64 density = num_points / area;
       F64 voxel_sizes = octree.get_size() / octree.get_gridsize();
       F64 swap_probabilities[limit_depth + 1];
@@ -1146,7 +1163,7 @@ int main(int argc, char* argv[])
       // Buffer of points
       U32 elem_size = laspoint->total_point_size;
       I32 buffer_size = 0;
-      U8* buffer = (U8*)malloc(num_points_buffer * elem_size);
+      U8* buffer = (U8*)malloc(static_cast<U64>(num_points_buffer) * elem_size);
       U8* temp = (U8*)malloc(elem_size);
 
       // EPT hierarchy
@@ -1188,7 +1205,7 @@ int main(int argc, char* argv[])
         if (!skip)
         {
           *laspoint = lasreader->point; // Conversion to target format
-          laspoint->copy_to(buffer + buffer_size * elem_size);
+          laspoint->copy_to(buffer + static_cast<U64>(buffer_size) * elem_size);
           buffer_size++;
           progressbar++;
           progressbar.print();
@@ -1203,8 +1220,8 @@ int main(int argc, char* argv[])
             for (i = 0; i < buffer_size; i++)
             {
               I32 j = rand() % buffer_size;
-              U8* block1 = buffer + i * elem_size;
-              U8* block2 = buffer + j * elem_size;
+              U8* block1 = buffer + static_cast<U64>(i) * elem_size;
+              U8* block2 = buffer + static_cast<U64>(j) * elem_size;
               memcpy(temp, block1, elem_size);
               memcpy(block1, block2, elem_size);
               memcpy(block2, temp, elem_size);
@@ -1214,7 +1231,7 @@ int main(int argc, char* argv[])
           // We put the incoming points (coming in a random order) in the octree
           for (i = 0; i < buffer_size; i++)
           {
-            laspoint->copy_from(buffer + i * elem_size);
+            laspoint->copy_from(buffer + static_cast<U64>(i) * elem_size);
             lasfinalizer.remove(laspoint);
 
             // Search a place to insert the point
@@ -1316,7 +1333,7 @@ int main(int argc, char* argv[])
 
                       it->second->load();
                       for (I32 k = 0; k < it->second->npoints(); k++)
-                        it2->second->insert(it->second->point_buffer + k * elem_size, -1, id_buffer);
+                        it2->second->insert(it->second->point_buffer + static_cast<U64>(k) * elem_size, -1, id_buffer);
 
                       it->second->clean();
 
@@ -1358,7 +1375,7 @@ int main(int argc, char* argv[])
                 // Write the chunk
                 for (I32 k = 0; k < it->second->npoints(); k++)
                 {
-                  laspoint->copy_from(it->second->point_buffer + k * elem_size);
+                  laspoint->copy_from(it->second->point_buffer + static_cast<U64>(k) * elem_size);
                   laswriter->write_point(laspoint);
                   laswriter->update_inventory(laspoint);
 

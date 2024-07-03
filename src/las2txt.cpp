@@ -569,8 +569,8 @@ static void parse_extended_flags(char* parse_string)
 
     while (found)
     {
-      int len_flag = (int)strlen(extended_flags[i]);
-      int len_remaining = (int)strlen(found + len_flag);
+      size_t len_flag = strlen(extended_flags[i]);
+      size_t len_remaining = strlen(found + len_flag);
       *found = (char)replacement_codes[i];
       memmove(found + 1, found + len_flag, len_remaining + 1);
       found = strstr(parse_string, extended_flags[i]);
@@ -1373,7 +1373,7 @@ int main(int argc, char* argv[])
           else if (optx)
           {
             int len;
-            len = sprintf(printstring, "%.3f", 1.0f / 4095.0f * lasreader->point.get_intensity()) - 1;
+            len = sprintf(printstring, "%.3f", 1.0f / 4095.0f * static_cast<double>(lasreader->point.get_intensity())) - 1;
             while (printstring[len] == '0') len--;
             if (printstring[len] != '.') len++;
             printstring[len] = '\0';
