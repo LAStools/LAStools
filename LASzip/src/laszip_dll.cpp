@@ -3052,26 +3052,7 @@ laszip_open_writer(
 
     // open the file
 
-#ifdef _MSC_VER
-    wchar_t* utf16_file_name = nullptr;
-
-    if (validate_utf8(file_name))
-    {
-      utf16_file_name = UTF8toUTF16(file_name);
-    }
-    else
-    {
-      utf16_file_name = ANSItoUTF16(file_name);
-    }
-
-    if (utf16_file_name)
-    {
-      laszip_dll->file = _wfopen(utf16_file_name, L"wb");
-    }
-    delete[] utf16_file_name;
-#else
-    laszip_dll->file = fopen(file_name, "wb");
-#endif
+    laszip_dll->file = LASfopen(file_name, "wb");
 
     if (laszip_dll->file == 0)
     {
@@ -4457,26 +4438,7 @@ laszip_open_reader(
 
     // open the file
 
-#ifdef _MSC_VER
-    wchar_t* utf16_file_name = nullptr;
-
-    if (validate_utf8(file_name))
-    {
-      utf16_file_name = UTF8toUTF16(file_name);
-    }
-    else
-    {
-      utf16_file_name = ANSItoUTF16(file_name);
-    }
-
-    if (utf16_file_name)
-    {
-      laszip_dll->file = _wfopen(utf16_file_name, L"rb");
-    }
-    delete[] utf16_file_name;
-#else
-    laszip_dll->file = fopen(file_name, "rb");
-#endif
+    laszip_dll->file = LASfopen(file_name, "rb");
 
     if (laszip_dll->file == 0)
     {
