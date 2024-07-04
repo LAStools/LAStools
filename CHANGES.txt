@@ -1,3 +1,12 @@
+# LAStools changes for open source code
+04 July 2024 -- NEW: lasinfo -scale_header argument to do a relative scale of all header values 
+21 June 2024 -- fix: avoid fallback to verbose if -vv and -v is used
+21 June 2024 -- fix: log las file open at very_verbose level
+21 June 2024 -- close #199: ARM64 fix; explicit signed char usage
+17 June 2024 -- NEW: support ascii codepages (umlauts) in filenames
+17 June 2024 -- resolve compiler warnings
+11 June 2024 -- fix: argument handler multi core support; pass 64bit to all multicore tools; fix 64bit executeable param
+21 Mai 2024 -- bugfix error handling
 19 March 2024 -- new: read z from attribute (-z_from_attribute) 
 19 March 2024 -- fix: find licensefile at bin location (linux)
 19 March 2024 -- fix: multicore bin localization (linux)

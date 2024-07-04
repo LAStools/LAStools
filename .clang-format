@@ -3,12 +3,12 @@ Language: Cpp
 BasedOnStyle: Google
 
 # Indentation
-IndentWidth: 4
+IndentWidth: 2
 TabWidth: 4
 UseTab: Never
 BreakBeforeBraces: Allman
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: None
 
 # Alignment
@@ -26,7 +26,7 @@ SpacesInCStyleCastParentheses: false
 SpacesInAngles:  false
 
 # Column limit and maximum penalties
-ColumnLimit: 250
+ColumnLimit: 150
 MaxEmptyLinesToKeep: 1
 
 # Sort includes
