@@ -1978,7 +1978,7 @@ int main(int argc, char* argv[])
         LASMessage(LAS_VERBOSE, "reading %lld and writing all surviving points ...", lasreader->npoints);
       }
 
-      if (save_vlr  == false) {
+      if (save_vlr == false) {
         // check output
 
         if (!laswriteopener.active())
