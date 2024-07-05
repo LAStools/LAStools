@@ -321,6 +321,13 @@ static bool save_single_vlr_to_file(const LASheader* header, const int& vlr_inde
   if (file == nullptr) {
     return false;
   }
+  if (vlr_index != -1) {
+    LASMessage(LAS_VERBOSE, "save VLR with vlr_index '%d' to '%s' file", vlr_index, vlr_output_filename);
+  }
+  else if (vlr_record_id != -1 && vlr_user_id)
+  {
+    LASMessage(LAS_VERBOSE, "save VLR with user_id '%s' and record_id '%d' to '%s' file", vlr_user_id, vlr_record_id, vlr_output_filename);
+  }
   // validating and determining the vlr index and the parameters
   i = determine_vlr_index(header, vlr_index, vlr_user_id, vlr_record_id);
 
@@ -477,12 +484,14 @@ static bool load_single_vlr_from_file(LASheader* header, const int& vlr_index, c
 
     if (vlr_index >= 0 && i == vlr_index) {
       header->add_vlr(vlr.user_id, vlr.record_id, vlr.record_length_after_header, vlr.data, TRUE, vlr.description);
+      LASMessage(LAS_VERBOSE, "load VLR with vlr_index '%d' from '%s' file", vlr_index, vlr_input_filename);
       break;
     }
     else if (vlr_user_id != nullptr && vlr_record_id >= 0 &&
              strcmp(vlr.user_id, vlr_user_id) == 0 && vlr.record_id == vlr_record_id)
     {
         header->add_vlr(vlr.user_id, vlr.record_id, vlr.record_length_after_header, vlr.data, TRUE, vlr.description);
+        LASMessage(LAS_VERBOSE, "load VLR with user_id '%s' and record_id '%d' from '%s' file", vlr_user_id, vlr_record_id, vlr_input_filename);
         break;
     }
   }
@@ -1912,73 +1921,74 @@ int main(int argc, char* argv[])
         lasreader->header.add_vlr(add_empty_vlr_user_ID, add_empty_vlr_record_ID, 0, 0, (add_empty_vlr_description ? FALSE : TRUE), add_empty_vlr_description);
       }
 
-      // do we need an extra pass
-
-      BOOL extra_pass = laswriteopener.is_piped();
-
-      // we only really need an extra pass if the coordinates are altered or if points are filtered
-
-      if (extra_pass)
+      if (save_vlr == false)
       {
-        if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
+        // do we need an extra pass
+        
+        BOOL extra_pass = laswriteopener.is_piped();
+        
+        // we only really need an extra pass if the coordinates are altered or if points are filtered
+        
+        if (extra_pass)
         {
-          extra_pass = FALSE;
-        }
-      }
-
-      // for piped output we need an extra pass
-
-      if (extra_pass)
-      {
-        if (lasreadopener.is_piped())
-        {
-          laserror("input and output cannot both be piped");
-        }
-        LASMessage(LAS_VERBOSE, "extra pass for piped output: reading %lld points ...", lasreader->npoints);
-        // maybe seek to start position
-        if (subsequence_start) lasreader->seek(subsequence_start);
-        while (lasreader->read_point())
-        {
-          if (lasreader->p_count > subsequence_stop) break;
-
-          if (clip_to_bounding_box)
+          if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
           {
-            if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
-            {
-              continue;
-            }
+            extra_pass = FALSE;
           }
-
+        }
+        
+        // for piped output we need an extra pass
+        
+        if (extra_pass)
+        {
+          if (lasreadopener.is_piped())
+          {
+            laserror("input and output cannot both be piped");
+          }
+          LASMessage(LAS_VERBOSE, "extra pass for piped output: reading %lld points ...", lasreader->npoints);
+          // maybe seek to start position
+          if (subsequence_start) lasreader->seek(subsequence_start);
+          while (lasreader->read_point())
+          {
+            if (lasreader->p_count > subsequence_stop) break;
+        
+            if (clip_to_bounding_box)
+            {
+              if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+              {
+                continue;
+              }
+            }
+        
+            if (reproject_quantizer)
+            {
+              lasreader->point.compute_coordinates();
+              geoprojectionconverter.to_target(lasreader->point.coordinates);
+              lasreader->point.compute_XYZ(reproject_quantizer);
+            }
+            lasinventory.add(&lasreader->point);
+          }
+          lasreader->close();
+        
+          if (reproject_quantizer) lasreader->header = *reproject_quantizer;
+        
+          lasinventory.update_header(&lasreader->header);
+        
+          LASMessage(LAS_VERBOSE, "extra pass took %g sec.", taketime() - start_time);
+          start_time = taketime();
+          LASMessage(LAS_VERBOSE, "piped output: reading %lld and writing %lld points ...", lasreader->npoints, lasinventory.extended_number_of_point_records);
+        }
+        else
+        {
           if (reproject_quantizer)
           {
-            lasreader->point.compute_coordinates();
-            geoprojectionconverter.to_target(lasreader->point.coordinates);
-            lasreader->point.compute_XYZ(reproject_quantizer);
+            saved_quantizer = new LASquantizer();
+            *saved_quantizer = lasreader->header;
+            lasreader->header = *reproject_quantizer;
           }
-          lasinventory.add(&lasreader->point);
+          LASMessage(LAS_VERBOSE, "reading %lld and writing all surviving points ...", lasreader->npoints);
         }
-        lasreader->close();
 
-        if (reproject_quantizer) lasreader->header = *reproject_quantizer;
-
-        lasinventory.update_header(&lasreader->header);
-
-        LASMessage(LAS_VERBOSE, "extra pass took %g sec.", taketime() - start_time);
-        start_time = taketime();
-        LASMessage(LAS_VERBOSE, "piped output: reading %lld and writing %lld points ...", lasreader->npoints, lasinventory.extended_number_of_point_records);
-      }
-      else
-      {
-        if (reproject_quantizer)
-        {
-          saved_quantizer = new LASquantizer();
-          *saved_quantizer = lasreader->header;
-          lasreader->header = *reproject_quantizer;
-        }
-        LASMessage(LAS_VERBOSE, "reading %lld and writing all surviving points ...", lasreader->npoints);
-      }
-
-      if (save_vlr == false) {
         // check output
 
         if (!laswriteopener.active())
