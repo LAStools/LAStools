@@ -253,6 +253,282 @@ static bool load_vlrs_from_file(LASheader* header)
   return true;
 }
 
+/// Checks if the specified filename has a ".vlr" extension.
+static bool has_vlr_extension(const CHAR* filename) {
+  const CHAR* extension = ".vlr";
+  const CHAR* dot = strrchr(filename, '.'); // Last occurrence of '.' in the filename
+
+  if (dot != nullptr) {
+    if (strcmp(dot, extension) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Validating and determining the VLR index and the parameters
+static U32 determine_vlr_index(const LASheader* header, const int& vlr_index, const CHAR* vlr_user_id, const int& vlr_record_id) {
+  U32 index = -1;
+
+  if (vlr_user_id == nullptr && vlr_record_id == -1) {
+    //Using index for '-save_vlr'
+    if (vlr_index != -1) {
+      if (vlr_index < 0 || static_cast<unsigned int>(vlr_index) >= header->number_of_variable_length_records) {  //HIER NOCHMAL KONTROLLIEREN ' >= '
+        laserror("Invalid index: The specified index '%d' for '-save_vlr' is out of range", vlr_index);
+      }
+      index = vlr_index;
+    }
+    //Default to index = 0 if no parameters are specified when using '-save_vlr'
+    else {
+      index = 0;
+    }
+  }
+  else if (vlr_index == -1 && vlr_user_id != nullptr && vlr_record_id != -1) {
+    //Using user ID and record ID for '-save_vlr'
+    for (U32 idx = 0; idx < header->number_of_variable_length_records; idx++)
+    {
+      if (strcmp(header->vlrs[idx].user_id, vlr_user_id) == 0 && header->vlrs[idx].record_id == vlr_record_id)
+      {
+        index = idx;
+        break;
+      }
+    }
+    if (index == -1) {
+      laserror("The specified user ID '%s' or record ID '%d' could not be found when using '-save_vlr'", vlr_user_id, vlr_record_id);
+    }
+  } 
+  else {
+    laserror("Invalid parameters: Either specify an index, or specify both user ID and record ID for '-save_vlr'");
+  }
+  return index;
+}
+
+/// Saves a single VLR from a LAS header to a specified or default file, ensuring data integrity and file format validation.
+static bool save_single_vlr_to_file(const LASheader* header, const int& vlr_index, const CHAR* vlr_user_id, const int& vlr_record_id, const CHAR* vlr_output_filename)
+{
+  U32 i = -1;
+  FILE* file  = nullptr;
+  // Save VLR to specified or default filename
+  if (vlr_output_filename == nullptr) {
+    file = LASfopen("save.vlr", "wb");
+  }
+  else {
+    if (has_vlr_extension(vlr_output_filename))
+      file = LASfopen(vlr_output_filename, "wb");
+    else
+      laserror("Invalid file format: The specified file must have a .vlr extension");
+  }
+  if (file == nullptr) {
+    return false;
+  }
+  if (vlr_index != -1) {
+    LASMessage(LAS_VERBOSE, "save VLR with vlr_index '%d' to '%s' file", vlr_index, vlr_output_filename);
+  }
+  else if (vlr_record_id != -1 && vlr_user_id)
+  {
+    LASMessage(LAS_VERBOSE, "save VLR with user_id '%s' and record_id '%d' to '%s' file", vlr_user_id, vlr_record_id, vlr_output_filename);
+  }
+  // validating and determining the vlr index and the parameters
+  i = determine_vlr_index(header, vlr_index, vlr_user_id, vlr_record_id);
+
+  ByteStreamOut* out;
+  if (IS_LITTLE_ENDIAN())
+    out = new ByteStreamOutFileLE(file);
+  else
+    out = new ByteStreamOutFileBE(file);
+
+  U32 number_of_single_variable_length_records = 1;
+  // write number of VLRs
+  if (!out->put32bitsLE((U8*)&(number_of_single_variable_length_records)))
+  {
+    laserror("writing number_of_single_variable_length_records in -save_vlr");
+  }
+
+  if (i >= 0) {
+    // using specified vlr [i]
+    if (!out->put16bitsLE((U8*)&(header->vlrs[i].reserved)))
+    {
+      laserror("writing header->vlrs[%d].reserved", i);
+    }
+    if (!out->putBytes((U8*)header->vlrs[i].user_id, 16))
+    {
+      laserror("writing header->vlrs[%d].user_id", i);
+    }
+    if (!out->put16bitsLE((U8*)&(header->vlrs[i].record_id)))
+    {
+      laserror("writing header->vlrs[%d].record_id", i);
+    }
+    if (!out->put16bitsLE((U8*)&(header->vlrs[i].record_length_after_header)))
+    {
+      laserror("writing header->vlrs[%d].record_length_after_header", i);
+    }
+    if (!out->putBytes((U8*)header->vlrs[i].description, 32))
+    {
+      laserror("writing header->vlrs[%d].description", i);
+    }
+
+    // write the data following the header of the variable length record
+    if (header->vlrs[i].record_length_after_header)
+    {
+      if (header->vlrs[i].data)
+      {
+        if (!out->putBytes((U8*)header->vlrs[i].data, header->vlrs[i].record_length_after_header))
+        {
+          laserror("writing %d bytes of data from header->vlrs[%d].data", header->vlrs[i].record_length_after_header, i);
+        }
+      }
+      else
+      {
+        laserror("there should be %d bytes of data in header->vlrs[%d].data", header->vlrs[i].record_length_after_header, i);
+      }
+    }
+  }
+  else {
+    laserror("specified vlr could not be located");
+  }
+  delete out;
+  fclose(file);
+  return true;
+}
+
+/// Loads a single VLR from a specified vlr file based on index or user ID and record ID, and adds it to the LAS header.
+static bool load_single_vlr_from_file(LASheader* header, const int& vlr_index, const CHAR* vlr_user_id, const int& vlr_record_id, const CHAR* vlr_input_filename)
+{
+  U32 i;
+  FILE* file = nullptr;
+  
+  if (vlr_input_filename == nullptr) {
+    //try to open default save.vlr file
+    file = LASfopen("save.vlr", "rb");
+  }
+  else {
+    file = LASfopen(vlr_input_filename, "rb");
+  }
+  if (file == nullptr) {
+    laserror("VLR file '%s' could not be found", vlr_input_filename);
+  }
+  ByteStreamIn* in;
+  if (IS_LITTLE_ENDIAN())
+    in = new ByteStreamInFileLE(file);
+  else
+    in = new ByteStreamInFileBE(file);
+  // read number of VLRs
+  U32 number_of_variable_length_records;
+  try {
+    in->get32bitsLE((U8*)&number_of_variable_length_records);
+  }
+  catch (...)
+  {
+    laserror("reading number_of_variable_length_records");
+  } 
+  // Check whether the specified index is valid
+  if (vlr_index >= 0 && static_cast<unsigned int>(vlr_index) >= number_of_variable_length_records) {
+    laserror("specified vlr index '%d' is out of range", vlr_index);
+  }
+  // loop over VLRs
+  LASvlr vlr;
+  for (i = 0; i < number_of_variable_length_records; i++)
+  {
+    try {
+      in->get16bitsLE((U8*)&(vlr.reserved));
+    }
+    catch (...)
+    {
+      laserror("reading vlr.reserved");
+    }
+    try {
+      in->getBytes((U8*)vlr.user_id, 16);
+    }
+    catch (...)
+    {
+      laserror("reading vlr.user_id");
+    }
+    try {
+      in->get16bitsLE((U8*)&(vlr.record_id));
+    }
+    catch (...)
+    {
+      laserror("reading vlr.record_id");
+    }
+    try {
+      in->get16bitsLE((U8*)&(vlr.record_length_after_header));
+    }
+    catch (...)
+    {
+      laserror("reading vlr.record_length_after_header");
+    }
+    try {
+      in->getBytes((U8*)vlr.description, 32);
+    }
+    catch (...)
+    {
+      laserror("reading vlr.description");
+    }
+
+    // write the data following the header of the variable length record
+    if (vlr.record_length_after_header)
+    {
+      vlr.data = new U8[vlr.record_length_after_header];
+      try {
+        in->getBytes((U8*)vlr.data, vlr.record_length_after_header);
+      }
+      catch (...)
+      {
+        laserror("reading %d bytes into vlr.data", vlr.record_length_after_header);
+      }
+    }
+    else
+    {
+      vlr.data = 0;
+    }
+
+    if (vlr_index >= 0 && i == vlr_index) {
+      header->add_vlr(vlr.user_id, vlr.record_id, vlr.record_length_after_header, vlr.data, TRUE, vlr.description);
+      LASMessage(LAS_VERBOSE, "load VLR with vlr_index '%d' from '%s' file", vlr_index, vlr_input_filename);
+      break;
+    }
+    else if (vlr_user_id != nullptr && vlr_record_id >= 0 &&
+             strcmp(vlr.user_id, vlr_user_id) == 0 && vlr.record_id == vlr_record_id)
+    {
+        header->add_vlr(vlr.user_id, vlr.record_id, vlr.record_length_after_header, vlr.data, TRUE, vlr.description);
+        LASMessage(LAS_VERBOSE, "load VLR with user_id '%s' and record_id '%d' from '%s' file", vlr_user_id, vlr_record_id, vlr_input_filename);
+        break;
+    }
+  }
+  delete in;
+  fclose(file);
+  return true;
+}
+
+/// Parse and handle arguments for -save_vlr or -load_vlr, based on specified vlr index or user ID and record ID and optional output filename
+static void parse_save_load_vlr_args(int& i, int argc, char* argv[], bool& save_vlr, int& vlr_index, char*& vlr_user_id, int& vlr_record_id, char*& vlr_filename) {
+  if (i + 1 >= argc) {
+    vlr_index = 0; // Default value if no arguments are provided
+  }
+  // Check for user ID and record ID
+  else if (i + 2 < argc && argv[i + 1][0] != '-' && isalnum(argv[i + 1][0]) && argv[i + 2][0] != '-' && isdigit(argv[i + 2][0])) {
+    vlr_user_id = argv[++i];
+    vlr_record_id = atoi(argv[++i]);
+    // Optional output filename
+    if (i + 1 < argc && argv[i + 1][0] != '-') {
+      vlr_filename = argv[++i];
+    }
+  }
+  // Check for numeric index
+  else if (i + 1 < argc && argv[i + 1][0] != '-' && isdigit(argv[i + 1][0])) {
+    vlr_index = atoi(argv[++i]);
+    // Optional output filename
+    if (i + 1 < argc && argv[i + 1][0] != '-') {
+      vlr_filename = argv[++i];
+    }
+  }
+  //Only filename arguments is provided
+  else if (i + 1 < argc && argv[i + 1][0] != '-') {
+    vlr_index = 0; // Default value if just filename arguments is provided
+    vlr_filename = argv[++i];
+  }
+}
+
 // for point type conversions
 const U8 convert_point_type_from_to[11][11] =
 {
@@ -308,6 +584,12 @@ int main(int argc, char* argv[])
   bool move_evlrs_to_vlrs = false;
   bool save_vlrs = false;
   bool load_vlrs = false;
+  bool save_vlr = false;
+  bool load_vlr = false;
+  int vlr_index = -1;
+  int vlr_record_id = -1;
+  CHAR* vlr_user_id = nullptr;
+  CHAR* vlr_filename = nullptr;
   int set_attribute_scales = 0;
   int set_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
   double set_attribute_scale_scale[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
@@ -707,6 +989,16 @@ int main(int argc, char* argv[])
     {
       load_vlrs = true;
     }
+    else if (strcmp(argv[i], "-save_vlr") == 0)
+    {
+      save_vlr = true;
+      parse_save_load_vlr_args(i, argc, argv, save_vlr, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
+    }
+    else if (strcmp(argv[i], "-load_vlr") == 0)
+    {
+      load_vlr = true;
+      parse_save_load_vlr_args(i, argc, argv, save_vlr, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
+    }
     else if (strcmp(argv[i], "-load_ogc_wkt") == 0)
     {
       lastool.parse_arg_cnt_check(i, 1, "file name");
@@ -827,17 +1119,28 @@ int main(int argc, char* argv[])
       laserror("input and output cannot both be piped");
     }
   }
-
-  // only save or load
-
-  if (save_vlrs && load_vlrs)
+    // only save or load
+    if (save_vlrs && load_vlrs)
   {
     laserror("cannot save and load VLRs at the same time");
   }
+  if (save_vlr && load_vlr)
+  {
+    laserror("cannot save and load VLR at the same time");
+  }
+
+  // only save/load a single vlr or multible vlrs
+    if (save_vlrs && save_vlr)
+  {
+    laserror("cannot save a single VLR and multiple VLRs at the same time");
+  }
+  if (load_vlrs && load_vlr)
+  {
+    laserror("cannot load a single VLR and multiple VLRs at the same time");
+  }
 
   // possibly loop over multiple input files
-
-  while (lasreadopener.active())
+    while (lasreadopener.active())
   {
     try
     {
@@ -1602,212 +1905,226 @@ int main(int argc, char* argv[])
         load_vlrs_from_file(&lasreader->header);
       }
 
+      if (save_vlr)
+      {
+        save_single_vlr_to_file(&lasreader->header, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
+      }
+
+      if (load_vlr)
+      {
+        load_single_vlr_from_file(&lasreader->header, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
+        load_vlr = false;
+      }
+
       if (add_empty_vlr_user_ID != 0)
       {
         lasreader->header.add_vlr(add_empty_vlr_user_ID, add_empty_vlr_record_ID, 0, 0, (add_empty_vlr_description ? FALSE : TRUE), add_empty_vlr_description);
       }
 
-      // do we need an extra pass
-
-      BOOL extra_pass = laswriteopener.is_piped();
-
-      // we only really need an extra pass if the coordinates are altered or if points are filtered
-
-      if (extra_pass)
+      if (save_vlr == false)
       {
-        if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
+        // do we need an extra pass
+        
+        BOOL extra_pass = laswriteopener.is_piped();
+        
+        // we only really need an extra pass if the coordinates are altered or if points are filtered
+        
+        if (extra_pass)
         {
-          extra_pass = FALSE;
+          if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
+          {
+            extra_pass = FALSE;
+          }
         }
-      }
-
-      // for piped output we need an extra pass
-
-      if (extra_pass)
-      {
-        if (lasreadopener.is_piped())
+        
+        // for piped output we need an extra pass
+        
+        if (extra_pass)
         {
-          laserror("input and output cannot both be piped");
+          if (lasreadopener.is_piped())
+          {
+            laserror("input and output cannot both be piped");
+          }
+          LASMessage(LAS_VERBOSE, "extra pass for piped output: reading %lld points ...", lasreader->npoints);
+          // maybe seek to start position
+          if (subsequence_start) lasreader->seek(subsequence_start);
+          while (lasreader->read_point())
+          {
+            if (lasreader->p_count > subsequence_stop) break;
+        
+            if (clip_to_bounding_box)
+            {
+              if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+              {
+                continue;
+              }
+            }
+        
+            if (reproject_quantizer)
+            {
+              lasreader->point.compute_coordinates();
+              geoprojectionconverter.to_target(lasreader->point.coordinates);
+              lasreader->point.compute_XYZ(reproject_quantizer);
+            }
+            lasinventory.add(&lasreader->point);
+          }
+          lasreader->close();
+        
+          if (reproject_quantizer) lasreader->header = *reproject_quantizer;
+        
+          lasinventory.update_header(&lasreader->header);
+        
+          LASMessage(LAS_VERBOSE, "extra pass took %g sec.", taketime() - start_time);
+          start_time = taketime();
+          LASMessage(LAS_VERBOSE, "piped output: reading %lld and writing %lld points ...", lasreader->npoints, lasinventory.extended_number_of_point_records);
         }
-        LASMessage(LAS_VERBOSE, "extra pass for piped output: reading %lld points ...", lasreader->npoints);
+        else
+        {
+          if (reproject_quantizer)
+          {
+            saved_quantizer = new LASquantizer();
+            *saved_quantizer = lasreader->header;
+            lasreader->header = *reproject_quantizer;
+          }
+          LASMessage(LAS_VERBOSE, "reading %lld and writing all surviving points ...", lasreader->npoints);
+        }
+
+        // check output
+
+        if (!laswriteopener.active())
+        {
+          // create name from input name
+          laswriteopener.make_file_name(lasreadopener.get_file_name());
+        }
+        else
+        {
+          // make sure we do not corrupt the input file
+
+          if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
+          {
+            laserror("input and output file name are identical: '%s'", lasreadopener.get_file_name());
+          }
+        }
+
+        // prepare the header for the surviving points
+
+        strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), "LAStools (c) by rapidlasso GmbH", 32);
+        lasreader->header.system_identifier[31] = '\0';
+        char temp[64];
+        snprintf(temp, sizeof(temp), "las2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
+        memset(lasreader->header.generating_software, 0, 32);
+        strncpy_las(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), temp, 32);
+        lasreader->header.generating_software[31] = '\0';
+
+        // open laswriter
+
+        LASwriter* laswriter = laswriteopener.open(&lasreader->header);
+
+        if (laswriter == 0)
+        {
+          laserror("could not open laswriter");
+        }
+
+        // for piped output we need to re-open the input file
+
+        if (extra_pass)
+        {
+          if (!lasreadopener.reopen(lasreader))
+          {
+            laserror("could not re-open lasreader");
+          }
+        }
+        else
+        {
+          if (reproject_quantizer)
+          {
+            lasreader->header = *saved_quantizer;
+            delete saved_quantizer;
+          }
+        }
+
         // maybe seek to start position
+
         if (subsequence_start) lasreader->seek(subsequence_start);
-        while (lasreader->read_point())
-        {
-          if (lasreader->p_count > subsequence_stop) break;
 
-          if (clip_to_bounding_box)
+        // loop over points
+
+        if (point)
+        {
+          while (lasreader->read_point())
           {
-            if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+            if (lasreader->p_count > subsequence_stop) break;
+
+            if (clip_to_bounding_box)
             {
-              continue;
+              if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+              {
+                continue;
+              }
             }
-          }
 
-          if (reproject_quantizer)
-          {
-            lasreader->point.compute_coordinates();
-            geoprojectionconverter.to_target(lasreader->point.coordinates);
-            lasreader->point.compute_XYZ(reproject_quantizer);
-          }
-          lasinventory.add(&lasreader->point);
-        }
-        lasreader->close();
-
-        if (reproject_quantizer) lasreader->header = *reproject_quantizer;
-
-        lasinventory.update_header(&lasreader->header);
-
-        LASMessage(LAS_VERBOSE, "extra pass took %g sec.", taketime() - start_time);
-        start_time = taketime();
-        LASMessage(LAS_VERBOSE, "piped output: reading %lld and writing %lld points ...", lasreader->npoints, lasinventory.extended_number_of_point_records);
-      }
-      else
-      {
-        if (reproject_quantizer)
-        {
-          saved_quantizer = new LASquantizer();
-          *saved_quantizer = lasreader->header;
-          lasreader->header = *reproject_quantizer;
-        }
-        LASMessage(LAS_VERBOSE, "reading %lld and writing all surviving points ...", lasreader->npoints);
-      }
-
-      // check output
-
-      if (!laswriteopener.active())
-      {
-        // create name from input name
-        laswriteopener.make_file_name(lasreadopener.get_file_name());
-      }
-      else
-      {
-        // make sure we do not corrupt the input file
-
-        if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
-        {
-          laserror("input and output file name are identical: '%s'", lasreadopener.get_file_name());
-        }
-      }
-
-      // prepare the header for the surviving points
-
-      strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), "LAStools (c) by rapidlasso GmbH", 32);
-      lasreader->header.system_identifier[31] = '\0';
-      char temp[64];
-      snprintf(temp, sizeof(temp), "las2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
-      memset(lasreader->header.generating_software, 0, 32);
-      strncpy_las(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), temp, 32);
-      lasreader->header.generating_software[31] = '\0';
-
-      // open laswriter
-
-      LASwriter* laswriter = laswriteopener.open(&lasreader->header);
-
-      if (laswriter == 0)
-      {
-        laserror("could not open laswriter");
-      }
-
-      // for piped output we need to re-open the input file
-
-      if (extra_pass)
-      {
-        if (!lasreadopener.reopen(lasreader))
-        {
-          laserror("could not re-open lasreader");
-        }
-      }
-      else
-      {
-        if (reproject_quantizer)
-        {
-          lasreader->header = *saved_quantizer;
-          delete saved_quantizer;
-        }
-      }
-
-      // maybe seek to start position
-
-      if (subsequence_start) lasreader->seek(subsequence_start);
-
-      // loop over points
-
-      if (point)
-      {
-        while (lasreader->read_point())
-        {
-          if (lasreader->p_count > subsequence_stop) break;
-
-          if (clip_to_bounding_box)
-          {
-            if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+            if (reproject_quantizer)
             {
-              continue;
+              lasreader->point.compute_coordinates();
+              geoprojectionconverter.to_target(lasreader->point.coordinates);
+              lasreader->point.compute_XYZ(reproject_quantizer);
             }
+            *point = lasreader->point;
+            laswriter->write_point(point);
+            // without extra pass we need inventory of surviving points
+            if (!extra_pass) laswriter->update_inventory(point);
           }
-
-          if (reproject_quantizer)
-          {
-            lasreader->point.compute_coordinates();
-            geoprojectionconverter.to_target(lasreader->point.coordinates);
-            lasreader->point.compute_XYZ(reproject_quantizer);
-          }
-          *point = lasreader->point;
-          laswriter->write_point(point);
-          // without extra pass we need inventory of surviving points
-          if (!extra_pass) laswriter->update_inventory(point);
+          delete point;
+          point = 0;
         }
-        delete point;
-        point = 0;
-      }
-      else
-      {
-        while (lasreader->read_point())
+        else
         {
-          if (lasreader->p_count > subsequence_stop) break;
-
-          if (clip_to_bounding_box)
+          while (lasreader->read_point())
           {
-            if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+            if (lasreader->p_count > subsequence_stop) break;
+
+            if (clip_to_bounding_box)
             {
-              continue;
+              if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+              {
+                continue;
+              }
             }
-          }
 
-          if (reproject_quantizer)
-          {
-            lasreader->point.compute_coordinates();
-            geoprojectionconverter.to_target(lasreader->point.coordinates);
-            lasreader->point.compute_XYZ(reproject_quantizer);
+            if (reproject_quantizer)
+            {
+              lasreader->point.compute_coordinates();
+              geoprojectionconverter.to_target(lasreader->point.coordinates);
+              lasreader->point.compute_XYZ(reproject_quantizer);
+            }
+            laswriter->write_point(&lasreader->point);
+            // without extra pass we need inventory of surviving points
+            if (!extra_pass) laswriter->update_inventory(&lasreader->point);
           }
-          laswriter->write_point(&lasreader->point);
-          // without extra pass we need inventory of surviving points
-          if (!extra_pass) laswriter->update_inventory(&lasreader->point);
         }
-      }
 
-      // without the extra pass we need to fix the header now
+        // without the extra pass we need to fix the header now
 
-      if (!extra_pass)
-      {
-        if (reproject_quantizer) lasreader->header = *reproject_quantizer;
-        laswriter->update_header(&lasreader->header, TRUE);
-        LASMessage(LAS_VERBOSE, "total time: %g sec. written %u surviving points to '%s'.", taketime() - start_time, (U32)laswriter->p_count, laswriteopener.get_file_name());
-      }
-      else
-      {
-        LASMessage(LAS_VERBOSE, "main pass took %g sec.", taketime() - start_time);
-      }
+        if (!extra_pass)
+        {
+          if (reproject_quantizer) lasreader->header = *reproject_quantizer;
+          laswriter->update_header(&lasreader->header, TRUE);
+          LASMessage(LAS_VERBOSE, "total time: %g sec. written %u surviving points to '%s'.", taketime() - start_time, (U32)laswriter->p_count, laswriteopener.get_file_name());
+        }
+        else
+        {
+          LASMessage(LAS_VERBOSE, "main pass took %g sec.", taketime() - start_time);
+        }
 
-      laswriter->close();
-      // delete empty output files
-      if (remove_empty_files && (laswriter->npoints == 0) && laswriteopener.get_file_name())
-      {
-        remove(laswriteopener.get_file_name());
-        LASMessage(LAS_VERBOSE, "removing empty output file '%s'", laswriteopener.get_file_name());
+        laswriter->close();
+        // delete empty output files
+        if (remove_empty_files && (laswriter->npoints == 0) && laswriteopener.get_file_name())
+        {
+          remove(laswriteopener.get_file_name());
+          LASMessage(LAS_VERBOSE, "removing empty output file '%s'", laswriteopener.get_file_name());
+        }
+        delete laswriter;
       }
-      delete laswriter;
 
       lasreader->close();
       delete lasreader;
@@ -1824,3 +2141,4 @@ int main(int argc, char* argv[])
   }
   byebye();
 }
+
