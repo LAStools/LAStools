@@ -12,11 +12,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lasziplib", "liblaszip.vcxp
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B202B552-8729-4395-94DA-A219FA7B9CA1}.Debug|x64.ActiveCfg = Debug|x64
+		{B202B552-8729-4395-94DA-A219FA7B9CA1}.Debug|x64.Build.0 = Debug|x64
 		{B202B552-8729-4395-94DA-A219FA7B9CA1}.Release|x64.ActiveCfg = Release|x64
 		{B202B552-8729-4395-94DA-A219FA7B9CA1}.Release|x64.Build.0 = Release|x64
+		{28E29AE8-ECC4-4189-A2F4-A72F33D119A2}.Debug|x64.ActiveCfg = Debug|x64
+		{28E29AE8-ECC4-4189-A2F4-A72F33D119A2}.Debug|x64.Build.0 = Debug|x64
 		{28E29AE8-ECC4-4189-A2F4-A72F33D119A2}.Release|x64.ActiveCfg = Release|x64
 		{28E29AE8-ECC4-4189-A2F4-A72F33D119A2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
