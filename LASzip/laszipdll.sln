@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.34902.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "laszipdll", "laszipdll.vcxproj", "{B202B552-8729-4395-94DA-A219FA7B9CA1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{28E29AE8-ECC4-4189-A2F4-A72F33D119A2} = {28E29AE8-ECC4-4189-A2F4-A72F33D119A2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lasziplib", "liblaszip.vcxproj", "{28E29AE8-ECC4-4189-A2F4-A72F33D119A2}"
 EndProject
