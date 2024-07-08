@@ -15,7 +15,7 @@ Samples of copy operations
     File1 File2 Target
     a 1    a 4    a 1  
     b 2    
-           c 3    c 3
+           c 2    c 2
     d 4    d 1    d 4
     
 With argument -zero:
@@ -26,12 +26,10 @@ With argument -zero:
            c 2    c 0
     d 4    d 1    d 4
 
-By default the selected attributes of the source points are
-copied to all target points if the two share the exact same
-combination of GPS-time stamp and return number. Selecting 
-attributes to be copied is done by adding '-classification',
-'-intensity', and/or '-elevation' to the command line. If no
-selection is made the classifications are copied.
+By default the selected attributes of the source points are copied to all target 
+points if the two share the exact same combination of key values. 
+Selecting attributes to be copied is done by adding one or more '-copy_...' arguments. 
+If no selection is made the classifications are copied.
 
 By default the points from the target file that have no match
 in the source file remain unchanged unless the option '-zero'
@@ -62,29 +60,29 @@ within 0.5 units in source exists. Set all other z-values to 0.
 
 ## lascopy specific arguments
 
--match_gps_time         : uses gps time to match data point (default)
--match_number_of_return : uses number of returns to match data point (default)
--match_classification : uses classification for point matching
--match_intensity      : uses intensity for point matching
--match_point_source_id: uses point source for point matching
--match_scanner_channel: uses scanner channel for point matching
--match_xy [dist]      : Matches point by x-y coordinates and the specified maximum distance
--match_xyz [dist]     : Matches point by x-y-z coordinates and the specified maximum distance
--match_xyz_warn [n]   : Issues warning if more than n points are considered for matching for a single point. This may hint to using a smaller matching distance for improved performance.
--copy_classification  : copy classification attribute (default)  
--copy_elevation       : copy elevation attribute  
--copy_intensity       : copy intensity attribute  
--copy_keypoint_flag   : copy keypoint flag to target  
--copy_overlap_flag    : copy overlap flag to target  
--copy_synthetic_flag  : copy synthetic flag to target  
--copy_withheld_flag   : copy withheld flag to target  
+-match_gps_time       : uses gps time to match data point (default) (64bit only)  
+-match_return_number  : uses number of return to match data point (default) (64bit only)  
+-match_classification : uses classification for point matching (64bit only)  
+-match_intensity      : uses intensity for point matching (64bit only)  
+-match_point_source_id: uses point source for point matching (64bit only)  
+-match_scanner_channel: uses scanner channel for point matching (64bit only)  
+-match_xy [dist]      : Matches point by x-y coordinates and the specified maximum distance (64bit only)  
+-match_xyz [dist]     : Matches point by x-y-z coordinates and the specified maximum distance (64bit only)  
+-match_xyz_warn [n]   : Issues warning if more than n points are considered for matching for a single point. This may hint to using a smaller matching distance for improved performance. (64bit only)  
+-copy_classification  : copy classification attribute (default) (64bit only)  
+-copy_elevation       : copy elevation attribute (64bit only)  
+-copy_intensity       : copy intensity attribute (64bit only)  
+-copy_keypoint_flag   : copy keypoint flag to target (64bit only)  
+-copy_overlap_flag    : copy overlap flag to target (64bit only)  
+-copy_synthetic_flag  : copy synthetic flag to target (64bit only)  
+-copy_withheld_flag   : copy withheld flag to target (64bit only)  
 -classification       : Deprecated: copy classification attribute (may be removed in futrue - replaced by copy_classification)  
 -elevation            : Deprecated: copy elevation attribute (may be removed in futrue - replaced by copy_elevation)  
 -intensity            : Deprecated: copy intensity attribute (may be removed in futrue - replaced by copy_intensity)  
--keypoint_flag        : Deprecated: copy keypoint flag to target (may be removed in futrue - replaced by copy_keypoint_flag)   
--overlap_flag         : Deprecated: copy overlap flag to target (may be removed in futrue - replaced by copy_overlap_flag)   
--synthetic_flag       : Deprecated: copy synthetic flag to target (may be removed in futrue - replaced by copy_synthetic_flag)   
--withheld_flag        : Deprecated: copy withheld flag to target (may be removed in futrue - replaced by copy_ithheld_flag)   
+-keypoint_flag        : Deprecated: copy keypoint flag to target (may be removed in futrue - replaced by copy_keypoint_flag)  
+-overlap_flag         : Deprecated: copy overlap flag to target (may be removed in futrue - replaced by copy_overlap_flag)  
+-synthetic_flag       : Deprecated: copy synthetic flag to target (may be removed in futrue - replaced by copy_synthetic_flag)  
+-withheld_flag        : Deprecated: copy withheld flag to target (may be removed in futrue - replaced by copy_ithheld_flag)  
 -zero                 : set attribute of points to zero if not found in source  
 -unmatched            : copy attributes from source to target by point order  
 -ilay [n]             : apply [n] or all LASlayers found in corresponding *.lay file on read  
@@ -242,6 +240,9 @@ within 0.5 units in source exists. Set all other z-values to 0.
 -translate_raw_xyz [x] [y] [z]      : translate raw coordinates by [x] [y] [z]  
 -translate_raw_y [n]                : translate raw y value by [n]  
 -translate_raw_z [n]                : translate raw z value by [n]  
+-translate_scale_translate_x [m] [n]: calculate x value as (x–[m])*[n]+[m]  
+-translate_scale_translate_y [m] [n]: calculate y value as (y–[m])*[n]+[m]  
+-translate_scale_translate_z [m] [n]: calculate z value as (z–[m])*[n]+[m]  
 -translate_then_scale_x [m] [n]     : translate x value by [m] and scale by [n]  
 -translate_then_scale_y [m] [n]     : translate y value by [m] and scale by [n]  
 -translate_then_scale_z [m] [n]     : translate z value by [m] and scale by [n]  

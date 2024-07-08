@@ -30,6 +30,12 @@ that it find stored in the pose of each scan. You can ask the tool
 not to apply those with '-no_pose'. To selevtively suppress only
 transformation or rotation use '-no_transformation' or '-no_rotation'
 
+This tool does not support multiple file input.
+Batch conversion can be done using a batch file like
+```dos
+:: convert all *.e57 files to *.laz
+for %%f in (*.e57) do if not exist %%~nf.laz e572las -i %%f -olaz
+```
   
 ## Examples
 
@@ -214,7 +220,26 @@ written a total 1213990 points
 -include_invalid       : include invalid points into target  
 -set_scale [x] [y] [z] : quantize ASCII points with [x] [y] [z] (unit meters)  
 -split_scans           : split output files by scan  
+-split                 : split output files by scan
+-no_pose               : perform neither translation nor rotation 
+-no_translation        : skip translation
+-no_rotation           : skip rotation
+-i                     : input e57 file
+-print_scan_count      : just print the number of scans and exit
+-scan 1 4 6 ...        : just process the given scans [1..n] 
 
+Any other argument is used as filename if "-i" is not set and the argument does not start with '-':
+    e572las64 foo.e57
+    
+### Basics
+-h            : print help output  
+-help         : print help output  
+-v            : verbose output (print extra information)  
+-verbose      : verbose output (print extra information)
+-very_verbose : very verbose output (print even more information)  
+-vv           : very verbose output (print even more information)  
+-version      : displays the version number of the tool  
+-license      : print license information
 
 ## License
 

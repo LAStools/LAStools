@@ -179,7 +179,7 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 -olaydir [dir]                : write the output *.lay file in directory [dir]  
 -percentile [m] [n]           : thins, flags, or classifies points closest to [m]th percentile in z (optional: if a cell has [n] or more points)  
 -random                       : thins, flags, or classifies some random point per cell  
--remain_buffered              : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
 -seed [n]                     : seeds the random generator with [n]  
 -sparse                       : always use hash to map points to cells internally  
 -step [n]                     : set grid cell size to [n] for thinning/classifying/flagging (default=2)  
@@ -336,6 +336,9 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 -translate_raw_xyz [x] [y] [z]      : translate raw coordinates by [x] [y] [z]  
 -translate_raw_y [n]                : translate raw y value by [n]  
 -translate_raw_z [n]                : translate raw z value by [n]  
+-translate_scale_translate_x [m] [n]: calculate x value as (x–[m])*[n]+[m]  
+-translate_scale_translate_y [m] [n]: calculate y value as (y–[m])*[n]+[m]  
+-translate_scale_translate_z [m] [n]: calculate z value as (z–[m])*[n]+[m]  
 -translate_then_scale_x [m] [n]     : translate x value by [m] and scale by [n]  
 -translate_then_scale_y [m] [n]     : translate y value by [m] and scale by [n]  
 -translate_then_scale_z [m] [n]     : translate z value by [m] and scale by [n]  

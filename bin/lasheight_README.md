@@ -1,4 +1,4 @@
-﻿# lasheight
+# lasheight
 
 This tool computes the height of each LAS point above the
 ground. This assumes that grounds points have already been
@@ -156,7 +156,7 @@ lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_heig
 -olay                           : write or append classification changes to a LASlayers *.lay file  
 -olaydir [dir]                  : write the output *.lay file in directory [dir]  
 -parse [xyz]                    : in case the input file is ascii use parse string [xyz] to access point values  
--remain_buffered                : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-remain_buffered                : write all data to the output, even if they are part of a boundary buffer  
 -replace_z                      : store heights to z coordinate (instead of in dm in user_data field). original elevations are lost.  
 -scale_u [n]                    : scale height quantized to [n] increments in user_data field (default=10 cm)  
 -skip_files                     : skip (instead of the default copy) files that have an insufficient number of ground points  
@@ -165,6 +165,8 @@ lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_heig
 -store_precise_as_extra_bytes   : store height with mm precision as int in "extra bytes" (instead of in dm in user_data field)  
 -switch_G_B                     : switch green and blue value  
 -week_to_adjusted [n]           : converts time stamps from GPS week [n] to Adjusted Standard GPS  
+-kill [length]                  : do not consider points when height is computed in respect to a triangle which has leg-lengths exceeding [length] (64bit)  
+-prohibit_extrapolation         : points are only considered when located over a ground-point triangle (64bit)  
 
 ### Basics
 -cpu64   : start 64 bit executable (instead of default 32 bit executable)  
@@ -315,6 +317,9 @@ lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_heig
 -translate_raw_xyz [x] [y] [z]      : translate raw coordinates by [x] [y] [z]  
 -translate_raw_y [n]                : translate raw y value by [n]  
 -translate_raw_z [n]                : translate raw z value by [n]  
+-translate_scale_translate_x [m] [n]: calculate x value as (x–[m])*[n]+[m]  
+-translate_scale_translate_y [m] [n]: calculate y value as (y–[m])*[n]+[m]  
+-translate_scale_translate_z [m] [n]: calculate z value as (z–[m])*[n]+[m]  
 -translate_then_scale_x [m] [n]     : translate x value by [m] and scale by [n]  
 -translate_then_scale_y [m] [n]     : translate y value by [m] and scale by [n]  
 -translate_then_scale_z [m] [n]     : translate z value by [m] and scale by [n]  

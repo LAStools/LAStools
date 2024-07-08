@@ -171,7 +171,7 @@ lasground64 -i *.laz -v -odir ground_classified  -olaz
 -olaydir [dir]                : write the output *.lay file in directory [dir]  
 -pertube                      : optional pertube x/y values by random value  
 -refine [n]                   : use [n] refinement loops (default=10)  
--remain_buffered              : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
 -replace_z                    : replace z value with computed height  
 -skip_files                   : skip (instead of the default copy) files that have an insufficient number of ground points  
 -spike [n]                    : remove up and down spikes > [n] centimeter  
@@ -336,6 +336,9 @@ lasground64 -i *.laz -v -odir ground_classified  -olaz
 -translate_raw_xyz [x] [y] [z]      : translate raw coordinates by [x] [y] [z]  
 -translate_raw_y [n]                : translate raw y value by [n]  
 -translate_raw_z [n]                : translate raw z value by [n]  
+-translate_scale_translate_x [m] [n]: calculate x value as (x–[m])*[n]+[m]  
+-translate_scale_translate_y [m] [n]: calculate y value as (y–[m])*[n]+[m]  
+-translate_scale_translate_z [m] [n]: calculate z value as (z–[m])*[n]+[m]  
 -translate_then_scale_x [m] [n]     : translate x value by [m] and scale by [n]  
 -translate_then_scale_y [m] [n]     : translate y value by [m] and scale by [n]  
 -translate_then_scale_z [m] [n]     : translate z value by [m] and scale by [n]  

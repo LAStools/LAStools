@@ -57,7 +57,7 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 -olay                         : write or append classification changes to a LASlayers *.lay file  
 -olaydir [dir]                : write the output *.lay file in directory [dir]  
 -poly [fns]                   : use file [fns] as source for polygonal segments  
--remain_buffered              : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
 -remove_points                : remove points from output file (instead of classifying them)  
 -step [n]                     : use granularity [n] to compute the approximated distances (default=0.5)  
 -step_xy [n]                  : granularity [n] with which the approximated distances are computed (default=0.5)  
@@ -211,6 +211,9 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 -translate_raw_xyz [x] [y] [z]      : translate raw coordinates by [x] [y] [z]  
 -translate_raw_y [n]                : translate raw y value by [n]  
 -translate_raw_z [n]                : translate raw z value by [n]  
+-translate_scale_translate_x [m] [n]: calculate x value as (x–[m])*[n]+[m]  
+-translate_scale_translate_y [m] [n]: calculate y value as (y–[m])*[n]+[m]  
+-translate_scale_translate_z [m] [n]: calculate z value as (z–[m])*[n]+[m]  
 -translate_then_scale_x [m] [n]     : translate x value by [m] and scale by [n]  
 -translate_then_scale_y [m] [n]     : translate y value by [m] and scale by [n]  
 -translate_then_scale_z [m] [n]     : translate z value by [m] and scale by [n]  

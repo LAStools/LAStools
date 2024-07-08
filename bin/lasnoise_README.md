@@ -97,7 +97,7 @@ lasnoise64 -i tiles\*.laz -step 3 -isolated 3 -classify_as 31 -odir denoised -ol
 -mem [n]                      : use [n] MB of main memory (500-2000; default=1500)  
 -olay                         : write or append classification changes to a LASlayers *.lay file  
 -olaydir [dir]                : write the output *.lay file in directory [dir]  
--remain_buffered              : write buffer points to output when using '-buffered 25' on-the-fly buffering  
+-remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
 -remove_noise                 : remove noise points from the file  
 -step [n]                     : use a [n]x[n]x[n] uniform grid for finding isolated points  
 -step_xy [n]                  : set the horizontal x and y spacing of the grid to [n]  
@@ -253,6 +253,9 @@ lasnoise64 -i tiles\*.laz -step 3 -isolated 3 -classify_as 31 -odir denoised -ol
 -translate_raw_xyz [x] [y] [z]      : translate raw coordinates by [x] [y] [z]  
 -translate_raw_y [n]                : translate raw y value by [n]  
 -translate_raw_z [n]                : translate raw z value by [n]  
+-translate_scale_translate_x [m] [n]: calculate x value as (x–[m])*[n]+[m]  
+-translate_scale_translate_y [m] [n]: calculate y value as (y–[m])*[n]+[m]  
+-translate_scale_translate_z [m] [n]: calculate z value as (z–[m])*[n]+[m]  
 -translate_then_scale_x [m] [n]     : translate x value by [m] and scale by [n]  
 -translate_then_scale_y [m] [n]     : translate y value by [m] and scale by [n]  
 -translate_then_scale_z [m] [n]     : translate z value by [m] and scale by [n]  
