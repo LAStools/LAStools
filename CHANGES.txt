@@ -1,13 +1,23 @@
-# LAStools changes for open source code
 04 July 2024 -- NEW: lasinfo -scale_header argument to do a relative scale of all header values 
+24 June 2024 -- fix: las2dem: rasterizer could hang on tiny grid steps
+21 June 2024 -- NEW: lasvdatum subgrid merge
 21 June 2024 -- fix: avoid fallback to verbose if -vv and -v is used
 21 June 2024 -- fix: log las file open at very_verbose level
 21 June 2024 -- close #199: ARM64 fix; explicit signed char usage
 17 June 2024 -- NEW: support ascii codepages (umlauts) in filenames
 17 June 2024 -- resolve compiler warnings
 11 June 2024 -- fix: argument handler multi core support; pass 64bit to all multicore tools; fix 64bit executeable param
+04 June 2024 -- NEW: lasheight: -kill and -prohibit_extrapolation options
+03 June 2024 -- fix: lasclassify: z_from_attrib support
+31 Mai 2024 -- fix: lasvoxel: support ignore_xxx arguments
+29 Mai 2024 -- NEW: lasdatum: support >16 (sub)grids (up to 255); print very_verbose log output about grid selection
+22 Mai 2024 -- fix: lasground64, lasground_new64: continue with next file on single file abort  
 21 Mai 2024 -- bugfix error handling
-19 March 2024 -- new: read z from attribute (-z_from_attribute) 
+18 Mai 2024 -- NEW: lasclip: support filename_as_prefix and filename_as_suffix
+7 Mai 2024 -- lascopy redesign: multiple match and copy options
+7 Mai 2024 -- unify exit codes; refactoring error handling
+7 Mai 2024 -- fix: lasinfo output point iterator
+19 March 2024 -- NEW: read z from attribute (-z_from_attribute) 
 19 March 2024 -- fix: find licensefile at bin location (linux)
 19 March 2024 -- fix: multicore bin localization (linux)
 26 February 2024 -- LASMessage concept; warnings fix; error handling
@@ -16,6 +26,7 @@
 15 January 2024 -- fix coldesc support las2txt, txt2las; doc update
 14 December 2023 -- hsv/hsl colormodel implementation
 8 December 2023 -- copc implementation 
+10 November 2023 -- fix: las2dem: missing pixel bug 
 04 August 2023 -- set default of VLR header "reserved" to 0 instead of 0xAABB
 31 July 2023 -- NEW: las3dpoly and lasintensity
 30 March 2023 -- lasclip: Enable large SHP files in split mode
