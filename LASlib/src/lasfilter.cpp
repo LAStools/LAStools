@@ -703,11 +703,44 @@ private:
 
 class LAScriterionKeepEdgeOfFlightLine : public LAScriterion
 {
-public:
-  inline const CHAR* name() const { return "keep_edge_of_flight_line"; };
-  inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s ", name()); };
-  inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_FLAGS; };
-  inline BOOL filter(const LASpoint* point) { return (point->edge_of_flight_line == 0); };
+ public:
+  inline const CHAR* name() const
+  {
+    return "keep_edge_of_flight_line";
+  };
+  inline I32 get_command(CHAR* string) const
+  {
+    return sprintf(string, "-%s ", name());
+  };
+  inline U32 get_decompress_selective() const
+  {
+    return LASZIP_DECOMPRESS_SELECTIVE_FLAGS;
+  };
+  inline BOOL filter(const LASpoint* point)
+  {
+    return (point->edge_of_flight_line == 0);
+  };
+};
+
+class LAScriterionDropEdgeOfFlightLine : public LAScriterion
+{
+ public:
+  inline const CHAR* name() const
+  {
+    return "drop_edge_of_flight_line";
+  };
+  inline I32 get_command(CHAR* string) const
+  {
+    return sprintf(string, "-%s ", name());
+  };
+  inline U32 get_decompress_selective() const
+  {
+    return LASZIP_DECOMPRESS_SELECTIVE_FLAGS;
+  };
+  inline BOOL filter(const LASpoint* point)
+  {
+    return (point->edge_of_flight_line != 0);
+  };
 };
 
 class LAScriterionKeepScannerChannel : public LAScriterion
@@ -5139,7 +5172,14 @@ BOOL LASfilter::parse(int argc, char* argv[])
           return FALSE;
         }
         add_criterion(new LAScriterionDropScannerChannel(scanner_channel));
-        *argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
+        *argv[i] = '\0';
+        *argv[i + 1] = '\0';
+        i += 1;
+      }
+      else if (strcmp(argv[i], "-drop_edge_of_flight_line") == 0)
+      {
+        add_criterion(new LAScriterionDropEdgeOfFlightLine());
+        *argv[i] = '\0';
       }
     }
     else if (strcmp(argv[i], "-first_only") == 0)
