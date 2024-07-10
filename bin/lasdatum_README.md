@@ -65,7 +65,8 @@ lasdatum64 -i in.laz -epsg 25833 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.
 -set_ogc_wkt_in_evlr               : same as "set_ogc_wkt" but adds it as LAS 1.4 EVLR instead. really not recommended!!!  
 -seven [1],[2],[3],[4],[5],[6],[7] : do a seven parameter transform  
 -switch_G_B                        : switch green and blue value  
--week_to_adjusted [n]              : converts time stamps from GPS week [n] to Adjusted Standard GPS  
+-week_to_adjusted [n]              : converts time stamps from GPS week [n] to Adjusted Standard GPS
+-preserve_z                        : keep original height after transformation (only transform x/y coordinates)  
 
 ### Basics
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  

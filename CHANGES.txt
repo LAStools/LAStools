@@ -1,3 +1,5 @@
+10 July 2024 -- NEW: lasdatum -preserve_z argument to keep original height after transformation (only transform x/y coordinates)  
+09 July 2024 -- NEW: filter argument -drop_edge_of_flight_line
 04 July 2024 -- NEW: lasinfo -scale_header argument to do a relative scale of all header values 
 24 June 2024 -- fix: las2dem: rasterizer could hang on tiny grid steps
 21 June 2024 -- NEW: lasvdatum subgrid merge
