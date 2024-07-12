@@ -50,8 +50,14 @@ BOOL strToFloatDegPcFail(const CHAR* cin, F32* out)
 {
   if (sscanf(cin, "%f", out) == 1)
   {
-    if ((tolower(cin[strlen(cin) - 1]) == 'd') || (tolower(cin[strlen(cin) - 1]) == '°')) { *out /= 360; } // 0xb0
-    if ((tolower(cin[strlen(cin) - 1]) == 'p') || (tolower(cin[strlen(cin) - 1]) == '%')) { *out /= 100; }
+    if ((tolower(cin[strlen(cin) - 1]) == 'd') || ((unsigned char)cin[strlen(cin) - 1] == 0xb0)) // degree, '°'
+    {
+      *out /= 360;
+    }
+    if ((tolower(cin[strlen(cin) - 1]) == 'p') || (cin[strlen(cin) - 1] == '%')) 
+    { 
+      *out /= 100; 
+    }
     return false;
   }
   return true;
