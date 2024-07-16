@@ -324,6 +324,7 @@ public:
   void clean_las_header()
   {
     memset((void*)this, 0, sizeof(LASheader));
+    attributes_linked = TRUE;
     file_signature[0] = 'L'; file_signature[1] = 'A'; file_signature[2] = 'S'; file_signature[3] = 'F';
     version_major = 1;
     version_minor = 2;
