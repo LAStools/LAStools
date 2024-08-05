@@ -43,7 +43,7 @@ typedef std::multimap<I64, F64> my_I64_F64_map;
 typedef std::set<I64> my_I64_set;
 
 // convert the first number in a input string to the out float
-// if the string ends with [d/D] or [p/P] the out value will be 
+// if the string ends with [d/D] or [p/P] the out value will be
 // converted from [d]ecimal or [p]ercent unit
 // outside of class > will be moved external soon...
 BOOL strToFloatDegPcFail(const CHAR* cin, F32* out)
@@ -54,9 +54,9 @@ BOOL strToFloatDegPcFail(const CHAR* cin, F32* out)
     {
       *out /= 360;
     }
-    if ((tolower(cin[strlen(cin) - 1]) == 'p') || (cin[strlen(cin) - 1] == '%')) 
-    { 
-      *out /= 100; 
+    if ((tolower(cin[strlen(cin) - 1]) == 'p') || (cin[strlen(cin) - 1] == '%'))
+    {
+      *out /= 100;
     }
     return false;
   }
