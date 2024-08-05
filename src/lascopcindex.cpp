@@ -770,7 +770,7 @@ int main(int argc, char* argv[])
   // if (verbose) progress = FALSE; -- why?
 
   /*#ifdef COMPILE_WITH_GUI
-    if (gui)
+    if (lastool.gui)
     {
       return lasopcindex_gui(argc, argv, &lasreadopener, &laswriteopener);
     }

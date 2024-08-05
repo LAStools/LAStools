@@ -462,7 +462,7 @@ int main(int argc, char* argv[])
   lastool.parse(arg_local);
 
 #ifdef COMPILE_WITH_GUI
-  if (gui)
+  if (lastool.gui)
   {
     return txt2las_gui(argc, argv, &lasreadopener);
   }

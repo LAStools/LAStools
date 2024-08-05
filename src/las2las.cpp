@@ -1063,7 +1063,7 @@ int main(int argc, char* argv[])
   lastool.parse(arg_local);
 
 #ifdef COMPILE_WITH_GUI
-  if (gui)
+  if (lastool.gui)
   {
     return las2las_gui(argc, argv, &lasreadopener);
   }
@@ -1140,7 +1140,7 @@ int main(int argc, char* argv[])
   }
 
   // possibly loop over multiple input files
-    while (lasreadopener.active())
+  while (lasreadopener.active())
   {
     try
     {

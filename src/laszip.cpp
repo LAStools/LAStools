@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
   lastool.parse(arg_local);
 
 #ifdef COMPILE_WITH_GUI
-  if (gui)
+  if (lastool.gui)
   {
     return laszip_gui(argc, argv, &lasreadopener);
   }

@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
   }
 
 #ifdef COMPILE_WITH_GUI
-  if (gui)
+  if (lastool.gui)
   {
     return lasindex_gui(argc, argv, &lasreadopener);
   }

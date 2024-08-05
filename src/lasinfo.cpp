@@ -201,7 +201,7 @@ class LasTool_lasinfo : public LasTool
   F64* scale_header = 0;
 
  public:
-  void run()
+  int run()
   {
     int i;
     bool no_header = false;
@@ -5086,6 +5086,5 @@ int main(int argc, char* argv[])
 {
   LasTool_lasinfo lastool;
   lastool.init(argc, argv, "lasinfo");
-  lastool.run();
-  return 0;
+  return lastool.run();
 }
