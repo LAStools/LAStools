@@ -64,7 +64,7 @@ foreach(file ${LAZ_SRC})
 endforeach(file)
 
 file(GLOB_RECURSE LAS_INCLUDES
-	${CMAKE_SOURCE_DIR}/LASzip/src/*.hpp 
+	${CMAKE_SOURCE_DIR}/LASzip/src/*.hpp
 	${CMAKE_SOURCE_DIR}/LASlib/inc/*.hpp
 )
 
@@ -77,10 +77,10 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 target_include_directories(LASlib PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASlib/inc>
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASzip/src>
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASzip/include/laszip>
-  $<INSTALL_INTERFACE:include/LASlib>
+	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASlib/inc>
+	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASzip/src>
+	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/LASzip/include/laszip>
+	$<INSTALL_INTERFACE:include/LASlib>
 )
 set_target_properties(LASlib PROPERTIES
 	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../lib
@@ -89,18 +89,18 @@ set_target_properties(LASlib PROPERTIES
 )
 
 if(MSVC)
-   target_compile_options(LASlib PRIVATE /Zi)
+	target_compile_options(LASlib PRIVATE /Zi)
 
-   # Tell linker to include symbol data
-    set_target_properties(LASlib PROPERTIES 
-        LINK_FLAGS "/INCREMENTAL:NO /DEBUG /OPT:REF /OPT:ICF"
-    )
+	# Tell linker to include symbol data
+	set_target_properties(LASlib PROPERTIES
+		LINK_FLAGS "/INCREMENTAL:NO /DEBUG /OPT:REF /OPT:ICF"
+	)
 
-    # Set file name & location
-    set_target_properties(LASlib PROPERTIES 
-        COMPILE_PDB_NAME LASlib 
-        COMPILE_PDB_OUTPUT_DIR ${CMAKE_BINARY_DIR}
-    )
+	# Set file name & location
+	set_target_properties(LASlib PROPERTIES
+		COMPILE_PDB_NAME LASlib
+		COMPILE_PDB_OUTPUT_DIR ${CMAKE_BINARY_DIR}
+	)
 endif()
 
 install(FILES ${LAS_INCLUDES} DESTINATION include/LASlib)
@@ -113,7 +113,8 @@ else()
 	install(TARGETS LASlib EXPORT laslib-targets
 		ARCHIVE DESTINATION lib/LASlib
 		LIBRARY DESTINATION lib/LASlib
-		RUNTIME DESTINATION lib/LASlib)
+		RUNTIME DESTINATION lib/LASlib
+	)
 	install(EXPORT laslib-targets DESTINATION lib/cmake/LASlib)
 	install(FILES ${CMAKE_SOURCE_DIR}/LASlib/src/laslib-config.cmake DESTINATION lib/cmake/LASlib)
 endif(MSVC)
