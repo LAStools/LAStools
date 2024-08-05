@@ -66,6 +66,7 @@ endforeach(file)
 file(GLOB_RECURSE LAS_INCLUDES
 	${CMAKE_SOURCE_DIR}/LASzip/src/*.hpp
 	${CMAKE_SOURCE_DIR}/LASlib/inc/*.hpp
+	${CMAKE_SOURCE_DIR}/LASzip/include/laszip/*.h
 )
 
 add_library(LASlib ${LAS_SRC} ${LAZ_SRC_FULL})
