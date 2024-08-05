@@ -1,3 +1,6 @@
+05 August 2024 -- NEW: blast tools ported to linux
+05 August 2024 -- NEW: local GUI option on 64 bit versions
+12 July 2024 -- fix: close #203: ascii file encoding fix
 10 July 2024 -- NEW: lasdatum -preserve_z argument to keep original height after transformation (only transform x/y coordinates)  
 09 July 2024 -- NEW: filter argument -drop_edge_of_flight_line
 04 July 2024 -- NEW: lasinfo -scale_header argument to do a relative scale of all header values 
