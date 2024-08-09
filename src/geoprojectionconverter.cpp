@@ -4370,7 +4370,7 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
             // this is where the name ends
             line[run] = '\0';
           }
-          if (description) sprintf(description, name);
+          if (description) sprintf(description, "%s", name);
           run++;
           // skip two commas
           while (line[run] != ',') run++;
