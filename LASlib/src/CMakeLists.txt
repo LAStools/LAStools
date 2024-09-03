@@ -65,6 +65,7 @@ endforeach(file)
 
 file(GLOB_RECURSE LAS_INCLUDES
 	${CMAKE_SOURCE_DIR}/LASzip/src/*.hpp 
+	${CMAKE_SOURCE_DIR}/LASzip/include/*.h
 	${CMAKE_SOURCE_DIR}/LASlib/inc/*.hpp
 )
 
