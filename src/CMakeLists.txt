@@ -28,15 +28,15 @@ set(STANDALONE_TARGETS
 set(ALL_TARGETS ${GEOPROJECTION_TARGETS} ${STANDALONE_TARGETS})
 
 foreach(TARGET ${GEOPROJECTION_TARGETS})
-	add_executable(${TARGET} ${TARGET}.cpp geoprojectionconverter.cpp)
+	add_executable(${TARGET} ${TARGET}.cpp geoprojectionconverter.cpp proj_loader.cpp)
 endforeach(TARGET)
 
 foreach(TARGET ${STANDALONE_TARGETS})
-	add_executable(${TARGET} ${TARGET}.cpp)
+	add_executable(${TARGET} ${TARGET}.cpp proj_loader.cpp)
 endforeach(TARGET)
 
 foreach(TARGET ${ALL_TARGETS})
-	set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 14)
+	set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
 	target_link_libraries(${TARGET} LASlib)
 	set_target_properties(${TARGET} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../bin64)
 	set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME ${TARGET}64)

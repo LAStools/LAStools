@@ -529,6 +529,45 @@ static void parse_save_load_vlr_args(int& i, int argc, char* argv[], bool& save_
   }
 }
 
+/// IMPORTANT: The Proj lib must be installed and loaded to use this functionality.
+/// Attempts to create the WKT representation of the CRS via the PROJ lib. 
+/// If it is a Proj transformation, the wkt has already been created.
+/// If GeoTIFFs in the header, first create a projection to get the epsg code.
+void get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjectionConverter& geoprojectionconverter, LASreader* lasreader)
+{
+  if (lasreader) {
+    const char* wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation();
+
+    //If the WKT representation has not been created yet
+    if (geoprojectionconverter.source_header_epsg == 0 && wkt_representation == nullptr) {
+      if (!geoprojectionconverter.has_projection(true)) {  // if no source projection was provided in the command line ...
+        if (lasreader->header.vlr_geo_ogc_wkt) {  // try to get it from the OGC WKT string
+          geoprojectionconverter.set_proj_crs_with_file_header_wkt(lasreader->header.vlr_geo_ogc_wkt, false);
+        } else if (lasreader->header.vlr_geo_keys) {  // if no WKT exist in file header try keo_keyss.
+          geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+          geoprojectionconverter.reset_projection();
+        }
+      }
+      wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation();
+    }   
+    if (wkt_representation == nullptr) {
+      // If no WKT representation is available, try to create it with EPSG
+      if (geoprojectionconverter.source_header_epsg > 0) {
+        geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, false);
+        wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation();
+      }
+    }
+    if (wkt_representation) {
+      size_t buff_len = strlen(wkt_representation) + 1;
+      ogc_wkt_out = (char*)calloc(buff_len, sizeof(char));
+
+      if (ogc_wkt_out) {
+        strcpy_las(ogc_wkt_out, buff_len, wkt_representation);
+      }
+    }
+  }
+}
+
 // for point type conversions
 const U8 convert_point_type_from_to[11][11] =
 {
@@ -609,7 +648,7 @@ int main(int argc, char* argv[])
   // fix files with corrupt points
   bool clip_to_bounding_box = false;
   double start_time = 0;
-
+  
   LASreadOpener lasreadopener;
   GeoProjectionConverter geoprojectionconverter;
   LASwriteOpener laswriteopener;
@@ -759,6 +798,9 @@ int main(int argc, char* argv[])
       }
       else if (strncmp(argv[i], "-set_ogc_wkt", 12) == 0)
       {
+        // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
+        geoprojectionconverter.is_proj_request = load_proj_library(nullptr, false);
+
         if (strcmp(argv[i], "-set_ogc_wkt") == 0)
         {
           set_ogc_wkt = true;
@@ -1706,6 +1748,57 @@ int main(int argc, char* argv[])
       {
         set_projection_in_header = true;
       }
+      // PROJ transformation
+      if (geoprojectionconverter.is_proj_request && !set_ogc_wkt) 
+      {
+        //If the source CRS is not specified as an argument (cmd line), try to generate it from the input file
+        if (geoprojectionconverter.check_header_for_crs) 
+        {      
+          if (lasreader->header.vlr_geo_ogc_wkt) 
+          {  // try to get it from the OGC WKT string
+            geoprojectionconverter.set_proj_crs_with_file_header_wkt(lasreader->header.vlr_geo_ogc_wkt, true);
+          } 
+          else if (lasreader->header.vlr_geo_keys) 
+          {  // if no WKT exist in file header try keo_keys
+            geoprojectionconverter.set_projection_from_geo_keys(
+                lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
+                lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+            geoprojectionconverter.reset_projection();
+
+            if (geoprojectionconverter.source_header_epsg > 0) 
+            {
+              // create the PROJ object
+              geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, true);
+            } 
+            else 
+            {
+              laserror("No valid CRS could be extracted from the header information of the source file. Please specify the coordinate system (CRS) directly when calling the transformation tool.");
+            }
+          } 
+          else 
+          {
+            laserror("No file header information could be found to identify the CRS.");
+          }
+          // Create the transformation PROJ object
+          geoprojectionconverter.set_proj_crs_transform();
+        }
+        reproject_quantizer = new LASquantizer();
+        double point[3];
+        point[0] = (lasreader->header.min_x + lasreader->header.max_x) / 2;
+        point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
+        point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
+        geoprojectionconverter.to_target(point);
+        reproject_quantizer->x_scale_factor = reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision();
+        reproject_quantizer->z_scale_factor = (geoprojectionconverter.has_target_elevation_precision() ? geoprojectionconverter.get_target_elevation_precision() : lasreader->header.z_scale_factor);
+        reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
+        reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
+        reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
+
+        set_projection_in_header = true;
+        set_ogc_wkt = true;
+        lasreader->header.clean_vlrs();
+        lasreader->header.clean_evlrs();
+      }
 
       if (set_projection_in_header)
       {
@@ -1734,7 +1827,13 @@ int main(int argc, char* argv[])
         if (set_ogc_wkt || (lasreader->header.point_data_format >= 6)) // maybe also set the OCG WKT
         {
           CHAR* ogc_wkt = set_ogc_wkt_string;
+          // First try to create the WKT representation of the CRS via the PROJ lib
+          if (ogc_wkt == 0 && geoprojectionconverter.is_proj_request) 
+            get_wkt_from_proj(ogc_wkt, geoprojectionconverter, lasreader);
+
           I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
+
+          // If the WKT could not be created by the PROJ lib
           if (ogc_wkt == 0)
           {
             if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false)))
@@ -1769,28 +1868,32 @@ int main(int argc, char* argv[])
             }
           }
         }
-      }
+      } 
       else if (set_ogc_wkt) // maybe only set the OCG WKT
       {
         CHAR* ogc_wkt = set_ogc_wkt_string;
-        I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
+        // First try to create the WKT representation of the CRS via the PROJ lib
+        if (ogc_wkt == 0 && geoprojectionconverter.is_proj_request)
+          get_wkt_from_proj(ogc_wkt, geoprojectionconverter, lasreader);
 
-        if (ogc_wkt == 0)
-        {
-          if (lasreader->header.vlr_geo_keys)
+        I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
+        //If the WKT could not be created by the PROJ lib
+        if (ogc_wkt == 0) 
+        { 
+          if (lasreader->header.vlr_geo_keys) 
           {
             geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
-            if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
+            if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt)) 
             {
               LASMessage(LAS_WARNING, "cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'", lasreadopener.get_file_name());
               if (ogc_wkt) free(ogc_wkt);
               ogc_wkt = 0;
             }
-          }
-          else
+          } 
+          else 
           {
             LASMessage(LAS_WARNING, "no projection information. ignoring '-set_ogc_wkt' for '%s'", lasreadopener.get_file_name());
-          }
+          }  
         }
 
         if (ogc_wkt)

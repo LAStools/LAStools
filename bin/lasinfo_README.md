@@ -226,19 +226,31 @@ without checking whether this will corrupt the file.
 CAREFUL! sets the start of waveform data packet record field of the LAS header
 to 0 without checking whether this will corrupt the file.
 
+Querying CRS representations and information, based on the input file.
+The [wkt] WKT representation, the [js] PROJJSON representation, the [str] PROJ string, 
+the [epsg] EPSG code, the [el] ellipsoid information, the [datum] datum information and 
+the [cs] coordinate system information can be queried.
+CAREFUL! If a CRS object was not created from a PROJ string, exporting it to a PROJ string will in 
+most cases lead to a loss of information. This can potentially lead to incorrect transformations. 
+The use of PROJ strings should only be used with advanced knowledge.
 
-lasinfo64 -i lidar.las  
-lasinfo64 -i lidar.las -compute_density -o lidar_info.txt  
-lasinfo64 -i *.las  
-lasinfo64 -i *.las -single -otxt  
-lasinfo64 -no_header -no_vlrs -i lidar.laz  
-lasinfo64 -nv -nc -stdout -i lidar.las  
-lasinfo64 -nv -nc -stdout -i *.laz -single | grep version  
-lasinfo64 -i *.laz -subseq 100000 100100 -histo user_data 8  
-lasinfo64 -i *.las -repair  
-lasinfo64 -i *.laz -repair_bb -set_file_creation 8 2007  
-lasinfo64 -i *.las -repair_counters -set_version 1.2  
-lasinfo64 -i *.laz -set_system_identifier "hello world!" -set_generating_software "this is a test (-:"
+    lasinfo64 -i lidar.las -proj_info wkt js str epsg el datum cs
+
+
+Further examples
+
+    lasinfo64 -i lidar.las  
+    lasinfo64 -i lidar.las -compute_density -o lidar_info.txt  
+    lasinfo64 -i *.las  
+    lasinfo64 -i *.las -single -otxt  
+    lasinfo64 -no_header -no_vlrs -i lidar.laz  
+    lasinfo64 -nv -nc -stdout -i lidar.las  
+    lasinfo64 -nv -nc -stdout -i *.laz -single | grep version  
+    lasinfo64 -i *.laz -subseq 100000 100100 -histo user_data 8  
+    lasinfo64 -i *.las -repair  
+    lasinfo64 -i *.laz -repair_bb -set_file_creation 8 2007  
+    lasinfo64 -i *.las -repair_counters -set_version 1.2  
+    lasinfo64 -i *.laz -set_system_identifier "hello world!" -set_generating_software "this is a test (-:"
 
 
 ## lasinfo specific arguments
@@ -268,6 +280,7 @@ lasinfo64 -i *.laz -set_system_identifier "hello world!" -set_generating_softwar
 -nw                                 : don't output WARNINGs  
 -otxt                               : output as textfile  
 -progress [n]                       : report progress every [n] points  
+-proj_info [wkt] [js] [str] [epsg] [el] [datum] [cs] : get CRS representations and information of the input file: [wkt] WKT, [js] PROJJSON, [str] PROJ string or [epsg] EPSG code representation and [el] ellipsoid, [datum] datum or [cs] coordinate system information.
 -rename [n]                         : renames input file 'fusa.laz' to '[n]_277750_6122250.laz'  
 -repair                             : repair both bounding box and counters  
 -repair_bb                          : repair bounding box  
