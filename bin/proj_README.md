@@ -2,7 +2,7 @@
 
 PROJ is a generic coordinate transformation software that transforms geospatial coordinates from one coordinate reference system (CRS) to another. 
 This includes cartographic projections as well as geodetic transformations. 
-It is utilized in the LAS tool (las2las) to transform LiDAR data between various coordinate reference systems and to 
+It is utilized in the LAStool (las2las) to transform LiDAR data between various coordinate reference systems and to 
 retrieve detailed represenations and information about CRS (lasinfo).
 
 **Key features include:**
@@ -10,7 +10,7 @@ retrieve detailed represenations and information about CRS (lasinfo).
 - Conversion and representation of CRS in various formats (EPSG, WKT, PROJ string, PROJJSON).
 - Retrieval of metadata such as ellipsoids, axes, and datum information related to a CRS.
 
-The integration of the PROJ library provides a flexible and powerful means to perform geodetic transformations directly within the LAStools.
+The integration of the PROJ library provides a flexible and powerful means to perform geodetic transformations directly within LAStools.
 
 The source code for the PROJ library is available at https://github.com/OSGeo/PROJ.
 
