@@ -2231,7 +2231,7 @@ BOOL LASfilter::parse(int argc, char* argv[])
             }
             if (classification > 31)
             {
-              laserror("'%s' needs arguments between 0 and 31 but '%u' is out of range", argv[i_in], classification);
+              laserror("'%s' needs arguments between 0 and 31 but '%u' is out of range (see -keep_extended_class)", argv[i_in], classification);
               return FALSE;
             }
             keep_classification_mask |= (1u << classification);

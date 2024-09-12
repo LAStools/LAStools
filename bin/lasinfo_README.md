@@ -51,6 +51,25 @@ listed in the GUI are:
 -auto_date
 -set_global_encoding 1
 
+lasinfo provides detail information about this VLR records:
+    (user_id/record_id) 
+    LASF_Projection
+       34735 (GeoTIFF GeoKeyDirectoryTag)
+       34736 (GeoTIFF GeoDoubleParamsTag)
+       34737 (GeoTIFF GeoAsciiParamsTag)
+       2111 (OGC Math Transform WKT)
+       2112 (OGC Coordinate System WKT)
+    LASF_Spec      
+       0 (Classification Lookup)
+       2 (Histogram)
+       3 (Text Area Description)
+       4 (Extra Bytes)
+       100..354 (Waveform Packet Descriptor)
+    Raster LAZ
+       7113 Raster LAZ information
+    copc
+       1 copc information
+
 ## Examples
 
     lasinfo64 lidar.las
@@ -252,6 +271,8 @@ lasinfo64 -i *.laz -set_system_identifier "hello world!" -set_generating_softwar
 -delete_empty                       : delete LAS files with zero points  
 -gps_week                           : compute the GPS week (if data is Adjusted Standard GPS time)  
 -gw                                 : compute the GPS week (if data is Adjusted Standard GPS time)  
+-histo [m] [n]                      : histogram output about [m] with step width [n]  
+-histo_avg [m] [n] [o]              : histogram output about [m] with step width [n] and average [o]  
 -nc                                 : don't parse points (only check header and VLRs)  
 -nco                                : don't check whether points fall outside of LAS header bounding box  
 -nh                                 : don't output LAS header information  
@@ -329,7 +350,6 @@ lasinfo64 -i *.laz -set_system_identifier "hello world!" -set_generating_softwar
 -buffered [n]          : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]        : set chunk size [n] in number of bytes  
 -comma_not_point       : use comma instead of point as decimal separator  
--histo_avg [m] [n] [o] : histogram output about [m] with step width [n] and average [o]  
 -neighbors [n]         : set neighbors filename or wildcard [n]  
 -neighbors_lof [n]     : set neighbors list of files [fnf]  
 -stored                : use in memory reader  
@@ -898,6 +918,34 @@ Supported [sep] values:
   semicolon
   hyphen
   space
+
+### aggregate options
+This parameters can be used in "-histo" and "-histo_avg" argument as first parameter  
+    x                     : x coordinate  
+    y                     : x coordinate  
+    z                     : x coordinate  
+    X                     : X integer data value  
+    Y                     : X integer data value  
+    Z                     : X integer data value  
+    intensity  
+    classification  
+    extended_scan_angle  
+    scan_angle  
+    return_number  
+    number_of_returns  
+    user_data  
+    point_source  
+    gps_time  
+    scanner_channel  
+    R                    : RGB red value
+    G                    : RGB green value
+    B                    : RGB blue value
+    I                    : intensity
+    attribute0..9        : extra byte attribute value
+    wavepacket_index  
+    wavepacket_offset  
+    wavepacket_size  
+    wavepacket_location  
 
 ## License
 

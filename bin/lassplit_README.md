@@ -40,7 +40,7 @@ offset only for the new point_source.
 If the id is negative it will be set to '1000000-id'.
 Point_source of points is limited/mapped to a unsigned 16 Bit integer.
  
-# See also
+## See also
 
 lasmerge - Merge or split lidar data files by number of points
 

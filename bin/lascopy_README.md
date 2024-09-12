@@ -76,13 +76,13 @@ within 0.5 units in source exists. Set all other z-values to 0.
 -copy_overlap_flag    : copy overlap flag to target (64bit only)  
 -copy_synthetic_flag  : copy synthetic flag to target (64bit only)  
 -copy_withheld_flag   : copy withheld flag to target (64bit only)  
--classification       : Deprecated: copy classification attribute (may be removed in futrue - replaced by copy_classification)  
--elevation            : Deprecated: copy elevation attribute (may be removed in futrue - replaced by copy_elevation)  
--intensity            : Deprecated: copy intensity attribute (may be removed in futrue - replaced by copy_intensity)  
--keypoint_flag        : Deprecated: copy keypoint flag to target (may be removed in futrue - replaced by copy_keypoint_flag)  
--overlap_flag         : Deprecated: copy overlap flag to target (may be removed in futrue - replaced by copy_overlap_flag)  
--synthetic_flag       : Deprecated: copy synthetic flag to target (may be removed in futrue - replaced by copy_synthetic_flag)  
--withheld_flag        : Deprecated: copy withheld flag to target (may be removed in futrue - replaced by copy_ithheld_flag)  
+-classification       : Deprecated: copy classification attribute (may be removed in future - replaced by copy_classification)  
+-elevation            : Deprecated: copy elevation attribute (may be removed in future - replaced by copy_elevation)  
+-intensity            : Deprecated: copy intensity attribute (may be removed in future - replaced by copy_intensity)  
+-keypoint_flag        : Deprecated: copy keypoint flag to target (may be removed in future - replaced by copy_keypoint_flag)  
+-overlap_flag         : Deprecated: copy overlap flag to target (may be removed in future - replaced by copy_overlap_flag)  
+-synthetic_flag       : Deprecated: copy synthetic flag to target (may be removed in future - replaced by copy_synthetic_flag)  
+-withheld_flag        : Deprecated: copy withheld flag to target (may be removed in future - replaced by copy_ithheld_flag)  
 -zero                 : set attribute of points to zero if not found in source  
 -unmatched            : copy attributes from source to target by point order  
 -ilay [n]             : apply [n] or all LASlayers found in corresponding *.lay file on read  
