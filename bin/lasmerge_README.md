@@ -33,7 +33,7 @@ Similarly a new offset can be specified
     -reoffset 600000 4000000 0
 
 
-# See also
+## See also
 
   lassplit - Merge or split lidar data files by properties
 

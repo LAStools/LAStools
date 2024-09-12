@@ -133,7 +133,7 @@ the result in ESRI's Shapefile format.
 -simplify_area [n]         : simplify area contours < area of [n] (but may lead to crossing contours)  
 -simplify_length [n]       : simplify individual contours < length [n] (but may lead to crossing contours)  
 -smooth [n]                : do [n] smooth iterations (typical 2..20; default=0)  
--tin                       : write output.shp TIN  
+-tin                       : write output.shp TIN for lake breakline (require -lakes argument)  
 -use_orig_bb               : raster tile without buffer added by on-the-fly buffering  
 -use_tile_bb               : raster tile without buffer added by lastile  
 -week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
