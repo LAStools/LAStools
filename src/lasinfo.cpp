@@ -182,7 +182,7 @@ static bool valid_resolution(F64 coordinate, F64 offset, F64 scale_factor)
 }
 
 #ifdef COMPILE_WITH_GUI
-extern int lasinfo_gui(int argc, char* argv[], LASreadOpener* lasreadopener);
+extern void lasinfo_gui(int argc, char* argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
@@ -201,7 +201,7 @@ class LasTool_lasinfo : public LasTool
   F64* scale_header = 0;
 
  public:
-  int run()
+  void run()
   {
     int i;
     bool no_header = false;
@@ -278,7 +278,7 @@ class LasTool_lasinfo : public LasTool
     if (argc == 1)
     {
 #ifdef COMPILE_WITH_GUI
-      return lasinfo_gui(argc, argv, 0);
+      lasinfo_gui(argc, argv, 0);
 #else
       wait_on_exit = true;
       fprintf(stderr, "%s is better run in the command line\n", argv[0]);
@@ -919,7 +919,7 @@ class LasTool_lasinfo : public LasTool
 #ifdef COMPILE_WITH_GUI
     if (gui)
     {
-      return lasinfo_gui(argc, argv, &lasreadopener);
+      lasinfo_gui(argc, argv, &lasreadopener);
     }
 #endif
 
@@ -5246,6 +5246,6 @@ int main(int argc, char* argv[])
 {
   LasTool_lasinfo lastool;
   lastool.init(argc, argv, "lasinfo");
-  return lastool.run();
+  lastool.run();
 }
 
