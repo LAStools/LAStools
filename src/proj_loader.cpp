@@ -199,12 +199,17 @@ static char* findLatestQGISInstallationPath() {
 
 #ifdef _WIN32
   if (qgisPathEnv) {
-    if (std::filesystem::exists(qgisPathEnv)) {
+    if (std::filesystem::exists(qgisPathEnv))
+    {
       std::filesystem::path path(qgisPathEnv);
       path /= "bin";  // Append "bin" to the path
       char* resultPath = new char[path.string().size() + 1];
       strcpy_las(resultPath, path.string().size() + 1, path.string().c_str());
       return resultPath;
+    }
+    else
+    {
+      LASMessage(LAS_WARNING, "QGIS_PREFIX_PATH set [%s] but not found", qgisPathEnv);
     }
   }
 
@@ -214,7 +219,7 @@ static char* findLatestQGISInstallationPath() {
   char* latestVersionPath = nullptr;
   const char* latestVersionName = nullptr;
 
-  // Checking the standard paths
+  // Checking the standard paths (e.g. "C:\Program Files\QGIS 3.36.3\bin\qgis-bin.exe")
   for (size_t i = 0; i < numPaths; ++i) {
     for (const auto& entry : std::filesystem::directory_iterator(defaultPaths[i])) {
       std::string directoryName = entry.path().filename().string();
@@ -228,6 +233,7 @@ static char* findLatestQGISInstallationPath() {
           delete[] latestVersionPath;
           latestVersionPath = new char[path.string().size() + 1];
           strcpy_las(latestVersionPath, path.string().size() + 1, path.string().c_str());
+          LASMessage(LAS_VERBOSE, "QGIS path found [%s]", latestVersionPath);
           return latestVersionPath;
         }
       }
@@ -242,6 +248,7 @@ static char* findLatestQGISInstallationPath() {
     if (std::filesystem::is_directory(binPath) && std::filesystem::exists(binPath / "libproj.so")) {
       char* resultPath = new char[binPath.string().size() + 1];
       strcpy_las(resultPath, binPath.string().size() + 1, binPath.string().c_str());
+      LASMessage(LAS_VERBOSE, "QGIS path found [%s]", resultPath);
       return resultPath;
     }
   }
