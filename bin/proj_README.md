@@ -134,7 +134,7 @@ searched for in the standard directories of the installation via
 Conda or QGIS/OSGeo4W.  
 
 - **Custom Directory**: Alternatively, you can place the library 
-files and PROJ data in custom     directories of your choice. To use 
+files and PROJ data in custom directories of your choice. To use 
 these custom directories, set the environment variables as follows:
   ```
   set LASTOOLS_PROJ=...
