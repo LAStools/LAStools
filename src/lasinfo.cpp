@@ -926,7 +926,11 @@ class LasTool_lasinfo : public LasTool
 #ifdef COMPILE_WITH_MULTI_CORE
     if (cores > 1)
     {
-      if (lasreadopener.get_file_name_number() < 2)
+      if (lasreadopener.get_use_stdin())
+      {
+        LASMessage(LAS_WARNING, "using stdin. ignoring '-cores %d' ...", cores);
+      }
+      else if (lasreadopener.get_file_name_number() < 2)
       {
         LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
       }

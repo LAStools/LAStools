@@ -280,6 +280,7 @@ public:
 	void set_copc_stream_ordered_by_chunk() { copc_stream_order = 0; };
 	void set_copc_stream_ordered_spatially() { copc_stream_order = 1; };
 	void set_copc_stream_ordered_by_level() { copc_stream_order = 2; };
+  BOOL get_use_stdin() { return use_stdin; };
 	LASreadOpener();
 	~LASreadOpener();
 private:

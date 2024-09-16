@@ -1482,7 +1482,8 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 	}
 	else if (use_stdin)
 	{
-		use_stdin = FALSE; populate_header = TRUE;
+		use_stdin = FALSE; 
+		populate_header = TRUE;
 		if (itxt)
 		{
 			LASreaderTXT* lasreadertxt = new LASreaderTXT(this);

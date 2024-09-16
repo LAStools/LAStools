@@ -300,7 +300,11 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
   if (lastool.cores > 1)
   {
-    if (lasreadopener.get_file_name_number() < 2)
+    if (lasreadopener.get_use_stdin())
+    {
+      LASMessage(LAS_WARNING, "using stdin. ignoring '-cores %d' ...", lastool.cores);
+    }
+    else if (lasreadopener.get_file_name_number() < 2)
     {
       LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), lastool.cores);
     }
