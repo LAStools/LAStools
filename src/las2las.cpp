@@ -536,6 +536,7 @@ static void parse_save_load_vlr_args(int& i, int argc, char* argv[], bool& save_
 void get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjectionConverter& geoprojectionconverter, LASreader* lasreader)
 {
   if (lasreader) {
+    //If there is a target wkt header, it is a CRS transformation
     const char* wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation();
 
     //If the WKT representation has not been created yet

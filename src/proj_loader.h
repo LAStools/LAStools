@@ -37,14 +37,16 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#define LOAD_LIBRARY(name) LoadLibrary(name)
+#define LOAD_LIBRARY(name) LoadLibraryEx(name, NULL, LOAD_WITH_ALTERED_SEARCH_PATH)
 #define GET_PROC_ADDRESS(lib, name) GetProcAddress((HMODULE)lib, name)
 #define FREE_LIBRARY(lib) FreeLibrary((HMODULE)lib)
+#define PROJ_LIB_HANDLE HMODULE
 #else
 #include <dlfcn.h>
 #define LOAD_LIBRARY(name) dlopen(name, RTLD_LAZY)
 #define GET_PROC_ADDRESS(lib, name) dlsym(lib, name)
 #define FREE_LIBRARY(lib) dlclose(lib)
+#define PROJ_LIB_HANDLE void*
 #endif
 
 // Function pointer type definitions
