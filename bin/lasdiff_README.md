@@ -54,7 +54,7 @@ lasdiff64 -i lidar1.las -i lidar2.las -o diff.las
 ## lasdiff specific arguments
 
 -random_seeks         : do 10 times a random seek every 25k points.  
--shutup [n]           : stop reporting differences after [n] differences found.  
+-shutup [n]           : stop reporting differences after [n] differences found (default=5)  
 -week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 -wildcards [m] [n]    : process files in filelist [m] against files in filelist [n]  
 
