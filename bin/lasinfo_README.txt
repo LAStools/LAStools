@@ -25,6 +25,13 @@ this file is deprecated - see *.md version of this file
 
   lasinfo -i *.laz -otxt -odir ..\reports -odix _info -cores 3
 
+  In addition, the lasinfo output can be provided in JSON format. To save 
+  the output to a JSON file, use either the '-ojs' option or specify an output 
+  file name with the '-o' option and the '.json' extension. The '-js' option can 
+  be used to output the JSON format directly.
+
+  lasinfo64 -i *.laz -ojs -js -o output_file.json
+
   The tool can also be used to modify various other entries in
   the header as described below. This needs to be done with care
   as such changes can potentially corrupt the file.
@@ -459,7 +466,7 @@ Supported LAS Outputs
   -odir C:\data\ground (specify output directory)
   -odix _classified (specify file name appendix)
   -ocut 2 (cut the last two characters from name)
-  -olas -olaz -otxt -obin -oqfit (specify format)
+  -olas -olaz -otxt -ojs -obin -oqfit (specify format)
   -stdout (pipe to stdout)
   -nil    (pipe to NULL)
 LAStools (by info@rapidlasso.de) version 150526

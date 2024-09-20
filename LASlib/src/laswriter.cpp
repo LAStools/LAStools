@@ -322,6 +322,12 @@ BOOL LASwriteOpener::parse(int argc, char* argv[])
       set_format(LAS_TOOLS_FORMAT_LAZ);
       *argv[i]='\0';
     }
+    else if (strcmp(argv[i], "-ojs") == 0)
+    {
+      specified = TRUE;
+      set_format(LAS_TOOLS_FORMAT_JSON);
+      *argv[i] = '\0';
+    }
     else if (strcmp(argv[i],"-otxt") == 0)
     {
       specified = TRUE;
@@ -490,7 +496,7 @@ void LASwriteOpener::set_file_name(const CHAR* file_name)
     while (ext && (this->file_name[ext-1] != '.'))
     {
       ext--;
-      if ((len - ext) > 3)
+      if ((len - ext) > 4)
       {
         ext = 0;
         break;
@@ -525,6 +531,10 @@ void LASwriteOpener::set_file_name(const CHAR* file_name)
         {
           format = LAS_TOOLS_FORMAT_VRML;
         }
+        else if (strstr(extension, "json") || strstr(extension, "JSON"))  // json
+        {
+          format = LAS_TOOLS_FORMAT_JSON;
+        }
         else // assume ascii output
         {
           format = LAS_TOOLS_FORMAT_TXT;
@@ -533,7 +543,7 @@ void LASwriteOpener::set_file_name(const CHAR* file_name)
     }
     else
     {
-      CHAR* temp_file_name = (CHAR*)malloc(len + (format == LAS_TOOLS_FORMAT_QFIT ? 4 : 5));
+      CHAR* temp_file_name = (CHAR*)malloc(len + (format == LAS_TOOLS_FORMAT_QFIT ? 4 : (format == LAS_TOOLS_FORMAT_JSON ? 6 : 5)));
       strcpy(temp_file_name, this->file_name);
       free(this->file_name);
       this->file_name = temp_file_name;
@@ -580,6 +590,17 @@ void LASwriteOpener::set_file_name(const CHAR* file_name)
         this->file_name[len] = 'r';
         len++;
         this->file_name[len] = 'l';
+      }
+      else if (format == LAS_TOOLS_FORMAT_JSON)  // json
+      {
+        len++;
+        this->file_name[len] = 'j';
+        len++;
+        this->file_name[len] = 's';
+        len++;
+        this->file_name[len] = 'o';
+        len++;
+        this->file_name[len] = 'n';
       }
       else // assume ascii output
       {
@@ -631,7 +652,7 @@ void LASwriteOpener::set_native(BOOL native)
 
 BOOL LASwriteOpener::set_format(I32 format)
 {
-  if ((format < LAS_TOOLS_FORMAT_DEFAULT) || (format > LAS_TOOLS_FORMAT_TXT))
+  if ((format < LAS_TOOLS_FORMAT_DEFAULT) || ((format > LAS_TOOLS_FORMAT_TXT) && format != LAS_TOOLS_FORMAT_JSON))
   {
     return FALSE;
   }
@@ -678,6 +699,13 @@ BOOL LASwriteOpener::set_format(I32 format)
         file_name[len+2] = 'r';
         file_name[len+3] = 'l';
 	    }
+      else if (format == LAS_TOOLS_FORMAT_JSON)
+        {
+          file_name[len+1] = 'j';
+          file_name[len+2] = 's';
+          file_name[len+3] = 'o';
+          file_name[len+4] = 'n';
+        }
       else if (format == LAS_TOOLS_FORMAT_TXT)
 	    {
         file_name[len+1] = 't';
@@ -688,7 +716,13 @@ BOOL LASwriteOpener::set_format(I32 format)
       {
         return FALSE;
       }
-      file_name[len+4] = '\0';
+      if (format == LAS_TOOLS_FORMAT_JSON) {
+        file_name[len + 5] = '\0';
+      }
+      else
+      {
+        file_name[len + 4] = '\0';
+      }
     }
   }
   return TRUE;
@@ -717,6 +751,10 @@ BOOL LASwriteOpener::set_format(const CHAR* format)
     else if (strstr(format, "wrl") || strstr(format, "WRL")) // VRML
     {
       return set_format(LAS_TOOLS_FORMAT_VRML);
+    }
+    else if (strstr(format, "json") || strstr(format, "JSON"))  // json
+    {
+      return set_format(LAS_TOOLS_FORMAT_JSON);
     }
     else // assume ascii output
     {
@@ -879,13 +917,26 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
     this->file_name[len+1] = 'i';
     this->file_name[len+2] = '\0';
   }
+  else if (format == LAS_TOOLS_FORMAT_JSON)
+  {
+    this->file_name[len] = 'j';
+    this->file_name[len + 1] = 's';
+    this->file_name[len + 2] = 'o';
+    this->file_name[len + 3] = 'n';
+  }
   else // if (format == LAS_TOOLS_FORMAT_TXT)
   {
     this->file_name[len] = 't';
     this->file_name[len+1] = 'x';
     this->file_name[len+2] = 't';
   }
-  this->file_name[len+3] = '\0';
+  if (format == LAS_TOOLS_FORMAT_JSON) {
+    this->file_name[len + 4] = '\0';
+  }
+  else
+  {
+    this->file_name[len + 3] = '\0';
+  }
 
   if (directory) add_directory();
 
@@ -913,6 +964,10 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
       else if (format == LAS_TOOLS_FORMAT_VRML)
       {
         this->file_name = LASCopyString("temp.wrl");
+      }
+      else if (format == LAS_TOOLS_FORMAT_JSON)
+      {
+        this->file_name = LASCopyString("temp.json");
       }
       else // if (format == LAS_TOOLS_FORMAT_TXT)
       {
@@ -1001,7 +1056,7 @@ BOOL LASwriteOpener::format_was_specified() const
   return specified;
 }
 
-static const CHAR* LAS_TOOLS_FORMAT_NAMES[11] = { "las", "las", "laz", "bin", "qi", "wrl", "txt", "shp", "asc", "bil", "flt" };
+static const CHAR* LAS_TOOLS_FORMAT_NAMES[12] = {"las", "las", "laz", "bin", "qi", "wrl", "txt", "shp", "asc", "bil", "flt", "json"};
 
 const CHAR* LASwriteOpener::get_format_name() const
 {
@@ -1035,6 +1090,10 @@ I32 LASwriteOpener::get_format() const
     else if (strstr(file_name, ".wrl") || strstr(file_name, ".WRL")) // VRML
     {
       return LAS_TOOLS_FORMAT_VRML;
+    }
+    else if (strstr(file_name, ".json") || strstr(file_name, ".JSON"))  // json
+    {
+      return LAS_TOOLS_FORMAT_JSON;
     }
     else // assume ascii output
     {
