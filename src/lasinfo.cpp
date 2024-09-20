@@ -4551,6 +4551,166 @@ class LasTool_lasinfo : public LasTool
         }
       }
 
+      // PROJ CRS Representations and information query
+      if (file_out && geoprojectionconverter.is_proj_request) 
+      {
+        // Try to generate the CRS PROJ object from the input file header information
+        if (lasreader->header.vlr_geo_ogc_wkt) 
+        {  // try to get it from the OGC WKT string
+          geoprojectionconverter.set_proj_crs_with_file_header_wkt(lasreader->header.vlr_geo_ogc_wkt, true);
+        } 
+        else if (lasreader->header.vlr_geo_keys) // if no WKT exist in file header try keo_keys
+        {  
+          geoprojectionconverter.set_projection_from_geo_keys(
+              lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
+              lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+          geoprojectionconverter.reset_projection();
+
+          if (geoprojectionconverter.source_header_epsg > 0) 
+          {
+            // create the PROJ object for the proj info query here
+            geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, true);
+          } 
+          else 
+          {
+            laserror("No valid CRS could be extracted from the header information of the source file.");
+          }
+        } 
+        else 
+        {
+            laserror("No file header information could be found to identify the CRS.");
+        }
+        const char* info_content = nullptr;
+        const char* proj_crs_infos = nullptr;
+        
+        fprintf(file_out, "PROJ Coordinate Reference System (CRS) Representation and Information \n");
+        // Query the WKT representation of the CRS
+        if (geoprojectionconverter.projParameters.proj_info_arg_contains("wkt")) 
+        {
+          proj_crs_infos = geoprojectionconverter.projParameters.get_wkt_representation(true);
+          info_content = indent_text(proj_crs_infos, "  ");
+        
+          if (info_content == nullptr || *info_content == '\0') 
+          {
+            LASMessage(LAS_WARNING, "the content of the wkt representation of the CRS could not be generated");
+          } 
+          else 
+          {
+            fprintf(file_out, "WKT representation of the CRS: \n");
+            fprintf(file_out, "%s \n", info_content);
+          }
+          delete[] info_content;
+          info_content = nullptr;
+        }
+        // Query the PROJJSON representation of the CRS
+        if (geoprojectionconverter.projParameters.proj_info_arg_contains("js")) 
+        {
+          proj_crs_infos = geoprojectionconverter.projParameters.get_json_representation(true);
+          info_content = indent_text(proj_crs_infos, "  ");
+        
+          if (info_content == nullptr || *info_content == '\0') 
+          {
+            LASMessage(LAS_WARNING, "the content of the json representation of the CRS could not be generated");
+          } 
+          else 
+          {
+            fprintf(file_out, "Json representation of the CRS: \n");
+            fprintf(file_out, "%s \n", info_content);
+          }
+          delete[] info_content;
+          info_content = nullptr;
+        }
+        // Query the PROJ string representation of the CRS
+        if (geoprojectionconverter.projParameters.proj_info_arg_contains("str")) {
+          proj_crs_infos = geoprojectionconverter.projParameters.get_projString_representation(true);
+          info_content = indent_text(proj_crs_infos, "  ");
+
+          if (info_content == nullptr || *info_content == '\0') 
+          {
+            LASMessage(LAS_WARNING, "the content of the PROJ string representation of the CRS could not be generated");
+          } 
+          else 
+          {
+            fprintf(file_out, "PROJ string representation of the CRS: \n");
+            fprintf(file_out, "%s \n", info_content);
+          }
+          delete[] info_content;
+          info_content = nullptr;
+        }
+        // Query the EPSG code of the CRS
+        if (geoprojectionconverter.projParameters.proj_info_arg_contains("epsg")) 
+        {
+          proj_crs_infos = geoprojectionconverter.projParameters.get_epsg_representation(true);
+          info_content = indent_text(proj_crs_infos, "  ");
+        
+          if (info_content == nullptr || *info_content == '\0') 
+          {
+            LASMessage(LAS_WARNING, "the content of the epsg representation of the CRS could not be generated");
+          } 
+          else 
+          {
+            fprintf(file_out, "Epsg-Code representation of the CRS: \n");
+            fprintf(file_out, "%s \n", info_content);
+          }
+          delete[] info_content;
+          info_content = nullptr;
+        }
+        // Query the ellipsoidal informations of the CRS
+        if (geoprojectionconverter.projParameters.proj_info_arg_contains("el")) 
+        {
+          proj_crs_infos = geoprojectionconverter.projParameters.get_ellipsoid_info(true);
+          info_content = indent_text(proj_crs_infos, "  ");
+        
+          if (info_content == nullptr || *info_content == '\0') 
+          {
+            LASMessage(LAS_WARNING, "the content of the ellipsoid information could not be generated");
+          } 
+          else 
+          {
+            fprintf(file_out, "Ellipsoid of the CRS: \n");
+            fprintf(file_out, "%s \n", info_content);
+          }
+          delete[] info_content;
+          info_content = nullptr;
+        }
+        // Query the datum informations of the CRS
+        if (geoprojectionconverter.projParameters.proj_info_arg_contains("datum")) 
+        {
+          proj_crs_infos = geoprojectionconverter.projParameters.get_datum_info(true);
+          info_content = indent_text(proj_crs_infos, "  ");
+        
+          if (info_content == nullptr || *info_content == '\0') 
+          {
+            LASMessage(LAS_WARNING, "the content of the datum information could not be generated");
+          } 
+          else 
+          {
+            fprintf(file_out, "Datum of the CRS: \n");
+            fprintf(file_out, "%s \n", info_content);
+          }
+          delete[] info_content;
+          info_content = nullptr;
+        }      
+        // Query the coordinate system informations of the CRS
+        if (geoprojectionconverter.projParameters.proj_info_arg_contains("cs")) 
+        {
+          proj_crs_infos = geoprojectionconverter.projParameters.get_coord_system_info(true);
+          info_content = indent_text(proj_crs_infos, "  ");
+        
+          if (info_content == nullptr || *info_content == '\0') 
+          {
+            LASMessage(LAS_WARNING, "the content of the CRS information could not be generated");
+          } 
+          else 
+          {
+            fprintf(file_out, "Coordinate system of the CRS: \n");
+            fprintf(file_out, "%s \n", info_content);
+          }
+          delete[] info_content;
+          info_content = nullptr;
+        } 
+      }
+
       lasreader->close();
 
       FILE* file = 0;
@@ -5092,3 +5252,4 @@ int main(int argc, char* argv[])
   lastool.init(argc, argv, "lasinfo");
   lastool.run();
 }
+

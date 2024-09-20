@@ -9,9 +9,11 @@
   <ItemGroup>
     <ClCompile Include="..\LASzip\src\lasmessage.cpp" />
     <ClCompile Include="geoprojectionconverter.cpp" />
+    <ClCompile Include="proj_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\LASzip\src\lasmessage.hpp" />
+    <ClInclude Include="proj_loader.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

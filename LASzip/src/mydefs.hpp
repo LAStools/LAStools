@@ -332,6 +332,7 @@ void byebye();
 bool validate_utf8(const char* utf8) noexcept;
 // Opens a file with the specified filename and mode, converting filename and mode to UTF-16 on Windows.
 FILE* LASfopen(const char* const filename, const char* const mode);
+const char* indent_text(const char* text, const char* indent);
 
 // las error message function which leads to an immediate program stop by default
 template<typename... Args>
