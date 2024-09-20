@@ -38,20 +38,12 @@
 #include <algorithm>
 #include <cstring>
 
-//namespace fs = std::filesystem;
-
 #ifdef min
 #undef min
 #endif
 
-#ifdef _WIN32
-#define PATH_SEPARATOR '\\'
-#else
-#define PATH_SEPARATOR '/'
-#endif
-
 // Global handle for the dynamically loaded library
-static void* proj_lib_handle = nullptr;
+PROJ_LIB_HANDLE proj_lib_handle = nullptr;
 
 // Initialise function pointer variables
 proj_as_wkt_t proj_as_wkt_ptr = nullptr;
@@ -217,28 +209,31 @@ static char* findLatestQGISInstallationPath() {
   size_t numPaths = 0;
   const char** defaultPaths = getDefaultProgramPaths(numPaths);
   char* latestVersionPath = nullptr;
-  const char* latestVersionName = nullptr;
+  char* latestVersionName = nullptr;
 
   // Checking the standard paths (e.g. "C:\Program Files\QGIS 3.36.3\bin\qgis-bin.exe")
   for (size_t i = 0; i < numPaths; ++i) {
-    for (const auto& entry : std::filesystem::directory_iterator(defaultPaths[i])) {
-      std::string directoryName = entry.path().filename().string();
-      // Check whether the name begins with ‘QGIS ’
-      if (directoryName.find("QGIS ") == 0) {
-        const char* dirName = directoryName.c_str();
-        if (!latestVersionName || compareVersions(dirName, latestVersionName)) {
-          latestVersionName = dirName;
-          std::filesystem::path path(entry.path());
-          path /= "bin";  // Append "bin" to the path
-          delete[] latestVersionPath;
-          latestVersionPath = new char[path.string().size() + 1];
-          strcpy_las(latestVersionPath, path.string().size() + 1, path.string().c_str());
-          LASMessage(LAS_VERBOSE, "QGIS path found [%s]", latestVersionPath);
-          return latestVersionPath;
+    for (const auto& programEntry : std::filesystem::directory_iterator(defaultPaths[i])) {
+      if (programEntry.is_directory()) {
+        std::string directoryName = programEntry.path().filename().string();
+        // Check whether the name begins with ï¿½QGIS ï¿½
+        if (directoryName.find("QGIS ") == 0) {
+          const char* dirName = directoryName.c_str();
+          if (!latestVersionName || compareVersions(dirName, latestVersionName)) {
+            free(latestVersionName);
+            delete[] latestVersionPath;
+            latestVersionName = strdup(dirName);
+            std::filesystem::path path(programEntry.path());
+            path /= "bin";  // Append "bin" to the path
+            latestVersionPath = new char[path.string().size() + 1];
+            strcpy_las(latestVersionPath, path.string().size() + 1, path.string().c_str());
+          }
         }
       }
     }
   }
+  free(latestVersionName);
+  return latestVersionPath;
 #else
   // First check the QGIS_PREFIX_PATH, then the system-wide library directories
   if (qgisPathEnv) {
@@ -333,20 +328,22 @@ static char* findLatestProjLibraryPath(const char* binPath) {
   const char* fileExtension = ".dll";
 
   char* latestVersionPath = nullptr;
-  const char* latestVersionName = nullptr;
+  char* latestVersionName = nullptr;
 
   for (const auto& entry : std::filesystem::directory_iterator(binPath)) {
     std::string fileName = entry.path().filename().string();
     if (fileName.find(projLibraryPattern) != std::string::npos && fileName.find(fileExtension) != std::string::npos) {
       if (!latestVersionName || compareVersions(fileName.c_str(), latestVersionName)) {
-        latestVersionName = fileName.c_str();
+        free(latestVersionName);
         delete[] latestVersionPath;
+        latestVersionName = strdup(fileName.c_str());
         latestVersionPath = new char[entry.path().string().size() + 1];
         strcpy_las(latestVersionPath, entry.path().string().size() + 1, entry.path().string().c_str());
-        return latestVersionPath;
       }
     }
   }
+  free(latestVersionName);
+  return latestVersionPath;
 #else
   // libproj.so always refers to the corresponding version
   const char* projLibraryName = "libproj.so";
@@ -355,7 +352,7 @@ static char* findLatestProjLibraryPath(const char* binPath) {
     std::string fileName = entry.path().filename().string();
     if (fileName == projLibraryName) {
       char* resultPath = new char[entry.path().string().size() + 1];
-      std::strcpy(resultPath, entry.path().string().c_str());
+      strcpy_las(resultPath, entry.path().string().size() + 1, entry.path().string().c_str());
       return resultPath;
     }
   }

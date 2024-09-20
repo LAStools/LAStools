@@ -5600,10 +5600,8 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   bool longlat = false;
   bool ecef = false;
 
-  if (source)
-  {
-    source_header_epsg = value;
-  }
+  if (source) source_header_epsg = value;
+  if (is_proj_request) return true;
 
   if ((value >= 32601) && (value <= 32660)) // PCS_WGS84_UTM_zone_1N - PCS_WGS84_UTM_zone_60N
   {
