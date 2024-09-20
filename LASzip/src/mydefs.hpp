@@ -212,6 +212,12 @@ typedef union I64U32I32F32 { I64 i64; U32 u32[2]; I32 i32[2]; F32 f32[2]; } I64U
 #define strcat_las(dest, destsz, src) strcat((dest), (src))
 #endif
 
+#ifdef _MSC_VER
+#define strdup_las(string) _strdup(string);
+#else
+#define strdup_las(string) strdup(string);
+#endif
+
 inline BOOL IS_LITTLE_ENDIAN()
 {
   const U32 i = 1;
@@ -332,6 +338,7 @@ void byebye();
 bool validate_utf8(const char* utf8) noexcept;
 // Opens a file with the specified filename and mode, converting filename and mode to UTF-16 on Windows.
 FILE* LASfopen(const char* const filename, const char* const mode);
+const char* indent_text(const char* text, const char* indent);
 
 // las error message function which leads to an immediate program stop by default
 template<typename... Args>

@@ -195,6 +195,31 @@ point coordinates they represent). Drops all the points of in.las that have
 point.Z<1000 or point.Z>4000 and stores all surviving points to out.las 
 (use lasinfo.exe to see the range of point.Z).
 
+Available options for using the PROJ library for transformations between 
+Coordinate Reference Systems (CRSs). Specifying the source CRS is optional 
+for all commands. If no source CRS is specified, the tool will attempt to extract this 
+information from the header of the input file in.las, which is recommended.
+There is a hierarchy for determining the source CRS for the PROJ transformation:
+1. the source CRS is passed as an argument.
+2. if not, the WKT is searched for in the header of the source file.
+3. if no WKT is available, it is generated from the GeoTIFF data.
+4. if this is not possible, the EPSG code from the GeoTIFF is used, which can lead to inaccuracies as GeoTIFF arguments could be ignored.
+
+Files with CompoundCRS are not yet supported for transformations using PROJ in LAStools.
+The recommended methods for specifying CRSs are the use of EPSG codes or 
+WKT representations, as these adhere to well-defined standards:
+ 
+    las2las64 -i in.las -o out.las -proj_epsg 32633 4326
+    las2las64 -i in.las -o out.las -proj_wkt filename_source_wkt filename_target_wkt
+
+The methods using the json representation or the PROJ string are only recommended 
+for advanced and experienced users. When using the PROJ string, a single PROJ string 
+can also be used directly to describe the transformation or operation.
+
+    las2las64 -i in.las -o out.las -proj_json filename_source_json filename_target_json
+    las2las64 -i in.las -o out.las -proj_string "proj_string_source" "proj_string_target"
+
+Further examples
 
     las2las64 -h
     las2las64 -i *.las -utm 13N
@@ -212,7 +237,6 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.las
     las2las64 -i in.las -drop_intensity_below 10 -olaz -stdout > out.laz
     las2las64 -i in.las -last_only -drop_gpstime_below 46.75 -otxt -oparse xyzt -stdout > out.txt
     las2las64 -i in.las -remove_all_vlrs -keep_class 2 3 4 -olas -stdout > out.las
-
 
 ## las2las specific arguments
 
@@ -772,6 +796,10 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.las
 -nad83_harn                         : use datum NAD83_HARN  
 -nad83_pa11                         : set horizontal datum to NAD83 PA11  
 -osgb1936                           : use datum OSGB 1936  
+-proj_epsg [s] [t]           	    : (Recommended) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified using EPSG code (deafult from the input file header). In addition, the target CRS [t] must be specified using EPSG code 
+-proj_wkt [s] [t]           	    : (Recommended) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified by using a file with the WKR representation of the CRS (deafult from the input file header). In addition, the target CRS [t] must be specified using a file with the WKR representation of the CRS
+-proj_string [s] [t]           	    : (For experienced users) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified using PRO string (deafult from the input file header). In addition, the target CRS [t] must be specified using PROJ string. Furthermore a single PROJ string [s] can also be specified, which directly describes a transformation or operation
+-proj_json [s] [t]           	    : (For experienced users) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified by using a file with the PROJJSON representation of the CRS (deafult from the input file header). In addition, the target CRS [t] must be specified using a file with the PROJJSON representation of the CRS
 -sp27 SC_N                          : use the NAD27 South Carolina North state plane  
 -sp83 CO_S                          : use the NAD83 Colorado South state plane for georeferencing  
 -survey_feet                        : use survey feet  

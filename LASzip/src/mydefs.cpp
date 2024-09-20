@@ -30,6 +30,7 @@
 */
 #include "mydefs.hpp"
 #include <stdio.h>
+#include <cstring>
 #include <stdarg.h>
 #include "laszip_common.h"
 #include "lasmessage.hpp"
@@ -203,3 +204,40 @@ FILE* LASfopen(const char* const filename, const char* const mode)
   return file;
 }
 
+/// !!The caller is responsible for managing the memory of the returned const char*
+/// using 'delete[]' when done!!
+/// Indents each line of content by the given 'indent'
+const char* indent_text(const char* text, const char* indent)
+{
+  if (text == nullptr || indent == nullptr) return nullptr;
+
+  size_t indent_len = strlen(indent);
+  size_t text_len = strlen(text);
+
+  // Count the number of line breaks and calculate the length of the new buffer
+  size_t num_lines = 1;
+  for (size_t i = 0; i < text_len; ++i) {
+    if (text[i] == '\n') ++num_lines;
+  }
+  size_t new_len = text_len + num_lines * indent_len;
+  char* result = new char[new_len + 1];
+
+  const char* src = text;
+  char* dest = result;
+
+  // Add indentation prefix before each line
+  while (*src) {
+    // Add the indentation prefix
+    memcpy(dest, indent, indent_len);
+    dest += indent_len;
+
+    while (*src && *src != '\n') {
+      *dest++ = *src++;
+    }
+    // Add the line break, if available
+    if (*src == '\n') *dest++ = *src++;
+  }
+  *dest = '\0';
+
+  return result;
+}
