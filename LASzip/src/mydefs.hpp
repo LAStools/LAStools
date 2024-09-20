@@ -212,6 +212,12 @@ typedef union I64U32I32F32 { I64 i64; U32 u32[2]; I32 i32[2]; F32 f32[2]; } I64U
 #define strcat_las(dest, destsz, src) strcat((dest), (src))
 #endif
 
+#ifdef _MSC_VER
+#define strdup_las(string) _strdup(string);
+#else
+#define strdup_las(string) strdup(string);
+#endif
+
 inline BOOL IS_LITTLE_ENDIAN()
 {
   const U32 i = 1;

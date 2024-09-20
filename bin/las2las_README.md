@@ -197,8 +197,14 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.las
 
 Available options for using the PROJ library for transformations between 
 Coordinate Reference Systems (CRSs). Specifying the source CRS is optional 
-for all commands. If no source CRS is specified, the tool will attempt to 
-extract this information from the header of the input file in.las.
+for all commands. If no source CRS is specified, the tool will attempt to extract this 
+information from the header of the input file in.las, which is recommended.
+There is a hierarchy for determining the source CRS for the PROJ transformation:
+1. the source CRS is passed as an argument.
+2. if not, the WKT is searched for in the header of the source file.
+3. if no WKT is available, it is generated from the GeoTIFF data.
+4. if this is not possible, the EPSG code from the GeoTIFF is used, which can lead to inaccuracies as GeoTIFF arguments could be ignored.
+
 Files with CompoundCRS are not yet supported for transformations using PROJ in LAStools.
 The recommended methods for specifying CRSs are the use of EPSG codes or 
 WKT representations, as these adhere to well-defined standards:

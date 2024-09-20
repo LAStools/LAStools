@@ -542,10 +542,29 @@ void get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjectionConverter& geoprojection
     //If the WKT representation has not been created yet
     if (geoprojectionconverter.source_header_epsg == 0 && wkt_representation == nullptr) {
       if (!geoprojectionconverter.has_projection(true)) {  // if no source projection was provided in the command line ...
-        if (lasreader->header.vlr_geo_ogc_wkt) {  // try to get it from the OGC WKT string
+        //1. try to get the WKT from file header
+        if (lasreader->header.vlr_geo_ogc_wkt) {
           geoprojectionconverter.set_proj_crs_with_file_header_wkt(lasreader->header.vlr_geo_ogc_wkt, false);
-        } else if (lasreader->header.vlr_geo_keys) {  // if no WKT exist in file header try keo_keyss.
-          geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+        } else if (lasreader->header.vlr_geo_keys) {  
+          // 2. If no source CRS was specified and no WKT is in the header, then create WKT from GeoTiff
+          geoprojectionconverter.disable_messages = true;
+
+          geoprojectionconverter.set_projection_from_geo_keys(
+              lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
+              lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+
+          CHAR* ogc_wkt = nullptr;
+          I32 len = 0;
+          if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt)) {
+            geoprojectionconverter.set_proj_crs_with_file_header_wkt(ogc_wkt, true);
+          // 3. if no WKT can be generated from GeoTiff try to get die EPSG from GeoTiff
+          } else if (geoprojectionconverter.source_header_epsg) {
+            LASMessage(LAS_WARNING, "No valid WKT could be generated from the GeoTiff of the source file. The EPSG code from the GeoTiff is used for generating the WKT, "
+                "this can lead to loss of GeoTiff arguments, which can lead to inaccuracies or data loss in the WKT.");
+            geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, true);
+          } else {
+            laserror("No WKT could be generated from the header information of the source file. Please specify the coordinate system (CRS) directly when calling the operation.");
+          }
           geoprojectionconverter.reset_projection();
         }
       }
@@ -799,22 +818,24 @@ int main(int argc, char* argv[])
       }
       else if (strncmp(argv[i], "-set_ogc_wkt", 12) == 0)
       {
-        // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
-        geoprojectionconverter.is_proj_request = load_proj_library(nullptr, false);
-
-        if (strcmp(argv[i], "-set_ogc_wkt") == 0)
-        {
-          set_ogc_wkt = true;
-          set_ogc_wkt_in_evlr = false;
-        }
-        else if (strcmp(argv[i], "-set_ogc_wkt_in_evlr") == 0)
-        {
-          set_ogc_wkt = true;
-          set_ogc_wkt_in_evlr = true;
-        }
-        else
-        {
-          lastool.parse_arg_invalid_n(i);
+        if (!geoprojectionconverter.is_proj_request) {
+          // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
+          geoprojectionconverter.is_proj_request = load_proj_library(nullptr, false);
+          
+          if (strcmp(argv[i], "-set_ogc_wkt") == 0)
+          {
+            set_ogc_wkt = true;
+            set_ogc_wkt_in_evlr = false;
+          }
+          else if (strcmp(argv[i], "-set_ogc_wkt_in_evlr") == 0)
+          {
+            set_ogc_wkt = true;
+            set_ogc_wkt_in_evlr = true;
+          }
+          else
+          {
+            lastool.parse_arg_invalid_n(i);
+          }
         }
         if ((i + 1) < argc)
         {
@@ -1702,6 +1723,7 @@ int main(int argc, char* argv[])
       LASquantizer* reproject_quantizer = 0;
       LASquantizer* saved_quantizer = 0;
       bool set_projection_in_header = false;
+      bool set_wkt_global_encoding_bit = false;
 
       if (geoprojectionconverter.has_projection(false)) // reproject because a target projection was provided in the command line
       {
@@ -1752,29 +1774,43 @@ int main(int argc, char* argv[])
       // PROJ transformation
       if (geoprojectionconverter.is_proj_request && !set_ogc_wkt) 
       {
-        //If the source CRS is not specified as an argument (cmd line), try to generate it from the input file
+        LASMessage(LAS_VERY_VERBOSE, "the PROJ transformation is prepared within las2las");
+        //1. If the source CRS is not specified as an argument (cmd line), try to generate it from the input file
         if (geoprojectionconverter.check_header_for_crs) 
         {      
+          LASMessage(LAS_VERY_VERBOSE, "the header of the input file is checked for its CRS");
+          // 2. try to get it the source CRS from the OGC header WKT string
           if (lasreader->header.vlr_geo_ogc_wkt) 
-          {  // try to get it from the OGC WKT string
+          {
             geoprojectionconverter.set_proj_crs_with_file_header_wkt(lasreader->header.vlr_geo_ogc_wkt, true);
           } 
           else if (lasreader->header.vlr_geo_keys) 
-          {  // if no WKT exist in file header try keo_keys
+          {
+            geoprojectionconverter.disable_messages = true;
+
             geoprojectionconverter.set_projection_from_geo_keys(
                 lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
                 lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
-            geoprojectionconverter.reset_projection();
 
-            if (geoprojectionconverter.source_header_epsg > 0) 
+            CHAR* ogc_wkt = nullptr;
+            I32 len = 0;
+            // 3. if no WKT exist in file header try to generate WKT from GeoTiff and lastool
+            if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
             {
-              // create the PROJ object
+              geoprojectionconverter.set_proj_crs_with_file_header_wkt(ogc_wkt, true);
+            }
+            // 4. if no WKT can be generated from GeoTiff try to get die EPSG from GeoTiff
+            else if (geoprojectionconverter.source_header_epsg)
+            {
+              LASMessage(LAS_WARNING, "No valid WKT could be generated from the GeoTiff of the source file. The EPSG code from the GeoTiff is used for the transformation, "
+                             "this can lead to loss of GeoTiff arguments, which can lead to inaccuracies or data loss during the transformation.");
               geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, true);
-            } 
+            }
             else 
             {
               laserror("No valid CRS could be extracted from the header information of the source file. Please specify the coordinate system (CRS) directly when calling the transformation tool.");
             }
+            geoprojectionconverter.reset_projection();
           } 
           else 
           {
@@ -1797,8 +1833,10 @@ int main(int argc, char* argv[])
 
         set_projection_in_header = true;
         set_ogc_wkt = true;
+        set_wkt_global_encoding_bit = true;
         lasreader->header.clean_vlrs();
         lasreader->header.clean_evlrs();
+        LASMessage(LAS_VERY_VERBOSE, "the original vlr and evlr header information from the source file are not transferred to the target file");
       }
 
       if (set_projection_in_header)
@@ -1828,9 +1866,12 @@ int main(int argc, char* argv[])
         if (set_ogc_wkt || (lasreader->header.point_data_format >= 6)) // maybe also set the OCG WKT
         {
           CHAR* ogc_wkt = set_ogc_wkt_string;
-          // First try to create the WKT representation of the CRS via the PROJ lib
-          if (ogc_wkt == 0 && geoprojectionconverter.is_proj_request) 
+          // The WKT should be generated via the PROJ lib if: it is a PROJ transformation, a soure EPSG in the arguments is specified or a WKT is specified in the file header. 
+          // For older file versions that only contain GeoKeys in file header, the WKT should still be generated via LAStool.
+          if (ogc_wkt == 0 && geoprojectionconverter.is_proj_request) { 
+            LASMessage(LAS_VERBOSE, "the WKT for the file header is created via the PROJ library");
             get_wkt_from_proj(ogc_wkt, geoprojectionconverter, lasreader);
+          }
 
           I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
 
@@ -1863,7 +1904,7 @@ int main(int argc, char* argv[])
               lasreader->header.set_geo_ogc_wkt(len, ogc_wkt);
             }
             if (!set_ogc_wkt_string) free(ogc_wkt);
-            if ((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6))
+            if (((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6)) || set_wkt_global_encoding_bit)
             {
               lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
             }
@@ -1873,9 +1914,12 @@ int main(int argc, char* argv[])
       else if (set_ogc_wkt) // maybe only set the OCG WKT
       {
         CHAR* ogc_wkt = set_ogc_wkt_string;
-        // First try to create the WKT representation of the CRS via the PROJ lib
-        if (ogc_wkt == 0 && geoprojectionconverter.is_proj_request)
+        // The WKT should be generated via the PROJ lib if: it is a PROJ transformation, a soure EPSG in the arguments is specified or a WKT is specified in the file header. 
+        // For older file versions that only contain GeoKeys in file header, the WKT should still be generated via LAStool.
+        if (ogc_wkt == 0 && geoprojectionconverter.is_proj_request) {
+          LASMessage(LAS_VERBOSE, "the WKT for the file header is created via the PROJ library");
           get_wkt_from_proj(ogc_wkt, geoprojectionconverter, lasreader);
+        }
 
         I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
         //If the WKT could not be created by the PROJ lib
@@ -1918,7 +1962,7 @@ int main(int argc, char* argv[])
 
           if (!set_ogc_wkt_string) free(ogc_wkt);
 
-          if ((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6))
+          if (((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6)) || set_wkt_global_encoding_bit)
           {
             lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
           }

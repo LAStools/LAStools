@@ -493,6 +493,7 @@ public:
   // parameters for the PROJ operation
   ProjParameters projParameters;
   bool is_proj_request;
+  bool disable_messages;
   bool check_header_for_crs;
   unsigned int source_header_epsg;
 
