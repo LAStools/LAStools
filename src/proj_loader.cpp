@@ -222,7 +222,7 @@ static char* findLatestQGISInstallationPath() {
           if (!latestVersionName || compareVersions(dirName, latestVersionName)) {
             free(latestVersionName);
             delete[] latestVersionPath;
-            latestVersionName = strdup(dirName);
+            latestVersionName = strdup_las(dirName);
             std::filesystem::path path(programEntry.path());
             path /= "bin";  // Append "bin" to the path
             latestVersionPath = new char[path.string().size() + 1];
@@ -336,7 +336,7 @@ static char* findLatestProjLibraryPath(const char* binPath) {
       if (!latestVersionName || compareVersions(fileName.c_str(), latestVersionName)) {
         free(latestVersionName);
         delete[] latestVersionPath;
-        latestVersionName = strdup(fileName.c_str());
+        latestVersionName = strdup_las(fileName.c_str());
         latestVersionPath = new char[entry.path().string().size() + 1];
         strcpy_las(latestVersionPath, entry.path().string().size() + 1, entry.path().string().c_str());
       }
