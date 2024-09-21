@@ -21,6 +21,13 @@ batch mode such as:
 
 lasinfo64 -i *.laz -otxt -odir ..\reports -odix _info -cores 3
 
+In addition, the lasinfo output can be provided in JSON format. To save 
+the output to a JSON file, use either the '-ojs' option or specify an output 
+file name with the '-o' option and the '.json' extension. The '-js' option can 
+be used to output the JSON format directly.
+
+lasinfo64 -i *.laz -ojs -js -o output_file.json
+
 The tool can also be used to modify various other entries in
 the header as described below. This needs to be done with care
 as such changes can potentially corrupt the file.
@@ -299,7 +306,9 @@ Further examples
 -nr                                 : don't output return information  
 -nv                                 : don't output VLR information  
 -nw                                 : don't output WARNINGs  
--otxt                               : output as textfile  
+-otxt                               : output as textfile 
+-ojs                                : output as json file 
+-js                                 : output in json format 
 -progress [n]                       : report progress every [n] points  
 -proj_info [wkt] [js] [str] [epsg] [el] [datum] [cs] : get CRS representations and information of the input file: [wkt] WKT, [js] PROJJSON, [str] PROJ string or [epsg] EPSG code representation and [el] ellipsoid, [datum] datum or [cs] coordinate system information.
 -rename [n]                         : renames input file 'fusa.laz' to '[n]_277750_6122250.laz'  
