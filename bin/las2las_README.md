@@ -14,7 +14,7 @@ are a certain return '-drop_return 2', that have a scan angle
 above some threshold '-drop_scan_angle_above 5', or below some
 intensity '-drop_intensity_below 15'. Sometimes points are far
 outside the bounding box (corrupted files) and it is handy to
-remove them with '-clip_to_bounding_box'.
+remove them with '-crop_to_bounding_box'.
 
 It is also possible to add missing projection information to
 the LAS/LAZ file or to reproject (using the same ellipsoid)
