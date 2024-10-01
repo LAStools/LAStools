@@ -175,9 +175,6 @@ int main(int argc, char *argv[])
   LasTool_lasprecision lastool;
   lastool.init(argc, argv, "lasprecision");
   int i;
-#ifdef COMPILE_WITH_MULTI_CORE
-  I32 cores = 1;
-#endif
   bool report_diff = true;
   bool report_diff_diff = false;
   bool report_x = true;
