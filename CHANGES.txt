@@ -1,10 +1,11 @@
-28 September -- NEW: lasgrid64 precision enhancement
-28 September -- NEW: rasterizer upgrade from 32 to 64 bit
-28 September -- NEW: lasvdatum: improve gtx parser; handle invalid files; -gtx_debug [n] argument
-28 September -- NEW: lasground_new multicore
-28 September -- NEW: Extension of lasinfo to support JSON output.
-28 September -- NEW: Integrate PROJ library into LAStools for CRS transformations and metadata querying
-28 September -- fix: Enhance log for stdin and multi-core
+01 October 2024 -- fix: lastile multi core
+28 September 2024 -- NEW: lasgrid64 precision enhancement
+28 September 2024 -- NEW: rasterizer upgrade from 32 to 64 bit
+28 September 2024 -- NEW: lasvdatum: improve gtx parser; handle invalid files; -gtx_debug [n] argument
+28 September 2024 -- NEW: lasground_new multicore
+28 September 2024 -- NEW: Extension of lasinfo to support JSON output.
+28 September 2024 -- NEW: Integrate PROJ library into LAStools for CRS transformations and metadata querying
+28 September 2024 -- fix: Enhance log for stdin and multi-core
 05 August 2024 -- NEW: blast2dem ported to linux
 05 August 2024 -- NEW: local GUI option on 64 bit versions
 12 July 2024 -- fix: close #203: ascii file encoding fix
