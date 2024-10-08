@@ -9862,7 +9862,7 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
 /// Parse and validate the input epsg and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int& epsg_code, bool source /*=true*/)
 {
-  int errno;
+  int err_no;
 
   if (epsg_code == 0 || epsg_code > 999999) laserror("Invalid epsg code");
 
@@ -9877,13 +9877,13 @@ void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int& epsg_code, boo
 
   // Check whether the CRS is valid
   if (!proj_crs) {
-    errno = proj_context_errno(projParameters.proj_ctx);
+    err_no = proj_context_errno(projParameters.proj_ctx);
 
-    if (errno == 0) {
+    if (err_no == 0) {
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS object using PROJ epsg code '%f'", crs_epsg);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, errno);
+      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS object using PROJ epsg code: %s", errstr);
     }
@@ -9904,7 +9904,7 @@ void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int& epsg_code, boo
 /// Parse and validate the input proj string and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_string(const char* proj_string, bool source /*= true*/) 
 {
-  int errno;
+  int err_no;
 
   if (proj_string == nullptr) laserror("PROJ string is not valid");
 
@@ -9916,13 +9916,13 @@ void GeoProjectionConverter::set_proj_crs_with_string(const char* proj_string, b
   
   // Check whether the CRS is valid
   if (!proj_crs) {
-    errno = proj_context_errno(projParameters.proj_ctx);
+    err_no = proj_context_errno(projParameters.proj_ctx);
   
-    if (errno == 0) {
+    if (err_no == 0) {
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using PROJ string '%s'", proj_string);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, errno);
+      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using PROJ string: %s", errstr);
     }
@@ -9943,7 +9943,7 @@ void GeoProjectionConverter::set_proj_crs_with_string(const char* proj_string, b
 /// Parse and validate the input json file and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, bool source /*= true*/)
 {
-  int errno;
+  int err_no;
 
   if (json_filename == nullptr) laserror("Json filename is not valid");
 
@@ -9984,13 +9984,13 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
   
   // Check whether the CRS is valid
   if (!proj_crs) {
-    errno = proj_context_errno(projParameters.proj_ctx);
+    err_no = proj_context_errno(projParameters.proj_ctx);
    
-    if (errno == 0) {
+    if (err_no == 0) {
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS object using PROJJSON file '%f'", json_filename);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, errno);
+      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS object using PROJJSON file: %s", errstr);
     }
@@ -10012,7 +10012,7 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
 void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, bool source /*= true*/)
 {
   size_t fileSize = 0;
-  int errno;
+  int err_no;
 
   if (!wkt_filename) laserror("Wkt filename is not valid");
 
@@ -10053,14 +10053,14 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
 
   // Check whether the CRS is valid
   if (!proj_crs) {
-    errno = proj_context_errno(projParameters.proj_ctx);
+    err_no = proj_context_errno(projParameters.proj_ctx);
     delete[] wktContent;
 
-    if (errno == 0) {
+    if (err_no == 0) {
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using WKT file '%f'", wkt_filename);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, errno);
+      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using WKT file: %s", errstr);
     }
@@ -10082,7 +10082,7 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
 /// Parse and validate the input wkt content and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_file_header_wkt(const char* wktContent, bool source /*= true*/)
 {
-  int errno;
+  int err_no;
 
   if (!wktContent) laserror("Wkt is not valid");
 
@@ -10094,13 +10094,13 @@ void GeoProjectionConverter::set_proj_crs_with_file_header_wkt(const char* wktCo
 
   // Check whether the CRS is valid
   if (!proj_crs) {
-    errno = proj_context_errno(projParameters.proj_ctx);
+    err_no = proj_context_errno(projParameters.proj_ctx);
 
-    if (errno == 0) {
+    if (err_no == 0) {
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using WKT content '%f'", wktContent);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, errno);
+      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
       proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using WKT content: %s", errstr);
     }
@@ -10121,22 +10121,23 @@ void GeoProjectionConverter::set_proj_crs_with_file_header_wkt(const char* wktCo
 /// create PROJ object for the transformation
 void GeoProjectionConverter::set_proj_crs_transform()
 {
+  int err_no;
   // Create the transformation PROJ object
   if (projParameters.proj_source_crs && projParameters.proj_target_crs) {
     // Check whether transformation between CRSs is valid
     projParameters.proj_transform_crs = proj_create_crs_to_crs_from_pj(projParameters.proj_ctx, projParameters.proj_source_crs, projParameters.proj_target_crs, nullptr, nullptr);
 
     if (!projParameters.proj_transform_crs) {
-      errno = proj_context_errno(projParameters.proj_ctx);
+      err_no = proj_context_errno(projParameters.proj_ctx);
 
       proj_destroy(projParameters.proj_source_crs);
       proj_destroy(projParameters.proj_target_crs);
 
-      if (errno == 0) {
+      if (err_no == 0) {
         proj_context_destroy(projParameters.proj_ctx);
         laserror("Failed to create PROJ object for the transformation, reason unknown");
       } else {
-        const char* errstr = proj_context_errno_string(projParameters.proj_ctx, errno);
+        const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
         proj_context_destroy(projParameters.proj_ctx);
         laserror("Failed to create PROJ object for the transformation: %s", errstr);
       }
@@ -10166,7 +10167,7 @@ void GeoProjectionConverter::set_proj_param_for_transformation_with_epsg(unsigne
 /// Parse and validate the input values and set the ProjParameter
 void GeoProjectionConverter::set_proj_param_for_transformation_with_string(const char* proj_source_string, const char* proj_target_string)
 {
-  int errno;
+  int err_no;
 
   //If source and target PROJ string is given
   if (proj_source_string && proj_target_string) {
@@ -10186,13 +10187,13 @@ void GeoProjectionConverter::set_proj_param_for_transformation_with_string(const
 
     // Check whether the CRS is valid
     if (!proj_crs) {
-      errno = proj_context_errno(projParameters.proj_ctx);
+      err_no = proj_context_errno(projParameters.proj_ctx);
 
-      if (errno == 0) {
+      if (err_no == 0) {
         proj_context_destroy(projParameters.proj_ctx);
         laserror("Failed to create the CRS objects using PROJ string '%s'", proj_source_string);
       } else {
-        const char* errstr = proj_context_errno_string(projParameters.proj_ctx, errno);
+        const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
         proj_context_destroy(projParameters.proj_ctx);
         laserror("Failed to create the CRS objects using PROJ string: %s", errstr);
       }
