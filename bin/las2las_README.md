@@ -16,17 +16,6 @@ intensity '-drop_intensity_below 15'. Sometimes points are far
 outside the bounding box (corrupted files) and it is handy to
 remove them with '-crop_to_bounding_box'.
 
-It is also possible to add missing projection information to
-the LAS/LAZ file or to reproject (using the same ellipsoid)
-for example from latitude/longitude to UTM or the stateplane
-of Ohio_North or to Earth-centered Earth-fixed (ECEF). You can
-also use common EPSG codes with '-epsg 32754'. For LAS 1.4 it
-is important to '-set_ogc_wkt' which translates the GeoTIFF
-keys into an CRS string in the OGC WKT format and adds them as
-the payload of the corresponding VLR. For LAS 1.4 files you
-can use '-set_ogc_wkt_in_evlr' to put that string into the
-EVLR instead of the VLR (but we don't recommend that).
-
 Another typical use is extract only first (-first_only) or only
 last (-last_only) returns. Extracting the first return is the
 same as dropping all others (e.g. -drop_return 2 3 4 5).
@@ -34,15 +23,53 @@ same as dropping all others (e.g. -drop_return 2 3 4 5).
 Or one can extract a subsequence of 1000 points (-subseq 540 1000)
 which will start at point 540.
 
-Finally one can also only keep or drop certain classifications.
+It is also possible to keep or drop certain classifications.
 The option -keep_class 2 3 will keep only those points that are
 of classification 2 or 3 and the option -drop_class 2 3 will drop
 only those points. For all options run 'las2las -h'.
 
+## projections
+
+las2las can add missing projection information to the LAS/LAZ file
+or reproject (using the same ellipsoid) for example from latitude/longitude
+to UTM or the stateplane of Ohio_North or to Earth-centered Earth-fixed (ECEF).
+You can also use common EPSG codes with '-epsg 32754'. 
+For LAS 1.4 it is important to '-set_ogc_wkt' which translates the GeoTIFF
+keys into an CRS string in the OGC WKT format and adds them as the payload
+of the corresponding VLR. For LAS 1.4 files you can use '-set_ogc_wkt_in_evlr'
+to put that string into the EVLR instead of the VLR (but we don't recommend that).
+
+## las2las with PROJ
+
+Using the PROJ library it is possible to transform between 
+different Coordinate Reference Systems (CRSs) using the argument '-proj_epsg'.
+Specifying the source CRS is optional for all commands. If no source CRS is specified, 
+the tool will attempt to extract this information from the header of the input file 
+'in.laz', which is recommended.
+There is a hierarchy for determining the source CRS for the PROJ transformation:
+1. the source CRS is passed as an argument.
+2. if not, the WKT is searched for in the header of the source file.
+3. if no WKT is available, it is generated from the GeoTIFF data.
+4. if this is not possible, the EPSG code from the GeoTIFF is used, which can lead to inaccuracies as GeoTIFF arguments could be ignored.
+
+Files with CompoundCRS are not yet supported for transformations using PROJ in LAStools.
+The recommended methods for specifying CRSs are the use of EPSG codes or 
+WKT representations, as these adhere to well-defined standards:
+ 
+    las2las64 -i in.laz -o out.laz -proj_epsg 32633 4326
+    las2las64 -i in.laz -o out.laz -proj_wkt filename_source_wkt filename_target_wkt
+
+The methods using the json representation or the PROJ string are only recommended 
+for advanced and experienced users. When using the PROJ string, a single PROJ string 
+can also be used directly to describe the transformation or operation.
+
+    las2las64 -i in.laz -o out.laz -proj_json filename_source_json filename_target_json
+    las2las64 -i in.laz -o out.laz -proj_string "proj_string_source" "proj_string_target"
+
  
 ## Examples
 
-    las2las64 -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet
+    las2las64 -i s1885565.laz -o out.laz -sp83 OH_S -feet -elevation_feet
 
 Adding the projection information to the file 's1885565.laz'. This
 will not modify the points but merely change the projection VLR in the
@@ -55,7 +82,7 @@ header to contain these four geokeys:
   - key 4099 value_offset 9002 - VerticalUnitsGeoKey: Linear_Foot  
 
 
-    las2las64 -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet -target_utm auto
+    las2las64 -i s1885565.laz -o out.laz -sp83 OH_S -feet -elevation_feet -target_utm auto
 
 Reprojects the points from the Ohio_South NAD83 state plane with all units
 in feet to NAD83 UTM coordinates with all units in meter and sets these four
@@ -68,7 +95,7 @@ geokeys as the projection information:
   - key 4099 value_offset 9001 - VerticalUnitsGeoKey: Linear_Meter  
 
 
-    las2las64 -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet -target_longlat
+    las2las64 -i s1885565.laz -o out.laz -sp83 OH_S -feet -elevation_feet -target_longlat
 
 Reprojects the points from the Ohio_South NAD83 state plane with all units
 in feet to geographic coordinates with x being longitude and y latitude and
@@ -80,23 +107,23 @@ sets these three geokeys as the projection information:
   - key 4099 value_offset 9001 - VerticalUnitsGeoKey: Linear_Meter  
 
 
-    las2las64 -i s1885565.laz -o out.las -sp83 OH_S -feet -elevation_feet -target_sp83 OH_N -target_survey_feet -target_elevation_survey_feet 
+    las2las64 -i s1885565.laz -o out.laz -sp83 OH_S -feet -elevation_feet -target_sp83 OH_N -target_survey_feet -target_elevation_survey_feet 
     las2las64 -i TO_core_last_zoom.laz -o out.laz -utm 17T
     las2las64 -i TO_core_last_zoom.laz -o out.laz -utm 17T -target_latlong
 
 other variations of adding / changing projection information.
 
 
-    las2las64 -i *.las -last_only
+    las2las64 -i *.laz -last_only
 
-processes all LAS files that match *.las and stores only the last returns
-to a corresponding LAS file called *_1.las (an added '_1' in the name).
+processes all LAS files that match *.laz and stores only the last returns
+to a corresponding LAS file called *_1.laz (an added '_1' in the name).
 
 
-    las2las64 -i *.las -olaz -keep_tile 630000 4830000 10000
+    las2las64 -i *.laz -olaz -keep_tile 630000 4830000 10000
 
 keeps a 10000 by 10000 tile with a lower left coordinate of x=630000
-and y=4830000 out of all LAS files that match *.las and stores each as a
+and y=4830000 out of all LAS files that match *.laz and stores each as a
 compressed LAZ file *_1.laz (an added '_1' in the name).
 
 
@@ -104,14 +131,14 @@ compressed LAZ file *_1.laz (an added '_1' in the name).
 
 processes all ASCII files that match *.txt, parses them with "xyztiarn",
 keeps all points whose scan angle is between -15 and 15, and stores them
-to a corresponding LAS file called *_1.las (an added '_1' in the name).
+to a corresponding LAS file called *_1.laz (an added '_1' in the name).
 
 
-    las2las64 -i in.las -o out.las -keep_xy 630250 4834500 630500 4834750
+    las2las64 -i in.laz -o out.laz -keep_xy 630250 4834500 630500 4834750
 
-keeps only points of in.las whose double-precision coordinates fall inside
+keeps only points of in.laz whose double-precision coordinates fall inside
 the rectangle (630250,4834500) to (630500,4834750) and stores these points 
-to out.las.
+to out.laz.
 
 
     las2las64 -lof file_list.txt -merged -o out.laz -keep_circle 630000 4850000 100
@@ -121,29 +148,29 @@ whose double-precision coordinates fall into the circle centered at 630000 48500
 with radius 100 and stores these points compressed to out.laz.
 
 
-    las2las64 -i in.las -o out.las -keep_z 10 100
+    las2las64 -i in.laz -o out.laz -keep_z 10 100
 
-keeps points of in.las whose double-precision elevations falls inside the
-range 10 to 100 and stores these points to out.las.
+keeps points of in.laz whose double-precision elevations falls inside the
+range 10 to 100 and stores these points to out.laz.
 
 
-    las2las64 -i in.las -o out.laz -drop_return 1
+    las2las64 -i in.laz -o out.laz -drop_return 1
 
-drops all points of in.las that are designated first returns by
+drops all points of in.laz that are designated first returns by
 the value in their return_number field and stores surviving points
 compressed to out.laz.
 
 
-    las2las64 -i in.laz -o out.las -drop_scan_angle_above 15
+    las2las64 -i in.laz -o out.laz -drop_scan_angle_above 15
 
 drops all points of compressed in.laz whose scan angle is above 15 or
 below -15 and stores surviving points compressed to out.laz.
 
 
-    las2las64 -i in.las -o out.las -drop_intensity_below 1000 -remove_padding
+    las2las64 -i in.laz -o out.laz -drop_intensity_below 1000 -remove_padding
 
-drops all points of in.las whose intensity is below 1000 and stores
-surviving points to out.las. In addition any additional user data after
+drops all points of in.laz whose intensity is below 1000 and stores
+surviving points to out.laz. In addition any additional user data after
 the LAS header or after the VLR block are stripped from the file.
 
 
@@ -153,7 +180,7 @@ extracts all last return points from compressed in.laz and stores them
 compressed to out.laz.
 
 
-    las2las64 -i in.las -o out.las -scale_rgb_up
+    las2las64 -i in.laz -o out.laz -scale_rgb_up
 
 multiplies all rgb values in the file with 256. this is used to scale
 the rgb values from standard unsigned char range (0 ... 255) to the
@@ -165,61 +192,37 @@ unsigned short range (0 ... 65535) used in the LAS format.
 does the opposite with compressed input and output files
 
 
-    las2las64 -i in.las -o out.las -subseq 1000 2000
+    las2las64 -i in.laz -o out.laz -subseq 1000 2000
 
 extracts a subsequence of points by skipping the first 1000 points and
 then collecting points until 2000 points were read.
 
 
-    las2las64 -i in.las -o out.las -keep_class 2 -keep_class 3
+    las2las64 -i in.laz -o out.laz -keep_class 2 -keep_class 3
 
-extracts all points classfied as 2 or 3 from in.las and stores
-them to out.las.
+extracts all points classfied as 2 or 3 from in.laz and stores
+them to out.laz.
 
 
-    las2las64 -i in.las -o out.las -keep_XY 63025000 483450000 63050000 483475000
+    las2las64 -i in.laz -o out.laz -keep_XY 63025000 483450000 63050000 483475000
 
 similar to '-keep_xy' (lowercase!) but uses the integer values point.X and point.Y
 that the points are stored with for the checks (and not the double precision 
-floating point coordinates they represent). Drops all the points of in.las that 
+floating point coordinates they represent). Drops all the points of in.laz that 
 have point.X<63025000 or point.Y<483450000 or point.X>63050000 or point.Y>483475000 
-and stores surviving points to out.las (use lasinfo.exe to see the range of 
+and stores surviving points to out.laz (use lasinfo.exe to see the range of 
 point.Z and point.Y).
 
 
-    las2las64 -i in.las -o out.las -keep_Z 1000 4000
+    las2las64 -i in.laz -o out.laz -keep_Z 1000 4000
 
 similar to '-keep_z' (lowercase!) but uses the integer values point.Z that the
 points are stored with for the checks (and not the double-precision floating 
-point coordinates they represent). Drops all the points of in.las that have 
-point.Z<1000 or point.Z>4000 and stores all surviving points to out.las 
+point coordinates they represent). Drops all the points of in.laz that have 
+point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz 
 (use lasinfo.exe to see the range of point.Z).
 
-Available options for using the PROJ library for transformations between 
-Coordinate Reference Systems (CRSs). Specifying the source CRS is optional 
-for all commands. If no source CRS is specified, the tool will attempt to extract this 
-information from the header of the input file in.las, which is recommended.
-There is a hierarchy for determining the source CRS for the PROJ transformation:
-1. the source CRS is passed as an argument.
-2. if not, the WKT is searched for in the header of the source file.
-3. if no WKT is available, it is generated from the GeoTIFF data.
-4. if this is not possible, the EPSG code from the GeoTIFF is used, which can lead to inaccuracies as GeoTIFF arguments could be ignored.
-
-Files with CompoundCRS are not yet supported for transformations using PROJ in LAStools.
-The recommended methods for specifying CRSs are the use of EPSG codes or 
-WKT representations, as these adhere to well-defined standards:
- 
-    las2las64 -i in.las -o out.las -proj_epsg 32633 4326
-    las2las64 -i in.las -o out.las -proj_wkt filename_source_wkt filename_target_wkt
-
-The methods using the json representation or the PROJ string are only recommended 
-for advanced and experienced users. When using the PROJ string, a single PROJ string 
-can also be used directly to describe the transformation or operation.
-
-    las2las64 -i in.las -o out.las -proj_json filename_source_json filename_target_json
-    las2las64 -i in.las -o out.las -proj_string "proj_string_source" "proj_string_target"
-
-Further examples
+### Further examples
 
     las2las64 -h
     las2las64 -i *.las -utm 13N
@@ -231,12 +234,12 @@ Further examples
     las2las64 -remove_vlr 2 -scale_rgb_up -i in.las -o out.las
     las2las64 -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las
     las2las64 -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt
-    las2las64 -i in.las -remove_padding -keep_scan_angle -15 15 -o out.las
-    las2las64 -i in.las -rescale 0.01 0.01 0.01 -reoffset 0 300000 0 -o out.las
-    las2las64 -i in.las -set_version 1.2 -keep_gpstime 46.5 47.5 -o out.las
-    las2las64 -i in.las -drop_intensity_below 10 -olaz -stdout > out.laz
-    las2las64 -i in.las -last_only -drop_gpstime_below 46.75 -otxt -oparse xyzt -stdout > out.txt
-    las2las64 -i in.las -remove_all_vlrs -keep_class 2 3 4 -olas -stdout > out.las
+    las2las64 -i in.laz -remove_padding -keep_scan_angle -15 15 -o out.laz
+    las2las64 -i in.laz -rescale 0.01 0.01 0.01 -reoffset 0 300000 0 -o out.laz
+    las2las64 -i in.laz -set_version 1.2 -keep_gpstime 46.5 47.5 -o out.laz
+    las2las64 -i in.laz -drop_intensity_below 10 -olaz -stdout > out.laz
+    las2las64 -i in.laz -last_only -drop_gpstime_below 46.75 -otxt -oparse xyzt -stdout > out.txt
+    las2las64 -i in.laz -remove_all_vlrs -keep_class 2 3 4 -olas -stdout > out.laz
 
 ## las2las specific arguments
 

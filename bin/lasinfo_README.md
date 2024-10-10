@@ -14,7 +14,7 @@ By default the output of lasinfo goes to stderr. The output can
 be suppressed with '-quiet' or changed to '-stdout'. To write
 to a particular file use '-o output.txt' or '-otxt' which stores
 the lasinfo report to "lidar.txt" assuming the file has the name
-"lidar.las". With the option '-odix _info' you change the name
+"lidar.laz". With the option '-odix _info' you change the name
 to "lidar_info.txt" and with '-odir E:\reports' you choose a
 particular directory. These options are especially useful in
 batch mode such as:
@@ -59,195 +59,195 @@ listed in the GUI are:
 -set_global_encoding 1
 
 lasinfo provides detail information about this VLR records:
-    (user_id/record_id) 
-    LASF_Projection
-       34735 (GeoTIFF GeoKeyDirectoryTag)
-       34736 (GeoTIFF GeoDoubleParamsTag)
-       34737 (GeoTIFF GeoAsciiParamsTag)
-       2111 (OGC Math Transform WKT)
-       2112 (OGC Coordinate System WKT)
+    (user_id/record_id)  
+    LASF_Projection  
+       34735 (GeoTIFF GeoKeyDirectoryTag)  
+       34736 (GeoTIFF GeoDoubleParamsTag)  
+       34737 (GeoTIFF GeoAsciiParamsTag)  
+       2111 (OGC Math Transform WKT)  
+       2112 (OGC Coordinate System WKT)  
     LASF_Spec      
-       0 (Classification Lookup)
-       2 (Histogram)
-       3 (Text Area Description)
-       4 (Extra Bytes)
-       100..354 (Waveform Packet Descriptor)
-    Raster LAZ
-       7113 Raster LAZ information
-    copc
-       1 copc information
+       0 (Classification Lookup)  
+       2 (Histogram)  
+       3 (Text Area Description)  
+       4 (Extra Bytes)  
+       100..354 (Waveform Packet Descriptor)  
+    Raster LAZ  
+       7113 Raster LAZ information  
+    copc  
+       1 copc information  
 
 ## Examples
 
-    lasinfo64 lidar.las
+    lasinfo64 lidar.laz
 
 reports all information to stderr.
 
 
-    lasinfo64 -i lidar1.las lidar2.las -merged
+    lasinfo64 -i lidar1.laz lidar2.laz -merged
 
 reports all information for a merged LAS file that contains the
-merged contents of lidar1.las and lidar2.las to stderr.
+merged contents of lidar1.laz and lidar2.laz to stderr.
 
 
-    lasinfo64 -i lidar1.las lidar2.las
+    lasinfo64 -i lidar1.laz lidar2.laz
 
 reports the information of the two files individually to stderr.
 
 
-    lasinfo64 *.las -merged -stdout
+    lasinfo64 *.laz -merged -stdout
 
 reports information for all files merged to stdout.
 
 
-    lasinfo64 *.las -stdout
+    lasinfo64 *.laz -stdout
 
 reports information for all files individually to stdout.
 
 
-    lasinfo64 *.las -odix _info
+    lasinfo64 *.laz -odix _info
 
 reports information for all files individually to *_info.txt
 
 
-    lasinfo64 -i lidar.las -o lidar_info.txt 
+    lasinfo64 -i lidar.laz -o lidar_info.txt 
 
 reports the information to a text file called lidar_info.txt.
 
 
-    lasinfo64 -i lidar.las -no_header
+    lasinfo64 -i lidar.laz -no_header
 
 supresses the reporting of the header information (short: '-nh').
 
 
-    lasinfo64 -i lidar.las -no_vlrs
+    lasinfo64 -i lidar.laz -no_vlrs
 
 supresses the reporting of variable length records (short: '-nv').
 
 
-    lasinfo64 -i lidar.las -no_min_max
+    lasinfo64 -i lidar.laz -no_min_max
 
 supresses the reporting of minimum/maximum value for each attribute
 of the point records (short: '-nmm').
 
 
-    lasinfo64 -i lidar.las -no_check_outside
+    lasinfo64 -i lidar.laz -no_check_outside
 
 supresses checking whether points fall outside of the bounding box that
 is reported in the header (short: '-nco').
 
 
-    lasinfo64 -i lidar.las -report_outside
+    lasinfo64 -i lidar.laz -report_outside
 
 reports the index and the coordinates of each point that falls outside
 of the bounding box that is reported in the header (short: '-ro').
 
 
-    lasinfo64 -i lidar.las -nh -nv -progress 1000000
+    lasinfo64 -i lidar.laz -nh -nv -progress 1000000
 
 supresses reporting of the header information and the vlrs and reports
 progress each time 1,000,000 points are parsed.
 
 
-    lasinfo64 -i lidar.las -no_check
+    lasinfo64 -i lidar.laz -no_check
 
 only reports header information (short: '-nc'). does not parse the points.
 
 
-    lasinfo64 -i lidar.las -compute_density
+    lasinfo64 -i lidar.laz -compute_density
 
 computes and reports a good estimate of the point density (short: '-cd').
 
 
-    lasinfo64 -i lidar.las -repair_bb
+    lasinfo64 -i lidar.laz -repair_bb
 
 corrects missing or wrong bounding box info in the header.
 
 
-    lasinfo64 -i lidar.las -repair_counters
+    lasinfo64 -i lidar.laz -repair_counters
 
 corrects missing or wrong point number info in the header.
 
 
-    lasinfo64 -i lidar.las -set_file_source_ID 27
+    lasinfo64 -i lidar.laz -set_file_source_ID 27
 
 sets the file source ID in the LAS header to 27.
 
 
-    lasinfo64 -i lidar.las -auto_date
+    lasinfo64 -i lidar.laz -auto_date
 
 sets the file creation day/year in the header to the creation date of the file.
 
 
-    lasinfo64 -i lidar.las -set_file_creation 8 2007
+    lasinfo64 -i lidar.laz -set_file_creation 8 2007
 
 sets the file creation day/year in the header to 8/2007
 
 
-    lasinfo64 -i lidar.las -set_system_identifier "hello world!"
+    lasinfo64 -i lidar.laz -set_system_identifier "hello world!"
 
 copies the first 31 characters of the string into the system_identifier field of the header 
 
 
-    lasinfo64 -i lidar.las -set_generating_software "this is a test (-:"
+    lasinfo64 -i lidar.laz -set_generating_software "this is a test (-:"
 
 copies the first 31 characters of the string into the generating_software field of the header 
 
 
-    lasinfo64 -i lidar.las -set_bounding_box 4100000 1800000 150 4110000 1810000 400
+    lasinfo64 -i lidar.laz -set_bounding_box 4100000 1800000 150 4110000 1810000 400
 
 sets the bounding box in the header to min_x=4100000, max_x=4110000, min_y=1800000, ...
 
 
-    lasinfo64 -i lidar.las -set_offset 3000000 1000000 0
+    lasinfo64 -i lidar.laz -set_offset 3000000 1000000 0
 
 CAREFUL! sets the offset in the LAS header to 3000000 1000000 0 without changing
 the point coordinates. hence this will, in general, translate the point cloud.
 
 
-    lasinfo64 -i lidar.las -set_scale 0.001 0.001 0.001
+    lasinfo64 -i lidar.laz -set_scale 0.001 0.001 0.001
 
 CAREFUL! sets the scale in the LAS header to 0.001 0.001 0.001 without changing
 the point coordinates. hence this will, in general, scale the point cloud.
 
 
-    lasinfo64 -i lidar.las -set_global_encoding 1
+    lasinfo64 -i lidar.laz -set_global_encoding 1
 
 CAREFUL! sets the global encoding field of the LAS header to 1 without checking
 whether this will corrupt the file.
 
 
-    lasinfo64 -i lidar.las -set_version 1.1
+    lasinfo64 -i lidar.laz -set_version 1.1
 
 CAREFUL! sets the version field of the LAS header to 1.1 without checking whether
 this will corrupt the file.
 
 
-    lasinfo64 -i lidar.las -set_header_size 235
+    lasinfo64 -i lidar.laz -set_header_size 235
 
 CAREFUL! sets the header size field of the LAS header to 235 without checking
 whether this will corrupt the file.
 
 
-    lasinfo64 -i lidar.las -set_offset_to_point_data 460
+    lasinfo64 -i lidar.laz -set_offset_to_point_data 460
 
 CAREFUL! sets the offset to point data field of the LAS header to 460 without
 checking whether this will corrupt the file.
 
 
-    lasinfo64 -i lidar.las -set_point_data_format 1
+    lasinfo64 -i lidar.laz -set_point_data_format 1
 
 CAREFUL! sets the point data format field of the LAS header to point type 1
 without checking whether this will corrupt the file.
 
 
-    lasinfo64 -i lidar.las -set_point_data_record_length 32
+    lasinfo64 -i lidar.laz -set_point_data_record_length 32
 
 CAREFUL! sets the point data record length field of the LAS header to size 32
 without checking whether this will corrupt the file.
 
 
-    lasinfo64 -i lidar.las -set_start_of_waveform_data_packet_record 0
+    lasinfo64 -i lidar.laz -set_start_of_waveform_data_packet_record 0
 
 CAREFUL! sets the start of waveform data packet record field of the LAS header
 to 0 without checking whether this will corrupt the file.
@@ -260,15 +260,15 @@ CAREFUL! If a CRS object was not created from a PROJ string, exporting it to a P
 most cases lead to a loss of information. This can potentially lead to incorrect transformations. 
 The use of PROJ strings should only be used with advanced knowledge.
 
-    lasinfo64 -i lidar.las -proj_info wkt js str epsg el datum cs
+    lasinfo64 -i lidar.laz -proj_info wkt js str epsg el datum cs
 
 
 Further examples
 
-    lasinfo64 -i lidar.las  
-    lasinfo64 -i lidar.las -compute_density -o lidar_info.txt  
+    lasinfo64 -i lidar.laz  
+    lasinfo64 -i lidar.laz -compute_density -o lidar_info.txt  
     lasinfo64 -i *.las  
-    lasinfo64 -i *.las -single -otxt  
+    lasinfo64 -i *.laz -single -otxt  
     lasinfo64 -no_header -no_vlrs -i lidar.laz  
     lasinfo64 -nv -nc -stdout -i lidar.las  
     lasinfo64 -nv -nc -stdout -i *.laz -single | grep version  
