@@ -30,7 +30,7 @@ finds all planar patches in the file 'terrestrial_scan.laz' and
 stores the result in RIEGL's PEF format
 
 
-    lasplanes64 -i terrestrial_scan.laz -o planes.pef
+    lasplanes64 -i terrestrial_scan.laz -o planes.shp
 
 same as above but outputting the SHP format
 

@@ -32,7 +32,7 @@ transformation or rotation use '-no_transformation' or '-no_rotation'
 
 This tool does not support multiple file input.
 Batch conversion can be done using a batch file like
-```dos
+```bat
 :: convert all *.e57 files to *.laz
 for %%f in (*.e57) do if not exist %%~nf.laz e572las -i %%f -olaz
 ```

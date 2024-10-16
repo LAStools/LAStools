@@ -12,9 +12,9 @@ laslayers is explained with 3 exercises:
 3. create LASlayers as difference files between an original and a modified
    LAS/LAZ file using 'laslayers'. 
 
-====================================================
-== (1) ==        first look at LASlayers          ++
-====================================================
+##############################
+## (1) first look at LASlayers
+##############################
 
 Have a look at the ll.laz file with 'lasview':  
   
@@ -45,10 +45,11 @@ Now apply only the first two LASlayers:
   
 laslayers64 -i ll.laz -ilay 2 -o ll_lay2.laz  
 lasview -i ll_lay2.laz  
+
   
-====================================================  
-== (2) ==   work with LASlayers using LAStools    ++  
-====================================================  
+##############################
+## (2) work with LASlayers
+##############################
   
 Imagine we obtained raw LAZ tiles and orthos from a customer and are now producing the desired products with LASlayers.  
   
@@ -144,10 +145,11 @@ laslayers64 -i ll.laz
 lasview -i ll.laz -ilay   
   
 Send the resulting small LAY file instead of the larger LAZ file back to the customer.  
-  
-====================================================  
-== (3) ==    create LASlayers difference files    ++  
-====================================================  
+
+
+##############################
+## (3) create LASlayers difference files  
+##############################
   
 We have a raw and a modified LAS file and want to create LASlayers that express the difference between them, storing only those parts that have actually changed which is much more compact.  
   

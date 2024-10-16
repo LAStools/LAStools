@@ -24,7 +24,7 @@ If any of these functions is called the LASreader will only return the points
 that fall inside the specified region or depth and use - when available - the spatial
 indexing information in the COPC EVLR.
 
-# Examples
+## Examples
 
     lascopcindex64 in.las
 

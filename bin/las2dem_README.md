@@ -3,9 +3,9 @@
 This tool reads LIDAR points from the LAS/LAZ format (or some
 ASCII format), triangulates them temporarily into a TIN, and
 then rasters the TIN onto a DEM. The tool can either rather
-the '-elevation', the '-slope', the '-intensity', the '-rgb'
-values, or a '-hillshade' or '-gray' or '-false' coloring. The
-output is either in BIL, ASC, IMG, FLT, XYZ, DTM, TIF, PNG or
+the '-elevation' (default), the '-slope', the '-intensity', the 
+'-rgb' values, or a '-hillshade' or '-gray' or '-false' coloring. 
+The output is either in BIL, ASC, IMG, FLT, XYZ, DTM, TIF, PNG or
 JPG format. Additional attributes that some LAS/LAZ files can
 store as "Extra Bytes" can be rasterized with '-attribute 0'
 or '-attribute 1' or '-attribute 2' ...
@@ -163,7 +163,18 @@ generated KML file:
 
 ## las2dem specific arguments
 
+### rasterization
+-elevation                 : use elevation as values (default)  
+-hillshade                 : color the image with hillside shading  
+-false                     : false-color based on elevation/intensity (used with PNG/TIF/JPG)  
+-gray                      : gray-scale based on elevation/intensity (used with PNG/TIF/JPG)  
+-grey                      : gray-scale based on elevation/intensity (used with PNG/TIF/JPG)  
+-rgb                       : use rgb values if available (only used with PNG/TIF/JPG)  
+-intensity                 : use intensity values  
+-slope                     : use slope as output color parameter  
 -attribute [n]             : use attribute [n] value as output color parameter  
+
+### others
 -buffer [n]                : increase tile by a bounding box of size [n]  
 -compute_min_max           : computes the range for -gray and -false  
 -copy_attribute_into_z [n] : copy attribute [n] value into z  
@@ -171,20 +182,14 @@ generated KML file:
 -creeks [fns]              : integrate hard breaklines listed in file [fns]{.shp or .txt}  
 -edge_longest              : rasterize the length of the longest edge around every vertex  
 -edge_shortest             : rasterize the length of the shortest edge around every vertex  
--elevation                 : use elevation as values  
 -elevation_feet            : use feet for elevation  
 -extra_pass                : do extra read pass to count points (only makes sense when filtering)  
--false                     : false-color based on elevation/intensity (used with PNG/TIF/JPG)  
 -feet                      : use feet  
 -float_precision [n]       : sets output float precision to [n]{used with ASC/BIL/TIF}  
 -force_precision           : force excessive elevation (z) precision  
--gray                      : gray-scale based on elevation/intensity (used with PNG/TIF/JPG)  
--grey                      : gray-scale based on elevation/intensity (used with PNG/TIF/JPG)  
 -grid [n]                  : raster with stepsize [n] (the default is 1 or 0.0001 on long/lat coordinates)  
--hillshade                 : color the image with hillside shading  
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
--intensity                 : use intensity values  
 -invert_ramp               : invert color ramp for output  
 -kill [n]                  : do not raster triangles with edges longer than [n] meters  
 -lakes [fns]               : respect lines in given shape or text file [fns]{closed polygons with elevations}  
@@ -197,10 +202,8 @@ generated KML file:
 -oobj                      : output as OBJ file  
 -pit_free                  : run spike-free algorithm with defaults freeze = 1.5, interval = 0.25, buffer = 0.5  
 -reversed                  : run spike-free in reverse (from bottom to top)  
--rgb                       : use rgb values if available (only used with PNG/TIF/JPG)  
 -scale [n]                 : multiply all elevation/intensity values by [n] before rastering  
 -set_min_max               : sets min & max range for -gray and -false  
--slope                     : use slope as output color parameter  
 -smooth [n]                : do [n] smooth iterations (typical 2..20; default=0)  
 -smooth_short [m] [n]      : smooth "elevation" or "intensity" values by [m] passes and edge length > [n]  
 -spike_free                : run spike-free algorithm with defaults freeze = 1.5, interval = 0.25, buffer = 0.5  

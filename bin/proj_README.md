@@ -1,11 +1,10 @@
-# proj lib
+# proj lib integration
 
 PROJ is a generic coordinate transformation software that transforms 
 geospatial coordinates from one coordinate reference system (CRS) to 
-another. 
-This includes cartographic projections as well as geodetic 
+another. This includes cartographic projections as well as geodetic 
 transformations. 
-It is utilized in LAStools (las2las) to transform LiDAR data between 
+PROJ is used and utilized in LAStools (las2las) to transform LiDAR data between 
 various coordinate reference systems and to retrieve detailed  
 represenations and information about CRS (lasinfo).
 
@@ -22,11 +21,6 @@ means to perform geodetic transformations directly within LAStools.
 The source code for the PROJ library is available at 
   https://github.com/OSGeo/PROJ.
 
-PROJ is released under the X/MIT open source License.
-For more information about the license and usage of the PROJ 
-library, 
-refer to the official PROJ repository or the official website 
-  https://proj.org.
 
 ## Installing the PROJ Library
 
@@ -153,9 +147,16 @@ For more information and detailed instructions about the
 installation, refer to the official PROJ installation page
   https://proj.org/install.html
 
+
 ## License
 
 This library is free to use.
+
+PROJ is released under the X/MIT open source License.
+For more information about the license and usage of the PROJ 
+library, refer to the official PROJ repository or the official website 
+  https://proj.org.
+
 
 ## Support
 
@@ -171,4 +172,3 @@ Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
 If you have any suggestions please let us (info@rapidlasso.de) know.
-
