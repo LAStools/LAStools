@@ -1,3 +1,4 @@
+16 October 2024 -- fix: las2dem64 handle NaN triangles on small step size
 01 October 2024 -- fix: lastile multi core
 28 September 2024 -- NEW: lasgrid64 precision enhancement
 28 September 2024 -- NEW: rasterizer upgrade from 32 to 64 bit
