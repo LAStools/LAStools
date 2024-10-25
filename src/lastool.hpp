@@ -31,8 +31,8 @@
 #include "lasmessage.hpp"
 #include "mydefs.hpp"
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <string>
 
 class LasTool
@@ -41,6 +41,7 @@ class LasTool
     bool header_printed_once = false;
 
    public:
+    virtual ~LasTool() = default;
     int argc = 0;
     char** argv;
     bool force = false;  // force continuation on serious_warnings
@@ -58,16 +59,16 @@ class LasTool
         this->argc = argc;
         this->argv = argv;
         this->name = name;
-    };
+    }
 
     virtual std::string sBlast()
     {
         return (blast ? " BLAST" : "");
-    };
+    }
 
     virtual void lastitle(LAS_MESSAGE_TYPE type, std::string info = "")
     {
-        if (info == "")
+        if (info.empty())
         {
             info = laslicinfo();
         }
@@ -76,34 +77,32 @@ class LasTool
             LASMessage(type, "LAStools%s %s (by info@rapidlasso.de) version %d%s\n", sBlast().c_str(), name.c_str(), LAS_TOOLS_VERSION, info.c_str());
             header_printed_once = type >= get_message_log_level();
         }
-    };
+    }
 
     virtual std::string laslicinfo()
     {
         return "";
-    };
+    }
 
     void laserrorusage(LAS_FORMAT_STRING(const char*) fmt, ...)
     {
         laserror(fmt);
         usage();
         byebye();
-    };
+    }
 
-    void laswarnforce(LAS_FORMAT_STRING(const char*) fmt, ...)
+    void laswarnforce(LAS_FORMAT_STRING(const char*) fmt, ...) const
     {
         LASMessage(LAS_SERIOUS_WARNING, fmt);
         if (!force)
         {
             byebye();
         }
-    };
+    }
 
     virtual void usage()
     {
-        // optional: general print usage of filter/transformation classes
-        return;
-    };
+    }
 
     /// <summary>
     /// handles the argument[i], first step (arguments which maybe influences other arguments or general behaviour)
@@ -155,7 +154,7 @@ class LasTool
             return false;
         }
         return true;
-    };
+    }
     /// <summary>
     /// handles the argument[i]
     /// </summary>
@@ -221,7 +220,7 @@ class LasTool
             return false;
         }
         return true;
-    };
+    }
     template <typename parseitm>
     void parse(parseitm x)
     {
@@ -251,37 +250,37 @@ class LasTool
             i++;
         }
         force_check();
-    };
-    void laserrorinfo(std::string pre)
+    }
+    void laserrorinfo(std::string pre) const
     {
         laserror("%s. use '-h' or see %s_README.md to get help.", pre.c_str(), name.c_str());
-    };
-    void parse_arg_invalid(char* argv)
+    }
+    void parse_arg_invalid(char* argv) const
     {
         std::ostringstream s;
         s << "cannot understand argument '" << std::string(argv) << "'";
         laserrorinfo(s.str());
-    };
-    void parse_arg_invalid_n(int n)
+    }
+    void parse_arg_invalid_n(int n) const
     {
         std::ostringstream s;
         s << "cannot understand argument [" << n << "]='" << std::string(argv[n]) << "'";
         laserrorinfo(s.str());
-    };
-    void error_parse_arg_n_invalid(int i, int n)
+    }
+    void error_parse_arg_n_invalid(int i, int n) const
     {
         std::ostringstream s;
         s << "cannot understand argument [" << n << "]=[" << std::string(argv[i + n]) << "] for [" << std::string(argv[i]) << "]";
         laserrorinfo(s.str());
-    };
-    void parse_arg_cnt_check(int i, int cnt, const char* desc)
+    }
+    void parse_arg_cnt_check(int i, int cnt, const char* desc) const
     {
         if ((i + cnt) >= argc)
         {
-            laserror("'%s' needs [%d] argument%s%s%s", argv[i], cnt, (cnt > 1 ? "s" : ""), (desc == "" ? "" : ": "), desc);
+            laserror("'%s' needs [%d] argument%s%s%s", argv[i], cnt, (cnt > 1 ? "s" : ""), (std::strcmp(desc, "") == 0 ? "" : ": "), desc);
         }
-    };
-    void force_check()
+    }
+    void force_check() const
     {
         if (force)
             return;
@@ -289,7 +288,7 @@ class LasTool
         {
             byebye();
         }
-    };
+    }
 };
 
 #endif
