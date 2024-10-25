@@ -31,6 +31,7 @@
 #include "mydefs.hpp"
 #include <stdio.h>
 #include <cstring>
+#include <string>
 #include <stdarg.h>
 #include "laszip_common.h"
 #include "lasmessage.hpp"
@@ -240,4 +241,16 @@ const char* indent_text(const char* text, const char* indent)
   *dest = '\0';
 
   return result;
+}
+
+void PathTrailingSlashRemove(int& path_len, char* path)
+{
+  while ((path_len > 0) && (path[path_len] != DIRECTORY_SLASH) && (path[path_len] != ':')) path_len--;
+  path[path_len] = 0;
+}
+
+bool StringEndsWith(const std::string& fullString, const std::string& ending)
+{
+  if (ending.size() > fullString.size()) return false;
+  return fullString.compare(fullString.size() - ending.size(), ending.size(), ending) == 0;
 }

@@ -380,4 +380,10 @@ void laserrorm(LAS_FORMAT_STRING(const char*) fmt, Args... args)
 #define DIRECTORY_SLASH '/'
 #endif
 
+// char helpers
+void PathTrailingSlashRemove(int& path_len, char* path);
+
+// string helpers
+bool StringEndsWith(const std::string& fullString, const std::string& ending);
+
 #endif

@@ -42,7 +42,9 @@
 #else
 #include <unistd.h>
 #endif
+#include "mydefs.hpp"
 #include "lasmessage.hpp"
+#include "lasutility.hpp"
 
 #if defined(_MSC_VER) && \
     (_MSC_FULL_VER >= 150000000)
@@ -2218,20 +2220,20 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
   return false;
 }
 
-static FILE* open_geo_file(const char* program_name, bool pcs=true, bool vertical=false)
+FILE* GeoProjectionConverter::open_geo_file(const char* program_name, bool pcs, bool vertical)
 {
   FILE* file = 0;
 
   // create path to 'pcs.csv', 'gcs.csv', or 'vertcs.csv' file
 
-  #define MAX_GEO_PATH_LENGTH 4096
+#define MAX_GEO_PATH_LENGTH 4096
   int path_len = 0;
   char path[MAX_GEO_PATH_LENGTH];
 
 #ifdef _WIN32
   if (program_name)
   {
-    GetModuleFileName(GetModuleHandle(program_name),(LPTSTR)path, MAX_GEO_PATH_LENGTH);
+    GetModuleFileName(GetModuleHandle(program_name), (LPTSTR)path, MAX_GEO_PATH_LENGTH);
     path_len = (int)strlen(path);
   }
   else
@@ -2239,44 +2241,37 @@ static FILE* open_geo_file(const char* program_name, bool pcs=true, bool vertica
     path[path_len] = '.';
     path_len = 1;
   }
-#else //_WIN32
+#else   //_WIN32
   path_len = readlink("/proc/self/exe", path, MAX_GEO_PATH_LENGTH);
-#endif //_WIN32
-
-  while ((path_len > 0) && (path[path_len] != '\\') && (path[path_len] != '/') && (path[path_len] != ':')) path_len--;
-  path[path_len] = '/'; path_len++;
-  path[path_len] = 's'; path_len++;
-  path[path_len] = 'e'; path_len++;
-  path[path_len] = 'r'; path_len++;
-  path[path_len] = 'f'; path_len++;
-  path[path_len] = '/'; path_len++;
-  path[path_len] = 'g'; path_len++;
-  path[path_len] = 'e'; path_len++;
-  path[path_len] = 'o'; path_len++;
-  path[path_len] = '/'; path_len++;
+#endif  //_WIN32
+  PathTrailingSlashRemove(path_len, path);
+  LASMessage(LAS_INFO, "crop Path is [%s], len[%d]", path, path_len);  // todo: debug remove
+  std::string sPath = std::string(path);
+  if (StringEndsWith(sPath, "blast") ) // particular case: exe in serf/blast subdir
+  {
+    LASMessage(LAS_INFO, "need crop [%s]", sPath.c_str());  // todo: debug remove
+    sPath = sPath.substr(0, sPath.length() - 11); // "../serf/blast" > ".."
+    LASMessage(LAS_INFO, "croped [%s]", sPath.c_str());  // todo: debug remove
+  }
+  sPath = sPath + DIRECTORY_SLASH + "serf" + DIRECTORY_SLASH + "geo" + DIRECTORY_SLASH;
   if (vertical)
   {
-    path[path_len] = 'v'; path_len++;
-    path[path_len] = 'e'; path_len++;
-    path[path_len] = 'r'; path_len++;
-    path[path_len] = 't'; path_len++;
-    path[path_len] = 'c'; path_len++;
-    path[path_len] = 's'; path_len++;
+    sPath = sPath + "vertcs";
+  }
+  else if (pcs)
+  {
+    sPath = sPath + "pcs";
   }
   else
   {
-    path[path_len] = (pcs ? 'p' : 'g'); path_len++;
-    path[path_len] = 'c'; path_len++;
-    path[path_len] = 's'; path_len++;
+    sPath = sPath + "gcs";
   }
-  path[path_len] = '.'; path_len++;
-  path[path_len] = 'c'; path_len++;
-  path[path_len] = 's'; path_len++;
-  path[path_len] = 'v'; path_len++;
-  path[path_len] = '\0';
-
-  file = LASfopen(path, "r");
-
+  sPath = sPath + ".csv";
+  file = LASfopen(sPath.c_str(), "r");
+  if ((file == 0) && (!disable_messages))
+  {
+    LASMessage(LAS_WARNING, "cannot open [%s]. please check your installation.", sPath.c_str());
+  }
   return file;
 }
 
@@ -2601,7 +2596,7 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
   return false;
 }
 
-static char* get_epsg_name_from_pcs_file(const char* program_name, short value)
+char* GeoProjectionConverter::get_epsg_name_from_pcs_file(const char* program_name, short value)
 {
   FILE* file = open_geo_file(program_name, true);
   if (file == 0)
@@ -2619,7 +2614,7 @@ static char* get_epsg_name_from_pcs_file(const char* program_name, short value)
       if (epsg_code == value)
       {
         char* name;
-        int run = 0;;
+        int run = 0;
         // skip until first comma
         while (line[run] != ',') run++;
         run++;
@@ -4688,7 +4683,6 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
     FILE* file = open_geo_file(argv_zero, true, true);
     if (file == 0)
     {
-      LASMessage(LAS_WARNING, "cannot open 'vertcs.csv' file. maybe your LAStools distribution\thas no .\\LAStools\\bin\\serf\\geo\\vertcs.csv file. download the\tlatest version at http://lastools.org/download/LAStools.zip ");
       return false;
     }
     int epsg_code = 0;
@@ -4704,7 +4698,7 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
           file = 0;
           // parse the current line
           char* name;
-          int dummy, units, run = 0;;
+          int dummy, units, run = 0;
           // skip until first comma
           while (line[run] != ',') run++;
           run++;
@@ -4966,7 +4960,6 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
     FILE* file = open_geo_file(argv_zero, false);
     if (file == 0)
     {
-      LASMessage(LAS_WARNING, "cannot open 'gcs.csv' file.");
       return false;
     }
     int value = 0;
@@ -4979,7 +4972,7 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
         if (code == value)
         {
           const char* gname;
-          int run = 0;;
+          int run = 0;
           // skip until first comma
           while (line[run] != ',') run++;
           run++;
@@ -5732,7 +5725,6 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     FILE* file = open_geo_file(argv_zero, true);
     if (file == 0)
     {
-      if (!disable_messages) LASMessage(LAS_WARNING, "cannot open 'pcs.csv' file. check for \\LAStools\\bin\\serf\\geo\\pcs.csv file. download latest version.");
       return false;
     }
     int epsg_code = 0;
@@ -5748,7 +5740,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
           file = 0;
           // parse the current line
           char* name;
-          int dummy, units, gcs, transform, run = 0;;
+          int dummy, units, gcs, transform, run = 0;
           // skip until first comma
           while (line[run] != ',') run++;
           run++;
