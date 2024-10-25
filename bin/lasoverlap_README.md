@@ -81,7 +81,7 @@ for continous segments (or rather interruptions) in the GPS time stamps.
 
 
     lasoverlap64 -i LDR*.las -files_are_flightlines -step 3 ^
-	           -min_diff 0.1 -max_diff 0.4 -o overlap.png
+             -min_diff 0.1 -max_diff 0.4 -o overlap.png
 
 merges all the files "LDR*.las" while assigning the points of each file 
 a unique point source ID (aka flight line number), and then creates an 
@@ -94,7 +94,7 @@ mapped to white.
 
 
     lasoverlap64 -i LDR*.las -files_are_flightlines -step 3 ^
-	           -min_diff 1.0 -max_diff 2.0 -o overlap.png
+             -min_diff 1.0 -max_diff 2.0 -o overlap.png
 
 same as above. But here the difference raster uses '-min_diff 1' and 
 '-max_diff 2' to map range (-2 ... -1) to color ramp (blue ... white), 
@@ -102,7 +102,7 @@ range (-1 ... +1) to white and (+1 ... +2) to (white ... red).
 
 
     lasoverlap64 -i LDR*.las -files_are_flightlines -step 2 ^
-	           -max_diff 0.5 -no_over
+             -max_diff 0.5 -no_over
 
 same as above but does not output an overlap raster ('-no_over') and 
 operates with different '-step 2' and '-max_diff 0.5' settings.
@@ -123,14 +123,14 @@ ID populated.
 
 
     lasoverlap64 -i tiles*.laz -step 2 -no_over -utm 15N ^
-	           -intensity -highest
+             -intensity -highest
 
 same as above but computes intensity differences. For intensities the 
 difference raster maps range -255 ... 0 ... 255 (e.g. '-max_diff 255').
 
 
     lasoverlap64 -i tiles*.laz -keep_last -step 2 -no_over ^
-	           -utm 15N -counter -highest
+             -utm 15N -counter -highest
 
 same as above but computes last return count differences. For counts the 
 difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
@@ -786,6 +786,8 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -osep [n]                : set text output separator as [sep] (see below, only xyz)  
 -otif                    : output as GeoTIFF image  
 -oxyz                    : output as xyz textfile  
+-force_tif               : force output in TIFF format, regardless of data size. Used in combination with GeoTIFF output  
+-force_bigTif            : force output in BigTIFF format, regardless of data size. Used in combination with GeoTIFF output  
 -pipe_on                 : write output to command pipe, see also -std_in  
 -populate                : populate header on output  
 -target_ecef             : output is geocentric (Earth-centered Earth-fixed)

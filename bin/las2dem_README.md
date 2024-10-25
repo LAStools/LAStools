@@ -811,6 +811,8 @@ generated KML file:
 -osep [n]                : set text output separator as [sep] (see below, only xyz)  
 -otif                    : output as GeoTIFF image  
 -oxyz                    : output as xyz textfile  
+-force_tif               : force output in TIFF format, regardless of data size. Used in combination with GeoTIFF output  
+-force_bigTif            : force output in BigTIFF format, regardless of data size. Used in combination with GeoTIFF output  
 -pipe_on                 : write output to command pipe, see also -std_in  
 -populate                : populate header on output  
 -target_ecef             : output is geocentric (Earth-centered Earth-fixed)  
