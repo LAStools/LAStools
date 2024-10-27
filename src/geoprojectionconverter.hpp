@@ -534,8 +534,8 @@ private:
   double target_elevation_precision;
 
   // helper functions
-  FILE* open_geo_file(const char* program_name, bool pcs = true, bool vertical = false);
-  char* get_epsg_name_from_pcs_file(const char* program_name, short value);
+  FILE* open_geo_file(bool pcs = true, bool vertical = false);
+  char* get_epsg_name_from_pcs_file(short value);
   void set_projection(GeoProjectionParameters* projection, bool source);
   void set_geokey(short geokey, bool source);
   void check_geokey(short geokey, bool source);

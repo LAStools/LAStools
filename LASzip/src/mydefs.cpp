@@ -33,8 +33,15 @@
 #include <cstring>
 #include <string>
 #include <stdarg.h>
+#include <filesystem>
 #include "laszip_common.h"
 #include "lasmessage.hpp"
+#ifdef _MSC_VER
+#include <windows.h>
+#else
+#include <iomanip>
+#include <unistd.h>
+#endif
 
 #if defined(_MSC_VER)
 #include <windows.h>
@@ -243,12 +250,82 @@ const char* indent_text(const char* text, const char* indent)
   return result;
 }
 
-void PathTrailingSlashRemove(int& path_len, char* path)
+/// <summary>
+/// Trim path to part prior last directory separator
+/// Sample: c:\temp\a.exe >> c:\temp || /temp/a >> /temp
+/// </summary>
+/// <param name="path_len">current len of path</param>
+/// <param name="path">pointer to path char</param>
+void ExeNameToPathWithoutTrailingDelimiter(int& path_len, char* path)
 {
   while ((path_len > 0) && (path[path_len] != DIRECTORY_SLASH) && (path[path_len] != ':')) path_len--;
   path[path_len] = 0;
 }
 
+///get the path of the exe file (incl. trailing path delimiter)
+std::string exe_path()
+{
+  size_t len = 0;
+#ifdef _WIN32
+  TCHAR path[MAX_PATH];
+  GetModuleFileName(NULL, path, MAX_PATH);
+#ifdef UNICODE
+  len = wcslen(path);
+#else
+  len = strlen(path);
+#endif
+#else
+  char path[MAX_PATH];
+  len = readlink("/proc/self/exe", path, MAX_PATH);
+#endif
+  while (len && (path[len] != '\\') && (path[len] != '/')) len--;
+  path[len] = '\0';
+  //
+#if defined(_WIN32) && defined(UNICODE)
+  return bufferWToString(path, len) + DIRECTORY_SLASH;
+#else
+  return std::string(path, len) + DIRECTORY_SLASH;
+#endif
+}
+
+/// <summary>
+/// get the current directory (exclude trailing delimiter)
+/// </summary>
+std::string dir_current()
+{
+  char curr_directory[MAX_PATH];
+#ifdef _MSC_VER
+  GetCurrentDirectory(MAX_PATH, curr_directory);
+#else
+  getcwd(curr_directory, MAX_PATH);
+#endif
+  return std::string(curr_directory);
+}
+
+/// replace string and return new string
+std::string ReplaceString(std::string subject, const std::string& search, const std::string& replace)
+{
+  size_t pos = 0;
+  while ((pos = subject.find(search, pos)) != std::string::npos)
+  {
+    subject.replace(pos, search.length(), replace);
+    pos += replace.length();
+  }
+  return subject;
+}
+
+/// replace string in current string
+void ReplaceStringInPlace(std::string& subject, const std::string& search, const std::string& replace)
+{
+  size_t pos = 0;
+  while ((pos = subject.find(search, pos)) != std::string::npos)
+  {
+    subject.replace(pos, search.length(), replace);
+    pos += replace.length();
+  }
+}
+
+/// checks if a fullString ends with a certain ending
 bool StringEndsWith(const std::string& fullString, const std::string& ending)
 {
   if (ending.size() > fullString.size()) return false;

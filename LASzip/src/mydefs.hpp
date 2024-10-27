@@ -46,6 +46,7 @@
 #endif // _WIN32
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <cstdio>
 #include <exception>
 #include <stdexcept>
@@ -380,10 +381,22 @@ void laserrorm(LAS_FORMAT_STRING(const char*) fmt, Args... args)
 #define DIRECTORY_SLASH '/'
 #endif
 
+#ifndef MAX_PATH  // linux
+#define MAX_PATH FILENAME_MAX
+#endif
+
 // char helpers
-void PathTrailingSlashRemove(int& path_len, char* path);
+void ExeNameToPathWithoutTrailingDelimiter(int& path_len, char* path);
 
 // string helpers
+std::string exe_path();
+
+std::string dir_current();
+
+std::string ReplaceString(std::string subject, const std::string& search, const std::string& replace);
+
+void ReplaceStringInPlace(std::string& subject, const std::string& search, const std::string& replace);
+
 bool StringEndsWith(const std::string& fullString, const std::string& ending);
 
 #endif

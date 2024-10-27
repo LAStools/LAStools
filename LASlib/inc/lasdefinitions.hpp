@@ -87,10 +87,6 @@
 #define LAS_TOOLS_IO_IBUFFER_SIZE   262144
 #define LAS_TOOLS_IO_OBUFFER_SIZE   262144
 
-#ifndef MAX_PATH // linux
-#define MAX_PATH 256
-#endif
-
 class LASLIB_DLL LASvlr
 {
 public:

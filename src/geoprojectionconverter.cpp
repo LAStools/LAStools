@@ -2220,57 +2220,39 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
   return false;
 }
 
-FILE* GeoProjectionConverter::open_geo_file(const char* program_name, bool pcs, bool vertical)
+/// <summary>
+/// open 'pcs.csv', 'gcs.csv', or 'vertcs.csv' file
+/// </summary>
+/// <param name="program_name"></param>
+/// <param name="pcs"></param>
+/// <param name="vertical"></param>
+/// <returns></returns>
+FILE* GeoProjectionConverter::open_geo_file(bool pcs, bool vertical)
 {
   FILE* file = 0;
-
-  // create path to 'pcs.csv', 'gcs.csv', or 'vertcs.csv' file
-
-#define MAX_GEO_PATH_LENGTH 4096
-  int path_len = 0;
-  char path[MAX_GEO_PATH_LENGTH];
-
-#ifdef _WIN32
-  if (program_name)
+  std::string fn = exe_path();
+  if (StringEndsWith(fn, "blast" + DIRECTORY_SLASH) ) // particular case: exe in serf/blast subdir
   {
-    GetModuleFileName(GetModuleHandle(program_name), (LPTSTR)path, MAX_GEO_PATH_LENGTH);
-    path_len = (int)strlen(path);
+    fn = fn.substr(0, fn.length() - 11); // "../serf/blast/" > ".."
   }
-  else
-  {
-    path[path_len] = '.';
-    path_len = 1;
-  }
-#else   //_WIN32
-  path_len = readlink("/proc/self/exe", path, MAX_GEO_PATH_LENGTH);
-#endif  //_WIN32
-  PathTrailingSlashRemove(path_len, path);
-  LASMessage(LAS_INFO, "crop Path is [%s], len[%d]", path, path_len);  // todo: debug remove
-  std::string sPath = std::string(path);
-  if (StringEndsWith(sPath, "blast") ) // particular case: exe in serf/blast subdir
-  {
-    LASMessage(LAS_INFO, "need crop [%s]", sPath.c_str());  // todo: debug remove
-    sPath = sPath.substr(0, sPath.length() - 11); // "../serf/blast" > ".."
-    LASMessage(LAS_INFO, "croped [%s]", sPath.c_str());  // todo: debug remove
-  }
-  sPath = sPath + DIRECTORY_SLASH + "serf" + DIRECTORY_SLASH + "geo" + DIRECTORY_SLASH;
+  fn = fn + "serf" + DIRECTORY_SLASH + "geo" + DIRECTORY_SLASH;
   if (vertical)
   {
-    sPath = sPath + "vertcs";
+    fn= fn+ "vertcs";
   }
   else if (pcs)
   {
-    sPath = sPath + "pcs";
+    fn = fn + "pcs";
   }
   else
   {
-    sPath = sPath + "gcs";
+    fn = fn + "gcs";
   }
-  sPath = sPath + ".csv";
-  file = LASfopen(sPath.c_str(), "r");
+  fn = fn + ".csv";
+  file = LASfopen(fn.c_str(), "r");
   if ((file == 0) && (!disable_messages))
   {
-    LASMessage(LAS_WARNING, "cannot open [%s]. please check your installation.", sPath.c_str());
+    LASMessage(LAS_WARNING, "cannot open [%s]. please check your installation.", fn.c_str());
   }
   return file;
 }
@@ -2596,9 +2578,9 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
   return false;
 }
 
-char* GeoProjectionConverter::get_epsg_name_from_pcs_file(const char* program_name, short value)
+char* GeoProjectionConverter::get_epsg_name_from_pcs_file(short value)
 {
-  FILE* file = open_geo_file(program_name, true);
+  FILE* file = open_geo_file(true);
   if (file == 0)
   {
     return 0;
@@ -2735,7 +2717,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
         char* epsg_name = 0;
         if (len == 0)
         {
-          epsg_name = get_epsg_name_from_pcs_file(argv_zero, projection->geokey);
+          epsg_name = get_epsg_name_from_pcs_file(projection->geokey);
         }
         else
         {
@@ -3272,7 +3254,7 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
       {
         if (strlen(projection->name) == 0)
         {
-          char* epsg_name = get_epsg_name_from_pcs_file(argv_zero, projection->geokey);
+          char* epsg_name = get_epsg_name_from_pcs_file(projection->geokey);
           if (epsg_name)
           {
             n += snprintf(&string[n], (buffer_size > n) ? (buffer_size - n) : 0, "PROJCS[\"%s\",", epsg_name);
@@ -4680,7 +4662,7 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
   else
   {
     // try to look it up in 'vertcs.csv' file
-    FILE* file = open_geo_file(argv_zero, true, true);
+    FILE* file = open_geo_file(true, true);
     if (file == 0)
     {
       return false;
@@ -4957,7 +4939,7 @@ bool GeoProjectionConverter::set_gcs(short code, char* description)
   else
   {
     // try to look it up in 'gcs.csv' file
-    FILE* file = open_geo_file(argv_zero, false);
+    FILE* file = open_geo_file(false);
     if (file == 0)
     {
       return false;
@@ -5722,7 +5704,7 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
     return true;
   default:
     // try to look it up in 'pcs.csv' file
-    FILE* file = open_geo_file(argv_zero, true);
+    FILE* file = open_geo_file(true);
     if (file == 0)
     {
       return false;

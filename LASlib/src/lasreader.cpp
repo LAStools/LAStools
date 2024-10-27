@@ -3671,8 +3671,11 @@ LASreadOpener::LASreadOpener()
 	filter = 0;
 	transform = 0;
 	ignore = 0;
-	temp_file_base = 0;
-
+#if defined(_WIN32)
+    temp_file_base = 0;
+#else
+    temp_file_base = ".";
+#endif
 	// COPC
 	inside_depth = 0;
 	copc_stream_order = 1;
