@@ -4971,7 +4971,7 @@ void LAStransform::check_for_overflow() const
     {
         if (operations[i]->get_overflow())
         {
-            CHAR command[256];
+            char command[4096];
             operations[i]->get_command(command);
             LASMessage(LAS_WARNING, "total of  %lld overflows caused by '%s'", operations[i]->get_overflow(), command);
         }

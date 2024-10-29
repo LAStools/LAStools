@@ -1548,7 +1548,7 @@ class LasTool_lasinfo : public LasTool
         {
           lasreader->close();
 
-          char command[2048];
+          char command[4096];
           snprintf(command, sizeof(command), "del \"%s\"", lasreadopener.get_file_name());
           LASMessage(LAS_VERBOSE, "executing '%s'", command);
 
@@ -1578,7 +1578,7 @@ class LasTool_lasinfo : public LasTool
         laserror("renaming not implemented ...");
 #endif
 
-        char command[2048];
+        char command[4096];
         if (strlen(base_name))
         {
           snprintf(
