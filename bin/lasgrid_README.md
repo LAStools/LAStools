@@ -342,7 +342,7 @@ See "grouping arguments by tokens" below to see all possible tokens to generate 
 
 
 ### other specific arguments
--color_map [fnm]           : load colormap txt file [fnm] to define class colors  
+-color_map [fnm]           : load colormap txt file [fnm] to define target colors  
 -compute_min_max           : computes the range for -gray and -false  
 -copy_attribute_into_z [n] : copy attribute [n] value into z  
 -density                   : check difference in point density per overlapping flightline per cell with an 8 bit counter  
