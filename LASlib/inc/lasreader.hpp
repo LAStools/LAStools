@@ -52,6 +52,7 @@
 #ifndef LAS_READER_HPP
 #define LAS_READER_HPP
 
+#include <string>
 #include "lasdefinitions.hpp"
 #include "lasignore.hpp"
 #include "lastransform.hpp"
@@ -266,7 +267,7 @@ public:
 	void set_ignore(LASignore* ignore);
 	inline LASignore* get_ignore() { return ignore; };
 	void reset();
-	const CHAR* get_temp_file_base() const { return temp_file_base; };
+	std::string get_temp_file_base() const { return temp_file_base; };
 	LASreader* open(const CHAR* other_file_name = 0, BOOL reset_after_other = TRUE);
 	BOOL reopen(LASreader* lasreader, BOOL remain_buffered = TRUE);
 	LASwaveform13reader* open_waveform13(const LASheader* lasheader);
@@ -306,7 +307,7 @@ private:
 	F64* file_names_max_y;
 	LASkdtreeRectangles* kdtree_rectangles;
 	F32 buffer_size;
-	CHAR* temp_file_base;
+	std::string temp_file_base;
 	CHAR** neighbor_file_names;
 	U32 neighbor_file_name_number;
 	U32 neighbor_file_name_allocated;

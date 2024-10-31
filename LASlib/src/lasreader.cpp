@@ -54,6 +54,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 LASreader::LASreader(LASreadOpener* opener)
 {
@@ -607,9 +608,9 @@ I32 LASreadOpener::unparse(CHAR* string) const
 	{
 		n += sprintf(string + n, "-io_ibuffer %u ", io_ibuffer_size);
 	}
-	if (temp_file_base)
+	if (!temp_file_base.empty())
 	{
-		n += sprintf(string + n, "-temp_files \"%s\" ", temp_file_base);
+		n += sprintf(string + n, "-temp_files \"%s\" ", temp_file_base.c_str());
 	}
 	return n;
 }
@@ -2479,7 +2480,7 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
 			{
 				laserror("'%s' needs 1 argument: base name", argv[i]);
 			}
-			temp_file_base = LASCopyString(argv[i + 1]);
+			temp_file_base = std::string(argv[i + 1]);
 			*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
 		}
 		else if (strncmp(argv[i], "-n", 2) == 0)
@@ -3672,7 +3673,7 @@ LASreadOpener::LASreadOpener()
 	transform = 0;
 	ignore = 0;
 #if defined(_WIN32)
-    temp_file_base = 0;
+    temp_file_base = "";
 #else
     temp_file_base = ".";
 #endif
@@ -3727,5 +3728,4 @@ LASreadOpener::~LASreadOpener()
 	if (filter) delete filter;
 	if (transform) delete transform;
 	if (ignore) delete ignore;
-	if (temp_file_base) free(temp_file_base);
 }

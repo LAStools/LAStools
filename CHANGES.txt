@@ -1,3 +1,7 @@
+31 October 2024 -- NEW: lasgrid64: Support more than 64 colors in color mapping
+31 October 2024 -- NEW: lascopy64: Support rgb and user data as copy value
+31 October 2024 -- NEW: lascopy64: Give warning when keys not match
+31 October 2024 -- NEW: Added support for BigTIFF format in TIFF outputs to handle data larger than 4GB.
 16 October 2024 -- fix: las2dem64 handle NaN triangles on small step size
 01 October 2024 -- fix: lastile multi core
 28 September 2024 -- NEW: lasgrid64 precision enhancement

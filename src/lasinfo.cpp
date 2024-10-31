@@ -1540,7 +1540,7 @@ class LasTool_lasinfo : public LasTool
       if (delete_empty && lasreadopener.get_file_name())
       {
 #ifdef _WIN32
-        LASMessage(LAS_VERBOSE, "delete check for '%s' with %I64d points", lasreadopener.get_file_name(), lasreader->npoints);
+        LASMessage(LAS_VERBOSE, "delete check for '%s' with %lld points", lasreadopener.get_file_name(), lasreader->npoints);
 #else
         laserror("deleting not implemented ...");
 #endif
@@ -1573,7 +1573,7 @@ class LasTool_lasinfo : public LasTool
         lasreader->close();
 
 #ifdef _WIN32
-        LASMessage(LAS_VERBOSE, "renaming '%s' with %I64d points", lasreadopener.get_file_name(), lasreader->npoints);
+        LASMessage(LAS_VERBOSE, "renaming '%s' with %lld points", lasreadopener.get_file_name(), lasreader->npoints);
 #else
         laserror("renaming not implemented ...");
 #endif
