@@ -23,7 +23,10 @@ AlignTrailingComments: true
 SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: false
 SpacesInCStyleCastParentheses: false
-SpacesInAngles:  false
+SpacesInAngles: false
+PointerAlignment: Left  # Ensures & and * stay with the type
+ReferenceAlignment: Left  # Ensures & aligns with the type
+DerivePointerAlignment: false  # Prevents automatic alignment override
 
 # Column limit and maximum penalties
 ColumnLimit: 150
