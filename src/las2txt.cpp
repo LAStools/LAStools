@@ -583,7 +583,7 @@ extern int las2txt_gui(int argc, char* argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int las2txt_multi_core(int argc, char* argv[], LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
+extern void las2txt_multi_core(int argc, char* argv[], LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
 #endif
 
 int main(int argc, char* argv[])
@@ -794,12 +794,12 @@ int main(int argc, char* argv[])
     }
     else
     {
-      return las2txt_multi_core(argc, argv, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
+      las2txt_multi_core(argc, argv, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
     }
   }
   if (lastool.cpu64)
   {
-    return las2txt_multi_core(argc, argv, &lasreadopener, &laswriteopener, 1, TRUE);
+    las2txt_multi_core(argc, argv, &lasreadopener, &laswriteopener, 1, TRUE);
   }
 #endif
 

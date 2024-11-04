@@ -74,7 +74,7 @@ extern int lasmerge_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int lasmerge_multi_core(int argc, char *argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, BOOL cpu64);
+extern void lasmerge_multi_core(int argc, char *argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, BOOL cpu64);
 #endif
 
 int main(int argc, char *argv[])
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_MULTI_CORE
   if (lastool.cpu64)
   {
-    return lasmerge_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, TRUE);
+    lasmerge_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, TRUE);
   }
 #endif
 

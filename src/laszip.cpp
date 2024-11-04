@@ -112,7 +112,7 @@ extern int laszip_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int laszip_multi_core(int argc, char *argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
+extern void laszip_multi_core(int argc, char *argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
 #endif
 
 int main(int argc, char *argv[])
@@ -300,12 +300,12 @@ int main(int argc, char *argv[])
     }
     else
     {
-      return laszip_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
+      laszip_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
     }
   }
   if (lastool.cpu64)
   {
-    return laszip_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, 1, TRUE);
+    laszip_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, 1, TRUE);
   }
 #endif
 

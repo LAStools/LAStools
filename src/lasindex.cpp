@@ -89,7 +89,7 @@ extern int lasindex_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int lasindex_multi_core(int argc, char *argv[], LASreadOpener* lasreadopener, int cores, BOOL cpu64);
+extern void lasindex_multi_core(int argc, char *argv[], LASreadOpener* lasreadopener, int cores, BOOL cpu64);
 #endif
 
 int main(int argc, char *argv[])
@@ -224,12 +224,12 @@ int main(int argc, char *argv[])
     }
     else
     {
-      return lasindex_multi_core(argc, argv, &lasreadopener, lastool.cores, lastool.cpu64);
+      lasindex_multi_core(argc, argv, &lasreadopener, lastool.cores, lastool.cpu64);
     }
   }
   if (lastool.cpu64)
   {
-    return lasindex_multi_core(argc, argv, &lasreadopener, 1, TRUE);
+    lasindex_multi_core(argc, argv, &lasreadopener, 1, TRUE);
   }
 #endif
 

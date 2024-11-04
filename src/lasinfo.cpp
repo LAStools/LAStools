@@ -201,7 +201,7 @@ extern void lasinfo_gui(int argc, char* argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int lasinfo_multi_core(
+extern void lasinfo_multi_core(
     int argc, char* argv[], LASreadOpener* lasreadopener, LAShistogram* lashistogram, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
 #endif
 

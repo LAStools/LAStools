@@ -43,7 +43,7 @@ class LasTool
    public:
     virtual ~LasTool() = default;
     int argc = 0;
-    char** argv;
+    char** argv = 0;
     bool force = false;  // force continuation on serious_warnings
     bool blast = false;
 #ifdef COMPILE_WITH_GUI

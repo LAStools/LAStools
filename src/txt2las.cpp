@@ -136,7 +136,7 @@ extern int txt2las_gui(int argc, char* argv[], LASreadOpener* lasreadopener);
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-extern int txt2las_multi_core(int argc, char* argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, I32 cores, BOOL cpu64);
+extern void txt2las_multi_core(int argc, char* argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, I32 cores, BOOL cpu64);
 #endif
 
 int main(int argc, char* argv[])
@@ -485,12 +485,12 @@ int main(int argc, char* argv[])
     }
     else
     {
-      return txt2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
+      txt2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
     }
   }
   if (lastool.cpu64)
   {
-    return txt2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, 1, TRUE);
+    txt2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, 1, TRUE);
   }
 #endif
 
