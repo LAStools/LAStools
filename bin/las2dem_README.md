@@ -234,6 +234,7 @@ generated KML file:
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
 -no_data [n]       : use [n] as the nodata value in the BIL / ASC format  
+-no_data_alpha     : adds an alpha channel to the GeoTIFF output, designating areas with no data as transparent  
 -no_kml            : avoids auto-creation of KML wrapper  
 -no_world_file     : avoid world-file for PNG, JPG, TIF and BIL output  
 -stored            : use in memory reader  
