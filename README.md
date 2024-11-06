@@ -124,17 +124,15 @@ Detailed information at https://rapidlasso.de/lastools-linux/
     tar xvzf LAStools.tar.gz
     rm LAStools.tar.gz
     
-2. expand your library path to include your installation directory
-
-    export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
-
-3. install dependencies
-
+2. install dependencies or expand your library path to catch the included libraries
+   - install dependencies
     sudo apt-get install libjpeg62 libpng-dev libtiff-dev libjpeg-dev libz-dev libproj-dev liblzma-dev libjbig-dev libzstd-dev libgeotiff-dev libwebp-dev liblzma-dev libsqlite3-dev
+   - expand library path to include the local "./lib" directory
+    export LD_LIBRARY_PATH=./lib:$LD_LIBRARY_PATH
 
-4. run the LAStools executables
+3. run the LAStools executables, e.g.
 
-    ./laszip64
+    ./las2las64
 
 
 # Examples
