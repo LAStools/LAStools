@@ -9,4 +9,4 @@ CPackSourceConfig.cmake
 *.bz2
 _CPack_Packages/
 install_mainifest.txt
-
+docs/build

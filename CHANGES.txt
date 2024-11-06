@@ -1,3 +1,5 @@
+06 November 2024 -- fix: lasinfo multi-core performance issue
+06 November 2024 -- NEW: 'no_data_alpha' option to support alpha channel in GeoTIFF outputs
 31 October 2024 -- NEW: lasgrid64: Support more than 64 colors in color mapping
 31 October 2024 -- NEW: lascopy64: Support rgb and user data as copy value
 31 October 2024 -- NEW: lascopy64: Give warning when keys not match
