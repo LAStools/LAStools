@@ -2076,11 +2076,9 @@ int main(int argc, char* argv[])
       if (save_vlr == false)
       {
         // do we need an extra pass
-        
         BOOL extra_pass = laswriteopener.is_piped();
         
         // we only really need an extra pass if the coordinates are altered or if points are filtered
-        
         if (extra_pass)
         {
           if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
@@ -2088,16 +2086,25 @@ int main(int argc, char* argv[])
             extra_pass = FALSE;
           }
         }
-        
+
+        bool doIntensityRangeGet = false;
+        U16 intensityMin = UINT16_MAX;
+        U16 intensityMax = 0;
+        LASoperationMultiplyScaledIntensityRangeIntoRGB* op = nullptr;
+        if (lasreadopener.get_transform()->find_operation(op))
+        {
+          doIntensityRangeGet = true;
+          extra_pass = true;
+        }
+
         // for piped output we need an extra pass
-        
         if (extra_pass)
         {
           if (lasreadopener.is_piped())
           {
             laserror("input and output cannot both be piped");
           }
-          LASMessage(LAS_VERBOSE, "extra pass for piped output: reading %lld points ...", lasreader->npoints);
+          LASMessage(LAS_VERBOSE, "extra pass required: reading %lld points ...", lasreader->npoints);
           // maybe seek to start position
           if (subsequence_start) lasreader->seek(subsequence_start);
           while (lasreader->read_point())
@@ -2119,9 +2126,26 @@ int main(int argc, char* argv[])
               lasreader->point.compute_XYZ(reproject_quantizer);
             }
             lasinventory.add(&lasreader->point);
+
+            if (doIntensityRangeGet)
+            {
+              U16 ints = lasreader->point.get_intensity();
+              intensityMin = min(ints,intensityMin);
+              intensityMax = max(ints, intensityMax);
+            }
           }
           lasreader->close();
-        
+
+          if (doIntensityRangeGet)
+          {
+            op->intensityMin = intensityMin;
+            op->intensityRange = intensityMax - intensityMin;
+            if (op->intensityRange == 0)
+            {
+              LASMessage(LAS_WARNING, "range of intensity values is zero. no intensity calculations will be done.");
+            }
+          }
+
           if (reproject_quantizer) lasreader->header = *reproject_quantizer;
         
           lasinventory.update_header(&lasreader->header);
@@ -2201,7 +2225,7 @@ int main(int argc, char* argv[])
 
         // loop over points
 
-        if (point)
+        if (point) // full rewrite: point copy
         {
           while (lasreader->read_point())
           {
@@ -2229,7 +2253,7 @@ int main(int argc, char* argv[])
           delete point;
           point = 0;
         }
-        else
+        else // direct copy from source point to target point
         {
           while (lasreader->read_point())
           {
