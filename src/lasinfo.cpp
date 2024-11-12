@@ -56,6 +56,7 @@
 */
 
 #include "geoprojectionconverter.hpp"
+#include "json.hpp"
 #include "lasindex.hpp"
 #include "lasquadtree.hpp"
 #include "lasreader.hpp"
@@ -63,7 +64,6 @@
 #include "lasvlrpayload.hpp"
 #include "laswriter.hpp"
 #include "laszip_decompress_selective_v3.hpp"
-#include "json.hpp"
 
 #include <math.h>
 #include <stdio.h>
@@ -110,8 +110,7 @@ static const char* LASpointClassification[32] = {
     "Reserved for ASPRS Definition",
     "Reserved for ASPRS Definition"};
 
-static inline void VecUpdateMinMax3dv(double min[3], double max[3], const double v[3])
-{
+static inline void VecUpdateMinMax3dv(double min[3], double max[3], const double v[3]) {
   if (v[0] < min[0])
     min[0] = v[0];
   else if (v[0] > max[0])
@@ -126,8 +125,7 @@ static inline void VecUpdateMinMax3dv(double min[3], double max[3], const double
     max[2] = v[2];
 }
 
-static inline void VecCopy3dv(double v[3], const double a[3])
-{
+static inline void VecCopy3dv(double v[3], const double a[3]) {
   v[0] = a[0];
   v[1] = a[1];
   v[2] = a[2];
@@ -140,13 +138,11 @@ double round_to_decimals(double value, int decimals) {
 }
 
 // Function for converting formatted character string to double
-static double parseFormattedDouble(const char* formattedString)
-{
+static double parseFormattedDouble(const char* formattedString) {
   return std::stod(formattedString);
 }
 
-static int lidardouble2string(char* string, double value)
-{
+static int lidardouble2string(char* string, double value) {
   int len;
   len = sprintf(string, "%.15f", value) - 1;
   while (string[len] == '0') len--;
@@ -155,8 +151,7 @@ static int lidardouble2string(char* string, double value)
   return len;
 }
 
-static I32 lidardouble2string(char* string, double value, double precision)
-{
+static I32 lidardouble2string(char* string, double value, double precision) {
   if (precision == 0.1)
     sprintf(string, "%.1f", value);
   else if (precision == 0.01)
@@ -184,13 +179,11 @@ static I32 lidardouble2string(char* string, double value, double precision)
   return (I32)strlen(string) - 1;
 }
 
-static bool valid_resolution(F64 coordinate, F64 offset, F64 scale_factor)
-{
+static bool valid_resolution(F64 coordinate, F64 offset, F64 scale_factor) {
   F64 coordinate_without_offset = coordinate - offset;
   F64 fixed_precision_multiplier = coordinate_without_offset / scale_factor;
   I64 quantized_fixed_precision_multiplier = I64_QUANTIZE(fixed_precision_multiplier);
-  if ((fabs(fixed_precision_multiplier - quantized_fixed_precision_multiplier)) < 0.001)
-  {
+  if ((fabs(fixed_precision_multiplier - quantized_fixed_precision_multiplier)) < 0.001) {
     return true;
   }
   return false;
@@ -205,8 +198,7 @@ extern void lasinfo_multi_core(
     int argc, char* argv[], LASreadOpener* lasreadopener, LAShistogram* lashistogram, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
 #endif
 
-class LasTool_lasinfo : public LasTool
-{
+class LasTool_lasinfo : public LasTool {
  private:
   bool do_scale_header = false;
   bool header_preread = false;
@@ -216,8 +208,7 @@ class LasTool_lasinfo : public LasTool
   F64* scale_header = 0;
 
  public:
-  void run()
-  {
+  void run() {
     int i;
     bool no_header = false;
     bool no_variable_header = false;
@@ -248,8 +239,7 @@ class LasTool_lasinfo : public LasTool
     I64 set_project_ID_GUID_data_1 = -1;
     I32 set_project_ID_GUID_data_2 = -1;
     I32 set_project_ID_GUID_data_3 = -1;
-    I32 set_project_ID_GUID_data_4a = -1;
-    I64 set_project_ID_GUID_data_4b = -1;
+    U8 set_project_ID_GUID_data_4[8];
     I8 set_version_major = -1;
     I8 set_version_minor = -1;
     I8* set_system_identifier = 0;
@@ -292,8 +282,7 @@ class LasTool_lasinfo : public LasTool
 
     lasreadopener.set_keep_copc(TRUE);
 
-    if (argc == 1)
-    {
+    if (argc == 1) {
 #ifdef COMPILE_WITH_GUI
       lasinfo_gui(argc, argv, 0);
 #else
@@ -305,11 +294,8 @@ class LasTool_lasinfo : public LasTool
       file_name[strlen(file_name) - 1] = '\0';
       lasreadopener.set_file_name(file_name);
 #endif
-    }
-    else
-    {
-      for (i = 1; i < argc; i++)
-      {
+    } else {
+      for (i = 1; i < argc; i++) {
         if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
       }
       if (!lashistogram.parse(argc, argv)) byebye();
@@ -318,210 +304,132 @@ class LasTool_lasinfo : public LasTool
       laswriteopener.parse(argc, argv);
     }
 
-    if (laswriteopener.is_piped())
-    {
+    if (laswriteopener.is_piped()) {
       file_out = stdout;
     }
 
-    auto arg_local = [&](int& i) -> bool
-    {
-      if (strcmp(argv[i], "-quiet") == 0)
-      {
+    auto arg_local = [&](int& i) -> bool {
+      if (strcmp(argv[i], "-quiet") == 0) {
         file_out = 0;
-      }
-      else if (strcmp(argv[i], "-otxt") == 0)
-      {
+      } else if (strcmp(argv[i], "-otxt") == 0) {
         laswriteopener.set_appendix("_info");
         laswriteopener.set_format("txt");
-      }
-      else if (strcmp(argv[i], "-ojs") == 0)
-      {
+      } else if (strcmp(argv[i], "-ojs") == 0) {
         laswriteopener.set_appendix("_info");
         laswriteopener.set_format("json");
-      }
-      else if (strcmp(argv[i], "-nh") == 0 || strcmp(argv[i], "-no_header") == 0)
-      {
+      } else if (strcmp(argv[i], "-nh") == 0 || strcmp(argv[i], "-no_header") == 0) {
         no_header = true;
-      }
-      else if (strcmp(argv[i], "-nv") == 0 || strcmp(argv[i], "-no_vlrs") == 0)
-      {
+      } else if (strcmp(argv[i], "-nv") == 0 || strcmp(argv[i], "-no_vlrs") == 0) {
         no_variable_header = true;
-      }
-      else if (strcmp(argv[i], "-nr") == 0 || strcmp(argv[i], "-no_returns") == 0)
-      {
+      } else if (strcmp(argv[i], "-nr") == 0 || strcmp(argv[i], "-no_returns") == 0) {
         no_returns = true;
-      }
-      else if (strcmp(argv[i], "-nmm") == 0 || strcmp(argv[i], "-no_min_max") == 0)
-      {
+      } else if (strcmp(argv[i], "-nmm") == 0 || strcmp(argv[i], "-no_min_max") == 0) {
         no_min_max = true;
-      }
-      else if (strcmp(argv[i], "-nw") == 0 || strcmp(argv[i], "-no_warnings") == 0)
-      {
+      } else if (strcmp(argv[i], "-nw") == 0 || strcmp(argv[i], "-no_warnings") == 0) {
         no_warnings = true;
-      }
-      else if (strcmp(argv[i], "-nc") == 0 || strcmp(argv[i], "-no_check") == 0)
-      {
+      } else if (strcmp(argv[i], "-nc") == 0 || strcmp(argv[i], "-no_check") == 0) {
         check_points = false;
-      }
-      else if (strcmp(argv[i], "-cd") == 0 || strcmp(argv[i], "-compute_density") == 0)
-      {
+      } else if (strcmp(argv[i], "-cd") == 0 || strcmp(argv[i], "-compute_density") == 0) {
         compute_density = true;
-      }
-      else if (strcmp(argv[i], "-gw") == 0 || strcmp(argv[i], "-gps_week") == 0)
-      {
+      } else if (strcmp(argv[i], "-gw") == 0 || strcmp(argv[i], "-gps_week") == 0) {
         gps_week = true;
-      }
-      else if (strcmp(argv[i], "-nco") == 0 || strcmp(argv[i], "-no_check_outside") == 0)
-      {
+      } else if (strcmp(argv[i], "-nco") == 0 || strcmp(argv[i], "-no_check_outside") == 0) {
         check_outside = false;
-      }
-      else if (strcmp(argv[i], "-js") == 0 || strcmp(argv[i], "-json") == 0)
-      {
+      } else if (strcmp(argv[i], "-js") == 0 || strcmp(argv[i], "-json") == 0) {
         json_out = true;
-      }
-      else if (strcmp(argv[i], "-ro") == 0 || strcmp(argv[i], "-report_outside") == 0)
-      {
+      } else if (strcmp(argv[i], "-ro") == 0 || strcmp(argv[i], "-report_outside") == 0) {
         report_outside = true;
         check_outside = true;
-      }
-      else if (strcmp(argv[i], "-subseq") == 0)
-      {
-        if ((i + 2) >= argc)
-        {
+      } else if (strcmp(argv[i], "-subseq") == 0) {
+        if ((i + 2) >= argc) {
           laserror("'%s' needs 2 arguments: start stop", argv[i]);
         }
-        if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1)
-        {
+        if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1) {
           laserror("'%s' needs 2 arguments: start stop but '%s' is not a valid start", argv[i], argv[i + 1]);
         }
-        if (subsequence_start < 0)
-        {
+        if (subsequence_start < 0) {
           laserror("'%s' needs 2 arguments: start stop but '%lld' is not a valid start", argv[i], subsequence_start);
         }
-        if (sscanf_las(argv[i + 2], "%lld", &subsequence_stop) != 1)
-        {
+        if (sscanf_las(argv[i + 2], "%lld", &subsequence_stop) != 1) {
           laserror("'%s' needs 2 arguments: start stop but '%s' is not a valid stop", argv[i], argv[i + 2]);
         }
-        if (subsequence_stop < 0)
-        {
+        if (subsequence_stop < 0) {
           laserror("'%s' needs 2 arguments: start stop but '%lld' is not a valid stop", argv[i], subsequence_stop);
         }
-        if (subsequence_start >= subsequence_stop)
-        {
+        if (subsequence_start >= subsequence_stop) {
           laserror(
               "'%s' needs 2 arguments: start stop but '%lld' and '%lld' are no valid start and stop combination ", argv[i], subsequence_start,
               subsequence_stop);
         }
         i += 2;
-      }
-      else if (strcmp(argv[i], "-start_at_point") == 0)
-      {
-        if ((i + 1) >= argc)
-        {
+      } else if (strcmp(argv[i], "-start_at_point") == 0) {
+        if ((i + 1) >= argc) {
           laserror("'%s' needs 1 argument: start", argv[i]);
         }
-        if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1)
-        {
+        if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1) {
           laserror("'%s' needs 1 argument: start but '%s' is not a valid start", argv[i], argv[i + 1]);
         }
-        if (subsequence_start < 0)
-        {
+        if (subsequence_start < 0) {
           laserror("'%s' needs 1 argument: start but '%lld' is not a valid start", argv[i], subsequence_start);
         }
         i += 1;
-      }
-      else if (strcmp(argv[i], "-stop_at_point") == 0)
-      {
-        if ((i + 1) >= argc)
-        {
+      } else if (strcmp(argv[i], "-stop_at_point") == 0) {
+        if ((i + 1) >= argc) {
           laserror("'%s' needs 1 argument: stop", argv[i]);
         }
-        if (sscanf_las(argv[i + 1], "%lld", &subsequence_stop) != 1)
-        {
+        if (sscanf_las(argv[i + 1], "%lld", &subsequence_stop) != 1) {
           laserror("'%s' needs 1 argument: start but '%s' is not a valid stop", argv[i], argv[i + 1]);
         }
-        if (subsequence_stop < 0)
-        {
+        if (subsequence_stop < 0) {
           laserror("'%s' needs 1 argument: start but '%lld' is not a valid stop", argv[i], subsequence_stop);
         }
         i += 1;
-      }
-      else if (strncmp(argv[i], "-repair", 7) == 0)
-      {
-        if (strcmp(argv[i], "-repair") == 0)
-        {
+      } else if (strncmp(argv[i], "-repair", 7) == 0) {
+        if (strcmp(argv[i], "-repair") == 0) {
           repair_bb = true;
           repair_counters = true;
-        }
-        else if (strcmp(argv[i], "-repair_bb") == 0)
-        {
+        } else if (strcmp(argv[i], "-repair_bb") == 0) {
           repair_bb = true;
-        }
-        else if (strcmp(argv[i], "-repair_counters") == 0)
-        {
+        } else if (strcmp(argv[i], "-repair_counters") == 0) {
           repair_counters = true;
         }
-      }
-      else if (strcmp(argv[i], "-delete_empty") == 0)
-      {
+      } else if (strcmp(argv[i], "-delete_empty") == 0) {
         delete_empty = true;
-      }
-      else if (strcmp(argv[i], "-auto_date") == 0 || strcmp(argv[i], "-auto_creation_date") == 0 || strcmp(argv[i], "-auto_creation") == 0)
-      {
+      } else if (strcmp(argv[i], "-auto_date") == 0 || strcmp(argv[i], "-auto_creation_date") == 0 || strcmp(argv[i], "-auto_creation") == 0) {
         auto_date_creation = true;
-      }
-      else if (strncmp(argv[i], "-set_", 5) == 0)
-      {
-        if (strcmp(argv[i], "-set_file_source_ID") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+      } else if (strncmp(argv[i], "-set_", 5) == 0) {
+        if (strcmp(argv[i], "-set_file_source_ID") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: index", argv[i]);
           }
-          if (sscanf_las(argv[i + 1], "%u", &set_file_source_ID) != 1)
-          {
+          if (sscanf_las(argv[i + 1], "%u", &set_file_source_ID) != 1) {
             laserror("'%s' needs 1 argument: index but '%s' is no valid index", argv[i], argv[i + 1]);
           }
-          if (set_file_source_ID > U16_MAX)
-          {
+          if (set_file_source_ID > U16_MAX) {
             laserror("'%s' needs 1 argument: index between 0 and %u but %u is out of range", argv[i], U16_MAX, set_file_source_ID);
           }
           i++;
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_file_source_ID_from_point_source_ID") == 0)
-        {
+        } else if (strcmp(argv[i], "-set_file_source_ID_from_point_source_ID") == 0) {
           set_file_source_ID_from_point_source_ID = true;
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_GUID") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_GUID") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: value1", argv[i]);
           }
           i++;
-#ifdef _WIN32
           if (sscanf_las(
-                  argv[i], "%I64x-%x-%x-%x-%I64x", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3,
-                  &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
-#else
-          if (sscanf_las(
-                  argv[i], "%llx-%x-%x-%x-%llx", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2, &set_project_ID_GUID_data_3,
-                  &set_project_ID_GUID_data_4a, &set_project_ID_GUID_data_4b) != 5)
-#endif
-          {
-            if ((i + 1) >= argc)
-            {
+                  argv[i], "%I64x-%x-%x-%02X%02X-%02X%02X%02X%02X%02X%02X", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2,
+                  &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4[0], &set_project_ID_GUID_data_4[1], &set_project_ID_GUID_data_4[2],
+                  &set_project_ID_GUID_data_4[3], &set_project_ID_GUID_data_4[4], &set_project_ID_GUID_data_4[5], &set_project_ID_GUID_data_4[6],
+                  &set_project_ID_GUID_data_4[7]) != 11) {
+            if ((i + 1) >= argc) {
               laserror("'%s' needs hexadecimal GUID in 'F794F8A4-A23E-421E-A134-ACF7754E1C54' format", argv[i]);
             }
           }
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_system_identifier") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_system_identifier") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: name", argv[i]);
           }
           i++;
@@ -529,11 +437,8 @@ class LasTool_lasinfo : public LasTool
           memset(set_system_identifier, 0, 32);
           strncpy_las(set_system_identifier, 32, argv[i], 32);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_generating_software") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_generating_software") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: name", argv[i]);
           }
           i++;
@@ -541,11 +446,8 @@ class LasTool_lasinfo : public LasTool
           memset(set_generating_software, 0, 32);
           strncpy_las(set_generating_software, 32, argv[i], 32);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_bb") == 0 || strcmp(argv[i], "-set_bounding_box") == 0)
-        {
-          if ((i + 6) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_bb") == 0 || strcmp(argv[i], "-set_bounding_box") == 0) {
+          if ((i + 6) >= argc) {
             laserror("'%s' needs 6 arguments: min_x min_y min_z max_x max_y max_z", argv[i]);
           }
           set_bounding_box = new F64[6];
@@ -562,11 +464,8 @@ class LasTool_lasinfo : public LasTool
           i++;
           set_bounding_box[4] = atof(argv[i]);  // z max
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_offset") == 0)
-        {
-          if ((i + 3) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_offset") == 0) {
+          if ((i + 3) >= argc) {
             laserror("'%s' needs 3 arguments: x y z", argv[i]);
           }
           set_offset = new F64[3];
@@ -577,61 +476,45 @@ class LasTool_lasinfo : public LasTool
           i++;
           set_offset[2] = atof(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_scale") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_scale") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 or 3 arguments: scale (xyz or x y z)", argv[i]);
           }
           set_scale = new F64[3];
           i++;
           set_scale[0] = atof(argv[i]);
-          if ((i + 2) < argc)
-          {
+          if ((i + 2) < argc) {
             i++;
             set_scale[1] = atof(argv[i]);
             i++;
             set_scale[2] = atof(argv[i]);
-          }
-          else
-          {
+          } else {
             set_scale[1] = set_scale[0];
             set_scale[2] = set_scale[0];
           }
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_global_encoding") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_global_encoding") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: number", argv[i]);
           }
           i++;
           set_global_encoding = atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_version") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_version") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: major.minor", argv[i]);
           }
           i++;
           int major;
           int minor;
-          if (sscanf_las(argv[i], "%d.%d", &major, &minor) != 2)
-          {
+          if (sscanf_las(argv[i], "%d.%d", &major, &minor) != 2) {
             laserror("cannot understand argument '%s' of '%s'", argv[i], argv[i - 1]);
           }
           set_version_major = (I8)major;
           set_version_minor = (I8)minor;
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_creation_date") == 0 || strcmp(argv[i], "-set_file_creation") == 0)
-        {
-          if ((i + 2) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_creation_date") == 0 || strcmp(argv[i], "-set_file_creation") == 0) {
+          if ((i + 2) >= argc) {
             laserror("'%s' needs 2 arguments: day year", argv[i]);
           }
           i++;
@@ -639,21 +522,15 @@ class LasTool_lasinfo : public LasTool
           i++;
           set_creation_year = (U16)atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_number_of_point_records") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_number_of_point_records") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: number", argv[i]);
           }
           i++;
           set_number_of_point_records = atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_number_of_points_by_return") == 0)
-        {
-          if ((i + 5) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_number_of_points_by_return") == 0) {
+          if ((i + 5) >= argc) {
             laserror("'%s' needs 5 arguments: ret1 ret2 ret3 ret4 ret5", argv[i]);
           }
           i++;
@@ -667,124 +544,89 @@ class LasTool_lasinfo : public LasTool
           i++;
           set_number_of_points_by_return[4] = atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_header_size") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_header_size") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: size", argv[i]);
           }
           i++;
           set_header_size = atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_offset_to_point_data") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_offset_to_point_data") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: offset", argv[i]);
           }
           i++;
           set_offset_to_point_data = atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_number_of_variable_length_records") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_number_of_variable_length_records") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: number", argv[i]);
           }
           i++;
           set_number_of_variable_length_records = atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_point_data_format") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_point_data_format") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: type", argv[i]);
           }
           i++;
           set_point_data_format = atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_point_data_record_length") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_point_data_record_length") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: size", argv[i]);
           }
           i++;
           set_point_data_record_length = atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_start_of_waveform_data_packet_record") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_start_of_waveform_data_packet_record") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: start", argv[i]);
           }
           i++;
           set_start_of_waveform_data_packet_record = atoi(argv[i]);
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_vlr_user_id") == 0)
-        {
-          if ((i + 2) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_vlr_user_id") == 0) {
+          if ((i + 2) >= argc) {
             laserror("'%s' needs 2 arguments: index user_id", argv[i]);
           }
-          if (sscanf_las(argv[i + 1], "%d", &set_vlr_user_id_index) != 1)
-          {
+          if (sscanf_las(argv[i + 1], "%d", &set_vlr_user_id_index) != 1) {
             laserror("'%s' needs 2 arguments: index user_ID but '%s' is no valid index", argv[i], argv[i + 1]);
           }
-          if ((set_vlr_user_id_index < 0) || (set_vlr_user_id_index > U16_MAX))
-          {
+          if ((set_vlr_user_id_index < 0) || (set_vlr_user_id_index > U16_MAX)) {
             laserror("'%s' needs 2 arguments: index user_ID, but index %d is out of range", argv[i], set_vlr_user_id_index);
           }
           i++;
           i++;
           set_vlr_user_id = argv[i];
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_vlr_record_id") == 0)
-        {
-          if ((i + 2) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_vlr_record_id") == 0) {
+          if ((i + 2) >= argc) {
             laserror("'%s' needs 2 arguments: index record_ID", argv[i]);
           }
-          if (sscanf_las(argv[i + 1], "%d", &set_vlr_record_id_index) != 1)
-          {
+          if (sscanf_las(argv[i + 1], "%d", &set_vlr_record_id_index) != 1) {
             laserror("'%s' needs 2 arguments: index record_ID but '%s' is no valid index", argv[i], argv[i + 1]);
           }
-          if ((set_vlr_record_id_index < 0) || (set_vlr_record_id_index > U16_MAX))
-          {
+          if ((set_vlr_record_id_index < 0) || (set_vlr_record_id_index > U16_MAX)) {
             laserror("'%s' needs 2 arguments: index record_ID, but index %d is out of range", argv[i], set_vlr_record_id_index);
           }
-          if (sscanf_las(argv[i + 2], "%d", &set_vlr_record_id) != 1)
-          {
+          if (sscanf_las(argv[i + 2], "%d", &set_vlr_record_id) != 1) {
             laserror("'%s' needs 2 arguments: index record_ID but '%s' is no valid record ID", argv[i], argv[i + 2]);
           }
-          if ((set_vlr_record_id < 0) || (set_vlr_record_id > U16_MAX))
-          {
+          if ((set_vlr_record_id < 0) || (set_vlr_record_id > U16_MAX)) {
             laserror("'%s' needs 2 arguments: index record_ID, but record_ID %d is out of range", argv[i], set_vlr_record_id_index);
           }
           i++;
           i++;
           edit_header = true;
-        }
-        else if (strcmp(argv[i], "-set_vlr_description") == 0)
-        {
-          if ((i + 2) >= argc)
-          {
+        } else if (strcmp(argv[i], "-set_vlr_description") == 0) {
+          if ((i + 2) >= argc) {
             laserror("'%s' needs 2 arguments: index description", argv[i]);
           }
-          if (sscanf_las(argv[i + 1], "%d", &set_vlr_description_index) != 1)
-          {
+          if (sscanf_las(argv[i + 1], "%d", &set_vlr_description_index) != 1) {
             laserror("'%s' needs 2 arguments: index description but '%s' is no valid index", argv[i], argv[i + 1]);
           }
-          if ((set_vlr_description_index < 0) || (set_vlr_description_index > U16_MAX))
-          {
+          if ((set_vlr_description_index < 0) || (set_vlr_description_index > U16_MAX)) {
             laserror("'%s' needs 2 arguments: index description, but index %d is out of range", argv[i], set_vlr_description_index);
           }
           i++;
@@ -813,128 +655,83 @@ class LasTool_lasinfo : public LasTool
                 edit_header = true;
                   }
         */
-        else if (strcmp(argv[i], "-set_geotiff_epsg") == 0)
-        {
-          if ((i + 1) >= argc)
-          {
+        else if (strcmp(argv[i], "-set_geotiff_epsg") == 0) {
+          if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: code", argv[i]);
           }
-          if (sscanf_las(argv[i + 1], "%u", &set_geotiff_epsg) != 1)
-          {
+          if (sscanf_las(argv[i + 1], "%u", &set_geotiff_epsg) != 1) {
             laserror("'%s' needs 1 argument: code but '%s' is no valid code", argv[i], argv[i + 1]);
           }
-          if (set_geotiff_epsg > U16_MAX)
-          {
+          if (set_geotiff_epsg > U16_MAX) {
             laserror("'%s' needs 1 argument: code between 0 and %u but %u is out of range", argv[i], U16_MAX, set_geotiff_epsg);
           }
           i++;
           edit_header = true;
-        }
-        else
-        {
+        } else {
           laserror("cannot understand argument '%s'", argv[i]);
         }
-      }
-      else if (strcmp(argv[i], "-scale_header") == 0)
-      {
-        if ((i + 1) >= argc)
-        {
+      } else if (strcmp(argv[i], "-scale_header") == 0) {
+        if ((i + 1) >= argc) {
           laserror("'%s' needs 1 or 3 arguments: header scale factor (factor or fx fy fz)", argv[i]);
         }
         scale_header = new F64[3];
         i++;
         scale_header[0] = atof(argv[i]);
-        if ((i + 2) < argc)
-        {
+        if ((i + 2) < argc) {
           i++;
           scale_header[1] = atof(argv[i]);
           i++;
           scale_header[2] = atof(argv[i]);
-        }
-        else
-        {
+        } else {
           scale_header[1] = scale_header[0];
           scale_header[2] = scale_header[0];
         }
         edit_header = true;
         do_scale_header = true;
         header_preread = true;
-      }
-      else if (strncmp(argv[i], "-suppress_", 10) == 0)
-      {
-        if (strcmp(argv[i], "-suppress_z") == 0)
-        {
+      } else if (strncmp(argv[i], "-suppress_", 10) == 0) {
+        if (strcmp(argv[i], "-suppress_z") == 0) {
           suppress_z = true;
-        }
-        else if (strcmp(argv[i], "-suppress_classification") == 0)
-        {
+        } else if (strcmp(argv[i], "-suppress_classification") == 0) {
           suppress_classification = true;
-        }
-        else if (strcmp(argv[i], "-suppress_flags") == 0)
-        {
+        } else if (strcmp(argv[i], "-suppress_flags") == 0) {
           suppress_flags = true;
-        }
-        else if (strcmp(argv[i], "-suppress_intensity") == 0)
-        {
+        } else if (strcmp(argv[i], "-suppress_intensity") == 0) {
           suppress_intensity = true;
-        }
-        else if (strcmp(argv[i], "-suppress_user_data") == 0)
-        {
+        } else if (strcmp(argv[i], "-suppress_user_data") == 0) {
           suppress_user_data = true;
-        }
-        else if (strcmp(argv[i], "-suppress_point_source") == 0)
-        {
+        } else if (strcmp(argv[i], "-suppress_point_source") == 0) {
           suppress_point_source = true;
-        }
-        else if (strcmp(argv[i], "-suppress_scan_angle") == 0)
-        {
+        } else if (strcmp(argv[i], "-suppress_scan_angle") == 0) {
           suppress_scan_angle = true;
-        }
-        else if (strcmp(argv[i], "-suppress_RGB") == 0)
-        {
+        } else if (strcmp(argv[i], "-suppress_RGB") == 0) {
           suppress_RGB = true;
-        }
-        else if (strcmp(argv[i], "-suppress_extra_bytes") == 0)
-        {
+        } else if (strcmp(argv[i], "-suppress_extra_bytes") == 0) {
           suppress_extra_bytes = true;
-        }
-        else
-        {
+        } else {
           laserror("cannot understand argument '%s'", argv[i]);
         }
-      }
-      else if (strcmp(argv[i], "-rename") == 0)
-      {
-        if ((i + 1) >= argc)
-        {
+      } else if (strcmp(argv[i], "-rename") == 0) {
+        if ((i + 1) >= argc) {
           laserror("'%s' needs 1 argument: base name", argv[i]);
         }
         i++;
         base_name = argv[i];
-      }
-      else if (strcmp(argv[i], "-progress") == 0)
-      {
-        if ((i + 1) >= argc)
-        {
+      } else if (strcmp(argv[i], "-progress") == 0) {
+        if ((i + 1) >= argc) {
           laserror("'%s' needs 1 argument: every", argv[i]);
         }
-        if (sscanf_las(argv[i + 1], "%u", &progress) != 1)
-        {
+        if (sscanf_las(argv[i + 1], "%u", &progress) != 1) {
           laserror("'%s' needs 1 argument: every but '%s' is no valid number", argv[i], argv[i + 1]);
         }
-        if (progress == 0)
-        {
+        if (progress == 0) {
           laserror("'%s' needs 1 argument: every but '%u' is no valid number", argv[i], progress);
         }
         i++;
-      }
-      else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))
-      {
+      } else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0)) {
         lasreadopener.add_file_name(argv[i]);
         argv[i][0] = '\0';
-      }
-      else
-      {
+      } else {
         return false;
       }
       return true;
@@ -943,38 +740,29 @@ class LasTool_lasinfo : public LasTool
     parse(arg_local);
 
 #ifdef COMPILE_WITH_GUI
-    if (gui)
-    {
+    if (gui) {
       lasinfo_gui(argc, argv, &lasreadopener);
     }
 #endif
 
 #ifdef COMPILE_WITH_MULTI_CORE
-    if (cores > 1)
-    {
-      if (lasreadopener.get_file_name_number() < 2)
-      {
+    if (cores > 1) {
+      if (lasreadopener.get_file_name_number() < 2) {
         LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
-      }
-      else if (lasreadopener.is_merged())
-      {
+      } else if (lasreadopener.is_merged()) {
         LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", cores);
-      }
-      else
-      {
+      } else {
         lasinfo_multi_core(argc, argv, &lasreadopener, &lashistogram, &laswriteopener, cores, cpu64);
       }
     }
-    if (cpu64)
-    {
+    if (cpu64) {
       lasinfo_multi_core(argc, argv, &lasreadopener, &lashistogram, &laswriteopener, 1, TRUE);
     }
 #endif
 
     // check input
 
-    if (!lasreadopener.active())
-    {
+    if (!lasreadopener.active()) {
       laserror("no input specified");
     }
 
@@ -982,170 +770,130 @@ class LasTool_lasinfo : public LasTool
 
     U32 decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL;
 
-    if (suppress_z)
-    {
+    if (suppress_z) {
       decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_Z;
     }
 
-    if (suppress_classification)
-    {
+    if (suppress_classification) {
       decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
     }
 
-    if (suppress_flags)
-    {
+    if (suppress_flags) {
       decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_FLAGS;
     }
 
-    if (suppress_intensity)
-    {
+    if (suppress_intensity) {
       decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     }
 
-    if (suppress_user_data)
-    {
+    if (suppress_user_data) {
       decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     }
 
-    if (suppress_point_source)
-    {
+    if (suppress_point_source) {
       decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE;
     }
 
-    if (suppress_scan_angle)
-    {
+    if (suppress_scan_angle) {
       decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE;
     }
 
-    if (suppress_RGB)
-    {
+    if (suppress_RGB) {
       decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_RGB;
     }
 
-    if (suppress_extra_bytes)
-    {
+    if (suppress_extra_bytes) {
       decompress_selective &= ~LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     }
 
     lasreadopener.set_decompress_selective(decompress_selective);
 
     // possibly loop over multiple input files
-    while (lasreadopener.active())
-    {
+    while (lasreadopener.active()) {
       LASreader* lasreader = nullptr;
       LASheader* lasheader = nullptr;
-      if (edit_header)
-      {
-        if (lasreadopener.is_piped())
-        {
+      if (edit_header) {
+        if (lasreadopener.is_piped()) {
           laserror("cannot edit header of piped input");
           edit_header = false;
-        }
-        else if (lasreadopener.is_merged())
-        {
+        } else if (lasreadopener.is_merged()) {
           laserror("cannot edit header of merged input");
           edit_header = false;
-        }
-        else if (lasreadopener.is_buffered())
-        {
+        } else if (lasreadopener.is_buffered()) {
           laserror("cannot edit header of buffered input");
           edit_header = false;
         }
         const CHAR* file_name = lasreadopener.get_file_name(lasreadopener.get_file_name_current());
         if ((strstr(file_name, ".laz") == 0) && (strstr(file_name, ".las") == 0) && (strstr(file_name, ".LAZ") == 0) &&
-            (strstr(file_name, ".LAS") == 0))
-        {
+            (strstr(file_name, ".LAS") == 0)) {
           laserror("can only edit for LAS or LAZ files, not for '%s'", file_name);
           edit_header = false;
         }
-        if (set_file_source_ID_from_point_source_ID)
-        {
+        if (set_file_source_ID_from_point_source_ID) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
-          if (lasreader == 0)
-          {
+          if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
-          if (lasreader->read_point())
-          {
+          if (lasreader->read_point()) {
             set_file_source_ID = lasreader->point.get_point_source_ID();
-          }
-          else
-          {
+          } else {
             set_file_source_ID = -1;
           }
           lasreader->close();
           delete lasreader;
         }
         I64 set_vlr_user_id_pos = -1;
-        if (set_vlr_user_id_index != -1)
-        {
+        if (set_vlr_user_id_index != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
-          if (lasreader == 0)
-          {
+          if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
-          if (set_vlr_user_id_index < (I32)lasreader->header.number_of_variable_length_records)
-          {
+          if (set_vlr_user_id_index < (I32)lasreader->header.number_of_variable_length_records) {
             I64 pos = lasreader->header.header_size;
-            for (i = 0; i < (int)set_vlr_user_id_index; i++)
-            {
+            for (i = 0; i < (int)set_vlr_user_id_index; i++) {
               pos += 54;
               pos += lasreader->header.vlrs[i].record_length_after_header;
             }
             set_vlr_user_id_pos = pos + 2;
-          }
-          else
-          {
+          } else {
             LASMessage(LAS_INFO, "SKIPPING: cannot set user_ID of VLR with index %d for file '%s'", set_vlr_user_id_index, file_name);
           }
           lasreader->close();
           delete lasreader;
         }
         I64 set_vlr_record_id_pos = -1;
-        if (set_vlr_record_id_index != -1)
-        {
+        if (set_vlr_record_id_index != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
-          if (lasreader == 0)
-          {
+          if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
-          if (set_vlr_record_id_index < (I32)lasreader->header.number_of_variable_length_records)
-          {
+          if (set_vlr_record_id_index < (I32)lasreader->header.number_of_variable_length_records) {
             I64 pos = lasreader->header.header_size;
-            for (i = 0; i < (int)set_vlr_record_id_index; i++)
-            {
+            for (i = 0; i < (int)set_vlr_record_id_index; i++) {
               pos += 54;
               pos += lasreader->header.vlrs[i].record_length_after_header;
             }
             set_vlr_record_id_pos = pos + 18;
-          }
-          else
-          {
+          } else {
             LASMessage(LAS_INFO, "SKIPPING: cannot set record_ID of VLR with index %d for file '%s'", set_vlr_record_id_index, file_name);
           }
           lasreader->close();
           delete lasreader;
         }
         I64 set_vlr_description_pos = -1;
-        if (set_vlr_description_index != -1)
-        {
+        if (set_vlr_description_index != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
-          if (lasreader == 0)
-          {
+          if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
-          if (set_vlr_description_index < (I32)lasreader->header.number_of_variable_length_records)
-          {
+          if (set_vlr_description_index < (I32)lasreader->header.number_of_variable_length_records) {
             I64 pos = lasreader->header.header_size;
-            for (i = 0; i < (int)set_vlr_description_index; i++)
-            {
+            for (i = 0; i < (int)set_vlr_description_index; i++) {
               pos += 54;
               pos += lasreader->header.vlrs[i].record_length_after_header;
             }
             set_vlr_description_pos = pos + 22;
-          }
-          else
-          {
+          } else {
             LASMessage(LAS_INFO, "SKIPPING: cannot set desciption of VLR with index %d for file '%s'", set_vlr_description_index, file_name);
           }
           lasreader->close();
@@ -1157,30 +905,24 @@ class LasTool_lasinfo : public LasTool
         U32 set_geotiff_vlr_geo_double_length = 0;
         I64 set_geotiff_vlr_geo_ascii_pos = -1;
         U32 set_geotiff_vlr_geo_ascii_length = 0;
-        if (set_geotiff_epsg != -1)
-        {
+        if (set_geotiff_epsg != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
-          if (lasreader == 0)
-          {
+          if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
           I64 pos = lasreader->header.header_size;
-          for (i = 0; i < (int)lasreader->header.number_of_variable_length_records; i++)
-          {
+          for (i = 0; i < (int)lasreader->header.number_of_variable_length_records; i++) {
             pos += 54;
-            if (strcmp(lasreader->header.vlrs[i].user_id, "LASF_Projection") == 0)
-            {
+            if (strcmp(lasreader->header.vlrs[i].user_id, "LASF_Projection") == 0) {
               if (lasreader->header.vlrs[i].record_id == 34735)  // GeoKeyDirectoryTag
               {
                 set_geotiff_vlr_geo_keys_pos = pos;
                 set_geotiff_vlr_geo_keys_length = lasreader->header.vlrs[i].record_length_after_header;
-              }
-              else if (lasreader->header.vlrs[i].record_id == 34736)  // GeoDoubleParamsTag
+              } else if (lasreader->header.vlrs[i].record_id == 34736)  // GeoDoubleParamsTag
               {
                 set_geotiff_vlr_geo_double_pos = pos;
                 set_geotiff_vlr_geo_double_length = lasreader->header.vlrs[i].record_length_after_header;
-              }
-              else if (lasreader->header.vlrs[i].record_id == 34737)  // GeoAsciiParamsTag
+              } else if (lasreader->header.vlrs[i].record_id == 34737)  // GeoAsciiParamsTag
               {
                 set_geotiff_vlr_geo_ascii_pos = pos;
                 set_geotiff_vlr_geo_ascii_length = lasreader->header.vlrs[i].record_length_after_header;
@@ -1192,33 +934,24 @@ class LasTool_lasinfo : public LasTool
           delete lasreader;
         }
         FILE* file = LASfopen(file_name, "rb+");
-        if (file == 0)
-        {
+        if (file == 0) {
           laserror("could not open file '%s' for edit of header", file_name);
           edit_header = false;
-        }
-        else if (edit_header)
-        {
+        } else if (edit_header) {
           // preread header actions
-          if (header_preread)
-          {
+          if (header_preread) {
             LASreader* lasreader = lasreadopener.open(file_name, FALSE);
-            if (lasreader == 0)
-            {
+            if (lasreader == 0) {
               laserror("cannot open lasreader for '%s'", file_name);
             }
-            if (do_scale_header)
-            {
-              if (set_scale)
-              {
+            if (do_scale_header) {
+              if (set_scale) {
                 laserror("invalid combination of -set_scale and -scale_header");
               }
-              if (set_offset)
-              {
+              if (set_offset) {
                 laserror("invalid combination of -set_offset and -scale_header");
               }
-              if (set_bounding_box)
-              {
+              if (set_bounding_box) {
                 laserror("invalid combination of -set_bounding_box and -scale_header");
               }
               set_scale = new F64[3];
@@ -1254,125 +987,99 @@ class LasTool_lasinfo : public LasTool
             delete lasreader;
           }
 
-          if (set_file_source_ID != -1)
-          {
+          if (set_file_source_ID != -1) {
             U16 file_source_ID = U16_CLAMP(set_file_source_ID);
             fseek(file, 4, SEEK_SET);
             fwrite(&file_source_ID, sizeof(U16), 1, file);
           }
-          if (set_global_encoding != -1)
-          {
+          if (set_global_encoding != -1) {
             U16 global_encoding = U16_CLAMP(set_global_encoding);
             fseek(file, 6, SEEK_SET);
             fwrite(&global_encoding, sizeof(U16), 1, file);
           }
-          if (set_project_ID_GUID_data_1 != -1)
-          {
+          if (set_project_ID_GUID_data_1 != -1) {
             fseek(file, 8, SEEK_SET);
             U32 GUID_data_1 = U32_CLAMP(set_project_ID_GUID_data_1);
             U16 GUID_data_2 = U16_CLAMP(set_project_ID_GUID_data_2);
             U16 GUID_data_3 = U16_CLAMP(set_project_ID_GUID_data_3);
-            U16 GUID_data_4a = U16_CLAMP(set_project_ID_GUID_data_4a);
-            U16 GUID_data_4b_a = U16_CLAMP(set_project_ID_GUID_data_4b >> 32);
-            U32 GUID_data_4b_b = U32_CLAMP(set_project_ID_GUID_data_4b & 0xFFFFFFFF);
             fwrite(&GUID_data_1, sizeof(U32), 1, file);
             fwrite(&GUID_data_2, sizeof(U16), 1, file);
             fwrite(&GUID_data_3, sizeof(U16), 1, file);
-            fwrite(&GUID_data_4a, sizeof(U16), 1, file);
-            fwrite(&GUID_data_4b_a, sizeof(U16), 1, file);
-            fwrite(&GUID_data_4b_b, sizeof(U32), 1, file);
+            fwrite(&set_project_ID_GUID_data_4[0], 8, 1, file);
           }
-          if (set_version_major != -1)
-          {
+          if (set_version_major != -1) {
             fseek(file, 24, SEEK_SET);
             fwrite(&set_version_major, sizeof(I8), 1, file);
           }
-          if (set_version_minor != -1)
-          {
+          if (set_version_minor != -1) {
             fseek(file, 25, SEEK_SET);
             fwrite(&set_version_minor, sizeof(I8), 1, file);
           }
-          if (set_system_identifier)
-          {
+          if (set_system_identifier) {
             fseek(file, 26, SEEK_SET);
             fwrite(set_system_identifier, sizeof(I8), 32, file);
           }
-          if (set_generating_software)
-          {
+          if (set_generating_software) {
             fseek(file, 58, SEEK_SET);
             fwrite(set_generating_software, sizeof(I8), 32, file);
           }
-          if (set_creation_day != -1)
-          {
+          if (set_creation_day != -1) {
             U16 creation_day = U16_CLAMP(set_creation_day);
             fseek(file, 90, SEEK_SET);
             fwrite(&creation_day, sizeof(U16), 1, file);
           }
-          if (set_creation_year != -1)
-          {
+          if (set_creation_year != -1) {
             U16 creation_year = U16_CLAMP(set_creation_year);
             fseek(file, 92, SEEK_SET);
             fwrite(&creation_year, sizeof(U16), 1, file);
           }
-          if (set_header_size)
-          {
+          if (set_header_size) {
             fseek(file, 94, SEEK_SET);
             fwrite(&set_header_size, sizeof(U16), 1, file);
           }
-          if (set_offset_to_point_data)
-          {
+          if (set_offset_to_point_data) {
             fseek(file, 96, SEEK_SET);
             fwrite(&set_offset_to_point_data, sizeof(U32), 1, file);
           }
-          if (set_number_of_variable_length_records != -1)
-          {
+          if (set_number_of_variable_length_records != -1) {
             fseek(file, 100, SEEK_SET);
             fwrite(&set_number_of_variable_length_records, sizeof(U32), 1, file);
           }
-          if (set_point_data_format != -1)
-          {
+          if (set_point_data_format != -1) {
             U8 point_data_format = U8_CLAMP(set_point_data_format);
             fseek(file, 104, SEEK_SET);
             fwrite(&point_data_format, sizeof(U8), 1, file);
           }
-          if (set_point_data_record_length != -1)
-          {
+          if (set_point_data_record_length != -1) {
             U16 point_data_record_length = U16_CLAMP(set_point_data_record_length);
             fseek(file, 105, SEEK_SET);
             fwrite(&point_data_record_length, sizeof(U16), 1, file);
           }
-          if (set_number_of_point_records != -1)
-          {
+          if (set_number_of_point_records != -1) {
             fseek(file, 107, SEEK_SET);
             fwrite(&set_number_of_point_records, sizeof(I32), 1, file);
           }
-          if (set_number_of_points_by_return[0] != -1)
-          {
+          if (set_number_of_points_by_return[0] != -1) {
             fseek(file, 111, SEEK_SET);
             fwrite(&(set_number_of_points_by_return[0]), sizeof(I32), 1, file);
           }
-          if (set_number_of_points_by_return[1] != -1)
-          {
+          if (set_number_of_points_by_return[1] != -1) {
             fseek(file, 115, SEEK_SET);
             fwrite(&(set_number_of_points_by_return[1]), sizeof(I32), 1, file);
           }
-          if (set_number_of_points_by_return[2] != -1)
-          {
+          if (set_number_of_points_by_return[2] != -1) {
             fseek(file, 119, SEEK_SET);
             fwrite(&(set_number_of_points_by_return[2]), sizeof(I32), 1, file);
           }
-          if (set_number_of_points_by_return[3] != -1)
-          {
+          if (set_number_of_points_by_return[3] != -1) {
             fseek(file, 123, SEEK_SET);
             fwrite(&(set_number_of_points_by_return[3]), sizeof(I32), 1, file);
           }
-          if (set_number_of_points_by_return[4] != -1)
-          {
+          if (set_number_of_points_by_return[4] != -1) {
             fseek(file, 127, SEEK_SET);
             fwrite(&(set_number_of_points_by_return[4]), sizeof(I32), 1, file);
           }
-          if (set_scale)
-          {
+          if (set_scale) {
             fseek(file, 131, SEEK_SET);
             fwrite(set_scale, 3 * sizeof(F64), 1, file);
             if (do_scale_header)  // clear offset on file-based-offset
@@ -1381,8 +1088,7 @@ class LasTool_lasinfo : public LasTool
               set_scale = 0;
             }
           }
-          if (set_offset)
-          {
+          if (set_offset) {
             fseek(file, 155, SEEK_SET);
             fwrite(set_offset, 3 * sizeof(F64), 1, file);
             if (do_scale_header)  // clear offset on file-based-offset
@@ -1391,8 +1097,7 @@ class LasTool_lasinfo : public LasTool
               set_offset = 0;
             }
           }
-          if (set_bounding_box)
-          {
+          if (set_bounding_box) {
             fseek(file, 179, SEEK_SET);
             fwrite(set_bounding_box, 6 * sizeof(F64), 1, file);
             if (do_scale_header)  // clear bb on file-based-bb
@@ -1401,75 +1106,55 @@ class LasTool_lasinfo : public LasTool
               set_bounding_box = 0;
             }
           }
-          if (set_start_of_waveform_data_packet_record != -1)
-          {
+          if (set_start_of_waveform_data_packet_record != -1) {
             fseek(file, 227, SEEK_SET);
             fwrite(&set_start_of_waveform_data_packet_record, sizeof(I64), 1, file);
           }
-          if (set_vlr_user_id_index != -1)
-          {
-            if (set_vlr_user_id_pos != -1)
-            {
+          if (set_vlr_user_id_index != -1) {
+            if (set_vlr_user_id_pos != -1) {
               fseek(file, (long)set_vlr_user_id_pos, SEEK_SET);
               I32 len = (I32)strlen(set_vlr_user_id);
-              for (i = 0; i < 16; i++)
-              {
-                if (i < len)
-                {
+              for (i = 0; i < 16; i++) {
+                if (i < len) {
                   fputc(set_vlr_user_id[i], file);
-                }
-                else
-                {
+                } else {
                   fputc(0, file);
                 }
               }
             }
           }
-          if (set_vlr_record_id_index != -1)
-          {
-            if (set_vlr_record_id_pos != -1)
-            {
+          if (set_vlr_record_id_index != -1) {
+            if (set_vlr_record_id_pos != -1) {
               fseek(file, (long)set_vlr_record_id_pos, SEEK_SET);
               U16 record_id = (U16)set_vlr_record_id;
               fwrite(&record_id, sizeof(U16), 1, file);
             }
           }
-          if (set_vlr_description_index != -1)
-          {
-            if (set_vlr_description_pos != -1)
-            {
+          if (set_vlr_description_index != -1) {
+            if (set_vlr_description_pos != -1) {
               fseek(file, (long)set_vlr_description_pos, SEEK_SET);
               I32 len = (I32)strlen(set_vlr_description);
-              for (i = 0; i < 32; i++)
-              {
-                if (i < len)
-                {
+              for (i = 0; i < 32; i++) {
+                if (i < len) {
                   fputc(set_vlr_description[i], file);
-                }
-                else
-                {
+                } else {
                   fputc(0, file);
                 }
               }
             }
           }
-          if (set_geotiff_epsg != -1)
-          {
-            if (set_geotiff_vlr_geo_keys_pos != -1)
-            {
+          if (set_geotiff_epsg != -1) {
+            if (set_geotiff_vlr_geo_keys_pos != -1) {
               GeoProjectionConverter geo;
-              if (geo.set_epsg_code(set_geotiff_epsg))
-              {
+              if (geo.set_epsg_code(set_geotiff_epsg)) {
                 int number_of_keys;
                 GeoProjectionGeoKeys* geo_keys = 0;
                 int num_geo_double_params;
                 double* geo_double_params = 0;
-                if (geo.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params))
-                {
+                if (geo.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params)) {
                   U32 set_geotiff_vlr_geo_keys_new_length = sizeof(GeoProjectionGeoKeys) * (number_of_keys + 1);
 
-                  if (set_geotiff_vlr_geo_keys_new_length <= set_geotiff_vlr_geo_keys_length)
-                  {
+                  if (set_geotiff_vlr_geo_keys_new_length <= set_geotiff_vlr_geo_keys_length) {
                     fseek(file, (long)set_geotiff_vlr_geo_keys_pos, SEEK_SET);
                     LASvlr_geo_keys vlr_geo_key_directory;
                     vlr_geo_key_directory.key_directory_version = 1;
@@ -1478,50 +1163,37 @@ class LasTool_lasinfo : public LasTool
                     vlr_geo_key_directory.number_of_keys = number_of_keys;
                     fwrite(&vlr_geo_key_directory, sizeof(LASvlr_geo_keys), 1, file);
                     fwrite(geo_keys, sizeof(GeoProjectionGeoKeys), number_of_keys, file);
-                    for (i = set_geotiff_vlr_geo_keys_new_length; i < (int)set_geotiff_vlr_geo_keys_length; i++)
-                    {
+                    for (i = set_geotiff_vlr_geo_keys_new_length; i < (int)set_geotiff_vlr_geo_keys_length; i++) {
                       fputc(0, file);
                     }
 
-                    if (set_geotiff_vlr_geo_double_pos != -1)
-                    {
+                    if (set_geotiff_vlr_geo_double_pos != -1) {
                       fseek(file, (long)set_geotiff_vlr_geo_double_pos, SEEK_SET);
-                      for (i = 0; i < (int)set_geotiff_vlr_geo_double_length; i++)
-                      {
+                      for (i = 0; i < (int)set_geotiff_vlr_geo_double_length; i++) {
                         fputc(0, file);
                       }
                     }
 
-                    if (set_geotiff_vlr_geo_ascii_pos != -1)
-                    {
+                    if (set_geotiff_vlr_geo_ascii_pos != -1) {
                       fseek(file, (long)set_geotiff_vlr_geo_ascii_pos, SEEK_SET);
-                      for (i = 0; i < (int)set_geotiff_vlr_geo_ascii_length; i++)
-                      {
+                      for (i = 0; i < (int)set_geotiff_vlr_geo_ascii_length; i++) {
                         fputc(0, file);
                       }
                     }
-                  }
-                  else
-                  {
+                  } else {
                     LASMessage(
                         LAS_WARNING, "cannot set EPSG to %u because file '%s' has not enough header space for GeoTIFF tags", set_geotiff_epsg,
                         file_name);
                   }
-                }
-                else
-                {
+                } else {
                   LASMessage(LAS_WARNING, "cannot set EPSG in GeoTIFF tags of because no GeoTIFF tags available for code %u", set_geotiff_epsg);
                   set_geotiff_epsg = -1;
                 }
-              }
-              else
-              {
+              } else {
                 LASMessage(LAS_WARNING, "cannot set EPSG in GeoTIFF tags of because code %u is unknown", set_geotiff_epsg);
                 set_geotiff_epsg = -1;
               }
-            }
-            else
-            {
+            } else {
               LASMessage(LAS_WARNING, "cannot set EPSG to %u because file '%s' has no GeoTIFF tags", set_geotiff_epsg, file_name);
             }
           }
@@ -1532,33 +1204,27 @@ class LasTool_lasinfo : public LasTool
 
       // open lasreader
       lasreader = lasreadopener.open();
-      if (lasreader == 0)
-      {
+      if (lasreader == 0) {
         laserror("cannot open lasreader");
       }
 
-      if (delete_empty && lasreadopener.get_file_name())
-      {
+      if (delete_empty && lasreadopener.get_file_name()) {
 #ifdef _WIN32
         LASMessage(LAS_VERBOSE, "delete check for '%s' with %lld points", lasreadopener.get_file_name(), lasreader->npoints);
 #else
         laserror("deleting not implemented ...");
 #endif
-        if (lasreader->npoints == 0)
-        {
+        if (lasreader->npoints == 0) {
           lasreader->close();
 
           char command[4096];
           snprintf(command, sizeof(command), "del \"%s\"", lasreadopener.get_file_name());
           LASMessage(LAS_VERBOSE, "executing '%s'", command);
 
-          if (system(command) != 0)
-          {
+          if (system(command) != 0) {
             laserror("failed to execute '%s'", command);
           }
-        }
-        else
-        {
+        } else {
           lasreader->close();
         }
 
@@ -1568,8 +1234,7 @@ class LasTool_lasinfo : public LasTool
 
       lasheader = &lasreader->header;
 
-      if (base_name && lasreadopener.get_file_name())
-      {
+      if (base_name && lasreadopener.get_file_name()) {
         lasreader->close();
 
 #ifdef _WIN32
@@ -1579,14 +1244,11 @@ class LasTool_lasinfo : public LasTool
 #endif
 
         char command[4096];
-        if (strlen(base_name))
-        {
+        if (strlen(base_name)) {
           snprintf(
               command, sizeof(command), "rename \"%s\" \"%s_%d_%d.xxx\"", lasreadopener.get_file_name(), base_name, I32_QUANTIZE(lasheader->min_x),
               I32_QUANTIZE(lasheader->min_y));
-        }
-        else
-        {
+        } else {
           snprintf(
               command, sizeof(command), "rename \"%s\" \"%d_%d.xxx\"", lasreadopener.get_file_name(), I32_QUANTIZE(lasheader->min_x),
               I32_QUANTIZE(lasheader->min_y));
@@ -1600,8 +1262,7 @@ class LasTool_lasinfo : public LasTool
 
         LASMessage(LAS_VERBOSE, "executing '%s'", command);
 
-        if (system(command) != 0)
-        {
+        if (system(command) != 0) {
           laserror("failed to execute '%s'", command);
         }
         continue;
@@ -1610,8 +1271,7 @@ class LasTool_lasinfo : public LasTool
       LASMessage(
           LAS_VERBOSE, "%s '%s' with %lld points", (repair_bb || repair_counters ? "repairing" : "reading"),
           (lasreadopener.get_file_name() ? lasreadopener.get_file_name() : "stdin"), lasreader->npoints);
-      if (auto_date_creation && lasreadopener.get_file_name())
-      {
+      if (auto_date_creation && lasreadopener.get_file_name()) {
 #ifdef _WIN32
         WIN32_FILE_ATTRIBUTE_DATA attr;
         SYSTEMTIME creation;
@@ -1626,32 +1286,27 @@ class LasTool_lasinfo : public LasTool
 #endif
       }
 
-      if (laswriteopener.get_file_name() == 0)
-      {
-        if (lasreadopener.get_file_name() && ((laswriteopener.get_format() == LAS_TOOLS_FORMAT_TXT || laswriteopener.get_format() == LAS_TOOLS_FORMAT_JSON)))
-        {
+      if (laswriteopener.get_file_name() == 0) {
+        if (lasreadopener.get_file_name() &&
+            ((laswriteopener.get_format() == LAS_TOOLS_FORMAT_TXT || laswriteopener.get_format() == LAS_TOOLS_FORMAT_JSON))) {
           laswriteopener.make_file_name(lasreadopener.get_file_name(), -2);
         }
       }
 
-      if (laswriteopener.get_file_name())
-      {
+      if (laswriteopener.get_file_name()) {
         // make sure we do not corrupt the input file
-        if (lasreadopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
-        {
+        if (lasreadopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0)) {
           laserror("input and output file name for '%s' are identical", lasreadopener.get_file_name());
         }
         // open the text output file
         file_out = LASfopen(laswriteopener.get_file_name(), "w");
-        if (file_out == 0)
-        {
+        if (file_out == 0) {
           LASMessage(LAS_WARNING, "could not open output text file '%s'", laswriteopener.get_file_name());
           file_out = stderr;
         }
       }
       // If a json output file was specified in the call, the las info is also compiled in json format.
-      if (laswriteopener.get_file_name() && laswriteopener.get_format() == LAS_TOOLS_FORMAT_JSON)
-      {
+      if (laswriteopener.get_file_name() && laswriteopener.get_format() == LAS_TOOLS_FORMAT_JSON) {
         json_out = true;
       }
 
@@ -1698,10 +1353,13 @@ class LasTool_lasinfo : public LasTool
           if (lasreader->npoints > number_of_point_records) {
             if (json_out) {
               char buffer[256];
-              snprintf(buffer, sizeof(buffer), "merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.\012", lasreader->npoints, lasreader->header.version_minor);
+              snprintf(
+                  buffer, sizeof(buffer), "merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.\012",
+                  lasreader->npoints, lasreader->header.version_minor);
               json_sub_main_header_entries["warnings"].push_back(buffer);
             } else {
-              fprintf(file_out, "WARNING: merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.\012", lasreader->npoints,
+              fprintf(
+                  file_out, "WARNING: merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.\012", lasreader->npoints,
                   lasreader->header.version_minor);
             }
           }
@@ -1710,14 +1368,8 @@ class LasTool_lasinfo : public LasTool
           json_sub_main_header_entries["file_signature"] = std::string(lasheader->file_signature).substr(0, 4);
           json_sub_main_header_entries["file_source_id"] = lasheader->file_source_ID;
           json_sub_main_header_entries["global_encoding"] = lasheader->global_encoding;
-          char guid_buffer[256];
-          snprintf( guid_buffer, sizeof(guid_buffer), "%08X-%04X-%04X-%04X-%04X%08X", lasheader->project_ID_GUID_data_1, lasheader->project_ID_GUID_data_2,
-              lasheader->project_ID_GUID_data_3, *((U16*)(lasheader->project_ID_GUID_data_4)), *((U16*)(lasheader->project_ID_GUID_data_4 + 2)),
-              *((U32*)(lasheader->project_ID_GUID_data_4 + 4)));
-          json_sub_main_header_entries["project_id_guid_data"] = std::string(guid_buffer);
-          char version_buffer[16];
-          snprintf(version_buffer, sizeof(version_buffer), "%d.%d", lasheader->version_major, lasheader->version_minor);
-          json_sub_main_header_entries["version_major_minor"] = version_buffer;
+          json_sub_main_header_entries["project_id_guid_data"] = lasheader->get_GUID();
+          json_sub_main_header_entries["version_major_minor"] = lasheader->get_version();
           json_sub_main_header_entries["system_identifier"] = std::string(lasheader->system_identifier).substr(0, 32);
           json_sub_main_header_entries["generating_software"] = std::string(lasheader->generating_software).substr(0, 32);
           json_sub_main_header_entries["file_creation_day"] = lasheader->file_creation_day;
@@ -1768,10 +1420,8 @@ class LasTool_lasinfo : public LasTool
           fprintf(file_out, "  file signature:             '%.4s'\012", lasheader->file_signature);
           fprintf(file_out, "  file source ID:             %d\012", lasheader->file_source_ID);
           fprintf(file_out, "  global_encoding:            %d\012", lasheader->global_encoding);
-          fprintf(file_out, "  project ID GUID data 1-4:   %08X-%04X-%04X-%04X-%04X%08X\012", lasheader->project_ID_GUID_data_1,
-              lasheader->project_ID_GUID_data_2, lasheader->project_ID_GUID_data_3, *((U16*)(lasheader->project_ID_GUID_data_4)),
-              *((U16*)(lasheader->project_ID_GUID_data_4 + 2)), *((U32*)(lasheader->project_ID_GUID_data_4 + 4)));
-          fprintf(file_out, "  version major.minor:        %d.%d\012", lasheader->version_major, lasheader->version_minor);
+          fprintf(file_out, "  project ID GUID data 1-4:   %s\012", lasheader->get_GUID().c_str());
+          fprintf(file_out, "  version major.minor:        %s\012", lasheader->get_version().c_str());
           fprintf(file_out, "  system identifier:          '%.32s'\012", lasheader->system_identifier);
           fprintf(file_out, "  generating software:        '%.32s'\012", lasheader->generating_software);
           fprintf(file_out, "  file creation day/year:     %d/%d\012", lasheader->file_creation_day, lasheader->file_creation_year);
@@ -1781,7 +1431,8 @@ class LasTool_lasinfo : public LasTool
           fprintf(file_out, "  point data format:          %d\012", lasheader->point_data_format);
           fprintf(file_out, "  point data record length:   %d\012", lasheader->point_data_record_length);
           fprintf(file_out, "  number of point records:    %u\012", lasheader->number_of_point_records);
-          fprintf(file_out, "  number of points by return: %u %u %u %u %u\012", lasheader->number_of_points_by_return[0],
+          fprintf(
+              file_out, "  number of points by return: %u %u %u %u %u\012", lasheader->number_of_points_by_return[0],
               lasheader->number_of_points_by_return[1], lasheader->number_of_points_by_return[2], lasheader->number_of_points_by_return[3],
               lasheader->number_of_points_by_return[4]);
           fprintf(file_out, "  scale factor x y z:         ");
@@ -1826,7 +1477,7 @@ class LasTool_lasinfo : public LasTool
           }
         }
         if (!no_warnings && !valid_resolution(lasheader->min_y, lasheader->y_offset, lasheader->y_scale_factor)) {
-          if (json_out){
+          if (json_out) {
             char buffer[256];
             lidardouble2string(printstring, lasheader->min_y);
             snprintf(buffer, sizeof(buffer), "Stored resolution of min_y not compatible with y_offset and y_scale_factor: %s", printstring);
@@ -1888,7 +1539,7 @@ class LasTool_lasinfo : public LasTool
         if ((lasheader->version_major == 1) && (lasheader->version_minor >= 3)) {
           if (json_out) {
             json_sub_main_header_entries["start_record_waveform_data_packet"] = lasheader->start_of_waveform_data_packet_record;
-          } else {        
+          } else {
             fprintf(file_out, "  start of waveform data packet record: %lld\012", lasheader->start_of_waveform_data_packet_record);
           }
         }
@@ -1902,11 +1553,13 @@ class LasTool_lasinfo : public LasTool
               json_extended_points.push_back(lasheader->extended_number_of_points_by_return[i]);
             }
             json_sub_main_header_entries["extended_number_of_points_by_return"] = json_extended_points;
-          } else { 
-            fprintf(file_out, "  start of first extended variable length record: %lld\012", lasheader->start_of_first_extended_variable_length_record);
+          } else {
+            fprintf(
+                file_out, "  start of first extended variable length record: %lld\012", lasheader->start_of_first_extended_variable_length_record);
             fprintf(file_out, "  number of extended_variable length records: %d\012", lasheader->number_of_extended_variable_length_records);
             fprintf(file_out, "  extended number of point records: %lld\012", lasheader->extended_number_of_point_records);
-            fprintf(file_out, "  extended number of points by return: %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld\012",
+            fprintf(
+                file_out, "  extended number of points by return: %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld %lld\012",
                 lasheader->extended_number_of_points_by_return[0], lasheader->extended_number_of_points_by_return[1],
                 lasheader->extended_number_of_points_by_return[2], lasheader->extended_number_of_points_by_return[3],
                 lasheader->extended_number_of_points_by_return[4], lasheader->extended_number_of_points_by_return[5],
@@ -1920,11 +1573,11 @@ class LasTool_lasinfo : public LasTool
         if (lasheader->user_data_in_header_size) {
           if (json_out) {
             json_sub_main_header_entries["user_defined_bytes"] = lasheader->user_data_in_header_size;
-          } else { 
+          } else {
             fprintf(file_out, "the header contains %u user-defined bytes\012", lasheader->user_data_in_header_size);
           }
         }
-        if (json_out && !json_sub_main_header_entries.is_null())  json_sub_main["las_header_entries"] = json_sub_main_header_entries;
+        if (json_out && !json_sub_main_header_entries.is_null()) json_sub_main["las_header_entries"] = json_sub_main_header_entries;
       }
       // maybe print variable header
       if (file_out && !no_variable_header) {
@@ -1951,16 +1604,18 @@ class LasTool_lasinfo : public LasTool
           // special handling for known variable header tags
 
           if ((strcmp(lasheader->vlrs[i].user_id, "LASF_Projection") == 0) && (lasheader->vlrs[i].data != 0)) {
-            if (lasheader->vlrs[i].record_id == 34735) { // GeoKeyDirectoryTag
+            if (lasheader->vlrs[i].record_id == 34735) {  // GeoKeyDirectoryTag
               if (json_out) {
                 json_vlr_record["geo_key_directory_tag"];
                 char buffer[256];
-                snprintf(buffer, sizeof(buffer), "%d.%d.%d", lasheader->vlr_geo_keys->key_directory_version,
-                    lasheader->vlr_geo_keys->key_revision, lasheader->vlr_geo_keys->minor_revision);
+                snprintf(
+                    buffer, sizeof(buffer), "%d.%d.%d", lasheader->vlr_geo_keys->key_directory_version, lasheader->vlr_geo_keys->key_revision,
+                    lasheader->vlr_geo_keys->minor_revision);
                 json_vlr_record["geo_key_directory_tag"]["geo_key_version"] = buffer;
                 json_vlr_record["geo_key_directory_tag"]["number_of_keys"] = lasheader->vlr_geo_keys->number_of_keys;
               } else {
-                fprintf(file_out, "    GeoKeyDirectoryTag version %d.%d.%d number of keys %d\012", lasheader->vlr_geo_keys->key_directory_version,
+                fprintf(
+                    file_out, "    GeoKeyDirectoryTag version %d.%d.%d number of keys %d\012", lasheader->vlr_geo_keys->key_directory_version,
                     lasheader->vlr_geo_keys->key_revision, lasheader->vlr_geo_keys->minor_revision, lasheader->vlr_geo_keys->number_of_keys);
               }
 
@@ -2014,8 +1669,7 @@ class LasTool_lasinfo : public LasTool
                         default:
                           if (json_out) {
                             char buffer[256];
-                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented",
-                              lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["gt_model_type_geo_key"] = buffer;
                           } else {
                             fprintf(
@@ -2347,7 +2001,9 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geographic_type_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "GeographicTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            fprintf(
+                                file_out, "GeographicTypeGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
@@ -2625,7 +2281,9 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_geodetic_datum_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "GeogGeodeticDatumGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            fprintf(
+                                file_out, "GeogGeodeticDatumGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
@@ -2658,7 +2316,9 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_prime_meridian_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "GeogPrimeMeridianGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            fprintf(
+                                file_out, "GeogPrimeMeridianGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
@@ -2776,17 +2436,21 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_linear_units_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "GeogLinearUnitsGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            fprintf(
+                                file_out, "GeogLinearUnitsGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
                     case 2053:  // GeogLinearUnitSizeGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["geog_linear_unit_size_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["geog_linear_unit_size_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "GeogLinearUnitSizeGeoKey: %.10g\012",
-                            lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "GeogLinearUnitSizeGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
@@ -2854,22 +2518,26 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_angular_units_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "GeogAngularUnitsGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            fprintf(
+                                file_out, "GeogAngularUnitsGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
                     case 2055:  // GeogAngularUnitSizeGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["geog_angular_unit_size_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["geog_angular_unit_size_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "GeogAngularUnitSizeGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "GeogAngularUnitSizeGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 2056:  // GeogEllipsoidGeoKey
-                      switch (lasreader->header.vlr_geo_key_entries[j].value_offset)
-                      {
+                      switch (lasreader->header.vlr_geo_key_entries[j].value_offset) {
                         case 32767:  // user-defined
                           if (json_out) {
                             json_geo_key_entry["geog_ellipsoid_geo_key"] = "user-defined";
@@ -3051,34 +2719,45 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_ellipsoid_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "GeogEllipsoidGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            fprintf(
+                                file_out, "GeogEllipsoidGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
                     case 2057:  // GeogSemiMajorAxisGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["geog_semi_major_axis_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["geog_semi_major_axis_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else if (lasreader->header.vlr_geo_double_params) {
-                          fprintf(file_out, "GeogSemiMajorAxisGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "GeogSemiMajorAxisGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 2058:  // GeogSemiMinorAxisGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["geog_semi_minor_axis_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["geog_semi_minor_axis_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else if (lasreader->header.vlr_geo_double_params) {
-                          fprintf(file_out, "GeogSemiMinorAxisGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "GeogSemiMinorAxisGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 2059:  // GeogInvFlatteningGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["geog_inv_flattening_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["geog_inv_flattening_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else if (lasreader->header.vlr_geo_double_params) {
-                          fprintf(file_out, "GeogInvFlatteningGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "GeogInvFlatteningGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
@@ -3146,16 +2825,21 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_azimuth_units_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "GeogAzimuthUnitsGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            fprintf(
+                                file_out, "GeogAzimuthUnitsGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
                     case 2061:  // GeogPrimeMeridianLongGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["geog_prime_meridian_long_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["geog_prime_meridian_long_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else if (lasreader->header.vlr_geo_double_params) {
-                          fprintf(file_out, "GeogPrimeMeridianLongGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "GeogPrimeMeridianLongGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
@@ -3164,14 +2848,18 @@ class LasTool_lasinfo : public LasTool
                         case 3:
                           if (lasreader->header.vlr_geo_double_params) {
                             if (json_out) {
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10));
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 1], 10));
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 2], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 1], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 2], 10));
                             } else {
-                              fprintf(file_out, "GeogTOWGS84GeoKey: TOWGS84[%.10g,%.10g,%.10g]\012",
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset],
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 1],
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 2]);
+                              fprintf(
+                                  file_out, "GeogTOWGS84GeoKey: TOWGS84[%.10g,%.10g,%.10g]\012",
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset],
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 1],
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 2]);
                             }
                           } else {
                             if (json_out) {
@@ -3184,22 +2872,30 @@ class LasTool_lasinfo : public LasTool
                         case 7:
                           if (lasreader->header.vlr_geo_double_params) {
                             if (json_out) {
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10));
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 1], 10));
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 2], 10));
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 3], 10));
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 4], 10));
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 5], 10));
-                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 6], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 1], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 2], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 3], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 4], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 5], 10));
+                              json_geo_key_entry["geog_towgs84_geo_key"].push_back(round_to_decimals(
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 6], 10));
                             } else {
-                              fprintf(file_out, "GeogTOWGS84GeoKey: TOWGS84[%.10g,%.10g,%.10g,%.10g,%.10g,%.10g,%.10g]\012",
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset],
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 1],
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 2],
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 3],
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 4],
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 5],
-                                lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 6]);
+                              fprintf(
+                                  file_out, "GeogTOWGS84GeoKey: TOWGS84[%.10g,%.10g,%.10g,%.10g,%.10g,%.10g,%.10g]\012",
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset],
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 1],
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 2],
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 3],
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 4],
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 5],
+                                  lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset + 6]);
                             }
                           } else {
                             if (json_out) {
@@ -3215,7 +2911,9 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for type %d not implemented", lasreader->header.vlr_geo_key_entries[j].count);
                             json_geo_key_entry["geog_towgs84_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "GeogTOWGS84GeoKey: look-up for type %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].count);
+                            fprintf(
+                                file_out, "GeogTOWGS84GeoKey: look-up for type %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].count);
                           }
                       }
                       break;
@@ -3234,7 +2932,9 @@ class LasTool_lasinfo : public LasTool
                           snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                           json_geo_key_entry["projected_cs_type_geo_key"] = buffer;
                         } else {
-                          fprintf(file_out, "ProjectedCSTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                          fprintf(
+                              file_out, "ProjectedCSTypeGeoKey: look-up for %d not implemented\012",
+                              lasreader->header.vlr_geo_key_entries[j].value_offset);
                         }
                       }
                       break;
@@ -3262,8 +2962,9 @@ class LasTool_lasinfo : public LasTool
                         } else {
                           fprintf(file_out, "ProjectionGeoKey: Proj_UTM_zone_%dN\012", lasreader->header.vlr_geo_key_entries[j].value_offset - 16000);
                         }
-                      } else if ((16101 <= lasreader->header.vlr_geo_key_entries[j].value_offset) &&
-                                (lasreader->header.vlr_geo_key_entries[j].value_offset <= 16160)) {
+                      } else if (
+                          (16101 <= lasreader->header.vlr_geo_key_entries[j].value_offset) &&
+                          (lasreader->header.vlr_geo_key_entries[j].value_offset <= 16160)) {
                         if (json_out) {
                           char buffer[100];
                           snprintf(buffer, sizeof(buffer), "Proj_UTM_zone_%dS", lasreader->header.vlr_geo_key_entries[j].value_offset - 16100);
@@ -5376,10 +5077,13 @@ class LasTool_lasinfo : public LasTool
                           default:
                             if (json_out) {
                               char buffer[100];
-                              snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                              snprintf(
+                                  buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                               json_geo_key_entry["projection_geo_key"] = buffer;
                             } else {
-                              fprintf(file_out, "ProjectionGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                              fprintf(
+                                  file_out, "ProjectionGeoKey: look-up for %d not implemented\012",
+                                  lasreader->header.vlr_geo_key_entries[j].value_offset);
                             }
                         }
                       }
@@ -5582,7 +5286,8 @@ class LasTool_lasinfo : public LasTool
                             json_geo_key_entry["proj_coord_trans_geo_key"] = buffer;
                           } else {
                             fprintf(
-                              file_out, "ProjCoordTransGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                                file_out, "ProjCoordTransGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
@@ -5700,178 +5405,237 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["proj_linear_units_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "ProjLinearUnitsGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            fprintf(
+                                file_out, "ProjLinearUnitsGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
                     case 3077:  // ProjLinearUnitSizeGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_linear_unit_size_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_linear_unit_size_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjLinearUnitSizeGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjLinearUnitSizeGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3078:  // ProjStdParallel1GeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_std_parallel1_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_std_parallel1_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjStdParallel1GeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjStdParallel1GeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3079:  // ProjStdParallel2GeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                           json_geo_key_entry["proj_std_parallel2_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_std_parallel2_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjStdParallel2GeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjStdParallel2GeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3080:  // ProjNatOriginLongGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_nat_origin_long_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_nat_origin_long_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjNatOriginLongGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjNatOriginLongGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3081:  // ProjNatOriginLatGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_nat_origin_lat_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_nat_origin_lat_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjNatOriginLatGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjNatOriginLatGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3082:  // ProjFalseEastingGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_false_easting_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_false_easting_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjFalseEastingGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjFalseEastingGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3083:  // ProjFalseNorthingGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_false_northing_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_false_northing_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjFalseNorthingGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjFalseNorthingGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3084:  // ProjFalseOriginLongGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_false_origin_long_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_false_origin_long_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjFalseOriginLongGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjFalseOriginLongGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3085:  // ProjFalseOriginLatGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_false_origin_lat_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_false_origin_lat_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjFalseOriginLatGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjFalseOriginLatGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3086:  // ProjFalseOriginEastingGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_false_origin_easting_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_false_origin_easting_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjFalseOriginEastingGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjFalseOriginEastingGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3087:  // ProjFalseOriginNorthingGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_false_origin_northing_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_false_origin_northing_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjFalseOriginNorthingGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjFalseOriginNorthingGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3088:  // ProjCenterLongGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_center_long_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_center_long_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjCenterLongGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjCenterLongGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3089:  // ProjCenterLatGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_center_lat_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_center_lat_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjCenterLatGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjCenterLatGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3090:  // ProjCenterEastingGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_center_easting_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_center_easting_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjCenterEastingGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjCenterEastingGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3091:  // ProjCenterNorthingGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_center_northing_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_center_northing_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjCenterNorthingGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjCenterNorthingGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3092:  // ProjScaleAtNatOriginGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_scale_at_nat_origin_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_scale_at_nat_origin_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjScaleAtNatOriginGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjScaleAtNatOriginGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3093:  // ProjScaleAtCenterGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_scale_at_center_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_scale_at_center_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjScaleAtCenterGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjScaleAtCenterGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3094:  // ProjAzimuthAngleGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_azimuth_angle_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_azimuth_angle_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjAzimuthAngleGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjAzimuthAngleGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
                     case 3095:  // ProjStraightVertPoleLongGeoKey
                       if (lasreader->header.vlr_geo_double_params) {
                         if (json_out) {
-                          json_geo_key_entry["proj_straight_vert_pole_long_geo_key"] = round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
+                          json_geo_key_entry["proj_straight_vert_pole_long_geo_key"] =
+                              round_to_decimals(lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset], 10);
                         } else {
-                          fprintf(file_out, "ProjStraightVertPoleLongGeoKey: %.10g\012", lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
+                          fprintf(
+                              file_out, "ProjStraightVertPoleLongGeoKey: %.10g\012",
+                              lasreader->header.vlr_geo_double_params[lasreader->header.vlr_geo_key_entries[j].value_offset]);
                         }
                       }
                       break;
@@ -6286,17 +6050,19 @@ class LasTool_lasinfo : public LasTool
                           } else {
                             if (json_out) {
                               char buffer[100];
-                              snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                              snprintf(
+                                  buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                               json_geo_key_entry["vertical_cs_type_geo_key"] = buffer;
                             } else {
-                              fprintf(file_out, "VerticalCSTypeGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                              fprintf(
+                                  file_out, "VerticalCSTypeGeoKey: look-up for %d not implemented\012",
+                                  lasreader->header.vlr_geo_key_entries[j].value_offset);
                             }
                           }
                       }
                       break;
                     case 4097:  // VerticalCitationGeoKey
-                      if (lasreader->header.vlr_geo_ascii_params)
-                      {
+                      if (lasreader->header.vlr_geo_ascii_params) {
                         char dummy[256];
                         strncpy_las(
                             dummy, sizeof(dummy), &(lasreader->header.vlr_geo_ascii_params[lasreader->header.vlr_geo_key_entries[j].value_offset]),
@@ -6311,7 +6077,7 @@ class LasTool_lasinfo : public LasTool
                       break;
                     case 4098:  // VerticalDatumGeoKey
                       if (json_out) {
-                        char buffer[100]; // Puffer ohne Initialisierung
+                        char buffer[100];  // Puffer ohne Initialisierung
                         snprintf(buffer, sizeof(buffer), "Vertical Datum Codes %d", lasreader->header.vlr_geo_key_entries[j].value_offset);
                         json_geo_key_entry["vertical_datum_geo_key"] = buffer;
                       } else {
@@ -6431,7 +6197,9 @@ class LasTool_lasinfo : public LasTool
                             snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["vertical_units_geo_key"] = buffer;
                           } else {
-                            fprintf(file_out, "VerticalUnitsGeoKey: look-up for %d not implemented\012", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            fprintf(
+                                file_out, "VerticalUnitsGeoKey: look-up for %d not implemented\012",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                           }
                       }
                       break;
@@ -6452,7 +6220,7 @@ class LasTool_lasinfo : public LasTool
                 json_vlr_record["geo_double_params_tag"];
                 json_vlr_record["geo_double_params_tag"]["number_of_doubles"] = lasreader->header.vlrs[i].record_length_after_header / 8;
                 json_vlr_record["geo_double_params_tag"]["geo_params"];
-              } else {            
+              } else {
                 fprintf(file_out, "    GeoDoubleParamsTag (number of doubles %d)\012", lasreader->header.vlrs[i].record_length_after_header / 8);
                 fprintf(file_out, "      ");
               }
@@ -6464,13 +6232,12 @@ class LasTool_lasinfo : public LasTool
                 }
               }
               if (!json_out) fprintf(file_out, "\012");
-            }
-            else if (lasheader->vlrs[i].record_id == 34737) {  // GeoAsciiParamsTag
+            } else if (lasheader->vlrs[i].record_id == 34737) {  // GeoAsciiParamsTag
               if (json_out) {
                 json_vlr_record["geo_ascii_params_tag"];
                 json_vlr_record["geo_ascii_params_tag"]["number_of_characters"] = lasreader->header.vlrs[i].record_length_after_header;
                 json_vlr_record["geo_ascii_params_tag"]["geo_params"];
-              } else { 
+              } else {
                 fprintf(file_out, "    GeoAsciiParamsTag (number of characters %d)\012", lasreader->header.vlrs[i].record_length_after_header);
                 fprintf(file_out, "      ");
               }
@@ -6492,7 +6259,7 @@ class LasTool_lasinfo : public LasTool
               } else {
                 fprintf(file_out, "    WKT OGC MATH TRANSFORM:\012");
                 fprintf(file_out, "    %s\012", lasreader->header.vlrs[i].data);
-              }                      
+              }
             } else if (lasheader->vlrs[i].record_id == 2112) {  // WKT OGC COORDINATE SYSTEM
               if (json_out) {
                 json_vlr_record["wkt_ogc_coordinate_system"] = reinterpret_cast<char*>(lasreader->header.vlrs[i].data);
@@ -6556,9 +6323,10 @@ class LasTool_lasinfo : public LasTool
                       json_extra_byte["type"] = name_table[type];
                       json_extra_byte["name"] = (char*)(lasheader->vlrs[i].data + j + 4);
                       json_extra_byte["description"] = (char*)(lasheader->vlrs[i].data + j + 160);
-                      //json_vlr_record["extra_byte_descriptions"].push_back(json_extra_byte);
+                      // json_vlr_record["extra_byte_descriptions"].push_back(json_extra_byte);
                     } else {
-                      fprintf(file_out, "      data type: %d (%s), name \"%s\", description: \"%s\"", (I32)(lasheader->vlrs[i].data[j + 2]),
+                      fprintf(
+                          file_out, "      data type: %d (%s), name \"%s\", description: \"%s\"", (I32)(lasheader->vlrs[i].data[j + 2]),
                           name_table[type], (char*)(lasheader->vlrs[i].data + j + 4), (char*)(lasheader->vlrs[i].data + j + 160));
                     }
                     if (lasheader->vlrs[i].data[j + 3] & 0x02) {  // if min is set
@@ -6579,7 +6347,7 @@ class LasTool_lasinfo : public LasTool
                             json_extra_byte["min"].push_back(((F64*)(lasheader->vlrs[i].data + j + 64))[k]);
                           } else {
                             fprintf(file_out, " %g", ((F64*)(lasheader->vlrs[i].data + j + 64))[k]);
-                          }                       
+                          }
                         }
                       }
                     }
@@ -6657,10 +6425,11 @@ class LasTool_lasinfo : public LasTool
                     json_extra_byte["data_type"] = 0;
                     json_extra_byte["type"] = "untyped bytes";
                     json_extra_byte["size"] = lasheader->vlrs[i].data[j + 3];
-                    json_vlr_record["extra_byte_descriptions"].push_back(json_extra_byte);;
+                    json_vlr_record["extra_byte_descriptions"].push_back(json_extra_byte);
+                    ;
                   } else {
                     fprintf(file_out, "      data type: 0 (untyped bytes), size: %d\012", lasheader->vlrs[i].data[j + 3]);
-                  }                              
+                  }
                 }
               }
             } else if ((lasheader->vlrs[i].record_id >= 100) && (lasheader->vlrs[i].record_id < 355)) {  // WavePacketDescriptor
@@ -6676,11 +6445,11 @@ class LasTool_lasinfo : public LasTool
                 json_vlr_record["wave_packet_descriptor"]["offset"] = vlr_wave_packet_descr->getDigitizerOffset();
               } else {
                 fprintf(
-                  file_out, "  index %d bits/sample %d compression %d samples %u temporal %u gain %lg, offset %lg\012",
-                  lasheader->vlrs[i].record_id - 99, vlr_wave_packet_descr->getBitsPerSample(), vlr_wave_packet_descr->getCompressionType(),
-                  vlr_wave_packet_descr->getNumberOfSamples(), vlr_wave_packet_descr->getTemporalSpacing(), vlr_wave_packet_descr->getDigitizerGain(),
-                  vlr_wave_packet_descr->getDigitizerOffset());
-              }         
+                    file_out, "  index %d bits/sample %d compression %d samples %u temporal %u gain %lg, offset %lg\012",
+                    lasheader->vlrs[i].record_id - 99, vlr_wave_packet_descr->getBitsPerSample(), vlr_wave_packet_descr->getCompressionType(),
+                    vlr_wave_packet_descr->getNumberOfSamples(), vlr_wave_packet_descr->getTemporalSpacing(),
+                    vlr_wave_packet_descr->getDigitizerGain(), vlr_wave_packet_descr->getDigitizerOffset());
+              }
             }
           } else if ((strcmp(lasheader->vlrs[i].user_id, "Raster LAZ") == 0) && (lasheader->vlrs[i].record_id == 7113)) {
             LASvlrRasterLAZ vlrRasterLAZ;
@@ -6763,7 +6532,7 @@ class LasTool_lasinfo : public LasTool
       }
 
       if (file_out && !no_variable_header) {
-      JsonObject json_evlr_record;
+        JsonObject json_evlr_record;
 
         for (int i = 0; i < (int)lasheader->number_of_extended_variable_length_records; i++) {
           if (json_out) {
@@ -6775,7 +6544,8 @@ class LasTool_lasinfo : public LasTool
             json_evlr_record["record_length_after_header"] = lasreader->header.evlrs[i].record_length_after_header;
             json_evlr_record["description"] = lasreader->header.evlrs[i].description;
           } else {
-            fprintf(file_out, "extended variable length header record %d of %d:\012", i + 1, (int)lasheader->number_of_extended_variable_length_records);
+            fprintf(
+                file_out, "extended variable length header record %d of %d:\012", i + 1, (int)lasheader->number_of_extended_variable_length_records);
             fprintf(file_out, "  reserved             %d\012", lasreader->header.evlrs[i].reserved);
             fprintf(file_out, "  user ID              '%.16s'\012", lasreader->header.evlrs[i].user_id);
             fprintf(file_out, "  record ID            %d\012", lasreader->header.evlrs[i].record_id);
@@ -6851,7 +6621,7 @@ class LasTool_lasinfo : public LasTool
             }
           }
           if (json_out) json_sub_main["las_extended_variable_length_records"].push_back(json_evlr_record);
-        }      
+        }
       }
 
       if (file_out && !no_variable_header) {
@@ -6867,8 +6637,7 @@ class LasTool_lasinfo : public LasTool
         }
       }
 
-      if (file_out && !no_header)
-      {
+      if (file_out && !no_header) {
         if (lasheader->user_data_after_header_size) {
           if (json_out) {
             json_sub_main["user_defined_bytes_after_header"] = lasheader->user_data_after_header_size;
@@ -6880,11 +6649,13 @@ class LasTool_lasinfo : public LasTool
         if (lasheader->laszip) {
           if (json_out) {
             char buffer[100];
-            snprintf(buffer, sizeof(buffer), "%d.%dr%d c%d", lasheader->laszip->version_major, lasheader->laszip->version_minor,
-              lasheader->laszip->version_revision, lasheader->laszip->compressor);
+            snprintf(
+                buffer, sizeof(buffer), "%d.%dr%d c%d", lasheader->laszip->version_major, lasheader->laszip->version_minor,
+                lasheader->laszip->version_revision, lasheader->laszip->compressor);
             json_sub_main["laszip_compression"]["version"] = buffer;
           } else {
-            fprintf(file_out, "LASzip compression (version %d.%dr%d c%d", lasheader->laszip->version_major, lasheader->laszip->version_minor,
+            fprintf(
+                file_out, "LASzip compression (version %d.%dr%d c%d", lasheader->laszip->version_major, lasheader->laszip->version_minor,
                 lasheader->laszip->version_revision, lasheader->laszip->compressor);
           }
           if ((lasheader->laszip->compressor == LASZIP_COMPRESSOR_CHUNKED) || (lasheader->laszip->compressor == LASZIP_COMPRESSOR_LAYERED_CHUNKED))
@@ -6893,7 +6664,7 @@ class LasTool_lasinfo : public LasTool
             } else {
               fprintf(file_out, " %d):", lasheader->laszip->chunk_size);
             }
-          else if (!json_out){
+          else if (!json_out) {
             fprintf(file_out, "):");
           }
           for (i = 0; i < (int)lasheader->laszip->num_items; i++) {
@@ -6908,8 +6679,7 @@ class LasTool_lasinfo : public LasTool
           }
           if (!json_out) fprintf(file_out, "\012");
         }
-        if (lasheader->vlr_lastiling)
-        {
+        if (lasheader->vlr_lastiling) {
           LASquadtree lasquadtree;
           lasquadtree.subtiling_setup(
               lasheader->vlr_lastiling->min_x, lasheader->vlr_lastiling->max_x, lasheader->vlr_lastiling->min_y, lasheader->vlr_lastiling->max_y,
@@ -6918,8 +6688,7 @@ class LasTool_lasinfo : public LasTool
           lasquadtree.get_cell_bounding_box(lasheader->vlr_lastiling->level_index, min, max);
           F32 buffer = 0.0f;
 
-          if (lasheader->vlr_lastiling->buffer)
-          {
+          if (lasheader->vlr_lastiling->buffer) {
             buffer = (F32)(min[0] - lasheader->min_x);
             if ((F32)(min[1] - lasheader->min_y) > buffer) buffer = (F32)(min[1] - lasheader->min_y);
             if ((F32)(lasheader->max_x - max[0]) > buffer) buffer = (F32)(lasheader->max_x - max[0]);
@@ -6954,7 +6723,8 @@ class LasTool_lasinfo : public LasTool
             json_sub_main["lastiling"]["size"] = json_size;
             json_sub_main["lastiling"]["buffer_size"] = buffer;
           } else {
-            fprintf(file_out, "LAStiling (idx %d, lvl %d, sub %d, bbox %.10g %.10g %.10g %.10g%s%s) (size %g x %g, buffer %g)\n",
+            fprintf(
+                file_out, "LAStiling (idx %d, lvl %d, sub %d, bbox %.10g %.10g %.10g %.10g%s%s) (size %g x %g, buffer %g)\n",
                 lasheader->vlr_lastiling->level_index, lasheader->vlr_lastiling->level, lasheader->vlr_lastiling->implicit_levels,
                 lasheader->vlr_lastiling->min_x, lasheader->vlr_lastiling->min_y, lasheader->vlr_lastiling->max_x, lasheader->vlr_lastiling->max_y,
                 (lasheader->vlr_lastiling->buffer ? ", buffer" : ""), (lasheader->vlr_lastiling->reversible ? ", reversible" : ""), max[0] - min[0],
@@ -6973,7 +6743,8 @@ class LasTool_lasinfo : public LasTool
             json_bbox["max_z"] = round_to_decimals(lasheader->vlr_lasoriginal->max_z, 10);
             json_sub_main["lasoriginal"]["bbox"] = json_bbox;
           } else {
-            fprintf(file_out, "LASoriginal (npoints %u, bbox %.10g %.10g %.10g %.10g %.10g %.10g)\n",
+            fprintf(
+                file_out, "LASoriginal (npoints %u, bbox %.10g %.10g %.10g %.10g %.10g %.10g)\n",
                 (U32)lasheader->vlr_lasoriginal->number_of_point_records, lasheader->vlr_lasoriginal->min_x, lasheader->vlr_lasoriginal->min_y,
                 lasheader->vlr_lasoriginal->min_z, lasheader->vlr_lasoriginal->max_x, lasheader->vlr_lasoriginal->max_y,
                 lasheader->vlr_lasoriginal->max_z);
@@ -7012,7 +6783,8 @@ class LasTool_lasinfo : public LasTool
           if (lasreader->p_count > subsequence_stop) break;
 
           if (check_outside) {
-            if (!lasreader->point.inside_bounding_box(enlarged_min_x, enlarged_min_y, enlarged_min_z, enlarged_max_x, enlarged_max_y, enlarged_max_z)) {
+            if (!lasreader->point.inside_bounding_box(
+                    enlarged_min_x, enlarged_min_y, enlarged_min_z, enlarged_max_x, enlarged_max_y, enlarged_max_z)) {
               outside_bounding_box++;
               if (file_out && report_outside) {
                 if (json_out) {
@@ -7033,7 +6805,8 @@ class LasTool_lasinfo : public LasTool
                   json_outside_box["point_source_id"] = lasreader->point.get_point_source_ID();
                   json_sub_main["points_outside_boundig_box"].push_back(json_outside_box);
                 } else {
-                  fprintf(file_out, "%u t %g x %g y %g z %g i %d (%d of %d) d %d e %d c %d s %d %u p %d \012", (U32)(lasreader->p_count - 1),
+                  fprintf(
+                      file_out, "%u t %g x %g y %g z %g i %d (%d of %d) d %d e %d c %d s %d %u p %d \012", (U32)(lasreader->p_count - 1),
                       lasreader->point.get_gps_time(), lasreader->point.get_x(), lasreader->point.get_y(), lasreader->point.get_z(),
                       lasreader->point.get_intensity(), lasreader->point.get_return_number(), lasreader->point.get_number_of_returns(),
                       lasreader->point.get_scan_direction_flag(), lasreader->point.get_edge_of_flight_line(), lasreader->point.get_classification(),
@@ -7124,16 +6897,14 @@ class LasTool_lasinfo : public LasTool
               fprintf(file_out, "  gps_time %f %f\012", lassummary.min.gps_time, lassummary.max.gps_time);
             }
             if ((lasreader->header.global_encoding & 1) == 0) {
-              if (!no_warnings && (lassummary.min.gps_time < 0.0 || lassummary.max.gps_time > 604800.0))
-              {
+              if (!no_warnings && (lassummary.min.gps_time < 0.0 || lassummary.max.gps_time > 604800.0)) {
                 if (json_out) {
                   json_las_point_report["warnings"].push_back("range violates GPS week time specified by global encoding bit 0");
                 } else {
                   fprintf(file_out, "WARNING: range violates GPS week time specified by global encoding bit 0\012");
                 }
               }
-            }
-            else if (gps_week) {
+            } else if (gps_week) {
               I32 week_min = (I32)(lassummary.min.gps_time / 604800.0 + 1653.4391534391534391534391534392);
               I32 week_max = (I32)(lassummary.max.gps_time / 604800.0 + 1653.4391534391534391534391534392);
               I32 secs_min = week_min * 604800 - 1000000000;
@@ -7195,7 +6966,7 @@ class LasTool_lasinfo : public LasTool
               fprintf(file_out, "             Xt       %g %g\012", lassummary.min.wavepacket.getXt(), lassummary.max.wavepacket.getXt());
               fprintf(file_out, "             Yt       %g %g\012", lassummary.min.wavepacket.getYt(), lassummary.max.wavepacket.getYt());
               fprintf(file_out, "             Zt       %g %g\012", lassummary.min.wavepacket.getZt(), lassummary.max.wavepacket.getZt());
-            }        
+            }
           }
           if (lasreader->point.extended_point_type) {
             if (json_out) {
@@ -7210,11 +6981,18 @@ class LasTool_lasinfo : public LasTool
               json_las_point_report["extended_scanner_channel"]["min"] = static_cast<int>(lassummary.min.extended_scanner_channel);
               json_las_point_report["extended_scanner_channel"]["max"] = static_cast<int>(lassummary.max.extended_scanner_channel);
             } else {
-              fprintf(file_out, "  extended_return_number     %6d %6d\012", lassummary.min.extended_return_number, lassummary.max.extended_return_number);
-              fprintf(file_out, "  extended_number_of_returns %6d %6d\012", lassummary.min.extended_number_of_returns, lassummary.max.extended_number_of_returns);
-              fprintf(file_out, "  extended_classification    %6d %6d\012", lassummary.min.extended_classification, lassummary.max.extended_classification);
+              fprintf(
+                  file_out, "  extended_return_number     %6d %6d\012", lassummary.min.extended_return_number, lassummary.max.extended_return_number);
+              fprintf(
+                  file_out, "  extended_number_of_returns %6d %6d\012", lassummary.min.extended_number_of_returns,
+                  lassummary.max.extended_number_of_returns);
+              fprintf(
+                  file_out, "  extended_classification    %6d %6d\012", lassummary.min.extended_classification,
+                  lassummary.max.extended_classification);
               fprintf(file_out, "  extended_scan_angle        %6d %6d\012", lassummary.min.extended_scan_angle, lassummary.max.extended_scan_angle);
-              fprintf(file_out, "  extended_scanner_channel   %6d %6d\012", lassummary.min.extended_scanner_channel, lassummary.max.extended_scanner_channel);
+              fprintf(
+                  file_out, "  extended_scanner_channel   %6d %6d\012", lassummary.min.extended_scanner_channel,
+                  lassummary.max.extended_scanner_channel);
             }
           }
           if (lasreader->point.extra_bytes_number && lasreader->point.attributer) {
@@ -7230,9 +7008,10 @@ class LasTool_lasinfo : public LasTool
                 json_attribute["name"] = lasreader->point.attributer->get_attribute_name(a);
                 json_las_point_report["attributes"].push_back(json_attribute);
               } else {
-                fprintf(file_out, "  attribute%d %10g %10g  ('%s')\012", a, lassummary.min.get_attribute_as_float(a), 
+                fprintf(
+                    file_out, "  attribute%d %10g %10g  ('%s')\012", a, lassummary.min.get_attribute_as_float(a),
                     lassummary.max.get_attribute_as_float(a), lasreader->point.attributer->get_attribute_name(a));
-              }         
+              }
             }
             lassummary.min.attributer = 0;
             lassummary.max.attributer = 0;
@@ -7304,44 +7083,54 @@ class LasTool_lasinfo : public LasTool
         if (!no_warnings && file_out && lassummary.has_fluff()) {
           if (json_out) {
             char buffer[256];
-            snprintf(buffer, sizeof(buffer), "there is coordinate resolution fluff (x10) in %s%s%s\012", (lassummary.has_fluff(0) ? "X" : ""),
-              (lassummary.has_fluff(1) ? "Y" : ""), (lassummary.has_fluff(2) ? "Z" : ""));
+            snprintf(
+                buffer, sizeof(buffer), "there is coordinate resolution fluff (x10) in %s%s%s\012", (lassummary.has_fluff(0) ? "X" : ""),
+                (lassummary.has_fluff(1) ? "Y" : ""), (lassummary.has_fluff(2) ? "Z" : ""));
             json_sub_main["warnings"].push_back(buffer);
           } else {
-            fprintf(file_out, "WARNING: there is coordinate resolution fluff (x10) in %s%s%s\012", (lassummary.has_fluff(0) ? "X" : ""),
+            fprintf(
+                file_out, "WARNING: there is coordinate resolution fluff (x10) in %s%s%s\012", (lassummary.has_fluff(0) ? "X" : ""),
                 (lassummary.has_fluff(1) ? "Y" : ""), (lassummary.has_fluff(2) ? "Z" : ""));
-          }     
+          }
           if (lassummary.has_serious_fluff()) {
             if (json_out) {
               char buffer[256];
-              snprintf(buffer, sizeof(buffer), "there is serious coordinate resolution fluff (x100) in %s%s%s\012", (lassummary.has_serious_fluff(0) ? "X" : ""),
-                (lassummary.has_serious_fluff(1) ? "Y" : ""), (lassummary.has_serious_fluff(2) ? "Z" : ""));
+              snprintf(
+                  buffer, sizeof(buffer), "there is serious coordinate resolution fluff (x100) in %s%s%s\012",
+                  (lassummary.has_serious_fluff(0) ? "X" : ""), (lassummary.has_serious_fluff(1) ? "Y" : ""),
+                  (lassummary.has_serious_fluff(2) ? "Z" : ""));
               json_sub_main["warnings"].push_back(buffer);
             } else {
-              fprintf(file_out, "WARNING: there is serious coordinate resolution fluff (x100) in %s%s%s\012", (lassummary.has_serious_fluff(0) ? "X" : ""),
-                  (lassummary.has_serious_fluff(1) ? "Y" : ""), (lassummary.has_serious_fluff(2) ? "Z" : ""));
+              fprintf(
+                  file_out, "WARNING: there is serious coordinate resolution fluff (x100) in %s%s%s\012",
+                  (lassummary.has_serious_fluff(0) ? "X" : ""), (lassummary.has_serious_fluff(1) ? "Y" : ""),
+                  (lassummary.has_serious_fluff(2) ? "Z" : ""));
             }
             if (lassummary.has_very_serious_fluff()) {
               if (json_out) {
                 char buffer[256];
-                snprintf(buffer, sizeof(buffer), "there is very serious coordinate resolution fluff (x1000) in %s%s%s\012",
-                  (lassummary.has_very_serious_fluff(0) ? "X" : ""), (lassummary.has_very_serious_fluff(1) ? "Y" : ""),
-                  (lassummary.has_very_serious_fluff(2) ? "Z" : ""));
+                snprintf(
+                    buffer, sizeof(buffer), "there is very serious coordinate resolution fluff (x1000) in %s%s%s\012",
+                    (lassummary.has_very_serious_fluff(0) ? "X" : ""), (lassummary.has_very_serious_fluff(1) ? "Y" : ""),
+                    (lassummary.has_very_serious_fluff(2) ? "Z" : ""));
                 json_sub_main["warnings"].push_back(buffer);
               } else {
-                fprintf(file_out, "WARNING: there is very serious coordinate resolution fluff (x1000) in %s%s%s\012",
+                fprintf(
+                    file_out, "WARNING: there is very serious coordinate resolution fluff (x1000) in %s%s%s\012",
                     (lassummary.has_very_serious_fluff(0) ? "X" : ""), (lassummary.has_very_serious_fluff(1) ? "Y" : ""),
                     (lassummary.has_very_serious_fluff(2) ? "Z" : ""));
               }
               if (lassummary.has_extremely_serious_fluff()) {
                 if (json_out) {
                   char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "there is extremely serious coordinate resolution fluff (x10000) in %s%s%s\012",
-                    (lassummary.has_extremely_serious_fluff(0) ? "X" : ""), (lassummary.has_extremely_serious_fluff(1) ? "Y" : ""),
-                    (lassummary.has_extremely_serious_fluff(2) ? "Z" : ""));
+                  snprintf(
+                      buffer, sizeof(buffer), "there is extremely serious coordinate resolution fluff (x10000) in %s%s%s\012",
+                      (lassummary.has_extremely_serious_fluff(0) ? "X" : ""), (lassummary.has_extremely_serious_fluff(1) ? "Y" : ""),
+                      (lassummary.has_extremely_serious_fluff(2) ? "Z" : ""));
                   json_sub_main["warnings"].push_back(buffer);
                 } else {
-                  fprintf(file_out, "WARNING: there is extremely serious coordinate resolution fluff (x10000) in %s%s%s\012",
+                  fprintf(
+                      file_out, "WARNING: there is extremely serious coordinate resolution fluff (x10000) in %s%s%s\012",
                       (lassummary.has_extremely_serious_fluff(0) ? "X" : ""), (lassummary.has_extremely_serious_fluff(1) ? "Y" : ""),
                       (lassummary.has_extremely_serious_fluff(2) ? "Z" : ""));
                 }
@@ -7363,27 +7152,34 @@ class LasTool_lasinfo : public LasTool
           }
         }
         if (file_out && lasoccupancygrid) {
-          if (num_last_returns){
+          if (num_last_returns) {
             JsonObject json_lasoccupancygrid;
 
             if (horizontal_units == 9001) {
               if (json_out) {
                 json_lasoccupancygrid["covered_area"]["description"] = "covered area in square meters/kilometers";
                 json_lasoccupancygrid["covered_area"]["square_meters"] = 4 * lasoccupancygrid->get_num_occupied();
-                json_lasoccupancygrid["covered_area"]["kilometers"] =  round_to_decimals(0.000004 * lasoccupancygrid->get_num_occupied(), 2);
+                json_lasoccupancygrid["covered_area"]["kilometers"] = round_to_decimals(0.000004 * lasoccupancygrid->get_num_occupied(), 2);
                 json_lasoccupancygrid["point_density"]["description"] = "point density per square meter";
-                json_lasoccupancygrid["point_density"]["all_returns"] = round_to_decimals(((F64)num_all_returns / (4.0 * lasoccupancygrid->get_num_occupied())), 2);
-                json_lasoccupancygrid["point_density"]["last_only"] =  round_to_decimals(((F64)num_last_returns / (4.0 * lasoccupancygrid->get_num_occupied())), 2);
+                json_lasoccupancygrid["point_density"]["all_returns"] =
+                    round_to_decimals(((F64)num_all_returns / (4.0 * lasoccupancygrid->get_num_occupied())), 2);
+                json_lasoccupancygrid["point_density"]["last_only"] =
+                    round_to_decimals(((F64)num_last_returns / (4.0 * lasoccupancygrid->get_num_occupied())), 2);
                 json_lasoccupancygrid["spacing"]["description"] = "spacing in meters";
-                json_lasoccupancygrid["spacing"]["all_returns"] = round_to_decimals(sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns), 2);
-                json_lasoccupancygrid["spacing"]["last_only"] =  round_to_decimals(sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns), 2);
+                json_lasoccupancygrid["spacing"]["all_returns"] =
+                    round_to_decimals(sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns), 2);
+                json_lasoccupancygrid["spacing"]["last_only"] =
+                    round_to_decimals(sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns), 2);
               } else {
-                fprintf(file_out, "covered area in square meters/kilometers: %d/%.2f\012", 4 * lasoccupancygrid->get_num_occupied(),
+                fprintf(
+                    file_out, "covered area in square meters/kilometers: %d/%.2f\012", 4 * lasoccupancygrid->get_num_occupied(),
                     0.000004 * lasoccupancygrid->get_num_occupied());
-                fprintf(file_out, "point density: all returns %.2f last only %.2f (per square meter)\012",
+                fprintf(
+                    file_out, "point density: all returns %.2f last only %.2f (per square meter)\012",
                     ((F64)num_all_returns / (4.0 * lasoccupancygrid->get_num_occupied())),
                     ((F64)num_last_returns / (4.0 * lasoccupancygrid->get_num_occupied())));
-                fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in meters)\012",
+                fprintf(
+                    file_out, "      spacing: all returns %.2f last only %.2f (in meters)\012",
                     sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns),
                     sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns));
               }
@@ -7391,20 +7187,27 @@ class LasTool_lasinfo : public LasTool
               if (json_out) {
                 json_lasoccupancygrid["covered_area"]["description"] = "covered area in square feet/miles";
                 json_lasoccupancygrid["covered_area"]["square_feet"] = 36 * lasoccupancygrid->get_num_occupied();
-                json_lasoccupancygrid["covered_area"]["miles"] =  round_to_decimals(1.2913223e-6 * lasoccupancygrid->get_num_occupied(), 2);
+                json_lasoccupancygrid["covered_area"]["miles"] = round_to_decimals(1.2913223e-6 * lasoccupancygrid->get_num_occupied(), 2);
                 json_lasoccupancygrid["point_density"]["description"] = "point density per square foot";
-                json_lasoccupancygrid["point_density"]["all_returns"] = round_to_decimals(((F64)num_all_returns / (36.0 * lasoccupancygrid->get_num_occupied())), 2);
-                json_lasoccupancygrid["point_density"]["last_only"] =  round_to_decimals(((F64)num_last_returns / (36.0 * lasoccupancygrid->get_num_occupied())), 2);
+                json_lasoccupancygrid["point_density"]["all_returns"] =
+                    round_to_decimals(((F64)num_all_returns / (36.0 * lasoccupancygrid->get_num_occupied())), 2);
+                json_lasoccupancygrid["point_density"]["last_only"] =
+                    round_to_decimals(((F64)num_last_returns / (36.0 * lasoccupancygrid->get_num_occupied())), 2);
                 json_lasoccupancygrid["spacing"]["description"] = "spacing in feet";
-                json_lasoccupancygrid["spacing"]["all_returns"] = round_to_decimals(sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns), 2);
-                json_lasoccupancygrid["spacing"]["last_only"] =  round_to_decimals(sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns), 2);
+                json_lasoccupancygrid["spacing"]["all_returns"] =
+                    round_to_decimals(sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns), 2);
+                json_lasoccupancygrid["spacing"]["last_only"] =
+                    round_to_decimals(sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns), 2);
               } else {
-                fprintf(file_out, "covered area in square feet/miles: %d/%.2f\012", 36 * lasoccupancygrid->get_num_occupied(),
+                fprintf(
+                    file_out, "covered area in square feet/miles: %d/%.2f\012", 36 * lasoccupancygrid->get_num_occupied(),
                     1.2913223e-6 * lasoccupancygrid->get_num_occupied());
-                fprintf(file_out, "point density: all returns %.2f last only %.2f (per square foot)\012",
+                fprintf(
+                    file_out, "point density: all returns %.2f last only %.2f (per square foot)\012",
                     ((F64)num_all_returns / (36.0 * lasoccupancygrid->get_num_occupied())),
                     ((F64)num_last_returns / (36.0 * lasoccupancygrid->get_num_occupied())));
-                fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in feet)\012",
+                fprintf(
+                    file_out, "      spacing: all returns %.2f last only %.2f (in feet)\012",
                     sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns),
                     sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns));
               }
@@ -7413,17 +7216,23 @@ class LasTool_lasinfo : public LasTool
                 json_lasoccupancygrid["covered_area"]["description"] = "covered area in square survey feet";
                 json_lasoccupancygrid["covered_area"]["square_survey_feet"] = 36 * lasoccupancygrid->get_num_occupied();
                 json_lasoccupancygrid["point_density"]["description"] = "point density per square survey foot";
-                json_lasoccupancygrid["point_density"]["all_returns"] = round_to_decimals(((F64)num_all_returns / (36.0 * lasoccupancygrid->get_num_occupied())), 2);
-                json_lasoccupancygrid["point_density"]["last_only"] =  round_to_decimals(((F64)num_last_returns / (36.0 * lasoccupancygrid->get_num_occupied())), 2);
+                json_lasoccupancygrid["point_density"]["all_returns"] =
+                    round_to_decimals(((F64)num_all_returns / (36.0 * lasoccupancygrid->get_num_occupied())), 2);
+                json_lasoccupancygrid["point_density"]["last_only"] =
+                    round_to_decimals(((F64)num_last_returns / (36.0 * lasoccupancygrid->get_num_occupied())), 2);
                 json_lasoccupancygrid["spacing"]["description"] = "spacing in survey feet";
-                json_lasoccupancygrid["spacing"]["all_returns"] = round_to_decimals(sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns), 2);
-                json_lasoccupancygrid["spacing"]["last_only"] =  round_to_decimals(sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns), 2);
+                json_lasoccupancygrid["spacing"]["all_returns"] =
+                    round_to_decimals(sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns), 2);
+                json_lasoccupancygrid["spacing"]["last_only"] =
+                    round_to_decimals(sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns), 2);
               } else {
                 fprintf(file_out, "covered area in square survey feet: %d\012", 36 * lasoccupancygrid->get_num_occupied());
-                fprintf(file_out, "point density: all returns %.2f last only %.2f (per square survey foot)\012",
+                fprintf(
+                    file_out, "point density: all returns %.2f last only %.2f (per square survey foot)\012",
                     ((F64)num_all_returns / (36.0 * lasoccupancygrid->get_num_occupied())),
                     ((F64)num_last_returns / (36.0 * lasoccupancygrid->get_num_occupied())));
-                fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in survey feet)\012",
+                fprintf(
+                    file_out, "      spacing: all returns %.2f last only %.2f (in survey feet)\012",
                     sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns),
                     sqrt(36.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns));
               }
@@ -7431,20 +7240,27 @@ class LasTool_lasinfo : public LasTool
               if (json_out) {
                 json_lasoccupancygrid["covered_area"]["description"] = "covered area in square units/kilounits";
                 json_lasoccupancygrid["covered_area"]["square_units"] = 4 * lasoccupancygrid->get_num_occupied();
-                json_lasoccupancygrid["covered_area"]["kilounits"] =  round_to_decimals(0.000004 * lasoccupancygrid->get_num_occupied(), 2);
+                json_lasoccupancygrid["covered_area"]["kilounits"] = round_to_decimals(0.000004 * lasoccupancygrid->get_num_occupied(), 2);
                 json_lasoccupancygrid["point_density"]["description"] = "point density per square units";
-                json_lasoccupancygrid["point_density"]["all_returns"] = round_to_decimals(((F64)num_all_returns / (4.0 * lasoccupancygrid->get_num_occupied())), 2);
-                json_lasoccupancygrid["point_density"]["last_only"] =  round_to_decimals(((F64)num_last_returns / (4.0 * lasoccupancygrid->get_num_occupied())), 2);
+                json_lasoccupancygrid["point_density"]["all_returns"] =
+                    round_to_decimals(((F64)num_all_returns / (4.0 * lasoccupancygrid->get_num_occupied())), 2);
+                json_lasoccupancygrid["point_density"]["last_only"] =
+                    round_to_decimals(((F64)num_last_returns / (4.0 * lasoccupancygrid->get_num_occupied())), 2);
                 json_lasoccupancygrid["spacing"]["description"] = "spacing in units";
-                json_lasoccupancygrid["spacing"]["all_returns"] = round_to_decimals(sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns), 2);
-                json_lasoccupancygrid["spacing"]["last_only"] =  round_to_decimals(sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns), 2);
+                json_lasoccupancygrid["spacing"]["all_returns"] =
+                    round_to_decimals(sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns), 2);
+                json_lasoccupancygrid["spacing"]["last_only"] =
+                    round_to_decimals(sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns), 2);
               } else {
-                fprintf(file_out, "covered area in square units/kilounits: %d/%.2f\012", 4 * lasoccupancygrid->get_num_occupied(),
+                fprintf(
+                    file_out, "covered area in square units/kilounits: %d/%.2f\012", 4 * lasoccupancygrid->get_num_occupied(),
                     0.000004 * lasoccupancygrid->get_num_occupied());
-                fprintf(file_out, "point density: all returns %.2f last only %.2f (per square units)\012",
+                fprintf(
+                    file_out, "point density: all returns %.2f last only %.2f (per square units)\012",
                     ((F64)num_all_returns / (4.0 * lasoccupancygrid->get_num_occupied())),
                     ((F64)num_last_returns / (4.0 * lasoccupancygrid->get_num_occupied())));
-                fprintf(file_out, "      spacing: all returns %.2f last only %.2f (in units)\012",
+                fprintf(
+                    file_out, "      spacing: all returns %.2f last only %.2f (in units)\012",
                     sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_all_returns),
                     sqrt(4.0 * lasoccupancygrid->get_num_occupied() / (F64)num_last_returns));
               }
@@ -7461,7 +7277,7 @@ class LasTool_lasinfo : public LasTool
         // Try to generate the CRS PROJ object from the input file header information
         if (lasreader->header.vlr_geo_ogc_wkt) {  // try to get it from the OGC WKT string
           geoprojectionconverter.set_proj_crs_with_file_header_wkt(lasreader->header.vlr_geo_ogc_wkt, true);
-        } else if (lasreader->header.vlr_geo_keys) { // if no WKT exist in file header try keo_keys
+        } else if (lasreader->header.vlr_geo_keys) {  // if no WKT exist in file header try keo_keys
           geoprojectionconverter.set_projection_from_geo_keys(
               lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
               lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
@@ -7474,11 +7290,11 @@ class LasTool_lasinfo : public LasTool
             laserror("No valid CRS could be extracted from the header information of the source file.");
           }
         } else {
-            laserror("No file header information could be found to identify the CRS.");
+          laserror("No file header information could be found to identify the CRS.");
         }
         const char* info_content = nullptr;
         const char* proj_crs_infos = nullptr;
-        
+
         if (json_out) {
           json_proj_info["description"] = "PROJ Coordinate Reference System (CRS) Representation and Information";
         } else {
@@ -7488,7 +7304,7 @@ class LasTool_lasinfo : public LasTool
         if (geoprojectionconverter.projParameters.proj_info_arg_contains("wkt")) {
           proj_crs_infos = geoprojectionconverter.projParameters.get_wkt_representation(true);
           info_content = indent_text(proj_crs_infos, "  ");
-        
+
           if (info_content == nullptr || *info_content == '\0') {
             LASMessage(LAS_WARNING, "the content of the wkt representation of the CRS could not be generated");
           } else {
@@ -7506,7 +7322,7 @@ class LasTool_lasinfo : public LasTool
         if (geoprojectionconverter.projParameters.proj_info_arg_contains("js")) {
           proj_crs_infos = geoprojectionconverter.projParameters.get_json_representation(true);
           info_content = indent_text(proj_crs_infos, "  ");
-        
+
           if (info_content == nullptr || *info_content == '\0') {
             LASMessage(LAS_WARNING, "the content of the json representation of the CRS could not be generated");
           } else {
@@ -7542,7 +7358,7 @@ class LasTool_lasinfo : public LasTool
         if (geoprojectionconverter.projParameters.proj_info_arg_contains("epsg")) {
           proj_crs_infos = geoprojectionconverter.projParameters.get_epsg_representation(true);
           info_content = indent_text(proj_crs_infos, "  ");
-        
+
           if (info_content == nullptr || *info_content == '\0') {
             LASMessage(LAS_WARNING, "the content of the epsg representation of the CRS could not be generated");
           } else {
@@ -7560,7 +7376,7 @@ class LasTool_lasinfo : public LasTool
         if (geoprojectionconverter.projParameters.proj_info_arg_contains("el")) {
           proj_crs_infos = geoprojectionconverter.projParameters.get_ellipsoid_info(true);
           info_content = indent_text(proj_crs_infos, "  ");
-        
+
           if (info_content == nullptr || *info_content == '\0') {
             LASMessage(LAS_WARNING, "the content of the ellipsoid information could not be generated");
           } else {
@@ -7578,7 +7394,7 @@ class LasTool_lasinfo : public LasTool
         if (geoprojectionconverter.projParameters.proj_info_arg_contains("datum")) {
           proj_crs_infos = geoprojectionconverter.projParameters.get_datum_info(true);
           info_content = indent_text(proj_crs_infos, "  ");
-        
+
           if (info_content == nullptr || *info_content == '\0') {
             LASMessage(LAS_WARNING, "the content of the datum information could not be generated");
           } else {
@@ -7591,12 +7407,12 @@ class LasTool_lasinfo : public LasTool
           }
           delete[] info_content;
           info_content = nullptr;
-        }      
+        }
         // Query the coordinate system informations of the CRS
         if (geoprojectionconverter.projParameters.proj_info_arg_contains("cs")) {
           proj_crs_infos = geoprojectionconverter.projParameters.get_coord_system_info(true);
           info_content = indent_text(proj_crs_infos, "  ");
-        
+
           if (info_content == nullptr || *info_content == '\0') {
             LASMessage(LAS_WARNING, "the content of the CRS information could not be generated");
           } else {
@@ -7609,7 +7425,7 @@ class LasTool_lasinfo : public LasTool
           }
           delete[] info_content;
           info_content = nullptr;
-        } 
+        }
         if (json_out && !json_proj_info.is_null()) json_sub_main["crs_infos"] = json_proj_info;
       }
 
@@ -7650,11 +7466,13 @@ class LasTool_lasinfo : public LasTool
               if (file_out) {
                 if (json_out) {
                   char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "WARNING: real number of point records (%u) is different from header entry (%u). it was repaired. \n",
-                    number_of_point_records, lasheader->number_of_point_records);
+                  snprintf(
+                      buffer, sizeof(buffer), "WARNING: real number of point records (%u) is different from header entry (%u). it was repaired. \n",
+                      number_of_point_records, lasheader->number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
-                  fprintf(file_out, "WARNING: real number of point records (%u) is different from header entry (%u). it was repaired. \n",
+                  fprintf(
+                      file_out, "WARNING: real number of point records (%u) is different from header entry (%u). it was repaired. \n",
                       number_of_point_records, lasheader->number_of_point_records);
                 }
               }
@@ -7662,10 +7480,14 @@ class LasTool_lasinfo : public LasTool
               if (file_out) {
                 if (json_out) {
                   char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.\n", lassummary.number_of_point_records);
+                  snprintf(
+                      buffer, sizeof(buffer), "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.\n",
+                      lassummary.number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
-                  fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.\n", lassummary.number_of_point_records);
+                  fprintf(
+                      file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.\n",
+                      lassummary.number_of_point_records);
                 }
               }
             } else if (lasheader->number_of_point_records != 0) {
@@ -7675,11 +7497,15 @@ class LasTool_lasinfo : public LasTool
               if (file_out) {
                 if (json_out) {
                   char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n",
-                    lassummary.number_of_point_records, lasheader->number_of_point_records);
+                  snprintf(
+                      buffer, sizeof(buffer),
+                      "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n",
+                      lassummary.number_of_point_records, lasheader->number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
-                  fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n",
+                  fprintf(
+                      file_out,
+                      "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n",
                       lassummary.number_of_point_records, lasheader->number_of_point_records);
                 }
               }
@@ -7697,18 +7523,21 @@ class LasTool_lasinfo : public LasTool
               if (lassummary.number_of_point_records <= U32_MAX) {
                 if (json_out) {
                   char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "WARNING: real number of point records (%lld) is different from header entry (%u).\n",
-                    lassummary.number_of_point_records, lasheader->number_of_point_records);
+                  snprintf(
+                      buffer, sizeof(buffer), "WARNING: real number of point records (%lld) is different from header entry (%u).\n",
+                      lassummary.number_of_point_records, lasheader->number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
-                  fprintf(file_out, "WARNING: real number of point records (%lld) is different from header entry (%u).\n",
+                  fprintf(
+                      file_out, "WARNING: real number of point records (%lld) is different from header entry (%u).\n",
                       lassummary.number_of_point_records, lasheader->number_of_point_records);
                 }
-              }
-              else if (lasheader->version_minor < 4) {
+              } else if (lasheader->version_minor < 4) {
                 if (json_out) {
                   char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "WARNING: real number of point records (%lld) exceeds 4,294,967,295.\n", lassummary.number_of_point_records);
+                  snprintf(
+                      buffer, sizeof(buffer), "WARNING: real number of point records (%lld) exceeds 4,294,967,295.\n",
+                      lassummary.number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
                   fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295.\n", lassummary.number_of_point_records);
@@ -7716,11 +7545,14 @@ class LasTool_lasinfo : public LasTool
               } else if (lasheader->number_of_point_records != 0) {
                 if (json_out) {
                   char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead of zero.\n",
-                    lassummary.number_of_point_records, lasheader->number_of_point_records);
+                  snprintf(
+                      buffer, sizeof(buffer),
+                      "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead of zero.\n",
+                      lassummary.number_of_point_records, lasheader->number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
-                  fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead of zero.\n",
+                  fprintf(
+                      file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead of zero.\n",
                       lassummary.number_of_point_records, lasheader->number_of_point_records);
                 }
               }
@@ -7735,11 +7567,13 @@ class LasTool_lasinfo : public LasTool
           if (!no_warnings && file_out) {
             if (json_out) {
               char buffer[256];
-              snprintf(buffer, sizeof(buffer), "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s\n",
-                lasheader->point_data_format, lasheader->number_of_point_records, (repair_counters ? "it was repaired." : ""));
+              snprintf(
+                  buffer, sizeof(buffer), "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s\n",
+                  lasheader->point_data_format, lasheader->number_of_point_records, (repair_counters ? "it was repaired." : ""));
               json_point_number["warnings"].push_back(buffer);
             } else {
-              fprintf(file_out, "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s\n",
+              fprintf(
+                  file_out, "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s\n",
                   lasheader->point_data_format, lasheader->number_of_point_records, (repair_counters ? "it was repaired." : ""));
             }
           }
@@ -7770,11 +7604,13 @@ class LasTool_lasinfo : public LasTool
             if (!no_warnings && file_out) {
               if (json_out) {
                 char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s\n",
-                  lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
+                snprintf(
+                    buffer, sizeof(buffer), "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s\n",
+                    lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
                 json_point_extended_number["warnings"].push_back(buffer);
               } else {
-                fprintf(file_out, "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s\n",
+                fprintf(
+                    file_out, "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s\n",
                     lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
               }
             }
@@ -7802,7 +7638,8 @@ class LasTool_lasinfo : public LasTool
         U32 number_of_points_by_return[5];
 
         for (i = 1; i < 6; i++) {
-          if ((lasheader->point_data_format < 6) && ((I64)(lasheader->number_of_points_by_return[i - 1]) != lassummary.number_of_points_by_return[i])) {
+          if ((lasheader->point_data_format < 6) &&
+              ((I64)(lasheader->number_of_points_by_return[i - 1]) != lassummary.number_of_points_by_return[i])) {
             if (lassummary.number_of_points_by_return[i] <= U32_MAX) {
               number_of_points_by_return[i - 1] = (U32)lassummary.number_of_points_by_return[i];
               wrong_entry = true;
@@ -7810,21 +7647,28 @@ class LasTool_lasinfo : public LasTool
                 if (was_set) {
                   if (json_out) {
                     char buffer[256];
-                    snprintf(buffer, sizeof(buffer), "WARNING: for return %d real number of points by return (%u) is different from header entry (%u).%s\n", i,
-                      number_of_points_by_return[i - 1], lasheader->number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
+                    snprintf(
+                        buffer, sizeof(buffer),
+                        "WARNING: for return %d real number of points by return (%u) is different from header entry (%u).%s\n", i,
+                        number_of_points_by_return[i - 1], lasheader->number_of_points_by_return[i - 1],
+                        (repair_counters ? " it was repaired." : ""));
                     json_point_by_return["warnings"].push_back(buffer);
                   } else {
-                    fprintf(file_out, "WARNING: for return %d real number of points by return (%u) is different from header entry (%u).%s\n", i,
-                        number_of_points_by_return[i - 1], lasheader->number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
+                    fprintf(
+                        file_out, "WARNING: for return %d real number of points by return (%u) is different from header entry (%u).%s\n", i,
+                        number_of_points_by_return[i - 1], lasheader->number_of_points_by_return[i - 1],
+                        (repair_counters ? " it was repaired." : ""));
                   }
                 } else {
                   if (json_out) {
                     char buffer[256];
-                    snprintf(buffer, sizeof(buffer), "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i,
-                      number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
+                    snprintf(
+                        buffer, sizeof(buffer), "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i,
+                        number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
                     json_point_by_return["warnings"].push_back(buffer);
                   } else {
-                    fprintf(file_out, "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i,
+                    fprintf(
+                        file_out, "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i,
                         number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
                   }
                 }
@@ -7833,11 +7677,13 @@ class LasTool_lasinfo : public LasTool
               if (!no_warnings && file_out) {
                 if (json_out) {
                   char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s\n", i,
-                    lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
+                  snprintf(
+                      buffer, sizeof(buffer), "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s\n", i,
+                      lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
                   json_point_by_return["warnings"].push_back(buffer);
                 } else {
-                  fprintf(file_out, "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s\n", i,
+                  fprintf(
+                      file_out, "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s\n", i,
                       lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
                 }
               }
@@ -7847,12 +7693,18 @@ class LasTool_lasinfo : public LasTool
               if (!no_warnings && file_out) {
                 if (json_out) {
                   char buffer[256];
-                  snprintf(buffer, sizeof(buffer), "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n",
-                    i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
+                  snprintf(
+                      buffer, sizeof(buffer),
+                      "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n",
+                      i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i - 1],
+                      (repair_counters ? " it was repaired." : ""));
                   json_point_by_return["warnings"].push_back(buffer);
                 } else {
-                  fprintf(file_out, "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n",
-                      i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
+                  fprintf(
+                      file_out,
+                      "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n",
+                      i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i - 1],
+                      (repair_counters ? " it was repaired." : ""));
                 }
               }
             } else {
@@ -7864,11 +7716,14 @@ class LasTool_lasinfo : public LasTool
             if (!no_warnings && file_out) {
               if (json_out) {
                 char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s\n",
-                  lasheader->point_data_format, i, lasheader->number_of_points_by_return[i - 1], (repair_counters ? "it was repaired." : ""));
+                snprintf(
+                    buffer, sizeof(buffer),
+                    "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s\n",
+                    lasheader->point_data_format, i, lasheader->number_of_points_by_return[i - 1], (repair_counters ? "it was repaired." : ""));
                 json_point_by_return["warnings"].push_back(buffer);
               } else {
-                fprintf(file_out, "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s\n",
+                fprintf(
+                    file_out, "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s\n",
                     lasheader->point_data_format, i, lasheader->number_of_points_by_return[i - 1], (repair_counters ? "it was repaired." : ""));
               }
             }
@@ -7909,21 +7764,28 @@ class LasTool_lasinfo : public LasTool
                 if (was_set) {
                   if (json_out) {
                     char buffer[256];
-                    snprintf(buffer, sizeof(buffer), "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i,
-                      lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
+                    snprintf(
+                        buffer, sizeof(buffer),
+                        "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i,
+                        lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i - 1],
+                        (repair_counters ? " it was repaired." : ""));
                     json_point_extended_by_return["warnings"].push_back(buffer);
                   } else {
-                    fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i,
-                        lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
+                    fprintf(
+                        file_out, "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i,
+                        lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i - 1],
+                        (repair_counters ? " it was repaired." : ""));
                   }
                 } else {
                   if (json_out) {
                     char buffer[256];
-                    snprintf(buffer, sizeof(buffer), "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i,
-                      lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
+                    snprintf(
+                        buffer, sizeof(buffer), "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i,
+                        lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
                     json_point_extended_by_return["warnings"].push_back(buffer);
                   } else {
-                    fprintf(file_out, "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i,
+                    fprintf(
+                        file_out, "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i,
                         lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
                   }
                 }
@@ -7943,18 +7805,22 @@ class LasTool_lasinfo : public LasTool
               }
             }
           }
-          if (json_out && !json_point_extended_by_return.is_null()) json_sub_main["extended_number_of_points_by_return"] = json_point_extended_by_return;
+          if (json_out && !json_point_extended_by_return.is_null())
+            json_sub_main["extended_number_of_points_by_return"] = json_point_extended_by_return;
         }
 
         if (!no_warnings && file_out && !no_returns) {
           if (lassummary.number_of_points_by_return[0]) {
             if (json_out) {
               char buffer[256];
-              snprintf(buffer, sizeof(buffer), "WARNING: there %s %lld point%s with return number 0\n", (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"),
-                lassummary.number_of_points_by_return[0], (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
+              snprintf(
+                  buffer, sizeof(buffer), "WARNING: there %s %lld point%s with return number 0\n",
+                  (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[0],
+                  (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
               json_point_by_return["warnings"].push_back(buffer);
             } else {
-              fprintf(file_out, "WARNING: there %s %lld point%s with return number 0\n", (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"),
+              fprintf(
+                  file_out, "WARNING: there %s %lld point%s with return number 0\n", (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"),
                   lassummary.number_of_points_by_return[0], (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
             }
           }
@@ -7962,22 +7828,28 @@ class LasTool_lasinfo : public LasTool
             if (lassummary.number_of_points_by_return[6]) {
               if (json_out) {
                 char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: there %s %lld point%s with return number 6\n", (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"),
-                  lassummary.number_of_points_by_return[6], (lassummary.number_of_points_by_return[6] > 1 ? "s" : ""));
+                snprintf(
+                    buffer, sizeof(buffer), "WARNING: there %s %lld point%s with return number 6\n",
+                    (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[6],
+                    (lassummary.number_of_points_by_return[6] > 1 ? "s" : ""));
                 json_point_by_return["warnings"].push_back(buffer);
               } else {
-                fprintf(file_out, "WARNING: there %s %lld point%s with return number 6\n", (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"),
+                fprintf(
+                    file_out, "WARNING: there %s %lld point%s with return number 6\n", (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"),
                     lassummary.number_of_points_by_return[6], (lassummary.number_of_points_by_return[6] > 1 ? "s" : ""));
               }
             }
             if (lassummary.number_of_points_by_return[7]) {
               if (json_out) {
                 char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: there %s %lld point%s with return number 7\n", (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"),
-                  lassummary.number_of_points_by_return[7], (lassummary.number_of_points_by_return[7] > 1 ? "s" : ""));
+                snprintf(
+                    buffer, sizeof(buffer), "WARNING: there %s %lld point%s with return number 7\n",
+                    (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[7],
+                    (lassummary.number_of_points_by_return[7] > 1 ? "s" : ""));
                 json_point_by_return["warnings"].push_back(buffer);
               } else {
-                fprintf(file_out, "WARNING: there %s %lld point%s with return number 7\n", (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"),
+                fprintf(
+                    file_out, "WARNING: there %s %lld point%s with return number 7\n", (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"),
                     lassummary.number_of_points_by_return[7], (lassummary.number_of_points_by_return[7] > 1 ? "s" : ""));
               }
             }
@@ -8013,7 +7885,9 @@ class LasTool_lasinfo : public LasTool
           if (lassummary.number_of_returns[0]) {
             if (json_out) {
               char buffer[256];
-              snprintf(buffer, sizeof(buffer), "WARNING: there are %lld points with a number of returns of given pulse of 0\n", lassummary.number_of_returns[0]);
+              snprintf(
+                  buffer, sizeof(buffer), "WARNING: there are %lld points with a number of returns of given pulse of 0\n",
+                  lassummary.number_of_returns[0]);
               json_point_by_return["warnings"].push_back(buffer);
             } else {
               fprintf(file_out, "WARNING: there are %lld points with a number of returns of given pulse of 0\n", lassummary.number_of_returns[0]);
@@ -8032,7 +7906,7 @@ class LasTool_lasinfo : public LasTool
           if (wrong_entry) {
             if (!json_out) fprintf(file_out, "histogram of classification of points:\n");
             for (i = 0; i < 32; i++) {
-              if (lassummary.classification[i]) { 
+              if (lassummary.classification[i]) {
                 if (json_out) {
                   JsonObject json_classification;
 
@@ -8051,7 +7925,7 @@ class LasTool_lasinfo : public LasTool
               } else {
                 fprintf(file_out, " +-> flagged as synthetic: %lld\n", lassummary.flagged_synthetic);
               }
-              for (i = 0; i < 32; i++){
+              for (i = 0; i < 32; i++) {
                 if (lassummary.flagged_synthetic_classification[i]) {
                   if (json_out) {
                     JsonObject json_synthetic_classification;
@@ -8061,7 +7935,9 @@ class LasTool_lasinfo : public LasTool
                     json_synthetic_classification["index"] = i;
                     json_histogram_classification["flagged_as_synthetic"]["classification"].push_back(json_synthetic_classification);
                   } else {
-                    fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_synthetic_classification[i], LASpointClassification[i], i);
+                    fprintf(
+                        file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_synthetic_classification[i], LASpointClassification[i],
+                        i);
                   }
                 }
               }
@@ -8096,7 +7972,9 @@ class LasTool_lasinfo : public LasTool
                     json_keypoint_classification["index"] = i;
                     json_histogram_classification["flagged_as_keypoints"]["classification"].push_back(json_keypoint_classification);
                   } else {
-                    fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_keypoint_classification[i], LASpointClassification[i], i);
+                    fprintf(
+                        file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_keypoint_classification[i], LASpointClassification[i],
+                        i);
                   }
                 }
               }
@@ -8131,7 +8009,9 @@ class LasTool_lasinfo : public LasTool
                     json_withheld_classification["index"] = i;
                     json_histogram_classification["flagged_as_withheld"]["classification"].push_back(json_withheld_classification);
                   } else {
-                    fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_withheld_classification[i], LASpointClassification[i], i);
+                    fprintf(
+                        file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_withheld_classification[i], LASpointClassification[i],
+                        i);
                   }
                 }
               }
@@ -8170,7 +8050,9 @@ class LasTool_lasinfo : public LasTool
                     json_extended_overlap_classification["index"] = i;
                     json_histogram_classification["flagged_as_extended_overlap"]["classification"].push_back(json_extended_overlap_classification);
                   } else {
-                    fprintf(file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_extended_overlap_classification[i], LASpointClassification[i], i);
+                    fprintf(
+                        file_out, "  +---> %15lld of those are %s (%u)\n", lassummary.flagged_extended_overlap_classification[i],
+                        LASpointClassification[i], i);
                   }
                 }
               }
@@ -8213,8 +8095,10 @@ class LasTool_lasinfo : public LasTool
               }
             }
           }
-          if (json_out && !json_histogram_classification.is_null()) json_sub_main["histogram_classification_of_points"] = json_histogram_classification;
-          if (json_out && !json_histogram_extended_classification.is_null()) json_sub_main["histogram_extended_classification_of_points"] = json_histogram_extended_classification;
+          if (json_out && !json_histogram_classification.is_null())
+            json_sub_main["histogram_classification_of_points"] = json_histogram_classification;
+          if (json_out && !json_histogram_extended_classification.is_null())
+            json_sub_main["histogram_extended_classification_of_points"] = json_histogram_extended_classification;
         }
 
         if (lashistogram.active()) {
@@ -8350,8 +8234,7 @@ class LasTool_lasinfo : public LasTool
       if (file) fclose(file);
     }
     // When creating the JSON file, it must only be closed at the very end, otherwise an invalid json will result if there are several input files
-    if (file_out && json_out)
-    {
+    if (file_out && json_out) {
       std::string json_string = json_main.dump(2);
       fprintf(file_out, "%s", json_string.c_str());
 
@@ -8368,8 +8251,7 @@ class LasTool_lasinfo : public LasTool
     byebye();
   };
 
-  void usage() override
-  {
+  void usage() override {
     fprintf(stderr, "usage:\n");
     fprintf(stderr, "lasinfo -i lidar.las\n");
     fprintf(stderr, "lasinfo -i lidar.las -compute_density -o lidar_info.txt\n");
@@ -8386,10 +8268,8 @@ class LasTool_lasinfo : public LasTool
   };
 };
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   LasTool_lasinfo lastool;
   lastool.init(argc, argv, "lasinfo");
   lastool.run();
 }
-
