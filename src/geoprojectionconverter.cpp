@@ -8034,7 +8034,7 @@ void GeoProjectionConverter::parse(int argc, char* argv[])
       {
         strcpy_las(proj_source_string, buffer_size, argv[i + 1]);
 
-        if (argv[i + 2] != nullptr && argv[i + 2][0] != '\0')
+        if (argv[i + 2] != nullptr && argv[i + 2][0] != '\0' && argv[i + 2][0] != '-')
         {
           buffer_size = strlen(argv[i + 2]) + 1;
           char* proj_target_string = (char*)malloc(buffer_size);
@@ -10104,6 +10104,15 @@ void GeoProjectionConverter::set_proj_crs_transform()
     if (!projParameters.proj_transform_crs) {
       err_no = proj_context_errno(projParameters.proj_ctx);
 
+      if (!proj_is_crs(projParameters.proj_source_crs) || !proj_is_crs(projParameters.proj_target_crs))
+      {
+        proj_destroy(projParameters.proj_source_crs);
+        proj_destroy(projParameters.proj_target_crs);
+        proj_context_destroy(projParameters.proj_ctx);
+        laserror("Failed to create PROJ object for the transformation. Currently, only transformations between different Coordinate Reference Systems (CRS) are supported. "
+                 "This means that the CRS information must be included in the input, such as in PROJ string, WKT, or PROJJSON. Pure Coordinate System (CS) "
+                 "operations are not supported at the moment.");
+      }
       proj_destroy(projParameters.proj_source_crs);
       proj_destroy(projParameters.proj_target_crs);
 
