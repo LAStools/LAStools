@@ -1039,6 +1039,21 @@ public:
     }
   }
 
+  std::string get_GUID() {
+    char guid_buffer[256];
+    snprintf(
+        guid_buffer, sizeof(guid_buffer), "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X", project_ID_GUID_data_1, project_ID_GUID_data_2,
+        project_ID_GUID_data_3, project_ID_GUID_data_4[0], project_ID_GUID_data_4[1], project_ID_GUID_data_4[2], project_ID_GUID_data_4[3],
+        project_ID_GUID_data_4[4], project_ID_GUID_data_4[5], project_ID_GUID_data_4[6], project_ID_GUID_data_4[7]);
+    return std::string(guid_buffer);
+  }
+
+  std::string get_version() {
+    char version_buffer[16];
+    snprintf(version_buffer, sizeof(version_buffer), "%d.%d", version_major, version_minor);
+    return std::string(version_buffer);
+  }
+
   ~LASheader()
   {
     clean();
