@@ -701,7 +701,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -copy_register_into_intensity [n]   : copy register [n] into point intensitiy value  
 -drop_intensity_above [n]           : drop points with intensity value above [n]  
 -drop_intensity_below [n]           : drop points with intensity value below [n]  
--drop_intensity_between [m] [n]     : drop points with intensity value between [m] and [n]  
+-drop_intensity_between [m] [n]     : drop points with intensity value between [m] and [n]
 -iscale_intensity [n]               : scale intensity value by [n]  
 -itranslate_intensity [n]           : translate input intensity by [n]  
 -keep_NDVI_intensity_is_NIR [min] [max]: keep NDVI (Normalized Difference Vegetation Index) where intensity is NIR between [min] [max]  
@@ -709,6 +709,10 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -keep_intensity_above [n]           : keep points with intensity value above [n]  
 -keep_intensity_below [n]           : keep points with intensity value below [n]  
 -map_intensity [fnm]                : set the intensity by map in file [fnm]  
+-multiply_scaled_intensity_into_RGB [n] : calculate gray color by (intensity(rel)/intensity(range))*[n]
+-multiply_scaled_intensity_into_RGB_red : set red color to [n]*intensity
+-multiply_scaled_intensity_into_RGB_green : set green color to [n]*intensity
+-multiply_scaled_intensity_into_RGB_blue : set blue color to [n]*intensity
 -scale_intensity [n]                : multiply intensity by [n]  
 -set_intensity [n]                  : set intensity to [n]  
 -switch_RGB_intensity_into_CIR      : set R to intensity; G to R; B to G  
@@ -948,6 +952,52 @@ The other supported entries are:
   e : [e]dge of flight line flag  
   d : [d]irection of scan flag  
   0-9 : additional attributes described as extra bytes (0 through 9)  
+
+### column descriptions
+Possible column descriptions in the first line of a text input file (*.txt) 
+to generate the parse format.
+This descriptions can be also generated using las2txt with -coldesc argument.
+
+  Column description  Resulting parse character 
+  x                   x coordinate
+  y                   y coordinate
+  z                   z coordinate
+  X                   X (unscaled raw X value)
+  Y                   Y (unscaled raw Y value)
+  Z                   Z (unscaled raw Z value)
+  gps_time            t (gps time)
+  intensity           i 
+  scan_angle          a
+  point_source_id     p
+  classification      c
+  user_data           u
+  return_number       r
+  number_of_returns   n
+  edge_of_flight_line e
+  scan_direction_flag d
+  withheld_flag       h
+  keypoint_flag       k
+  synthetic_flag      g
+  skip                s (skip this column without warning)
+  overlap_flag        o
+  scanner_channel     l
+  R                   R (RGB red)
+  G                   G (RGB green)
+  B                   B (RGB blue)
+  HSV_H               (HSV) HSV color model hue [0..360]
+  HSV_S                                     saturation [0..100]
+  HSV_V                                     value [0..100]
+  HSV_h               (hsv) HSV color model hue [0..1]
+  HSV_s                                     saturation [0..1]
+  HSV_v                                     value [0..1] 
+  HSL_H               (HSL) HSL color model hue [0..360]
+  HSL_S                                     saturation [0..100]
+  HSL_L                                     luminance [0..100] 
+  HSL_h               (hsl) HSL color model hue [0..1]
+  HSL_s                                     saturation [0..1]
+  HSL_l                                     luminance [0..1] 
+
+Other header descriptions will output a warning and the column will be skipped during import.
 
 ### output separator
 The '-osep [sep]' argument specifies the output format of a text(xyz) output.
