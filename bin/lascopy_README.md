@@ -60,25 +60,27 @@ within 0.5 units in source exists. Set all other z-values to 0.
 
 ## lascopy specific arguments
 
--match_gps_time       : uses gps time to match data point (default) (64bit only)  
--match_return_number  : uses number of return to match data point (default) (64bit only)  
--match_classification : uses classification for point matching (64bit only)  
--match_intensity      : uses intensity for point matching (64bit only)  
--match_point_source_id: uses point source for point matching (64bit only)  
--match_scanner_channel: uses scanner channel for point matching (64bit only)  
--match_xy [dist]      : Matches point by x-y coordinates and the specified maximum distance (64bit only)  
--match_xyz [dist]     : Matches point by x-y-z coordinates and the specified maximum distance (64bit only)  
--match_xyz_warn [n]   : Issues warning if more than n points are considered for matching for a single point. This may hint to using a smaller matching distance for improved performance. (64bit only)  
--copy_classification  : copy classification attribute (default) (64bit only)  
--copy_elevation       : copy elevation attribute (64bit only)  
--copy_intensity       : copy intensity attribute (64bit only)  
--copy_keypoint_flag   : copy keypoint flag to target (64bit only)  
--copy_overlap_flag    : copy overlap flag to target (64bit only)  
--copy_synthetic_flag  : copy synthetic flag to target (64bit only)  
--copy_withheld_flag   : copy withheld flag to target (64bit only)  
--copy_rgb             : copy rgb to target (64bit only)  
--copy_user_data       : copy user data to target (64bit only)  
--copy_attribute [n]   : copy attribute with index n. Only checks if index number exists in source and target, as well as if the data type matches. (64bit only)  
+-match_gps_time       : uses gps time to match data point (default)  
+-match_return_number  : uses number of return to match data point (default)  
+-match_classification : uses classification for point matching  
+-match_intensity      : uses intensity for point matching  
+-match_point_source_id: uses point source for point matching  
+-match_scanner_channel: uses scanner channel for point matching  
+-match_xy [dist]      : Matches point by x-y coordinates and the specified maximum distance  
+-match_xyz [dist]     : Matches point by x-y-z coordinates and the specified maximum distance  
+-match_xyz_warn [n]   : Issues warning if more than n points are considered for matching for a single point. This may hint to using a smaller matching distance for improved performance.
+-copy_attribute [n]   : copy attribute with index [n]. Attribute must exist in source and target with matching data type.  
+-copy_classification  : copy classification attribute (default)  
+-copy_elevation       : copy elevation attribute  
+-copy_intensity       : copy intensity attribute  
+-copy_keypoint_flag   : copy keypoint flag to target  
+-copy_overlap_flag    : copy overlap flag to target  
+-copy_synthetic_flag  : copy synthetic flag to target  
+-copy_withheld_flag   : copy withheld flag to target  
+-copy_rgb             : copy rgb to target  
+-copy_user_data       : copy user data to target  
+-copy_return_number   : copy return number to target  
+-copy_number_of_returns : copy number of returns to target  
 -zero                 : set attribute of points to zero if not found in source  
 -unmatched            : copy attributes from source to target by point order  
 -ilay [n]             : apply [n] or all LASlayers found in corresponding *.lay file on read  
@@ -91,10 +93,6 @@ within 0.5 units in source exists. Set all other z-values to 0.
 -classification       : Deprecated: copy classification attribute (may be removed in future - replaced by copy_classification)  
 -elevation            : Deprecated: copy elevation attribute (may be removed in future - replaced by copy_elevation)  
 -intensity            : Deprecated: copy intensity attribute (may be removed in future - replaced by copy_intensity)  
--keypoint_flag        : Deprecated: copy keypoint flag to target (may be removed in future - replaced by copy_keypoint_flag)  
--overlap_flag         : Deprecated: copy overlap flag to target (may be removed in future - replaced by copy_overlap_flag)  
--synthetic_flag       : Deprecated: copy synthetic flag to target (may be removed in future - replaced by copy_synthetic_flag)  
--withheld_flag        : Deprecated: copy withheld flag to target (may be removed in future - replaced by copy_ithheld_flag)  
 
 ### Basics
 -cores [n]    : process multiple inputs on [n] cores in parallel  
