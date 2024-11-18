@@ -488,7 +488,12 @@ public:
     }
     if ((version_major != 1) || (version_minor > 4))
     {
-      LASMessage(LAS_WARNING, "unknown version %d.%d (should be 1.0 or 1.1 or 1.2 or 1.3 or 1.4)", version_major, version_minor);
+      LASMessage(LAS_WARNING, "unknown version %d.%d (allowed 1.0-1.4)", version_major, version_minor);
+    }
+    if ((version_minor < 4) && (point_data_format >= 6) ||
+        (version_minor < 3) && (point_data_format >= 4) ||
+        (version_minor < 2) && (point_data_format >= 1)) {
+        LASMessage(LAS_WARNING, "LAS version %d.%d does not allow point format %d", version_major, version_minor, point_data_format);
     }
     if (header_size < 227)
     {
