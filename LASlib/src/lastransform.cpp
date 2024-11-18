@@ -4785,33 +4785,33 @@ class LASoperationAddAttributeToZ : public LASoperation
 
 class LASoperationMultiplyScaledIntensityIntoRGB : public LASoperation
 {
-   public:
-    inline const CHAR* name() const
-    {
-        return "multiply_scaled_intensity_into_RGB";
-    };
-    inline I32 get_command(CHAR* string) const
-    {
-        return sprintf(string, "-%s_%s %f ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))), scale);
-    };
-    inline U32 get_decompress_selective() const
-    {
-        return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY | LASZIP_DECOMPRESS_SELECTIVE_RGB;
-    };
-    inline void transform(LASpoint* point)
-    {
-        F32 rgb = scale * point->get_intensity() * point->rgb[channel];
-        point->rgb[channel] = U16_CLAMP(rgb);
-    };
-    LASoperationMultiplyScaledIntensityIntoRGB(U32 channel, F32 scale)
-    {
-        this->channel = channel;
-        this->scale = scale;
-    };
+ public:
+  inline const CHAR* name() const
+  {
+    return "multiply_scaled_intensity_into_RGB";
+  };
+  inline I32 get_command(CHAR* string) const
+  {
+    return sprintf(string, "-%s_%s %f ", name(), (channel == 0 ? "red" : (channel == 1 ? "green" : (channel == 2 ? "blue" : "nir"))), scale);
+  };
+  inline U32 get_decompress_selective() const
+  {
+    return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY | LASZIP_DECOMPRESS_SELECTIVE_RGB;
+  };
+  inline void transform(LASpoint* point)
+  {
+    F32 rgb = scale * point->get_intensity() * point->rgb[channel];
+    point->rgb[channel] = U16_CLAMP(rgb);
+  };
+  LASoperationMultiplyScaledIntensityIntoRGB(U32 channel, F32 scale)
+  {
+    this->channel = channel;
+    this->scale = scale;
+  };
 
-   private:
-    U32 channel;
-    F32 scale;
+ private:
+  U32 channel;
+  F32 scale;
 };
 
 class LASoperationAddScaledAttributeToZ : public LASoperation
@@ -8887,7 +8887,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
             }
             else if (strncmp(argv[i] + 10, "scaled_intensity_into_RGB", 25) == 0)
             {
-                if ((i + 1) >= argc)
+              if ((i + 1) >= argc)
                 {
                     laserror("'%s' needs 1 argument: scale", argv[i]);
                     return FALSE;
@@ -8929,11 +8929,20 @@ BOOL LAStransform::parse(int argc, char* argv[])
                 }
                 else if (strcmp(argv[i] + 36, "nir") == 0)
                 {
-                    transformed_fields |= LASTRANSFORM_NIR;
-                    add_operation(new LASoperationMultiplyScaledIntensityIntoRGB(3, scale));
-                    *argv[i] = '\0';
-                    *argv[i + 1] = '\0';
-                    i += 1;
+                  transformed_fields |= LASTRANSFORM_NIR;
+                  add_operation(new LASoperationMultiplyScaledIntensityIntoRGB(3, scale));
+                  *argv[i] = '\0';
+                  *argv[i + 1] = '\0';
+                  i += 1;
+                }
+                else 
+                {
+                  transformed_fields |= LASTRANSFORM_RGB;
+                  needPreread = true;
+                  add_operation(new LASoperationMultiplyScaledIntensityRangeIntoRGB(scale));
+                  *argv[i] = '\0';
+                  *argv[i + 1] = '\0';
+                  i += 1;
                 }
             }
             else if (strncmp(argv[i] + 10, "divided_intensity_into_RGB", 25) == 0)

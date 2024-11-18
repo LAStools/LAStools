@@ -45,6 +45,7 @@
 
 #include "lasdefinitions.hpp"
 #include "laszip_decompress_selective_v3.hpp"
+#include <cmath>
 
 class LASfilter;
 
@@ -126,6 +127,42 @@ private:
 	F64 r11, r12, r13, r21, r22, r23, r31, r32, r33, tr1, tr2, tr3;
 };
 
+class LASoperationMultiplyScaledIntensityRangeIntoRGB : public LASoperation
+{
+ public:
+  inline const CHAR* name() const
+  {
+    return "multiply_scaled_intensity_range_into_RGB";
+  };
+  inline I32 get_command(CHAR* string) const
+  {
+    return sprintf(string, "-%s %f ", name(), scale);
+  };
+  inline U32 get_decompress_selective() const
+  {
+    return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY | LASZIP_DECOMPRESS_SELECTIVE_RGB;
+  };
+  inline void transform(LASpoint* point)
+  {
+    if ((intensityRange != 0) && (scale != 0))
+    {
+      U16 val = U16_CLAMP(std::round(scale * 0xFFFF * (point->get_intensity() - intensityMin) / intensityRange));
+      point->rgb[0] = val;
+      point->rgb[1] = val;
+      point->rgb[2] = val;
+    }
+  };
+  LASoperationMultiplyScaledIntensityRangeIntoRGB(F32 scale)
+  {
+    this->scale = scale;
+  };
+  I16 intensityMin = 0;
+  I16 intensityRange = 0;
+
+ private:
+  F32 scale;
+};
+
 #define LASTRANSFORM_X_COORDINATE 0x00000001
 #define LASTRANSFORM_Y_COORDINATE 0x00000002
 #define LASTRANSFORM_Z_COORDINATE 0x00000004
@@ -139,6 +176,7 @@ private:
 class LAStransform
 {
 public:
+  bool needPreread;
 	U32 transformed_fields;
 	F64 registers[16];
 
@@ -161,7 +199,21 @@ public:
 	void check_for_overflow() const;
 
 	void reset();
-	void add_operation(LASoperation* operation);
+  void add_operation(LASoperation* operation);
+  template <typename T>
+  bool find_operation(T*& op)
+  {
+    U32 i;
+    for (i = 0; i < num_operations; i++)
+    {
+      if (T* castedObject = dynamic_cast<T*>(operations[i]))
+      {
+        op = castedObject;
+        return true;
+      }
+    }
+    return false;
+  }
 
 	LAStransform();
 	~LAStransform();
