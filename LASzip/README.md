@@ -1,6 +1,6 @@
 # LASzip
 
-*Award-winning software for efficient LiDAR compression *
+*Award-winning software for efficient LiDAR compression*
 
 Open-source compression library for compressing LAS to LAZ.
 LASzip is completely lossless: It compresses bulky LAS files into compact LAZ files that are only 7-20% of the original size, while accurately preserving every single bit. Likewise, LAZ files can be decompressed into a bitwise identical LAS file. LASzip allows compressed LAZ files to be treated like standard LAS files. They can be loaded directly from the compressed form into an application without first decompressing them to a disk.
@@ -9,6 +9,9 @@ This is the repository of the open source LAZ compressor under the terms of the 
 
 For the full LASlib and LAStools repository include the popular open source tools las2las, las2txt, txt2las please see https://github.com/LAStools/LAStools  
 
+# Specification
+
+LAZ Specification 1.4 - Revision R1 available at https://rapidlasso.de/laszip/
 
 # Installation
 

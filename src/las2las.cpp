@@ -625,6 +625,7 @@ int main(int argc, char* argv[])
   int set_global_encoding_gps_bit = -1;
   int set_lastiling_buffer_flag = -1;
   // variable header changes
+  bool ogc_wkt_in_header = false;
   bool set_ogc_wkt = false;
   bool set_ogc_wkt_in_evlr = false;
   CHAR* set_ogc_wkt_string = 0;
@@ -1761,9 +1762,24 @@ int main(int argc, char* argv[])
           point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
           point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
           geoprojectionconverter.to_target(point);
-          reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision();
-          reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision();
-          reproject_quantizer->z_scale_factor = (geoprojectionconverter.has_target_elevation_precision() ? geoprojectionconverter.get_target_elevation_precision() : lasreader->header.z_scale_factor);
+          reproject_quantizer->x_scale_factor = 
+              geoprojectionconverter.has_target_precision() 
+                  ? geoprojectionconverter.get_target_precision()
+                  : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[0] > 0.0 
+                      ? lasreadopener.get_scale_factor()[0] 
+                      : lasreader->header.x_scale_factor);
+          reproject_quantizer->y_scale_factor = 
+              geoprojectionconverter.has_target_precision() 
+                  ? geoprojectionconverter.get_target_precision()
+                  : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[1] > 0.0 
+                      ? lasreadopener.get_scale_factor()[1] 
+                      : lasreader->header.y_scale_factor);
+          reproject_quantizer->z_scale_factor = 
+              geoprojectionconverter.has_target_elevation_precision() 
+                  ? geoprojectionconverter.get_target_elevation_precision()
+                  : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[2] > 0.0 
+                      ? lasreadopener.get_scale_factor()[2] 
+                      : lasreader->header.z_scale_factor);          
           reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
           reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
           reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
@@ -1829,14 +1845,30 @@ int main(int argc, char* argv[])
         point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
         point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
         geoprojectionconverter.to_target(point);
-        reproject_quantizer->x_scale_factor = reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision();
-        reproject_quantizer->z_scale_factor = (geoprojectionconverter.has_target_elevation_precision() ? geoprojectionconverter.get_target_elevation_precision() : lasreader->header.z_scale_factor);
+        reproject_quantizer->x_scale_factor = 
+            geoprojectionconverter.has_target_precision() 
+                ? geoprojectionconverter.get_target_precision()
+                : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[0] > 0.0 
+                    ? lasreadopener.get_scale_factor()[0] 
+                    : lasreader->header.x_scale_factor);
+        reproject_quantizer->y_scale_factor = 
+            geoprojectionconverter.has_target_precision() 
+                ? geoprojectionconverter.get_target_precision()
+                : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[1] > 0.0 
+                    ? lasreadopener.get_scale_factor()[1] 
+                    : lasreader->header.y_scale_factor);
+        reproject_quantizer->z_scale_factor = 
+            geoprojectionconverter.has_target_elevation_precision() 
+                ? geoprojectionconverter.get_target_elevation_precision()
+                : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[2] > 0.0 
+                    ? lasreadopener.get_scale_factor()[2] 
+                    : lasreader->header.z_scale_factor);
         reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
         reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
         reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
 
         set_projection_in_header = true;
-        set_ogc_wkt = true;
+        ogc_wkt_in_header = true;
         set_wkt_global_encoding_bit = true;
         lasreader->header.clean_vlrs();
         lasreader->header.clean_evlrs();
@@ -1867,7 +1899,7 @@ int main(int argc, char* argv[])
           lasreader->header.del_geo_ogc_wkt();
         }
 
-        if (set_ogc_wkt || (lasreader->header.point_data_format >= 6)) // maybe also set the OCG WKT
+        if (set_ogc_wkt || ogc_wkt_in_header || (lasreader->header.point_data_format >= 6)) // maybe also set the OCG WKT
         {
           CHAR* ogc_wkt = set_ogc_wkt_string;
           // The WKT should be generated via the PROJ lib if: it is a PROJ transformation, a soure EPSG in the arguments is specified or a WKT is specified in the file header. 
@@ -1972,6 +2004,7 @@ int main(int argc, char* argv[])
           }
         }
       }
+      ogc_wkt_in_header = false;
 
       // maybe we should remove some stuff
 
@@ -2076,11 +2109,9 @@ int main(int argc, char* argv[])
       if (save_vlr == false)
       {
         // do we need an extra pass
-        
         BOOL extra_pass = laswriteopener.is_piped();
         
         // we only really need an extra pass if the coordinates are altered or if points are filtered
-        
         if (extra_pass)
         {
           if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
@@ -2088,16 +2119,25 @@ int main(int argc, char* argv[])
             extra_pass = FALSE;
           }
         }
-        
+
+        bool doIntensityRangeGet = false;
+        U16 intensityMin = UINT16_MAX;
+        U16 intensityMax = 0;
+        LASoperationMultiplyScaledIntensityRangeIntoRGB* op = nullptr;
+        if (lasreadopener.get_transform()->find_operation(op))
+        {
+          doIntensityRangeGet = true;
+          extra_pass = true;
+        }
+
         // for piped output we need an extra pass
-        
         if (extra_pass)
         {
           if (lasreadopener.is_piped())
           {
             laserror("input and output cannot both be piped");
           }
-          LASMessage(LAS_VERBOSE, "extra pass for piped output: reading %lld points ...", lasreader->npoints);
+          LASMessage(LAS_VERBOSE, "extra pass required: reading %lld points ...", lasreader->npoints);
           // maybe seek to start position
           if (subsequence_start) lasreader->seek(subsequence_start);
           while (lasreader->read_point())
@@ -2119,9 +2159,26 @@ int main(int argc, char* argv[])
               lasreader->point.compute_XYZ(reproject_quantizer);
             }
             lasinventory.add(&lasreader->point);
+
+            if (doIntensityRangeGet)
+            {
+              U16 ints = lasreader->point.get_intensity();
+              intensityMin = min(ints,intensityMin);
+              intensityMax = max(ints, intensityMax);
+            }
           }
           lasreader->close();
-        
+
+          if (doIntensityRangeGet)
+          {
+            op->intensityMin = intensityMin;
+            op->intensityRange = intensityMax - intensityMin;
+            if (op->intensityRange == 0)
+            {
+              LASMessage(LAS_WARNING, "range of intensity values is zero. no intensity calculations will be done.");
+            }
+          }
+
           if (reproject_quantizer) lasreader->header = *reproject_quantizer;
         
           lasinventory.update_header(&lasreader->header);
@@ -2201,7 +2258,7 @@ int main(int argc, char* argv[])
 
         // loop over points
 
-        if (point)
+        if (point) // full rewrite: point copy
         {
           while (lasreader->read_point())
           {
@@ -2229,7 +2286,7 @@ int main(int argc, char* argv[])
           delete point;
           point = 0;
         }
-        else
+        else // direct copy from source point to target point
         {
           while (lasreader->read_point())
           {

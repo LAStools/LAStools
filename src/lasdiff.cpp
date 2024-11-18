@@ -122,24 +122,9 @@ static int check_header(LASreader* lasreader1, LASreader* lasreader2)
       fprintf(stderr, "  different reserved (global_encoding): %d %d\n", lasheader1->global_encoding, lasheader2->global_encoding);
       different_header++;
     }
-    if (lasheader1->project_ID_GUID_data_1 != lasheader2->project_ID_GUID_data_1)
+    if (lasheader1->get_GUID() != lasheader2->get_GUID())
     {
-      fprintf(stderr, "  different project_ID_GUID_data_1: %d %d\n", lasheader1->project_ID_GUID_data_1, lasheader2->project_ID_GUID_data_1);
-      different_header++;
-    }
-    if (lasheader1->project_ID_GUID_data_2 != lasheader2->project_ID_GUID_data_2)
-    {
-      fprintf(stderr, "  different project_ID_GUID_data_2: %d %d\n", lasheader1->project_ID_GUID_data_2, lasheader2->project_ID_GUID_data_2);
-      different_header++;
-    }
-    if (lasheader1->project_ID_GUID_data_3 != lasheader2->project_ID_GUID_data_3)
-    {
-      fprintf(stderr, "  different project_ID_GUID_data_3: %d %d\n", lasheader1->project_ID_GUID_data_3, lasheader2->project_ID_GUID_data_3);
-      different_header++;
-    }
-    if (strncmp((const char*)lasheader1->project_ID_GUID_data_4, (const char*)lasheader2->project_ID_GUID_data_4, 8))
-    {
-      fprintf(stderr, "  different project_ID_GUID_data_4: '%.8s' '%.8s'\n", lasheader1->project_ID_GUID_data_4, lasheader2->project_ID_GUID_data_4);
+      fprintf(stderr, "  different project_ID_GUID: %s %s\n", lasheader1->get_GUID().c_str(), lasheader2->get_GUID().c_str());
       different_header++;
     }
     if (lasheader1->version_major != lasheader2->version_major || lasheader1->version_minor != lasheader2->version_minor)
