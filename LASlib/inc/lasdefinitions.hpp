@@ -490,10 +490,11 @@ public:
     {
       LASMessage(LAS_WARNING, "unknown version %d.%d (allowed 1.0-1.4)", version_major, version_minor);
     }
-    if ((version_minor < 4) && (point_data_format >= 6) ||
-        (version_minor < 3) && (point_data_format >= 4) ||
-        (version_minor < 2) && (point_data_format >= 1)) {
-        LASMessage(LAS_WARNING, "LAS version %d.%d does not allow point format %d", version_major, version_minor, point_data_format);
+    U8 pdf = point_data_format & 0x7f; // remove LAZ bit 7
+    if ((version_minor < 4) && (pdf >= 6) ||
+        (version_minor < 3) && (pdf >= 4) ||
+        (version_minor < 2) && (pdf >= 1)) {
+        LASMessage(LAS_WARNING, "LAS version %d.%d does not allow point format %d", version_major, version_minor, pdf);
     }
     if (header_size < 227)
     {
