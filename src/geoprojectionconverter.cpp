@@ -2232,7 +2232,7 @@ FILE* GeoProjectionConverter::open_geo_file(bool pcs, bool vertical)
 {
   FILE* file = 0;
   std::string fn = exe_path();
-  if (StringEndsWith(fn, "blast" + DIRECTORY_SLASH) ) // particular case: exe in serf/blast subdir
+  if (StringEndsWith(fn, "blast" + std::string(1,DIRECTORY_SLASH))) // particular case: exe in serf/blast subdir
   {
     fn = fn.substr(0, fn.length() - 11); // "../serf/blast/" > ".."
   }
