@@ -81,6 +81,7 @@ typedef const char* (*proj_context_errno_string_t)(PJ_CONTEXT*, int);
 typedef PJ_COORD (*proj_coord_t)(double, double, double, double);
 typedef PJ_COORD (*proj_trans_t)(PJ*, PJ_DIRECTION, PJ_COORD);
 typedef PJ_TYPE (*proj_get_type_t)(const PJ*);
+typedef int (*proj_is_crs_t)(const PJ*);
 
 // External variables for function pointers
 extern proj_as_wkt_t proj_as_wkt_ptr;
@@ -114,6 +115,7 @@ extern proj_context_errno_string_t proj_context_errno_string_ptr;
 extern proj_coord_t proj_coord_ptr;
 extern proj_trans_t proj_trans_ptr;
 extern proj_get_type_t proj_get_type_ptr;
+extern proj_is_crs_t proj_is_crs_ptr;
 
 // Function for dynamic loading of the PROJ library
 bool load_proj_library(const char* path, bool isNecessary = true);
@@ -199,5 +201,7 @@ void unload_proj_library();
 #define proj_trans(P, direction, coord) (proj_trans_ptr ? proj_trans_ptr(P, direction, coord) : PJ_COORD{})
 
 #define proj_get_type(P) (proj_get_type_ptr ? proj_get_type_ptr(P) : PJ_TYPE{})
+
+#define proj_is_crs(P) (proj_is_crs_ptr ? proj_is_crs_ptr(P) : 0)
 
 #endif  // PROJ_LOADER_H
