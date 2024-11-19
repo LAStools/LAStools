@@ -177,6 +177,12 @@ typedef union I64U32I32F32 { I64 i64; U32 u32[2]; I32 i32[2]; F32 f32[2]; } I64U
 #define U32_ZERO_BIT_0(n) (((n)&(U32)0xFFFFFFFE))
 #define U32_ZERO_BIT_0_1(n) (((n)&(U32)0xFFFFFFFC))
 
+ // MSVC does not like std::max({a, b, c}) nor std::max() and wants max(). g++ want std::max not max().
+#define MIN2(a, b) ((a) < (b) ? (a) : (b))
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+#define MIN3(a, b, c) MIN2(MIN2(a, b), (c))
+#define MAX3(a, b, c) MAX2(MAX2(a, b), (c))
+
 #ifndef FALSE
 #define FALSE   0
 #endif

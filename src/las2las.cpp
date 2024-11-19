@@ -2163,8 +2163,8 @@ int main(int argc, char* argv[])
             if (doIntensityRangeGet)
             {
               U16 ints = lasreader->point.get_intensity();
-              intensityMin = min(ints,intensityMin);
-              intensityMax = max(ints, intensityMax);
+              intensityMin = MIN2(ints, intensityMin);
+              intensityMax = MAX2(ints, intensityMax);
             }
           }
           lasreader->close();

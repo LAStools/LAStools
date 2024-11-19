@@ -74,12 +74,6 @@
 #define strcasecmp _stricmp
 #endif
 
- // MSVC does not like std::max({a, b, c}) nor std::max() and wants max(). g++ want std::max not max().
-#define MIN2(a, b) ((a) < (b) ? (a) : (b))
-#define MAX2(a, b) ((a) > (b) ? (a) : (b))
-#define MIN3(a, b, c) MIN2(MIN2(a, b), (c))
-#define MAX3(a, b, c) MAX2(MAX2(a, b), (c))
-
 // Default: Linux 1024, Windows 512 may be increased to 2048 with MSVC, MacOS ??? (minus 3 for stdin, stderr, stdout)
 #ifdef _WIN32
 I32 MAX_FOPEN = 500;

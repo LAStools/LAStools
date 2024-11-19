@@ -41,8 +41,6 @@
 #include <cmath>
 #include <algorithm>
 
-#define MAX(a, b, c) ((a) <= (b)? (b) <= (c)? (c) : (b) : (a) <= (c)? (c) : (a)) // MSVC does not like std::max({a, b, c})
-
 EPTkey::EPTkey(I32 d, I32 x, I32 y, I32 z) : d(d), x(x), y(y), z(z) {}
 EPTkey::EPTkey() : EPTkey(-1, -1, -1, -1) {}
 
@@ -105,7 +103,7 @@ EPToctant::EPToctant(const LASvlr_copc_entry entry, const F64 xmin, const F64 ym
   position.end = end;
 
   // Step size accounts for depth level
-  F64 size = MAX(xmax - xmin, ymax - ymin, zmax - zmin);
+  F64 size = MAX3(xmax - xmin, ymax - ymin, zmax - zmin);
   F64 res  = size / std::pow(2, d);
 
   // Bounding box
@@ -135,7 +133,7 @@ EPToctree::EPToctree(const LASheader& header)
     F64 center_x = (header.min_x + header.max_x)/2;
     F64 center_y = (header.min_y + header.max_y)/2;
     F64 center_z = (header.min_z + header.max_z)/2;
-    F64 halfsize = MAX(header.max_x - header.min_x, header.max_y - header.min_y, header.max_z - header.min_z)/2;
+    F64 halfsize = MAX3(header.max_x - header.min_x, header.max_y - header.min_y, header.max_z - header.min_z)/2;
 
     xmin = center_x - halfsize;
     ymin = center_y - halfsize;
@@ -244,8 +242,8 @@ I32 EPToctree::compute_max_depth(const LASheader& header, U64 max_points_per_oct
   F64 xsize = header.max_x - header.min_x;
   F64 ysize = header.max_y - header.min_y;
   F64 zsize = header.max_z - header.min_z;
-  F64 size  = MAX(xsize, ysize, zsize);
-  U64 npts  = MAX((U64)header.number_of_point_records, header.extended_number_of_point_records, 0);
+  F64 size  = MAX3(xsize, ysize, zsize);
+  U64 npts  = MAX3((U64)header.number_of_point_records, header.extended_number_of_point_records, 0);
   I32 max_depth = 0;
 
   while (npts > max_points_per_octant)
