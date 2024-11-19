@@ -354,6 +354,7 @@ See "grouping arguments by tokens" below to see all possible tokens to generate 
 -grey                      : gray-scale based on min/max range (used with PNG/TIF/JPG)  
 -grid_ll [x] [y]           : shift raster grid lower left to [x]/[y]  
 -grid_spacing [n]          : raster with stepsize [n] (the default is 1)  
+-grid_center               : aligns the grid's origin to the center of a cell instead of its corner  
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
 -invert_ramp               : invert color ramp for output  
