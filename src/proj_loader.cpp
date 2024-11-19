@@ -77,6 +77,7 @@ proj_context_errno_string_t proj_context_errno_string_ptr = nullptr;
 proj_coord_t proj_coord_ptr = nullptr;
 proj_trans_t proj_trans_ptr = nullptr;
 proj_get_type_t proj_get_type_ptr = nullptr;
+proj_is_crs_t proj_is_crs_ptr = nullptr;
 
 /// Function to get the home directory of the current user
 const char* getHomeDirectory() {
@@ -450,6 +451,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
   proj_coord_ptr = (proj_coord_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_coord");
   proj_trans_ptr = (proj_trans_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_trans");
   proj_get_type_ptr = (proj_get_type_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_get_type");
+  proj_is_crs_ptr = (proj_is_crs_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_is_crs");
 
   if (!proj_as_wkt_ptr || !proj_as_proj_string_ptr || !proj_as_projjson_ptr || !proj_get_source_crs_ptr || !proj_get_target_crs_ptr ||
       !proj_destroy_ptr || !proj_context_create_ptr || !proj_context_destroy_ptr || !proj_get_id_code_ptr || !proj_get_ellipsoid_ptr ||
@@ -457,7 +459,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       !proj_datum_ensemble_get_accuracy_ptr || !proj_datum_ensemble_get_member_ptr || !proj_crs_get_datum_ptr ||
       !proj_crs_get_coordinate_system_ptr || !proj_cs_get_type_ptr || !proj_cs_get_axis_count_ptr || !proj_cs_get_axis_info_ptr || !proj_create_ptr ||
       !proj_create_argv_ptr || !proj_create_crs_to_crs_ptr || !proj_create_crs_to_crs_from_pj_ptr || !proj_create_from_wkt_ptr ||
-      !proj_context_errno_ptr || !proj_context_errno_string_ptr || !proj_coord_ptr || !proj_trans_ptr || !proj_get_type_ptr)
+      !proj_context_errno_ptr || !proj_context_errno_string_ptr || !proj_coord_ptr || !proj_trans_ptr || !proj_get_type_ptr || !proj_is_crs_ptr)
   {
     unload_proj_library();
     laserror("Failed to load necessary PROJ functions.");
@@ -504,4 +506,5 @@ void unload_proj_library() {
   proj_coord_ptr = nullptr;
   proj_trans_ptr = nullptr;
   proj_get_type_ptr = nullptr;
+  proj_is_crs_ptr = nullptr;
 }
