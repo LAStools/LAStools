@@ -768,6 +768,28 @@ class LASLIB_DLL LASpoint {
     return extended_scanner_channel;
   };
 
+  U8 get_classification_uni() const {
+    if (extended_point_type) {
+      return get_extended_classification();
+    } else {
+      return get_classification();
+    }
+  };
+  U8 get_return_number_uni() const {
+    if (extended_point_type) {
+      return get_extended_return_number();
+    } else {
+      return get_return_number();
+    }
+  };
+  U8 get_number_of_returns_uni() const {
+    if (extended_point_type) {
+      return get_extended_number_of_returns();
+    } else {
+      return get_number_of_returns();
+    }
+  };
+
   inline void set_extended_classification(U8 extended_classification) {
     this->extended_classification = extended_classification;
     if (extended_classification > 31)
@@ -789,6 +811,28 @@ class LASLIB_DLL LASpoint {
   };
   inline void set_extended_scanner_channel(U8 extended_scanner_channel) {
     this->extended_scanner_channel = extended_scanner_channel;
+  };
+
+  inline void set_classification_uni(U8 classification) {
+    if (extended_point_type) {
+      set_extended_classification(classification);
+    } else {
+      set_classification(classification);
+    }
+  };
+  inline void set_return_number_uni(U8 return_number) {
+    if (extended_point_type) {
+      set_extended_return_number(return_number);
+    } else {
+      set_return_number(return_number);
+    }
+  };
+  inline void set_number_of_returns_uni(U8 number_of_returns) {
+    if (extended_point_type) {
+      set_extended_number_of_returns(number_of_returns);
+    } else {
+      set_number_of_returns(number_of_returns);
+    }
   };
 
   inline F32 get_scan_angle() const {
