@@ -419,7 +419,7 @@ class LasTool_lasinfo : public LasTool {
           }
           i++;
           if (sscanf_las(
-                  argv[i], "%I64x-%x-%x-%02X%02X-%02X%02X%02X%02X%02X%02X", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2,
+                  argv[i], "%I64x-%x-%x-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2,
                   &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4[0], &set_project_ID_GUID_data_4[1], &set_project_ID_GUID_data_4[2],
                   &set_project_ID_GUID_data_4[3], &set_project_ID_GUID_data_4[4], &set_project_ID_GUID_data_4[5], &set_project_ID_GUID_data_4[6],
                   &set_project_ID_GUID_data_4[7]) != 11) {
