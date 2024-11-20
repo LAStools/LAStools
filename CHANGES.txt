@@ -1,3 +1,10 @@
+19 November 2024 -- NEW: Extended lasgrid and las2dem with '-grid_center' argument.
+19 November 2024 -- fix: blast2dem get dynamic directories
+18 November 2024 -- NEW: validate LAS version and point_data_format prior writing LAS/LAZ files
+14 November 2024 -- NEW: lascopy: -copy_attribute, -copy_return_number, -copy_number_of_returns arguments
+12 November 2024 -- fix: lasinfo GUID byteorder
+11 November 2024 -- NEW: Multi-file support for PROJ operations
+07 November 2024 -- convert intensity to gray RGB value (https://groups.google.com/g/lastools/c/mnEbBBCsN2M/m/DyFYL4d9BwAJ)
 06 November 2024 -- fix: lasinfo multi-core performance issue
 06 November 2024 -- NEW: 'no_data_alpha' option to support alpha channel in GeoTIFF outputs
 31 October 2024 -- NEW: lasgrid64: Support more than 64 colors in color mapping
