@@ -178,6 +178,7 @@ other commandline arguments are
 -ncols 512            : raster at most 512 columns
 -ll 300000 600000     : start rastering at these lower left x and y coordinates
 -nodata -9999         : use -9999 as the nodata value in the BIL/ASC format
+-grid_center          : aligns the grid's origin to the center of a cell instead of its corner
 -hillshade            : color the image with hillside shading
 -intensity            : use intensity values
 -rgb                  : use rgb values if available (only used with PNG/TIF/JPG)

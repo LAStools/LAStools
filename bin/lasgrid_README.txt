@@ -223,6 +223,7 @@ overview of all tool-specific switches:
 -ncols 512             : raster at most 512 columns (starting from the lower left)
 -ll 300000 600000      : start rastering at these lower left x and y coordinates
 -nodata 9999           : use 9999 as the nodata value in the BIL / ASC format
+-grid_center           : aligns the grid's origin to the center of a cell instead of its corner
 -elevation             : use elevation values
 -intensity             : use intensity values
 -highest -high -max    : for each grid cell keep highest value

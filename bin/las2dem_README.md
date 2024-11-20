@@ -188,6 +188,7 @@ generated KML file:
 -float_precision [n]       : sets output float precision to [n]{used with ASC/BIL/TIF}  
 -force_precision           : force excessive elevation (z) precision  
 -grid [n]                  : raster with stepsize [n] (the default is 1 or 0.0001 on long/lat coordinates)  
+-grid_center               : aligns the grid's origin to the center of a cell instead of its corner  
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
 -invert_ramp               : invert color ramp for output  
