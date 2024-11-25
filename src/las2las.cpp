@@ -2124,7 +2124,7 @@ int main(int argc, char* argv[])
         U16 intensityMin = UINT16_MAX;
         U16 intensityMax = 0;
         LASoperationMultiplyScaledIntensityRangeIntoRGB* op = nullptr;
-        if (lasreadopener.get_transform()->find_operation(op))
+        if ((lasreadopener.get_transform() != nullptr) && (lasreadopener.get_transform()->find_operation(op)))
         {
           doIntensityRangeGet = true;
           extra_pass = true;

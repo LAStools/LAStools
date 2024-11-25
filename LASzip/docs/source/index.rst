@@ -24,7 +24,7 @@ Source
 Specification
 ..............................................................................
 
-`LAZ Specification 1.4 <https://downloads.rapidlasso.de/doc/LAZ_Specification_1.4_R0.pdf>`_
+`LAZ Specification 1.4 <https://rapidlasso.de/laszip/>`_
 
 
 Example

@@ -1,3 +1,6 @@
+25 November 2024 -- NEW: demzip and demdiff @linux
+25 November 2024 -- fix: lasvdatum performance bug / debug output
+22 November 2024 -- 7z removed from the delivery. User must install it themselves if required.
 19 November 2024 -- NEW: Extended lasgrid and las2dem with '-grid_center' argument.
 19 November 2024 -- fix: blast2dem get dynamic directories
 18 November 2024 -- NEW: validate LAS version and point_data_format prior writing LAS/LAZ files
