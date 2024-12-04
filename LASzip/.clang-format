@@ -1,0 +1,42 @@
+Language: Cpp
+# Uses the defaults from the Google coding style
+BasedOnStyle: Google
+
+# Indentation
+IndentWidth: 2
+TabWidth: 4
+UseTab: Never
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: None
+
+# Alignment
+AlignAfterOpenBracket: AlwaysBreak
+AlignOperands: true
+AlignEscapedNewlines: Right
+AlignConsecutiveAssignments: false
+AlignConsecutiveBitFields: true
+AlignTrailingComments: true
+
+# Spaces and Parentheses
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpacesInAngles: false
+PointerAlignment: Left  # Ensures & and * stay with the type
+DerivePointerAlignment: false  # Prevents automatic alignment override
+
+# Column limit and maximum penalties
+ColumnLimit: 150
+MaxEmptyLinesToKeep: 1
+
+# Sort includes
+SortIncludes: true  
+IncludeBlocks: Regroup
+IncludeCategories:                     
+  - Regex: '^"(llvm|llvm-c|clang|clang-c)/'
+    Priority: 2
+  - Regex: '^(<|"(gtest|gmock|isl|json)/)'
+    Priority: 3
+  - Regex: '.*'            
+    Priority: 1
