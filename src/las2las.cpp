@@ -65,6 +65,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cstdint> 
 
 #include "lastool.hpp"
 #include "lasreader.hpp"

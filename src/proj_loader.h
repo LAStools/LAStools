@@ -33,8 +33,6 @@
 #ifndef PROJ_LOADER_H
 #define PROJ_LOADER_H
 
-#include <proj.h>
-
 #ifdef _WIN32
 #include <windows.h>
 #define LOAD_LIBRARY(name) LoadLibraryEx(name, NULL, LOAD_WITH_ALTERED_SEARCH_PATH)
@@ -48,6 +46,64 @@
 #define FREE_LIBRARY(lib) dlclose(lib)
 #define PROJ_LIB_HANDLE void*
 #endif
+
+// Placeholder for compiling without proj.h
+typedef void* PJ;
+typedef void* PJ_CONTEXT;
+typedef void* PJ_AREA;
+typedef void* PROJ_STRING_LIST;
+
+typedef struct {
+  double x, y, z, t;
+} PJ_XYZT;
+
+typedef struct {
+  PJ_XYZT xyzt;
+} PJ_COORD;
+
+typedef enum {
+  PJ_CS_TYPE_UNKNOWN,
+  PJ_CS_TYPE_CARTESIAN,
+  PJ_CS_TYPE_ELLIPSOIDAL,
+  PJ_CS_TYPE_VERTICAL,
+  PJ_CS_TYPE_SPHERICAL,
+  PJ_CS_TYPE_ORDINAL,
+  PJ_CS_TYPE_PARAMETRIC,
+  PJ_CS_TYPE_DATETIMETEMPORAL,
+  PJ_CS_TYPE_TEMPORALCOUNT,
+  PJ_CS_TYPE_TEMPORALMEASURE
+} PJ_COORDINATE_SYSTEM_TYPE;
+
+typedef enum PJ_DIRECTION{
+  PJ_FWD = 1,
+  PJ_IDENT = 0,
+  PJ_INV = -1
+};
+
+typedef enum {
+  PJ_TYPE_UNKNOWN = 0,
+  PJ_TYPE_TRANSFORMATION,
+  PJ_TYPE_CONVERSION,
+  PJ_TYPE_CONCATENATED_OPERATION,
+  PJ_TYPE_CRS,
+  PJ_TYPE_ELLIPSOID,
+} PJ_TYPE;
+
+typedef enum {
+  PJ_PROJ_5,
+  PJ_PROJ_4
+} PJ_PROJ_STRING_TYPE;
+
+typedef enum {
+  PJ_WKT2_2015,
+  PJ_WKT2_2015_SIMPLIFIED,
+  PJ_WKT2_2019,
+  PJ_WKT2_2018 = PJ_WKT2_2019,
+  PJ_WKT2_2019_SIMPLIFIED,
+  PJ_WKT2_2018_SIMPLIFIED = PJ_WKT2_2019_SIMPLIFIED,
+  PJ_WKT1_GDAL,
+  PJ_WKT1_ESRI
+} PJ_WKT_TYPE;
 
 // Function pointer type definitions
 typedef const char* (*proj_as_wkt_t)(PJ_CONTEXT*, const PJ*, PJ_WKT_TYPE, const char* const*);
