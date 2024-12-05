@@ -74,11 +74,11 @@ typedef enum {
   PJ_CS_TYPE_TEMPORALMEASURE
 } PJ_COORDINATE_SYSTEM_TYPE;
 
-typedef enum PJ_DIRECTION{
+typedef enum {
   PJ_FWD = 1,
   PJ_IDENT = 0,
   PJ_INV = -1
-};
+} PJ_DIRECTION;
 
 typedef enum {
   PJ_TYPE_UNKNOWN = 0,
