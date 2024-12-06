@@ -37,7 +37,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <proj.h>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -46,6 +45,7 @@
 #include "mydefs.hpp"
 #include "lasmessage.hpp"
 #include "lasutility.hpp"
+#include "proj_loader.h"
 
 #if defined(_MSC_VER) && \
     (_MSC_FULL_VER >= 150000000)
