@@ -60,15 +60,22 @@ within 0.5 units in source exists. Set all other z-values to 0.
 
 ## lascopy specific arguments
 
--match_gps_time       : uses gps time to match data point (default)  
--match_return_number  : uses number of return to match data point (default)  
--match_classification : uses classification for point matching  
--match_intensity      : uses intensity for point matching  
--match_point_source_id: uses point source for point matching  
--match_scanner_channel: uses scanner channel for point matching  
--match_xy [dist]      : Matches point by x-y coordinates and the specified maximum distance  
--match_xyz [dist]     : Matches point by x-y-z coordinates and the specified maximum distance  
--match_xyz_warn [n]   : Issues warning if more than n points are considered for matching for a single point. This may hint to using a smaller matching distance for improved performance.
+### point matching
+-match_gps_time          : uses gps time to match data point (default)  
+-match_return_number     : uses number of return to match data point (default)  
+-match_number_of_returns : uses number of returns for point matching  
+-match_classification    : uses classification for point matching  
+-match_intensity         : uses intensity for point matching  
+-match_point_source_id   : uses point source for point matching  
+-match_scanner_channel   : uses scanner channel for point matching  
+-match_scan_angle        : uses scan angle for point matching  
+-match_edge_of_flightline: uses edge of flightline flag for point matching  
+-match_scan_direction    : uses scan direction flag for point matching  
+-match_user_data         : uses user data for point matching  
+-match_xy [dist]         : Match points by x-y coordinates and the specified maximum distance  
+-match_xyz [dist]        : Match points by x-y-z coordinates and the specified maximum distance  
+
+### copy operations
 -copy_attribute [n]   : copy attribute with index [n]. Attribute must exist in source and target with matching data type.  
 -copy_classification  : copy classification attribute (default)  
 -copy_elevation       : copy elevation attribute  
@@ -81,15 +88,18 @@ within 0.5 units in source exists. Set all other z-values to 0.
 -copy_user_data       : copy user data to target  
 -copy_return_number   : copy return number to target  
 -copy_number_of_returns : copy number of returns to target  
--zero                 : set attribute of points to zero if not found in source  
--unmatched            : copy attributes from source to target by point order  
--ilay [n]             : apply [n] or all LASlayers found in corresponding *.lay file on read  
--ilaydir [n]          : look for corresponding *.lay file in directory [n]  
--switch_G_B           : switch green and blue value  
--week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
+
+### other specific arguments
+-match_xyz_warn [n]      : Issues warning if more than [n] points are considered for matching for a single point.  
+                           This may hint to using a smaller matching distance for improved performance.  
+-zero                    : set attribute of points to zero if not found in source  
+-unmatched               : copy attributes from source to target by point order  
+-ilay [n]                : apply [n] or all LASlayers found in corresponding *.lay file on read  
+-ilaydir [n]             : look for corresponding *.lay file in directory [n]  
+-switch_G_B              : switch green and blue value  
+-week_to_adjusted [n]    : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### deprecated arguments
-
 -classification       : Deprecated: copy classification attribute (may be removed in future - replaced by copy_classification)  
 -elevation            : Deprecated: copy elevation attribute (may be removed in future - replaced by copy_elevation)  
 -intensity            : Deprecated: copy intensity attribute (may be removed in future - replaced by copy_intensity)  

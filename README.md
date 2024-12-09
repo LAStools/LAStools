@@ -147,9 +147,11 @@ All open source tools can be compiled from source code.
 A ready-to-use MSVS solution file (LAStools.sln) is available for Windows.  
 This solution builds all open source tools and dlls in 64 bit.  
 There is a cmake file for Linux and MacOS.  
-Just go to the root directory and run  
+Just go to the root directory and run
+
     cmake -DCMAKE_BUILD_TYPE=Release CMakeLists.txt  
-    cmake --build .  
+    cmake --build .
+    
 The QGIS toolbox can be installed within QGIS, see (https://rapidlasso.de/lastools-as-qgis-plugin/).  
 The binary download contains the plugin for ArcGIS in `.\ArcGIS_toolbox`.  
 
