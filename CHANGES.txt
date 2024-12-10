@@ -1,3 +1,4 @@
+9 December 2024 -- NEW: lascopy64: new match arguments: number_of_returns, scan_angle, flags, user_data
 25 November 2024 -- NEW: demzip and demdiff @linux
 25 November 2024 -- fix: lasvdatum performance bug / debug output
 22 November 2024 -- 7z removed from the delivery. User must install it themselves if required.
