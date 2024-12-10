@@ -219,126 +219,126 @@ Aggregate arguments will overwrite aggreagte endings given with the grouping arg
 -stddev  : for each grid cell compute standard deviation  
 
 ### grouping arguments - samples
-Grouping arguments can have aggreate endings. No aggregate arguments are needed then.
-See "grouping arguments by tokens" below to see all possible tokens to generate grouping arguments. 
+Grouping arguments can have aggreate endings. No aggregate arguments are needed then.  
+See "grouping arguments by tokens" below to see all possible tokens to generate grouping arguments.  
 -attribute [n]          : use attribute [n] value as output color parameter  
--counter_2bit           : counts points per cell with an 8 bit counter
--counter_4bit           : counts points per cell with an 4 bit counter
--counter_8bit           : counts points per cell with an 8 bit counter
--counter_16bit          : counts points per cell with an 16 bit counter
--counter_32bit          : counts points per cell with an 32 bit counter
--counter_quotient_8bit  : calculate density quotient with an 8 bit counter 
--counter_quotient_16bit : calculate density quotient with an 16 bit counter
--elevation_highest      : use highest elevation values 
--elevation_min          : use min elevation as values
--elevation_max          : use max elevation as values
--elevation_average      : use average elevation as values
--elevation_avg          : use average elevation as values
+-counter_2bit           : counts points per cell with an 8 bit counter  
+-counter_4bit           : counts points per cell with an 4 bit counter  
+-counter_8bit           : counts points per cell with an 8 bit counter  
+-counter_16bit          : counts points per cell with an 16 bit counter  
+-counter_32bit          : counts points per cell with an 32 bit counter  
+-counter_quotient_8bit  : calculate density quotient with an 8 bit counter  
+-counter_quotient_16bit : calculate density quotient with an 16 bit counter  
+-elevation_highest      : use highest elevation values  
+-elevation_min          : use min elevation as values  
+-elevation_max          : use max elevation as values  
+-elevation_average      : use average elevation as values  
+-elevation_avg          : use average elevation as values  
 -elevation_stddev       : use standard derivation of elevation as values  
--elevation_std          : use standard derivation of elevation as values
--elevation_range        : use elevation range as values
--elevation_index        : use elevation index as values
--intensity_lowest       : use intensity minimum as values
--intensity_min          : use intensity minimum as values
--intensity_max          : use intensity maximum as values
+-elevation_std          : use standard derivation of elevation as values  
+-elevation_range        : use elevation range as values  
+-elevation_index        : use elevation index as values  
+-intensity_lowest       : use intensity minimum as values  
+-intensity_min          : use intensity minimum as values  
+-intensity_max          : use intensity maximum as values  
 -intensity_average      : use intensity average as values  
--intensity_avg          : use intensity average as values
--intensity_stddev       : use standard derivation of intensity as values
--intensity_std          : use standard derivation of intensity as values
--intensity_range        : use intensity range as values
--scan_angle_min         : use minimum scan angle as values
--scan_angle_min_abs     : use minimum absolute scan angle as values
--scan_angle_max         : use maximum scan angle as values
--scan_angle_max_abs     : use maximum absolute scan angle as values
--scan_angle_highest     : use maximum scan angle as values
--scan_angle_highest_abs : use maximum absolute scan angle as values
--scan_angle_range       : use scan angle range as values
--scan_angle_average     : use average scan angle as values
--scan_angle_average_abs : use average absolute scan angle as values
--scan_angle_avg         : use average scan angle as values
--scan_angle_avg_abs     : use average absolute scan angle as values
--user_data_lowest       : use minimum of user data as values
--user_data_min          : use minimum of user data as values
--user_data_max          : use maximum of user data as values
--user_data_average      : use average of user data as values
--user_data_avg          : use average of user data as values
--user_data_stddev       : use standard derivation of user data as values
--user_data_std          : use standard derivation of user data as values
--user_data_range        : use user data range as values
--point_source_lowest    : use minimum of point source as values
--point_source_min       : use minimum of point source as values
--point_source_max       : use maximum of point source as values
--point_source_range     : use range of point source as values
--gps_time_lowest        : use minimum of gps time as values
--gps_time_min           : use minimum of gps time as values
--gps_time_max           : use maximum of gps time as values
--gps_time_range         : use range of gps time as values
--number_returns_avg     : use average number of returns as values
--number_returns_lowest  : use minimum number of returns as values
--number_returns_min     : use minimum number of returns as values
--number_returns_highest : use maximum number of returns as values
--number_returns_max     : use maximum number of returns as values
--number_returns_stddev  : use standard derivation of returns as values
--number_returns_std     : use standard derivation of returns as values
--range_elevation        : use range of elevation as values
--range_intensity        : use range of intensity as values
--range_scan_angle       : use range of scan_angle as values
--range_user_data        : use range of user_data as values
--range_point_source     : use range of point_source as values
--range_attribute        : use range of attribute as values
--range_gps_time         : use range of gps time as values
--return_type_lowest     : use return type minimum as values
--return_type_min        : use return type minimum as values
--return_type_max        : use return type maximum as values
--return_type_highest    : use return type maximum as values
+-intensity_avg          : use intensity average as values  
+-intensity_stddev       : use standard derivation of intensity as values  
+-intensity_std          : use standard derivation of intensity as values  
+-intensity_range        : use intensity range as values  
+-scan_angle_min         : use minimum scan angle as values  
+-scan_angle_min_abs     : use minimum absolute scan angle as values  
+-scan_angle_max         : use maximum scan angle as values  
+-scan_angle_max_abs     : use maximum absolute scan angle as values  
+-scan_angle_highest     : use maximum scan angle as values  
+-scan_angle_highest_abs : use maximum absolute scan angle as values  
+-scan_angle_range       : use scan angle range as values  
+-scan_angle_average     : use average scan angle as values  
+-scan_angle_average_abs : use average absolute scan angle as values  
+-scan_angle_avg         : use average scan angle as values  
+-scan_angle_avg_abs     : use average absolute scan angle as values  
+-user_data_lowest       : use minimum of user data as values  
+-user_data_min          : use minimum of user data as values  
+-user_data_max          : use maximum of user data as values  
+-user_data_average      : use average of user data as values  
+-user_data_avg          : use average of user data as values  
+-user_data_stddev       : use standard derivation of user data as values  
+-user_data_std          : use standard derivation of user data as values  
+-user_data_range        : use user data range as values  
+-point_source_lowest    : use minimum of point source as values  
+-point_source_min       : use minimum of point source as values  
+-point_source_max       : use maximum of point source as values  
+-point_source_range     : use range of point source as values  
+-gps_time_lowest        : use minimum of gps time as values  
+-gps_time_min           : use minimum of gps time as values  
+-gps_time_max           : use maximum of gps time as values  
+-gps_time_range         : use range of gps time as values  
+-number_returns_avg     : use average number of returns as values  
+-number_returns_lowest  : use minimum number of returns as values  
+-number_returns_min     : use minimum number of returns as values  
+-number_returns_highest : use maximum number of returns as values  
+-number_returns_max     : use maximum number of returns as values  
+-number_returns_stddev  : use standard derivation of returns as values  
+-number_returns_std     : use standard derivation of returns as values  
+-range_elevation        : use range of elevation as values  
+-range_intensity        : use range of intensity as values  
+-range_scan_angle       : use range of scan_angle as values  
+-range_user_data        : use range of user_data as values  
+-range_point_source     : use range of point_source as values  
+-range_attribute        : use range of attribute as values  
+-range_gps_time         : use range of gps time as values  
+-return_type_lowest     : use return type minimum as values  
+-return_type_min        : use return type minimum as values  
+-return_type_max        : use return type maximum as values  
+-return_type_highest    : use return type maximum as values  
 -rgb                    : use rgb values if available (only used with PNG/TIF/JPG)  
--occupancy              : use occupancy as value
--classification_8bit                      : use classification majority as values using a 8 bit counter
--classification_16bit                     : use classification majority as values using a 16 bit counter
--classification_32bit                     : use classification majority as values using a 32 bit counter
--classification_majority_8bit             : use classification majority as values using a 8 bit counter
--classification_majority_16bit            : use classification majority as values using a 16 bit counter
--classification_majority_32bit            : use classification majority as values using a 32 bit counter
--classification_1_quotient_8bit           : use quotient of classification 1 as values using a 8 bit counter
--classification_2_quotient_8bit           : use quotient of classification 2 as values using a 8 bit counter
--classification_3_quotient_8bit           : use quotient of classification 3 as values using a 8 bit counter
--classification_4_quotient_8bit           : use quotient of classification 4 as values using a 8 bit counter
--classification_5_quotient_8bit           : use quotient of classification 5 as values using a 8 bit counter
--classification_6_quotient_8bit           : use quotient of classification 6 as values using a 8 bit counter
--classification_7_quotient_8bit           : use quotient of classification 7 as values using a 8 bit counter
--classification_8_quotient_8bit           : use quotient of classification 8 as values using a 8 bit counter
--classification_1_quotient_16bit          : use quotient of classification 1 as values using a 16 bit counter
--classification_2_quotient_16bit          : use quotient of classification 2 as values using a 16 bit counter
--classification_3_quotient_16bit          : use quotient of classification 3 as values using a 16 bit counter
--classification_4_quotient_16bit          : use quotient of classification 4 as values using a 16 bit counter
--classification_5_quotient_16bit          : use quotient of classification 5 as values using a 16 bit counter
--classification_6_quotient_16bit          : use quotient of classification 6 as values using a 16 bit counter
--classification_7_quotient_16bit          : use quotient of classification 7 as values using a 16 bit counter
--classification_8_quotient_16bit          : use quotient of classification 8 as values using a 16 bit counter
--classification_variety                   : use classification variety as values
--extended_classification_8bit             : use classification majority as values using a 8 bit counter
--extended_classification_16bit            : use classification majority as values using a 16 bit counter
--extended_classification_32bit            : use classification majority as values using a 32 bit counter
--extended_classification_majority_8bit    : use classification majority as values using a 8 bit counter
--extended_classification_majority_16bit   : use classification majority as values using a 16 bit counter
--extended_classification_majority_32bit   : use classification majority as values using a 32 bit counter
--extended_classification_1_quotient_8bit  : use quotient of classification 1 as values using a 8 bit counter
--extended_classification_2_quotient_8bit  : use quotient of classification 2 as values using a 8 bit counter
--extended_classification_3_quotient_8bit  : use quotient of classification 3 as values using a 8 bit counter
--extended_classification_4_quotient_8bit  : use quotient of classification 4 as values using a 8 bit counter
--extended_classification_5_quotient_8bit  : use quotient of classification 5 as values using a 8 bit counter
--extended_classification_6_quotient_8bit  : use quotient of classification 6 as values using a 8 bit counter
--extended_classification_7_quotient_8bit  : use quotient of classification 7 as values using a 8 bit counter
--extended_classification_8_quotient_8bit  : use quotient of classification 8 as values using a 8 bit counter
--extended_classification_1_quotient_16bit : use quotient of classification 1 as values using a 16 bit counter
--extended_classification_2_quotient_16bit : use quotient of classification 2 as values using a 16 bit counter
--extended_classification_3_quotient_16bit : use quotient of classification 3 as values using a 16 bit counter
--extended_classification_4_quotient_16bit : use quotient of classification 4 as values using a 16 bit counter
--extended_classification_5_quotient_16bit : use quotient of classification 5 as values using a 16 bit counter
--extended_classification_6_quotient_16bit : use quotient of classification 6 as values using a 16 bit counter
--extended_classification_7_quotient_16bit : use quotient of classification 7 as values using a 16 bit counter
--extended_classification_8_quotient_16bit : use quotient of classification 8 as values using a 16 bit counter
--extended_classification_variety          : use classification variety as values
+-occupancy              : use occupancy as value  
+-classification_8bit                      : use classification majority as values using a 8 bit counter  
+-classification_16bit                     : use classification majority as values using a 16 bit counter  
+-classification_32bit                     : use classification majority as values using a 32 bit counter  
+-classification_majority_8bit             : use classification majority as values using a 8 bit counter  
+-classification_majority_16bit            : use classification majority as values using a 16 bit counter  
+-classification_majority_32bit            : use classification majority as values using a 32 bit counter  
+-classification_1_quotient_8bit           : use quotient of classification 1 as values using a 8 bit counter  
+-classification_2_quotient_8bit           : use quotient of classification 2 as values using a 8 bit counter  
+-classification_3_quotient_8bit           : use quotient of classification 3 as values using a 8 bit counter  
+-classification_4_quotient_8bit           : use quotient of classification 4 as values using a 8 bit counter  
+-classification_5_quotient_8bit           : use quotient of classification 5 as values using a 8 bit counter  
+-classification_6_quotient_8bit           : use quotient of classification 6 as values using a 8 bit counter  
+-classification_7_quotient_8bit           : use quotient of classification 7 as values using a 8 bit counter  
+-classification_8_quotient_8bit           : use quotient of classification 8 as values using a 8 bit counter  
+-classification_1_quotient_16bit          : use quotient of classification 1 as values using a 16 bit counter  
+-classification_2_quotient_16bit          : use quotient of classification 2 as values using a 16 bit counter  
+-classification_3_quotient_16bit          : use quotient of classification 3 as values using a 16 bit counter  
+-classification_4_quotient_16bit          : use quotient of classification 4 as values using a 16 bit counter  
+-classification_5_quotient_16bit          : use quotient of classification 5 as values using a 16 bit counter  
+-classification_6_quotient_16bit          : use quotient of classification 6 as values using a 16 bit counter  
+-classification_7_quotient_16bit          : use quotient of classification 7 as values using a 16 bit counter  
+-classification_8_quotient_16bit          : use quotient of classification 8 as values using a 16 bit counter  
+-classification_variety                   : use classification variety as values  
+-extended_classification_8bit             : use classification majority as values using a 8 bit counter  
+-extended_classification_16bit            : use classification majority as values using a 16 bit counter  
+-extended_classification_32bit            : use classification majority as values using a 32 bit counter  
+-extended_classification_majority_8bit    : use classification majority as values using a 8 bit counter  
+-extended_classification_majority_16bit   : use classification majority as values using a 16 bit counter  
+-extended_classification_majority_32bit   : use classification majority as values using a 32 bit counter  
+-extended_classification_1_quotient_8bit  : use quotient of classification 1 as values using a 8 bit counter  
+-extended_classification_2_quotient_8bit  : use quotient of classification 2 as values using a 8 bit counter  
+-extended_classification_3_quotient_8bit  : use quotient of classification 3 as values using a 8 bit counter  
+-extended_classification_4_quotient_8bit  : use quotient of classification 4 as values using a 8 bit counter  
+-extended_classification_5_quotient_8bit  : use quotient of classification 5 as values using a 8 bit counter  
+-extended_classification_6_quotient_8bit  : use quotient of classification 6 as values using a 8 bit counter  
+-extended_classification_7_quotient_8bit  : use quotient of classification 7 as values using a 8 bit counter  
+-extended_classification_8_quotient_8bit  : use quotient of classification 8 as values using a 8 bit counter  
+-extended_classification_1_quotient_16bit : use quotient of classification 1 as values using a 16 bit counter  
+-extended_classification_2_quotient_16bit : use quotient of classification 2 as values using a 16 bit counter  
+-extended_classification_3_quotient_16bit : use quotient of classification 3 as values using a 16 bit counter  
+-extended_classification_4_quotient_16bit : use quotient of classification 4 as values using a 16 bit counter  
+-extended_classification_5_quotient_16bit : use quotient of classification 5 as values using a 16 bit counter  
+-extended_classification_6_quotient_16bit : use quotient of classification 6 as values using a 16 bit counter  
+-extended_classification_7_quotient_16bit : use quotient of classification 7 as values using a 16 bit counter  
+-extended_classification_8_quotient_16bit : use quotient of classification 8 as values using a 16 bit counter  
+-extended_classification_variety          : use classification variety as values  
 
 
 ### other specific arguments
