@@ -302,21 +302,21 @@ Further examples
 -no_min_max                         : don't output point minimum / maximum entry information  
 -no_returns                         : don't output return information  
 -no_vlrs                            : don't output VLR information  
--no_warnings                        : don't output WARNINGs  
+-no_warnings                        : don't output warnings  
 -nr                                 : don't output return information  
 -nv                                 : don't output VLR information  
--nw                                 : don't output WARNINGs  
--otxt                               : output as textfile 
--ojs                                : output as json file 
--js                                 : output in json format 
+-nw                                 : don't output warnings  
+-otxt                               : output as textfile  
+-ojs                                : output as json file  
+-js                                 : output in json format  
 -progress [n]                       : report progress every [n] points  
--proj_info [wkt] [js] [str] [epsg] [el] [datum] [cs] : get CRS representations and information of the input file: [wkt] WKT, [js] PROJJSON, [str] PROJ string or [epsg] EPSG code representation and [el] ellipsoid, [datum] datum or [cs] coordinate system information.
+-proj_info [wkt] [js] [str] [epsg] [el] [datum] [cs] : get CRS representations and information of the input file: [wkt] WKT, [js] PROJJSON, [str] PROJ string or [epsg] EPSG code representation and [el] ellipsoid, [datum] datum or [cs] coordinate system information  
 -rename [n]                         : renames input file 'fusa.laz' to '[n]_277750_6122250.laz'  
 -repair                             : repair both bounding box and counters  
 -repair_bb                          : repair bounding box  
 -repair_counters                    : set (in place) the counters for point number and (extended) return histograms in header  
 -report_outside                     : report attributes of each point that falls outside of LAS header bounding box  
--ro                                 : report attributes of each point that falls outside of LAS header bounding box
+-ro                                 : report attributes of each point that falls outside of LAS header bounding box  
 -scale_header [x] [y] [z]           : scale whole file by scaling the header values with factor [x] [y] [z] or [xyz] (one for all) (64bit only)   
 -set_bb [x1] [y1] [z1] [x2] [y2] [z2]: set bounding box to [x1] [y1] [z1] [x2] [y2] [z2]  
 -set_bounding_box [x1] [y1] [z1] [x2] [y2] [z2]: set bounding box to [x1] [y1] [z1] [x2] [y2] [z2]  
@@ -494,7 +494,7 @@ Further examples
 -switch_x_y                         : exchange x and y value  
 -switch_x_z                         : exchange x and z value  
 -switch_y_z                         : exchange z and x value  
--transform_affine [k,w,x,y]         : transform by k*cos(w)+k*sin(w)+tx;k*cos(w)+k*sin(w)+ty - angle in second of arc  
+-transform_affine [k,w,x,y]         : transform by k*cos(w)+k*sin(w)+tx;k*cos(w)+k*sin(w)+ty (angle in second of arc)  
 -transform_helmert [m] [n] [o]      : do a helmert transformation with 3 or 7 comma separated parameters [n] ...  
 -transform_matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]: transform input using matrix [r11,r12,r13] [r21,r22,r23] [r31,r32,r33] [tr1,tr2,tr3]  
 -translate_raw_x [n]                : translate raw x value by [n]  

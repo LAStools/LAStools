@@ -210,7 +210,7 @@ generated KML file:
 -spike_free                : run spike-free algorithm with defaults freeze = 1.5, interval = 0.25, buffer = 0.5  
 -spike_free [m] [n] [o]    : run spike-free algorithm with freeze = [m], interval = [n], buffer = [o]  
 -step [n]                  : raster with stepsize [n] (the default is 1 or 0.0001 on long/lat coordinates)  
--tin                       : write output.shp TIN  
+-tin                       : write output.shp TIN for lake breakline (require -lakes argument)  
 -trim_upper_right          : trim upper right corner to one quantization unit  
 -use_orig_bb               : raster tile without buffer added by on-the-fly buffering  
 -use_tile_bb               : raster tile without buffer added by lastile  

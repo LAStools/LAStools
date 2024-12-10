@@ -76,7 +76,7 @@ within 0.5 units in source exists. Set all other z-values to 0.
 -match_xyz [dist]        : Match points by x-y-z coordinates and the specified maximum distance  
 
 ### copy operations
--copy_attribute [n]   : copy attribute with index [n]. Attribute must exist in source and target with matching data type.  
+-copy_attribute [n]   : copy attribute with index [n]. Attribute must exist in source and target with matching data type  
 -copy_classification  : copy classification attribute (default)  
 -copy_elevation       : copy elevation attribute  
 -copy_intensity       : copy intensity attribute  

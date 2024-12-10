@@ -254,7 +254,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -feet                               : use feet  
 -force                              : force a GPS week conversion even if conversion is suspect.  
 -load_vlrs                          : loads all VLRs from a file called vlrs.vlr and adds them to each processed file  
--load_vlr [i] [u] [r] [f]           : loads a single VLR specified by index [i] (default = 0) or user ID [u] and record ID [r] from the file [f] (default: save.vlr) and adds it to each processed file header
+-load_vlr [i] [u] [r] [f]           : loads a single VLR specified by index [i] (default = 0) or user ID [u] and record ID [r] from the file [f] (default: save.vlr) and adds it to each processed file header  
 -load_ogc_wkt [f]                   : loads the first single-string from file [f] and puts it into the place of the OGC WKT  
 -move_evlrs_to_vlrs                 : move all EVLRs with small enough payload to VLR section  
 -remove_all_evlrs                   : remove all EVLRs  
@@ -269,7 +269,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -save_vlrs                          : saves all VLRs to a file called vlrs.vlr so they can be loaded into another file  
--save_vlr [i] [u] [r] [f]           : saves a single VLR specified by index [i] (default = 0) or user ID [u] and record ID [r] to the file [f] (default: save.vlr) so it can be loaded into another file header
+-save_vlr [i] [u] [r] [f]           : saves a single VLR specified by index [i] (default = 0) or user ID [u] and record ID [r] to the file [f] (default: save.vlr) so it can be loaded into another file header  
 -set_attribute_offset [m] [n]       : set offset of the attribute [m]{0-based} in the extra bytes to [n]  
 -set_attribute_scale [m] [n]        : set scale of the attribute [m]{0-based} in the extra bytes to [n]  
 -set_classification [n]             : set classification to [n]  
@@ -701,7 +701,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -copy_register_into_intensity [n]   : copy register [n] into point intensitiy value  
 -drop_intensity_above [n]           : drop points with intensity value above [n]  
 -drop_intensity_below [n]           : drop points with intensity value below [n]  
--drop_intensity_between [m] [n]     : drop points with intensity value between [m] and [n]
+-drop_intensity_between [m] [n]     : drop points with intensity value between [m] and [n]  
 -iscale_intensity [n]               : scale intensity value by [n]  
 -itranslate_intensity [n]           : translate input intensity by [n]  
 -keep_NDVI_intensity_is_NIR [min] [max]: keep NDVI (Normalized Difference Vegetation Index) where intensity is NIR between [min] [max]  
@@ -709,10 +709,10 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -keep_intensity_above [n]           : keep points with intensity value above [n]  
 -keep_intensity_below [n]           : keep points with intensity value below [n]  
 -map_intensity [fnm]                : set the intensity by map in file [fnm]  
--multiply_scaled_intensity_into_RGB [n] : calculate gray color by (intensity(rel)/intensity(range))*[n]
--multiply_scaled_intensity_into_RGB_red : set red color to [n]*intensity
--multiply_scaled_intensity_into_RGB_green : set green color to [n]*intensity
--multiply_scaled_intensity_into_RGB_blue : set blue color to [n]*intensity
+-multiply_scaled_intensity_into_RGB [n] : calculate gray color by (intensity(rel)/intensity(range))*[n]  
+-multiply_scaled_intensity_into_RGB_red : set red color to [n]*intensity  
+-multiply_scaled_intensity_into_RGB_green : set green color to [n]*intensity  
+-multiply_scaled_intensity_into_RGB_blue : set blue color to [n]*intensity  
 -scale_intensity [n]                : multiply intensity by [n]  
 -set_intensity [n]                  : set intensity to [n]  
 -switch_RGB_intensity_into_CIR      : set R to intensity; G to R; B to G  
@@ -804,9 +804,9 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -nad83_pa11                         : set horizontal datum to NAD83 PA11  
 -osgb1936                           : use datum OSGB 1936  
 -proj_epsg [s] [t]           	    : (Recommended) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified using EPSG code (deafult from the input file header). In addition, the target CRS [t] must be specified using EPSG code 
--proj_wkt [s] [t]           	    : (Recommended) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified by using a file with the WKR representation of the CRS (deafult from the input file header). In addition, the target CRS [t] must be specified using a file with the WKR representation of the CRS
--proj_string [s] [t]           	    : (For experienced users) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified using PRO string (deafult from the input file header). In addition, the target CRS [t] must be specified using PROJ string. Furthermore a single PROJ string [s] can also be specified, which directly describes a transformation or operation
--proj_json [s] [t]           	    : (For experienced users) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified by using a file with the PROJJSON representation of the CRS (deafult from the input file header). In addition, the target CRS [t] must be specified using a file with the PROJJSON representation of the CRS
+-proj_wkt [s] [t]           	    : (Recommended) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified by using a file with the WKR representation of the CRS (deafult from the input file header). In addition, the target CRS [t] must be specified using a file with the WKR representation of the CRS  
+-proj_string [s] [t]           	    : (For experienced users) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified using PRO string (deafult from the input file header). In addition, the target CRS [t] must be specified using PROJ string. Furthermore a single PROJ string [s] can also be specified, which directly describes a transformation or operation  
+-proj_json [s] [t]           	    : (For experienced users) uses the PROJ lib to perform a CRS transformation. Optionally, the source CRS [s] can be specified by using a file with the PROJJSON representation of the CRS (deafult from the input file header). In addition, the target CRS [t] must be specified using a file with the PROJJSON representation of the CRS  
 -sp27 SC_N                          : use the NAD27 South Carolina North state plane  
 -sp83 CO_S                          : use the NAD83 Colorado South state plane for georeferencing  
 -survey_feet                        : use survey feet  
