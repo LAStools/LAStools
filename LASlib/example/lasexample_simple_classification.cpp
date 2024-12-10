@@ -2,21 +2,21 @@
 ===============================================================================
 
   FILE:  lasexample_simple_classification.cpp
-  
+
   CONTENTS:
-  
+
     This source code serves as an example how you can easily use LASlib to
-    read one LAS / LAZ file and then perform your own classification of the 
+    read one LAS / LAZ file and then perform your own classification of the
     points based on some (geometric) criteria (here we make it dependent on
     the range in z values within a certain 2D cell size) and then write the
     resulting LAS / LAZ file with new classifiations to disk.
 
   PROGRAMMERS:
-  
+
     info@rapidlasso.de  -  http://rapidlasso.de
-  
+
   COPYRIGHT:
-  
+
     (c) 2017, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -25,11 +25,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     19 October 2017 -- created at Cyient in Hyderabad, India as an example
-  
+
 ===============================================================================
 */
 
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
   {
     for (i = 1; i < argc; i++)
     {
-      if (argv[i][0] == '–') argv[i][0] = '-';
+      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
     }
     if (!lasreadopener.parse(argc, argv)) byebye(true);
     if (!laswriteopener.parse(argc, argv)) byebye(true);
@@ -202,19 +202,19 @@ int main(int argc, char *argv[])
 
       if (ypos < 0)
       {
-        fprintf(stderr, "ERROR: ypos = %d\n", ypos); 
+        fprintf(stderr, "ERROR: ypos = %d\n", ypos);
       }
 
       pos = ypos*xdim + xpos;
 
       if (pos < 0)
       {
-        fprintf(stderr, "ERROR: pos = %d\n", pos); 
+        fprintf(stderr, "ERROR: pos = %d\n", pos);
         byebye(true);
       }
       else if (pos >= (xdim*ydim))
       {
-        fprintf(stderr, "ERROR: pos = %d\n", pos); 
+        fprintf(stderr, "ERROR: pos = %d\n", pos);
         byebye(true);
       }
 
@@ -317,7 +317,7 @@ int main(int argc, char *argv[])
 
     laswriter->update_header(&lasreader->header, TRUE);
     laswriter->close();
-    if (verbose) fprintf(stderr,"classified %d points. processing file '%s' took %g sec.\n", count, lasreadopener.get_file_name(), taketime()-start_time); 
+    if (verbose) fprintf(stderr,"classified %d points. processing file '%s' took %g sec.\n", count, lasreadopener.get_file_name(), taketime()-start_time);
     delete laswriter;
 
     lasreader->close();
