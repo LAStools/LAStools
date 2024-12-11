@@ -361,12 +361,21 @@ BOOL LASreaderQFIT::read_point_default()
     {
       point.compute_coordinates();
       // update bounding box
-      if (point.coordinates[0] < header.min_x) header.min_x = point.coordinates[0];
-      else if (point.coordinates[0] > header.max_x) header.max_x = point.coordinates[0];
-      if (point.coordinates[1] < header.min_y) header.min_y = point.coordinates[1];
-      else if (point.coordinates[1] > header.max_y) header.max_y = point.coordinates[1];
-      if (point.coordinates[2] < header.min_z) header.min_z = point.coordinates[2];
-      else if (point.coordinates[2] > header.max_z) header.max_z = point.coordinates[2];
+      if (opener->is_offset_adjust() == FALSE) 
+      {
+        if (point.coordinates[0] < header.min_x)
+          header.min_x = point.coordinates[0];
+        else if (point.coordinates[0] > header.max_x)
+          header.max_x = point.coordinates[0];
+        if (point.coordinates[1] < header.min_y)
+          header.min_y = point.coordinates[1];
+        else if (point.coordinates[1] > header.max_y)
+          header.max_y = point.coordinates[1];
+        if (point.coordinates[2] < header.min_z)
+          header.min_z = point.coordinates[2];
+        else if (point.coordinates[2] > header.max_z)
+          header.max_z = point.coordinates[2];
+      }
     }
     
     p_count++;
@@ -439,6 +448,12 @@ LASreaderQFIT::LASreaderQFIT(LASreadOpener* opener) :LASreader(opener)
   pitch_start = -1;
   roll_start = -1;
   pulse_width_start = -1;
+  orig_x_offset = 0.0;
+  orig_y_offset = 0.0;
+  orig_z_offset = 0.0;
+  orig_x_scale_factor = 0.01;
+  orig_y_scale_factor = 0.01;
+  orig_z_scale_factor = 0.01;
 }
 
 LASreaderQFIT::~LASreaderQFIT()

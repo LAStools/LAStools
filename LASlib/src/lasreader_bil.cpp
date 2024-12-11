@@ -746,21 +746,57 @@ BOOL LASreaderBIL::read_point_default()
 
     if (elevation != nodata)
     {
-      if (!point.set_x(ulxcenter + col * xdim))
+      F64 x = ulxcenter + col * xdim;
+      F64 y = ulycenter - row * ydim;
+      F64 z = elevation;
+
+      if (opener->is_offset_adjust() == FALSE) 
       {
-        overflow_I32_x++;
-      }
-      if (!point.set_y(ulycenter - row * ydim))
+        // compute the quantized x, y, and z values
+        if (!point.set_x(x)) {
+          overflow_I32_x++;
+        }
+        if (!point.set_y(y)) {
+          overflow_I32_y++;
+        }
+        if (!point.set_z(z)) {
+          overflow_I32_z++;
+        }
+      } 
+      else 
       {
-        overflow_I32_y++;
-      }
-      if (!point.set_z(elevation))
-      {
-        overflow_I32_z++;
+        I64 X = 0;
+        I64 Y = 0;
+        I64 Z = 0;
+        if (x >= orig_x_offset)
+          X = ((I64)((x / orig_x_scale_factor) + 0.5));
+        else
+          X = ((I64)((x / orig_x_scale_factor) - 0.5));
+        if (y >= orig_y_offset)
+          Y = ((I64)(((y - orig_y_offset) / orig_y_scale_factor) + 0.5));
+        else
+          Y = ((I64)(((y - orig_y_offset) / orig_y_scale_factor) - 0.5));
+        if (z >= orig_z_offset)
+          Z = ((I64)(((z - orig_z_offset) / orig_z_scale_factor) + 0.5));
+        else
+          Z = ((I64)(((z - orig_z_offset) / orig_z_scale_factor) - 0.5));
+
+        if (I32_FITS_IN_RANGE(X))
+          point.set_X(X);
+        else
+          overflow_I32_x++;
+        if (I32_FITS_IN_RANGE(Y))
+          point.set_Y(Y);
+        else
+          overflow_I32_y++;
+        if (I32_FITS_IN_RANGE(Z))
+          point.set_Z(Z);
+        else
+          overflow_I32_z++;
       }
       p_count++;
       col++;
-      return TRUE;
+      return TRUE;    
     }
     else
     {
@@ -856,6 +892,12 @@ LASreaderBIL::LASreaderBIL(LASreadOpener* opener) :LASreader(opener)
   file = 0;
   scale_factor = 0;
   offset = 0;
+  orig_x_offset = 0.0;
+  orig_y_offset = 0.0;
+  orig_z_offset = 0.0;
+  orig_x_scale_factor = 0.01;
+  orig_y_scale_factor = 0.01;
+  orig_z_scale_factor = 0.01;
   clean();
 }
 
@@ -911,6 +953,9 @@ void LASreaderBIL::populate_scale_and_offset()
     }
     header.z_scale_factor = 0.01;
   }
+  orig_x_scale_factor = header.x_scale_factor;
+  orig_y_scale_factor = header.y_scale_factor;
+  orig_z_scale_factor = header.z_scale_factor;
 
   // if not specified in the command line, set a reasonable offset
   if (offset)
@@ -936,6 +981,9 @@ void LASreaderBIL::populate_scale_and_offset()
     else
       header.z_offset = 0;
   }
+  orig_x_offset = header.x_offset;
+  orig_y_offset = header.y_offset;
+  orig_z_offset = header.z_offset;
 }
 
 void LASreaderBIL::populate_bounding_box()

@@ -32,11 +32,128 @@
 
 #include "lasfilter.hpp"
 #include "lasmessage.hpp"
+#include "lasreader.hpp"
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/// Adds the operated values with consideration of the scaling and the specified offset
+void LASoperation::write_transformed_values_with_adjust_offset(F64 x, F64 y, F64 z, LASpoint* point) 
+{
+  I64 X = 0;
+  I64 Y = 0;
+  I64 Z = 0;
+
+  if (x >= adjusted_offset_x)
+    X = (I64)(((x - adjusted_offset_x) / scale_factor_x) + 0.5);
+  else
+    X = (I64)(((x - adjusted_offset_x) / scale_factor_x) - 0.5);
+  if (y >= adjusted_offset_y)
+    Y = (I64)(((y - adjusted_offset_y) / scale_factor_y) + 0.5);
+  else
+    Y = (I64)(((y - adjusted_offset_y) / scale_factor_y) - 0.5);
+  if (z >= adjusted_offset_z)
+    Z = (I64)(((z - adjusted_offset_z) / scale_factor_z) + 0.5);
+  else
+    Z = (I64)(((z - adjusted_offset_z) / scale_factor_z) - 0.5);
+
+  //if min/max is not known at the beginning/calcutation (e.g. txt input) must be set here in header
+  if (header != nullptr)
+  {
+    if (x < header->min_x)
+      header->min_x = x;
+    else if (x > header->max_x)
+      header->max_x = x;
+    if (y < header->min_y)
+      header->min_y = y;
+    else if (y > header->max_y)
+      header->max_y = y;
+    if (z < header->min_z)
+      header->min_z = z;
+    else if (z > header->max_z)
+      header->max_z = z;
+  }
+
+  if (I32_FITS_IN_RANGE(X))
+    point->set_X(X);
+  else
+    overflow++;
+  if (I32_FITS_IN_RANGE(Y))
+    point->set_Y(Y);
+  else
+    overflow++;
+  if (I32_FITS_IN_RANGE(Z))
+    point->set_Z(Z);
+  else
+    overflow++;
+}
+
+/// setting the origin (input) offset and scaling factors
+void LASoperation::set_origins(F64 orig_x_offset, F64 orig_y_offset, F64 orig_z_offset, F64 orig_x_scale_factor, F64 orig_y_scale_factor, F64 orig_z_scale_factor) 
+{
+  this->orig_x_offset = orig_x_offset;
+  this->orig_y_offset = orig_y_offset;
+  this->orig_z_offset = orig_z_offset;
+  this->orig_x_scale_factor = orig_x_scale_factor;
+  this->orig_y_scale_factor = orig_y_scale_factor;
+  this->orig_z_scale_factor = orig_z_scale_factor;
+};
+
+/// setting the new scaling factor 
+void LASoperation::set_scale_factor(F64 scale_factor_x, F64 scale_factor_y, F64 scale_factor_z) 
+{
+  this->scale_factor_x = (scale_factor_x != 0) ? scale_factor_x : orig_x_scale_factor;
+  this->scale_factor_y = (scale_factor_y != 0) ? scale_factor_y : orig_y_scale_factor;
+  this->scale_factor_z = (scale_factor_z != 0) ? scale_factor_z : orig_z_scale_factor;
+};
+
+/// setting the new offset factor 
+void LASoperation::set_adjusted_offset(F64 adjusted_offset_x, F64 adjusted_offset_y, F64 adjusted_offset_z) 
+{
+  this->adjusted_offset_x = adjusted_offset_x;
+  this->adjusted_offset_y = adjusted_offset_y;
+  this->adjusted_offset_z = adjusted_offset_z;
+};
+
+/// Returns the coordinate array if the point coordinates were not changed during the operation or transformed
+F64* LASoperation::get_offset_adjust_coord_without_trafo_changes(F64 x, F64 y, F64 z) {
+  F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+  tranformed_coord[0] = x;
+  tranformed_coord[1] = y;
+  tranformed_coord[2] = z;
+  return tranformed_coord;
+};
+
+/// get the origin Z and consider whether Z is fetched from the extrabyte (z_from_attrib)
+I32 LASoperation::get_Z(LASpoint* point) {
+  I64 Z = 0;
+
+  if (offset_adjust && point->quantizer != nullptr && point->quantizer->z_from_attrib >= 0) {
+    // get Z from extrabyte
+    F64 z_tmp = (point->get_Z() * scale_factor_z) + adjusted_offset_z;
+    if (z_tmp >= orig_z_offset)
+      Z = (I64)(((z_tmp - orig_z_offset) / orig_z_scale_factor) + 0.5);
+    else
+      Z = (I64)(((z_tmp - orig_z_offset) / orig_z_scale_factor) - 0.5);
+  } else {
+    // Default case or no offset adjustment
+    Z = point->get_Z();
+  }
+
+  return I32_CLAMP(Z);
+};
+
+/// sets the new offset based on the points if point coordinates were not changed during the operation or transformed
+void LASoperation::set_offset_adjust_coord_without_trafo_changes(LASpoint* point){
+  if (offset_adjust) {
+    F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+    F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+    F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+    write_transformed_values_with_adjust_offset(x, y, z, point);
+  }
+};
 
 class LASoperationTranslateX : public LASoperation
 {
@@ -49,11 +166,31 @@ class LASoperationTranslateX : public LASoperation
     {
         return sprintf(string, "-%s %lf ", name(), offset);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x + offset;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_x(point->get_x() + offset))
+        if (offset_adjust) 
         {
+          // y and z must also be set here if  rescale or adjusted offset
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset + offset; 
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        }
+        else 
+        {
+          if (!point->set_x(point->get_x() + offset)) 
+          {
             overflow++;
+          }
         }
     };
     LASoperationTranslateX(F64 offset)
@@ -76,11 +213,28 @@ class LASoperationTranslateY : public LASoperation
     {
         return sprintf(string, "-%s %lf ", name(), offset);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y + offset;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_y(point->get_y() + offset))
+        if (offset_adjust) 
         {
-            overflow++;
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset + offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } else 
+        {       
+          if (!point->set_y(point->get_y() + offset))
+          {
+              overflow++;
+          }
         }
     };
     LASoperationTranslateY(F64 offset)
@@ -107,11 +261,29 @@ class LASoperationTranslateZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = z;
+      tranformed_coord[2] = z + offset;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_z(point->get_z() + offset))
+        if (offset_adjust) 
         {
-            overflow++;
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset + offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        }
+        else 
+        {
+          if (!point->set_z(point->get_z() + offset))
+          {
+              overflow++;
+          }
         }
     };
     LASoperationTranslateZ(F64 offset)
@@ -138,19 +310,38 @@ class LASoperationTranslateXYZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x + offset[0];
+      tranformed_coord[1] = y + offset[1];
+      tranformed_coord[2] = z + offset[2];
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_x(point->get_x() + offset[0]))
+        if (offset_adjust) 
         {
-            overflow++;
-        }
-        if (!point->set_y(point->get_y() + offset[1]))
+          F64 xZ = point->get_X();
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset + offset[0];
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset + offset[1];
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset + offset[2];
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else 
         {
+          if (!point->set_x(point->get_x() + offset[0])) 
+          {
             overflow++;
-        }
-        if (!point->set_z(point->get_z() + offset[2]))
-        {
+          }
+          if (!point->set_y(point->get_y() + offset[1])) 
+          {
             overflow++;
+          }
+          if (!point->set_z(point->get_z() + offset[2])) 
+          {
+            overflow++;
+          }
         }
     };
     LASoperationTranslateXYZ(F64 x_offset, F64 y_offset, F64 z_offset)
@@ -175,11 +366,30 @@ class LASoperationScaleX : public LASoperation
     {
         return sprintf(string, "-%s %lf ", name(), scale);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x * scale;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_x(point->get_x() * scale))
+        if (offset_adjust) 
         {
-            overflow++;
+          F64 x_tmp = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 x = x_tmp * scale;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
+        {
+          if (!point->set_x(point->get_x() * scale))
+          {
+              overflow++;
+          }
         }
     };
     LASoperationScaleX(F64 scale)
@@ -202,11 +412,29 @@ class LASoperationScaleY : public LASoperation
     {
         return sprintf(string, "-%s %lf ", name(), scale);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y * scale;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_y(point->get_y() * scale))
+        if (offset_adjust) 
         {
+          F64 y_tmp = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = y_tmp * scale;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
+        {
+          if (!point->set_y(point->get_y() * scale)) {
             overflow++;
+          }
         }
     };
     LASoperationScaleY(F64 scale)
@@ -233,12 +461,30 @@ class LASoperationScaleZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = z * scale;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_z(point->get_z() * scale))
+        if (offset_adjust) 
         {
+          F64 z_tmp = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = z_tmp * scale;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
+        {
+          if (!point->set_z(point->get_z() * scale)) {
             overflow++;
-        }
+          }
+        }      
     };
     LASoperationScaleZ(F64 scale)
     {
@@ -264,20 +510,38 @@ class LASoperationScaleXYZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x * scale[0];
+      tranformed_coord[1] = y * scale[1];
+      tranformed_coord[2] = z * scale[2];
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_x(point->get_x() * scale[0]))
+        if (offset_adjust) 
         {
-            overflow++;
-        }
-        if (!point->set_y(point->get_y() * scale[1]))
+          F64 x_tmp = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y_tmp = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z_tmp = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          F64 x = x_tmp * scale[0];
+          F64 y = y_tmp * scale[1];
+          F64 z = z_tmp * scale[2];
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
         {
+          if (!point->set_x(point->get_x() * scale[0])) {
             overflow++;
-        }
-        if (!point->set_z(point->get_z() * scale[2]))
-        {
+          }
+          if (!point->set_y(point->get_y() * scale[1])) {
             overflow++;
-        }
+          }
+          if (!point->set_z(point->get_z() * scale[2])) {
+            overflow++;
+          }
+        }      
     };
     LASoperationScaleXYZ(F64 x_scale, F64 y_scale, F64 z_scale)
     {
@@ -301,12 +565,30 @@ class LASoperationTranslateThenScaleX : public LASoperation
     {
         return sprintf(string, "-%s %lf %lf ", name(), offset, scale);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = (x + offset) * scale;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_x((point->get_x() + offset) * scale))
+        if (offset_adjust) 
         {
+          F64 x_tmp = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          F64 x = (x_tmp + offset) * scale;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
+        {
+          if (!point->set_x((point->get_x() + offset) * scale)) {
             overflow++;
-        }
+          }
+        }            
     };
     LASoperationTranslateThenScaleX(F64 offset, F64 scale)
     {
@@ -330,12 +612,30 @@ class LASoperationTranslateThenScaleY : public LASoperation
     {
         return sprintf(string, "-%s %lf %lf ", name(), offset, scale);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = (y + offset) * scale;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_y((point->get_y() + offset) * scale))
+        if (offset_adjust) 
         {
+          F64 y_tmp = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          F64 y = (y_tmp + offset) * scale;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
+        {
+          if (!point->set_y((point->get_y() + offset) * scale)) {
             overflow++;
-        }
+          }
+        }    
     };
     LASoperationTranslateThenScaleY(F64 offset, F64 scale)
     {
@@ -363,12 +663,30 @@ class LASoperationTranslateThenScaleZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = (z + offset) * scale;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_z((point->get_z() + offset) * scale))
+        if (offset_adjust) 
         {
+          F64 z_tmp = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = (z_tmp + offset) * scale;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
+        {
+          if (!point->set_z((point->get_z() + offset) * scale)) {
             overflow++;
-        }
+          }
+        }  
     };
     LASoperationTranslateThenScaleZ(F64 offset, F64 scale)
     {
@@ -392,12 +710,30 @@ class LASoperationTranslateScaleTranslateX : public LASoperation
     {
         return sprintf(string, "-%s %lf %lf ", name(), offset, scale);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = (x - offset) * scale + offset;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_x((point->get_x() - offset) * scale + offset))
+        if (offset_adjust) 
         {
+          F64 x_tmp = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          F64 x = (x_tmp - offset) * scale + offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
+        {
+          if (!point->set_x((point->get_x() - offset) * scale + offset)) {
             overflow++;
-        }
+          }
+        }  
     };
     LASoperationTranslateScaleTranslateX(F64 offset, F64 scale)
     {
@@ -421,12 +757,30 @@ class LASoperationTranslateScaleTranslateY : public LASoperation
     {
         return sprintf(string, "-%s %lf %lf ", name(), offset, scale);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = (y - offset) * scale + offset;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_y((point->get_y() - offset) * scale + offset))
+        if (offset_adjust) 
         {
+          F64 y_tmp = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          F64 y = (y_tmp - offset) * scale + offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
+        {
+          if (!point->set_y((point->get_y() - offset) * scale + offset)) {
             overflow++;
-        }
+          }
+        } 
     };
     LASoperationTranslateScaleTranslateY(F64 offset, F64 scale)
     {
@@ -454,12 +808,30 @@ class LASoperationTranslateScaleTranslateZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = (z - offset) * scale + offset;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_z((point->get_z() - offset) * scale + offset))
+        if (offset_adjust) 
         {
+          F64 z_tmp = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = (z_tmp - offset) * scale + offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
+        {
+          if (!point->set_z((point->get_z() - offset) * scale + offset)) {
             overflow++;
-        }
+          }
+        } 
     };
     LASoperationTranslateScaleTranslateZ(F64 offset, F64 scale)
     {
@@ -483,18 +855,40 @@ class LASoperationRotateXY : public LASoperation
     {
         return sprintf(string, "-%s %lf %lf %lf ", name(), angle, x_offset, y_offset);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      F64 x_tmp = x - x_offset;
+      F64 y_tmp = y - y_offset;
+      tranformed_coord[0] = cos_angle * x_tmp - sin_angle * y_tmp + x_offset;
+      tranformed_coord[1] = cos_angle * y_tmp + sin_angle * x_tmp + y_offset;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        F64 x = point->get_x() - x_offset;
-        F64 y = point->get_y() - y_offset;
-        if (!point->set_x(cos_angle * x - sin_angle * y + x_offset))
+        if (offset_adjust) 
         {
-            overflow++;
-        }
-        if (!point->set_y(cos_angle * y + sin_angle * x + y_offset))
+          F64 x_tmp = point->get_X() * orig_x_scale_factor + orig_x_offset - x_offset;
+          F64 y_tmp = point->get_Y() * orig_y_scale_factor + orig_y_offset - y_offset;
+          F64 x = cos_angle * x_tmp - sin_angle * y_tmp + x_offset;
+          F64 y = cos_angle * y_tmp + sin_angle * x_tmp + y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
         {
+          F64 x = point->get_x() - x_offset;
+          F64 y = point->get_y() - y_offset;
+          if (!point->set_x(cos_angle * x - sin_angle * y + x_offset)) 
+          {
             overflow++;
-        }
+          }
+          if (!point->set_y(cos_angle * y + sin_angle * x + y_offset)) 
+          {
+            overflow++;
+          }
+        } 
     };
     LASoperationRotateXY(F64 angle, F64 x_offset, F64 y_offset)
     {
@@ -526,18 +920,40 @@ class LASoperationRotateXZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      F64 x_tmp = x - x_offset;
+      F64 z_tmp = z - z_offset;
+      tranformed_coord[0] = cos_angle * x_tmp - sin_angle * z_tmp + x_offset;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = cos_angle * z_tmp + sin_angle * x_tmp + z_offset;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        F64 x = point->get_x() - x_offset;
-        F64 z = point->get_z() - z_offset;
-        if (!point->set_x(cos_angle * x - sin_angle * z + x_offset))
+        if (offset_adjust) 
         {
-            overflow++;
-        }
-        if (!point->set_z(cos_angle * z + sin_angle * x + z_offset))
+          F64 x_tmp = point->get_X() * orig_x_scale_factor + orig_x_offset - x_offset;
+          F64 z_tmp = get_Z(point) * orig_z_scale_factor + orig_z_offset - z_offset;
+          F64 x = cos_angle * x_tmp - sin_angle * z_tmp + x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = cos_angle * z_tmp + sin_angle * x_tmp + z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
         {
+          F64 x = point->get_x() - x_offset;
+          F64 z = point->get_z() - z_offset;
+          if (!point->set_x(cos_angle * x - sin_angle * z + x_offset)) 
+          {
             overflow++;
-        }
+          }
+          if (!point->set_z(cos_angle * z + sin_angle * x + z_offset)) 
+          {
+            overflow++;
+          }
+        } 
     };
     LASoperationRotateXZ(F64 angle, F64 x_offset, F64 z_offset)
     {
@@ -569,18 +985,40 @@ class LASoperationRotateYZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      F64 y_tmp = y - y_offset;
+      F64 z_tmp = z - z_offset;
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = cos_angle * y_tmp - sin_angle * z_tmp + y_offset;
+      tranformed_coord[2] = cos_angle * z_tmp + sin_angle * y_tmp + z_offset;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        F64 y = point->get_y() - y_offset;
-        F64 z = point->get_z() - z_offset;
-        if (!point->set_y(cos_angle * y - sin_angle * z + y_offset))
+        if (offset_adjust) 
         {
-            overflow++;
-        }
-        if (!point->set_z(cos_angle * z + sin_angle * y + z_offset))
+          F64 y_tmp = point->get_Y() * orig_y_scale_factor + orig_y_offset - y_offset;
+          F64 z_tmp = get_Z(point) * orig_z_scale_factor + orig_z_offset - z_offset;
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = cos_angle * y_tmp - sin_angle * z_tmp + y_offset;
+          F64 z = cos_angle * z_tmp + sin_angle * y_tmp + z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else
         {
+          F64 y = point->get_y() - y_offset;
+          F64 z = point->get_z() - z_offset;
+          if (!point->set_y(cos_angle * y - sin_angle * z + y_offset)) 
+          {
             overflow++;
-        }
+          }
+          if (!point->set_z(cos_angle * z + sin_angle * y + z_offset)) 
+          {
+            overflow++;
+          }
+        } 
     };
     LASoperationRotateYZ(F64 angle, F64 y_offset, F64 z_offset)
     {
@@ -612,22 +1050,46 @@ class LASoperationTransformHelmert : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z) 
+    {
+      F64* tranformed_coord = new F64[3] {0.0,0.0,0.0};
+      tranformed_coord[0] = scale * ((x) - (rz_rad * y) + (ry_rad * z)) + dx;
+      tranformed_coord[1] = scale * ((rz_rad * x) + (y) - (rx_rad * z)) + dy;
+      tranformed_coord[2] = scale * (-(ry_rad * x) + (rx_rad * y) + (z)) + dz;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        F64 x = scale * ((point->get_x()) - (rz_rad * point->get_y()) + (ry_rad * point->get_z())) + dx;
-        F64 y = scale * ((rz_rad * point->get_x()) + (point->get_y()) - (rx_rad * point->get_z())) + dy;
-        F64 z = scale * (-(ry_rad * point->get_x()) + (rx_rad * point->get_y()) + (point->get_z())) + dz;
-        if (!point->set_x(x))
+        F64 x = 0.0;
+        F64 y = 0.0;
+        F64 z = 0.0;
+
+        if (offset_adjust) 
         {
-            overflow++;
-        }
-        if (!point->set_y(y))
+          F64 x_pos = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y_pos = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z_pos = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          x = scale * ((x_pos) - (rz_rad * y_pos) + (ry_rad * z_pos)) + dx;
+          y = scale * ((rz_rad * x_pos) + (y_pos) - (rx_rad * z_pos)) + dy;
+          z = scale * (-(ry_rad * x_pos) + (rx_rad * y_pos) + (z_pos)) + dz;
+
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else 
         {
+          x = scale * ((point->get_x()) - (rz_rad * point->get_y()) + (ry_rad * point->get_z())) + dx;
+          y = scale * ((rz_rad * point->get_x()) + (point->get_y()) - (rx_rad * point->get_z())) + dy;
+          z = scale * (-(ry_rad * point->get_x()) + (rx_rad * point->get_y()) + (point->get_z())) + dz;
+
+          if (!point->set_x(x)) {
             overflow++;
-        }
-        if (!point->set_z(z))
-        {
+          }
+          if (!point->set_y(y)) {
             overflow++;
+          }
+          if (!point->set_z(z)) {
+            overflow++;
+          }
         }
     };
     LASoperationTransformHelmert(F64 dx, F64 dy, F64 dz, F64 rx, F64 ry, F64 rz, F64 m)
@@ -664,17 +1126,38 @@ class LASoperationTransformAffine : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = r * ((cosw * x) + (sinw * y)) + tx;
+      tranformed_coord[1] = r * ((cosw * y) - (sinw * x)) + ty;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        F64 x = r * ((cosw * point->get_x()) + (sinw * point->get_y())) + tx;
-        F64 y = r * ((cosw * point->get_y()) - (sinw * point->get_x())) + ty;
-        if (!point->set_x(x))
-        {
-            overflow++;
-        }
-        if (!point->set_y(y))
-        {
-            overflow++;
+        F64 x = 0.0;
+        F64 y = 0.0;
+
+        if (offset_adjust) {
+          F64 x_pos = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y_pos = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z_pos = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          x = r * ((cosw * x_pos) + (sinw * y_pos)) + tx;
+          y = r * ((cosw * y_pos) - (sinw * x_pos)) + ty;
+        
+          write_transformed_values_with_adjust_offset(x, y, z_pos, point);
+        } else {
+          x = r * ((cosw * point->get_x()) + (sinw * point->get_y())) + tx;
+          y = r * ((cosw * point->get_y()) - (sinw * point->get_x())) + ty;
+          if (!point->set_x(x))
+          {
+              overflow++;
+          }
+          if (!point->set_y(y))
+          {
+              overflow++;
+          }
         }
     };
     LASoperationTransformAffine(F64 r, F64 w, F64 tx, F64 ty)
@@ -706,22 +1189,52 @@ class LASoperationClampZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y;
+      if (z < below)
+        tranformed_coord[2] = below;
+      else if (z > above)
+        tranformed_coord[2] = above;
+      else
+        tranformed_coord[2] = z;
+
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        F64 z = point->get_z();
-        if (z < below)
-        {
-            if (!point->set_z(below))
-            {
-                overflow++;
-            }
-        }
-        else if (z > above)
-        {
-            if (!point->set_z(above))
-            {
-                overflow++;
-            }
+        F64 z = 0.0;
+
+        if (offset_adjust) {
+          F64 x_pos = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y_pos = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z_pos = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          if (z_pos < below)
+            z = below;
+          else if (z_pos > above)
+            z = above;
+          else
+            z = z_pos;
+        
+          write_transformed_values_with_adjust_offset(x_pos, y_pos, z, point);
+        } else {
+          z = point->get_z();
+          if (z < below)
+          {
+              if (!point->set_z(below))
+              {
+                  overflow++;
+              }
+          }
+          else if (z > above)
+          {
+              if (!point->set_z(above))
+              {
+                  overflow++;
+              }
+          }
         }
     };
     LASoperationClampZ(F64 below, F64 above)
@@ -749,15 +1262,39 @@ class LASoperationClampZbelow : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y;
+      if (z < below)
+        tranformed_coord[2] = below;
+      else
+        tranformed_coord[2] = z;
+
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        F64 z = point->get_z();
-        if (z < below)
-        {
-            if (!point->set_z(below))
-            {
-                overflow++;
+        F64 z = 0.0;
+        
+        if (offset_adjust) {
+          F64 x_pos = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y_pos = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z_pos = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          if (z_pos < below)
+            z = below;
+          else
+            z = z_pos;
+        
+          write_transformed_values_with_adjust_offset(x_pos, y_pos, z, point);
+        } else {
+          z = point->get_z();
+          if (z < below) {
+            if (!point->set_z(below)) {
+              overflow++;
             }
+          }
         }
     };
     LASoperationClampZbelow(F64 below)
@@ -784,15 +1321,39 @@ class LASoperationClampZabove : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y;
+      if (z > above)
+        tranformed_coord[2] = above;
+      else
+        tranformed_coord[2] = z;
+
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        F64 z = point->get_z();
-        if (z > above)
-        {
-            if (!point->set_z(above))
-            {
-                overflow++;
+        F64 z = 0.0;
+
+        if (offset_adjust) {
+          F64 x_pos = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y_pos = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z_pos = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          if (z_pos > above)
+            z = above;
+          else
+            z = z_pos;
+        
+          write_transformed_values_with_adjust_offset(x_pos, y_pos, z, point);
+        } else {
+          z = point->get_z();
+          if (z > above) {
+            if (!point->set_z(above)) {
+              overflow++;
             }
+          }
         }
     };
     LASoperationClampZabove(F64 above)
@@ -819,9 +1380,23 @@ class LASoperationClampRGBto8Bit : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
-    inline void transform(LASpoint* point)
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
     {
-        F64 z = point->get_z();
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
+    inline void transform(LASpoint* point) 
+    {
+        F64 z = 0.0;
+
+        if (offset_adjust) {
+          F64 x_pos = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y_pos = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+
+          write_transformed_values_with_adjust_offset(x_pos, y_pos, z, point);
+        } else {
+          z = point->get_z();
+        }
         if (point->get_R() > 255)
             point->set_R(255);
         if (point->get_G() > 255)
@@ -846,6 +1421,11 @@ class LASoperationCopyAttributeIntoX : public LASoperation
     inline U32 get_decompress_selective() const
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      LASMessage(LAS_WARNING, "The adjustment of the offset using '-offset_adjust' is not supported for the operation '%s'.", name());
+      return 0;
     };
     inline void transform(LASpoint* point)
     {
@@ -879,6 +1459,11 @@ class LASoperationCopyAttributeIntoY : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      LASMessage(LAS_WARNING, "The adjustment of the offset using '-offset_adjust' is not supported for the operation '%s'.", name());
+      return 0;
+    };
     inline void transform(LASpoint* point)
     {
         F64 y = point->get_attribute_as_float(index);
@@ -910,6 +1495,11 @@ class LASoperationCopyAttributeIntoZ : public LASoperation
     inline U32 get_decompress_selective() const
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      LASMessage(LAS_WARNING, "The adjustment of the offset using '-offset_adjust' is not supported for the operation '%s'.", name());
+      return 0;
     };
     inline void transform(LASpoint* point)
     {
@@ -943,6 +1533,11 @@ class LASoperationCopyIntensityIntoZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      LASMessage(LAS_WARNING, "The adjustment of the offset using '-offset_adjust' is not supported for the operation '%s'.", name());
+      return 0;
+    };
     inline void transform(LASpoint* point)
     {
         F64 intensity = (F64)point->get_intensity();
@@ -968,6 +1563,11 @@ class LASoperationCopyUserDataIntoZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      LASMessage(LAS_WARNING, "The adjustment of the offset using '-offset_adjust' is not supported for the operation '%s'.", name());
+      return 0;
+    };
     inline void transform(LASpoint* point)
     {
         F64 user_data = point->get_user_data();
@@ -989,9 +1589,24 @@ class LASoperationTranslateRawX : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), offset);
     };
-    inline void transform(LASpoint* point)
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
     {
-        point->set_X(point->get_X() + offset);
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x + (offset * orig_x_scale_factor);
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
+    inline void transform(LASpoint* point) {      
+        if (offset_adjust) {
+          F64 x = point->get_X() * orig_x_scale_factor + offset * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+        
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } else {
+          point->set_X(point->get_X() + offset);
+        }
     };
     LASoperationTranslateRawX(I32 offset)
     {
@@ -1013,9 +1628,25 @@ class LASoperationTranslateRawY : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), offset);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y + (offset * orig_y_scale_factor);
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        point->set_Y(point->get_Y() + offset);
+        if (offset_adjust) {
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + offset * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+        
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } else {
+          point->set_Y(point->get_Y() + offset);
+        }
     };
     LASoperationTranslateRawY(I32 offset)
     {
@@ -1041,9 +1672,25 @@ class LASoperationTranslateRawZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = z + (offset * orig_z_scale_factor);
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        point->set_Z(point->get_Z() + offset);
+        if (offset_adjust) {
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + offset * orig_z_scale_factor + orig_z_offset;
+        
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } else {
+          point->set_Z(point->get_Z() + offset);
+        }
     };
     LASoperationTranslateRawZ(I32 offset)
     {
@@ -1069,11 +1716,27 @@ class LASoperationTranslateRawXYZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x + (raw_offset[0] * orig_x_scale_factor);
+      tranformed_coord[1] = y + (raw_offset[1] * orig_y_scale_factor);
+      tranformed_coord[2] = z + (raw_offset[2] * orig_z_scale_factor);
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        point->set_X(point->get_X() + raw_offset[0]);
-        point->set_Y(point->get_Y() + raw_offset[1]);
-        point->set_Z(point->get_Z() + raw_offset[2]);
+        if (offset_adjust) {
+          F64 x = point->get_X() * orig_x_scale_factor + raw_offset[0] * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + raw_offset[1] * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + raw_offset[2] * orig_z_scale_factor + orig_z_offset;
+        
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } else {
+          point->set_X(point->get_X() + raw_offset[0]);
+          point->set_Y(point->get_Y() + raw_offset[1]);
+          point->set_Z(point->get_Z() + raw_offset[2]);
+        }
     };
     LASoperationTranslateRawXYZ(I32 raw_x_offset, I32 raw_y_offset, I32 raw_z_offset)
     {
@@ -1097,15 +1760,31 @@ class LASoperationTranslateRawXYatRandom : public LASoperation
     {
         return sprintf(string, "-%s %d %d ", name(), max_raw_offset[0], max_raw_offset[1]);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x - (max_raw_offset[0] * orig_x_scale_factor);
+      tranformed_coord[1] = y - (max_raw_offset[1] * orig_y_scale_factor);
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        I32 r;
         srand(seed);
         seed = rand();
-        r = ((seed >> 3) % ((2 * max_raw_offset[0]) + 1)) - max_raw_offset[0];
-        point->set_X(point->get_X() + r);
-        r = ((seed >> 6) % ((2 * max_raw_offset[1]) + 1)) - max_raw_offset[1];
-        point->set_Y(point->get_Y() + r);
+        I32 rx = ((seed >> 3) % ((2 * max_raw_offset[0]) + 1)) - max_raw_offset[0];
+        I32 ry = ((seed >> 6) % ((2 * max_raw_offset[1]) + 1)) - max_raw_offset[1];
+
+        if (offset_adjust) {
+          F64 x = point->get_X() * orig_x_scale_factor + rx * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + ry * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } else {
+          point->set_X(point->get_X() + rx);
+          point->set_Y(point->get_Y() + ry);
+        }
     };
     void reset()
     {
@@ -1138,12 +1817,40 @@ class LASoperationClampRawZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y;
+      if (z < below)
+        tranformed_coord[2] = below * orig_x_scale_factor + orig_x_offset;
+      else if (z > above)
+        tranformed_coord[2] = above * orig_x_scale_factor + orig_x_offset;
+      else
+        tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
+      if (offset_adjust) {
+        F64 z = 0.0;
+        F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+        F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+        F64 z_pos = get_Z(point);
+        if (z_pos < below)
+          z = below * orig_z_scale_factor + orig_z_offset;
+        else if (z_pos > above)
+          z = above * orig_z_scale_factor + orig_z_offset;
+        else
+          z = z_pos * orig_z_scale_factor + orig_z_offset;
+
+        write_transformed_values_with_adjust_offset(x, y, z, point);
+      } else {
         if (point->get_Z() < below)
-            point->set_Z(below);
+          point->set_Z(below);
         else if (point->get_Z() > above)
-            point->set_Z(above);
+          point->set_Z(above);
+      }
     };
     LASoperationClampRawZ(I32 below, I32 above)
     {
@@ -1166,8 +1873,14 @@ class LASoperationSetIntensity : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), (I32)intensity);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_intensity(intensity);
     };
     LASoperationSetIntensity(U16 intensity)
@@ -1194,8 +1907,14 @@ class LASoperationScaleIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F32 intensity = scale * point->get_intensity();
         point->set_intensity(U16_CLAMP(intensity));
     };
@@ -1223,8 +1942,14 @@ class LASoperationTranslateIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F32 intensity = offset + point->get_intensity();
         point->set_intensity(U16_CLAMP(intensity));
     };
@@ -1252,8 +1977,14 @@ class LASoperationTranslateThenScaleIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F32 intensity = (offset + point->get_intensity()) * scale;
         point->set_intensity(U16_CLAMP(intensity));
     };
@@ -1283,8 +2014,14 @@ class LASoperationClampIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_intensity() > above)
             point->set_intensity(above);
         else if (point->get_intensity() < below)
@@ -1316,8 +2053,14 @@ class LASoperationClampIntensityBelow : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_intensity() < below)
             point->set_intensity(below);
     };
@@ -1345,8 +2088,14 @@ class LASoperationClampIntensityAbove : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_intensity() > above)
             point->set_intensity(above);
     };
@@ -1374,8 +2123,14 @@ class LASoperationMapIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         U16 intensity = point->get_intensity();
         point->set_intensity(map[intensity]);
     };
@@ -1434,8 +2189,14 @@ class LASoperationCopyAttributeIntoIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 intensity = point->get_attribute_as_float(index);
         point->set_intensity(U16_CLAMP(intensity));
     };
@@ -1463,8 +2224,14 @@ class LASoperationCopyAttributeIntoPointSource : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 point_source = point->get_attribute_as_float(index);
         point->set_point_source_ID(U16_CLAMP(point_source));
     };
@@ -1492,8 +2259,14 @@ class LASoperationCopyAttributeIntoRGBNIR : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 attribute = point->get_attribute_as_float(index);
         point->set_RGBI(rgbi, U16_CLAMP(attribute));
     };
@@ -1519,8 +2292,14 @@ class LASoperationAddRegisters : public LASoperation
     {
         return sprintf(string, "-%s %u %u %u ", name(), input1, input2, output);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 result = registers[input1] + registers[input2];
         registers[output] = result;
     };
@@ -1550,8 +2329,14 @@ class LASoperationSubtractRegisters : public LASoperation
     {
         return sprintf(string, "-%s %u %u %u ", name(), input1, input2, output);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 result = registers[input1] - registers[input2];
         registers[output] = result;
     };
@@ -1581,8 +2366,14 @@ class LASoperationMultiplyRegisters : public LASoperation
     {
         return sprintf(string, "-%s %u %u %u ", name(), input1, input2, output);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 result = registers[input1] * registers[input2];
         registers[output] = result;
     };
@@ -1612,8 +2403,14 @@ class LASoperationDivideRegisters : public LASoperation
     {
         return sprintf(string, "-%s %u %u %u ", name(), input1, input2, output);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 result = registers[input1] / registers[input2];
         registers[output] = result;
     };
@@ -1647,8 +2444,14 @@ class LASoperationCopyIntensityIntoRegister : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         registers[index] = point->get_intensity();
     };
     LASoperationCopyIntensityIntoRegister(F64* registers, const U32 index)
@@ -1677,8 +2480,14 @@ class LASoperationCopyUserDataIntoRegister : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         registers[index] = point->get_user_data();
     };
     LASoperationCopyUserDataIntoRegister(F64* registers, U32 index)
@@ -1707,8 +2516,14 @@ class LASoperationCopyPointSourceIntoRegister : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         registers[index] = point->get_point_source_ID();
     };
     LASoperationCopyPointSourceIntoRegister(F64* registers, U32 index)
@@ -1737,8 +2552,14 @@ class LASoperationCopyAttributeIntoRegister : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 attribute = point->get_attribute_as_float(index_attribute);
         registers[index_register] = attribute;
     };
@@ -1766,8 +2587,14 @@ class LASoperationSetRegister : public LASoperation
     {
         return sprintf(string, "-%s %u %g ", name(), index, value);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         registers[index] = value;
     };
     LASoperationSetRegister(F64* registers, U32 index, F64 value)
@@ -1794,8 +2621,14 @@ class LASoperationScaleRegister : public LASoperation
     {
         return sprintf(string, "-%s %u %g ", name(), index, scale);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         registers[index] *= scale;
     };
     LASoperationScaleRegister(F64* registers, U32 index, F32 scale)
@@ -1822,8 +2655,14 @@ class LASoperationTranslateRegister : public LASoperation
     {
         return sprintf(string, "-%s %u %lf ", name(), index, offset);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         registers[index] += offset;
     };
     LASoperationTranslateRegister(F64* registers, U32 index, F64 offset)
@@ -1850,11 +2689,30 @@ class LASoperationCopyRegisterIntoX : public LASoperation
     {
         return sprintf(string, "-%s %u ", name(), index);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = registers[index];
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_x(registers[index]))
+        if (offset_adjust) 
         {
-            overflow++;
+          F64 x_pos = registers[index];
+          F64 y_pos = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z_pos = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+
+          write_transformed_values_with_adjust_offset(x_pos, y_pos, z_pos, point);
+        }
+        else 
+        {       
+          if (!point->set_x(registers[index]))
+          {
+              overflow++;
+          }
         }
     };
     LASoperationCopyRegisterIntoX(F64* registers, U32 index)
@@ -1879,11 +2737,30 @@ class LASoperationCopyRegisterIntoY : public LASoperation
     {
         return sprintf(string, "-%s %u ", name(), index);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = registers[index];
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_y(registers[index]))
+        if (offset_adjust) 
         {
-            overflow++;
+          F64 x_pos = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y_pos = registers[index];
+          F64 z_pos = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+
+          write_transformed_values_with_adjust_offset(x_pos, y_pos, z_pos, point);
+        }
+        else 
+        {   
+          if (!point->set_y(registers[index]))
+          {
+              overflow++;
+          }
         }
     };
     LASoperationCopyRegisterIntoY(F64* registers, U32 index)
@@ -1908,11 +2785,30 @@ class LASoperationCopyRegisterIntoZ : public LASoperation
     {
         return sprintf(string, "-%s %u ", name(), index);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = registers[index];
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        if (!point->set_z(registers[index]))
+        if (offset_adjust) 
         {
-            overflow++;
+          F64 x_pos = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y_pos = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z_pos = registers[index];
+
+          write_transformed_values_with_adjust_offset(x_pos, y_pos, z_pos, point);
+        }
+        else 
+        {  
+          if (!point->set_z(registers[index]))
+          {
+              overflow++;
+          }
         }
     };
     LASoperationCopyRegisterIntoZ(F64* registers, U32 index)
@@ -1937,8 +2833,14 @@ class LASoperationCopyRegisterIntoUserData : public LASoperation
     {
         return sprintf(string, "-%s %u ", name(), index);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_user_data(U8_CLAMP(registers[index]));
     };
     LASoperationCopyRegisterIntoUserData(F64* registers, U32 index)
@@ -1963,8 +2865,14 @@ class LASoperationCopyRegisterIntoIntensity : public LASoperation
     {
         return sprintf(string, "-%s %u ", name(), index);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_intensity(U16_CLAMP(registers[index]));
     };
     LASoperationCopyRegisterIntoIntensity(F64* registers, U32 index)
@@ -1989,8 +2897,14 @@ class LASoperationCopyRegisterIntoPointSource : public LASoperation
     {
         return sprintf(string, "-%s %u ", name(), index);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_point_source_ID(U16_CLAMP(registers[index]));
     };
     LASoperationCopyRegisterIntoPointSource(F64* registers, U32 index)
@@ -2015,8 +2929,14 @@ class LASoperationCopyRegisterIntoRGBNIR : public LASoperation
     {
         return sprintf(string, "-%s%s %u ", name(), (rgbi == 0 ? "R" : (rgbi == 1 ? "G" : (rgbi == 2 ? "B" : "NIR"))), index);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_RGBI(rgbi, U16_CLAMP(registers[index]));
     };
     LASoperationCopyRegisterIntoRGBNIR(F64* registers, U32 index, U32 rgbi)
@@ -2043,8 +2963,14 @@ class LASoperationCopyRegisterIntoAttribute : public LASoperation
     {
         return sprintf(string, "-%s %u %u ", name(), index_register, index_attribute);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_attribute_as_float(index_attribute, registers[index_register]);
     };
     LASoperationCopyRegisterIntoAttribute(F64* registers, U32 index_register, U32 index_attribute)
@@ -2075,8 +3001,14 @@ class LASoperationBinGpsTimeIntoIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_intensity((U16)(I32_QUANTIZE(point->get_gps_time() / bin_size) & 0xFFFF));
     };
     LASoperationBinGpsTimeIntoIntensity(F64 bin_size = 1.0)
@@ -2099,8 +3031,14 @@ class LASoperationSetScanAngle : public LASoperation
     {
         return sprintf(string, "-%s %g ", name(), scan_angle);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_scan_angle(scan_angle);
     };
     LASoperationSetScanAngle(F32 scan_angle)
@@ -2127,8 +3065,14 @@ class LASoperationScaleScanAngle : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F32 scan_angle_rank = scale * point->scan_angle_rank;
         point->scan_angle_rank = I8_CLAMP(I32_QUANTIZE(scan_angle_rank));
     };
@@ -2156,8 +3100,14 @@ class LASoperationTranslateScanAngle : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F32 scan_angle_rank = offset + point->scan_angle_rank;
         point->scan_angle_rank = I8_CLAMP(I32_QUANTIZE(scan_angle_rank));
     };
@@ -2185,8 +3135,14 @@ class LASoperationTranslateThenScaleScanAngle : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F32 scan_angle_rank = (offset + point->scan_angle_rank) * scale;
         point->scan_angle_rank = I8_CLAMP(I32_QUANTIZE(scan_angle_rank));
     };
@@ -2212,8 +3168,14 @@ class LASoperationSetClassification : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), classification);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_extended_classification(classification);
     };
     LASoperationSetClassification(U8 classification)
@@ -2240,8 +3202,14 @@ class LASoperationChangeClassificationFromTo : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (class_from > 31)
         {
             if (point->get_extended_classification() == class_from)
@@ -2280,8 +3248,14 @@ class LASoperationMoveAncientToExtendedClassification : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_FLAGS | LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+ 
         if (point->get_withheld_flag() || point->get_keypoint_flag() || point->get_synthetic_flag())
         {
             point->set_extended_classification((point->get_withheld_flag() ? 128 : 0) | (point->get_keypoint_flag() ? 64 : 0) | (point->get_synthetic_flag() ? 32 : 0) | point->get_classification());
@@ -2308,11 +3282,27 @@ class LASoperationClassifyZbelowAs : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
-        if (point->get_z() < z_below)
+        F64 z = 0.0;
+
+        if (offset_adjust) {
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else 
         {
-            point->set_extended_classification(class_to);
+          z = point->get_z();
+        }
+        if (z < z_below)
+        {
+          point->set_extended_classification(class_to);
         }
     };
     LASoperationClassifyZbelowAs(F64 z_below, U8 class_to)
@@ -2341,11 +3331,26 @@ class LASoperationClassifyZaboveAs : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
-        if (point->get_z() > z_above)
+        F64 z = 0.0;
+
+        if (offset_adjust) {
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else 
         {
-            point->set_extended_classification(class_to);
+          z = point->get_z();
+        }
+        if (point->get_z() > z_above) {
+          point->set_extended_classification(class_to);
         }
     };
     LASoperationClassifyZaboveAs(F64 z_above, U8 class_to)
@@ -2374,9 +3379,25 @@ class LASoperationClassifyZbetweenAs : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
-        if ((z_below <= point->get_z()) && (point->get_z() <= z_above))
+        F64 z = 0.0;
+
+        if (offset_adjust) {
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else 
+        {
+          z = point->get_z();
+        }
+        if ((z_below <= z) && (z <= z_above))
         {
             point->set_extended_classification(class_to);
         }
@@ -2409,8 +3430,14 @@ class LASoperationClassifyIntensityBelowAs : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_intensity() < intensity_below)
         {
             point->set_extended_classification(class_to);
@@ -2442,8 +3469,14 @@ class LASoperationClassifyIntensityAboveAs : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+ 
         if (point->get_intensity() > intensity_above)
         {
             point->set_extended_classification(class_to);
@@ -2475,8 +3508,14 @@ class LASoperationClassifyIntensityBetweenAs : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+ 
         if ((intensity_below <= point->get_intensity()) && (point->get_intensity() <= intensity_above))
         {
             point->set_extended_classification(class_to);
@@ -2510,8 +3549,14 @@ class LASoperationClassifyAttributeBelowAs : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+ 
         if (point->get_attribute_as_float(index) < below)
         {
             point->set_extended_classification(class_to);
@@ -2545,8 +3590,14 @@ class LASoperationClassifyAttributeAboveAs : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+ 
         if (point->get_attribute_as_float(index) > above)
         {
             point->set_extended_classification(class_to);
@@ -2580,8 +3631,14 @@ class LASoperationClassifyAttributeBetweenAs : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 value = point->get_attribute_as_float(index);
         if ((below <= value) && (value <= above))
         {
@@ -2618,8 +3675,14 @@ class LASoperationCopyIntensityIntoClassification : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_classification((U8)point->get_intensity());
     };
 };
@@ -2635,8 +3698,14 @@ class LASoperationSetWithheldFlag : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), flag);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_withheld_flag(flag);
     };
     LASoperationSetWithheldFlag(U8 flag)
@@ -2659,8 +3728,14 @@ class LASoperationSetSyntheticFlag : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), flag);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_synthetic_flag(flag);
     };
     LASoperationSetSyntheticFlag(U8 flag)
@@ -2683,8 +3758,14 @@ class LASoperationSetKeypointFlag : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), flag);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_keypoint_flag(flag);
     };
     LASoperationSetKeypointFlag(U8 flag)
@@ -2707,8 +3788,14 @@ class LASoperationSetExtendedOverlapFlag : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), flag);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+ 
         point->set_extended_overlap_flag(flag);
     };
     LASoperationSetExtendedOverlapFlag(U8 flag)
@@ -2731,8 +3818,14 @@ class LASoperationSetScanDirectionFlag : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), flag);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_scan_direction_flag(flag);
     };
     LASoperationSetScanDirectionFlag(U8 flag)
@@ -2755,8 +3848,14 @@ class LASoperationSetEdgeOfFlightLine : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), flag);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_edge_of_flight_line(flag);
     };
     LASoperationSetEdgeOfFlightLine(U8 flag)
@@ -2779,8 +3878,14 @@ class LASoperationSetExtendedScannerChannel : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), channel);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_extended_scanner_channel(channel);
     };
     LASoperationSetExtendedScannerChannel(U8 channel)
@@ -2803,8 +3908,14 @@ class LASoperationSetUserData : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), user_data);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->user_data = user_data;
     };
     LASoperationSetUserData(U8 user_data)
@@ -2831,8 +3942,14 @@ class LASoperationScaleUserData : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_user_data(U8_CLAMP(scale * point->get_user_data()));
     };
     LASoperationScaleUserData(F32 scale)
@@ -2859,8 +3976,14 @@ class LASoperationChangeUserDataFromTo : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_user_data() == user_data_from)
             point->set_user_data(user_data_to);
     };
@@ -2890,8 +4013,14 @@ class LASoperationMapUserData : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         U8 user_data = point->get_user_data();
         point->set_user_data(map[user_data]);
     };
@@ -2950,8 +4079,14 @@ class LASoperationCopyClassificationIntoUserData : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_user_data(point->get_classification() ? point->get_classification() : point->get_extended_classification());
     };
 };
@@ -2971,8 +4106,14 @@ class LASoperationCopyUserDataIntoClassification : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->is_extended_point_type())
             point->set_extended_classification(point->get_user_data());
         else
@@ -2995,8 +4136,14 @@ class LASoperationCopyClassificationIntoPointSource : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_point_source_ID(point->get_classification() ? point->get_classification() : point->get_extended_classification());
     };
 };
@@ -3016,8 +4163,14 @@ class LASoperationCopyAttributeIntoUserData : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 user_data = point->get_attribute_as_float(index);
         point->set_user_data(U8_CLAMP(user_data));
     };
@@ -3045,8 +4198,14 @@ class LASoperationCopyUserDataIntoAttribute : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 user_data = point->get_user_data();
         point->set_attribute_as_float(index, user_data);
     };
@@ -3074,8 +4233,14 @@ class LASoperationCopyIntensityIntoAttribute : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 user_data = point->get_intensity();
         point->set_attribute_as_float(index, user_data);
     };
@@ -3103,9 +4268,24 @@ class LASoperationCopyZIntoAttribute : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
-        F64 user_data = point->get_z();
+        F64 user_data = 0.0;
+
+        if (offset_adjust) {
+          F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          user_data = z;
+        
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } else {
+          user_data = point->get_z();
+        }
         point->set_attribute_as_float(index, user_data);
     };
     LASoperationCopyZIntoAttribute(U32 index)
@@ -3128,8 +4308,14 @@ class LASoperationSetPointSource : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), psid);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_point_source_ID(psid);
     };
     LASoperationSetPointSource(U16 psid)
@@ -3156,8 +4342,14 @@ class LASoperationChangePointSourceFromTo : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_point_source_ID() == psid_from)
             point->set_point_source_ID(psid_to);
     };
@@ -3187,8 +4379,14 @@ class LASoperationMapPointSource : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         U16 point_source = point->get_point_source_ID();
         point->set_point_source_ID(map[point_source]);
     };
@@ -3247,8 +4445,14 @@ class LASoperationBinGpsTimeIntoPointSource : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_point_source_ID((U16)(I32_QUANTIZE(point->get_gps_time() / bin_size) & 0xFFFF));
     };
     LASoperationBinGpsTimeIntoPointSource(F64 bin_size = 1.0)
@@ -3271,8 +4475,14 @@ class LASoperationRepairZeroReturns : public LASoperation
     {
         return sprintf(string, "-%s ", name());
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_number_of_returns() == 0)
             point->set_number_of_returns(1);
         if (point->get_return_number() == 0)
@@ -3291,8 +4501,14 @@ class LASoperationSetReturnNumber : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), return_number);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_return_number(return_number);
     };
     LASoperationSetReturnNumber(U8 return_number)
@@ -3315,8 +4531,14 @@ class LASoperationSetExtendedReturnNumber : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), extended_return_number);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_extended_return_number(extended_return_number);
     };
     LASoperationSetExtendedReturnNumber(U8 extended_return_number)
@@ -3339,8 +4561,14 @@ class LASoperationChangeReturnNumberFromTo : public LASoperation
     {
         return sprintf(string, "-%s %d %d ", name(), return_number_from, return_number_to);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_return_number() == return_number_from)
             point->set_return_number(return_number_to);
     };
@@ -3366,8 +4594,14 @@ class LASoperationChangeExtendedReturnNumberFromTo : public LASoperation
     {
         return sprintf(string, "-%s %d %d ", name(), extended_return_number_from, extended_return_number_to);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_extended_return_number() == extended_return_number_from)
             point->set_extended_return_number(extended_return_number_to);
     };
@@ -3393,8 +4627,14 @@ class LASoperationSetNumberOfReturns : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), number_of_returns);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_number_of_returns(number_of_returns);
     };
     LASoperationSetNumberOfReturns(U8 number_of_returns)
@@ -3417,8 +4657,14 @@ class LASoperationSetExtendedNumberOfReturns : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), extended_number_of_returns);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_extended_number_of_returns(extended_number_of_returns);
     };
     LASoperationSetExtendedNumberOfReturns(U8 extended_number_of_returns)
@@ -3441,8 +4687,14 @@ class LASoperationChangeNumberOfReturnsFromTo : public LASoperation
     {
         return sprintf(string, "-%s %d %d ", name(), number_of_returns_from, number_of_returns_to);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_number_of_returns() == number_of_returns_from)
             point->set_number_of_returns(number_of_returns_to);
     };
@@ -3468,8 +4720,14 @@ class LASoperationChangeExtendedNumberOfReturnsFromTo : public LASoperation
     {
         return sprintf(string, "-%s %d %d ", name(), extended_number_of_returns_from, extended_number_of_returns_to);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_extended_number_of_returns() == extended_number_of_returns_from)
             point->set_extended_number_of_returns(extended_number_of_returns_to);
     };
@@ -3495,8 +4753,14 @@ class LASoperationSetGpsTime : public LASoperation
     {
         return sprintf(string, "-%s %lf ", name(), gps_time);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->gps_time = gps_time;
     };
     LASoperationSetGpsTime(F64 gps_time)
@@ -3523,8 +4787,14 @@ class LASoperationTranslateGpsTime : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->gps_time += offset;
     };
     LASoperationTranslateGpsTime(F64 offset)
@@ -3551,8 +4821,14 @@ class LASoperationConvertAdjustedGpsToWeek : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         I32 week = (I32)(point->gps_time / 604800.0 + 1653.4391534391534391534391534392);
         I32 secs = week * 604800 - 1000000000;
         point->gps_time -= secs;
@@ -3574,8 +4850,14 @@ class LASoperationConvertWeekToAdjustedGps : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->gps_time += delta_secs;
     }
     LASoperationConvertWeekToAdjustedGps(U32 week)
@@ -3602,8 +4884,14 @@ class LASoperationForceRGB : public LASoperation
     {
         return sprintf(string, "-%s ", name());
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->have_rgb = TRUE;
     };
     LASoperationForceRGB(){};
@@ -3620,8 +4908,14 @@ class LASoperationSetRGB : public LASoperation
     {
         return sprintf(string, "-%s %d %d %d ", name(), RGB[0], RGB[1], RGB[2]);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_RGB(RGB);
     };
     LASoperationSetRGB(U16 R, U16 G, U16 B)
@@ -3650,8 +4944,14 @@ class LASoperationSetRGBofClass : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_classification() == c)
             point->set_RGB(RGB);
     };
@@ -3679,8 +4979,14 @@ class LASoperationSetNIR : public LASoperation
     {
         return sprintf(string, "-%s %d ", name(), value);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_NIR(value);
     };
     LASoperationSetNIR(U16 value)
@@ -3707,8 +5013,14 @@ class LASoperationSetRGBofExtendedClass : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_CLASSIFICATION;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_extended_classification() == c)
             point->set_RGB(RGB);
     };
@@ -3740,8 +5052,14 @@ class LASoperationScaleRGB : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->rgb[0] = U16_CLAMP(scale[0] * point->rgb[0]);
         point->rgb[1] = U16_CLAMP(scale[1] * point->rgb[1]);
         point->rgb[2] = U16_CLAMP(scale[2] * point->rgb[2]);
@@ -3772,8 +5090,14 @@ class LASoperationScaleRGBdown : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->rgb[0] = point->rgb[0] / 256;
         point->rgb[1] = point->rgb[1] / 256;
         point->rgb[2] = point->rgb[2] / 256;
@@ -3795,8 +5119,14 @@ class LASoperationScaleRGBup : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->rgb[0] = point->rgb[0] * 256;
         point->rgb[1] = point->rgb[1] * 256;
         point->rgb[2] = point->rgb[2] * 256;
@@ -3818,8 +5148,14 @@ class LASoperationScaleRGBto8bit : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if ((point->get_R() > 255) || (point->get_G() > 255) || (point->get_B() > 255))
         {
             point->rgb[0] = point->rgb[0] / 256;
@@ -3844,8 +5180,14 @@ class LASoperationScaleRGBto16bit : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if ((point->get_R() < 256) && (point->get_G() < 256) && (point->get_B() < 256))
         {
             point->rgb[0] = point->rgb[0] * 256;
@@ -3870,8 +5212,14 @@ class LASoperationScaleNIR : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_NIR;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->rgb[3] = U16_CLAMP(scale * point->rgb[3]);
     };
     LASoperationScaleNIR(F32 scale_NIR)
@@ -3898,8 +5246,14 @@ class LASoperationScaleNIRdown : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_NIR;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->rgb[3] = point->rgb[3] / 256;
     };
 };
@@ -3919,8 +5273,14 @@ class LASoperationScaleNIRup : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_NIR;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->rgb[3] = point->rgb[3] * 256;
     };
 };
@@ -3940,8 +5300,14 @@ class LASoperationScaleNIRto8bit : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_NIR;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_NIR() > 255)
         {
             point->rgb[3] = point->rgb[3] / 256;
@@ -3964,8 +5330,14 @@ class LASoperationScaleNIRto16bit : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_NIR;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (point->get_R() < 256)
         {
             point->rgb[3] = point->rgb[3] * 256;
@@ -3984,11 +5356,29 @@ class LASoperationSwitchXY : public LASoperation
     {
         return sprintf(string, "-%s ", name());
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = y;
+      tranformed_coord[1] = x;
+      tranformed_coord[2] = z;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        I32 temp = point->get_X();
-        point->set_X(point->get_Y());
-        point->set_Y(temp);
+        if (offset_adjust) 
+        {
+          F64 y = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 x = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 z = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } 
+        else 
+        {
+          I32 temp = point->get_X();
+          point->set_X(point->get_Y());
+          point->set_Y(temp);
+        }
     };
 };
 
@@ -4007,11 +5397,26 @@ class LASoperationSwitchXZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = z;
+      tranformed_coord[1] = y;
+      tranformed_coord[2] = x;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
-        I32 temp = point->get_X();
-        point->set_X(point->get_Z());
-        point->set_Z(temp);
+        if (offset_adjust) {
+          F64 z = point->get_X() * orig_x_scale_factor + orig_x_offset;
+          F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+          F64 x = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+          write_transformed_values_with_adjust_offset(x, y, z, point);
+        } else {
+          I32 temp = point->get_X();
+          point->set_X(point->get_Z());
+          point->set_Z(temp);
+        }
     };
 };
 
@@ -4030,11 +5435,26 @@ class LASoperationSwitchYZ : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x;
+      tranformed_coord[1] = z;
+      tranformed_coord[2] = y;
+      return tranformed_coord;
+    };
     inline void transform(LASpoint* point)
     {
+      if (offset_adjust) {
+        F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+        F64 z = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+        F64 y = get_Z(point) * orig_z_scale_factor + orig_z_offset;
+        write_transformed_values_with_adjust_offset(x, y, z, point);
+      } else {
         I32 temp = point->get_Y();
         point->set_Y(point->get_Z());
         point->set_Z(temp);
+      }
     };
 };
 
@@ -4053,8 +5473,14 @@ class LASoperationSwitchRG : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         I16 temp = point->get_R();
         point->set_R(point->get_G());
         point->set_G(temp);
@@ -4076,8 +5502,14 @@ class LASoperationSwitchRB : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+ 
         I16 temp = point->get_R();
         point->set_R(point->get_B());
         point->set_B(temp);
@@ -4099,8 +5531,14 @@ class LASoperationSwitchGB : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         I16 temp = point->get_G();
         point->set_G(point->get_B());
         point->set_B(temp);
@@ -4122,8 +5560,14 @@ class LASoperationMapAttributeIntoRGB : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (size)
         {
             F64 value = point->get_attribute_as_float(index);
@@ -4241,8 +5685,14 @@ class LASoperationLoadAttributeFromText : public LASoperation
     {
         return sprintf(string, "-%s %u \"%s\" ", name(), index, file_name);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         if (file)
         {
             CHAR line[256];
@@ -4300,8 +5750,14 @@ class LASoperationCopyRGBintoIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_intensity(U16_QUANTIZE((0.2989 * point->get_R()) + (0.5870 * point->get_G()) + (0.1140 * point->get_B())));
     };
 };
@@ -4321,8 +5777,14 @@ class LASoperationCopyRintoIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_intensity(point->get_R());
     };
 };
@@ -4342,8 +5804,14 @@ class LASoperationCopyRBGNIRintoRegister : public LASoperation
     {
         return (band < 3 ? LASZIP_DECOMPRESS_SELECTIVE_RGB : LASZIP_DECOMPRESS_SELECTIVE_NIR);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         registers[index] = point->get_RGBI(band);
     };
     LASoperationCopyRBGNIRintoRegister(const U32 band, F64* registers, const U32 index)
@@ -4374,8 +5842,14 @@ class LASoperationCopyRintoNIR : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_NIR(point->get_R());
     };
 };
@@ -4395,8 +5869,14 @@ class LASoperationCopyGintoIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_intensity(point->get_G());
     };
 };
@@ -4416,8 +5896,14 @@ class LASoperationCopyGintoNIR : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_NIR(point->get_G());
     };
 };
@@ -4437,8 +5923,14 @@ class LASoperationCopyBintoIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_intensity(point->get_B());
     };
 };
@@ -4458,8 +5950,14 @@ class LASoperationCopyBintoNIR : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_NIR(point->get_B());
     };
 };
@@ -4479,8 +5977,14 @@ class LASoperationCopyNIRintoIntensity : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_NIR;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_intensity(point->get_NIR());
     };
 };
@@ -4500,8 +6004,14 @@ class LASoperationCopyIntensityIntoNIR : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_NIR(point->get_intensity());
     };
 };
@@ -4521,8 +6031,14 @@ class LASoperationSwitchRGBItoCIR : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB | LASZIP_DECOMPRESS_SELECTIVE_NIR;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         U16 R = point->get_R();
         U16 G = point->get_G();
         U16 I = point->get_NIR();
@@ -4547,8 +6063,14 @@ class LASoperationSwitchRGBIntensitytoCIR : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_RGB | LASZIP_DECOMPRESS_SELECTIVE_INTENSITY;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         U16 R = point->get_R();
         U16 G = point->get_G();
         U16 intensity = point->get_intensity();
@@ -4573,8 +6095,14 @@ class LASoperationFlipWaveformDirection : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_WAVEPACKET;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->wavepacket.flipDirection();
     };
 };
@@ -4594,8 +6122,14 @@ class LASoperationCopyUserDataIntoPointSource : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+ 
         point->set_point_source_ID(point->get_user_data());
     };
 };
@@ -4615,8 +6149,14 @@ class LASoperationCopyUserDataIntoScannerChannel : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_extended_scanner_channel(point->get_user_data() & 0x0003);
     };
 };
@@ -4632,8 +6172,14 @@ class LASoperationCopyScannerChannelIntoUserData : public LASoperation
     {
         return sprintf(string, "-%s ", name());
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_user_data(point->get_extended_scanner_channel());
     };
 };
@@ -4649,8 +6195,14 @@ class LASoperationCopyScannerChannelIntoPointSource : public LASoperation
     {
         return sprintf(string, "-%s ", name());
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_point_source_ID(point->get_extended_scanner_channel());
     };
 };
@@ -4670,8 +6222,14 @@ class LASoperationMergeScannerChannelIntoPointSource : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_point_source_ID((point->get_point_source_ID() << 2) | point->get_extended_scanner_channel());
     };
 };
@@ -4691,8 +6249,14 @@ class LASoperationSplitScannerChannelFromPointSource : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_POINT_SOURCE;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_extended_scanner_channel(point->get_point_source_ID() & 0x0003);
         point->set_point_source_ID(point->get_point_source_ID() >> 2);
     };
@@ -4713,9 +6277,14 @@ class LASoperationBinZintoPointSource : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
         point->set_point_source_ID(U16_CLAMP(point->get_Z() / bin_size));
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
     };
     LASoperationBinZintoPointSource(I32 bin_size = 1)
     {
@@ -4741,8 +6310,14 @@ class LASoperationBinAbsScanAngleIntoPointSource : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_SCAN_ANGLE;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_point_source_ID(U16_CLAMP(point->get_abs_scan_angle() / bin_size));
     };
     LASoperationBinAbsScanAngleIntoPointSource(F32 bin_size = 1.0f)
@@ -4768,6 +6343,11 @@ class LASoperationAddAttributeToZ : public LASoperation
     inline U32 get_decompress_selective() const
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z | LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      LASMessage(LAS_WARNING, "The adjustment of the offset using '-offset_adjust' is not supported for the operation '%s'.", name());
+      return 0;
     };
     inline void transform(LASpoint* point)
     {
@@ -4798,10 +6378,16 @@ class LASoperationMultiplyScaledIntensityIntoRGB : public LASoperation
   {
     return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY | LASZIP_DECOMPRESS_SELECTIVE_RGB;
   };
+  inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
   inline void transform(LASpoint* point)
   {
-    F32 rgb = scale * point->get_intensity() * point->rgb[channel];
-    point->rgb[channel] = U16_CLAMP(rgb);
+      if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
+      F32 rgb = scale * point->get_intensity() * point->rgb[channel];
+      point->rgb[channel] = U16_CLAMP(rgb);
   };
   LASoperationMultiplyScaledIntensityIntoRGB(U32 channel, F32 scale)
   {
@@ -4828,6 +6414,11 @@ class LASoperationAddScaledAttributeToZ : public LASoperation
     inline U32 get_decompress_selective() const
     {
         return LASZIP_DECOMPRESS_SELECTIVE_Z | LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      LASMessage(LAS_WARNING, "The adjustment of the offset using '-offset_adjust' is not supported for the operation '%s'.", name());
+      return 0;
     };
     inline void transform(LASpoint* point)
     {
@@ -4860,8 +6451,14 @@ class LASoperationAddScaledAttributeToUserData : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_USER_DATA | LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 user_data = point->get_attribute_as_float(index) * scale + point->get_user_data();
         point->set_user_data(U8_QUANTIZE(user_data));
     };
@@ -4887,8 +6484,14 @@ class LASoperationSetAttribute : public LASoperation
     {
         return sprintf(string, "-%s %u %g ", name(), index, value);
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         point->set_attribute_as_float(index, value);
     };
     LASoperationSetAttribute(U32 index, F64 value)
@@ -4917,8 +6520,14 @@ class LASoperationScaleAttribute : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
         F64 attribute = scale * point->get_attribute_as_float(index);
         point->set_attribute_as_float(index, attribute);
     };
@@ -4948,8 +6557,15 @@ class LASoperationTranslateAttribute : public LASoperation
     {
         return LASZIP_DECOMPRESS_SELECTIVE_EXTRA_BYTES;
     };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+      return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
     inline void transform(LASpoint* point)
     {
+        if (offset_adjust) {
+          set_offset_adjust_coord_without_trafo_changes(point);
+        }
         F64 attribute = offset + point->get_attribute_as_float(index);
         point->set_attribute_as_float(index, attribute);
     };
@@ -6866,6 +8482,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
                 if (sscanf(argv[i + 1], "%u", &value) != 1)
                 {
                     laserror("'%s' needs 1 argument: value but '%s' is no valid value", argv[i], argv[i + 1]);
+
                     return FALSE;
                 }
                 if (value > U16_MAX)
@@ -9164,8 +10781,9 @@ void LAStransform::transform(LASpoint* point)
             return;
         }
     }
-    for (i = 0; i < num_operations; i++)
-        operations[i]->transform(point);
+    for (i = 0; i < num_operations; i++) {
+      operations[i]->transform(point);
+    }
 }
 
 void LAStransform::reset()
@@ -9193,6 +10811,126 @@ LAStransform::~LAStransform()
 {
     if (operations)
         clean();
+}
+
+/// Calculates a new offset after operations (transformations) to avoid an I32 overflow.
+void LAStransform::adjust_offset(LASreader* lasreader, F64* scale_factor) 
+{
+  if (!operations || !lasreader) return;
+
+  BOOL min_max_known = TRUE;
+  F64* adj_offset = new F64[3]{0.0, 0.0, 0.0};
+  F64* transf_min = nullptr;
+  F64* transf_max = nullptr;
+  F64 transf_x_min = lasreader->get_min_x();
+  F64 transf_x_max = lasreader->get_max_x();
+  F64 transf_y_min = lasreader->get_min_y();
+  F64 transf_y_max = lasreader->get_max_y();
+  F64 transf_z_min = lasreader->get_min_z();
+  F64 transf_z_max = lasreader->get_max_z();
+  F64 adj_offset_x = 0.0;
+  F64 adj_offset_y = 0.0;
+  F64 adj_offset_z = 0.0;
+
+  if (transf_x_min == transf_x_max || transf_y_min == transf_y_max || transf_z_min == transf_z_max) {
+    min_max_known = FALSE;
+  }
+
+  for (U32 i = 0; i < num_operations; i++) 
+  { 
+    // setting the original offset and scaling factors
+    if (i == 0) 
+    {
+      operations[i]->set_origins(lasreader->header.x_offset, lasreader->header.y_offset, lasreader->header.z_offset, lasreader->header.x_scale_factor,
+          lasreader->header.y_scale_factor, lasreader->header.z_scale_factor);
+    } 
+    else if (adj_offset != nullptr && scale_factor != nullptr) 
+    {
+      operations[i]->set_origins(adj_offset[0], adj_offset[1], adj_offset[2], scale_factor[0], scale_factor[1], scale_factor[2]);
+    } 
+    else if (adj_offset != nullptr) 
+    {
+      operations[i]->set_origins(adj_offset[0], adj_offset[1], adj_offset[2], lasreader->header.x_scale_factor, lasreader->header.y_scale_factor,
+          lasreader->header.z_scale_factor);
+    }
+
+    //get min/max coordinate values after the operation (transformation)
+    transf_min = operations[i]->transform_coords_for_offset_adjustment(transf_x_min, transf_y_min, transf_z_min);
+    transf_max = operations[i]->transform_coords_for_offset_adjustment(transf_x_max, transf_y_max, transf_z_max);
+    //calculate the adjusted offset after the operation (transformation)
+    if (transf_min != 0 && transf_max != 0) 
+    {
+      if (F64_IS_FINITE(transf_min[0]) && F64_IS_FINITE(transf_max[0]))
+        adj_offset_x = ((I64)((transf_min[0] + transf_max[0]) / lasreader->header.x_scale_factor / 20000000)) * 10000000 * lasreader->header.x_scale_factor;
+      else
+        adj_offset_x = 0.0;
+      
+      if (F64_IS_FINITE(transf_min[1]) && F64_IS_FINITE(transf_max[1]))
+        adj_offset_y = ((I64)((transf_min[1] + transf_max[1]) / lasreader->header.y_scale_factor / 20000000)) * 10000000 * lasreader->header.y_scale_factor;
+      else
+        adj_offset_y = 0.0;
+      
+      if (F64_IS_FINITE(transf_min[2]) && F64_IS_FINITE(transf_max[2]))
+        adj_offset_z = ((I64)((transf_min[2] + transf_max[2]) / lasreader->header.z_scale_factor / 20000000)) * 10000000 * lasreader->header.z_scale_factor;
+      else
+        adj_offset_z = 0.0;
+      //is required when several operations are performed 
+      transf_x_min = transf_min[0];
+      transf_y_min = transf_min[1];
+      transf_z_min = transf_min[2];
+      transf_x_max = transf_max[0];
+      transf_y_max = transf_max[1];
+      transf_z_max = transf_max[2];
+
+      delete[] transf_min;
+      delete[] transf_max;
+    }
+    if (adj_offset_x != 0) adj_offset[0] = adj_offset_x;
+    if (adj_offset_y != 0) adj_offset[1] = adj_offset_y;
+    if (adj_offset_z != 0) adj_offset[2] = adj_offset_z;
+    if (adj_offset_x == 0 && i == 0) adj_offset[0] = lasreader->header.x_offset;
+    if (adj_offset_y == 0 && i == 0) adj_offset[1] = lasreader->header.y_offset;
+    if (adj_offset_z == 0 && i == 0) adj_offset[2] = lasreader->header.z_offset;
+
+    operations[i]->set_offset_adjust(TRUE);
+    if (adj_offset != nullptr) 
+      operations[i]->set_adjusted_offset(adj_offset[0], adj_offset[1], adj_offset[2]);
+    else 
+      operations[i]->set_adjusted_offset(lasreader->header.x_offset, lasreader->header.y_offset, lasreader->header.z_offset);
+    if (scale_factor != nullptr)
+      operations[i]->set_scale_factor(scale_factor[0], scale_factor[1], scale_factor[2]);
+    else
+      operations[i]->set_scale_factor(lasreader->header.x_scale_factor, lasreader->header.y_scale_factor, lasreader->header.z_scale_factor);
+
+    if (min_max_known == FALSE) {
+      operations[i]->set_header(lasreader->header);
+    }
+
+    LASMessage(LAS_VERBOSE, "Offset_adjust: Sets the adjusted offset for the operation '%s' to the values x_offset: %.0lf, y_offset: %.0lf, z_offset: %.0lf",
+        operations[i]->name(), adj_offset[0], adj_offset[1], adj_offset[2]);
+  }
+  // Set the LASreader header with the offset, min/max and scaling factors resulting from the final (if multiple operations) operation (transformation).
+  if (lasreader->opener && adj_offset != 0) 
+  {
+    lasreader->opener->set_offset(adj_offset);
+    lasreader->header.x_offset = adj_offset[0];
+    lasreader->header.y_offset = adj_offset[1];
+    lasreader->header.z_offset = adj_offset[2];
+    lasreader->header.min_x = transf_x_min;
+    lasreader->header.min_y = transf_y_min;
+    lasreader->header.min_z = transf_z_min;
+    lasreader->header.max_x = transf_x_max;
+    lasreader->header.max_y = transf_y_max;
+    lasreader->header.max_z = transf_z_max;
+    if (scale_factor != nullptr) 
+    {
+      lasreader->opener->set_scale_factor(scale_factor);
+      lasreader->header.x_scale_factor = scale_factor[0];
+      lasreader->header.y_scale_factor = scale_factor[1];
+      lasreader->header.z_scale_factor = scale_factor[2];
+    }
+  }
+  delete[] adj_offset;
 }
 
 void LAStransform::add_operation(LASoperation* transform_operation)

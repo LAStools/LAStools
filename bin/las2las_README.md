@@ -66,7 +66,16 @@ can also be used directly to describe the transformation or operation.
     las2las64 -i in.laz -o out.laz -proj_json filename_source_json filename_target_json
     las2las64 -i in.laz -o out.laz -proj_string "proj_string_source" "proj_string_target"
 
- 
+## Offset
+The following options are available for automatically setting a sensible offset of the point coordinates to avoid overflows:
+
+-auto_reoffset: This option sets an appropriate offset in the header and translates the points accordingly. 
+This option is only considered for LAS/LAZ input files and is recommended as long as no point coordinate operation or transformation is performed.
+
+-offset_adjust: This option sets the offset based on the selected point coordinate operations and transformations. 
+It is recommended to be used for such operations and transformations and is applicable to all supported input file formats.
+
+
 ## Examples
 
     las2las64 -i s1885565.laz -o out.laz -sp83 OH_S -feet -elevation_feet
@@ -374,7 +383,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 ### Coordinates
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
--auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly  
+-auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly. Only applicable to LAS/LAZ input files 
 -bin_Z_into_point_source [n]        : set point source to z/[n]  
 -clamp_raw_z [min] [max]            : limit raw z values to [min] and [max]  
 -clamp_z [min] [max]                : limit z values to [min] and [max]  
@@ -417,6 +426,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
 -rescale_z [z]                      : rescale z by [z]  
 -rotate_xy [a] [x] [y]              : rotate points by [a] degrees, center at [x] [y]  

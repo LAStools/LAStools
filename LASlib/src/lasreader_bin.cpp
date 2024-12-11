@@ -307,12 +307,21 @@ BOOL LASreaderBIN::read_point_default()
       echo = tsrow.echo_intensity >> 14;
     }
 
-    if (header.min_x > point.get_x()) header.min_x = point.get_x();
-    else if (header.max_x < point.get_x()) header.max_x = point.get_x();
-    if (header.min_y > point.get_y()) header.min_y = point.get_y();
-    else if (header.max_y < point.get_y()) header.max_y = point.get_y();
-    if (header.min_z > point.get_z()) header.min_z = point.get_z();
-    else if (header.max_z < point.get_z()) header.max_z = point.get_z();
+    if (opener->is_offset_adjust() == FALSE) 
+    {
+      if (header.min_x > point.get_x())
+        header.min_x = point.get_x();
+      else if (header.max_x < point.get_x())
+        header.max_x = point.get_x();
+      if (header.min_y > point.get_y())
+        header.min_y = point.get_y();
+      else if (header.max_y < point.get_y())
+        header.max_y = point.get_y();
+      if (header.min_z > point.get_z())
+        header.min_z = point.get_z();
+      else if (header.max_z < point.get_z())
+        header.max_z = point.get_z();
+    }
 
     if (echo == 0) // only echo
     {

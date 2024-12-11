@@ -599,7 +599,11 @@ I32 LASreadOpener::unparse(CHAR* string) const
 	else if (auto_reoffset)
 	{
 		n += sprintf(string + n, "-auto_reoffset ");
-	}
+	} 
+	else if (offset_adjust) 
+	{
+    n += sprintf(string + n, "-offset_adjust ");
+  }
 	if (populate_header)
 	{
 		n += sprintf(string + n, "-populate ");
@@ -892,20 +896,22 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			}
 			if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
 			{
-				LASreaderLAS* lasreaderlas;
+				LASreaderLAS* lasreaderlas = nullptr;
 				if (scale_factor == 0 && offset == 0)
 				{
-					if (auto_reoffset)
+					if (auto_reoffset || (offset_adjust && !transform))
 						lasreaderlas = new LASreaderLASreoffset(this);
 					else
 						lasreaderlas = new LASreaderLAS(this);
 				}
 				else if (scale_factor != 0 && offset == 0)
 				{
-					if (auto_reoffset)
+					if (auto_reoffset || (offset_adjust && !transform))
 						lasreaderlas = new LASreaderLASrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2]);
-					else
+					else if (!offset_adjust)
 						lasreaderlas = new LASreaderLASrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
+					else 
+					  lasreaderlas = new LASreaderLAS(this);
 				}
 				else if (scale_factor == 0 && offset != 0)
 					lasreaderlas = new LASreaderLASreoffset(this, offset[0], offset[1], offset[2]);
@@ -976,7 +982,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 
 					lasreaderlas->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
 				}
-				//
+
+				if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderlas);
+
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -1012,11 +1020,17 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN"))
 			{
 				LASreaderBIN* lasreaderbin;
-				if (scale_factor == 0 && offset == 0)
+				if (offset_adjust) {
+				  if (offset != 0 && !transform)
+					  lasreaderbin = new LASreaderBINreoffset(this, offset[0], offset[1], offset[2]);
+          else
+				  	lasreaderbin = new LASreaderBIN(this);
+				}
+				else if (offset == 0 && scale_factor == 0)
 					lasreaderbin = new LASreaderBIN(this);
 				else if (scale_factor != 0 && offset == 0)
 					lasreaderbin = new LASreaderBINrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
-				else if (scale_factor == 0 && offset != 0)
+        else if (scale_factor == 0 && offset != 0)
 					lasreaderbin = new LASreaderBINreoffset(this, offset[0], offset[1], offset[2]);
 				else
 					lasreaderbin = new LASreaderBINrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
@@ -1038,6 +1052,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_tile) lasreaderbin->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				if (inside_circle) lasreaderbin->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				if (inside_rectangle) lasreaderbin->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+				if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderbin);
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -1073,11 +1088,17 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			else if (strstr(file_name, ".shp") || strstr(file_name, ".SHP"))
 			{
 				LASreaderSHP* lasreadershp;
-				if (scale_factor == 0 && offset == 0)
+				if (offset_adjust) {
+				  if (offset != 0 && !transform)
+					  lasreadershp = new LASreaderSHPreoffset(this, offset[0], offset[1], offset[2]);
+          else
+				  	lasreadershp = new LASreaderSHP(this);
+				}
+        else if (offset == 0 && (scale_factor == 0 || (offset_adjust && transform)))
 					lasreadershp = new LASreaderSHP(this);
-				else if (scale_factor != 0 && offset == 0)
+				else if (scale_factor != 0 && offset == 0 && !offset_adjust)
 					lasreadershp = new LASreaderSHPrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
-				else if (scale_factor == 0 && offset != 0)
+				else if (scale_factor == 0 && offset != 0  && (offset_adjust && !transform))
 					lasreadershp = new LASreaderSHPreoffset(this, offset[0], offset[1], offset[2]);
 				else
 					lasreadershp = new LASreaderSHPrescalereoffset(this, scale_factor[0], scale_factor[1], scale_factor[2], offset[0], offset[1], offset[2]);
@@ -1094,6 +1115,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_tile) lasreadershp->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				if (inside_circle) lasreadershp->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				if (inside_rectangle) lasreadershp->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+				if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreadershp);
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -1129,7 +1151,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			else if (strstr(file_name, ".asc") || strstr(file_name, ".ASC"))
 			{
 				LASreaderASC* lasreaderasc;
-				if (scale_factor == 0 && offset == 0)
+				if (offset_adjust) {
+				  if (offset != 0 && !transform)
+					  lasreaderasc = new LASreaderASCreoffset(this, offset[0], offset[1], offset[2]);
+          else
+				  	lasreaderasc = new LASreaderASC(this);
+				}
+				else if (scale_factor == 0 && offset == 0)
 					lasreaderasc = new LASreaderASC(this);
 				else if (scale_factor != 0 && offset == 0)
 					lasreaderasc = new LASreaderASCrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
@@ -1150,6 +1178,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_tile) lasreaderasc->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				if (inside_circle) lasreaderasc->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				if (inside_rectangle) lasreaderasc->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+				if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderasc);
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -1185,7 +1214,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			else if (strstr(file_name, ".bil") || strstr(file_name, ".BIL"))
 			{
 				LASreaderBIL* lasreaderbil;
-				if (scale_factor == 0 && offset == 0)
+				if (offset_adjust) {
+				  if (offset != 0 && !transform)
+					  lasreaderbil = new LASreaderBILreoffset(this, offset[0], offset[1], offset[2]);
+          else
+				  	lasreaderbil = new LASreaderBIL(this);
+				}
+				else if (scale_factor == 0 && offset == 0)
 					lasreaderbil = new LASreaderBIL(this);
 				else if (scale_factor != 0 && offset == 0)
 					lasreaderbil = new LASreaderBILrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
@@ -1206,6 +1241,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_tile) lasreaderbil->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				if (inside_circle) lasreaderbil->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				if (inside_rectangle) lasreaderbil->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+				if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderbil);
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -1241,7 +1277,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			else if (strstr(file_name, ".dtm") || strstr(file_name, ".DTM"))
 			{
 				LASreaderDTM* lasreaderdtm;
-				if (scale_factor == 0 && offset == 0)
+				if (offset_adjust) {
+				  if (offset != 0 && !transform)
+					  lasreaderdtm = new LASreaderDTMreoffset(this, offset[0], offset[1], offset[2]);
+          else
+            lasreaderdtm = new LASreaderDTM(this);
+				}
+				else if (scale_factor == 0 && offset == 0)
 					lasreaderdtm = new LASreaderDTM(this);
 				else if (scale_factor != 0 && offset == 0)
 					lasreaderdtm = new LASreaderDTMrescale(this, scale_factor[0], scale_factor[1], scale_factor[2]);
@@ -1262,6 +1304,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_tile) lasreaderdtm->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				if (inside_circle) lasreaderdtm->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				if (inside_rectangle) lasreaderdtm->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+				if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderdtm);
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -1314,6 +1357,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_tile) lasreaderply->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				if (inside_circle) lasreaderply->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				if (inside_rectangle) lasreaderply->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+				if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderply);
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -1349,7 +1393,13 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			else if (strstr(file_name, ".qi") || strstr(file_name, ".QI"))
 			{
 				LASreaderQFIT* lasreaderqfit;
-				if (scale_factor == 0 && offset == 0)
+				if (offset_adjust) {
+				  if (offset != 0 && !transform)
+					  lasreaderqfit = new LASreaderQFITreoffset(this,offset[0], offset[1], offset[2]);
+          else
+            lasreaderqfit = new LASreaderQFIT(this);
+				}
+				else if (scale_factor == 0 && offset == 0)
 					lasreaderqfit = new LASreaderQFIT(this);
 				else if (scale_factor != 0 && offset == 0)
 					lasreaderqfit = new LASreaderQFITrescale(this,scale_factor[0], scale_factor[1], scale_factor[2]);
@@ -1375,6 +1425,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_tile) lasreaderqfit->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				if (inside_circle) lasreaderqfit->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				if (inside_rectangle) lasreaderqfit->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+				if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderqfit);
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -1447,6 +1498,8 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_tile) lasreadertxt->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				if (inside_circle) lasreadertxt->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				if (inside_rectangle) lasreadertxt->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+        if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreadertxt);
+
 				LASreader* lasreader = 0;
 				if (stored)
 				{
@@ -2451,6 +2504,11 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
 				*argv[i] = '\0'; *argv[i + 1] = '\0'; i += 1;
 			}
 		}
+		else if (strcmp(argv[i], "-offset_adjust") == 0) 
+    {
+      set_offset_adjust(TRUE);
+      *argv[i] = '\0';
+    }
 		else if (strcmp(argv[i], "-merged") == 0)
 		{
 			set_merged(TRUE);
@@ -2596,6 +2654,7 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
 
 	if (transform) transform->clean();
 	else transform = new LAStransform();
+
 	if (!transform->parse(argc, argv))
 	{
 		delete transform;
@@ -2842,6 +2901,13 @@ void LASreadOpener::set_transform(LAStransform* transform)
 void LASreadOpener::set_auto_reoffset(const BOOL auto_reoffset)
 {
 	this->auto_reoffset = auto_reoffset;
+}
+
+/// Call up after transformation object has been set in LASreaderOpener (if it is a transformation)!
+void LASreadOpener::adjust_offset_when_transformation(LASreader* lasreader, BOOL set_header_direct /*=TRUE*/) {
+  if (transform && offset_adjust && lasreader && offset == 0) {
+    transform->adjust_offset(lasreader, scale_factor);
+	}
 }
 
 void LASreadOpener::set_files_are_flightlines(const I32 files_are_flightlines)
@@ -3629,6 +3695,7 @@ LASreadOpener::LASreadOpener()
 	offset = 0;
 	buffer_size = 0.0f;
 	auto_reoffset = FALSE;
+	offset_adjust = FALSE;
 	files_are_flightlines = 0;
 	files_are_flightlines_index = -1;
 	apply_file_source_ID = FALSE;

@@ -72,6 +72,8 @@ private:
   I32 pitch_start;
   I32 roll_start;
   I32 pulse_width_start;
+  F64 orig_x_offset, orig_y_offset, orig_z_offset;
+  F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
 };
 
 class LASreaderQFITrescale : public virtual LASreaderQFIT

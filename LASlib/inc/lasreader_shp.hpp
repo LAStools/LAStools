@@ -66,6 +66,8 @@ private:
   I32 points_allocated;
   I32 number_of_points;
   I32 point_count;
+  F64 orig_x_offset, orig_y_offset, orig_z_offset;
+  F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
   bool piped;
   void populate_scale_and_offset();
   void populate_bounding_box();
