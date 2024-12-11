@@ -42,7 +42,7 @@ withheld, or removed with the '-ignore_class 2' option.
     lasnoise64 -i tiles\*.laz ^
             -step 2 -isolated 3 ^
             -odix _denoised -olaz ^
-            -cores 7
+            -classify_as 7
 
 classifies all points that have only 3 or fewer other points in
 their surrounding 3 by 3 by 3 grid (with the respective point
