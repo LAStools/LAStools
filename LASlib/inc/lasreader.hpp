@@ -222,7 +222,10 @@ public:
 	BOOL add_neighbor_file_name(const CHAR* file_name, I64 npoints, F64 min_x, F64 min_y, F64 max_x, F64 max_y, BOOL unique = FALSE);
 	BOOL add_neighbor_list_of_files(const CHAR* list_of_files, BOOL unique = FALSE);
 	void set_auto_reoffset(const BOOL auto_reoffset);
+	void adjust_offset_when_transformation(LASreader* lasreader, BOOL set_header_direct=TRUE);
 	inline BOOL is_auto_reoffset() const { return auto_reoffset; };
+  inline void set_offset_adjust(const BOOL offset_adjust) { this->offset_adjust = offset_adjust; };
+	inline BOOL is_offset_adjust() { return this->offset_adjust; };
 	void set_files_are_flightlines(const I32 files_are_flightlines);
 	inline I32 are_files_flightlines() const { return files_are_flightlines; };
 	void set_files_are_flightlines_index(const I32 files_are_flightlines_index);
@@ -321,6 +324,7 @@ private:
 	F64* scale_factor;
 	F64* offset;
 	BOOL auto_reoffset;
+  BOOL offset_adjust;
 	I32 files_are_flightlines;
 	I32 files_are_flightlines_index;
 	BOOL apply_file_source_ID;

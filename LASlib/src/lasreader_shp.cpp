@@ -330,10 +330,25 @@ BOOL LASreaderSHP::read_point_default()
       {
         if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // x of point (LITTLE)
         from_little_endian(&double_input);
-        points[3*i+0] = (I32)header.get_X(double_input);
+        if (opener->is_offset_adjust() == FALSE) 
+        {
+          points[3*i+0] = (I32)header.get_X(double_input);
+        } else {
+          if (double_input >= orig_x_offset) 
+            points[3 * i + 0] = (I32)(((double_input - orig_x_offset) / orig_x_scale_factor) + 0.5);
+          else 
+            points[3 * i + 0] = (I32)(((double_input - orig_x_offset) / orig_x_scale_factor) - 0.5);
+        }
         if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // y of point (LITTLE)
         from_little_endian(&double_input);
-        points[3*i+1] = (I32)header.get_Y(double_input);
+        if (opener->is_offset_adjust() == FALSE) {
+          points[3 * i + 1] = (I32)header.get_Y(double_input);
+        } else {
+          if (double_input >= orig_y_offset)
+            points[3 * i + 1] = (I32)(((double_input - orig_y_offset) / orig_y_scale_factor) + 0.5);
+          else
+            points[3 * i + 1] = (I32)(((double_input - orig_y_offset) / orig_y_scale_factor) - 0.5);
+        }
       }
       // read points z and write LAS points
       if (shape_type == 18) // Multipoint
@@ -345,7 +360,14 @@ BOOL LASreaderSHP::read_point_default()
       {
         if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // z of point (LITTLE)
         from_little_endian(&double_input);
-        points[3*i+2] = (I32)header.get_Z(double_input);
+        if (opener->is_offset_adjust() == FALSE) {
+          points[3 * i + 2] = (I32)header.get_Z(double_input);
+        } else {
+          if (double_input >= orig_z_offset)
+            points[3 * i + 2] = (I32)(((double_input - orig_z_offset) / orig_z_scale_factor) + 0.5);
+          else
+            points[3 * i + 2] = (I32)(((double_input - orig_z_offset) / orig_z_scale_factor) - 0.5);
+        }
       }
     }
     else
@@ -361,10 +383,24 @@ BOOL LASreaderSHP::read_point_default()
       {
         if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // x of point (LITTLE)
         from_little_endian(&double_input);
-        points[2*i+0] = (I32)header.get_X(double_input);
+        if (opener->is_offset_adjust() == FALSE) {
+          points[2 * i + 0] = (I32)header.get_X(double_input);
+        } else {
+          if (double_input >= orig_x_offset)
+            points[2 * i + 0] = (I32)(((double_input - orig_x_offset) / orig_x_scale_factor) + 0.5);
+          else
+            points[2 * i + 0] = (I32)(((double_input - orig_x_offset) / orig_x_scale_factor) - 0.5);
+        }
         if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // y of point (LITTLE)
         from_little_endian(&double_input);
-        points[2*i+1] = (I32)header.get_Y(double_input);
+        if (opener->is_offset_adjust() == FALSE) {
+          points[2 * i + 1] = (I32)header.get_Y(double_input);
+        } else {
+          if (double_input >= orig_y_offset)
+            points[2 * i + 1] = (I32)(((double_input - orig_y_offset) / orig_y_scale_factor) + 0.5);
+          else
+            points[2 * i + 1] = (I32)(((double_input - orig_y_offset) / orig_y_scale_factor) - 0.5);
+        }
       }
     }
     // read points m
@@ -384,15 +420,36 @@ BOOL LASreaderSHP::read_point_default()
   }
   if (shape_type == 11 || shape_type == 18)
   {
-    point.set_X(points[3*point_count+0]);
-    point.set_Y(points[3*point_count+1]);
-    point.set_Z(points[3*point_count+2]);
+    point.set_X(points[3 * point_count + 0]);
+    point.set_Y(points[3 * point_count + 1]);
+    point.set_Z(points[3 * point_count + 2]);
   }
   else
   {
-    point.set_X(points[2*point_count+0]);
-    point.set_Y(points[2*point_count+1]);
-    point.set_Z(0);
+    if (opener->is_offset_adjust() == FALSE) 
+    {
+      point.set_X(points[2 * point_count + 0]);
+      point.set_Y(points[2 * point_count + 1]);
+      point.set_Z(0);
+    } 
+    else 
+    {
+      I32 x = points[2 * point_count + 0];
+      I32 y = points[2 * point_count + 1];
+      I32 z = points[0];
+      if (x >= orig_x_offset)
+        point.set_X((I32)(((x - orig_x_offset) / orig_x_scale_factor) + 0.5));
+      else
+        point.set_X((I32)(((x - orig_x_offset) / orig_x_scale_factor) - 0.5));
+      if (y >= orig_y_offset)
+        point.set_Y((I32)(((y - orig_y_offset) / orig_y_scale_factor) + 0.5));
+      else
+        point.set_Y((I32)(((y - orig_y_offset) / orig_y_scale_factor) - 0.5));
+      if (z >= orig_z_offset)
+        point.set_Z((I32)(((z - orig_z_offset) / orig_z_scale_factor) + 0.5));
+      else
+        point.set_Z((I32)(((z - orig_z_offset) / orig_z_scale_factor) - 0.5));
+    }
   }
   p_count++;
   point_count++;
@@ -481,6 +538,12 @@ LASreaderSHP::LASreaderSHP(LASreadOpener* opener):LASreader(opener)
   points_allocated = 0;
   number_of_points = 0;
   point_count = 0;
+  orig_x_offset = 0.0;
+  orig_y_offset = 0.0;
+  orig_z_offset = 0.0;
+  orig_x_scale_factor = 0.01;
+  orig_y_scale_factor = 0.01;
+  orig_z_scale_factor = 0.01;
 }
 
 LASreaderSHP::~LASreaderSHP()
@@ -526,6 +589,9 @@ void LASreaderSHP::populate_scale_and_offset()
     }
     header.z_scale_factor = 0.01;
   }
+  orig_x_scale_factor = header.x_scale_factor;
+  orig_y_scale_factor = header.y_scale_factor;
+  orig_z_scale_factor = header.z_scale_factor;
 
   // if not specified in the command line, set a reasonable offset
   if (offset)
@@ -551,6 +617,9 @@ void LASreaderSHP::populate_scale_and_offset()
     else
       header.z_offset = 0;
   }
+  orig_x_offset = header.x_offset;
+  orig_y_offset = header.y_offset;
+  orig_z_offset = header.z_offset;
 }
 
 void LASreaderSHP::populate_bounding_box()

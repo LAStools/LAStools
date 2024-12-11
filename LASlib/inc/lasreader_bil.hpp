@@ -74,6 +74,8 @@ private:
   I64 overflow_I32_x;
   I64 overflow_I32_y;
   I64 overflow_I32_z;
+  F64 orig_x_offset, orig_y_offset, orig_z_offset;
+  F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
 
   void clean();
   BOOL read_hdr_file(const CHAR* file_name);

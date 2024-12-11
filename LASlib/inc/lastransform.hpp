@@ -48,6 +48,7 @@
 #include <cmath>
 
 class LASfilter;
+class LASreader;
 
 struct LASTransformMatrix {
 	F64 r11;
@@ -72,12 +73,44 @@ public:
 	virtual U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY; };
 	inline I64 get_overflow() const { return overflow; };
 	inline void zero_overflow() { overflow = 0; };
+  inline void set_header(LASheader& header){ this->header = &header; };
+  virtual F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z) = 0;
 	virtual void transform(LASpoint* point) = 0;
 	virtual void reset() { overflow = 0; };
-	inline LASoperation() { overflow = 0; };
+	inline void set_offset_adjust(BOOL offset_adjust) { this->offset_adjust = offset_adjust; };
+  void set_origins(F64 orig_x_offset, F64 orig_y_offset, F64 orig_z_offset, F64 orig_x_scale_factor, F64 orig_y_scale_factor, F64 orig_z_scale_factor);
+  void set_scale_factor(F64 scale_factor_x, F64 scale_factor_y, F64 scale_factor_z);
+  void set_adjusted_offset(F64 adjusted_offset_x, F64 adjusted_offset_y, F64 adjusted_offset_z);
+  void write_transformed_values_with_adjust_offset(F64 x, F64 y, F64 z, LASpoint* point);
+  F64* get_offset_adjust_coord_without_trafo_changes(F64 x, F64 y, F64 z);
+  I32 get_Z(LASpoint* point); 
+  void set_offset_adjust_coord_without_trafo_changes(LASpoint* point);
+  inline LASoperation() {
+    overflow = 0;
+    orig_x_offset = 0.0;
+    orig_y_offset = 0.0;
+    orig_z_offset = 0.0;
+    adjusted_offset_x = 0.0;
+    adjusted_offset_y = 0.0;
+    adjusted_offset_z = 0.0;
+    orig_x_scale_factor = 0.01;
+    orig_y_scale_factor = 0.01;
+    orig_z_scale_factor = 0.01;
+    scale_factor_x = 0.01;
+    scale_factor_y = 0.01;
+    scale_factor_z = 0.01;
+    offset_adjust = FALSE;
+    header = nullptr;
+   };
 	virtual ~LASoperation() {};
 protected:
 	I64 overflow;
+  F64 orig_x_offset, orig_y_offset, orig_z_offset;
+  F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
+  F64 adjusted_offset_x, adjusted_offset_y, adjusted_offset_z;
+  F64 scale_factor_x, scale_factor_y, scale_factor_z;
+	BOOL offset_adjust;
+  LASheader* header;
 };
 
 // this operation is public cause used out of reader in ptx header
@@ -89,25 +122,51 @@ public:
 		constexpr size_t buffer_size = 330; //Maximum expected length for 12xF64(double), name() + safety margin
 		return snprintf(string, buffer_size, "-%s %lf,%lf,%lf %lf,%lf,%lf %lf,%lf,%lf %lf,%lf,%lf", name(), r11, r12, r13, r21, r22, r23, r31, r32, r33, tr1, tr2, tr3); };
 	inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_CHANNEL_RETURNS_XY | LASZIP_DECOMPRESS_SELECTIVE_Z; };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z) {
+      F64* tranformed_coord = new F64[3]{0.0, 0.0, 0.0};
+      tranformed_coord[0] = x * r11 + y * r12 + z * r13 + tr1;
+      tranformed_coord[1] = x * r21 + y * r22 + z * r23 + tr2;
+      tranformed_coord[2] = x * r31 + y * r32 + z * r33 + tr3;
+      return tranformed_coord;
+    };
 	inline void transform(LASpoint* point) {
-		F64 x = point->get_x();
-		F64 y = point->get_y();
-		F64 z = point->get_z();
-		F64 xr = x * r11 + y * r12 + z * r13 + tr1;
-		F64 yr = x * r21 + y * r22 + z * r23 + tr2;
-		F64 zr = x * r31 + y * r32 + z * r33 + tr3;
-		if (!point->set_x(xr))
+    F64 xr = 0.0;
+    F64 yr = 0.0;
+    F64 zr = 0.0;
+
+    if (offset_adjust) 
 		{
-			overflow++;
-		}
-		if (!point->set_y(yr))
+      F64 x = point->get_X() * orig_x_scale_factor + orig_x_offset;
+      F64 y = point->get_Y() * orig_y_scale_factor + orig_y_offset;
+      F64 z = point->get_Z() * orig_z_scale_factor + orig_z_offset;
+      xr = x * r11 + y * r12 + z * r13 + tr1;
+      yr = x * r21 + y * r22 + z * r23 + tr2;
+      zr = x * r31 + y * r32 + z * r33 + tr3;
+
+      write_transformed_values_with_adjust_offset(xr, yr, zr, point);
+    }
+		else 
 		{
-			overflow++;
-		}
-		if (!point->set_z(zr))
-		{
-			overflow++;
-		}
+      F64 x = point->get_x();
+      F64 y = point->get_y();
+      F64 z = point->get_z();
+      xr = x * r11 + y * r12 + z * r13 + tr1;
+      yr = x * r21 + y * r22 + z * r23 + tr2;
+      zr = x * r31 + y * r32 + z * r33 + tr3;
+
+      if (!point->set_x(xr)) 
+      {
+        overflow++;
+      }
+      if (!point->set_y(yr)) 
+      {
+        overflow++;
+      }
+      if (!point->set_z(zr)) 
+      {
+        overflow++;
+      }
+    }
 	};
 	LASoperationTransformMatrix(F64 r11, F64 r12, F64 r13, F64 r21, F64 r22, F64 r23, F64 r31, F64 r32, F64 r33, F64 tr1, F64 tr2, F64 tr3)
 	{
@@ -141,6 +200,11 @@ class LASoperationMultiplyScaledIntensityRangeIntoRGB : public LASoperation
   inline U32 get_decompress_selective() const
   {
     return LASZIP_DECOMPRESS_SELECTIVE_INTENSITY | LASZIP_DECOMPRESS_SELECTIVE_RGB;
+  };
+  inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z) 
+	{
+    LASMessage(LAS_WARNING, "The adjustment of the offset using '-offset_adjust' is not supported for the operation '%s' yet.", name());
+    return 0;
   };
   inline void transform(LASpoint* point)
   {
@@ -200,6 +264,7 @@ public:
 
 	void reset();
   void add_operation(LASoperation* operation);
+  void adjust_offset(LASreader* lasreader, F64* scale_factor);
   template <typename T>
   bool find_operation(T*& op)
   {

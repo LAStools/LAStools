@@ -101,6 +101,8 @@ private:
 	F64 attribute_pre_offsets[32];
 	F64 attribute_no_datas[32];
 	I32 attribute_starts[32];
+  F64 orig_x_offset, orig_y_offset, orig_z_offset;
+  F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
 	BOOL parse_extended_flags(CHAR* parse_string);
 	BOOL parse_column_description(CHAR** parse_string);
 	BOOL parse_attribute(const CHAR* l, I32 index);

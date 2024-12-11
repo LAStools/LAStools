@@ -529,6 +529,9 @@ void LASreaderPLY::set_scale_factor(const F64* scale_factor)
     this->scale_factor[0] = scale_factor[0];
     this->scale_factor[1] = scale_factor[1];
     this->scale_factor[2] = scale_factor[2];
+    orig_x_scale_factor = scale_factor[0];
+    orig_y_scale_factor = scale_factor[1];
+    orig_z_scale_factor = scale_factor[2];
   }
   else if (this->scale_factor)
   {
@@ -545,6 +548,9 @@ void LASreaderPLY::set_offset(const F64* offset)
     this->offset[0] = offset[0];
     this->offset[1] = offset[1];
     this->offset[2] = offset[2];
+    orig_x_offset = offset[0];
+    orig_y_offset = offset[1];
+    orig_z_offset = offset[2];
   }
   else if (this->offset)
   {
@@ -675,9 +681,27 @@ BOOL LASreaderPLY::read_point_default()
     }
     
     // compute the quantized x, y, and z values
-    point.set_X((I32)header.get_X(point.coordinates[0]));
-    point.set_Y((I32)header.get_Y(point.coordinates[1]));
-    point.set_Z((I32)header.get_Z(point.coordinates[2]));
+    if (opener->is_offset_adjust() == FALSE) 
+    {
+      point.set_X((I32)header.get_X(point.coordinates[0]));
+      point.set_Y((I32)header.get_Y(point.coordinates[1]));
+      point.set_Z((I32)header.get_Z(point.coordinates[2]));
+    } 
+    else 
+    {
+      if (point.coordinates[0] >= orig_x_offset)
+        point.set_X((I32)(((point.coordinates[0] - orig_x_offset) / orig_x_scale_factor) + 0.5));
+      else
+        point.set_X((I32)(((point.coordinates[0] - orig_x_offset) / orig_x_scale_factor) - 0.5));
+      if (point.coordinates[1] >= orig_y_offset)
+        point.set_Y((I32)(((point.coordinates[1] - orig_y_offset) / orig_y_scale_factor) + 0.5));
+      else
+        point.set_Y((I32)(((point.coordinates[1] - orig_y_offset) / orig_y_scale_factor) - 0.5));
+      if (point.coordinates[2] >= orig_z_offset)
+        point.set_Z((I32)(((point.coordinates[2] - orig_z_offset) / orig_z_scale_factor) + 0.5));
+      else
+        point.set_Z((I32)(((point.coordinates[2] - orig_z_offset) / orig_z_scale_factor) - 0.5));
+    }
     p_count++;
     if (!populated_header)
     {
@@ -692,13 +716,21 @@ BOOL LASreaderPLY::read_point_default()
         if (point.return_number >= 1 && point.return_number <= 5) header.number_of_points_by_return[point.return_number-1]++;
       }
       // update bounding box
-      if (point.coordinates[0] < header.min_x) header.min_x = point.coordinates[0];
-      else if (point.coordinates[0] > header.max_x) header.max_x = point.coordinates[0];
-      if (point.coordinates[1] < header.min_y) header.min_y = point.coordinates[1];
-      else if (point.coordinates[1] > header.max_y) header.max_y = point.coordinates[1];
-      if (point.coordinates[2] < header.min_z) header.min_z = point.coordinates[2];
-      else if (point.coordinates[2] > header.max_z) header.max_z = point.coordinates[2];
-
+      if (opener->is_offset_adjust() == FALSE) 
+      {
+        if (point.coordinates[0] < header.min_x)
+          header.min_x = point.coordinates[0];
+        else if (point.coordinates[0] > header.max_x)
+          header.max_x = point.coordinates[0];
+        if (point.coordinates[1] < header.min_y)
+          header.min_y = point.coordinates[1];
+        else if (point.coordinates[1] > header.max_y)
+          header.max_y = point.coordinates[1];
+        if (point.coordinates[2] < header.min_z)
+          header.min_z = point.coordinates[2];
+        else if (point.coordinates[2] > header.max_z)
+          header.max_z = point.coordinates[2];
+      }
       // update the min and max of attributes in extra bytes
       if (number_attributes)
       {
@@ -817,6 +849,12 @@ LASreaderPLY::LASreaderPLY(LASreadOpener* opener) :LASreader(opener)
   translate_intensity = 0.0f;
   scale_intensity = 1.0f;
   number_attributes = 0;
+  orig_x_offset = 0.0;
+  orig_y_offset = 0.0;
+  orig_z_offset = 0.0;
+  orig_x_scale_factor = 0.01;
+  orig_y_scale_factor = 0.01;
+  orig_z_scale_factor = 0.01;
   clean();
 }
 
@@ -1849,6 +1887,9 @@ void LASreaderPLY::populate_scale_and_offset()
       header.z_scale_factor = 0.001;
     }
   }
+  orig_x_scale_factor = header.x_scale_factor;
+  orig_y_scale_factor = header.y_scale_factor;
+  orig_z_scale_factor = header.z_scale_factor;
 
   // if not specified in the command line, set a reasonable offset
   if (offset)
@@ -1874,6 +1915,9 @@ void LASreaderPLY::populate_scale_and_offset()
     else
       header.z_offset = 0;
   }
+  orig_x_offset = header.x_offset;
+  orig_y_offset = header.y_offset;
+  orig_z_offset = header.z_offset;
 }
 
 void LASreaderPLY::populate_bounding_box()
