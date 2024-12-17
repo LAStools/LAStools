@@ -43,6 +43,14 @@ There is an example SHP file called "TO_city_hall.shp" that
 can be used together with the TO_core_last_zoom.las or the
 TO_core_last.las data set to clip away the Toronto city hall.
 
+Running lasclip64 with -v option gives an information how much points
+was clipped and how much points was written:
+    removed points [m] ([n]). outputting [o] points took 1.234 sec.
+The values there means
+    [m]=number of points removed in total (maybe by other filters or the polygon outer boundary)
+    [n]=number of points removed by the polygon
+    [o]=number of points written into the result file (0 means no file written)
+
 
 ## Examples
 
