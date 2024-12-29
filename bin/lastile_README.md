@@ -18,7 +18,7 @@ stores the tile index in the square quad-tree from which its
 min/max extend can be computed. The VLR also tells LAStools
 whether a tile has buffers. Why are buffers important? See:
 
-http://rapidlasso.com/2015/08/07/use-buffers-when-processing-lidar-in-tiles/
+https://rapidlasso.de/use-buffers-when-processing-lidar-in-tiles/
 
 The tool can either operate in one or in two reading passes
 via a commandline switch ('-extra_pass'). The additional reading 
