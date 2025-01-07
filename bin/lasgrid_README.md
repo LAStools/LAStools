@@ -144,13 +144,47 @@ rasters the lowest elevation for each file listed in lidar_files.txt
 individually that fall into cells of size 10 by 10 units and stores
 each resulting grid in BIL format with 32 bits floats.
 
+### counter and density
+
+Tokens of aggregate functions often habe a _8bit, _16bit or _32bit option.
+This indicates the used data size for the bin of each grid cell.
+As long as there is no overflow the bin size does not matter.
+If there are more values than the maximum value of the bin size
+the bin size does matter.
+If there are larger cell values than the bin can hold a overflow will be reported.
+Either you accept this - because you are e.g. only interested in
+low value point counts 1..255 or you should use a larger bin size.
+If you always use a 32bit bin size your memory will maybe exceed on very large files.
+
+    lasgrid64 -i lake.laz -o 1.laz -counter_8bit -step 1
+    lasgrid64 -i lake.laz -o 2.laz -counter_16bit -step 1
+    lasgrid64 -i lake.laz -o 3.laz -counter_32bit -step 1
+
+will produce 3 identical output grids, with a count of (z) range of 1 to 53.
+A larger grid size of 10 will not fit into a 8 bit counter:
+    lasgrid64 -i lake.laz -o 1.laz -counter_8bit -step 10
+WARNING: there were 8699 counter overflows  -> z range 1..255
+    lasgrid64 -i lake.laz -o 2.laz -counter_16bit -step 10
+    lasgrid64 -i lake.laz -o 3.laz -counter_32bit -step 10
+both: z range 1..770
+
+Arguments "-density" or "-point_density" calculates the density per grid cell.
+The formula is
+    d = points / area
+A point count of 123 on a step size of 5 will result into
+    d = 123 / (5x5) = 4.92
+
+Note: Where there are NO input points at all, no output grid value will be
+produced. So the minimum value of "-counter" of a cell is "1".
+
+### other samples
+
 the following commands generate some interesting georeferenced grids that
 you can look at in Google Earth by double clicking the generated KML file
 
     lasgrid64 -i ..\data\test.las -false -o test.png
     lasgrid64 -i ..\data\TO_core_last_zoom.las -gray -o toronto.png -utm 17T
     lasgrid64 -i ..\data\SerpentMound.las -false -o SerpentMound.png
-
 
 lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -o elev_low.png  
 lasgrid64 -v -sp83 OH_S -feet -i s1885565.laz -step 10 -gray -o elev_high.png -highest  
@@ -185,7 +219,7 @@ lasgrid64 -v -o result.png -false -i Lincoln.las -utm 14T -step 5
 lasgrid64 -v -o result.png -false -i S1C1_strip021.las -set_min_max 1630 1690 -step 2 -high  
 lasgrid64 -v -o result.png -false -i "Serpent Mound Model LAS Data.las" -intensity -set_min_max 0 400  
 lasgrid64 -v -o result.png -false -i USACE_Merrick_lots_of_VLRs.las -step 10 -intensity  
-  
+
   
 lasgrid64 -h  
 lasgrid64 -i *.las -opng -step 5 -false  
@@ -346,6 +380,7 @@ See "grouping arguments by tokens" below to see all possible tokens to generate 
 -compute_min_max           : computes the range for -gray and -false  
 -copy_attribute_into_z [n] : copy attribute [n] value into z  
 -density                   : check difference in point density per overlapping flightline per cell with an 8 bit counter  
+-point_density             : check difference in point density per overlapping flightline per cell with an 8 bit counter  
 -false                     : false-color based on min/max range (used with PNG/TIF/JPG)  
 -elevation_feet            : use feet for elevation  
 -feet                      : use feet  
@@ -385,6 +420,7 @@ If a token is detected, the next level of tokens will be checked.
 The order of the tokens is not relevant.
 If a subtoken is not present and a (default) is defined, this will be used. 
 
+    attribute
     counter
       quotient
         16bit
@@ -394,6 +430,10 @@ If a subtoken is not present and a (default) is defined, this will be used.
       2bit
       4bit
       (default):8bit
+    density / point_density
+      8bit
+      (default):16bit
+      32bit
     elevation
       highest|max
       average|avg
@@ -437,6 +477,7 @@ If a subtoken is not present and a (default) is defined, this will be used.
       lowest|min
       highest|max
     rgb
+    scan_angle
     occupancy
     classification
       extended_classification
