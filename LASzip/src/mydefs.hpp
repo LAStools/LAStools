@@ -196,6 +196,8 @@ typedef union I64U32I32F32 {
 #define MIN3(a, b, c) MIN2(MIN2(a, b), (c))
 #define MAX3(a, b, c) MAX2(MAX2(a, b), (c))
 
+#define FLOATEQUAL(a,b) (abs(a - b) < 1e-8) // universal float equal compare
+
 #ifndef FALSE
 #define FALSE 0
 #endif
