@@ -40,6 +40,7 @@
 #include <deque>
 #include <cmath>
 #include <algorithm>
+#include <cstdint>
 
 EPTkey::EPTkey(I32 d, I32 x, I32 y, I32 z) : d(d), x(x), y(y), z(z) {}
 EPTkey::EPTkey() : EPTkey(-1, -1, -1, -1) {}
@@ -127,6 +128,7 @@ EPToctree::EPToctree(const LASheader& header)
     zmax = header.vlr_copc_info->center_z + header.vlr_copc_info->halfsize;
     point_spacing = header.vlr_copc_info->spacing;
     max_depth = 0;
+    grid_size = 0;
   }
   else
   {
@@ -143,6 +145,7 @@ EPToctree::EPToctree(const LASheader& header)
     zmax = center_z + halfsize;
     point_spacing = 0;
     max_depth = 0;
+    grid_size = 0;
   }
 
   if (header.vlr_copc_info && header.vlr_copc_entries)
@@ -280,7 +283,7 @@ EPTkey EPToctree::get_key(const LASpoint* p, const I32 depth) const
 I32 EPToctree::get_cell(const LASpoint*p, const EPTkey& key) const
 {
   F64 size = get_halfsize()*2;
-  F64 res  = size / (1 << key.d);
+  F64 res  = size / (static_cast<uint64_t>(1) << key.d);
 
   // Bounding box of the octant
   F64 minx = res * key.x + (get_center_x() - get_halfsize());

@@ -62,7 +62,7 @@ private:
   I32 version;
   BOOL endian_swap;
   BOOL rescale_reoffset;
-  I32 buffer[14];
+  I32 buffer[14] = {0};
   I32 scan_azimuth_array_offset;
   I32 pitch_array_offset;
   I32 roll_array_offset;

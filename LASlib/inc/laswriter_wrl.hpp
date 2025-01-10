@@ -55,7 +55,7 @@ private:
   BOOL close_file;
   FILE* file;
   const LASheader* header;
-  CHAR printstring[512];
+  CHAR printstring[512] = {0};
   U8* rgb;
   I32 rgb_alloc;
 };

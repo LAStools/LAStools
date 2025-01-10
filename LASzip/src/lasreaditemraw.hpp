@@ -62,7 +62,7 @@ public:
     ENDIAN_SWAP_16(&swapped[18], &item[18]);    // point_source_ID
   };
 private:
-  U8 swapped[20];
+  U8 swapped[20] = {0};
 };
 
 class LASreadItemRaw_GPSTIME11_LE : public LASreadItemRaw
@@ -85,7 +85,7 @@ public:
     ENDIAN_SWAP_64(swapped, item);
   };
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 class LASreadItemRaw_RGB12_LE : public LASreadItemRaw
@@ -110,7 +110,7 @@ public:
     ENDIAN_SWAP_32(&swapped[ 4], &item[ 4]); // B
   };
 private:
-  U8 swapped[6];
+  U8 swapped[6] = {0};
 };
 
 class LASreadItemRaw_WAVEPACKET13_LE : public LASreadItemRaw
@@ -139,7 +139,7 @@ public:
     ENDIAN_SWAP_32(&swapped[25], &item[25]); // Z(t)
   };
 private:
-  U8 swapped[29];
+  U8 swapped[29] = {0};
 };
 
 class LASreadItemRaw_BYTE : public LASreadItemRaw
@@ -257,7 +257,7 @@ public:
     ((LAStempReadPoint10*)item)->gps_time = *((F64*)&buffer[22]);
   }
 private:
-  U8 buffer[30];
+  U8 buffer[30] = {0};
 };
 
 class LASreadItemRaw_POINT14_BE : public LASreadItemRaw
@@ -311,7 +311,7 @@ public:
     ENDIAN_SWAP_64(&swapped[22], (U8*)&(((LAStempReadPoint10*)item)->gps_time));
   }
 private:
-  U8 swapped[30];
+  U8 swapped[30] = {0};
 };
 
 class LASreadItemRaw_RGBNIR14_LE : public LASreadItemRaw
@@ -337,7 +337,7 @@ public:
     ENDIAN_SWAP_32(&swapped[ 6], &item[ 6]); // NIR
   };
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 #endif

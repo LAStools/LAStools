@@ -408,6 +408,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
 
   CHAR line[512];
   CHAR dummy[32];
+  unsigned int dummy_size = static_cast<unsigned int>(sizeof(dummy));
   col = 0;
   row = 0;
   ncols = 0;
@@ -429,23 +430,23 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "ncols") || strstr(line, "NCOLS"))
     {
-      sscanf(line, "%s %d", dummy, &ncols);
+      sscanf_las(line, "%s %d", dummy, dummy_size, & ncols);
     }
     else if (strstr(line, "nrows") || strstr(line, "NROWS"))
     {
-      sscanf(line, "%s %d", dummy, &nrows);
+      sscanf_las(line, "%s %d", dummy, dummy_size, &nrows);
     }
     else if (strstr(line, "nbands") || strstr(line, "NBANDS"))
     {
-      sscanf(line, "%s %d", dummy, &nbands);
+      sscanf_las(line, "%s %d", dummy, dummy_size, &nbands);
     }
     else if (strstr(line, "nbits") || strstr(line, "NBITS"))
     {
-      sscanf(line, "%s %d", dummy, &nbits);
+      sscanf_las(line, "%s %d", dummy, dummy_size, &nbits);
     }
     else if (strstr(line, "layout") || strstr(line, "LAYOUT"))
     {
-      CHAR layout[32];
+      CHAR layout[32] = {0};
       if (sscanf(line, "%s %s", dummy, layout) == 2)
       {
         if (strcmp(layout, "bil") && strcmp(layout, "BIL"))
@@ -460,8 +461,8 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "pixeltype") || strstr(line, "PIXELTYPE"))
     {
-      CHAR pixeltype[32];
-      sscanf(line, "%s %s", dummy, pixeltype);
+      CHAR pixeltype[32] = {0};
+      sscanf_las(line, "%s %s", dummy, dummy_size, pixeltype);
       if ((strcmp(pixeltype, "float") == 0) || (strcmp(pixeltype, "FLOAT") == 0))
       {
         floatpixels = TRUE;
@@ -477,12 +478,12 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "nodata") || strstr(line, "NODATA"))
     {
-      sscanf(line, "%s %f", dummy, &nodata);
+      sscanf_las(line, "%s %f", dummy, dummy_size, &nodata);
     }
     else if (strstr(line, "byteorder") || strstr(line, "BYTEORDER")) // if little or big endian machine (i == intel, m == motorola)
     {
-      CHAR byteorder[32];
-      sscanf(line, "%s %s", dummy, byteorder);
+      CHAR byteorder[32] = {0};
+      sscanf_las(line, "%s %s", dummy, dummy_size, byteorder);
       if (strcmp(byteorder, "i") && strcmp(byteorder, "I"))
       {
         LASMessage(LAS_WARNING, "byteorder '%s' not recognized by LASreader_bil", byteorder);
@@ -490,19 +491,19 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "ulxmap") || strstr(line, "ULXMAP"))
     {
-      sscanf(line, "%s %lf", dummy, &ulxmap);
+      sscanf_las(line, "%s %lf", dummy, dummy_size, &ulxmap);
     }
     else if (strstr(line, "ulymap") || strstr(line, "ULYMAP"))
     {
-      sscanf(line, "%s %lf", dummy, &ulymap);
+      sscanf_las(line, "%s %lf", dummy, dummy_size, &ulymap);
     }
     else if (strstr(line, "xdim") || strstr(line, "XDIM"))
     {
-      sscanf(line, "%s %f", dummy, &xdim);
+      sscanf_las(line, "%s %f", dummy, dummy_size, &xdim);
     }
     else if (strstr(line, "ydim") || strstr(line, "YDIM"))
     {
-      sscanf(line, "%s %f", dummy, &ydim);
+      sscanf_las(line, "%s %f", dummy, dummy_size, &ydim);
     }
   }
 
@@ -585,7 +586,7 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
     LASMessage(LAS_WARNING, "corrupt world file");
     return FALSE;
   }
-  sscanf(line, "%f", &xdim);
+  sscanf_las(line, "%f", &xdim);
   if (!fgets(line, 256, file))
   {
     LASMessage(LAS_WARNING, "corrupt world file");
@@ -601,20 +602,20 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
     LASMessage(LAS_WARNING, "corrupt world file");
     return FALSE;
   }
-  sscanf(line, "%f", &ydim);
+  sscanf_las(line, "%f", &ydim);
   ydim = -1*ydim;
   if (!fgets(line, 256, file))
   {
     LASMessage(LAS_WARNING, "corrupt world file");
     return FALSE;
   }
-  sscanf(line, "%lf", &ulxcenter);
+  sscanf_las(line, "%lf", &ulxcenter);
   if (!fgets(line, 256, file))
   {
     LASMessage(LAS_WARNING, "corrupt world file");
     return FALSE;
   }
-  sscanf(line, "%lf", &ulycenter);
+  sscanf_las(line, "%lf", &ulycenter);
 
   fclose(file);
 

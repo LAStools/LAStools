@@ -54,6 +54,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <cstdarg>
+
 extern void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*), ...);
 
 typedef char CHAR;
@@ -220,11 +222,11 @@ typedef union I64U32I32F32 {
 #define strcpy_las(dest, destsz, src) strcpy((dest), (src))
 #endif
 
-#ifdef _MSC_VER
-#define sscanf_las(buf, format, ...) sscanf_s((buf), (format), __VA_ARGS__)
-#else
-#define sscanf_las(buf, format, ...) sscanf((buf), (format), __VA_ARGS__)
-#endif
+//#ifdef _MSC_VER -> has been replaced by the wrapper of the same name
+//#define sscanf_las(buf, format, ...) sscanf_s((buf), (format), __VA_ARGS__)
+//#else
+//#define sscanf_las(buf, format, ...) sscanf((buf), (format), __VA_ARGS__)
+//#endif
 
 #ifdef _MSC_VER
 #define strcat_las(dest, destsz, src) strcat_s((dest), (destsz), (src))
@@ -399,5 +401,10 @@ std::string ReplaceString(std::string subject, const std::string& search, const 
 void ReplaceStringInPlace(std::string& subject, const std::string& search, const std::string& replace);
 
 bool StringEndsWith(const std::string& fullString, const std::string& ending);
+
+void* realloc_las(void* ptr, size_t size);
+
+/// Wrapper for `sscanf` on other platforms than _MSC_VER and `sscanf_s` on Windows and ensures that the size is passed correctly for strings.
+int sscanf_las(const char* buffer, const char* format, ...);
 
 #endif

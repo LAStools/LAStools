@@ -211,12 +211,14 @@ int main(int argc, char *argv[])
   start_time = taketime();
 
   LASreader* lasreader = lasreadopener.open();
-  if (lasreader == 0)
+  if (lasreader == nullptr)
   {
     laserror("could not open lasreader");
   }
-
+#pragma warning(push)
+#pragma warning(disable : 6011)
   LASMessage(LAS_VERBOSE, "merging headers took %g sec. there are %lld points in total.", taketime()-start_time, lasreader->npoints);
+#pragma warning(push)
   start_time = taketime();
 
   // prepare the header for the surviving points

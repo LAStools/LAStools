@@ -106,6 +106,14 @@ LASwriteItemCompressed_POINT14_v3::LASwriteItemCompressed_POINT14_v3(ArithmeticE
   outstream_point_source = 0;
   outstream_gps_time = 0;
 
+  changed_classification = FALSE;
+  changed_flags = FALSE;
+  changed_intensity = FALSE;
+  changed_scan_angle = FALSE;
+  changed_user_data = FALSE;
+  changed_point_source = FALSE;
+  changed_gps_time = FALSE;
+
   enc_channel_returns_XY = 0;
   enc_Z = 0;
   enc_classification = 0;

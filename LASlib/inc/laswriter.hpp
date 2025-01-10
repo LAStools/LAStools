@@ -133,7 +133,6 @@ private:
   U32 chunk_size;
   BOOL use_stdout;
   BOOL use_nil;
-  BOOL buffered;
 };
 
 #endif

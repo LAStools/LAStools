@@ -80,7 +80,7 @@ public:
 /* write 64 bit big-endian field                             */
   BOOL put64bitsBE(const U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 class ByteStreamOutOstreamBE : public ByteStreamOutOstream
@@ -100,7 +100,7 @@ public:
 /* write 64 bit big-endian field                             */
   BOOL put64bitsBE(const U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 inline ByteStreamOutOstream::ByteStreamOutOstream(std::ostream& stream_param) :

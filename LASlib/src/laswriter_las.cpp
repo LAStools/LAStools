@@ -1394,6 +1394,7 @@ LASwriterLAS::LASwriterLAS()
   start_of_first_extended_variable_length_record = 0;
   number_of_extended_variable_length_records = 0;
   evlrs = 0;
+  header_start_position = 0;
 }
 
 LASwriterLAS::~LASwriterLAS()

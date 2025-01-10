@@ -622,6 +622,8 @@ int main(int argc, char* argv[]) {
     decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_RGB;
   } else if (parse_string == 0) {
     decompress_selective |= LASZIP_DECOMPRESS_SELECTIVE_Z;
+#pragma warning(push)
+#pragma warning(disable : 26819)
   } else {
     // check requested fields and print warnings of necessary
     i = 0;
@@ -725,6 +727,7 @@ int main(int argc, char* argv[]) {
       }
       i++;
     }
+#pragma warning(pop)
   }
 
   // only decompress the layers we need (for new LAS 1.4 point types only)

@@ -141,7 +141,7 @@ private:
   U32 sub_level;
   U32 sub_level_index;
   U32 level_offset[20];
-  U32 coarser_indices[4];
+  U32 coarser_indices[4] = {0};
   U32 adaptive_alloc;
   U32* adaptive;
 

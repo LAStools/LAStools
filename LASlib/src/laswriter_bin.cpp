@@ -288,6 +288,11 @@ LASwriterBIN::LASwriterBIN()
 {
   stream = 0;
   file = 0;
+  origin_x = 0;
+  origin_y = 0;
+  origin_z = 0;
+  units = 0;
+  version = 0;
 }
 
 LASwriterBIN::~LASwriterBIN()

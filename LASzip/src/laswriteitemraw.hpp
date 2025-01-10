@@ -64,7 +64,7 @@ public:
     return outstream->putBytes(swapped, 20);
   };
 private:
-  U8 swapped[20];
+  U8 swapped[20] = {0};
 };
 
 class LASwriteItemRaw_GPSTIME11_LE : public LASwriteItemRaw
@@ -87,7 +87,7 @@ public:
     return outstream->putBytes(swapped, 8);
   };
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 class LASwriteItemRaw_RGB12_LE : public LASwriteItemRaw
@@ -112,7 +112,7 @@ public:
     return outstream->putBytes(swapped, 6);
   };
 private:
-  U8 swapped[6];
+  U8 swapped[6] = {0};
 };
 
 class LASwriteItemRaw_WAVEPACKET13_LE : public LASwriteItemRaw
@@ -141,7 +141,7 @@ public:
     return outstream->putBytes(swapped, 29);
   };
 private:
-  U8 swapped[29];
+  U8 swapped[29] = {0};
 };
 
 class LASwriteItemRaw_BYTE : public LASwriteItemRaw
@@ -250,7 +250,7 @@ public:
     return outstream->putBytes(buffer, 30);
   }
 private:
-  U8 buffer[30];
+  U8 buffer[30] = {0};
 };
 
 class LASwriteItemRaw_POINT14_BE : public LASwriteItemRaw
@@ -291,7 +291,7 @@ public:
     return outstream->putBytes(swapped, 30);
   }
 private:
-  U8 swapped[30];
+  U8 swapped[30] = {0};
 };
 
 class LASwriteItemRaw_RGBNIR14_LE : public LASwriteItemRaw
@@ -317,7 +317,7 @@ public:
     return outstream->putBytes(swapped, 8);
   };
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 #endif

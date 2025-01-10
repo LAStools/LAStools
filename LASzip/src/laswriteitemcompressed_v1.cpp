@@ -65,6 +65,8 @@ LASwriteItemCompressed_POINT10_v1::LASwriteItemCompressed_POINT10_v1(ArithmeticE
   assert(enc);
   this->enc = enc;
 
+  last_incr = 0;
+
   /* create models and integer compressors */
   ic_dx = new IntegerCompressor(enc, 32);  // 32 bits, 1 context
   ic_dy = new IntegerCompressor(enc, 32, 20); // 32 bits, 20 contexts
@@ -272,6 +274,12 @@ LASwriteItemCompressed_GPSTIME11_v1::LASwriteItemCompressed_GPSTIME11_v1(Arithme
   m_gpstime_multi = enc->createSymbolModel(LASZIP_GPSTIME_MULTIMAX);
   m_gpstime_0diff = enc->createSymbolModel(3);
   ic_gpstime = new IntegerCompressor(enc, 32, 6); // 32 bits, 6 contexts
+
+  last_gpstime_diff = 0;
+  multi_extreme_counter = 0;
+  last_gpstime.i64= 0;
+  last_gpstime.u64 = 0;
+  last_gpstime.f64 = 0.0;
 }
 
 LASwriteItemCompressed_GPSTIME11_v1::~LASwriteItemCompressed_GPSTIME11_v1()
@@ -492,6 +500,9 @@ LASwriteItemCompressed_WAVEPACKET13_v1::LASwriteItemCompressed_WAVEPACKET13_v1(A
   ic_packet_size = new IntegerCompressor(enc, 32);
   ic_return_point = new IntegerCompressor(enc, 32);
   ic_xyz = new IntegerCompressor(enc, 32, 3);
+
+  sym_last_offset_diff = 0;
+  last_diff_32 = 0;
 
   /* create last item */
   last_item = new U8[28];

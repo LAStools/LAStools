@@ -66,7 +66,7 @@ private:
   BOOL little_endian;
   BOOL endian_swap;
   I32 offset;
-  I32 buffer[14];
+  I32 buffer[14] = {0};
   BOOL populated_header;
   I32 scan_azimuth_start;
   I32 pitch_start;

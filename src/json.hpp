@@ -8216,6 +8216,8 @@ class lexer : public lexer_base<BasicJsonType>
      */
     bool scan_comment()
     {
+#pragma warning(push)
+#pragma warning(disable : 26819)
         switch (get())
         {
             // single-line comments skip input until a newline or EOF is read
@@ -8279,6 +8281,7 @@ class lexer : public lexer_base<BasicJsonType>
                 return false;
             }
         }
+#pragma warning(pop)
     }
 
     JSON_HEDLEY_NON_NULL(2)
@@ -18929,7 +18932,7 @@ class serializer
         };
 
         JSON_ASSERT(byte < utf8d.size());
-        const std::uint8_t type = utf8d[byte];
+        const std::uint8_t type = (byte >= 0 && byte < 400) ? utf8d[byte] : 0;
 
         codep = (state != UTF8_ACCEPT)
                 ? (byte & 0x3fu) | (codep << 6u)

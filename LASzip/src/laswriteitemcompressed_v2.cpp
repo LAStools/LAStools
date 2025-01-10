@@ -252,6 +252,8 @@ LASwriteItemCompressed_GPSTIME11_v2::LASwriteItemCompressed_GPSTIME11_v2(Arithme
   m_gpstime_multi = enc->createSymbolModel(LASZIP_GPSTIME_MULTI_TOTAL);
   m_gpstime_0diff = enc->createSymbolModel(6);
   ic_gpstime = new IntegerCompressor(enc, 32, 9); // 32 bits, 9 contexts
+
+  last = 0;
 }
 
 LASwriteItemCompressed_GPSTIME11_v2::~LASwriteItemCompressed_GPSTIME11_v2()

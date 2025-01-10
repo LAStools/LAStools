@@ -75,10 +75,10 @@ public:
   I64 flagged_extended_overlap_classification[256];
   LASpoint min;
   LASpoint max;
-  U16 xyz_low_digits_10[3];
-  U16 xyz_low_digits_100[3];
-  U16 xyz_low_digits_1000[3];
-  U16 xyz_low_digits_10000[3];
+  U16 xyz_low_digits_10[3] = {0};
+  U16 xyz_low_digits_100[3] = {0};
+  U16 xyz_low_digits_1000[3] = {0};
+  U16 xyz_low_digits_10000[3] = {0};
   I64 xyz_fluff_10[3];
   I64 xyz_fluff_100[3];
   I64 xyz_fluff_1000[3];

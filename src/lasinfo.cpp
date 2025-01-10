@@ -207,6 +207,8 @@ class LasTool_lasinfo : public LasTool {
   F64* set_scale = 0;
   F64* scale_header = 0;
 
+#pragma warning(push)
+#pragma warning(disable : 6262)
  public:
   void run() {
     int i;
@@ -419,7 +421,7 @@ class LasTool_lasinfo : public LasTool {
           }
           i++;
           if (sscanf_las(
-                  argv[i], "%I64x-%x-%x-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2,
+                  argv[i], "%llx-%x-%x-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX", &set_project_ID_GUID_data_1, &set_project_ID_GUID_data_2,
                   &set_project_ID_GUID_data_3, &set_project_ID_GUID_data_4[0], &set_project_ID_GUID_data_4[1], &set_project_ID_GUID_data_4[2],
                   &set_project_ID_GUID_data_4[3], &set_project_ID_GUID_data_4[4], &set_project_ID_GUID_data_4[5], &set_project_ID_GUID_data_4[6],
                   &set_project_ID_GUID_data_4[7]) != 11) {
@@ -1217,12 +1219,12 @@ class LasTool_lasinfo : public LasTool {
         if (lasreader->npoints == 0) {
           lasreader->close();
 
-          char command[4096];
-          snprintf(command, sizeof(command), "del \"%s\"", lasreadopener.get_file_name());
-          LASMessage(LAS_VERBOSE, "executing '%s'", command);
+          std::string command(4096, '\0');
+          snprintf(command.data(), sizeof(command), "del \"%s\"", lasreadopener.get_file_name());
+          LASMessage(LAS_VERBOSE, "executing '%s'", command.c_str());
 
-          if (system(command) != 0) {
-            laserror("failed to execute '%s'", command);
+          if (system(command.data()) != 0) {
+            laserror("failed to execute '%s'", command.c_str());
           }
         } else {
           lasreader->close();
@@ -1243,27 +1245,27 @@ class LasTool_lasinfo : public LasTool {
         laserror("renaming not implemented ...");
 #endif
 
-        char command[4096];
+        std::string command(4096, '\0');
         if (strlen(base_name)) {
           snprintf(
-              command, sizeof(command), "rename \"%s\" \"%s_%d_%d.xxx\"", lasreadopener.get_file_name(), base_name, I32_QUANTIZE(lasheader->min_x),
+              command.data(), sizeof(command), "rename \"%s\" \"%s_%d_%d.xxx\"", lasreadopener.get_file_name(), base_name, I32_QUANTIZE(lasheader->min_x),
               I32_QUANTIZE(lasheader->min_y));
         } else {
           snprintf(
-              command, sizeof(command), "rename \"%s\" \"%d_%d.xxx\"", lasreadopener.get_file_name(), I32_QUANTIZE(lasheader->min_x),
+              command.data(), sizeof(command), "rename \"%s\" \"%d_%d.xxx\"", lasreadopener.get_file_name(), I32_QUANTIZE(lasheader->min_x),
               I32_QUANTIZE(lasheader->min_y));
         }
         int len1 = (int)strlen(lasreadopener.get_file_name());
-        int len2 = (int)strlen(command);
+        int len2 = (int)strlen(command.data());
         command[len2 - 4] = lasreadopener.get_file_name()[len1 - 3];
         command[len2 - 3] = lasreadopener.get_file_name()[len1 - 2];
         command[len2 - 2] = lasreadopener.get_file_name()[len1 - 1];
         delete lasreader;
 
-        LASMessage(LAS_VERBOSE, "executing '%s'", command);
+        LASMessage(LAS_VERBOSE, "executing '%s'", command.c_str());
 
-        if (system(command) != 0) {
-          laserror("failed to execute '%s'", command);
+        if (system(command.data()) != 0) {
+          laserror("failed to execute '%s'", command.c_str());
         }
         continue;
       }
@@ -1344,7 +1346,7 @@ class LasTool_lasinfo : public LasTool {
       U32 number_of_points_by_return0 = lasheader->number_of_points_by_return[0];
 
       // print header info
-      CHAR printstring[4096];
+      std::string printstring(4096, '\0');
 
       if (file_out && !no_header) {
         JsonObject json_sub_main_header_entries;
@@ -1352,9 +1354,9 @@ class LasTool_lasinfo : public LasTool {
         if (lasreadopener.is_merged() && (lasreader->header.version_minor < 4)) {
           if (lasreader->npoints > number_of_point_records) {
             if (json_out) {
-              char buffer[256];
+              std::vector<char> buffer(256);
               snprintf(
-                  buffer, sizeof(buffer), "merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.\012",
+                  buffer.data(), buffer.size(), "merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.\012",
                   lasreader->npoints, lasreader->header.version_minor);
               json_sub_main_header_entries["warnings"].push_back(buffer);
             } else {
@@ -1384,36 +1386,36 @@ class LasTool_lasinfo : public LasTool {
               lasheader->number_of_points_by_return[0], lasheader->number_of_points_by_return[1], lasheader->number_of_points_by_return[2],
               lasheader->number_of_points_by_return[3], lasheader->number_of_points_by_return[4]};
           JsonObject json_scale_factor;
-          lidardouble2string(printstring, lasheader->x_scale_factor);
-          json_scale_factor["x"] = parseFormattedDouble(printstring);
-          lidardouble2string(printstring, lasheader->y_scale_factor);
-          json_scale_factor["y"] = parseFormattedDouble(printstring);
-          lidardouble2string(printstring, lasheader->z_scale_factor);
-          json_scale_factor["z"] = parseFormattedDouble(printstring);
+          lidardouble2string(printstring.data(), lasheader->x_scale_factor);
+          json_scale_factor["x"] = parseFormattedDouble(printstring.data());
+          lidardouble2string(printstring.data(), lasheader->y_scale_factor);
+          json_scale_factor["y"] = parseFormattedDouble(printstring.data());
+          lidardouble2string(printstring.data(), lasheader->z_scale_factor);
+          json_scale_factor["z"] = parseFormattedDouble(printstring.data());
           json_sub_main_header_entries["scale_factor"] = json_scale_factor;
           JsonObject json_offset_factor;
-          lidardouble2string(printstring, lasheader->x_offset);
-          json_offset_factor["x"] = parseFormattedDouble(printstring);
-          lidardouble2string(printstring, lasheader->y_offset);
-          json_offset_factor["y"] = parseFormattedDouble(printstring);
-          lidardouble2string(printstring, lasheader->z_offset);
-          json_offset_factor["z"] = parseFormattedDouble(printstring);
+          lidardouble2string(printstring.data(), lasheader->x_offset);
+          json_offset_factor["x"] = parseFormattedDouble(printstring.data());
+          lidardouble2string(printstring.data(), lasheader->y_offset);
+          json_offset_factor["y"] = parseFormattedDouble(printstring.data());
+          lidardouble2string(printstring.data(), lasheader->z_offset);
+          json_offset_factor["z"] = parseFormattedDouble(printstring.data());
           json_sub_main_header_entries["offset"] = json_offset_factor;
           JsonObject json_min_value;
-          lidardouble2string(printstring, lasheader->min_x, lasheader->x_scale_factor);
-          json_min_value["x"] = parseFormattedDouble(printstring);
-          lidardouble2string(printstring, lasheader->min_y, lasheader->y_scale_factor);
-          json_min_value["y"] = parseFormattedDouble(printstring);
-          lidardouble2string(printstring, lasheader->min_z, lasheader->z_scale_factor);
-          json_min_value["z"] = parseFormattedDouble(printstring);
+          lidardouble2string(printstring.data(), lasheader->min_x, lasheader->x_scale_factor);
+          json_min_value["x"] = parseFormattedDouble(printstring.data());
+          lidardouble2string(printstring.data(), lasheader->min_y, lasheader->y_scale_factor);
+          json_min_value["y"] = parseFormattedDouble(printstring.data());
+          lidardouble2string(printstring.data(), lasheader->min_z, lasheader->z_scale_factor);
+          json_min_value["z"] = parseFormattedDouble(printstring.data());
           json_sub_main_header_entries["min"] = json_min_value;
           JsonObject json_max_value;
-          lidardouble2string(printstring, lasheader->max_x, lasheader->x_scale_factor);
-          json_max_value["x"] = parseFormattedDouble(printstring);
-          lidardouble2string(printstring, lasheader->max_y, lasheader->y_scale_factor);
-          json_max_value["y"] = parseFormattedDouble(printstring);
-          lidardouble2string(printstring, lasheader->max_z, lasheader->z_scale_factor);
-          json_max_value["z"] = parseFormattedDouble(printstring);
+          lidardouble2string(printstring.data(), lasheader->max_x, lasheader->x_scale_factor);
+          json_max_value["x"] = parseFormattedDouble(printstring.data());
+          lidardouble2string(printstring.data(), lasheader->max_y, lasheader->y_scale_factor);
+          json_max_value["y"] = parseFormattedDouble(printstring.data());
+          lidardouble2string(printstring.data(), lasheader->max_z, lasheader->z_scale_factor);
+          json_max_value["z"] = parseFormattedDouble(printstring.data());
           json_sub_main_header_entries["max"] = json_max_value;
         } else {
           fprintf(file_out, "reporting all LAS header entries:\012");
@@ -1436,104 +1438,104 @@ class LasTool_lasinfo : public LasTool {
               lasheader->number_of_points_by_return[1], lasheader->number_of_points_by_return[2], lasheader->number_of_points_by_return[3],
               lasheader->number_of_points_by_return[4]);
           fprintf(file_out, "  scale factor x y z:         ");
-          lidardouble2string(printstring, lasheader->x_scale_factor);
-          fprintf(file_out, "%s ", printstring);
-          lidardouble2string(printstring, lasheader->y_scale_factor);
-          fprintf(file_out, "%s ", printstring);
-          lidardouble2string(printstring, lasheader->z_scale_factor);
-          fprintf(file_out, "%s\012", printstring);
+          lidardouble2string(printstring.data(), lasheader->x_scale_factor);
+          fprintf(file_out, "%s ", printstring.c_str());
+          lidardouble2string(printstring.data(), lasheader->y_scale_factor);
+          fprintf(file_out, "%s ", printstring.c_str());
+          lidardouble2string(printstring.data(), lasheader->z_scale_factor);
+          fprintf(file_out, "%s\012", printstring.c_str());
           fprintf(file_out, "  offset x y z:               ");
-          lidardouble2string(printstring, lasheader->x_offset);
-          fprintf(file_out, "%s ", printstring);
-          lidardouble2string(printstring, lasheader->y_offset);
-          fprintf(file_out, "%s ", printstring);
-          lidardouble2string(printstring, lasheader->z_offset);
-          fprintf(file_out, "%s\012", printstring);
+          lidardouble2string(printstring.data(), lasheader->x_offset);
+          fprintf(file_out, "%s ", printstring.c_str());
+          lidardouble2string(printstring.data(), lasheader->y_offset);
+          fprintf(file_out, "%s ", printstring.c_str());
+          lidardouble2string(printstring.data(), lasheader->z_offset);
+          fprintf(file_out, "%s\012", printstring.c_str());
           fprintf(file_out, "  min x y z:                  ");
-          lidardouble2string(printstring, lasheader->min_x, lasheader->x_scale_factor);
-          fprintf(file_out, "%s ", printstring);
-          lidardouble2string(printstring, lasheader->min_y, lasheader->y_scale_factor);
-          fprintf(file_out, "%s ", printstring);
-          lidardouble2string(printstring, lasheader->min_z, lasheader->z_scale_factor);
-          fprintf(file_out, "%s\012", printstring);
+          lidardouble2string(printstring.data(), lasheader->min_x, lasheader->x_scale_factor);
+          fprintf(file_out, "%s ", printstring.c_str());
+          lidardouble2string(printstring.data(), lasheader->min_y, lasheader->y_scale_factor);
+          fprintf(file_out, "%s ", printstring.c_str());
+          lidardouble2string(printstring.data(), lasheader->min_z, lasheader->z_scale_factor);
+          fprintf(file_out, "%s\012", printstring.c_str());
           fprintf(file_out, "  max x y z:                  ");
-          lidardouble2string(printstring, lasheader->max_x, lasheader->x_scale_factor);
-          fprintf(file_out, "%s ", printstring);
-          lidardouble2string(printstring, lasheader->max_y, lasheader->y_scale_factor);
-          fprintf(file_out, "%s ", printstring);
-          lidardouble2string(printstring, lasheader->max_z, lasheader->z_scale_factor);
-          fprintf(file_out, "%s\012", printstring);
+          lidardouble2string(printstring.data(), lasheader->max_x, lasheader->x_scale_factor);
+          fprintf(file_out, "%s ", printstring.c_str());
+          lidardouble2string(printstring.data(), lasheader->max_y, lasheader->y_scale_factor);
+          fprintf(file_out, "%s ", printstring.c_str());
+          lidardouble2string(printstring.data(), lasheader->max_z, lasheader->z_scale_factor);
+          fprintf(file_out, "%s\012", printstring.c_str());
         }
         if (!no_warnings && !valid_resolution(lasheader->min_x, lasheader->x_offset, lasheader->x_scale_factor)) {
           if (json_out) {
-            char buffer[256];
-            lidardouble2string(printstring, lasheader->min_x);
-            snprintf(buffer, sizeof(buffer), "Stored resolution of min_x not compatible with x_offset and x_scale_factor: %s", printstring);
+            std::vector<char> buffer(256);
+            lidardouble2string(printstring.data(), lasheader->min_x);
+            snprintf(buffer.data(), buffer.size(), "Stored resolution of min_x not compatible with x_offset and x_scale_factor: %s", printstring.c_str());
             json_sub_main_header_entries["warnings"].push_back(buffer);
           } else {
             fprintf(file_out, "WARNING: stored resolution of min_x not compatible with x_offset and x_scale_factor: ");
-            lidardouble2string(printstring, lasheader->min_x);
-            fprintf(file_out, "%s\n", printstring);
+            lidardouble2string(printstring.data(), lasheader->min_x);
+            fprintf(file_out, "%s\n", printstring.c_str());
           }
         }
         if (!no_warnings && !valid_resolution(lasheader->min_y, lasheader->y_offset, lasheader->y_scale_factor)) {
           if (json_out) {
-            char buffer[256];
-            lidardouble2string(printstring, lasheader->min_y);
-            snprintf(buffer, sizeof(buffer), "Stored resolution of min_y not compatible with y_offset and y_scale_factor: %s", printstring);
+            std::vector<char> buffer(256);
+            lidardouble2string(printstring.data(), lasheader->min_y);
+            snprintf(buffer.data(), buffer.size(), "Stored resolution of min_y not compatible with y_offset and y_scale_factor: %s", printstring.c_str());
             json_sub_main_header_entries["warnings"].push_back(buffer);
           } else {
             fprintf(file_out, "WARNING: stored resolution of min_y not compatible with y_offset and y_scale_factor: ");
-            lidardouble2string(printstring, lasheader->min_y);
-            fprintf(file_out, "%s\n", printstring);
+            lidardouble2string(printstring.data(), lasheader->min_y);
+            fprintf(file_out, "%s\n", printstring.c_str());
           }
         }
         if (!no_warnings && !valid_resolution(lasheader->min_z, lasheader->z_offset, lasheader->z_scale_factor)) {
           if (json_out) {
-            char buffer[256];
-            lidardouble2string(printstring, lasheader->min_z);
-            snprintf(buffer, sizeof(buffer), "Stored resolution of min_z not compatible with z_offset and z_scale_factor: %s", printstring);
+            std::vector<char> buffer(256);
+            lidardouble2string(printstring.data(), lasheader->min_z);
+            snprintf(buffer.data(), buffer.size(), "Stored resolution of min_z not compatible with z_offset and z_scale_factor: %s", printstring.c_str());
             json_sub_main_header_entries["warnings"].push_back(buffer);
           } else {
             fprintf(file_out, "WARNING: stored resolution of min_z not compatible with z_offset and z_scale_factor: ");
-            lidardouble2string(printstring, lasheader->min_z);
-            fprintf(file_out, "%s\n", printstring);
+            lidardouble2string(printstring.data(), lasheader->min_z);
+            fprintf(file_out, "%s\n", printstring.c_str());
           }
         }
         if (!no_warnings && !valid_resolution(lasheader->max_x, lasheader->x_offset, lasheader->x_scale_factor)) {
           if (json_out) {
-            char buffer[256];
-            lidardouble2string(printstring, lasheader->max_x);
-            snprintf(buffer, sizeof(buffer), "Stored resolution of max_x not compatible with x_offset and x_scale_factor: %s", printstring);
+            std::vector<char> buffer(256);
+            lidardouble2string(printstring.data(), lasheader->max_x);
+            snprintf(buffer.data(), buffer.size(), "Stored resolution of max_x not compatible with x_offset and x_scale_factor: %s", printstring.c_str());
             json_sub_main_header_entries["warnings"].push_back(buffer);
           } else {
             fprintf(file_out, "WARNING: stored resolution of max_x not compatible with x_offset and x_scale_factor: ");
-            lidardouble2string(printstring, lasheader->max_x);
-            fprintf(file_out, "%s\n", printstring);
+            lidardouble2string(printstring.data(), lasheader->max_x);
+            fprintf(file_out, "%s\n", printstring.c_str());
           }
         }
         if (!no_warnings && !valid_resolution(lasheader->max_y, lasheader->y_offset, lasheader->y_scale_factor)) {
           if (json_out) {
-            char buffer[256];
-            lidardouble2string(printstring, lasheader->max_y);
-            snprintf(buffer, sizeof(buffer), "Stored resolution of max_y not compatible with y_offset and y_scale_factor: %s", printstring);
+            std::vector<char> buffer(256);
+            lidardouble2string(printstring.data(), lasheader->max_y);
+            snprintf(buffer.data(), buffer.size(), "Stored resolution of max_y not compatible with y_offset and y_scale_factor: %s", printstring.c_str());
             json_sub_main_header_entries["warnings"].push_back(buffer);
           } else {
             fprintf(file_out, "WARNING: stored resolution of max_y not compatible with y_offset and y_scale_factor: ");
-            lidardouble2string(printstring, lasheader->max_y);
-            fprintf(file_out, "%s\n", printstring);
+            lidardouble2string(printstring.data(), lasheader->max_y);
+            fprintf(file_out, "%s\n", printstring.c_str());
           }
         }
         if (!no_warnings && !valid_resolution(lasheader->max_z, lasheader->z_offset, lasheader->z_scale_factor)) {
           if (json_out) {
-            char buffer[256];
-            lidardouble2string(printstring, lasheader->max_z);
-            snprintf(buffer, sizeof(buffer), "Stored resolution of max_z not compatible with z_offset and z_scale_factor: %s", printstring);
+            std::vector<char> buffer(256);
+            lidardouble2string(printstring.data(), lasheader->max_z);
+            snprintf(buffer.data(), buffer.size(), "Stored resolution of max_z not compatible with z_offset and z_scale_factor: %s", printstring.c_str());
             json_sub_main_header_entries["warnings"].push_back(buffer);
           } else {
             fprintf(file_out, "WARNING: stored resolution of max_z not compatible with z_offset and z_scale_factor: ");
-            lidardouble2string(printstring, lasheader->max_z);
-            fprintf(file_out, "%s\n", printstring);
+            lidardouble2string(printstring.data(), lasheader->max_z);
+            fprintf(file_out, "%s\n", printstring.c_str());
           }
         }
         if ((lasheader->version_major == 1) && (lasheader->version_minor >= 3)) {
@@ -1607,9 +1609,9 @@ class LasTool_lasinfo : public LasTool {
             if (lasheader->vlrs[i].record_id == 34735) {  // GeoKeyDirectoryTag
               if (json_out) {
                 json_vlr_record["geo_key_directory_tag"];
-                char buffer[256];
+                std::vector<char> buffer(256);
                 snprintf(
-                    buffer, sizeof(buffer), "%d.%d.%d", lasheader->vlr_geo_keys->key_directory_version, lasheader->vlr_geo_keys->key_revision,
+                    buffer.data(), buffer.size(), "%d.%d.%d", lasheader->vlr_geo_keys->key_directory_version, lasheader->vlr_geo_keys->key_revision,
                     lasheader->vlr_geo_keys->minor_revision);
                 json_vlr_record["geo_key_directory_tag"]["geo_key_version"] = buffer;
                 json_vlr_record["geo_key_directory_tag"]["number_of_keys"] = lasheader->vlr_geo_keys->number_of_keys;
@@ -1668,8 +1670,8 @@ class LasTool_lasinfo : public LasTool {
                           break;
                         default:
                           if (json_out) {
-                            char buffer[256];
-                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            std::vector<char> buffer(256);
+                            snprintf(buffer.data(), buffer.size(), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["gt_model_type_geo_key"] = buffer;
                           } else {
                             fprintf(
@@ -1696,8 +1698,10 @@ class LasTool_lasinfo : public LasTool {
                           break;
                         default:
                           if (json_out) {
-                            char buffer[256];
-                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            std::vector<char> buffer(256);
+                            snprintf(
+                                buffer.data(), buffer.size(), "look-up for %d not implemented",
+                                lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["gt_raster_type_geo_key"] = buffer;
                           } else {
                             fprintf(
@@ -1997,8 +2001,8 @@ class LasTool_lasinfo : public LasTool {
                           break;
                         default:
                           if (json_out) {
-                            char buffer[256];
-                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            std::vector<char> buffer(256);
+                            snprintf(buffer.data(), buffer.size(), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geographic_type_geo_key"] = buffer;
                           } else {
                             fprintf(
@@ -2277,8 +2281,8 @@ class LasTool_lasinfo : public LasTool {
                           break;
                         default:
                           if (json_out) {
-                            char buffer[256];
-                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            std::vector<char> buffer(256);
+                            snprintf(buffer.data(), buffer.size(), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_geodetic_datum_geo_key"] = buffer;
                           } else {
                             fprintf(
@@ -2312,8 +2316,8 @@ class LasTool_lasinfo : public LasTool {
                           break;
                         default:
                           if (json_out) {
-                            char buffer[256];
-                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            std::vector<char> buffer(256);
+                            snprintf(buffer.data(), buffer.size(), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_prime_meridian_geo_key"] = buffer;
                           } else {
                             fprintf(
@@ -2432,8 +2436,8 @@ class LasTool_lasinfo : public LasTool {
                           break;
                         default:
                           if (json_out) {
-                            char buffer[256];
-                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            std::vector<char> buffer(256);
+                            snprintf(buffer.data(), buffer.size(), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_linear_units_geo_key"] = buffer;
                           } else {
                             fprintf(
@@ -2514,8 +2518,8 @@ class LasTool_lasinfo : public LasTool {
                           break;
                         default:
                           if (json_out) {
-                            char buffer[256];
-                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            std::vector<char> buffer(256);
+                            snprintf(buffer.data(), buffer.size(), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_angular_units_geo_key"] = buffer;
                           } else {
                             fprintf(
@@ -2715,8 +2719,8 @@ class LasTool_lasinfo : public LasTool {
                           break;
                         default:
                           if (json_out) {
-                            char buffer[256];
-                            snprintf(buffer, sizeof(buffer), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
+                            std::vector<char> buffer(256);
+                            snprintf(buffer.data(), buffer.size(), "look-up for %d not implemented", lasreader->header.vlr_geo_key_entries[j].value_offset);
                             json_geo_key_entry["geog_ellipsoid_geo_key"] = buffer;
                           } else {
                             fprintf(
@@ -2918,12 +2922,12 @@ class LasTool_lasinfo : public LasTool {
                       }
                       break;
                     case 3072:  // ProjectedCSTypeGeoKey
-                      if (geoprojectionconverter.set_ProjectedCSTypeGeoKey(lasreader->header.vlr_geo_key_entries[j].value_offset, printstring)) {
+                      if (geoprojectionconverter.set_ProjectedCSTypeGeoKey(lasreader->header.vlr_geo_key_entries[j].value_offset, printstring.data())) {
                         horizontal_units = geoprojectionconverter.get_ProjLinearUnitsGeoKey();
                         if (json_out) {
                           json_geo_key_entry["projected_cs_type_geo_key"] = printstring;
                         } else {
-                          fprintf(file_out, "ProjectedCSTypeGeoKey: %s\012", printstring);
+                          fprintf(file_out, "ProjectedCSTypeGeoKey: %s\012", printstring.c_str());
                         }
                         break;
                       } else {
@@ -6041,11 +6045,11 @@ class LasTool_lasinfo : public LasTool {
                           }
                           break;
                         default:
-                          if (geoprojectionconverter.set_VerticalCSTypeGeoKey(lasreader->header.vlr_geo_key_entries[j].value_offset, printstring)) {
+                          if (geoprojectionconverter.set_VerticalCSTypeGeoKey(lasreader->header.vlr_geo_key_entries[j].value_offset, printstring.data())) {
                             if (json_out) {
                               json_geo_key_entry["vertical_cs_type_geo_key"] = printstring;
                             } else {
-                              fprintf(file_out, "VerticalCSTypeGeoKey: %s\012", printstring);
+                              fprintf(file_out, "VerticalCSTypeGeoKey: %s\012", printstring.c_str());
                             }
                           } else {
                             if (json_out) {
@@ -6496,12 +6500,12 @@ class LasTool_lasinfo : public LasTool {
             LASvlr_copc_info* info = (LASvlr_copc_info*)lasheader->vlrs[i].data;
             if (json_out) {
               JsonObject json_copc;
-              lidardouble2string(printstring, info->center_x, lasheader->x_scale_factor);
-              json_copc["center"]["x"] = parseFormattedDouble(printstring);
-              lidardouble2string(printstring, info->center_y, lasheader->y_scale_factor);
-              json_copc["center"]["y"] = parseFormattedDouble(printstring);
-              lidardouble2string(printstring, info->center_z, lasheader->z_scale_factor);
-              json_copc["center"]["z"] = parseFormattedDouble(printstring);
+              lidardouble2string(printstring.data(), info->center_x, lasheader->x_scale_factor);
+              json_copc["center"]["x"] = parseFormattedDouble(printstring.data());
+              lidardouble2string(printstring.data(), info->center_y, lasheader->y_scale_factor);
+              json_copc["center"]["y"] = parseFormattedDouble(printstring.data());
+              lidardouble2string(printstring.data(), info->center_z, lasheader->z_scale_factor);
+              json_copc["center"]["z"] = parseFormattedDouble(printstring.data());
               json_copc["root_node_halfsize"] = info->halfsize;
               json_copc["root_node_point_spacing"] = info->spacing;
               json_copc["gpstime"]["min"] = info->gpstime_minimum;
@@ -6511,12 +6515,12 @@ class LasTool_lasinfo : public LasTool {
               json_vlr_record["copc"] = json_copc;
             } else {
               fprintf(file_out, "    center x y z: ");
-              lidardouble2string(printstring, info->center_x, lasheader->x_scale_factor);
-              fprintf(file_out, "%s ", printstring);
-              lidardouble2string(printstring, info->center_y, lasheader->y_scale_factor);
-              fprintf(file_out, "%s ", printstring);
-              lidardouble2string(printstring, info->center_z, lasheader->z_scale_factor);
-              fprintf(file_out, "%s\012", printstring);
+              lidardouble2string(printstring.data(), info->center_x, lasheader->x_scale_factor);
+              fprintf(file_out, "%s ", printstring.c_str());
+              lidardouble2string(printstring.data(), info->center_y, lasheader->y_scale_factor);
+              fprintf(file_out, "%s ", printstring.c_str());
+              lidardouble2string(printstring.data(), info->center_z, lasheader->z_scale_factor);
+              fprintf(file_out, "%s\012", printstring.c_str());
               fprintf(file_out, "    root node halfsize: %.3lf\012", info->halfsize);
               fprintf(file_out, "    root node point spacing: %.3lf\012", info->spacing);
               fprintf(file_out, "    gpstime min/max: %.2lf/%.2lf\012", info->gpstime_minimum, info->gpstime_maximum);
@@ -7029,18 +7033,18 @@ class LasTool_lasinfo : public LasTool {
                 json_point_records["number_of_points_by_return"].push_back(lasheader->number_of_points_by_return[3]);
                 json_point_records["number_of_points_by_return"].push_back(lasheader->number_of_points_by_return[4]);
               }
-              lidardouble2string(printstring, lasheader->min_x, lasheader->x_scale_factor);
-              json_point_records["x"]["min"] = parseFormattedDouble(printstring);
-              lidardouble2string(printstring, lasheader->min_y, lasheader->y_scale_factor);
-              json_point_records["y"]["min"] = parseFormattedDouble(printstring);
-              lidardouble2string(printstring, lasheader->min_z, lasheader->z_scale_factor);
-              json_point_records["z"]["min"] = parseFormattedDouble(printstring);
-              lidardouble2string(printstring, lasheader->max_x, lasheader->x_scale_factor);
-              json_point_records["x"]["max"] = parseFormattedDouble(printstring);
-              lidardouble2string(printstring, lasheader->max_y, lasheader->y_scale_factor);
-              json_point_records["y"]["max"] = parseFormattedDouble(printstring);
-              lidardouble2string(printstring, lasheader->max_z, lasheader->z_scale_factor);
-              json_point_records["z"]["max"] = parseFormattedDouble(printstring);
+              lidardouble2string(printstring.data(), lasheader->min_x, lasheader->x_scale_factor);
+              json_point_records["x"]["min"] = parseFormattedDouble(printstring.data());
+              lidardouble2string(printstring.data(), lasheader->min_y, lasheader->y_scale_factor);
+              json_point_records["y"]["min"] = parseFormattedDouble(printstring.data());
+              lidardouble2string(printstring.data(), lasheader->min_z, lasheader->z_scale_factor);
+              json_point_records["z"]["min"] = parseFormattedDouble(printstring.data());
+              lidardouble2string(printstring.data(), lasheader->max_x, lasheader->x_scale_factor);
+              json_point_records["x"]["max"] = parseFormattedDouble(printstring.data());
+              lidardouble2string(printstring.data(), lasheader->max_y, lasheader->y_scale_factor);
+              json_point_records["y"]["max"] = parseFormattedDouble(printstring.data());
+              lidardouble2string(printstring.data(), lasheader->max_z, lasheader->z_scale_factor);
+              json_point_records["z"]["max"] = parseFormattedDouble(printstring.data());
 
               json_las_point_report["point_records"] = json_point_records;
             } else {
@@ -7053,19 +7057,19 @@ class LasTool_lasinfo : public LasTool {
                     lasheader->number_of_points_by_return[1], lasheader->number_of_points_by_return[2], lasheader->number_of_points_by_return[3],
                     lasheader->number_of_points_by_return[4]);
               fprintf(file_out, "  min x y z                  ");
-              lidardouble2string(printstring, lasheader->min_x, lasheader->x_scale_factor);
-              fprintf(file_out, "%s ", printstring);
-              lidardouble2string(printstring, lasheader->min_y, lasheader->y_scale_factor);
-              fprintf(file_out, "%s ", printstring);
-              lidardouble2string(printstring, lasheader->min_z, lasheader->z_scale_factor);
-              fprintf(file_out, "%s\012", printstring);
+              lidardouble2string(printstring.data(), lasheader->min_x, lasheader->x_scale_factor);
+              fprintf(file_out, "%s ", printstring.c_str());
+              lidardouble2string(printstring.data(), lasheader->min_y, lasheader->y_scale_factor);
+              fprintf(file_out, "%s ", printstring.c_str());
+              lidardouble2string(printstring.data(), lasheader->min_z, lasheader->z_scale_factor);
+              fprintf(file_out, "%s\012", printstring.c_str());
               fprintf(file_out, "  max x y z                  ");
-              lidardouble2string(printstring, lasheader->max_x, lasheader->x_scale_factor);
-              fprintf(file_out, "%s ", printstring);
-              lidardouble2string(printstring, lasheader->max_y, lasheader->y_scale_factor);
-              fprintf(file_out, "%s ", printstring);
-              lidardouble2string(printstring, lasheader->max_z, lasheader->z_scale_factor);
-              fprintf(file_out, "%s\012", printstring);
+              lidardouble2string(printstring.data(), lasheader->max_x, lasheader->x_scale_factor);
+              fprintf(file_out, "%s ", printstring.c_str());
+              lidardouble2string(printstring.data(), lasheader->max_y, lasheader->y_scale_factor);
+              fprintf(file_out, "%s ", printstring.c_str());
+              lidardouble2string(printstring.data(), lasheader->max_z, lasheader->z_scale_factor);
+              fprintf(file_out, "%s\012", printstring.c_str());
             }
           }
           if (json_out && !json_las_point_report.is_null()) json_sub_main["min_max_las_point_report"] = json_las_point_report;
@@ -7073,8 +7077,8 @@ class LasTool_lasinfo : public LasTool {
 
         if (!no_warnings && file_out && outside_bounding_box) {
           if (json_out) {
-            char buffer[256];
-            snprintf(buffer, sizeof(buffer), "%lld points outside of header bounding box", outside_bounding_box);
+            std::vector<char> buffer(256);
+            snprintf(buffer.data(), buffer.size(), "%lld points outside of header bounding box", outside_bounding_box);
             json_sub_main["warnings"].push_back(buffer);
           } else {
             fprintf(file_out, "WARNING: %lld points outside of header bounding box\012", outside_bounding_box);
@@ -7082,9 +7086,9 @@ class LasTool_lasinfo : public LasTool {
         }
         if (!no_warnings && file_out && lassummary.has_fluff()) {
           if (json_out) {
-            char buffer[256];
+            std::vector<char> buffer(256);
             snprintf(
-                buffer, sizeof(buffer), "there is coordinate resolution fluff (x10) in %s%s%s\012", (lassummary.has_fluff(0) ? "X" : ""),
+                buffer.data(), buffer.size(), "there is coordinate resolution fluff (x10) in %s%s%s\012", (lassummary.has_fluff(0) ? "X" : ""),
                 (lassummary.has_fluff(1) ? "Y" : ""), (lassummary.has_fluff(2) ? "Z" : ""));
             json_sub_main["warnings"].push_back(buffer);
           } else {
@@ -7094,9 +7098,9 @@ class LasTool_lasinfo : public LasTool {
           }
           if (lassummary.has_serious_fluff()) {
             if (json_out) {
-              char buffer[256];
+              std::vector<char> buffer(256);
               snprintf(
-                  buffer, sizeof(buffer), "there is serious coordinate resolution fluff (x100) in %s%s%s\012",
+                  buffer.data(), buffer.size(), "there is serious coordinate resolution fluff (x100) in %s%s%s\012",
                   (lassummary.has_serious_fluff(0) ? "X" : ""), (lassummary.has_serious_fluff(1) ? "Y" : ""),
                   (lassummary.has_serious_fluff(2) ? "Z" : ""));
               json_sub_main["warnings"].push_back(buffer);
@@ -7108,9 +7112,9 @@ class LasTool_lasinfo : public LasTool {
             }
             if (lassummary.has_very_serious_fluff()) {
               if (json_out) {
-                char buffer[256];
+                std::vector<char> buffer(256);
                 snprintf(
-                    buffer, sizeof(buffer), "there is very serious coordinate resolution fluff (x1000) in %s%s%s\012",
+                    buffer.data(), buffer.size(), "there is very serious coordinate resolution fluff (x1000) in %s%s%s\012",
                     (lassummary.has_very_serious_fluff(0) ? "X" : ""), (lassummary.has_very_serious_fluff(1) ? "Y" : ""),
                     (lassummary.has_very_serious_fluff(2) ? "Z" : ""));
                 json_sub_main["warnings"].push_back(buffer);
@@ -7122,9 +7126,9 @@ class LasTool_lasinfo : public LasTool {
               }
               if (lassummary.has_extremely_serious_fluff()) {
                 if (json_out) {
-                  char buffer[256];
+                  std::vector<char> buffer(256);
                   snprintf(
-                      buffer, sizeof(buffer), "there is extremely serious coordinate resolution fluff (x10000) in %s%s%s\012",
+                      buffer.data(), buffer.size(), "there is extremely serious coordinate resolution fluff (x10000) in %s%s%s\012",
                       (lassummary.has_extremely_serious_fluff(0) ? "X" : ""), (lassummary.has_extremely_serious_fluff(1) ? "Y" : ""),
                       (lassummary.has_extremely_serious_fluff(2) ? "Z" : ""));
                   json_sub_main["warnings"].push_back(buffer);
@@ -7465,9 +7469,9 @@ class LasTool_lasinfo : public LasTool {
               fwrite(&number_of_point_records, sizeof(U32), 1, file);
               if (file_out) {
                 if (json_out) {
-                  char buffer[256];
+                  std::vector<char> buffer(256);
                   snprintf(
-                      buffer, sizeof(buffer), "WARNING: real number of point records (%u) is different from header entry (%u). it was repaired. \n",
+                      buffer.data(), buffer.size(), "WARNING: real number of point records (%u) is different from header entry (%u). it was repaired. \n",
                       number_of_point_records, lasheader->number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
@@ -7479,9 +7483,9 @@ class LasTool_lasinfo : public LasTool {
             } else if (lasheader->version_minor < 4) {
               if (file_out) {
                 if (json_out) {
-                  char buffer[256];
+                  std::vector<char> buffer(256);
                   snprintf(
-                      buffer, sizeof(buffer), "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.\n",
+                      buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.\n",
                       lassummary.number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
@@ -7496,9 +7500,9 @@ class LasTool_lasinfo : public LasTool {
               fwrite(&number_of_point_records, sizeof(U32), 1, file);
               if (file_out) {
                 if (json_out) {
-                  char buffer[256];
+                  std::vector<char> buffer(256);
                   snprintf(
-                      buffer, sizeof(buffer),
+                      buffer.data(), buffer.size(),
                       "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n",
                       lassummary.number_of_point_records, lasheader->number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
@@ -7522,9 +7526,9 @@ class LasTool_lasinfo : public LasTool {
             if (!no_warnings && file_out) {
               if (lassummary.number_of_point_records <= U32_MAX) {
                 if (json_out) {
-                  char buffer[256];
+                  std::vector<char> buffer(256);
                   snprintf(
-                      buffer, sizeof(buffer), "WARNING: real number of point records (%lld) is different from header entry (%u).\n",
+                      buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) is different from header entry (%u).\n",
                       lassummary.number_of_point_records, lasheader->number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
@@ -7534,9 +7538,9 @@ class LasTool_lasinfo : public LasTool {
                 }
               } else if (lasheader->version_minor < 4) {
                 if (json_out) {
-                  char buffer[256];
+                  std::vector<char> buffer(256);
                   snprintf(
-                      buffer, sizeof(buffer), "WARNING: real number of point records (%lld) exceeds 4,294,967,295.\n",
+                      buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) exceeds 4,294,967,295.\n",
                       lassummary.number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
                 } else {
@@ -7544,9 +7548,9 @@ class LasTool_lasinfo : public LasTool {
                 }
               } else if (lasheader->number_of_point_records != 0) {
                 if (json_out) {
-                  char buffer[256];
+                  std::vector<char> buffer(256);
                   snprintf(
-                      buffer, sizeof(buffer),
+                      buffer.data(), buffer.size(),
                       "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead of zero.\n",
                       lassummary.number_of_point_records, lasheader->number_of_point_records);
                   json_point_number["warnings"].push_back(buffer);
@@ -7566,9 +7570,9 @@ class LasTool_lasinfo : public LasTool {
           }
           if (!no_warnings && file_out) {
             if (json_out) {
-              char buffer[256];
+              std::vector<char> buffer(256);
               snprintf(
-                  buffer, sizeof(buffer), "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s\n",
+                  buffer.data(), buffer.size(), "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s\n",
                   lasheader->point_data_format, lasheader->number_of_point_records, (repair_counters ? "it was repaired." : ""));
               json_point_number["warnings"].push_back(buffer);
             } else {
@@ -7603,9 +7607,9 @@ class LasTool_lasinfo : public LasTool {
             }
             if (!no_warnings && file_out) {
               if (json_out) {
-                char buffer[256];
+                std::vector<char> buffer(256);
                 snprintf(
-                    buffer, sizeof(buffer), "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s\n",
+                    buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s\n",
                     lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
                 json_point_extended_number["warnings"].push_back(buffer);
               } else {
@@ -7646,9 +7650,9 @@ class LasTool_lasinfo : public LasTool {
               if (!no_warnings && file_out) {
                 if (was_set) {
                   if (json_out) {
-                    char buffer[256];
+                    std::vector<char> buffer(256);
                     snprintf(
-                        buffer, sizeof(buffer),
+                        buffer.data(), buffer.size(),
                         "WARNING: for return %d real number of points by return (%u) is different from header entry (%u).%s\n", i,
                         number_of_points_by_return[i - 1], lasheader->number_of_points_by_return[i - 1],
                         (repair_counters ? " it was repaired." : ""));
@@ -7661,9 +7665,9 @@ class LasTool_lasinfo : public LasTool {
                   }
                 } else {
                   if (json_out) {
-                    char buffer[256];
+                    std::vector<char> buffer(256);
                     snprintf(
-                        buffer, sizeof(buffer), "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i,
+                        buffer.data(), buffer.size(), "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i,
                         number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
                     json_point_by_return["warnings"].push_back(buffer);
                   } else {
@@ -7676,9 +7680,9 @@ class LasTool_lasinfo : public LasTool {
             } else if (lasheader->version_minor < 4) {
               if (!no_warnings && file_out) {
                 if (json_out) {
-                  char buffer[256];
+                  std::vector<char> buffer(256);
                   snprintf(
-                      buffer, sizeof(buffer), "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s\n", i,
+                      buffer.data(), buffer.size(), "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s\n", i,
                       lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
                   json_point_by_return["warnings"].push_back(buffer);
                 } else {
@@ -7692,9 +7696,9 @@ class LasTool_lasinfo : public LasTool {
               wrong_entry = true;
               if (!no_warnings && file_out) {
                 if (json_out) {
-                  char buffer[256];
+                  std::vector<char> buffer(256);
                   snprintf(
-                      buffer, sizeof(buffer),
+                      buffer.data(), buffer.size(),
                       "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295. but header entry is %u instead zero.%s\n",
                       i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i - 1],
                       (repair_counters ? " it was repaired." : ""));
@@ -7715,9 +7719,9 @@ class LasTool_lasinfo : public LasTool {
             wrong_entry = true;
             if (!no_warnings && file_out) {
               if (json_out) {
-                char buffer[256];
+                std::vector<char> buffer(256);
                 snprintf(
-                    buffer, sizeof(buffer),
+                    buffer.data(), buffer.size(),
                     "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s\n",
                     lasheader->point_data_format, i, lasheader->number_of_points_by_return[i - 1], (repair_counters ? "it was repaired." : ""));
                 json_point_by_return["warnings"].push_back(buffer);
@@ -7763,9 +7767,9 @@ class LasTool_lasinfo : public LasTool {
               if (!no_warnings && file_out) {
                 if (was_set) {
                   if (json_out) {
-                    char buffer[256];
+                    std::vector<char> buffer(256);
                     snprintf(
-                        buffer, sizeof(buffer),
+                        buffer.data(), buffer.size(),
                         "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i,
                         lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i - 1],
                         (repair_counters ? " it was repaired." : ""));
@@ -7778,9 +7782,9 @@ class LasTool_lasinfo : public LasTool {
                   }
                 } else {
                   if (json_out) {
-                    char buffer[256];
+                    std::vector<char> buffer(256);
                     snprintf(
-                        buffer, sizeof(buffer), "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i,
+                        buffer.data(), buffer.size(), "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i,
                         lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
                     json_point_extended_by_return["warnings"].push_back(buffer);
                   } else {
@@ -7812,9 +7816,9 @@ class LasTool_lasinfo : public LasTool {
         if (!no_warnings && file_out && !no_returns) {
           if (lassummary.number_of_points_by_return[0]) {
             if (json_out) {
-              char buffer[256];
+              std::vector<char> buffer(256);
               snprintf(
-                  buffer, sizeof(buffer), "WARNING: there %s %lld point%s with return number 0\n",
+                  buffer.data(), buffer.size(), "WARNING: there %s %lld point%s with return number 0\n",
                   (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[0],
                   (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
               json_point_by_return["warnings"].push_back(buffer);
@@ -7827,9 +7831,9 @@ class LasTool_lasinfo : public LasTool {
           if (lasheader->version_minor < 4) {
             if (lassummary.number_of_points_by_return[6]) {
               if (json_out) {
-                char buffer[256];
+                std::vector<char> buffer(256);
                 snprintf(
-                    buffer, sizeof(buffer), "WARNING: there %s %lld point%s with return number 6\n",
+                    buffer.data(), buffer.size(), "WARNING: there %s %lld point%s with return number 6\n",
                     (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[6],
                     (lassummary.number_of_points_by_return[6] > 1 ? "s" : ""));
                 json_point_by_return["warnings"].push_back(buffer);
@@ -7841,9 +7845,9 @@ class LasTool_lasinfo : public LasTool {
             }
             if (lassummary.number_of_points_by_return[7]) {
               if (json_out) {
-                char buffer[256];
+                std::vector<char> buffer(256);
                 snprintf(
-                    buffer, sizeof(buffer), "WARNING: there %s %lld point%s with return number 7\n",
+                    buffer.data(), buffer.size(), "WARNING: there %s %lld point%s with return number 7\n",
                     (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[7],
                     (lassummary.number_of_points_by_return[7] > 1 ? "s" : ""));
                 json_point_by_return["warnings"].push_back(buffer);
@@ -7884,9 +7888,9 @@ class LasTool_lasinfo : public LasTool {
 
           if (lassummary.number_of_returns[0]) {
             if (json_out) {
-              char buffer[256];
+              std::vector<char> buffer(256);
               snprintf(
-                  buffer, sizeof(buffer), "WARNING: there are %lld points with a number of returns of given pulse of 0\n",
+                  buffer.data(), buffer.size(), "WARNING: there are %lld points with a number of returns of given pulse of 0\n",
                   lassummary.number_of_returns[0]);
               json_point_by_return["warnings"].push_back(buffer);
             } else {
@@ -8153,8 +8157,8 @@ class LasTool_lasinfo : public LasTool {
           if (value > enlarged_max_x) {
             if (!no_warnings && file_out) {
               if (json_out) {
-                char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: real max x larger than header max x by %lf\n", value - lasheader->max_x);
+                std::vector<char> buffer(256);
+                snprintf(buffer.data(), buffer.size(), "WARNING: real max x larger than header max x by %lf\n", value - lasheader->max_x);
                 json_bounding_box["warnings"].push_back(buffer);
               } else {
                 fprintf(file_out, "WARNING: real max x larger than header max x by %lf\n", value - lasheader->max_x);
@@ -8165,8 +8169,8 @@ class LasTool_lasinfo : public LasTool {
           if (value < enlarged_min_x) {
             if (!no_warnings && file_out) {
               if (json_out) {
-                char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: real min x smaller than header min x by %lf\n", lasheader->min_x - value);
+                std::vector<char> buffer(256);
+                snprintf(buffer.data(), buffer.size(), "WARNING: real min x smaller than header min x by %lf\n", lasheader->min_x - value);
                 json_bounding_box["warnings"].push_back(buffer);
               } else {
                 fprintf(file_out, "WARNING: real min x smaller than header min x by %lf\n", lasheader->min_x - value);
@@ -8177,8 +8181,8 @@ class LasTool_lasinfo : public LasTool {
           if (value > enlarged_max_y) {
             if (!no_warnings && file_out) {
               if (json_out) {
-                char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: real max y larger than header max y by %lf\n", value - lasheader->max_y);
+                std::vector<char> buffer(256);
+                snprintf(buffer.data(), buffer.size(), "WARNING: real max y larger than header max y by %lf\n", value - lasheader->max_y);
                 json_bounding_box["warnings"].push_back(buffer);
               } else {
                 fprintf(file_out, "WARNING: real max y larger than header max y by %lf\n", value - lasheader->max_y);
@@ -8189,8 +8193,8 @@ class LasTool_lasinfo : public LasTool {
           if (value < enlarged_min_y) {
             if (!no_warnings && file_out) {
               if (json_out) {
-                char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: real min y smaller than header min y by %lf\n", lasheader->min_y - value);
+                std::vector<char> buffer(256);
+                snprintf(buffer.data(), buffer.size(), "WARNING: real min y smaller than header min y by %lf\n", lasheader->min_y - value);
                 json_bounding_box["warnings"].push_back(buffer);
               } else {
                 fprintf(file_out, "WARNING: real min y smaller than header min y by %lf\n", lasheader->min_y - value);
@@ -8201,8 +8205,8 @@ class LasTool_lasinfo : public LasTool {
           if (value > enlarged_max_z) {
             if (!no_warnings && file_out) {
               if (json_out) {
-                char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: real max z larger than header max z by %lf\n", value - lasheader->max_z);
+                std::vector<char> buffer(256);
+                snprintf(buffer.data(), buffer.size(), "WARNING: real max z larger than header max z by %lf\n", value - lasheader->max_z);
                 json_bounding_box["warnings"].push_back(buffer);
               } else {
                 fprintf(file_out, "WARNING: real max z larger than header max z by %lf\n", value - lasheader->max_z);
@@ -8213,8 +8217,8 @@ class LasTool_lasinfo : public LasTool {
           if (value < enlarged_min_z) {
             if (!no_warnings && file_out) {
               if (json_out) {
-                char buffer[256];
-                snprintf(buffer, sizeof(buffer), "WARNING: real min z smaller than header min z by %lf\n", lasheader->min_z - value);
+                std::vector<char> buffer(256);
+                snprintf(buffer.data(), buffer.size(), "WARNING: real min z smaller than header min z by %lf\n", lasheader->min_z - value);
                 json_bounding_box["warnings"].push_back(buffer);
               } else {
                 fprintf(file_out, "WARNING: real min z smaller than header min z by %lf\n", lasheader->min_z - value);
@@ -8250,6 +8254,7 @@ class LasTool_lasinfo : public LasTool {
 
     byebye();
   };
+#pragma warning(pop)
 
   void usage() override {
     fprintf(stderr, "usage:\n");

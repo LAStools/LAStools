@@ -587,7 +587,7 @@ public:
       {
         number_of_variable_length_records++;
         offset_to_point_data += 54;
-        vlrs = (LASvlr*)realloc(vlrs, sizeof(LASvlr)*number_of_variable_length_records);
+        vlrs = (LASvlr*)realloc_las(vlrs, sizeof(LASvlr)*number_of_variable_length_records);
       }
     }
     else
@@ -596,33 +596,36 @@ public:
       offset_to_point_data += 54;
       vlrs = (LASvlr*)malloc(sizeof(LASvlr));
     }
-    memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
-    vlrs[i].reserved = 0; // used to be 0xAABB
-    strncpy_las(vlrs[i].user_id, sizeof(vlrs[i].user_id), user_id, 16);
-    vlrs[i].record_id = record_id;
-    vlrs[i].record_length_after_header = record_length_after_header;
-    if (keep_description && found_description)
-    {
-      // do nothing
+    if (vlrs != nullptr) {
+      memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
+      vlrs[i].reserved = 0; // used to be 0xAABB
+      strncpy_las(vlrs[i].user_id, sizeof(vlrs[i].user_id), user_id, 16);
+      vlrs[i].record_id = record_id;
+      vlrs[i].record_length_after_header = record_length_after_header;
+
+      if (keep_description && found_description)
+      {
+        // do nothing
+      }
+      else if (description)
+      {
+        snprintf(vlrs[i].description, sizeof(vlrs[i].description), "%.31s", description);
+      }
+      else
+      {
+        snprintf(vlrs[i].description, sizeof(vlrs[i].description), "by LAStools of rapidlasso GmbH");
+      }
+      if (record_length_after_header)
+      {
+        offset_to_point_data += record_length_after_header;
+        vlrs[i].data = data;
+      }
+      else
+      {
+        vlrs[i].data = 0;
+      }
     }
-    else if (description)
-    {
-      snprintf(vlrs[i].description, sizeof(vlrs[i].description), "%.31s", description);
-    }
-    else
-    {
-      snprintf(vlrs[i].description, sizeof(vlrs[i].description), "by LAStools of rapidlasso GmbH");
-    }
-    if (record_length_after_header)
-    {
-      offset_to_point_data += record_length_after_header;
-      vlrs[i].data = data;
-    }
-    else
-    {
-      vlrs[i].data = 0;
-    }
-		return TRUE;
+    return TRUE;
   };
 
   const LASvlr* get_vlr(const CHAR* user_id, U16 record_id) const
@@ -656,7 +659,7 @@ public:
         if (number_of_variable_length_records)
         {
           vlrs[i] = vlrs[number_of_variable_length_records];
-          vlrs = (LASvlr*)realloc(vlrs, sizeof(LASvlr)*number_of_variable_length_records);
+          vlrs = (LASvlr*)realloc_las(vlrs, sizeof(LASvlr)*number_of_variable_length_records);
         }
         else
         {
@@ -714,7 +717,7 @@ public:
       if (i == number_of_extended_variable_length_records)
       {
         number_of_extended_variable_length_records++;
-        evlrs = (LASevlr*)realloc(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
+        evlrs = (LASevlr*)realloc_las(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
       }
     }
     else
@@ -722,29 +725,32 @@ public:
       number_of_extended_variable_length_records = 1;
       evlrs = (LASevlr*)malloc(sizeof(LASevlr)*number_of_extended_variable_length_records);
     }
-    evlrs[i].reserved = 0; // used to be 0xAABB
-    strncpy_las(evlrs[i].user_id, sizeof(evlrs[i].user_id), user_id, 16);
-    evlrs[i].record_id = record_id;
-    evlrs[i].record_length_after_header = record_length_after_header;
-    if (keep_description && found_description)
-    {
-      // do nothing
-    }
-    else if (description)
-    {
-      snprintf(evlrs[i].description, sizeof(evlrs[i].description), "%.31s", description);
-    }
-    else
-    {
-      snprintf(evlrs[i].description, sizeof(evlrs[i].description), "by LAStools of rapidlasso GmbH");
-    }
-    if (record_length_after_header)
-    {
-      evlrs[i].data = data;
-    }
-    else
-    {
-      evlrs[i].data = 0;
+    if (evlrs != nullptr) {
+      evlrs[i].reserved = 0;  // used to be 0xAABB
+      strncpy_las(evlrs[i].user_id, sizeof(evlrs[i].user_id), user_id, 16);
+      evlrs[i].record_id = record_id;
+      evlrs[i].record_length_after_header = record_length_after_header;
+
+      if (keep_description && found_description)
+      {
+        // do nothing
+      }
+      else if (description)
+      {
+        snprintf(evlrs[i].description, sizeof(evlrs[i].description), "%.31s", description);
+      }
+      else
+      {
+        snprintf(evlrs[i].description, sizeof(evlrs[i].description), "by LAStools of rapidlasso GmbH");
+      }
+      if (record_length_after_header)
+      {
+        evlrs[i].data = data;
+      }
+      else
+      {
+        evlrs[i].data = 0;
+      }
     }
   };
 
@@ -765,7 +771,7 @@ public:
         if (number_of_extended_variable_length_records)
         {
           evlrs[i] = evlrs[number_of_extended_variable_length_records];
-          evlrs = (LASevlr*)realloc(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
+          evlrs = (LASevlr*)realloc_las(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
         }
         else
         {

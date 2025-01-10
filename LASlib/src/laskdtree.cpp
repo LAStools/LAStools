@@ -96,6 +96,7 @@ LASkdtreeRectanglesNode::LASkdtreeRectanglesNode()
   left = 0;
   right = 0;
   list = 0;
+  split = 0;
 }
 
 LASkdtreeRectanglesNode::~LASkdtreeRectanglesNode()
@@ -426,6 +427,7 @@ LASkdtreeRectangles::LASkdtreeRectangles()
   rectangle_list = 0;
   overlap_set = 0;
   root = 0;
+  num_rectangles = 0;
 }
 
 LASkdtreeRectangles::~LASkdtreeRectangles()

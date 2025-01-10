@@ -83,7 +83,7 @@ public:
 /* write 64 bit big-endian field                             */
   BOOL put64bitsBE(const U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 class ByteStreamOutFileBE : public ByteStreamOutFile
@@ -103,7 +103,7 @@ public:
 /* write 64 bit big-endian field                             */
   BOOL put64bitsBE(const U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 inline ByteStreamOutFile::ByteStreamOutFile(FILE* file)

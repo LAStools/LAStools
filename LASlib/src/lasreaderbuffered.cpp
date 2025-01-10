@@ -537,13 +537,16 @@ BOOL LASreaderBuffered::copy_point_to_buffer()
     else if (number_of_buffers == size_of_buffers_array)
     {
       size_of_buffers_array *= 2;
-      buffers = (U8**)realloc(buffers, sizeof(U8*)*size_of_buffers_array);
+      buffers = (U8**)realloc_las(buffers, sizeof(U8*)*size_of_buffers_array);
     }
-    buffers[number_of_buffers] = (U8*)malloc(point.total_point_size * points_per_buffer);
-    current_buffer = buffers[number_of_buffers];
+    if (buffers != nullptr) 
+    {
+      buffers[number_of_buffers] = (U8*)malloc(point.total_point_size * points_per_buffer);
+      current_buffer = buffers[number_of_buffers];
+    }
     number_of_buffers++;
   }
-  point.copy_to(&(current_buffer[point_count_in_buffer*point.total_point_size]));
+  if (current_buffer != nullptr) point.copy_to(&(current_buffer[point_count_in_buffer * point.total_point_size]));
   buffered_points++;
   return TRUE;
 }

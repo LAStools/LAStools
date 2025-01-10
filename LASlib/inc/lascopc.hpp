@@ -114,6 +114,8 @@ struct LASLIB_DLL EPToctant : public EPTkey
 
 inline bool spatial_order(const EPToctant& a, const EPToctant& b)
 {
+#pragma warning(push)
+#pragma warning(disable : 6297)
   // 2D spatial order
   F64 dx_a = (F64)a.x/(1 << a.d);
   F64 dx_b = (F64)b.x/(1 << b.d);
@@ -132,7 +134,7 @@ inline bool spatial_order(const EPToctant& a, const EPToctant& b)
   F64 dz_b = (F64)b.z/(1 << b.d);
   if (dz_a < dz_b) return true;
   if (dz_a > dz_b) return false;
-
+#pragma warning(pop)
   return false;
 }
 

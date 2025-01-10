@@ -300,7 +300,8 @@ class LASLIB_DLL LASpoint {
 
     // create point's item pointers
     point = new U8*[num_items];
-
+#pragma warning(push)
+#pragma warning(disable : 26819)
     U16 i;
     for (i = 0; i < num_items; i++) {
       total_point_size += items[i].size;
@@ -342,6 +343,7 @@ class LASLIB_DLL LASpoint {
     this->quantizer = quantizer;
     this->attributer = attributer;
     return TRUE;
+#pragma warning(pop)
   };
 
   BOOL init(const LASquantizer* quantizer, const U32 num_items, const LASitem* items, const LASattributer* attributer = 0) {
@@ -354,7 +356,8 @@ class LASLIB_DLL LASpoint {
     this->items = new LASitem[num_items];
     if (this->point) delete[] this->point;
     this->point = new U8*[num_items];
-
+#pragma warning(push)
+#pragma warning(disable : 26819)
     for (i = 0; i < num_items; i++) {
       this->items[i] = items[i];
       total_point_size += items[i].size;
@@ -396,6 +399,7 @@ class LASLIB_DLL LASpoint {
     this->quantizer = quantizer;
     this->attributer = attributer;
     return TRUE;
+#pragma warning(pop)
   };
 
   BOOL inside_rectangle(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y) const {
@@ -734,7 +738,7 @@ class LASLIB_DLL LASpoint {
     return I32_FITS_IN_RANGE(Y);
   };
   inline BOOL set_z(const F64 z) {
-    if ((quantizer == nullptr) || (quantizer->z_from_attrib < 0)) {
+    if (quantizer->z_from_attrib < 0) {
       I64 Z = quantizer->get_Z(z);
       this->Z = (I32)(Z);
       return I32_FITS_IN_RANGE(Z);
@@ -968,7 +972,9 @@ class LASLIB_DLL LASpoint {
     F32 s = hsv[1];
     F32 v = hsv[2];
 
-    F32 r, g, b;
+    F32 r = 0.0;
+    F32 g = 0.0;
+    F32 b = 0.0;
 
     I32 i = (I32)(h * 6);
     F32 f = h * 6 - i;

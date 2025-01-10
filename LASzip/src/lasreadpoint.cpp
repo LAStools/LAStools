@@ -438,7 +438,7 @@ BOOL LASreadPoint::read(U8* const * point)
           if (current_chunk >= number_chunks)
           {
             number_chunks += 256;
-            chunk_starts = (I64*)realloc(chunk_starts, sizeof(I64)*(number_chunks+1));
+            chunk_starts = (I64*)realloc_las(chunk_starts, sizeof(I64)*(number_chunks+1));
           }
           chunk_starts[tabled_chunks] = point_start; // needs fixing
           tabled_chunks++;
@@ -743,12 +743,15 @@ BOOL LASreadPoint::read_chunk_table()
     }
     else
     {
+#pragma warning(push)
+#pragma warning(disable : 6011)
       // otherwise fix as many additional chunk_starts as possible
       U32 i;
       for (i = 1; i < tabled_chunks; i++)
       {
         chunk_starts[i] += chunk_starts[i-1];
       }
+#pragma warning(pop)
     }
     // create warning string
     if (last_warning == 0) last_warning = new CHAR[128];

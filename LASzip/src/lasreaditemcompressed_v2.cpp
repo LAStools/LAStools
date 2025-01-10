@@ -259,6 +259,7 @@ LASreadItemCompressed_GPSTIME11_v2::LASreadItemCompressed_GPSTIME11_v2(Arithmeti
   m_gpstime_multi = dec->createSymbolModel(LASZIP_GPSTIME_MULTI_TOTAL);
   m_gpstime_0diff = dec->createSymbolModel(6);
   ic_gpstime = new IntegerCompressor(dec, 32, 9); // 32 bits, 9 contexts
+  last = 0;
 }
 
 LASreadItemCompressed_GPSTIME11_v2::~LASreadItemCompressed_GPSTIME11_v2()
@@ -539,6 +540,8 @@ LASreadItemCompressed_BYTE_v2::LASreadItemCompressed_BYTE_v2(ArithmeticDecoder* 
   this->dec = dec;
   assert(number);
   this->number = number;
+
+  last_item = nullptr;
 
   /* create models and integer compressors */
   m_byte = new ArithmeticModel*[number];

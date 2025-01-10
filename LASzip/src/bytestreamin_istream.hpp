@@ -83,7 +83,7 @@ public:
 /* read 64 bit big-endian field                              */
   void get64bitsBE(U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 class ByteStreamInIstreamBE : public ByteStreamInIstream
@@ -103,7 +103,7 @@ public:
 /* read 64 bit big-endian field                              */
   void get64bitsBE(U8* bytes);
 private:
-  U8 swapped[8];
+  U8 swapped[8] = {0};
 };
 
 inline ByteStreamInIstream::ByteStreamInIstream(std::istream& stream_param, BOOL seekable_param) : stream(stream_param), seekable(seekable_param)

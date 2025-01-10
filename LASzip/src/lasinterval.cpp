@@ -43,33 +43,12 @@
 #include <map>
 #include <set>
 
-
-#ifdef UNORDERED
-// Figure out whether <unordered_map> is in tr1
-#  ifdef __has_include
-#    if __has_include(<unordered_map>)
-#     include <unordered_map>
-#     define UNORDERED_FOUND
-#    endif
-#  endif
-#  ifdef HAVE_UNORDERED_MAP
-#     include <unordered_map>
-#  elif defined(UNORDERED_FOUND)
-#    include <tr1/unordered_map>
-    using namespace tr1;
-#  endif
-typedef std::unordered_map<I32, LASintervalStartCell*> my_cell_hash;
-#elif defined(LZ_WIN32_VC6)
-#include <hash_map>
-typedef std::hash_map<I32, LASintervalStartCell*> my_cell_hash;
-#else
 #include <unordered_map>
+
 typedef std::unordered_map<I32, LASintervalStartCell*> my_cell_hash;
-#endif
 
 typedef std::multimap<U32, LASintervalCell*> my_cell_map;
 typedef std::set<LASintervalStartCell*> my_cell_set;
-
 
 LASintervalCell::LASintervalCell()
 {
@@ -205,7 +184,7 @@ BOOL LASinterval::merge_cells(const U32 num_indices, const I32* indices, const I
 // merge adjacent intervals with small gaps in cells to reduce total interval number to maximum
 void LASinterval::merge_intervals(U32 maximum_intervals)
 {
-  U32 diff;
+  U32 diff = 0;
   LASintervalCell* cell;
   LASintervalCell* delete_cell;
 
@@ -267,9 +246,12 @@ void LASinterval::merge_intervals(U32 maximum_intervals)
     }
     else
     {
+#pragma warning(push)
+#pragma warning(disable : 28182)
       delete_cell = cell->next;
       cell->end = delete_cell->end;
       cell->next = delete_cell->next;
+#pragma warning(pop)
       if (cell->next)
       {
         map.insert(my_cell_map::value_type(cell->next->start - cell->end - 1, cell));
@@ -430,6 +412,8 @@ BOOL LASinterval::merge(const BOOL erase)
     LASintervalCell* cell;
     my_cell_map map;
     my_cell_set::iterator set_element = ((my_cell_set*)cells_to_merge)->begin();
+#pragma warning(push)
+#pragma warning(disable : 6011)
     while (true)
     {
       if (set_element == ((my_cell_set*)cells_to_merge)->end()) break;
@@ -442,6 +426,7 @@ BOOL LASinterval::merge(const BOOL erase)
       }
       set_element++;
     }
+#pragma warning(pop)
     // initialize merged_cells with first interval
     my_cell_map::iterator map_element = map.begin();
     cell = (*map_element).second;
@@ -527,6 +512,11 @@ LASinterval::LASinterval(const U32 threshold)
   current_cell = 0;
   merged_cells = 0;
   merged_cells_temporary = FALSE;
+  end = 0;
+  full = 0;
+  index = 0;
+  start = 0;
+  total = 0;
 }
 
 LASinterval::~LASinterval()
@@ -676,9 +666,12 @@ BOOL LASinterval::write(ByteStreamOut* stream) const
   while (hash_element != ((my_cell_hash*)cells)->end())
   {
     LASintervalCell* cell = (*hash_element).second;
+#pragma warning(push)
+#pragma warning(disable : 6011)
     // count number of intervals and points in cell
     U32 number_intervals = 0;
     U32 number_points = ((LASintervalStartCell*)cell)->full;
+#pragma warning(pop)
     while (cell)
     {
       number_intervals++;

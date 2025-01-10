@@ -443,13 +443,19 @@ BOOL LASwriteOpener::set_directory(const CHAR* directory)
                               "\tinstead.");
     }
     this->directory = LASCopyString(directory);
+    if (this->directory == nullptr) 
+    {
+      return FALSE;
+    }
+#pragma warning(push)
+#pragma warning(disable : 6001)
     I32 len = (I32)strlen(this->directory);
     if ((len > 0) && ((this->directory[len-1] == '\\') || (this->directory[len-1] == '/')))
     {
       this->directory[len-1] = '\0';
     }
     if (file_name) add_directory();
-
+#pragma warning(pop)
     // return FALSE if it does not exist or is no directory
 
     if ((len > 0) && (this->directory[len-1] != ':'))
@@ -544,10 +550,13 @@ void LASwriteOpener::set_file_name(const CHAR* file_name)
     else
     {
       CHAR* temp_file_name = (CHAR*)malloc(len + (format == LAS_TOOLS_FORMAT_QFIT ? 4 : (format == LAS_TOOLS_FORMAT_JSON ? 6 : 5)));
-      strcpy(temp_file_name, this->file_name);
-      free(this->file_name);
-      this->file_name = temp_file_name;
-      this->file_name[len] = '.';
+      if (temp_file_name) 
+      {
+        strcpy(temp_file_name, this->file_name);
+        free(this->file_name);
+        this->file_name = temp_file_name;
+        this->file_name[len] = '.';
+      }
       if (format == LAS_TOOLS_FORMAT_LAZ)
       {
         len++;
@@ -787,35 +796,38 @@ void LASwriteOpener::make_numbered_file_name(const CHAR* file_name, I32 digits)
     if (this->file_name != 0) free(this->file_name);
     len = (I32)strlen(file_name);
     this->file_name = (CHAR*)malloc(len + digits + 2);
-    strcpy(this->file_name, file_name);
+    if (this->file_name) strcpy(this->file_name, file_name);
   }
   else
   {
     if (this->file_name == 0) this->file_name = LASCopyString("output.xxx");
     len = (I32)strlen(this->file_name);
-    this->file_name = (CHAR*)realloc(this->file_name, len + digits + 2);
+    this->file_name = (CHAR*)realloc_las(this->file_name, len + digits + 2);
   }
-  while (len > 0 && this->file_name[len] != '.')
+  if (this->file_name != nullptr) 
   {
-    len--;
-  }
-  if (len > 0)
-  {
-    this->file_name[len] = '_';
+    while (len > 0 && this->file_name[len] != '.')
+    {
+      len--;
+    }
+    if (len > 0)
+    {
+      this->file_name[len] = '_';
+      len++;
+    }
+    while (digits > 0)
+    {
+      this->file_name[len] = '0';
+      digits--;
+      len++;
+    }
+    this->file_name[len] = '.';
     len++;
+    this->file_name[len] = 'x';
+    this->file_name[len+1] = 'x';
+    this->file_name[len+2] = 'x';
+    this->file_name[len+3] = '\0';
   }
-  while (digits > 0)
-  {
-    this->file_name[len] = '0';
-    digits--;
-    len++;
-  }
-  this->file_name[len] = '.';
-  len++;
-  this->file_name[len] = 'x';
-  this->file_name[len+1] = 'x';
-  this->file_name[len+2] = 'x';
-  this->file_name[len+3] = '\0';
 }
 
 void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
@@ -1210,7 +1222,7 @@ void LASwriteOpener::cut_characters(U32 cut)
 LASwriteOpener::LASwriteOpener()
 {
   io_obuffer_size = LAS_TOOLS_IO_OBUFFER_SIZE;
-  directory = 0;
+  directory = nullptr;
   file_name = 0;
   appendix = 0;
   cut = 0;

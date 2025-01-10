@@ -442,8 +442,8 @@ BOOL LASwritePoint::add_chunk_to_table()
     else
     {
       alloced_chunks *= 2;
-      if (chunk_size == U32_MAX) chunk_sizes = (U32*)realloc(chunk_sizes, sizeof(U32)*alloced_chunks); 
-      chunk_bytes = (U32*)realloc(chunk_bytes, sizeof(U32)*alloced_chunks); 
+      if (chunk_size == U32_MAX) chunk_sizes = (U32*)realloc_las(chunk_sizes, sizeof(U32)*alloced_chunks); 
+      chunk_bytes = (U32*)realloc_las(chunk_bytes, sizeof(U32)*alloced_chunks); 
     }
     if (chunk_size == U32_MAX && chunk_sizes == 0) return FALSE;
     if (chunk_bytes == 0) return FALSE;

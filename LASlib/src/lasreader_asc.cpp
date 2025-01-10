@@ -118,6 +118,9 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
   nodata = -9999;
   header_lines = 0;
 
+#pragma warning(push)
+#pragma warning(disable : 6387)
+
   while (!complete)
   {
     if (!fgets(line, line_size, file)) break;
@@ -133,40 +136,43 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
       }
     }
 
+    unsigned int dummy_size = static_cast<unsigned int>(sizeof(dummy));
+
     if (strstr(line, "ncols") || strstr(line, "NCOLS"))
     {
-      sscanf(line, "%s %d", dummy, &ncols);
+      sscanf_las(line, "%s %d", dummy, dummy_size, &ncols);
       free(line);
       line_size = 1024 + 50 * ncols;
       line = (CHAR*)malloc(sizeof(CHAR) * line_size);
     }
+#pragma warning(pop)
     else if (strstr(line, "nrows") || strstr(line, "NROWS"))
     {
-      sscanf(line, "%s %d", dummy, &nrows);
+      sscanf_las(line, "%s %d", dummy, dummy_size, &nrows);
     }
     else if (strstr(line, "xllcorner") || strstr(line, "XLLCORNER"))
     {
-      sscanf(line, "%s %lf", dummy, &xllcorner);
+      sscanf_las(line, "%s %lf", dummy, dummy_size, &xllcorner);
     }
     else if (strstr(line, "yllcorner") || strstr(line, "YLLCORNER"))
     {
-      sscanf(line, "%s %lf", dummy, &yllcorner);
+      sscanf_las(line, "%s %lf", dummy, dummy_size, &yllcorner);
     }
     else if (strstr(line, "xllcenter") || strstr(line, "XLLCENTER"))
     {
-      sscanf(line, "%s %lf", dummy, &xllcenter);
+      sscanf_las(line, "%s %lf", dummy, dummy_size, &xllcenter);
     }
     else if (strstr(line, "yllcenter") || strstr(line, "YLLCENTER"))
     {
-      sscanf(line, "%s %lf", dummy, &yllcenter);
+      sscanf_las(line, "%s %lf", dummy, dummy_size, &yllcenter);
     }
     else if (strstr(line, "cellsize") || strstr(line, "CELLSIZE"))
     {
-      sscanf(line, "%s %f", dummy, &cellsize);
+      sscanf_las(line, "%s %f", dummy, dummy_size, &cellsize);
     }
     else if (strstr(line, "nodata_value") || strstr(line, "NODATA_VALUE") || strstr(line, "nodata_VALUE") || strstr(line, "NODATA_value"))
     {
-      sscanf(line, "%s %f", dummy, &nodata);
+      sscanf_las(line, "%s %f", dummy, dummy_size, &nodata);
     }
     else if ((ncols != 0) && (nrows != 0) && (((xllcorner != F64_MAX) && (yllcorner != F64_MAX)) || ((xllcenter != F64_MAX) && (yllcenter != F64_MAX))) && (cellsize > 0))
     {
@@ -273,7 +279,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
         while ((line[line_curr] != '\0') && (line[line_curr] <= ' ')) line_curr++;
       }
       // get elevation value
-      sscanf(&(line[line_curr]), "%lf", &elevation);
+      sscanf_las(&(line[line_curr]), "%lf", &elevation);
       // skip parsed number
       while ((line[line_curr] != '\0') && (line[line_curr] > ' ')) line_curr++;
       // skip following spaces
@@ -408,7 +414,7 @@ BOOL LASreaderASC::read_point_default()
       row++;
     }
     // get elevation value
-    sscanf(&(line[line_curr]), "%lf", &elevation);
+    sscanf_las(&(line[line_curr]), "%lf", &elevation);
     // skip parsed number
     while ((line[line_curr] != '\0') && (line[line_curr] > ' ')) line_curr++;
     // skip following spaces

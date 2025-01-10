@@ -844,7 +844,7 @@ public:
   };
 private:
   F32 h_min, h_max, s_min, s_max, v_min, v_max;
-  F32 hsl[3];
+  F32 hsl[3] = {0};
 };
 
 class LAScriterionDropHSLA : public LAScriterion
@@ -869,7 +869,7 @@ public:
   };
 private:
   F32 h_min, h_max, s_min, s_max, v_min, v_max;
-  F32 hsl[3];
+  F32 hsl[3] = {0};
 };
 
 class LAScriterionKeepHSL : public LAScriterion
@@ -899,7 +899,7 @@ public:
 private:
   F32 below_HSL, above_HSL;
   I32 channel;
-  F32 hsl[3];
+  F32 hsl[3] = {0};
 };
 
 class LAScriterionDropHSL : public LAScriterion
@@ -929,7 +929,7 @@ public:
 private:
   F32 below_HSL, above_HSL;
   I32 channel;
-  F32 hsl[3];
+  F32 hsl[3] = {0};
 };
 
 class LAScriterionKeepHSVA : public LAScriterion
@@ -954,7 +954,7 @@ public:
   };
 private:
   F32 h_min, h_max, s_min, s_max, v_min, v_max;
-  F32 hsv[3];
+  F32 hsv[3] = {0};
 };
 
 class LAScriterionDropHSVA : public LAScriterion
@@ -979,7 +979,7 @@ public:
   };
 private:
   F32 h_min, h_max, s_min, s_max, v_min, v_max;
-  F32 hsv[3];
+  F32 hsv[3] = {0};
 };
 
 class LAScriterionKeepHSV : public LAScriterion
@@ -1009,7 +1009,7 @@ public:
 private:
   F32 below_HSV, above_HSV;
   I32 channel;
-  F32 hsv[3];
+  F32 hsv[3] = {0};
 };
 
 class LAScriterionDropHSV : public LAScriterion
@@ -1039,7 +1039,7 @@ public:
 private:
   F32 below_HSV, above_HSV;
   I32 channel;
-  F32 hsv[3];
+  F32 hsv[3] = {0};
 };
 
 
@@ -1813,9 +1813,9 @@ public:
       U32 array_size_new = ((pos_y / 1024) + 1) * 1024;
       if (*array_size)
       {
-        if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)realloc(*ankers, array_size_new * sizeof(I32));
-        *array = (U32**)realloc(*array, array_size_new * sizeof(U32*));
-        *array_sizes = (U16*)realloc(*array_sizes, array_size_new * sizeof(U16));
+        if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)realloc_las(*ankers, array_size_new * sizeof(I32));
+        *array = (U32**)realloc_las(*array, array_size_new * sizeof(U32*));
+        *array_sizes = (U16*)realloc_las(*array_sizes, array_size_new * sizeof(U16));
       }
       else
       {
@@ -1825,43 +1825,47 @@ public:
       }
       for (U32 i = *array_size; i < array_size_new; i++)
       {
-        (*array)[i] = 0;
-        (*array_sizes)[i] = 0;
+        if (array != nullptr && *array != nullptr) (*array)[i] = 0;
+        if (array_sizes != nullptr && *array_sizes != nullptr) (*array_sizes)[i] = 0;
       }
       *array_size = array_size_new;
     }
     // is this the first x anker for this y pos?
     if (no_x_anker)
     {
-      (*ankers)[pos_y] = pos_x;
+      if (ankers != nullptr && *ankers != nullptr) (*ankers)[pos_y] = pos_x;
       pos_x = 0;
     }
     // maybe grow banded grid in x direction
     U32 pos_x_pos = pos_x / 32;
-    if (pos_x_pos >= (*array_sizes)[pos_y])
+    if (array_sizes != nullptr && *array_sizes != nullptr && pos_x_pos >= (*array_sizes)[pos_y])
     {
       U32 array_sizes_new = ((pos_x_pos / 256) + 1) * 256;
       if ((*array_sizes)[pos_y])
       {
-        (*array)[pos_y] = (U32*)realloc((*array)[pos_y], array_sizes_new * sizeof(U32));
+        (*array)[pos_y] = (U32*)realloc_las((*array)[pos_y], array_sizes_new * sizeof(U32));
       }
       else
       {
-        (*array)[pos_y] = (U32*)malloc(array_sizes_new * sizeof(U32));
+        if (array != nullptr && *array != nullptr && (*array)[pos_y] != nullptr) (*array)[pos_y] = (U32*)malloc(array_sizes_new * sizeof(U32));
       }
       for (U16 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
       {
-        (*array)[pos_y][i] = 0;
+        if (array != nullptr && *array != nullptr && (*array)[pos_y] != nullptr) (*array)[pos_y][i] = 0;
       }
       (*array_sizes)[pos_y] = array_sizes_new;
     }
     U32 pos_x_bit = 1 << (pos_x % 32);
-    if ((*array)[pos_y][pos_x_pos] & pos_x_bit) return TRUE;
-    (*array)[pos_y][pos_x_pos] |= pos_x_bit;
+    if (array != nullptr && *array != nullptr && (*array)[pos_y] != nullptr) {
+      if ((*array)[pos_y][pos_x_pos] & pos_x_bit) return TRUE;
+      (*array)[pos_y][pos_x_pos] |= pos_x_bit;
+    }
     return FALSE;
   }
   void reset()
   {
+#pragma warning(push)
+#pragma warning(disable : 6001)
     if (grid_spacing > 0) grid_spacing = -grid_spacing;
     if (minus_minus_size)
     {
@@ -1903,6 +1907,7 @@ public:
       plus_plus_sizes = 0;
       plus_plus_size = 0;
     }
+#pragma warning(pop)
   };
   LAScriterionThinWithGrid(F32 grid_spacing)
   {
@@ -1921,6 +1926,7 @@ public:
     plus_plus_size = 0;
     plus_plus = 0;
     plus_plus_sizes = 0;
+    anker = 0;
   };
   ~LAScriterionThinWithGrid() { reset(); };
 private:

@@ -408,6 +408,7 @@ LASbin::LASbin(F64 step, F64 clamp_min, F64 clamp_max)
   bins_neg = 0;
   values_pos = 0;
   values_neg = 0;
+  anker = 0;
 }
 
 LASbin::~LASbin()
@@ -468,6 +469,8 @@ void LASbin::add(I64 item)
 
 void LASbin::add_to_bin(I32 bin)
 {
+#pragma warning(push)
+#pragma warning(disable : 6011)
   if (first)
   {
     anker = bin;
@@ -493,7 +496,7 @@ void LASbin::add_to_bin(I32 bin)
       else
       {
         I32 new_size = bin + 1024;
-        bins_pos = (U32*)realloc(bins_pos, sizeof(U32)*new_size);
+        bins_pos = (U32*)realloc_las(bins_pos, sizeof(U32)*new_size);
         if (bins_pos == 0)
         {
           laserror("reallocating %u pos bins", new_size);
@@ -525,7 +528,7 @@ void LASbin::add_to_bin(I32 bin)
       else
       {
         I32 new_size = bin + 1024;
-        bins_neg = (U32*)realloc(bins_neg, sizeof(U32)*new_size);
+        bins_neg = (U32*)realloc_las(bins_neg, sizeof(U32)*new_size);
         if (bins_neg == 0)
         {
           laserror("reallocating %u neg bins", new_size);
@@ -537,10 +540,13 @@ void LASbin::add_to_bin(I32 bin)
     }
     bins_neg[bin]++;
   }
+#pragma warning(pop)
 }
 
 void LASbin::add(I32 item, I32 value)
 {
+#pragma warning(push)
+#pragma warning(disable : 6011)
   total += item;
   count++;
   I32 bin = I32_FLOOR(one_over_step*item);
@@ -575,8 +581,8 @@ void LASbin::add(I32 item, I32 value)
       else
       {
         I32 new_size = bin + 1024;
-        bins_pos = (U32*)realloc(bins_pos, sizeof(U32)*new_size);
-        values_pos = (F64*)realloc(values_pos, sizeof(F64)*new_size);
+        bins_pos = (U32*)realloc_las(bins_pos, sizeof(U32)*new_size);
+        values_pos = (F64*)realloc_las(values_pos, sizeof(F64)*new_size);
         if (bins_pos == 0)
         {
           laserror("reallocating %u pos bins", new_size);
@@ -620,8 +626,8 @@ void LASbin::add(I32 item, I32 value)
       else
       {
         I32 new_size = bin + 1024;
-        bins_neg = (U32*)realloc(bins_neg, sizeof(U32)*new_size);
-        values_neg = (F64*)realloc(values_neg, sizeof(F64)*new_size);
+        bins_neg = (U32*)realloc_las(bins_neg, sizeof(U32)*new_size);
+        values_neg = (F64*)realloc_las(values_neg, sizeof(F64)*new_size);
         if (bins_neg == 0)
         {
           laserror("reallocating %u neg bins", new_size);
@@ -639,10 +645,13 @@ void LASbin::add(I32 item, I32 value)
     bins_neg[bin]++;
     values_neg[bin] += value;
   }
+#pragma warning(pop)
 }
 
 void LASbin::add(F64 item, F64 value)
 {
+#pragma warning(push)
+#pragma warning(disable : 6011)
   total += item;
   count++;
   I32 bin = I32_FLOOR(one_over_step*item);
@@ -677,8 +686,8 @@ void LASbin::add(F64 item, F64 value)
       else
       {
         I32 new_size = bin + 1024;
-        bins_pos = (U32*)realloc(bins_pos, sizeof(U32)*new_size);
-        values_pos = (F64*)realloc(values_pos, sizeof(F64)*new_size);
+        bins_pos = (U32*)realloc_las(bins_pos, sizeof(U32)*new_size);
+        values_pos = (F64*)realloc_las(values_pos, sizeof(F64)*new_size);
         if (bins_pos == 0)
         {
           laserror("reallocating %u pos bins", new_size);
@@ -722,8 +731,8 @@ void LASbin::add(F64 item, F64 value)
       else
       {
         I32 new_size = bin + 1024;
-        bins_neg = (U32*)realloc(bins_neg, sizeof(U32)*new_size);
-        values_neg = (F64*)realloc(values_neg, sizeof(F64)*new_size);
+        bins_neg = (U32*)realloc_las(bins_neg, sizeof(U32)*new_size);
+        values_neg = (F64*)realloc_las(values_neg, sizeof(F64)*new_size);
         if (bins_neg == 0)
         {
           laserror("reallocating %u neg bins", new_size);
@@ -741,6 +750,7 @@ void LASbin::add(F64 item, F64 value)
     bins_neg[bin]++;
     values_neg[bin] += value;
   }
+#pragma warning(pop)
 }
 
 static void lidardouble2string(CHAR* string, F64 value)
@@ -1451,15 +1461,17 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
       array_sizes = &plus_plus_sizes;
     }
   }
+#pragma warning(push)
+#pragma warning(disable : 6011)
   // maybe grow banded grid in y direction
   if ((U32)pos_y >= *array_size)
   {
     U32 array_size_new = ((pos_y/1024)+1)*1024;
     if (*array_size)
     {
-      if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)realloc(*ankers, array_size_new*sizeof(I32));
-      *array = (U32**)realloc(*array, array_size_new*sizeof(U32*));
-      *array_sizes = (U16*)realloc(*array_sizes, array_size_new*sizeof(U16));
+      if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)realloc_las(*ankers, array_size_new*sizeof(I32));
+      *array = (U32**)realloc_las(*array, array_size_new*sizeof(U32*));
+      *array_sizes = (U16*)realloc_las(*array_sizes, array_size_new*sizeof(U16));
     }
     else
     {
@@ -1487,7 +1499,7 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
     U32 array_sizes_new = ((pos_x_pos/256)+1)*256;
     if ((*array_sizes)[pos_y])
     {
-      (*array)[pos_y] = (U32*)realloc((*array)[pos_y], array_sizes_new*sizeof(U32));
+      (*array)[pos_y] = (U32*)realloc_las((*array)[pos_y], array_sizes_new*sizeof(U32));
     }
     else
     {
@@ -1504,6 +1516,7 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
   (*array)[pos_y][pos_x_pos] |= pos_x_bit;
   num_occupied++;
   return TRUE;
+#pragma warning(pop)
 }
 
 BOOL LASoccupancyGrid::occupied(const LASpoint* point) const
@@ -1596,6 +1609,8 @@ BOOL LASoccupancyGrid::active() const
 
 void LASoccupancyGrid::reset()
 {
+#pragma warning(push)
+#pragma warning(disable : 6001)
   min_x = min_y = max_x = max_y = 0;
   if (grid_spacing > 0) grid_spacing = -grid_spacing;
   if (minus_minus_size)
@@ -1639,6 +1654,7 @@ void LASoccupancyGrid::reset()
     plus_plus_size = 0;
   }
   num_occupied = 0;
+#pragma warning(pop)
 }
 
 BOOL LASoccupancyGrid::write_asc_grid(const CHAR* file_name) const
@@ -1691,6 +1707,7 @@ LASoccupancyGrid::LASoccupancyGrid(F32 grid_spacing)
   plus_plus = 0;
   plus_plus_sizes = 0;
   num_occupied = 0;
+  anker = 0;
 }
 
 LASoccupancyGrid::~LASoccupancyGrid()

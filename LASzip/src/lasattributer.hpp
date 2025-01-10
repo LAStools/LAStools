@@ -619,6 +619,7 @@ class LASLIB_DLL LASattributer {
     }
     attribute_starts[0] = 0;
     attribute_sizes[0] = attributes[0].get_size();
+
     for (i = 1; i < number_attributes; i++) {
       attribute_starts[i] = attribute_starts[i - 1] + attribute_sizes[i - 1];
       attribute_sizes[i] = attributes[i].get_size();
@@ -630,15 +631,15 @@ class LASLIB_DLL LASattributer {
     if (attribute.get_size()) {
       if (attributes) {
         number_attributes++;
-        attributes = (LASattribute*)realloc(attributes, sizeof(LASattribute) * number_attributes);
+        attributes = (LASattribute*)realloc_las(attributes, sizeof(LASattribute) * number_attributes);
         if (attributes == 0) {
           return -1;
         }
-        attribute_starts = (I32*)realloc(attribute_starts, sizeof(I32) * number_attributes);
+        attribute_starts = (I32*)realloc_las(attribute_starts, sizeof(I32) * number_attributes);
         if (attribute_starts == 0) {
           return -1;
         }
-        attribute_sizes = (I32*)realloc(attribute_sizes, sizeof(I32) * number_attributes);
+        attribute_sizes = (I32*)realloc_las(attribute_sizes, sizeof(I32) * number_attributes);
         if (attribute_sizes == 0) {
           return -1;
         }
@@ -728,9 +729,9 @@ class LASLIB_DLL LASattributer {
     }
     number_attributes--;
     if (number_attributes) {
-      attributes = (LASattribute*)realloc(attributes, sizeof(LASattribute) * number_attributes);
-      attribute_starts = (I32*)realloc(attribute_starts, sizeof(I32) * number_attributes);
-      attribute_sizes = (I32*)realloc(attribute_sizes, sizeof(I32) * number_attributes);
+      attributes = (LASattribute*)realloc_las(attributes, sizeof(LASattribute) * number_attributes);
+      attribute_starts = (I32*)realloc_las(attribute_starts, sizeof(I32) * number_attributes);
+      attribute_sizes = (I32*)realloc_las(attribute_sizes, sizeof(I32) * number_attributes);
     } else {
       free(attributes);
       attributes = 0;

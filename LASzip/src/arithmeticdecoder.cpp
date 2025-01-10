@@ -103,6 +103,8 @@
 ArithmeticDecoder::ArithmeticDecoder()
 {
   instream = 0;
+  length = 0;
+  value = 0;
 }
 
 BOOL ArithmeticDecoder::init(ByteStreamIn* instream, BOOL really_init)

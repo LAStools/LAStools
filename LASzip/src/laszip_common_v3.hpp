@@ -36,7 +36,8 @@
 #include "laszip_common_v2.hpp"
 
 #define DEBUG_OUTPUT_NUM_BYTES_DETAILS 0
-
+#pragma warning(push)
+#pragma warning(disable : 26495)
 class LAScontextPOINT14
 {
 public:
@@ -321,5 +322,5 @@ const U8 number_return_level_8ctx[16][16] =
   {  7,  7,  7,  7,  7,  7,  7,  7,  6,  5,  4,  3,  2,  1,  0,  1 },
   {  7,  7,  7,  7,  7,  7,  7,  7,  7,  6,  5,  4,  3,  2,  1,  0 }
 };
-
+#pragma warning(pop)
 #endif

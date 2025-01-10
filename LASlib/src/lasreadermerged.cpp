@@ -490,10 +490,10 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     file_name_allocated += 1024;
     if (file_names)
     {
-      file_names = (CHAR**)realloc(file_names, sizeof(CHAR*) * file_name_allocated);
+      file_names = (CHAR**)realloc_las(file_names, sizeof(CHAR*) * file_name_allocated);
       if (file_names_ID)
       {
-        file_names_ID = (U32*)realloc(file_names_ID, sizeof(U32) * file_name_allocated);
+        file_names_ID = (U32*)realloc_las(file_names_ID, sizeof(U32) * file_name_allocated);
         if (file_names_ID == 0)
         {
           laserror("alloc for file_names_ID array failed at %d", file_name_allocated);

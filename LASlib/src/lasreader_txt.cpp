@@ -1654,6 +1654,8 @@ BOOL LASreaderTXT::parse_column_description(CHAR** parse_string)
     char* auto_parse_string = (char*)calloc(64, sizeof(char));
 
     U32 i = 0;
+#pragma warning(push)
+#pragma warning(disable : 6011)
     while (token)
     {
       if (strcmp(token, "x") == 0) auto_parse_string[i] = 'x';
@@ -1753,6 +1755,7 @@ BOOL LASreaderTXT::parse_column_description(CHAR** parse_string)
           return true;
         }
       }
+#pragma warning(pop)
       else if (strcmp(token, "HSV_S") == 0 || strcmp(token, "HSV_V") == 0)
       {
         // Assuming that HSV columns are consecutive HSV_S should have already been parsed
@@ -1777,7 +1780,7 @@ BOOL LASreaderTXT::parse_column_description(CHAR** parse_string)
       else
       {
         LASMessage(LAS_WARNING, "unknown parse item '%s'. skipping ...", token);
-        auto_parse_string[i] = 's';
+        if (auto_parse_string != nullptr) auto_parse_string[i] = 's';
       }
       token = strtok(NULL, delimiters);
       i++;
@@ -2128,13 +2131,13 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       while (lptr[0] && (lptr[0] == ' ' || lptr[0] == ',' || lptr[0] == '\t' || lptr[0] == ';' || lptr[0] == '\"')) lptr++; // first skip white spaces and quotes
       if (lptr[0] == 0) return FALSE;
       hex_string[0] = lptr[0]; hex_string[1] = lptr[1];
-      sscanf(hex_string, "%x", &hex_value);
+      sscanf_las(hex_string, "%x", &hex_value);
       point.rgb[0] = hex_value;
       hex_string[0] = lptr[2]; hex_string[1] = lptr[3];
-      sscanf(hex_string, "%x", &hex_value);
+      sscanf_las(hex_string, "%x", &hex_value);
       point.rgb[1] = hex_value;
       hex_string[0] = lptr[4]; hex_string[1] = lptr[5];
-      sscanf(hex_string, "%x", &hex_value);
+      sscanf_las(hex_string, "%x", &hex_value);
       point.rgb[2] = hex_value;
       lptr += 6;
       skip_post();
@@ -2144,7 +2147,7 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       I32 hex_value;
       while (lptr[0] && (lptr[0] == ' ' || lptr[0] == ',' || lptr[0] == '\t' || lptr[0] == ';' || lptr[0] == '\"')) lptr++; // first skip white spaces and quotes
       if (lptr[0] == 0) return FALSE;
-      sscanf(lptr, "%x", &hex_value);
+      sscanf_las(lptr, "%x", &hex_value);
       point.intensity = U8_CLAMP(((F64)hex_value / (F64)0xFFFFFF) * 255);
       lptr += 6;
       skip_post();

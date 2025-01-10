@@ -89,7 +89,7 @@ void byebye() {
   }
   if (wait_on_exit) {
     std::fprintf(stderr, "<press ENTER>\n");
-    std::getc(stdin);
+    (void)std::getc(stdin);
   }
   //
   int code = 0;
@@ -299,4 +299,62 @@ void ReplaceStringInPlace(std::string& subject, const std::string& search, const
 bool StringEndsWith(const std::string& fullString, const std::string& ending) {
   if (ending.size() > fullString.size()) return false;
   return fullString.compare(fullString.size() - ending.size(), ending.size(), ending) == 0;
+}
+
+/// extension of the realloc function to check memory allocation errors
+void* realloc_las(void* ptr, size_t size) {
+  void* temp = realloc(ptr, size);
+  if (temp == NULL) {
+    LASMessage(LAS_WARNING, "realloc_las: memory allocation failed\n");
+    return ptr;
+  } else {
+    return temp;
+  }
+}
+
+/// Wrapper for `sscanf` on other platforms than _MSC_VER and `sscanf_s` on Windows and ensures that the size is passed correctly for strings.
+int sscanf_las(const char* buffer, const char* format, ...) {
+  va_list args;
+  va_start(args, format);
+
+#ifdef _MSC_VER
+  // On Windows we use sscanf_s and may need `sizeof` for strings
+  int result = 0;
+  const char* cursor = format;
+
+  // Temporary argument stack for handling `sizeof` strings
+  va_list args_copy;
+  va_copy(args_copy, args);
+
+  // Count the arguments in the format string and insert `sizeof` where necessary
+  char adjusted_format[512] = {0};
+  char* adjusted_cursor = adjusted_format;
+
+  while (*cursor) {
+    if (*cursor == '%' && (*(cursor + 1) != '%')) {
+      *adjusted_cursor++ = *cursor++;
+      if (*cursor == 's') {
+        // Copy argument and add size
+        void* str_arg = va_arg(args_copy, void*);
+#pragma warning(push)
+#pragma warning(disable : 6269)
+        va_arg(args_copy, unsigned int);  // sizeof argument
+#pragma warning(pop)
+        adjusted_cursor += sprintf(adjusted_cursor, "%%s");
+      }
+    }
+    *adjusted_cursor++ = *cursor++;
+  }
+
+  *adjusted_cursor = '\0';
+  result = vsscanf_s(buffer, adjusted_format, args_copy);
+
+  va_end(args_copy);
+#else
+  // On other platforms we use sscanf without size specifications
+  int result = vsscanf(buffer, format, args);
+#endif
+
+  va_end(args);
+  return result;
 }

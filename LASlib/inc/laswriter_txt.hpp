@@ -67,8 +67,8 @@ private:
   BOOL optx;
   F32 scale_rgb;
   CHAR separator_sign;
-  CHAR printstring[512];
-  I32 attribute_starts[10];
+  CHAR printstring[512] = {0};
+  I32 attribute_starts[10] = {0};
   BOOL check_parse_string(const CHAR* parse_string);
   BOOL unparse_attribute(const LASpoint* point, I32 index);
 };

@@ -1080,12 +1080,12 @@ int main(int argc, char* argv[])
           U32 buff_size = 5; I32 c = 0; U32 k = 0;
           set_ogc_wkt_string = (CHAR*)calloc(buff_size, sizeof(CHAR));
 
-          while (c != EOF && c != '\n')
+          while (c != EOF && c != '\n' && set_ogc_wkt_string != nullptr)
           {
             c = fgetc(file);
 
             if (k == buff_size)
-              set_ogc_wkt_string = (CHAR*)realloc(set_ogc_wkt_string, (buff_size *= 2) * sizeof(CHAR));
+              set_ogc_wkt_string = (CHAR*)realloc_las(set_ogc_wkt_string, (buff_size *= 2) * sizeof(CHAR));
 
             if (c == EOF || c == '\n')
               set_ogc_wkt_string[k] = '\0';

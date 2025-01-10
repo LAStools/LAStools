@@ -5606,11 +5606,17 @@ class LASoperationMapAttributeIntoRGB : public LASoperation
     };
     LASoperationMapAttributeIntoRGB(const U32 index, const CHAR* file_name)
     {
-        F64 value;
-        U32 R, G, B;
-        CHAR line[256];
+        F64 value = 0.0;
+        U32 R = 0;
+        U32 G = 0;
+        U32 B = 0;
+        CHAR line[256] = {0};
         FILE* file = LASfopen(file_name, "r");
         size = 0;
+        values = nullptr;
+        Rs = nullptr;
+        Gs = nullptr;
+        Bs = nullptr;
         if (file)
         {
             while (fgets(line, 256, file))
@@ -10203,7 +10209,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
                     return FALSE;
                 }
                 F64 dx, dy, dz, rx, ry, rz, m, dummy;
-                I32 num = sscanf(argv[i + 1], "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &dx, &dy, &dz, &rx, &ry, &rz, &m, &dummy);
+                I32 num = sscanf_las(argv[i + 1], "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf", &dx, &dy, &dz, &rx, &ry, &rz, &m, &dummy);
                 if (num == 7)
                 {
                     add_operation(new LASoperationTransformHelmert(dx, dy, dz, rx, ry, rz, m));
@@ -10229,7 +10235,7 @@ BOOL LAStransform::parse(int argc, char* argv[])
                     return FALSE;
                 }
                 F64 k, w, tx, ty, dummy;
-                I32 num = sscanf(argv[i + 1], "%lf,%lf,%lf,%lf,%lf", &k, &w, &tx, &ty, &dummy);
+                I32 num = sscanf_las(argv[i + 1], "%lf,%lf,%lf,%lf,%lf", &k, &w, &tx, &ty, &dummy);
                 if (num == 4)
                 {
                     add_operation(new LASoperationTransformAffine(k, w, tx, ty));
@@ -10251,10 +10257,10 @@ BOOL LAStransform::parse(int argc, char* argv[])
                     return FALSE;
                 }
                 F64 r11, r12, r13, r21, r22, r23, r31, r32, r33, tr1, tr2, tr3, dummy;
-                I32 row1 = sscanf(argv[i + 1], "%lf,%lf,%lf,%lf", &r11, &r12, &r13, &dummy);
-                I32 row2 = sscanf(argv[i + 2], "%lf,%lf,%lf,%lf", &r21, &r22, &r23, &dummy);
-                I32 row3 = sscanf(argv[i + 3], "%lf,%lf,%lf,%lf", &r31, &r32, &r33, &dummy);
-                I32 row4 = sscanf(argv[i + 4], "%lf,%lf,%lf,%lf", &tr1, &tr2, &tr3, &dummy);
+                I32 row1 = sscanf_las(argv[i + 1], "%lf,%lf,%lf,%lf", &r11, &r12, &r13, &dummy);
+                I32 row2 = sscanf_las(argv[i + 2], "%lf,%lf,%lf,%lf", &r21, &r22, &r23, &dummy);
+                I32 row3 = sscanf_las(argv[i + 3], "%lf,%lf,%lf,%lf", &r31, &r32, &r33, &dummy);
+                I32 row4 = sscanf_las(argv[i + 4], "%lf,%lf,%lf,%lf", &tr1, &tr2, &tr3, &dummy);
                 if ((row1 == 3) && (row2 == 3) && (row3 == 3) && (row4 == 3))
                 {
                     add_operation(new LASoperationTransformMatrix(r11, r12, r13, r21, r22, r23, r31, r32, r33, tr1, tr2, tr3));

@@ -315,7 +315,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
 
   // read the 200 byte header
 
-  CHAR signature[21];
+  CHAR signature[21] = {0};
   if (fread(signature, 1, 21, file) != 21)
   {
     laserror("reading 21 byte signature for '%s'", file_name);

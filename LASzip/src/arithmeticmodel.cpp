@@ -77,6 +77,14 @@ ArithmeticModel::ArithmeticModel(U32 symbols, BOOL compress)
   this->symbols = symbols;
   this->compress = compress;
   distribution = 0;
+  decoder_table = 0;
+  last_symbol = 0;
+  symbols_until_update = 0;
+  symbol_count = 0;
+  table_shift = 0;
+  table_size = 0;
+  total_count = 0;
+  update_cycle = 0;
 }
 
 ArithmeticModel::~ArithmeticModel()

@@ -403,6 +403,7 @@ LASreaderBIN::LASreaderBIN(LASreadOpener* opener):LASreader(opener)
 {
   file = 0;
   stream = 0;
+  version = 0;
 }
 
 LASreaderBIN::~LASreaderBIN()

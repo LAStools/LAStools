@@ -51,10 +51,10 @@ public:
 
 private:
   ArithmeticDecoder* dec;
-  U8 last_item[20];
+  U8 last_item[20] = {0};
 
-  I32 last_x_diff[3];
-  I32 last_y_diff[3];
+  I32 last_x_diff[3] = {0};
+  I32 last_y_diff[3] = {0};
   I32 last_incr;
   IntegerCompressor* ic_dx;
   IntegerCompressor* ic_dy;

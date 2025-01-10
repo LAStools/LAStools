@@ -114,7 +114,7 @@ BOOL LASreaderLAS::open(FILE* file, BOOL peek_only, U32 decompress_selective)
   return open(in, peek_only, decompress_selective);
 }
 
-BOOL LASreaderLAS::open(istream& stream, BOOL peek_only, U32 decompress_selective, BOOL seekable)
+BOOL LASreaderLAS::open(std::istream& stream, BOOL peek_only, U32 decompress_selective, BOOL seekable)
 {
   // create input
   ByteStreamIn* in;
@@ -1569,6 +1569,7 @@ LASreaderLAS::LASreaderLAS(LASreadOpener* opener) : LASreader(opener)
   delete_stream = TRUE;
   reader = 0;
   keep_copc = FALSE;
+  checked_end = FALSE;
 }
 
 LASreaderLAS::~LASreaderLAS()
@@ -1582,6 +1583,12 @@ LASreaderLASrescale::LASreaderLASrescale(LASreadOpener* opener, F64 x_scale_fact
   scale_factor[1] = y_scale_factor;
   scale_factor[2] = z_scale_factor;
   this->check_for_overflow = check_for_overflow;
+  orig_x_scale_factor = 0;
+  orig_y_scale_factor = 0;
+  orig_z_scale_factor = 0;
+  rescale_x = 0;
+  rescale_y = 0;
+  rescale_z = 0;
 }
 
 BOOL LASreaderLASrescale::read_point_default()

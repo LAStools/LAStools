@@ -65,6 +65,8 @@ LASreadItemCompressed_POINT10_v1::LASreadItemCompressed_POINT10_v1(ArithmeticDec
   assert(dec);
   this->dec = dec;
 
+  last_incr = 0;
+
   /* create models and integer compressors */
   ic_dx = new IntegerCompressor(dec, 32);  // 32 bits, 1 context
   ic_dy = new IntegerCompressor(dec, 32, 20); // 32 bits, 20 contexts
@@ -263,6 +265,12 @@ LASreadItemCompressed_GPSTIME11_v1::LASreadItemCompressed_GPSTIME11_v1(Arithmeti
   /* set decoder */
   assert(dec);
   this->dec = dec;
+  last_gpstime_diff = 0;
+  last_gpstime.u64 = 0;
+  last_gpstime.i64 = 0;
+  last_gpstime.f64 = 0.0;
+  multi_extreme_counter = 0;
+
   /* create entropy models and integer compressors */
   m_gpstime_multi = dec->createSymbolModel(LASZIP_GPSTIME_MULTIMAX);
   m_gpstime_0diff = dec->createSymbolModel(3);
@@ -431,6 +439,9 @@ LASreadItemCompressed_WAVEPACKET13_v1::LASreadItemCompressed_WAVEPACKET13_v1(Ari
   /* set decoder */
   assert(dec);
   this->dec = dec;
+
+  last_diff_32 = 0;
+  sym_last_offset_diff = 0;
 
   /* create models and integer compressors */
   m_packet_index = dec->createSymbolModel(256);

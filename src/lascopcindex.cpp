@@ -247,7 +247,12 @@ struct VoxelRecord
 
 struct Octant
 {
-  Octant() {};
+  Octant() {
+    point_buffer = nullptr;
+    point_count = 0;
+    point_size = 0;
+    point_capacity = 0;
+  };
   ~Octant() {};
 
   void sort()
@@ -293,7 +298,7 @@ struct OctantInMemory : public Octant
     if (point_count == point_capacity)
     {
       point_capacity *= 2;
-      point_buffer = (U8*)realloc(point_buffer, point_capacity * point_size);
+      point_buffer = (U8*)realloc_las(point_buffer, point_capacity * point_size);
     }
 
     memcpy(point_buffer + point_count * point_size, buffer, point_size);
@@ -309,7 +314,7 @@ struct OctantInMemory : public Octant
     if (point_count == point_capacity)
     {
       point_capacity *= 2;
-      point_buffer = (U8*)realloc(point_buffer, point_capacity * point_size);
+      point_buffer = (U8*)realloc_las(point_buffer, point_capacity * point_size);
     }
 
     laspoint->copy_to(point_buffer + point_count * point_size);
@@ -323,10 +328,13 @@ struct OctantInMemory : public Octant
   void swap(LASpoint* laspoint, const I32 pos)
   {
     U8* tmp = (U8*)malloc(point_size);
-    laspoint->copy_to(tmp);
-    laspoint->copy_from(point_buffer + pos * point_size);
-    memcpy(point_buffer + pos * point_size, tmp, point_size);
-    free(tmp);
+    if (tmp != nullptr)
+    {
+      laspoint->copy_to(tmp);
+      laspoint->copy_from(point_buffer + pos * point_size);
+      memcpy(point_buffer + pos * point_size, tmp, point_size);
+      free(tmp);
+    }
   };
 
   void clean()
@@ -398,9 +406,12 @@ struct OctantOnDisk : public Octant
     reactivate("r+b");
 
     U8* buffer = (U8*)malloc(point_size);
-    laspoint->copy_to(buffer);
-    fwrite(buffer, point_size, 1, fp);
-    free(buffer);
+    if (buffer != nullptr)
+    {
+      laspoint->copy_to(buffer);
+      fwrite(buffer, point_size, 1, fp);
+      free(buffer);
+    }
 
     // cell = -1 means that recording the location of the point is useless (save memory)
     if (cell >= 0)
@@ -417,15 +428,18 @@ struct OctantOnDisk : public Octant
 
     U8* buffer1 = (U8*)malloc(point_size);
     U8* buffer2 = (U8*)malloc(point_size);
-    fseek(fp, pos * point_size, SEEK_SET);
-    fread(buffer1, point_size, 1, fp);
-    laspoint->copy_to(buffer2);
-    laspoint->copy_from(buffer1);
-    fseek(fp, pos * point_size, SEEK_SET);
-    fwrite(buffer2, point_size, 1, fp);
-    fseek(fp, 0, SEEK_END);
-    free(buffer1);
-    free(buffer2);
+    if (buffer1 != nullptr && buffer2 != nullptr) 
+    {
+      fseek(fp, pos * point_size, SEEK_SET);
+      fread(buffer1, point_size, 1, fp);
+      laspoint->copy_to(buffer2);
+      laspoint->copy_from(buffer1);
+      fseek(fp, pos * point_size, SEEK_SET);
+      fwrite(buffer2, point_size, 1, fp);
+      fseek(fp, 0, SEEK_END);
+      free(buffer1);
+      free(buffer2);
+    }
 
     close();
   };
@@ -495,8 +509,11 @@ struct OctantOnDisk : public Octant
     reactivate("r+b");
 
     point_buffer = (U8*)malloc(point_count * point_size);
-    fseek(fp, 0, SEEK_SET);
-    fread(point_buffer, point_size, point_count, fp);
+    if (point_buffer != nullptr)
+    {
+      fseek(fp, 0, SEEK_SET);
+      fread(point_buffer, point_size, point_count, fp);
+    }
 
     close();
   };
@@ -1098,7 +1115,7 @@ int main(int argc, char* argv[])
       {
         lasreader->header.number_of_variable_length_records++;
         lasreader->header.offset_to_point_data += 54;
-        lasreader->header.vlrs = (LASvlr*)realloc(lasreader->header.vlrs, lasreader->header.number_of_variable_length_records * sizeof(LASvlr));
+        lasreader->header.vlrs = (LASvlr*)realloc_las(lasreader->header.vlrs, lasreader->header.number_of_variable_length_records * sizeof(LASvlr));
         for (U32 i = lasreader->header.number_of_variable_length_records - 1; i > 0; i--) lasreader->header.vlrs[i] = lasreader->header.vlrs[i - 1];
         memset((void*)&(lasreader->header.vlrs[0]), 0, sizeof(LASvlr));
         lasreader->header.vlrs[0].reserved = 0;
@@ -1277,7 +1294,7 @@ int main(int argc, char* argv[])
               for (it = registry.begin(); it != registry.end();)
               {
                 // Bounding box of the octant
-                F64 res = octree.get_size() / (1 << it->first.d);
+                F64 res = octree.get_size() / (static_cast<uint64_t>(1) << it->first.d);
                 F64 minx = res * it->first.x + octree.get_xmin();
                 F64 miny = res * it->first.y + octree.get_ymin();
                 F64 minz = res * it->first.z + octree.get_zmin();

@@ -1522,13 +1522,13 @@ BOOL LASreaderPLY::parse(const char* parse_string)
       while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';' || l[0] == '\"')) l++; // first skip white spaces and quotes
       if (l[0] == 0) return FALSE;
       hex_string[0] = l[0]; hex_string[1] = l[1];
-      sscanf(hex_string,"%x",&hex_value);
+      sscanf_las(hex_string,"%x",&hex_value);
       point.rgb[0] = hex_value; 
       hex_string[0] = l[2]; hex_string[1] = l[3];
-      sscanf(hex_string,"%x",&hex_value);
+      sscanf_las(hex_string,"%x",&hex_value);
       point.rgb[1] = hex_value; 
       hex_string[0] = l[4]; hex_string[1] = l[5];
-      sscanf(hex_string,"%x",&hex_value);
+      sscanf_las(hex_string,"%x",&hex_value);
       point.rgb[2] = hex_value;
       l+=6;
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
@@ -1538,7 +1538,7 @@ BOOL LASreaderPLY::parse(const char* parse_string)
       I32 hex_value;
       while (l[0] && (l[0] == ' ' || l[0] == ',' || l[0] == '\t' || l[0] == ';' || l[0] == '\"')) l++; // first skip white spaces and quotes
       if (l[0] == 0) return FALSE;
-      sscanf(l,"%x",&hex_value);
+      sscanf_las(l,"%x",&hex_value);
       point.intensity = U8_CLAMP(((F64)hex_value/(F64)0xFFFFFF)*255);
       l+=6;
       while (l[0] && l[0] != ' ' && l[0] != ',' && l[0] != '\t' && l[0] != ';') l++; // then advance to next white space
@@ -1702,8 +1702,8 @@ BOOL LASreaderPLY::parse_header()
           CHAR description[32];
           memset(name, 0, 16);
           memset(description, 0, 32);
-          sscanf(&line[offset], "%15s", name);
-          sscanf(&line[offset], "%31s", description);
+          sscanf_las(&line[offset], "%15s", name);
+          sscanf_las(&line[offset], "%31s", description);
           add_attribute(LAS_ATTRIBUTE_F32, name, description);
           parse_string[items] = '0' + num;
           type_string[items] = 'f';
@@ -1769,8 +1769,8 @@ BOOL LASreaderPLY::parse_header()
           CHAR description[32];
           memset(name, 0, 16);
           memset(description, 0, 32);
-          sscanf(&line[offset], "%15s", name);
-          sscanf(&line[offset], "%31s", description);
+          sscanf_las(&line[offset], "%15s", name);
+          sscanf_las(&line[offset], "%31s", description);
           add_attribute(LAS_ATTRIBUTE_F64, name, description);
           parse_string[items] = '0' + num;
           type_string[items] = 'd';
@@ -1810,8 +1810,8 @@ BOOL LASreaderPLY::parse_header()
           CHAR description[32];
           memset(name, 0, 16);
           memset(description, 0, 32);
-          sscanf(&line[15], "%15s", name);
-          sscanf(&line[15], "%31s", description);
+          sscanf_las(&line[15], "%15s", name);
+          sscanf_las(&line[15], "%31s", description);
           add_attribute(LAS_ATTRIBUTE_U8, name, description);
           parse_string[items] = '0' + num;
           type_string[items] = 'f';
@@ -1825,8 +1825,8 @@ BOOL LASreaderPLY::parse_header()
         CHAR description[32];
         memset(name, 0, 16);
         memset(description, 0, 32);
-        sscanf(&line[13], "%15s", name);
-        sscanf(&line[13], "%31s", description);
+        sscanf_las(&line[13], "%15s", name);
+        sscanf_las(&line[13], "%31s", description);
         add_attribute(LAS_ATTRIBUTE_I32, name, description);
         parse_string[items] = '0' + num;
         type_string[items] = 'i';
@@ -1839,8 +1839,8 @@ BOOL LASreaderPLY::parse_header()
         CHAR description[32];
         memset(name, 0, 16);
         memset(description, 0, 32);
-        sscanf(&line[13], "%15s", name);
-        sscanf(&line[13], "%31s", description);
+        sscanf_las(&line[13], "%15s", name);
+        sscanf_las(&line[13], "%31s", description);
         add_attribute(LAS_ATTRIBUTE_I32, name, description);
         parse_string[items] = '0' + num;
         type_string[items] = 'I';

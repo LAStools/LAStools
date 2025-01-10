@@ -418,7 +418,8 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       return false;
     }
   }
-
+#pragma warning(push)
+#pragma warning(disable : 6387)
   // 4. resolve function pointer
   proj_as_wkt_ptr = (proj_as_wkt_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_as_wkt");
   proj_as_proj_string_ptr = (proj_as_proj_string_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_as_proj_string");
@@ -465,6 +466,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
     laserror("Failed to load necessary PROJ functions.");
   }
   return true;
+#pragma warning(pop)
 }
 
 /// unloads the PROJ library and sets all associated function pointers to nullptr.

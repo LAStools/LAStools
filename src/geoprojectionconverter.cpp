@@ -1028,12 +1028,18 @@ const char* ProjParameters::get_datum_info(bool source /*=true*/)
 
       LASMessage(LAS_VERBOSE, "the PROJ datum ensamble object was successfully created, count: '%s', member_count: '%d', accuracy '%f'", datum_name, member_count, accuracy);
       // Formatted output of the basic information
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
       offset += snprintf(
           proj_crs_infos + offset, sizeof(proj_crs_infos) - offset,
           "Name: %s\n"
           "Accuracy: %.2f\n",
           datum_name ? datum_name : "Unknown", accuracy);
-
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
       // Get and format member information
       for (int i = 0; i < member_count; ++i) {
         PJ* member = proj_datum_ensemble_get_member(proj_ctx, datum_ensemble, i);
@@ -1714,6 +1720,8 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
 
 bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, GeoProjectionGeoKeys** geo_keys, int& num_geo_double_params, double** geo_double_params, bool source)
 {
+#pragma warning(push)
+#pragma warning(disable : 6011)
   num_geo_keys = 0;
   num_geo_double_params = 0;
   GeoProjectionParameters* projection = (source ? source_projection : target_projection);
@@ -2219,6 +2227,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(int& num_geo_keys, Geo
     }
   }
   return false;
+#pragma warning(pop)
 }
 
 /// <summary>
@@ -2724,7 +2733,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
         {
           len += (int)strlen(gcs_name) + 16;
           epsg_name = (char*)malloc(len);
-          snprintf(epsg_name, sizeof(len), "%s / %s", gcs_name, projection->name);
+          snprintf(epsg_name, len, "%s / %s", gcs_name, projection->name);
         }
         // maybe output a compound CRS
         if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) || (vertical_geokey == GEO_VERTICAL_EVRF2007) || (vertical_geokey == GEO_VERTICAL_CGVD28) || (vertical_geokey == GEO_VERTICAL_DVR90) || (vertical_geokey == GEO_VERTICAL_NN2000) || (vertical_geokey == GEO_VERTICAL_NN54) || (vertical_geokey == GEO_VERTICAL_DHHN92) || (vertical_geokey == GEO_VERTICAL_DHHN2016) || (vertical_geokey == GEO_VERTICAL_NZVD2016) )
@@ -4708,7 +4717,10 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
             // this is where the name ends
             line[run] = '\0';
           }
-          if (description) sprintf(description, name);
+          size_t len = strlen(name) + 1;
+          description = (char*)malloc(len);
+
+          if (description) snprintf(description, len, "%s", name);
           run++;
           // skip two commas
           while (line[run] != ',') run++;
@@ -8977,7 +8989,8 @@ bool GeoProjectionConverter::to_target(const double* point,  double &x, double &
 {
   if (source_projection && target_projection)
   {
-    double longitude, latitude;
+    double longitude = 0.0;
+    double latitude = 0.0;
 
     switch (source_projection->type)
     {
@@ -9939,7 +9952,8 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
   }
   fseek(Proj_file, 0, SEEK_SET); 
   char* jsonContent = new char[fileSize + 1];
-
+#pragma warning(push)
+#pragma warning(disable : 6001)
   if (!jsonContent) {
     fclose(Proj_file);
     proj_context_destroy(projParameters.proj_ctx);
@@ -9955,7 +9969,9 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
     laserror("Error reading the PROJJSON file '%s'", json_filename);
   }
   PJ* proj_crs = proj_create(projParameters.proj_ctx, jsonContent);
+
   delete[] jsonContent;
+#pragma warning(pop)
   
   // Check whether the CRS is valid
   if (!proj_crs) {
@@ -10049,7 +10065,10 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
     projParameters.set_header_wkt_representation(projParameters.proj_target_crs);
     LASMessage(LAS_VERY_VERBOSE, "the PROJ target object was successfully created");
   }
+#pragma warning(push)
+#pragma warning(disable : 6001)
   delete[] wktContent;
+#pragma warning(pop)
 }
 
 /// IMPORTANT: The Proj lib must be installed and loaded to use this functionality.
