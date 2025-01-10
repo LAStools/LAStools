@@ -21,8 +21,6 @@
 
     * laszip
     * lasindex
-    * lasvalidate
-    * lasliberate
     * lasinfo
     * las2las
     * lasdiff
@@ -39,8 +37,10 @@
     * demdiff
     * e572las
     * lasview
+    * lasvalidate
     * laspublish
     * lasoptimize
+    * lasliberate
 
 --------------------------------------------------------------------------
 
@@ -56,9 +56,11 @@
     
     * las2dem
     * las2iso
-    * las2shp & shp2las
+    * las2shp
     * las2tin
+    * las3dpoly
     * lasboundary
+    * lascanopy
     * lasclassify
     * lasclip
     * lascolor
@@ -67,10 +69,12 @@
     * lasdatum & lasvdatum
     * lasdistance
     * lasduplicate
-    * lasgrid & lascanopy
+    * lasgrid
     * lasground & lasground_new
-    * lasheight & lastrack
+    * lasheight
+    * lasintensity
     * laslayers
+    * lasnoise
     * lasoverage
     * lasoverlap
     * lasplanes
@@ -78,10 +82,11 @@
     * lasreturn
     * lassort
     * lassplit
-    * lasthin & lasnoise
+    * lasthin
     * lastile
     * lastool
     * lasvoxel
+    * shp2las
 
 --------------------------------------------------------------------------
 
@@ -99,6 +104,6 @@
 
   COPYRIGHT:
   
-  (c) 2007-2022, rapidlasso GmbH, GERMANY - fast tools to catch reality
+  (c) 2007-2025, rapidlasso GmbH, GERMANY - fast tools to catch reality
 
 --------------------------------------------------------------------------
