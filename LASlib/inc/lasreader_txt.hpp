@@ -74,51 +74,51 @@ protected:
   BOOL read_point_default();
 
 private:
-	U8 point_type;
-	CHAR* parse_string;
-	CHAR* parse_string_unparsed;
-	F32 translate_intensity;
-	F32 scale_intensity;
-	F32 translate_scan_angle;
-	F32 scale_scan_angle;
-	F64* scale_factor;
-	F64* offset;
-	I32 skip_lines;
-	BOOL populated_header;
-	BOOL ipts;
-	BOOL iptx;
-	FILE* file;
-	bool piped;
-	const char* lptr;
-	CHAR line[512];
-	I32 number_attributes;
-	I32 attributes_data_types[32];
-	const CHAR* attribute_names[32];
-	const CHAR* attribute_descriptions[32];
-	F64 attribute_scales[32];
-	F64 attribute_offsets[32];
-	F64 attribute_pre_scales[32];
-	F64 attribute_pre_offsets[32];
-	F64 attribute_no_datas[32];
-	I32 attribute_starts[32];
+  U8 point_type;
+  CHAR* parse_string;
+  CHAR* parse_string_unparsed;
+  F32 translate_intensity;
+  F32 scale_intensity;
+  F32 translate_scan_angle;
+  F32 scale_scan_angle;
+  F64* scale_factor;
+  F64* offset;
+  I32 skip_lines;
+  BOOL populated_header;
+  BOOL ipts;
+  BOOL iptx;
+  FILE* file;
+  bool piped;
+  const char* lptr;
+  CHAR line[512];
+  I32 number_attributes;
+  I32 attributes_data_types[32];
+  const CHAR* attribute_names[32];
+  const CHAR* attribute_descriptions[32];
+  F64 attribute_scales[32];
+  F64 attribute_offsets[32];
+  F64 attribute_pre_scales[32];
+  F64 attribute_pre_offsets[32];
+  F64 attribute_no_datas[32];
+  I32 attribute_starts[32];
   F64 orig_x_offset, orig_y_offset, orig_z_offset;
   F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
-	BOOL parse_extended_flags(CHAR* parse_string);
-	BOOL parse_column_description(CHAR** parse_string);
-	BOOL parse_attribute(const CHAR* l, I32 index);
-	template<typename T>
-	BOOL parse_item_i(I32* out, const I32 imin, const I32 imax, const CHAR* context, T addon);
-	BOOL parse_item_i(I32* out, const I32 imin, const I32 imax, const CHAR* context);
-	template<typename T>
-	BOOL parse_item_f(F32* out, const F32 imin, const F32 imax, const CHAR* context, T addon);
-	BOOL parse_item_f(F32* out, const F32 imin, const F32 imax, const CHAR* context);
-	BOOL parse(const CHAR* parse_string);
-	BOOL check_parse_string(const CHAR* parse_string);
-	BOOL skip_pre();
-	void skip_post();
-	void populate_scale_and_offset();
-	void populate_bounding_box();
-	void clean();
+  BOOL parse_extended_flags(CHAR* parse_string);
+  BOOL parse_column_description(CHAR** parse_string);
+  BOOL parse_attribute(const CHAR* l, I32 index);
+  template<typename T>
+  BOOL parse_item_i(I32* out, const I32 imin, const I32 imax, const CHAR* context, T addon);
+  BOOL parse_item_i(I32* out, const I32 imin, const I32 imax, const CHAR* context);
+  template<typename T>
+  BOOL parse_item_f(F32* out, const F32 imin, const F32 imax, const CHAR* context, T addon);
+  BOOL parse_item_f(F32* out, const F32 imin, const F32 imax, const CHAR* context);
+  BOOL parse(const CHAR* parse_string);
+  BOOL check_parse_string(const CHAR* parse_string);
+  BOOL skip_pre();
+  void skip_post();
+  void populate_scale_and_offset();
+  void populate_bounding_box();
+  void clean();
 
   enum extended_flag{
     HSV_H = -1,  HSV_S = -2,  HSV_V = -3, 
