@@ -7,12 +7,12 @@
 
 --------------------------------------------------------------------------
 
-  There are TWO parts of LAStools. One part is OPEN source. 
-  The other part is CLOSED source and requires licensing for most 
+  There are TWO parts of LAStools. One part is open source. 
+  The other part is closed source and requires licensing for most 
   commercial or government use. If you're unsure please email 
   'info@rapidlasso.de' before using LAStools.
   For education and evaluation purposes you can use and test LAStools 
-  for free. Some free version tools are may limited in the maximum count
+  for free. Some free version tools are limited in the maximum count
   of lidar points in one single file to avoid commercial usage.
   
 --------------------------------------------------------------------------
