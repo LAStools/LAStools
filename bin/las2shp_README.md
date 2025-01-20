@@ -37,7 +37,6 @@ las2shp64 -i *.laz -drop_return 1
 
 ## las2shp specific arguments
 
--cores [n]            : process multiple inputs on [n] cores in parallel  
 -parse [xyz]          : use parse string [xyz] to access point values  
 -record [n]           : set shp output record size to [n]{default=1024}  
 -record_size [n]      : set shp output record size to [n]{default=1024}  
@@ -45,14 +44,15 @@ las2shp64 -i *.laz -drop_return 1
 -week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
 
 ## Module arguments
 

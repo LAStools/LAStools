@@ -125,7 +125,6 @@ option. These are unsigned integers numbers so no scale value is required.
 
 -add_attribute [m] [n] [o] [p] [q] [r] [s] [t]: adds a new "extra_byte" attribute of data_type [m] name [n] description [o]; optional: scale[p] offset [q] pre_scale [r] pre_offset [s] no_data_value [t]  
 -add_extra [m] [n] [o] [p] [q] [r] [s] [t]: adds a new "extra_byte" attribute of data_type [m] name [n] description [o]; optional: scale[p] offset [q] pre_scale [r] pre_offset [s] no_data_value [t]  
--cores [n]                          : process multiple inputs on [n] cores in parallel  
 -parse [xyz]                        : in case the input file is ascii use parse string [xyz] to access point values. See table below for details.  
 -point_type [n]                     : use point type [n]{1-10} of LAS 1.4 instead of point type 1 of LAS 1.2  
 -progress [n]                       : report progress every [n] points  
@@ -149,6 +148,7 @@ option. These are unsigned integers numbers so no scale value is required.
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

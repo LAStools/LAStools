@@ -47,7 +47,6 @@ lasplanes64 -i in.las -opef
 -cell_points [n]           : skip if less than [n] points (default=100)  
 -cell_size [s]             : set cell size to [s]*[s]*[s] (default=1)  
 -cell_size_xyz [x] [y] [z] : set cell size to [x]*[y]*[z]  
--cores [n]                 : process multiple inputs on [n] cores in parallel  
 -eigen_ratio_largest [n]   : skip if largest eigenvalue over sum of all three eigenvalues > [n]{default=0.90000}  
 -eigen_ratio_smallest [n]  : skip if smallest eigenvalue over sum of all three eigenvalues > [n]{default=0.00010}  
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
@@ -76,14 +75,15 @@ lasplanes64 -i in.las -opef
 -week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
--wait    : wait for <ENTER> in the console at end of process  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-h        : print help output  
+-license  : show license information  
+-v        : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
+-wait     : wait for <ENTER> in the console at end of process  
 
 ## Module arguments
 

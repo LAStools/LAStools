@@ -37,7 +37,6 @@ the header information found in the SHP file
 
 ## shp2las specific arguments
 
--cores [n]                      : process multiple inputs on [n] cores in parallel  
 -idbf                           : use DBF file of shapefile as additional input  
 -set_class [n]                  : set classification to [n]  
 -set_classification [n]         : set classification to [n]  
@@ -48,14 +47,15 @@ the header information found in the SHP file
 -set_version [m] [n]            : set version to major.minor = [m].[n]  
 
 ### Basics
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
+-cores [n] : process multiple inputs on [n] cores in parallel  
+-fail      : fail if license expired or invalid  
+-gui       : start with files loaded into GUI  
+-h         : print help output  
+-help      : print help output  
+-license   : show license information  
+-v         : verbose output (print extra information)  
+-verbose   : verbose output (print extra information)  
+-version   : reports this tool's version number  
 
 ## Module arguments
 

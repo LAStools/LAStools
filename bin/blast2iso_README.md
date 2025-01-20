@@ -65,7 +65,6 @@ assumption that all points are in UTM zone 17T.
 ## blast2iso specific arguments
 
 -clean [n]                 : removes entire contours with less than [n] units.  
--cores [n]                 : process multiple inputs on [n] cores in parallel  
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
 -iso [n]                   : extracts iso [n] (may multiple -iso [n] parameters)  
@@ -80,14 +79,15 @@ assumption that all points are in UTM zone 17T.
 -translate_xyz [x] [y] [z] : translate point coordinates by [x] [y] [z]  
 
 ### Basics
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
 
 ## Module arguments
 

@@ -136,8 +136,8 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 -week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64     : start 64 bit executable (instead of default 32 bit executable)  
 -cores [n] : process multiple inputs on [n] cores in parallel  
+-cpu64     : start 64 bit executable (instead of default 32 bit executable)  
 -fail      : fail if license expired or invalid  
 -gui       : start with files loaded into GUI  
 -h         : print help output  

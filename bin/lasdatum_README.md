@@ -55,7 +55,6 @@ lasdatum64 -i in.laz -epsg 25833 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.
 -backward                          : convert from geoidal (or orthometric) elevations to ellipsoidal elevations  
 -cfr                               : use CFR (Coordinate Frame Rotation)  
 -CFR                               : use CFR (Coordinate Frame Rotation)  
--cores [n]                         : process multiple inputs on [n] cores in parallel  
 -grid [n]                          : use "Grid Shift Binary" (*.gsb) file [n] as datum grid  
 -ilay [n]                          : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]                       : look for corresponding *.lay file in directory [n]  
@@ -69,6 +68,7 @@ lasdatum64 -i in.laz -epsg 25833 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.
 -preserve_z                        : keep original height after transformation (only transform x/y coordinates)  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

@@ -286,7 +286,6 @@ Further examples
 -auto_date                          : set (in place) creation year / day of year in header automatically based on file creation date  
 -cd                                 : compute rough approximation for covered area, density, and spacing  
 -compute_density                    : compute rough approximation for covered area, density, and spacing  
--cores [n]                          : process multiple inputs on [n] cores in parallel  
 -delete_empty                       : delete LAS files with zero points  
 -gps_week                           : compute the GPS week (if data is Adjusted Standard GPS time)  
 -gw                                 : compute the GPS week (if data is Adjusted Standard GPS time)  
@@ -357,14 +356,15 @@ Further examples
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--version : reports this tool's version number  
--wait    : wait for <ENTER> in the console at end of process  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-wait     : wait for <ENTER> in the console at end of process  
 
 ## Module arguments
 

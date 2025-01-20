@@ -112,7 +112,6 @@ input files then treated as individual flightlines.
 ## lasoverage specific arguments
 
 -classify_as [n]                  : set the classification of the overage points to [n]{default:12}  
--cores [n]                        : process multiple inputs on [n] cores in parallel  
 -entire_overlap                   : do the action for the entire overlap instead of the overage  
 -feet                             : use feet  
 -flag_as_overlap                  : set 'overlap flag' for overage points instead of setting classification to 12  
@@ -127,6 +126,7 @@ input files then treated as individual flightlines.
 -step [n]                         : set resolution of grid (granularity) to [n] for overage points computation (default=1)  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

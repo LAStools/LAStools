@@ -219,7 +219,6 @@ lascolor64 -i lidar\*.laz -odir colored_lidar -olaz -cores 4
 -classify_non_black                 : points falling into a non-black pixels  
 -classify_non_white                 : points falling into a non-white pixels  
 -classify_white                     : points falling into a white pixels  
--cores [n]                          : process multiple inputs on [n] cores in parallel  
 -dont_scale_rgb_up                  : copy RGBI values as they are (don't default upscale from 8 to 16 bit)  
 -gray                               : copies selected band (-band) into all three RGB channels  
 -green                              : copies selected band (-band) into the green (G) channels  
@@ -244,6 +243,7 @@ lascolor64 -i lidar\*.laz -odir colored_lidar -olaz -cores 4
 -zero_rgb                           : any LiDAR points not covered by the image receive the color black  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

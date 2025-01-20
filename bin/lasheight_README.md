@@ -143,7 +143,6 @@ lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_heig
 -classify_above [z] [c]         : classify points that are [z] units vertically above Delaunay TIN of ground points as [c]  
 -classify_below [z] [c]         : classify points that are [z] units vertically below Delaunay TIN of ground points as [c]  
 -classify_between [z1] [z2] [c] : classify points that are between [z1] and [z2] units vertically above TIN of ground points as [c]  
--cores [n]                      : process multiple inputs on [n] cores in parallel  
 -do_not_store_in_user_data      : do not modify the user_data field at all  
 -dont_remove_empty_files        : do not remove files that have zero points remaining from disk  
 -drop_above [z]                 : drop points that are [z] units vertically above Delaunay TIN of ground points  
@@ -169,18 +168,19 @@ lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_heig
 -prohibit_extrapolation         : points are only considered when located over a ground-point triangle (64bit)  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
--wait    : wait for <ENTER> in the console at end of process  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
+-wait     : wait for <ENTER> in the console at end of process  
 
 ## Module arguments
 

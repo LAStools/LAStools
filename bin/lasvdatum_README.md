@@ -51,12 +51,12 @@ lasvdatum64 -i in.laz -epsg 26917 -vgrid g2012bu0.gtx -backward -o out.laz
 
 -backward             : convert from geoidal (or orthometric) elevations to ellipsoidal elevations  
 -bicubic              : use bicubic interpolation instead of bilinear interpolation  
--cores [n]            : process multiple inputs on [n] cores in parallel  
 -switch_G_B           : switch green and blue value  
 -vgrid [n]            : use file [n]{*.gtx} as vertical grid  
 -week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

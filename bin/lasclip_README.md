@@ -109,9 +109,8 @@ following format:
 
 ## lasclip specific arguments
 
--classify [n]                 : classify points as [n] instead of clip away  
+-classify [n]                 : set classification code of points outside the shape to [n]  
 -classify_as [n]              : set classification code of points outside the shape to [n]  
--cores [n]                    : process multiple inputs on [n] cores in parallel  
 -digits [n]                   : use [n] digits to enumerate filenames  
 -dont_remove_empty_files      : do not remove files that have zero points remaining from disk  
 -donut                        : clip only lakes but no islands  
@@ -134,16 +133,17 @@ following format:
 -week_to_adjusted [n]         : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--license : show license information  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
--wait    : wait for <ENTER> in the console at end of process  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-license  : show license information  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
+-wait     : wait for <ENTER> in the console at end of process  
 
 ## Module arguments
 

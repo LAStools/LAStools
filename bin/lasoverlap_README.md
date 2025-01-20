@@ -142,7 +142,6 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -avg                              : compute per cell averages before checking difference  
 -bands [w] [b] [g]                : map absolute differences up to [w] to white,  [b] to blue, [g] to green, and above to red  
 -color_bands [m] [n]              : see tool description  
--cores [n]                        : process multiple inputs on [n] cores in parallel  
 -counter                          : check difference in point counts per overlapping flightline per cell with an 8 bit counter  
 -counter_16bit                    : check difference in point counts per overlapping flightline per cell with a 16 bit counter  
 -counter_32bit                    : check difference in point counts per overlapping flightline per cell with a 32 bit counter  
@@ -190,15 +189,16 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -week_to_adjusted [n]             : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
 
 ## Module arguments
 

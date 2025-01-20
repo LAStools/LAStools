@@ -1,8 +1,7 @@
 ﻿# e572las
 
-This tool reads LiDAR in the E57 format from a *.e57 file and
-converts it to either standard LAS, compressed LAZ, or simple
-ASCII TXT.
+Reads LiDAR in the E57 format from a *.e57 file and converts it
+to either standard LAS, compressed LAZ, or simple ASCII TXT.
 
 By default all scans contained in the E57 file are merged into
 one output with all invalid points being omitted. The points of
@@ -218,7 +217,7 @@ written a total 1213990 points
 ## e572las specific arguments
 
 -include_invalid       : include invalid points into target  
--set_scale [x] [y] [z] : quantize ASCII points with [x] [y] [z] (unit meters)  
+-set_scale [x] [y] [z] : quantize ASCII points with [x] [y] [z] (default 0.001 meters)  
 -split_scans           : split output files by scan  
 -split                 : split output files by scan
 -no_pose               : perform neither translation nor rotation 

@@ -149,7 +149,6 @@ lasduplicate64 -i in.las -nil
 
 ## lasduplicate specific arguments
 
--cores [n]            : process multiple inputs on [n] cores in parallel  
 -flag_as_withheld     : instead of removing points set their withheld flag to true  
 -hash_map             : use hash_map as internal data structure for finding duplicates  
 -hash_set             : use hash_set as internal data structure for finding duplicates  
@@ -173,6 +172,7 @@ lasduplicate64 -i in.las -nil
 
 ### Basics
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  
 -h            : print help output  

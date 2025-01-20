@@ -117,7 +117,6 @@ lassplit64 -i *.las -merged -split 100000000 -digits 2
 -by_x_interval [n]                : split points based on x coordinate intervals of [n]  
 -by_y_interval [n]                : split points based on y coordinate intervals of [n]  
 -by_z_interval [n]                : split points based on z coordinate intervals of [n]  
--cores [n]                        : process multiple inputs on [n] cores in parallel  
 -digits [n]                       : use [n] digits for naming of split files (default=7)  
 -ilay [n]                         : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]                      : look for corresponding *.lay file in directory [n]  
@@ -131,14 +130,15 @@ lassplit64 -i *.las -merged -split 100000000 -digits 2
 -point_source_offset [n]          : additional offset [n] only for the point_source if point_source is updated
 
 ### Basics
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
+-cores [n] : process multiple inputs on [n] cores in parallel  
+-fail      : fail if license expired or invalid  
+-gui       : start with files loaded into GUI  
+-h         : print help output  
+-help      : print help output  
+-license   : show license information  
+-v         : verbose output (print extra information)  
+-verbose   : verbose output (print extra information)  
+-version   : reports this tool's version number  
 
 ## Module arguments
 

@@ -102,7 +102,6 @@ file that georeferences the PNG file in Google Earth
 
 -attribute [n]             : use attribute [n] value as output color parameter  
 -compute_min_max           : computes the range for -gray and -false  
--cores [n]                 : process multiple inputs on [n] cores in parallel  
 -elevation                 : use elevation value as output color parameter  
 -elevation_feet            : use feet for elevation  
 -false                     : false-color based on elevation/intensity (used with PNG/TIF/JPG)  
@@ -136,14 +135,15 @@ file that georeferences the PNG file in Google Earth
 -week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
 
 ## Module arguments
 

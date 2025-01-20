@@ -63,7 +63,6 @@ of each point.
 
 -append                             : append LAX index to existing file  
 -average [n]                        : requested average point per cells value of [n] (default=20000)  
--cores [n]                          : process multiple inputs on [n] cores in parallel  
 -do_not_create_lax                  : do not create index file  
 -do_not_eliminate_fluff             : do not eliminate point coordinate value fluff  
 -do_not_move_EVLRs                  : do not move EVLRs  
@@ -79,17 +78,18 @@ of each point.
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
 
 ## Module arguments
 

@@ -255,7 +255,6 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -add_attribute [m] [n] [o] [p] [q] [t]: adds a new "extra_byte" attribute of data_type [m] name [n] description [o]; optional: scale[p] offset [q] no_data_value [t]  
 -add_empty_vlr [m] [n] [o]          : add an empty VLR with user-id [m], record-id [n] and description [o]  
 -adjusted_to_week                   : converts time stamps from Adjusted Standard GPS to GPS week  
--cores [n]                          : process multiple inputs on [n] cores in parallel  
 -crop_to_bb                         : removes points that falls outsize the bouding box specified in the LAS header  
 -crop_to_bounding_box               : removes points that falls outsize the bouding box specified in the LAS header  
 -dont_remove_empty_files            : do not remove files that have zero points remaining from disk  
@@ -302,6 +301,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

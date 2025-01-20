@@ -46,7 +46,6 @@ the above workflow is for larger areas and/or tiny voxels sizes
 
 -compute_IDs_and_voxel_table  : https://groups.google.com/d/topic/lastools/Nc-rN5OuxY8/discussion  
 -compute_mean_xyz             : compute averaged coordinate for output voxels  
--cores [n]                    : process multiple inputs on [n] cores in parallel  
 -empty_voxels                 : also output voxels without returns but give them intensity of zero  
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ...  
 -ignore_class_mask [n]        : ignores points with DWORD class mask [n]  
@@ -67,17 +66,18 @@ the above workflow is for larger areas and/or tiny voxels sizes
 -week_to_adjusted [n]         : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
+-cores [n] : process multiple inputs on [n] cores in parallel  
+-cpu64     : start 64 bit executable (instead of default 32 bit executable)  
+-fail      : fail if license expired or invalid  
+-gui       : start with files loaded into GUI  
+-h         : print help output  
+-help      : print help output  
+-license   : show license information  
+-quiet     : nothing reported in console  
+-v         : verbose output (print extra information)  
+-verbose   : verbose output (print extra information)  
+-version   : reports this tool's version number  
+-vv        : very verbose output (print even more information)  
 
 ## Module arguments
 

@@ -37,7 +37,7 @@ input (use lassort -gps_time).
 
     lasreturn64 -i lidar.laz -histo return_distance 0.1 0.0 4.99
 
-same as before but limits the histogram to the range rfrom 0 to 5
+same as before but limits the histogram to the range from 0 to 5
 
 
     lasreturn64 -i in.laz -check_return_numbering
@@ -92,7 +92,6 @@ lasreturn64 -i in.laz -histo angle_bigger_error 0.1
 -classify_violating_as [n]  : classify points with violating returns as [n]  
 -classify_violation_as [n]  : classify points with violating returns as [n]  
 -compute_gap_to_next_return : adds an attribute 'gap to next return' as "extra bytes" and stores the 3D distance from the current to the next return of the same pulse for all pulses that have multiple returns  
--cores [n]                  : process multiple inputs on [n] cores in parallel  
 -error [n]                  : set quantization error to [n]{default: 0.75}  
 -flag_as_synthetic          : mark remaining returns in output as synthetic  
 -flag_as_withheld           : mark remaining returns in output as withheld  
@@ -108,19 +107,20 @@ lasreturn64 -i in.laz -histo angle_bigger_error 0.1
 -week_to_adjusted [n]       : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64        : start 64 bit executable (instead of default 32 bit executable)  
--fail         : fail if license expired or invalid  
--gui          : start with files loaded into GUI  
--h            : print help output  
--help         : print help output  
--license      : show license information  
--quiet        : nothing reported in console  
--v            : verbose output (print extra information)  
--verbose      : verbose output (print extra information)  
--version      : reports this tool's version number  
--very_verbose : very verbose output (print even more information)  
--vv           : very verbose output (print even more information)  
--wait         : wait for <ENTER> in the console at end of process  
+-cpu64       : start 64 bit executable (instead of default 32 bit executable)  
+-cores [n]   : process multiple inputs on [n] cores in parallel  
+-fail        : fail if license expired or invalid  
+-gui         : start with files loaded into GUI  
+-h           : print help output  
+-help        : print help output  
+-license     : show license information  
+-quiet       : nothing reported in console  
+-v           : verbose output (print extra information)  
+-verbose     : verbose output (print extra information)  
+-version     : reports this tool's version number  
+-very_verbose: very verbose output (print even more information)  
+-vv          : very verbose output (print even more information)  
+-wait        : wait for <ENTER> in the console at end of process  
 
 ## Module arguments
 

@@ -126,7 +126,6 @@ lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 -city                         : use city setting (step=25)  
 -coarse                       : use default setting for flat terrains (4 substeps)  
 -compute_height               : compute height of each point  
--cores [n]                    : process multiple inputs on [n] cores in parallel  
 -cutoff_z_above [z]           : points above elevation [z] are completely excluded from ground search  
 -down_spike [n]               : remove down spikes > [n] centimeter  
 -extra_coarse                 : use default setting for very flat terrains (3 substeps)  
@@ -169,6 +168,7 @@ lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 -wilderness                   : use wilderness setting (step=3)  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

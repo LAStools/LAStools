@@ -68,7 +68,6 @@ lasindex64 -i lidar.las -tile_size 2 -maximum -50
 ## lasindex specific arguments
 
 -append               : append LAX index to LAZ file (not possible for LAS)  
--cores [n]            : process multiple inputs on [n] cores in parallel  
 -dont_reindex         : skip LAS or LAZ that already have an index  
 -maximum [n]          : maximum number of intervals [n] per spatial area  
 -meta                 : create a meta index above multiple files  
@@ -80,6 +79,7 @@ lasindex64 -i lidar.las -tile_size 2 -maximum -50
 -week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

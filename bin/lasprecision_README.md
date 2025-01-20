@@ -34,20 +34,8 @@ that are output per statistic with '-lines 30'.
 
 ## Examples
 
-What happens in the example below? We load -all the raw integer
-x, y, and z coordinates of -i "MARS_Sample_Filtered_LiDAR.las"
-into three separate arrays, sort each array in ascending sorted
-orders, compute the difference between all neighboring values
-and output a histogram in textural form.
+    lasprecision64 -i in.laz -all
 
-What do these histograms tell us? We see that the original scale
-factors are inflated/missleading. There is not actual millimeter
-precision (=> 0.001) in the data. All x, and y, or, z values are
-either 10, 20, 30, 40, or other multiple of 10 units spaced apart.
-Hence the true precision is only centimeters (=> 0.01). This is
-not nice and makes compression less efficient.
-
-    lasprecision64 -i MARS_Sample_Filtered_LiDAR.las -all
 original scale factors: 0.001 0.001 0.001
 loading first 8146178 of 8146178 points
 X differences
@@ -69,6 +57,21 @@ Z differences
          50 :          7   0.05
          60 :          4   0.06
 ...
+
+This example analyzes all raw integer coordinates of "in.laz"
+into three separate arrays, sort each array in ascending sorted
+orders, compute the difference between all neighboring values
+and output a histogram in textural form.
+
+These histograms provide information about the original scale
+factors and if they are inflated/missleading. Here there is no
+millimeter precision (=> 0.001) in the data, even if the scale factor
+tells so. All x, and y, or, z values are either 10, 20, 30, 40,
+or other multiple of 10 units spaced apart.
+Hence the true precision is only centimeters (=> 0.01).
+The scale in the header is set to millimeter - this makes compression
+inefficient.
+
 
 Let can take a closer look at the *raw* XYZ integers in this LAS
 file to understand what is happening:
@@ -481,7 +484,6 @@ lasprecision64 -i in.las -o out.las -rescale 0.333333333 0.333333333 0.01
 ## lasprecision specific arguments
 
 -all                  : analyze all points (otherwise: limit to 5 mil. points)  
--cores [n]            : process multiple inputs on [n] cores in parallel  
 -diff_diff            : report also differences of differences  
 -diff_diff_only       : report only differences of differences  
 -gps                  : report also gps timestamp statistics  
@@ -503,13 +505,14 @@ lasprecision64 -i in.las -o out.las -rescale 0.333333333 0.333333333 0.01
 -week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
 
 ## Module arguments
 

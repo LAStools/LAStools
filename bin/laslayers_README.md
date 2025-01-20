@@ -178,7 +178,6 @@ lasdiff64 -i ll_modified.laz -i ll_applied.laz
 ## laslayers specific arguments
 
 -add           : create or add to LAY files with LASlayers storing filters, transforms or file modifications  
--cores [n]     : process multiple inputs on [n] cores in parallel  
 -del [n]       : delete layer with index [n(1..32)]  
 -del_last [n]  : delete last [n] layers  
 -detach        : detach layers  
@@ -190,14 +189,15 @@ lasdiff64 -i ll_modified.laz -i ll_applied.laz
 -short         : output layer information only  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--h       : print help output  
--help    : print help output  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-h        : print help output  
+-help     : print help output  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
 
 ## Module arguments
 

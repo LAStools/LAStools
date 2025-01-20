@@ -115,7 +115,6 @@ the result in ESRI's Shapefile format.
 
 -clean [n]                 : removes entire contours with less than [n] points  
 -concavity [n]             : remove all triangles with an edge length of [n] meters (disable=0; default=50)  
--cores [n]                 : process multiple inputs on [n] cores in parallel  
 -creeks [fns]              : integrate hard breaklines listed in file [fns]{.shp or .txt}  
 -extra_pass                : do extra read pass to count points (only makes sense when filtering)  
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
@@ -139,15 +138,16 @@ the result in ESRI's Shapefile format.
 -week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
 
 ## Module arguments
 

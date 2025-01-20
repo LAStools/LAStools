@@ -43,9 +43,8 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 
 ## lasdistance specific arguments
 
--classify [n]                 : classify points as [n] instead of clip away  
--classify_as [n]              : classify points within distance as [n] (default=20)  
--cores [n]                    : process multiple inputs on [n] cores in parallel  
+-classify [n]                 : classify points within distance as [n] instead of clip away  
+-classify_as [n]              : classify points within distance as [n] instead of clip away  
 -distance_xy [n]              : use distance [n] from polygons to classify, flag or remove points (default=4.0)  
 -flag_as_keypoint             : flag points as keypoint (instead of classifying them)  
 -flag_as_synthetic            : flag points as synthetic (instead of classifying them)  
@@ -65,16 +64,17 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 -week_to_adjusted [n]         : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
 
 ## Module arguments
 

@@ -87,7 +87,6 @@ lasnoise64 -i tiles\*.laz -step 3 -isolated 3 -classify_as 31 -odir denoised -ol
 
 -by_flightline                : processes points of each flightline separately (needs populated point source IDs)  
 -classify_as [n]              : set classification code of isolated points to [n]  
--cores [n]                    : process multiple inputs on [n] cores in parallel  
 -dont_remove_empty_files      : do not remove files that have zero points remaining from disk  
 -flag_as_withheld             : mark isolated points by turning their withheld flag to on  
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ...  
@@ -106,17 +105,18 @@ lasnoise64 -i tiles\*.laz -step 3 -isolated 3 -classify_as 31 -odir denoised -ol
 -week_to_adjusted [n]         : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
 
 ## Module arguments
 

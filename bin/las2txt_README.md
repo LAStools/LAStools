@@ -98,7 +98,6 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 
 ## las2txt specific arguments
 
--cores [n]   : process multiple inputs on [n] cores in parallel  
 -extra [n]   : use [n] as value of output extra string  
 -header [n]  : use header prefix [n] (pound,percent,dollar,comma,star,colon,semicolon)  
 -opts        : output as PTS (plain text lidar data)  
@@ -110,14 +109,15 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
                (this enables to omit -parse during import using txt2las)
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
 
 ## Module arguments
 

@@ -189,7 +189,6 @@ tiles the last returns from huge.laz into compressed tiling.
 ## lastile specific arguments
 
 -buffer [n]                         : increase tile by a bounding box of size [n]  
--cores [n]                          : process multiple inputs on [n] cores in parallel  
 -dont_delete_refined                : keep original tiles around tile refinement to 4 smaller tiles  
 -external_tile [x1] [y1] [x2] [y2]  : generate one external defined tile with the given bounding box  
 -external_tiling [fns] [n]          : use tile info of SHP file [fns] and DBF attribute [n]  
@@ -213,16 +212,17 @@ tiles the last returns from huge.laz into compressed tiling.
 -unindexed                          : force processing even if input is not indexed  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
--wait    : wait for <ENTER> in the console at end of process  
+-cores [n] : process multiple inputs on [n] cores in parallel  
+-cpu64     : start 64 bit executable (instead of default 32 bit executable)  
+-fail      : fail if license expired or invalid  
+-gui       : start with files loaded into GUI  
+-h         : print help output  
+-help      : print help output  
+-license   : show license information  
+-v         : verbose output (print extra information)  
+-version   : reports this tool's version number  
+-vv        : very verbose output (print even more information)  
+-wait      : wait for <ENTER> in the console at end of process  
 
 ## Module arguments
 

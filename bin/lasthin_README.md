@@ -164,7 +164,6 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 -central                      : thins, flags or classifies the point closest to the x/y center of each cell  
 -classify_as [n]              : keep all points in file (do not thin) but classify surviving points as [n] instead  
 -contours [n]                 : thins, flags, or classifies points per cell that are as far as possible from contour intervals of [n]  
--cores [n]                    : process multiple inputs on [n] cores in parallel  
 -flag_as_keypoint             : keep all points in file (do not thin) but flag surviving points as keypoint instead  
 -flag_as_withheld             : keep all points in file (do not thin) but flag surviving points as withheld instead  
 -gps_time                     : thin on GPS time instead (still in beta)  
@@ -187,6 +186,7 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 -withheld                     : keep all points in file (do not thin) but flag surviving points as withheld instead  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

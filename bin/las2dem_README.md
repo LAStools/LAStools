@@ -178,7 +178,6 @@ generated KML file:
 -buffer [n]                : increase tile by a bounding box of size [n]  
 -compute_min_max           : computes the range for -gray and -false  
 -copy_attribute_into_z [n] : copy attribute [n] value into z  
--cores [n]                 : process multiple inputs on [n] cores in parallel  
 -creeks [fns]              : integrate hard breaklines listed in file [fns]{.shp or .txt}  
 -edge_longest              : rasterize the length of the longest edge around every vertex  
 -edge_shortest             : rasterize the length of the shortest edge around every vertex  
@@ -217,15 +216,16 @@ generated KML file:
 -week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
--wait    : wait for <ENTER> in the console at end of process  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-license  : show license information  
+-v        : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
+-wait     : wait for <ENTER> in the console at end of process  
 
 ## Module arguments
 

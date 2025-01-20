@@ -181,7 +181,6 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 -c [m] [n] [o] ...         : compute those height rasters [m-n,n-o,...]  
 -centroids                 : add centroids to CSV output  
 -copy_attribute_into_z [n] : copy attribute [n] value into z  
--cores [n]                 : process multiple inputs on [n] cores in parallel  
 -cov                       : cover is computed as the number of first returns above the cover cutoff divided by the number of all first returns and output as a percentage  
 -cover_cutoff [n]          : set level for -cov or -dns calculation to [n]{default="-height_cutoff"}  
 -d [m] [n] [o] ...         : compute a height raster [m-n,n-o,...] in which the counts are divided by the total number of points and scaled to a percentage  
@@ -238,6 +237,7 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 -week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
+-cores [n]    : process multiple inputs on [n] cores in parallel  
 -cpu64        : start 64 bit executable (instead of default 32 bit executable)  
 -fail         : fail if license expired or invalid  
 -gui          : start with files loaded into GUI  

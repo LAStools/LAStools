@@ -170,7 +170,6 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 -color_by_user_data                 : render points by mapping the 8-bit user data field to a color ramp (blue-]green-]red)  
 -concavity [n]                      : remove large exterior triangles from TIN who have an edge longer [n]{default=50}  
 -cones [m] [n]                      : define structural elements as cones of radius [m] and height [n]  
--cores [n]                          : process multiple inputs on [n] cores in parallel  
 -cp [fnt]                           : load control points with parse string xyz from file [fnt] and visualize each as red sphere with radius 1 meter  
 -cp_parse [xyz]                     : use parse string [xyz] to parse control point file  
 -every [n]                          : visualize incremental loading of points every [n] points  
@@ -228,14 +227,15 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 -win [m] [n]                        : start with render window size of [m] by [n] pixels  
 
 ### Basics
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number..
+-cores [n] : process multiple inputs on [n] cores in parallel  
+-fail      : fail if license expired or invalid  
+-gui       : start with files loaded into GUI  
+-h         : print help output  
+-help      : print help output  
+-license   : show license information  
+-v         : verbose output (print extra information)  
+-verbose   : verbose output (print extra information)  
+-version   : reports this tool's version number..
 
 ## Module arguments
 

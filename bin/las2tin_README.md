@@ -109,7 +109,6 @@ las2tin64 -i lidar.laz -last_only -histo_only min_edge_length 0.1
 ## las2tin specific arguments
 
 -concavity [n]                      : remove triangles longer than [n]{meter/feet; Default=50}  
--cores [n]                          : process multiple inputs on [n] cores in parallel  
 -creeks [fns]                       : integrate hard breaklines listed in file [fns]{.shp or .txt}  
 -extra_pass                         : do extra read pass to count points (only makes sense when filtering)  
 -histo_area [n]                     : output histogram about area with bin size [n]  
@@ -132,16 +131,17 @@ las2tin64 -i lidar.laz -last_only -histo_only min_edge_length 0.1
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--v       : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
--wait    : wait for <ENTER> in the console at end of process  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-v        : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
+-wait     : wait for <ENTER> in the console at end of process  
 
 ## Module arguments
 

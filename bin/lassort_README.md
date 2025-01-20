@@ -40,9 +40,9 @@ IDs and then by time).
 
 ## Examples
 
-    lassort64 *.las 
+    lassort64 *.laz  
 
-z-orders all LAS files with a default bucket size. 
+z-orders all LAZ files with a default bucket size. 
 
 
     lassort64 flight1*.las flight2*.las -gps_time
@@ -92,7 +92,6 @@ z-orders the points from lidar.las with bucket size 2.
 -average         : lower level as needed to get specified average points per cell  
 -bucket          : bucket size used for spatial sort (and when no subtiling for tiles is desired)  
 -bucket_size     : bucket size used for spatial sort (and when no subtiling for tiles is desired)  
--cores [n]       : process multiple inputs on [n] cores in parallel  
 -destroy_tiling  : for files that are tiles a bucket size destroys the subtiling. remove tiling info.  
 -extra_pass      : do extra read pass to count points (only makes sense when filtering)  
 -gps_time        : sort points based on their GPS time stamps  
@@ -116,17 +115,18 @@ z-orders the points from lidar.las with bucket size 2.
 -userdata        : sort by user data field  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
 
 ## Module arguments
 

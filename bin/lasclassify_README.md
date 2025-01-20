@@ -91,7 +91,6 @@ lasclassify64 -i *.laz -verbose -feet -elevation_feet
 
 ## lasclassify specific arguments
 
--cores [n]                    : process multiple inputs on [n] cores in parallel  
 -elevation_feet               : use feet for elevation  
 -feet                         : use feet  
 -ground_offset [n]            : only points [n] meters above ground are considered (default=2)  
@@ -117,17 +116,18 @@ lasclassify64 -i *.laz -verbose -feet -elevation_feet
 -wide_gutters                 : try harder to complete roof along edges  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--license : show license information  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-license  : show license information  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
 
 ## Module arguments
 

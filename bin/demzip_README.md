@@ -17,7 +17,6 @@ https://groups.google.com/d/topic/lastools/nMPU75zpqPw/discussion
 
 -class [n]          : use point class [n]  
 -classification [n] : set classification to [n]  
--cores [n]          : process multiple inputs on [n] cores in parallel  
 -nodata_max [n]     : raster values [n] or above considered nodata  
 -nodata_min [n]     : raster values [n] or below considered nodata  
 -nodata_value [n]   : raster value [n] considered nodata  
@@ -25,16 +24,17 @@ https://groups.google.com/d/topic/lastools/nMPU75zpqPw/discussion
 -sigmaxy [n]        : horizontal accuracy expected at [n] meters (inactive)  
 
 ### Basics
--cpu64   : start 64 bit executable (instead of default 32 bit executable)  
--fail    : fail if license expired or invalid  
--gui     : start with files loaded into GUI  
--h       : print help output  
--help    : print help output  
--quiet   : nothing reported in console  
--v       : verbose output (print extra information)  
--verbose : verbose output (print extra information)  
--version : reports this tool's version number  
--vv      : very verbose output (print even more information)  
+-cores [n]: process multiple inputs on [n] cores in parallel  
+-cpu64    : start 64 bit executable (instead of default 32 bit executable)  
+-fail     : fail if license expired or invalid  
+-gui      : start with files loaded into GUI  
+-h        : print help output  
+-help     : print help output  
+-quiet    : nothing reported in console  
+-v        : verbose output (print extra information)  
+-verbose  : verbose output (print extra information)  
+-version  : reports this tool's version number  
+-vv       : very verbose output (print even more information)  
 
 
 ## License
