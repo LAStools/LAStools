@@ -155,6 +155,7 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -fill [n]                         : fills voids in the grid with a square search radius of [n]  
 -gray                             : map values to gray values instead of colors  
 -grey                             : map values to gray values instead of colors  
+-grid_center                      : aligns the grid's origin to the center of a cell instead of its corner
 -high                             : use highest value per cell to checking difference  
 -highest                          : use highest value per cell to checking difference  
 -ilay [n]                         : apply [n] or all LASlayers found in corresponding *.lay file on read  

@@ -541,6 +541,7 @@ If a subtoken is not present and a (default) is defined, this will be used.
 -neighbors_lof [n] : set neighbors list of files [fnf]  
 -no_data [n]       : use [n] as the nodata value in the BIL / ASC / TIF format  
 -no_data_alpha     : adds an alpha channel to the GeoTIFF output, designating areas with no data as transparent  
+-no_data_map       : use [n] to specify the key from the color_map and set its value to all rasters with no data
 -no_kml            : avoids auto-creation of KML wrapper  
 -no_world_file     : avoid world-file for PNG, JPG, TIF and BIL output  
 -stored            : use in memory reader  

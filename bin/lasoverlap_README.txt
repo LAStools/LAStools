@@ -165,7 +165,8 @@ overview of all tool-specific switches:
 -max_diff 0.2          : map differences below -0.2 or above +0.2 to saturated blue or red
 -bands 0.1 0.2 0.4     : map absolute differences up to 0.1 to white, 0.2 to blue, 0.4 to green, and above to red 
 -color_bands 0.1 0x00.. : see long explanation above
--gray                  : map values to gray values instead of colors
+-gray                  : map values to gray values instead of Colors
+-grid_center           : aligns the grid's origin to the center of a cell instead of its corner
 -false                 : map values to colors
 -values                : do not map values to gray or to color tones but output actual difference and overlap values
 -elevation             : check difference in elevation values per overlapping flightline per cell
