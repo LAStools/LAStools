@@ -196,7 +196,8 @@ tiles the last returns from huge.laz into compressed tiling.
 -flag_as_synthetic                  : flag buffer points as synthetic  
 -flag_as_withheld                   : flag buffer points as withheld  
 -full_bb                            : prevent the bounding box from being shrunk to the actual extent of the points  
--kdtree                             : use tree structure for fast overlap checks  
+-kdtree                             : use tree structure for fast overlap checks
+-keep_buffer_only_tiles             : keep files, even if only contain buffer points
 -olay                               : write or append classification changes to a LASlayers *.lay file  
 -overview                           : create single overview file for multiple inputs  
 -refine                             : refine a former tiling  

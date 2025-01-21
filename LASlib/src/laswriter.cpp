@@ -1190,10 +1190,9 @@ void LASwriteOpener::add_appendix(const CHAR* appendix)
   }
 }
 
-void LASwriteOpener::cut_characters(U32 cut)
-{
-  if (cut == 0) cut = this->cut;
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+void LASwriteOpener::cut_characters() {
   if (file_name && cut)
   {
     I32 len = (I32)strlen(file_name);
@@ -1218,6 +1217,7 @@ void LASwriteOpener::cut_characters(U32 cut)
     file_name = new_file_name;
   }
 }
+#pragma GCC diagnostic pop
 
 LASwriteOpener::LASwriteOpener()
 {

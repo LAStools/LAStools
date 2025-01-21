@@ -115,7 +115,7 @@ public:
 private:
   void add_directory(const CHAR* directory=0);
   void add_appendix(const CHAR* appendix=0);
-  void cut_characters(U32 cut=0);
+  void cut_characters();
   I32 io_obuffer_size;
   CHAR* directory;
   CHAR* file_name;

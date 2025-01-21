@@ -1180,15 +1180,20 @@ laszip_set_point(
     {
       if (point->extra_bytes)
       {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
         if (laszip_dll->point.num_extra_bytes == point->num_extra_bytes)
         {
           memcpy(laszip_dll->point.extra_bytes, point->extra_bytes, laszip_dll->point.num_extra_bytes);
         }
         else
         {
-          snprintf(laszip_dll->error, sizeof(laszip_dll->error), "target point has %ld extra bytes but source point has %ld", laszip_dll->point.num_extra_bytes, point->num_extra_bytes);
+          snprintf(
+              laszip_dll->error, sizeof(laszip_dll->error), "target point has %ld extra bytes but source point has %ld",
+              laszip_dll->point.num_extra_bytes, point->num_extra_bytes);
           return 1;
         }
+#pragma GCC diagnostic pop
       }
       else if (!laszip_dll->compatibility_mode)
       {
