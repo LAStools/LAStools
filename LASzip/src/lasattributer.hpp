@@ -676,7 +676,7 @@ class LASLIB_DLL LASattributer {
   I32 get_attribute_index(const CHAR* name) const {
     I32 i;
     for (i = 0; i < number_attributes; i++) {
-      if (strcmp(attributes[i].name, name) == 0) {
+      if ((name!=nullptr) && (strcmp(attributes[i].name, name) == 0)) {
         return i;
       }
     }
@@ -686,7 +686,7 @@ class LASLIB_DLL LASattributer {
   I32 get_attribute_start(const CHAR* name) const {
     I32 i;
     for (i = 0; i < number_attributes; i++) {
-      if (strcmp(attributes[i].name, name) == 0) {
+      if ((name!=nullptr) && (strcmp(attributes[i].name, name) == 0)) {
         return attribute_starts[i];
       }
     }
