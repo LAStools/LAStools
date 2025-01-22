@@ -212,11 +212,11 @@ typedef union I64U32I32F32 {
 #define NULL 0
 #endif
 
-#ifdef _MSC_VER
-#define strncpy_las(dest, destsz, src, count) strncpy_s((dest), (destsz), (src), (count))
-#else
-#define strncpy_las(dest, destsz, src, count) strncpy((dest), (src), (count))
-#endif
+//#ifdef _MSC_VER -> has been replaced by the wrapper of the same name
+//#define strncpy_las(dest, destsz, src, count) strncpy_s((dest), (destsz), (src), (count)); 
+//#else
+//#define strncpy_las(dest, destsz, src, count) strncpy((dest), (src), (count)); 
+//#endif
 
 #ifdef _MSC_VER
 #define strcpy_las(dest, destsz, src) strcpy_s((dest), (destsz), (src))
@@ -408,5 +408,7 @@ void* realloc_las(void* ptr, size_t size);
 
 /// Wrapper for `sscanf` on other platforms than _MSC_VER and `sscanf_s` on Windows and ensures that the size is passed correctly for strings.
 int sscanf_las(const char* buffer, const char* format, ...);
+/// Wrapper for `strncpy` on other platforms than _MSC_VER and `strncpy_s` on Windows.
+int strncpy_las(char *dest, size_t destsz, const char *src, size_t count);
 
 #endif

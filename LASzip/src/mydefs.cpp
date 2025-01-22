@@ -358,3 +358,25 @@ int sscanf_las(const char* buffer, const char* format, ...) {
   va_end(args);
   return result;
 }
+
+/// Wrapper for `strncpy` on other platforms than _MSC_VER and `strncpy_s` on Windows
+int strncpy_las(char *dest, size_t destsz, const char *src, size_t count) {
+  if (dest == nullptr || src == nullptr) {
+    return -1;
+  }
+#ifdef _MSC_VER
+  if (strncpy_s(dest, destsz, src, count) != 0) {
+    return -1;
+  }
+#else
+  strncpy(dest, src, count);
+#endif
+  // Nulltermination
+  if (count < destsz) {
+    dest[count] = '\0';
+  } else {
+    dest[destsz - 1] = '\0';
+  }
+  return 0;
+}
+
