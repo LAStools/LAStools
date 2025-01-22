@@ -5,9 +5,9 @@ popular forestry metrics, and grids them onto a raster. A very
 important parameter is '-step n' that specifies the n x n area
 of LiDAR points that are gridded on one raster (or pixel). The
 default of step is 20. The output can be either in BIL, ASC, IMG,
-TIF, XYZ, FLT, or DTM format. New is raster output in CSV format
-where you can request the '-centroids' to be added. In order to
-shift the raster grid that the points are binned into away from
+TIF, XYZ, FLT, DTM or LAS/LAZ format.
+In CSV format you can request the '-centroids' to be added.
+In order to shift the raster grid that the points are binned into away from
 the default alignment of (0/0) to (5/15) use '-grid_ll 5 15'.
 
 If your input files are plots you can use the '-files_are_plots'
@@ -171,7 +171,7 @@ lascanopy64 -i *.laz -p 95 -int_p 95 -cov -fractions -lop list_of_polygons.shp
 lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov -p 50 95
 
 
-## lascanopy specific arguments
+## lascanopy arguments for metrics 
 
 -abv                       : report number of points above the cutoff  
 -all                       : report total number of points  
@@ -179,25 +179,13 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 -b [n]                     : deliver the percentage or fraction of points between the height cutoff (aka breast height) and the maximum height [n]  
 -b_upper [n]               : specifies a certain height [n] percentile to be used instead of the maximum height as "upper" limit for the bins  
 -c [m] [n] [o] ...         : compute those height rasters [m-n,n-o,...]  
--centroids                 : add centroids to CSV output  
--copy_attribute_into_z [n] : copy attribute [n] value into z  
 -cov                       : cover is computed as the number of first returns above the cover cutoff divided by the number of all first returns and output as a percentage  
--cover_cutoff [n]          : set level for -cov or -dns calculation to [n]{default="-height_cutoff"}  
 -d [m] [n] [o] ...         : compute a height raster [m-n,n-o,...] in which the counts are divided by the total number of points and scaled to a percentage  
 -dns                       : compute the canopy density as the number of all points above the cover cutoff divided by the number of all returns  
--elevation_feet            : use feet for elevation  
--feet                      : use feet  
--files_are_plots           : input files are plot names  
--fractions                 : use fraction (0.000..1.000) instead of percentage as output  
 -gap                       : compute the inverse of the canopy cover (100% - canopy)  
 -gps_max                   : compute GPS max value  
 -gps_min                   : compute GPS min value  
--grid_ll [x] [y]           : shift raster grid lower left to [x]/[y]  
--height_cutoff [n]         : set height cutoff to [n] (default=1.37) in meters  
--height_in_attribute [n]   : use height above ground stored in extra attribute [n]{0=first} instead of from user data  
 -hom                       : compute the height & intensity metric known as "Height of Median Energy"  
--ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
--ilaydir [n]               : look for corresponding *.lay file in directory [n]  
 -int_avg                   : compute intensity average  
 -int_c [m] [n] [o] ...     : produce intensity bands with gap values [m] [n] [o] ...  
 -int_d [m] [n] [o] ...     : produce intensity bands with absolute values [m] [n] [o] ...  
@@ -209,31 +197,46 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 -int_ske                   : compute intensity skewness  
 -int_std                   : compute intensity standard deviation  
 -kur                       : compute kurtosis / bulge  
+-max                       : for each grid cell keep highest value  
+-min                       : for each grid cell keep lowest value  
+-p [m] [n] [o] ...         : compute height percentiles [m] [n] [o] ...  
+-qav                       : computer the average square height above the height cutoff  
+-ske                       : compute height skewness  
+-std                       : for each grid cell compute standard deviation  
+-vc [m] [n] [o] ...        : compute the Vertical Complexity Index (VCI) with bin sizes width of [m] [n] [o] ...  
+
+## lascanopy other specific arguments
+
+-centroids                 : add centroids to CSV output  
+-copy_attribute_into_z [n] : copy attribute [n] value into z  
+-cover_cutoff [n]          : set level for -cov or -dns calculation to [n]{default="-height_cutoff"}  
+-elevation_feet            : use feet for elevation  
+-feet                      : use feet  
+-files_are_plots           : input files are plot names  
+-fractions                 : use fraction (0.000..1.000) instead of percentage as output  
+-grid_ll [x] [y]           : shift raster grid lower left to [x]/[y]  
+-height_cutoff [n]         : set height cutoff to [n] (default=1.37) in meters  
+-height_in_attribute [n]   : use height above ground stored in extra attribute [n]{0=first} instead of from user data  
+-ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
+-ilaydir [n]               : look for corresponding *.lay file in directory [n]  
 -ll [x] [y]                : start rastering at these lower left [x] and [y] coordinates  
 -loc [fnt]                 : use file [fnt] as list of circular plots "name center_x center_y radius"  
 -loc_radius [n]            : set radius to [n]  
 -lop [m] [n]               : use input out of a list of points [m] using plot_ID [n]  
 -lor [fnt]                 : use file [fnt] as list of rectangular plots as "name min_x min_y max_x max_y"  
--max                       : for each grid cell keep highest value  
 -mem [n]                   : use [n] MB of main memory (500-2000; default=1500)  
--min                       : for each grid cell keep lowest value  
 -names                     : use names of plots in output  
 -ncols [n]                 : raster at most [n] columns  
 -nodata [n]                : use [n] as the nodata value in the BIL/ASC format  
 -nrows [n]                 : raster at most [n] rows  
--p [m] [n] [o] ...         : compute height percentiles [m] [n] [o] ...  
--qav                       : computer the average square height above the height cutoff  
 -remove_empty_raster       : remove empty rasters  
 -remove_empty_rasters      : remove raster files containing only 'nodata' values  
 -s_upper [n]               : limit the computation of the statistics [-qav,-avg,-ske,-kur,-std] to use only the highest [n] percent of the points above the height cutoff  
--ske                       : compute height skewness  
--std                       : for each grid cell compute standard deviation  
 -stdout                    : pipe to stdout  
 -step [n]                  : raster with stepsize [n] (default=20)  
 -use_bb                    : raster area specified by bounding box in LAS header  
 -use_orig_bb               : raster tile without buffer added by on-the-fly buffering  
 -use_tile_bb               : raster tile without buffer added by lastile  
--vc [m] [n] [o] ...        : compute the Vertical Complexity Index (VCI) with bin sizes width of [m] [n] [o] ...  
 -week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
 ### Basics
