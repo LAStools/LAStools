@@ -9960,14 +9960,16 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
     laserror("Memory allocation failed for WKT content");
   }
   size_t readSize = fread(jsonContent, 1, fileSize, Proj_file);
-  jsonContent[readSize] = '\0';
-  fclose(Proj_file);
   
   if (readSize > fileSize) {
     delete[] jsonContent;
+    fclose(Proj_file);
     proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading the PROJJSON file '%s'", json_filename);
   }
+  jsonContent[readSize] = '\0';
+  fclose(Proj_file);
+
   PJ* proj_crs = proj_create(projParameters.proj_ctx, jsonContent);
 
   delete[] jsonContent;
@@ -10032,14 +10034,16 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
     laserror("Memory allocation failed for WKT content");
   }
   size_t readSize = fread(wktContent, 1, fileSize, Proj_file);
-  wktContent[readSize] = '\0';
-  fclose(Proj_file);
 
   if (readSize > fileSize) {
     delete[] wktContent;
+    fclose(Proj_file);
     proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading the WKT file '%s'", wkt_filename);
   }
+  wktContent[readSize] = '\0';
+  fclose(Proj_file);
+
   PJ* proj_crs = proj_create(projParameters.proj_ctx, wktContent);
 
   // Check whether the CRS is valid

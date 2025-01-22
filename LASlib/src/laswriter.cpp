@@ -1190,8 +1190,10 @@ void LASwriteOpener::add_appendix(const CHAR* appendix)
   }
 }
 
+#ifdef __GNUC__ 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
 void LASwriteOpener::cut_characters() {
   if (file_name && cut)
   {
@@ -1217,7 +1219,9 @@ void LASwriteOpener::cut_characters() {
     file_name = new_file_name;
   }
 }
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 
 LASwriteOpener::LASwriteOpener()
 {
