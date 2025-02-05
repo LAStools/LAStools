@@ -70,7 +70,7 @@
 #   define LASZIP_API
 #endif
 
-#include <laszip_common.h>
+#include <laszip/laszip_common.h>
 
 #ifdef __cplusplus
 extern "C"
