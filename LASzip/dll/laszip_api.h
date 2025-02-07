@@ -54,6 +54,9 @@
 
 #ifdef LASZIP_API_VERSION
 #include <laszip/laszip_api_version.h>
+#include <laszip/laszip_common.h>
+#else
+#include <laszip_common.h>
 #endif
 
 #ifdef _WIN32
@@ -69,8 +72,6 @@
 #else
 #   define LASZIP_API
 #endif
-
-#include <laszip/laszip_common.h>
 
 #ifdef __cplusplus
 extern "C"
