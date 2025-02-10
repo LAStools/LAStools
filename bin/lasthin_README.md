@@ -160,30 +160,30 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 
 ## lasthin specific arguments
 
--adaptive [m] [n]             : thins, flags, or classifies points forming TIN within vertical [m] and (optional) horizontal [n] tolerance  
--central                      : thins, flags or classifies the point closest to the x/y center of each cell  
--classify_as [n]              : keep all points in file (do not thin) but classify surviving points as [n] instead  
--contours [n]                 : thins, flags, or classifies points per cell that are as far as possible from contour intervals of [n]  
--flag_as_keypoint             : keep all points in file (do not thin) but flag surviving points as keypoint instead  
--flag_as_withheld             : keep all points in file (do not thin) but flag surviving points as withheld instead  
--gps_time                     : thin on GPS time instead (still in beta)  
--highest                      : thins, flags, or classifies the highest point per cell  
--ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ...  
--ilay [n]                     : apply [n] or all LASlayers found in corresponding *.lay file on read  
--ilaydir [n]                  : look for corresponding *.lay file in directory [n]  
--keypoint                     : keep points in file (do not thin) but flag surviving points as keypoint instead  
--lowest                       : thins, flags, or classifies the lowest point per cell  
--margin                       : enforce minimal margins  
--olay                         : write or append classification changes to a LASlayers *.lay file  
--olaydir [dir]                : write the output *.lay file in directory [dir]  
--percentile [m] [n]           : thins, flags, or classifies points closest to [m]th percentile in z (optional: if a cell has [n] or more points)  
--random                       : thins, flags, or classifies some random point per cell  
--remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
--seed [n]                     : seeds the random generator with [n]  
--sparse                       : always use hash to map points to cells internally  
--step [n]                     : set grid cell size to [n] for thinning/classifying/flagging (default=2)  
--subcircle [n]                : adds a circle of 8 points at radius [n] around the input point  
--withheld                     : keep all points in file (do not thin) but flag surviving points as withheld instead  
+-adaptive [m] [n]       : thins, flags, or classifies points forming TIN within vertical [m] and (optional) horizontal [n] tolerance  
+-central                : thins, flags or classifies the point closest to the x/y center of each cell  
+-classify_as [n]        : keep all points in file (do not thin) but classify surviving points as [n] instead  
+-contours [n]           : thins, flags, or classifies points per cell that are as far as possible from contour intervals of [n]  
+-flag_as_keypoint       : keep all points in file (do not thin) but flag surviving points as keypoint instead  
+-flag_as_withheld       : keep all points in file (do not thin) but flag surviving points as withheld instead  
+-gps_time               : thin on GPS time instead (still in beta)  
+-highest                : thins, flags, or classifies the highest point per cell  
+-ignore_class [m] [n]...: ignores points with classification codes [m] [n] ...  
+-ilay [n]               : apply [n] or all LASlayers found in corresponding *.lay file on read  
+-ilaydir [n]            : look for corresponding *.lay file in directory [n]  
+-keypoint               : keep points in file (do not thin) but flag surviving points as keypoint instead  
+-lowest                 : thins, flags, or classifies the lowest point per cell  
+-margin                 : enforce minimal margins  
+-olay                   : write or append classification changes to a LASlayers *.lay file  
+-olaydir [dir]          : write the output *.lay file in directory [dir]  
+-percentile [m] [n]     : thins, flags, or classifies points closest to [m]th percentile in z (optional: if a cell has [n] or more points)  
+-random                 : thins, flags, or classifies some random point per cell  
+-remain_buffered        : write all data to the output, even if they are part of a boundary buffer  
+-seed [n]               : seeds the random generator with [n]  
+-sparse                 : always use hash to map points to cells internally  
+-step [n]               : set grid cell size to [n] for thinning/classifying/flagging (default=2)  
+-subcircle [n]          : adds a circle of 8 points at radius [n] around the input point  
+-withheld               : keep all points in file (do not thin) but flag surviving points as withheld instead  
 
 ### Basics
 -cores [n]    : process multiple inputs on [n] cores in parallel  
