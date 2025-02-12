@@ -131,7 +131,7 @@ static std::vector<int> parseVersion(const char* versionStr) {
   return versionNumbers;
 }
 
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
 static char* findUnixLibProjPath() {
   // Check system-wide directories
   const std::string systemLibPaths[] = {
