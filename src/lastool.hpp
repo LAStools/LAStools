@@ -221,6 +221,7 @@ class LasTool
         }
         return true;
     }
+    virtual void after_parse() {}
     template <typename parseitm>
     void parse(parseitm x)
     {
@@ -249,6 +250,8 @@ class LasTool
             }
             i++;
         }
+        //
+        after_parse();
         force_check();
     }
     void laserrorinfo(std::string pre) const
