@@ -1,3 +1,4 @@
+19 February 2025 -- NEW: "-fail" for licensed tools will be default. use "-demo" to run in demo mode
 21 January 2025 -- NEW: lastile: option to keep files containing only buffer points (-keep_buffer_only_tiles)
 17 January 2025 -- NEW: lasgrid 'no_data_map' argument to set all no_data values to a color_map entry
 17 January 2025 -- NEW: lasoverlap 'grid_center' option
