@@ -2331,6 +2331,12 @@ bool get_parameter_from_ogc_wkt(const char* ogc_wkt, const char* name, double* v
   return false;
 }
 
+/// <summary>
+/// try to set projection vars from a ogc_wkt char.
+/// </summary>
+/// <param name="ogc_wkt">input wkt</param>
+/// <param name="description"></param>
+/// <returns>true if valid wkt found</returns>
 bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, char* description)
 {
 /*
@@ -2347,15 +2353,13 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
   int ellipsoid = -1;
   int datum = -1;
 */
-
+  bool isWkt1 = false;
   // this very first version only checks for the EPSG code of projection
-
-  // check if we have vertical datum (e.g. string contains a VERT_CS)
-
+  // check if we have vertical datum (e.g. string contains a VERT_CS) - WKT1
   const char* vertcs = strstr(ogc_wkt, "VERT_CS[");
-
   if (vertcs)
   {
+    isWkt1 = true;
     vertical_geokey = 0;
     int len = (int)strlen(ogc_wkt);
     // see if we can find an AUTHORITY containing the EPSG code
@@ -2436,13 +2440,11 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
       curr++;
     }
   }
-
   // check if we have a projection (e.g. string contains a PROJCS)
-
   const char* projcs = strstr(ogc_wkt, "PROJCS[");
-
   if (projcs)
   {
+    isWkt1 = true;
     int len = (int)strlen(ogc_wkt);
     // if we can find an AUTHORITY containing the EPSG code we are done
     int open_bracket = 1;
@@ -2489,11 +2491,8 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
       }
       curr++;
     }
-
     // otherwise try to find the PROJECTION and all its parameters
-
     const char* proj = strstr(projcs, "PROJECTION[");
-
     if (proj)
     {
       int open_bracket = 1;
@@ -2581,8 +2580,227 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
   }
   else
   {
-      // check if the string contains a GEOCCS
+    // check if the string contains a GEOCCS
     const char* geoccs = strstr(ogc_wkt, "GEOCCS[");
+    if (geoccs) {
+      isWkt1 = true;
+    }
+  }
+
+  // try wkt2
+  if (!isWkt1) {
+    vertcs = strstr(ogc_wkt, "VERTCRS[");
+    if (vertcs) {
+      vertical_geokey = 0;
+      int len = (int)strlen(ogc_wkt);
+      // see if we can find an AUTHORITY containing the EPSG code
+      int open_bracket = 1;
+      int curr = (int)((vertcs - ogc_wkt) + 8);
+      while ((curr < len) && open_bracket) {
+        if (ogc_wkt[curr] == '[') {
+          open_bracket++;
+        } else if (ogc_wkt[curr] == ']') {
+          open_bracket--;
+        } else if (open_bracket == 2) {
+          if (ogc_wkt[curr] == 'A') {
+            if (strncmp(&ogc_wkt[curr], "AUTHORITY", 9) == 0) {
+              curr += 9;
+              const char* epsg = strstr(&ogc_wkt[curr], "\"EPSG\"");
+              if (epsg) {
+                curr = (int)((epsg - ogc_wkt) + 6);
+                while ((curr < len) && ogc_wkt[curr] != ',') {
+                  curr++;
+                }
+                curr++;
+                while ((curr < len) && ogc_wkt[curr] != '\"') {
+                  curr++;
+                }
+                curr++;
+                int code = -1;
+                if (sscanf_las(&ogc_wkt[curr], "%d", &code) == 1) {
+                  vertical_geokey = code;
+                  open_bracket++;  // because the one from "AUTHORITY[" was not counted
+                }
+              }
+            }
+          }
+        } else if (open_bracket == 1) {
+          if (ogc_wkt[curr] == 'U') {
+            if (strncmp(&ogc_wkt[curr], "UNIT[", 5) == 0) {
+              curr += 5;
+              while ((curr < len) && ogc_wkt[curr] != ',')  // skip description
+              {
+                curr++;
+              }
+              curr++;
+              double unit;
+              if (sscanf_las(&ogc_wkt[curr], "%lf", &unit) == 1) {
+                if (unit == 1.0) {
+                  set_elevation_in_meter();
+                } else if (fabs(unit - 0.3048006096012192) < 0.000000001) {
+                  set_elevation_in_survey_feet();
+                } else {
+                  set_elevation_in_feet();
+                }
+              }
+            }
+          }
+        }
+        curr++;
+      }
+    }
+    // check if we have a projection (e.g. string contains a PROJCS)
+    const char* projcs = strstr(ogc_wkt, "PROJCS[");
+    if (projcs) {
+      isWkt1 = true;
+      int len = (int)strlen(ogc_wkt);
+      // if we can find an AUTHORITY containing the EPSG code we are done
+      int open_bracket = 1;
+      int curr = (int)((projcs - ogc_wkt) + 7);
+      while ((curr < len) && open_bracket) {
+        if (ogc_wkt[curr] == '[') {
+          open_bracket++;
+        } else if (ogc_wkt[curr] == ']') {
+          open_bracket--;
+        } else if (open_bracket == 1) {
+          if (ogc_wkt[curr] == 'A') {
+            if (strncmp(&ogc_wkt[curr], "AUTHORITY", 9) == 0) {
+              curr += 9;
+              const char* epsg = strstr(&ogc_wkt[curr], "\"EPSG\"");
+              if (epsg) {
+                curr = (int)((epsg - ogc_wkt) + 6);
+                while ((curr < len) && ogc_wkt[curr] != ',') {
+                  curr++;
+                }
+                curr++;
+                while ((curr < len) && ogc_wkt[curr] != '\"') {
+                  curr++;
+                }
+                curr++;
+                int code = -1;
+                if (sscanf_las(&ogc_wkt[curr], "%d", &code) == 1) {
+                  return set_epsg_code(code, description);
+                }
+              }
+            }
+          }
+        }
+        curr++;
+      }
+      // otherwise try to find the PROJECTION and all its parameters
+      const char* proj = strstr(projcs, "PROJECTION[");
+      if (proj) {
+        int open_bracket = 1;
+        int curr = (int)((proj - ogc_wkt) + 11);
+
+        while (curr < len) {
+          if (ogc_wkt[curr] == '[') {
+            open_bracket++;
+          } else if (ogc_wkt[curr] == ']') {
+            open_bracket--;
+          } else if (open_bracket == 1) {
+            if (ogc_wkt[curr] == '\"') {
+              curr++;
+              if (strncmp(&ogc_wkt[curr], "Lambert_Conformal_Conic", 23) == 0) {
+                double false_easting;
+                double false_northing;
+                double unit = 1.0;
+                double latitude_of_origin;
+                double central_meridian;
+                double standard_parallel_1;
+                double standard_parallel_2;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_easting", &false_easting) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Easting", &false_easting))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_northing", &false_northing) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Northing", &false_northing))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "latitude_of_origin", &latitude_of_origin) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Latitude_Of_Origin", &latitude_of_origin))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "central_meridian", &central_meridian) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Central_Meridian", &central_meridian))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_1", &standard_parallel_1) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_1", &standard_parallel_1))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_2", &standard_parallel_2) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_2", &standard_parallel_2))
+                  return false;
+                get_unit_from_ogc_wkt(&ogc_wkt[curr], &unit);
+                set_lambert_conformal_conic_projection(
+                    unit * false_easting, unit * false_northing, latitude_of_origin, central_meridian, standard_parallel_1, standard_parallel_2);
+                return true;
+              } else if (strncmp(&ogc_wkt[curr], "Transverse_Mercator", 19) == 0) {
+                double false_easting;
+                double false_northing;
+                double unit = 1.0;
+                double latitude_of_origin;
+                double central_meridian;
+                double scale_factor;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_easting", &false_easting) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Easting", &false_easting))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_northing", &false_northing) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Northing", &false_northing))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "latitude_of_origin", &latitude_of_origin) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Latitude_Of_Origin", &latitude_of_origin))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "central_meridian", &central_meridian) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Central_Meridian", &central_meridian))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "scale_factor", &scale_factor) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Scale_Factor", &scale_factor))
+                  return false;
+                get_unit_from_ogc_wkt(&ogc_wkt[curr], &unit);
+                set_transverse_mercator_projection(unit * false_easting, unit * false_northing, latitude_of_origin, central_meridian, scale_factor);
+                return true;
+              } else if (strncmp(&ogc_wkt[curr], "Albers_Conic_Equal_Area", 23) == 0) {
+                double false_easting;
+                double false_northing;
+                double unit = 1.0;
+                double latitude_of_center;
+                double longitude_of_center;
+                double standard_parallel_1;
+                double standard_parallel_2;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_easting", &false_easting) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Easting", &false_easting))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_northing", &false_northing) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Northing", &false_northing))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "latitude_of_center", &latitude_of_center) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Latitude_Of_Center", &latitude_of_center))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "longitude_of_center", &longitude_of_center) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Longitude_Of_Center", &longitude_of_center))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_1", &standard_parallel_1) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_1", &standard_parallel_1))
+                  return false;
+                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_2", &standard_parallel_2) &&
+                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_2", &standard_parallel_2))
+                  return false;
+                get_unit_from_ogc_wkt(&ogc_wkt[curr], &unit);
+                set_albers_equal_area_conic_projection(
+                    unit * false_easting, unit * false_northing, latitude_of_center, longitude_of_center, standard_parallel_1, standard_parallel_2);
+                return true;
+              } else {
+                return false;
+              }
+            }
+          }
+          curr++;
+        }
+      }
+    } else {
+      // check if the string contains a GEOCCS
+      const char* geoccs = strstr(ogc_wkt, "GEOCCS[");
+      if (geoccs) {
+        isWkt1 = true;
+      }
+    }
   }
 
   return false;
