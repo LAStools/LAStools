@@ -36,7 +36,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -46,6 +46,7 @@
 #include "lasmessage.hpp"
 #include "lasutility.hpp"
 #include "proj_loader.h"
+#include "wktparser.h"
 
 #if defined(_MSC_VER) && \
     (_MSC_FULL_VER >= 150000000)
@@ -1432,13 +1433,13 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(int num_geo_keys, cons
     case 2052: // GeogLinearUnitsGeoKey
       switch (geo_keys[i].value_offset)
       {
-      case 9001: // Linear_Meter
+      case EPSG_METER: // Linear_Meter
         set_coordinates_in_meter();
         break;
-      case 9002: // Linear_Foot
+      case EPSG_FEET: // Linear_Foot
         set_coordinates_in_feet();
         break;
-      case 9003: // Linear_Foot_US_Survey
+      case EPSG_SURFEET: // Linear_Foot_US_Survey
         set_coordinates_in_survey_feet();
         break;
       default:
@@ -2267,542 +2268,89 @@ FILE* GeoProjectionConverter::open_geo_file(bool pcs, bool vertical)
   return file;
 }
 
-bool get_unit_from_ogc_wkt(const char* ogc_wkt, double* value)
-{
-  const char* unit = strstr(ogc_wkt, "UNIT[");
-  if (unit)
-  {
-    int len = (int)strlen(ogc_wkt);
-    int curr = (int)((unit - ogc_wkt) + 5);
-    while (curr < len)
-    {
-      if (ogc_wkt[curr] == '[')
-      {
-        return false;
-      }
-      else if (ogc_wkt[curr] == ']')
-      {
-        return false;
-      }
-      else if (ogc_wkt[curr] == ',')
-      {
-        curr++;
-        if (sscanf_las(&ogc_wkt[curr], "%lf", value) == 1)
-        {
-//          LASMessage(LAS_INFO, "unit %f", *value);
-          return true;
-        }
-      }
-      curr++;
-    }
-  }
-  return false;
-}
-
-bool get_parameter_from_ogc_wkt(const char* ogc_wkt, const char* name, double* value)
-{
-  const char* para = strstr(ogc_wkt, name);
-  if (para)
-  {
-    int len = (int)strlen(ogc_wkt);
-    int curr = (int)((para - ogc_wkt) + strlen(name));
-    while (curr < len)
-    {
-      if (ogc_wkt[curr] == '[')
-      {
-        return false;
-      }
-      else if (ogc_wkt[curr] == ']')
-      {
-        return false;
-      }
-      else if (ogc_wkt[curr] == ',')
-      {
-        curr++;
-        if (sscanf_las(&ogc_wkt[curr], "%lf", value) == 1)
-        {
-//          LASMessage(LAS_INFO, "%s %f", name, *value);
-          return true;
-        }
-      }
-      curr++;
-    }
-  }
-  return false;
-}
-
 /// <summary>
 /// try to set projection vars from a ogc_wkt char.
 /// </summary>
-/// <param name="ogc_wkt">input wkt</param>
-/// <param name="description"></param>
-/// <returns>true if valid wkt found</returns>
+/// <param name="ogc_wkt">input wkt string</param>
+/// <param name="description">description of projection</param>
+/// <returns>true if valid wkt found and assigned</returns>
 bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, char* description)
 {
-/*
-  bool user_defined_ellipsoid = false;
-  int user_defined_projection = 0;
-  int offsetProjStdParallel1GeoKey = -1;
-  int offsetProjStdParallel2GeoKey = -1;
-  int offsetProjNatOriginLatGeoKey = -1;
-  int offsetProjFalseEastingGeoKey = -1;
-  int offsetProjFalseNorthingGeoKey = -1;
-  int offsetProjCenterLongGeoKey = -1;
-  int offsetProjScaleAtNatOriginGeoKey = -1;
-  bool has_projection = false;
-  int ellipsoid = -1;
-  int datum = -1;
-*/
-  bool isWkt1 = false;
-  // this very first version only checks for the EPSG code of projection
-  // check if we have vertical datum (e.g. string contains a VERT_CS) - WKT1
-  const char* vertcs = strstr(ogc_wkt, "VERT_CS[");
-  if (vertcs)
-  {
-    isWkt1 = true;
-    vertical_geokey = 0;
-    int len = (int)strlen(ogc_wkt);
-    // see if we can find an AUTHORITY containing the EPSG code
-    int open_bracket = 1;
-    int curr = (int)((vertcs - ogc_wkt) + 8);
-    while ((curr < len) && open_bracket)
-    {
-      if (ogc_wkt[curr] == '[')
-      {
-        open_bracket++;
-      }
-      else if (ogc_wkt[curr] == ']')
-      {
-        open_bracket--;
-      }
-      else if (open_bracket == 2)
-      {
-        if (ogc_wkt[curr] == 'A')
-        {
-          if (strncmp(&ogc_wkt[curr], "AUTHORITY", 9) == 0)
-          {
-            curr += 9;
-            const char* epsg = strstr(&ogc_wkt[curr], "\"EPSG\"");
-            if (epsg)
-            {
-              curr = (int)((epsg - ogc_wkt) + 6);
-              while ((curr < len) && ogc_wkt[curr] != ',')
-              {
-                curr++;
-              }
-              curr++;
-              while ((curr < len) && ogc_wkt[curr] != '\"')
-              {
-                curr++;
-              }
-              curr++;
-              int code = -1;
-              if (sscanf_las(&ogc_wkt[curr], "%d", &code) == 1)
-              {
-                vertical_geokey = code;
-                open_bracket++; // because the one from "AUTHORITY[" was not counted
-              }
-            }
-          }
-        }
-      }
-      else if (open_bracket == 1)
-      {
-        if (ogc_wkt[curr] == 'U')
-        {
-          if (strncmp(&ogc_wkt[curr], "UNIT[", 5) == 0)
-          {
-            curr += 5;
-            while ((curr < len) && ogc_wkt[curr] != ',') // skip description
-            {
-              curr++;
-            }
-            curr++;
-            double unit;
-            if (sscanf_las(&ogc_wkt[curr], "%lf", &unit) == 1)
-            {
-              if (unit == 1.0)
-              {
-                set_elevation_in_meter();
-              }
-              else if (fabs(unit-0.3048006096012192) < 0.000000001)
-              {
-                set_elevation_in_survey_feet();
-              }
-              else
-              {
-                set_elevation_in_feet();
-              }
-            }
-          }
-        }
-      }
-      curr++;
-    }
+  WktParserSem wkt = WktParserSem(ogc_wkt);
+  LASMessage(LAS_VERBOSE, "reading wkt%c %s", wkt.isWkt1 ? '1' : '2', wkt.isCompound ? "[compound]" : "" );
+  vertical_geokey = wkt.Vert_Epsg();
+  set_VerticalUnitsGeoKey(wkt.Vert_Unit_Epsg());
+  // check if we have a projection
+  if (set_epsg_code(wkt.Pcs_Epsg(), description)) {
+    LASMessage(LAS_VERBOSE, "source projection [%s] set", source_projection->info().c_str());
+    return true;
   }
-  // check if we have a projection (e.g. string contains a PROJCS)
-  const char* projcs = strstr(ogc_wkt, "PROJCS[");
-  if (projcs)
-  {
-    isWkt1 = true;
-    int len = (int)strlen(ogc_wkt);
-    // if we can find an AUTHORITY containing the EPSG code we are done
-    int open_bracket = 1;
-    int curr = (int)((projcs - ogc_wkt) + 7);
-    while ((curr < len) && open_bracket)
-    {
-      if (ogc_wkt[curr] == '[')
-      {
-        open_bracket++;
+  // otherwise try to find the PROJECTION and all its parameters
+  PROJECTION_METHOD projection;
+  if (wkt.HasProjection(projection)){
+    double unit = 1.0;
+    double false_easting = -1;
+    double false_northing = -1;
+    double latitude_of_origin = 0;
+    double latitude_of_center = 0;
+    double longitude_of_center = 0;
+    double central_meridian = 0;
+    double standard_parallel_1 = 0;
+    double standard_parallel_2 = 0;
+    double scale_factor = 1;
+    /* optional: universal check for valid vars for all projections
+    *  not activated now: set_ function have to check for valid arguments
+    auto check = [&]() {
+      if (unit == 0 || false_easting == -1 || false_northing == -1) {
+        LASMessage(
+            LAS_ERROR, "invalid projection info in wkt: %f %f %f %f %f %f %f", unit, false_easting, false_northing, latitude_of_origin, central_meridian,
+            standard_parallel_1, standard_parallel_2);
+        return false;
       }
-      else if (ogc_wkt[curr] == ']')
-      {
-        open_bracket--;
-      }
-      else if (open_bracket == 1)
-      {
-        if (ogc_wkt[curr] == 'A')
-        {
-          if (strncmp(&ogc_wkt[curr], "AUTHORITY", 9) == 0)
-          {
-            curr += 9;
-            const char* epsg = strstr(&ogc_wkt[curr], "\"EPSG\"");
-            if (epsg)
-            {
-              curr = (int)((epsg - ogc_wkt) + 6);
-              while ((curr < len) && ogc_wkt[curr] != ',')
-              {
-                curr++;
-              }
-              curr++;
-              while ((curr < len) && ogc_wkt[curr] != '\"')
-              {
-                curr++;
-              }
-              curr++;
-              int code = -1;
-              if (sscanf_las(&ogc_wkt[curr], "%d", &code) == 1)
-              {
-                return set_epsg_code(code, description);
-              }
-            }
-          }
-        }
-      }
-      curr++;
+    };
+    */
+    switch (projection) {
+      case pro_Albers:                  // Albers_Conic_Equal_Area
+        false_easting = wkt.ProjectionFalseEasting();
+        false_northing = wkt.ProjectionFalseNorthing();
+        latitude_of_center = wkt.ProjectionLatitudeOfCenter();
+        longitude_of_center = wkt.ProjectionLongitudeOfCenter();
+        standard_parallel_1 = wkt.ProjectionCentralStandardParallel1();
+        standard_parallel_2 = wkt.ProjectionCentralStandardParallel2();
+        unit = wkt.Pcs_Unit();
+        set_albers_equal_area_conic_projection(
+            unit * false_easting, unit * false_northing, latitude_of_center, longitude_of_center, standard_parallel_1, standard_parallel_2);
+        LASMessage(LAS_VERBOSE, "source albers projection [%s] set", source_projection->info().c_str());
+        return true;
+        break;
+      case pro_LambertConicConformal2:  // Lambert_Conformal_Conic
+        false_easting = wkt.ProjectionFalseEasting();
+        false_northing = wkt.ProjectionFalseNorthing();
+        latitude_of_origin = wkt.ProjectionLatitudeOfOrigin();
+        central_meridian = wkt.ProjectionCentralMeridian();
+        standard_parallel_1 = wkt.ProjectionCentralStandardParallel1();
+        standard_parallel_2 = wkt.ProjectionCentralStandardParallel2();
+        unit = wkt.Pcs_Unit();
+        set_lambert_conformal_conic_projection(
+              unit * false_easting, unit * false_northing, latitude_of_origin, central_meridian, standard_parallel_1, standard_parallel_2);
+        LASMessage(LAS_VERBOSE, "source lambert projection [%s] set", source_projection->info().c_str());
+        return true;
+        break;
+      case pro_TransverseMercator:  // Transverse_Mercator
+        false_easting = wkt.ProjectionFalseEasting();
+        false_northing = wkt.ProjectionFalseNorthing();
+        latitude_of_origin = wkt.ProjectionLatitudeOfOrigin();
+        central_meridian = wkt.ProjectionCentralMeridian();
+        scale_factor= wkt.ProjectionScaleFactor();
+        unit = wkt.Pcs_Unit();
+        set_transverse_mercator_projection(unit * false_easting, unit * false_northing, latitude_of_origin, central_meridian, scale_factor);
+        LASMessage(LAS_VERBOSE, "source transverse projection [%s] set", source_projection->info().c_str());
+        return true;
+        break;
     }
-    // otherwise try to find the PROJECTION and all its parameters
-    const char* proj = strstr(projcs, "PROJECTION[");
-    if (proj)
-    {
-      int open_bracket = 1;
-      int curr = (int)((proj - ogc_wkt) + 11);
-
-      while (curr < len)
-      {
-        if (ogc_wkt[curr] == '[')
-        {
-          open_bracket++;
-        }
-        else if (ogc_wkt[curr] == ']')
-        {
-          open_bracket--;
-        }
-        else if (open_bracket == 1)
-        {
-          if (ogc_wkt[curr] == '\"')
-          {
-            curr++;
-            if (strncmp(&ogc_wkt[curr], "Lambert_Conformal_Conic", 23) == 0)
-            {
-              double false_easting;
-              double false_northing;
-              double unit = 1.0;
-              double latitude_of_origin;
-              double central_meridian;
-              double standard_parallel_1;
-              double standard_parallel_2;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_easting", &false_easting) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Easting", &false_easting)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_northing", &false_northing) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Northing", &false_northing)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "latitude_of_origin", &latitude_of_origin) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Latitude_Of_Origin", &latitude_of_origin)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "central_meridian", &central_meridian) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Central_Meridian", &central_meridian)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_1", &standard_parallel_1) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_1", &standard_parallel_1)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_2", &standard_parallel_2) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_2", &standard_parallel_2)) return false;
-              get_unit_from_ogc_wkt(&ogc_wkt[curr], &unit);
-              set_lambert_conformal_conic_projection(unit*false_easting, unit*false_northing, latitude_of_origin, central_meridian, standard_parallel_1, standard_parallel_2);
-              return true;
-            }
-            else if (strncmp(&ogc_wkt[curr], "Transverse_Mercator", 19) == 0)
-            {
-              double false_easting;
-              double false_northing;
-              double unit = 1.0;
-              double latitude_of_origin;
-              double central_meridian;
-              double scale_factor;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_easting", &false_easting) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Easting", &false_easting)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_northing", &false_northing) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Northing", &false_northing)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "latitude_of_origin", &latitude_of_origin) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Latitude_Of_Origin", &latitude_of_origin)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "central_meridian", &central_meridian) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Central_Meridian", &central_meridian)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "scale_factor", &scale_factor) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Scale_Factor", &scale_factor)) return false;
-              get_unit_from_ogc_wkt(&ogc_wkt[curr], &unit);
-              set_transverse_mercator_projection(unit*false_easting, unit*false_northing, latitude_of_origin, central_meridian, scale_factor);
-              return true;
-            }
-            else if (strncmp(&ogc_wkt[curr], "Albers_Conic_Equal_Area", 23) == 0)
-            {
-              double false_easting;
-              double false_northing;
-              double unit = 1.0;
-              double latitude_of_center;
-              double longitude_of_center;
-              double standard_parallel_1;
-              double standard_parallel_2;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_easting", &false_easting) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Easting", &false_easting)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_northing", &false_northing) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Northing", &false_northing)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "latitude_of_center", &latitude_of_center) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Latitude_Of_Center", &latitude_of_center)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "longitude_of_center", &longitude_of_center) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Longitude_Of_Center", &longitude_of_center)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_1", &standard_parallel_1) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_1", &standard_parallel_1)) return false;
-              if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_2", &standard_parallel_2) && !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_2", &standard_parallel_2)) return false;
-              get_unit_from_ogc_wkt(&ogc_wkt[curr], &unit);
-              set_albers_equal_area_conic_projection(unit*false_easting, unit*false_northing, latitude_of_center, longitude_of_center, standard_parallel_1, standard_parallel_2);
-              return true;
-            }
-            else
-            {
-              return false;
-            }
-          }
-        }
-        curr++;
-      }
-    }
+  } else {
+    // no projection found - optional: check if the string contains a wkt1-GEOCCS
   }
-  else
-  {
-    // check if the string contains a GEOCCS
-    const char* geoccs = strstr(ogc_wkt, "GEOCCS[");
-    if (geoccs) {
-      isWkt1 = true;
-    }
-  }
-
-  // try wkt2
-  if (!isWkt1) {
-    vertcs = strstr(ogc_wkt, "VERTCRS[");
-    if (vertcs) {
-      vertical_geokey = 0;
-      int len = (int)strlen(ogc_wkt);
-      // see if we can find an AUTHORITY containing the EPSG code
-      int open_bracket = 1;
-      int curr = (int)((vertcs - ogc_wkt) + 8);
-      while ((curr < len) && open_bracket) {
-        if (ogc_wkt[curr] == '[') {
-          open_bracket++;
-        } else if (ogc_wkt[curr] == ']') {
-          open_bracket--;
-        } else if (open_bracket == 2) {
-          if (ogc_wkt[curr] == 'A') {
-            if (strncmp(&ogc_wkt[curr], "AUTHORITY", 9) == 0) {
-              curr += 9;
-              const char* epsg = strstr(&ogc_wkt[curr], "\"EPSG\"");
-              if (epsg) {
-                curr = (int)((epsg - ogc_wkt) + 6);
-                while ((curr < len) && ogc_wkt[curr] != ',') {
-                  curr++;
-                }
-                curr++;
-                while ((curr < len) && ogc_wkt[curr] != '\"') {
-                  curr++;
-                }
-                curr++;
-                int code = -1;
-                if (sscanf_las(&ogc_wkt[curr], "%d", &code) == 1) {
-                  vertical_geokey = code;
-                  open_bracket++;  // because the one from "AUTHORITY[" was not counted
-                }
-              }
-            }
-          }
-        } else if (open_bracket == 1) {
-          if (ogc_wkt[curr] == 'U') {
-            if (strncmp(&ogc_wkt[curr], "UNIT[", 5) == 0) {
-              curr += 5;
-              while ((curr < len) && ogc_wkt[curr] != ',')  // skip description
-              {
-                curr++;
-              }
-              curr++;
-              double unit;
-              if (sscanf_las(&ogc_wkt[curr], "%lf", &unit) == 1) {
-                if (unit == 1.0) {
-                  set_elevation_in_meter();
-                } else if (fabs(unit - 0.3048006096012192) < 0.000000001) {
-                  set_elevation_in_survey_feet();
-                } else {
-                  set_elevation_in_feet();
-                }
-              }
-            }
-          }
-        }
-        curr++;
-      }
-    }
-    // check if we have a projection (e.g. string contains a PROJCS)
-    const char* projcs = strstr(ogc_wkt, "PROJCS[");
-    if (projcs) {
-      isWkt1 = true;
-      int len = (int)strlen(ogc_wkt);
-      // if we can find an AUTHORITY containing the EPSG code we are done
-      int open_bracket = 1;
-      int curr = (int)((projcs - ogc_wkt) + 7);
-      while ((curr < len) && open_bracket) {
-        if (ogc_wkt[curr] == '[') {
-          open_bracket++;
-        } else if (ogc_wkt[curr] == ']') {
-          open_bracket--;
-        } else if (open_bracket == 1) {
-          if (ogc_wkt[curr] == 'A') {
-            if (strncmp(&ogc_wkt[curr], "AUTHORITY", 9) == 0) {
-              curr += 9;
-              const char* epsg = strstr(&ogc_wkt[curr], "\"EPSG\"");
-              if (epsg) {
-                curr = (int)((epsg - ogc_wkt) + 6);
-                while ((curr < len) && ogc_wkt[curr] != ',') {
-                  curr++;
-                }
-                curr++;
-                while ((curr < len) && ogc_wkt[curr] != '\"') {
-                  curr++;
-                }
-                curr++;
-                int code = -1;
-                if (sscanf_las(&ogc_wkt[curr], "%d", &code) == 1) {
-                  return set_epsg_code(code, description);
-                }
-              }
-            }
-          }
-        }
-        curr++;
-      }
-      // otherwise try to find the PROJECTION and all its parameters
-      const char* proj = strstr(projcs, "PROJECTION[");
-      if (proj) {
-        int open_bracket = 1;
-        int curr = (int)((proj - ogc_wkt) + 11);
-
-        while (curr < len) {
-          if (ogc_wkt[curr] == '[') {
-            open_bracket++;
-          } else if (ogc_wkt[curr] == ']') {
-            open_bracket--;
-          } else if (open_bracket == 1) {
-            if (ogc_wkt[curr] == '\"') {
-              curr++;
-              if (strncmp(&ogc_wkt[curr], "Lambert_Conformal_Conic", 23) == 0) {
-                double false_easting;
-                double false_northing;
-                double unit = 1.0;
-                double latitude_of_origin;
-                double central_meridian;
-                double standard_parallel_1;
-                double standard_parallel_2;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_easting", &false_easting) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Easting", &false_easting))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_northing", &false_northing) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Northing", &false_northing))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "latitude_of_origin", &latitude_of_origin) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Latitude_Of_Origin", &latitude_of_origin))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "central_meridian", &central_meridian) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Central_Meridian", &central_meridian))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_1", &standard_parallel_1) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_1", &standard_parallel_1))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_2", &standard_parallel_2) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_2", &standard_parallel_2))
-                  return false;
-                get_unit_from_ogc_wkt(&ogc_wkt[curr], &unit);
-                set_lambert_conformal_conic_projection(
-                    unit * false_easting, unit * false_northing, latitude_of_origin, central_meridian, standard_parallel_1, standard_parallel_2);
-                return true;
-              } else if (strncmp(&ogc_wkt[curr], "Transverse_Mercator", 19) == 0) {
-                double false_easting;
-                double false_northing;
-                double unit = 1.0;
-                double latitude_of_origin;
-                double central_meridian;
-                double scale_factor;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_easting", &false_easting) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Easting", &false_easting))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_northing", &false_northing) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Northing", &false_northing))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "latitude_of_origin", &latitude_of_origin) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Latitude_Of_Origin", &latitude_of_origin))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "central_meridian", &central_meridian) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Central_Meridian", &central_meridian))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "scale_factor", &scale_factor) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Scale_Factor", &scale_factor))
-                  return false;
-                get_unit_from_ogc_wkt(&ogc_wkt[curr], &unit);
-                set_transverse_mercator_projection(unit * false_easting, unit * false_northing, latitude_of_origin, central_meridian, scale_factor);
-                return true;
-              } else if (strncmp(&ogc_wkt[curr], "Albers_Conic_Equal_Area", 23) == 0) {
-                double false_easting;
-                double false_northing;
-                double unit = 1.0;
-                double latitude_of_center;
-                double longitude_of_center;
-                double standard_parallel_1;
-                double standard_parallel_2;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_easting", &false_easting) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Easting", &false_easting))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "false_northing", &false_northing) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "False_Northing", &false_northing))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "latitude_of_center", &latitude_of_center) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Latitude_Of_Center", &latitude_of_center))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "longitude_of_center", &longitude_of_center) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Longitude_Of_Center", &longitude_of_center))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_1", &standard_parallel_1) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_1", &standard_parallel_1))
-                  return false;
-                if (!get_parameter_from_ogc_wkt(&ogc_wkt[curr], "standard_parallel_2", &standard_parallel_2) &&
-                    !get_parameter_from_ogc_wkt(&ogc_wkt[curr], "Standard_Parallel_2", &standard_parallel_2))
-                  return false;
-                get_unit_from_ogc_wkt(&ogc_wkt[curr], &unit);
-                set_albers_equal_area_conic_projection(
-                    unit * false_easting, unit * false_northing, latitude_of_center, longitude_of_center, standard_parallel_1, standard_parallel_2);
-                return true;
-              } else {
-                return false;
-              }
-            }
-          }
-          curr++;
-        }
-      }
-    } else {
-      // check if the string contains a GEOCCS
-      const char* geoccs = strstr(ogc_wkt, "GEOCCS[");
-      if (geoccs) {
-        isWkt1 = true;
-      }
-    }
-  }
-
   return false;
 }
 
@@ -2963,11 +2511,11 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
             n += snprintf(&string[n], (buffer_size > n) ? (buffer_size - n) : 0, "NAVD88");
             if (vertical_geoid)
             {
-              if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B)
-              {
+              if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID18) {
+                n += snprintf(&string[n], (buffer_size > n) ? (buffer_size - n) : 0, " height - Geoid18");
+              } else if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B) {
                 n += snprintf(&string[n], (buffer_size > n) ? (buffer_size - n) : 0, " height - Geoid12B");
-              }
-              else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID12A)
+              } else if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12A)
               {
                 n += snprintf(&string[n], (buffer_size > n) ? (buffer_size - n) : 0, " height - Geoid12A");
               }
@@ -3230,11 +2778,11 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
           n += snprintf(&string[n], (buffer_size > n) ? (buffer_size - n) : 0, "VERT_CS[\"NAVD88");
           if (vertical_geoid)
           {
-            if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B)
-            {
+            if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID18) {
+              n += snprintf(&string[n], (buffer_size > n) ? (buffer_size - n) : 0, " height - Geoid18");
+            } else if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12B) {
               n += snprintf(&string[n], (buffer_size > n) ? (buffer_size - n) : 0, " height - Geoid12B");
-            }
-            else if (vertical_geoid ==  GEO_VERTICAL_NAVD88_GEOID12A)
+            } else if (vertical_geoid == GEO_VERTICAL_NAVD88_GEOID12A)
             {
               n += snprintf(&string[n], (buffer_size > n) ? (buffer_size - n) : 0, " height - Geoid12A");
             }
@@ -4071,15 +3619,15 @@ short GeoProjectionConverter::get_GeogLinearUnitsGeoKey() const
 {
   if (coordinates2meter == 1.0)
   {
-    return 9001; // Linear_Meter
+    return EPSG_METER; // Linear_Meter
   }
   else if (coordinates2meter == 0.3048)
   {
-    return 9002; // Linear_Foot
+    return EPSG_FEET; // Linear_Foot
   }
   else
   {
-    return 9003; // assume Linear_Foot_US_Survey
+    return EPSG_SURFEET; // assume Linear_Foot_US_Survey
   }
 }
 
@@ -4693,13 +4241,13 @@ bool GeoProjectionConverter::set_ProjLinearUnitsGeoKey(short value, bool source)
 {
   switch (value)
   {
-  case 9001: // Linear_Meter
+  case EPSG_METER: // Linear_Meter
     set_coordinates_in_meter(source);
     break;
-  case 9002: // Linear_Foot
+  case EPSG_FEET: // Linear_Foot
     set_coordinates_in_feet(source);
     break;
-  case 9003: // Linear_Foot_US_Survey
+  case EPSG_SURFEET: // Linear_Foot_US_Survey
     set_coordinates_in_survey_feet(source);
     break;
   default:
@@ -4720,15 +4268,15 @@ short GeoProjectionConverter::get_ProjLinearUnitsGeoKey(bool source) const
     }
     else if (coordinates2meter == 1.0)
     {
-      return 9001; // Linear_Meter
+      return EPSG_METER; // Linear_Meter
     }
     else if (coordinates2meter == 0.3048)
     {
-      return 9002; // Linear_Foot
+      return EPSG_FEET; // Linear_Foot
     }
     else
     {
-      return 9003; // assume Linear_Foot_US_Survey
+      return EPSG_SURFEET; // assume Linear_Foot_US_Survey
     }
   }
   else
@@ -4739,15 +4287,15 @@ short GeoProjectionConverter::get_ProjLinearUnitsGeoKey(bool source) const
     }
     else if (meter2coordinates == 1.0)
     {
-      return 9001; // Linear_Meter
+      return EPSG_METER; // Linear_Meter
     }
     else if (meter2coordinates == 1.0/0.3048)
     {
-      return 9002; // Linear_Foot
+      return EPSG_FEET; // Linear_Foot
     }
     else
     {
-      return 9003; // assume Linear_Foot_US_Survey
+      return EPSG_SURFEET; // assume Linear_Foot_US_Survey
     }
   }
 }
@@ -4756,13 +4304,13 @@ bool GeoProjectionConverter::set_VerticalUnitsGeoKey(short value)
 {
   switch (value)
   {
-  case 9001: // Linear_Meter
+  case EPSG_METER: // Linear_Meter
     set_elevation_in_meter();
     break;
-  case 9002: // Linear_Foot
+  case EPSG_FEET: // Linear_Foot
     set_elevation_in_feet();
     break;
-  case 9003: // Linear_Foot_US_Survey
+  case EPSG_SURFEET: // Linear_Foot_US_Survey
     set_elevation_in_survey_feet();
     break;
   default:
@@ -4779,30 +4327,30 @@ short GeoProjectionConverter::get_VerticalUnitsGeoKey(bool source) const
   {
     if (elevation2meter == 1.0)
     {
-      return 9001; // Linear_Meter
+      return EPSG_METER; // Linear_Meter
     }
     else if (elevation2meter == 0.3048)
     {
-      return 9002; // Linear_Foot
+      return EPSG_FEET; // Linear_Foot
     }
     else
     {
-      return 9003; // assume Linear_Foot_US_Survey
+      return EPSG_SURFEET; // assume Linear_Foot_US_Survey
     }
   }
   else
   {
     if (meter2elevation == 1.0)
     {
-      return 9001; // Linear_Meter
+      return EPSG_METER; // Linear_Meter
     }
     else if (meter2elevation == 1.0/0.3048)
     {
-      return 9002; // Linear_Foot
+      return EPSG_FEET; // Linear_Foot
     }
     else
     {
-      return 9003; // assume Linear_Foot_US_Survey
+      return EPSG_SURFEET; // assume Linear_Foot_US_Survey
     }
   }
 }
@@ -5811,15 +5359,15 @@ static double unit2decdeg(double length, int unit, bool disable_messages)
 
 static double unit2meter(double length, int unit, bool disable_messages)
 {
-  if (unit == 9001)
+  if (unit == EPSG_METER)
   {
     return length;
   }
-  else if (unit == 9002)
+  else if (unit == EPSG_FEET)
   {
     return length*0.3048;
   }
-  else if (unit == 9003)
+  else if (unit == EPSG_SURFEET)
   {
     return length*0.3048006096012;
   }
@@ -5829,6 +5377,7 @@ static double unit2meter(double length, int unit, bool disable_messages)
  
 bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool source)
 {
+  if (value == 0) return false;
   int ellipsoid = -1;
   int gcs = -1;
   bool utm_northern = false;
@@ -8030,12 +7579,11 @@ void GeoProjectionConverter::parse(int argc, char* argv[])
         if (strcmp(argv[i] + 16,"") == 0)
         {
           vertical_geoid = 0; // none
-        }
-        else if (strcmp(argv[i] + 16,"_geoid12b") == 0)
-        {
+        } else if (strcmp(argv[i] + 16, "_geoid18") == 0) {
+          vertical_geoid = GEO_VERTICAL_NAVD88_GEOID18;
+        } else if (strcmp(argv[i] + 16, "_geoid12b") == 0) {
           vertical_geoid = GEO_VERTICAL_NAVD88_GEOID12B;
-        }
-        else if (strcmp(argv[i] + 16,"_geoid12a") == 0)
+        } else if (strcmp(argv[i] + 16, "_geoid12a") == 0)
         {
           vertical_geoid = GEO_VERTICAL_NAVD88_GEOID12A;
         }
@@ -9517,15 +9065,15 @@ bool GeoProjectionConverter::get_img_projection_parameters(char** proName, int* 
 
 bool GeoProjectionConverter::get_dtm_projection_parameters(short* horizontal_units, short* vertical_units, short* coordinate_system, short* coordinate_zone, short* horizontal_datum, short* vertical_datum, bool source)
 {
-  if (get_ProjLinearUnitsGeoKey(source) == 9001)
+  if (get_ProjLinearUnitsGeoKey(source) == EPSG_METER)
   {
     *horizontal_units = 1;
   }
-  else if (get_ProjLinearUnitsGeoKey(source) == 9002)
+  else if (get_ProjLinearUnitsGeoKey(source) == EPSG_FEET)
   {
     *horizontal_units = 0;
   }
-  else if (get_ProjLinearUnitsGeoKey(source) == 9003)
+  else if (get_ProjLinearUnitsGeoKey(source) == EPSG_SURFEET)
   {
     *horizontal_units = 0;
   }
@@ -9534,15 +9082,15 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(short* horizontal_uni
     *horizontal_units = 2;
   }
 
-  if (get_VerticalUnitsGeoKey(source) == 9001)
+  if (get_VerticalUnitsGeoKey(source) == EPSG_METER)
   {
     *vertical_units = 1;
   }
-  else if (get_VerticalUnitsGeoKey(source) == 9002)
+  else if (get_VerticalUnitsGeoKey(source) == EPSG_FEET)
   {
     *vertical_units = 0;
   }
-  else if (get_VerticalUnitsGeoKey(source) == 9003)
+  else if (get_VerticalUnitsGeoKey(source) == EPSG_SURFEET)
   {
     *vertical_units = 0;
   }
@@ -10009,20 +9557,20 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(short horizontal_unit
 {
   if (horizontal_units == 1)
   {
-    set_ProjLinearUnitsGeoKey(9001, source);
+    set_ProjLinearUnitsGeoKey(EPSG_METER, source);
   }
   else if (horizontal_units == 0)
   {
-    set_ProjLinearUnitsGeoKey(9002, source);
+    set_ProjLinearUnitsGeoKey(EPSG_FEET, source);
   }
 
   if (vertical_units == 1)
   {
-    set_VerticalUnitsGeoKey(9001);
+    set_VerticalUnitsGeoKey(EPSG_METER);
   }
   else if (vertical_units == 0)
   {
-    set_VerticalUnitsGeoKey(9002);
+    set_VerticalUnitsGeoKey(EPSG_FEET);
   }
 
   if (coordinate_system == 1)
@@ -10070,7 +9618,7 @@ void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int& epsg_code, boo
 {
   int err_no;
 
-  if (epsg_code == 0 || epsg_code > 999999) laserror("Invalid epsg code");
+  if (epsg_code == 0 || epsg_code > 999999) laserror("Invalid epsg code: %u", epsg_code);
 
   projParameters.proj_ctx = proj_context_create();
 
@@ -10112,7 +9660,7 @@ void GeoProjectionConverter::set_proj_crs_with_string(const char* proj_string, b
 {
   int err_no;
 
-  if (proj_string == nullptr) laserror("PROJ string is not valid");
+  if (proj_string == nullptr) laserror("PROJ string is empty");
 
   projParameters.proj_ctx = proj_context_create();
 
@@ -10151,7 +9699,7 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
 {
   int err_no;
 
-  if (json_filename == nullptr) laserror("Json filename is not valid");
+  if (json_filename == nullptr) laserror("Json filename is missing");
 
   projParameters.proj_ctx = proj_context_create();
   
@@ -10225,7 +9773,7 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
   size_t fileSize = 0;
   int err_no;
 
-  if (!wkt_filename) laserror("Wkt filename is not valid");
+  if (!wkt_filename) laserror("Wkt filename is missing");
 
   projParameters.proj_ctx = proj_context_create();
 
@@ -10300,7 +9848,7 @@ void GeoProjectionConverter::set_proj_crs_with_file_header_wkt(const char* wktCo
 {
   int err_no;
 
-  if (!wktContent) laserror("Wkt is not valid");
+  if (!wktContent) laserror("Wkt content is empty");
 
   projParameters.proj_ctx = proj_context_create();
 

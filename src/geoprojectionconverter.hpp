@@ -72,6 +72,7 @@
 
 #include "proj_loader.h"
 #include <stdio.h>
+#include <string>
 
 struct GeoProjectionGeoKeys
 {
@@ -145,6 +146,7 @@ struct GeoProjectionGeoKeys
 #define GEO_VERTICAL_NAVD88_GEOID12  1125103
 #define GEO_VERTICAL_NAVD88_GEOID12A 1135103
 #define GEO_VERTICAL_NAVD88_GEOID12B 1145103
+#define GEO_VERTICAL_NAVD88_GEOID18  1185103
 
 #pragma warning(push)
 #pragma warning(disable : 26495)
@@ -170,6 +172,9 @@ public:
   short datum;
   char name[256];
   GeoProjectionParameters() { type = -1; geokey = 0; datum = 0; name[0] = '\0'; };
+  std::string info() {
+    return "epsg=" + std::to_string(geokey) + ", " + std::string(name);
+  }
 };
 
 class GeoProjectionParametersUTM : public GeoProjectionParameters
