@@ -28,6 +28,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <map>
 #include <unordered_map>
 
 const int EPSG_METER = 9001;    // Linear_Meter
@@ -67,18 +68,20 @@ const std::vector<std::string> Wkt2Tkn = {"BOUNDCRS",    "COMPOUNDCRS",        "
 /// helper function to get unit-epsg out of unit value
 int UnitValueToEpsg(double val);
 
+typedef std::multimap<std::string, std::string> WktMap;
+
 /// <summary>
 /// wkt parser for wkt1 and wkt2
 /// read the wkt and create a key-value map of all entries for fast and simple access to each element.
 /// provide some access functions to fetch values.
 /// </summary>
 /// ### sample input wkt of
-///   PROJCS[\"NAD83(2011) / UTM zone 17N\"
-///       GEOGCS[\"NAD83(2011)\"
-///           AUTHORITY[\"EPSG\",\"6318\"]]
-///       PROJECTION[\"Transverse_Mercator\"]
-///       PARAMETER[\"false_northing\",0]
-///       AUTHORITY[\"EPSG\",\"6346\"]]
+///   PROJCS["NAD83(2011) / UTM zone 17N"
+///       GEOGCS["NAD83(2011)"
+///           AUTHORITY["EPSG","6318"]]
+///       PROJECTION["Transverse_Mercator"]
+///       PARAMETER["false_northing",0]
+///       AUTHORITY["EPSG","6346"]]
 /// ### will result in a map like:
 ///   projcs = NAD83(2011) / UTM zone 17N
 ///   projcs.geogcs = NAD83(2011)
@@ -96,16 +99,20 @@ class WktParser {
   bool isWktUnknown = true;
 
  protected:
+  std::string wktraw;
   std::string compoundPfx = "";
-
  public:
-  std::unordered_multimap<std::string, std::string> map;
+  WktMap map;
   bool isWkt1 = false;
   bool isCompound = false; // wkt is a compound wkt
-  WktParser(const std::string wktin);
+  bool silent = false; // no info/verbose output
+  WktParser();
+  void SetWkt(const std::string wktin);
   /// output parsed wkt to console for debugging
   void Debug();
-  /// <summary>
+  /// format wkt string multiline with indent
+  std::string WktFormat(bool flat = false, const short indent = 2, const short indent_offset = 0);
+    /// <summary>
   /// check if a value is available and assign this if possible
   /// </summary>
   /// <param name="key">key to look for like 'projcs.authority'</param>
@@ -166,7 +173,7 @@ class WktParser {
 /// </summary>
 class WktParserSem : public WktParser {
  public:
-  WktParserSem(const std::string wktin);
+  // WktParserSem();
   int Pcs_Epsg();
   int Vert_Epsg();
   int Gcs_Epsg();

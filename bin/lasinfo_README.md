@@ -353,7 +353,8 @@ Further examples
 -suppress_scan_angle                : do not decompress scan angle for native-compressed LAS 1.4 point types 6 or higher  
 -suppress_user_data                 : do not decompress user data field for native-compressed LAS 1.4 point types 6 or higher  
 -suppress_z                         : do not decompress z coordinates for native-compressed LAS 1.4 point types 6 or higher  
--week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
+-week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS
+-wkt_format                         : formats WKT output with line breaks and indent for better readability
 
 ### Basics
 -cores [n]: process multiple inputs on [n] cores in parallel  
@@ -988,4 +989,3 @@ Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
 If you have any suggestions please let us (info@rapidlasso.de) know.
-

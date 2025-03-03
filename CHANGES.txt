@@ -1,3 +1,9 @@
+10 March 2025 -- NEW: WKT/WKT2 to GeoTIFF conversion for raster output
+10 March 2025 -- NEW: NAVD88 GEOID18 information support
+10 March 2025 -- NEW: tool geotiffinfo to show detail infos about GeoKey directory entries of GeoTIFF files
+10 March 2025 -- NEW: tool wktformat to format WKT/WKT2 information as single line / multi line string
+10 March 2025 -- fix: copc reader: initialization fix
+10 March 2025 -- fix: lasinfo64: do not abort '-lof' lists if '-errors_ignore' is set
 19 February 2025 -- NEW: "-fail" for licensed tools will be default. use "-demo" to run in demo mode
 21 January 2025 -- NEW: lastile: option to keep files containing only buffer points (-keep_buffer_only_tiles)
 17 January 2025 -- NEW: lasgrid 'no_data_map' argument to set all no_data values to a color_map entry

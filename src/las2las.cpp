@@ -821,10 +821,7 @@ int main(int argc, char* argv[])
       }
       else if (strncmp(argv[i], "-set_ogc_wkt", 12) == 0)
       {
-        if (!geoprojectionconverter.is_proj_request) {
-          // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
-          geoprojectionconverter.is_proj_request = load_proj_library(nullptr, false);
-          
+        if (!geoprojectionconverter.is_proj_request) {         
           if (strcmp(argv[i], "-set_ogc_wkt") == 0)
           {
             set_ogc_wkt = true;
@@ -844,6 +841,27 @@ int main(int argc, char* argv[])
         {
           if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0'))
           {
+            set_ogc_wkt_string = argv[i + 1];
+            i++;
+          }
+        }
+      } else if (strncmp(argv[i], "-set_proj_wkt", 13) == 0) {
+        if (!geoprojectionconverter.is_proj_request) {
+          // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
+          geoprojectionconverter.is_proj_request = load_proj_library(nullptr, false);
+
+          if (strcmp(argv[i], "-set_proj_wkt") == 0) {
+            set_ogc_wkt = true;
+            set_ogc_wkt_in_evlr = false;
+          } else if (strcmp(argv[i], "-set_proj_wkt_in_evlr") == 0) {
+            set_ogc_wkt = true;
+            set_ogc_wkt_in_evlr = true;
+          } else {
+            lastool.parse_arg_invalid_n(i);
+          }
+        }
+        if ((i + 1) < argc) {
+          if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0')) {
             set_ogc_wkt_string = argv[i + 1];
             i++;
           }

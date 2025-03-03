@@ -29,6 +29,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -44,7 +45,11 @@ int UnitValueToEpsg(double val) {
   }
 }
 
-WktParser::WktParser(const std::string wktin) {
+WktParser::WktParser() {
+}
+
+void WktParser::SetWkt(const std::string wktin) {
+  wktraw = wktin;
   std::string work = wktin;
   std::string token = "";
   std::vector<std::string> vkey;
@@ -100,20 +105,25 @@ WktParser::WktParser(const std::string wktin) {
         if (StringInVector(token, Wkt2Tkn, false)) {
           if (isWkt1) {
             // warn: invalid
+            LASMessage(LAS_WARNING, "WKT2/WKT1 mismatch");
           }
           isWkt1 = false;
+          if (!silent) LASMessage(LAS_VERBOSE, "WKT2 detected");  // optional: warning
         }
         // check coupound
         if (isWkt1) {
-          isCompound = token.compare("COMPD_CS") == 0;
+          isCompound = token.compare("compd_cs") == 0;
           if (isCompound) {
-            compoundPfx = "COMPD_CS.";
+            compoundPfx = "compd_cs.";
           }
         } else {
-          isCompound = token.compare("COMPOUNDCRS") == 0;
+          isCompound = token.compare("compoundcrs") == 0;
           if (isCompound) {
-            compoundPfx = "COMPOUNDCRS.";
+            compoundPfx = "compoundcrs.";
           }
+        }
+        if (isCompound) {
+          if (!silent) LASMessage(LAS_VERBOSE, "WKT: compound CS detected");
         }
       }
       vkeyAdd();
@@ -151,6 +161,58 @@ WktParser::WktParser(const std::string wktin) {
       token += c;
     }
   }
+}
+
+std::string WktParser::WktFormat(bool flat, const short indent, const short indent_offset) {
+  if (flat) {
+    // optional format as single line
+    return ReplaceString(ReplaceString(ReplaceString(wktraw, "\n", ""), "\r", ""), ", ", ",");
+  }
+  // default: format with linebreaks and indent
+  std::string work = wktraw;
+  std::string token = "";
+  std::string result = "";
+  bool inStr = false;
+  bool inEscape = false;
+  int level = 0;
+  // parse wkt
+  for (char& c : work) {
+    if (inStr) {
+      // get string till trailing "
+      if (c == '\\') {
+        inEscape = true;
+      } else if (inEscape || c != '"') {
+        inEscape = false;
+        token += c;
+      } else {
+        // string close
+        inEscape = false;
+        inStr = false;
+      }
+    } else if (c == '[') {
+      // output last key in new line with indent
+      if (!result.empty()) result += '\n';
+      result += std::string(indent_offset, ' ') + std::string(level * indent, ' ') + BOOST_PRE trim(token) + c;
+      level++;
+      token = "";
+    } else if (c == ']') {
+      // close values
+      result += BOOST_PRE trim(token) + c;
+      token = "";
+      level--;
+    } else if (c == ',') {
+      // add this value
+      result += BOOST_PRE trim(token) + c;
+      token = "";
+    } else if (c == '"') {
+      // start string parser
+      inStr = true;
+      inEscape = false;
+    } else {
+      token += c;
+    }
+  }
+  return result;
 }
 
 void WktParser::Debug() {
@@ -273,8 +335,7 @@ double WktParser::ValueSubDouble(const std::string& key, const std::string sub, 
     WktParserSem
 ************************* */
 
-WktParserSem::WktParserSem(const std::string wktin) : WktParser(wktin) {
-}
+// WktParserSem::WktParserSem(const std::string wktin) : WktParser(wktin) {}
 
 int WktParserSem::Pcs_Epsg() {
   int res;
@@ -291,7 +352,7 @@ int WktParserSem::Vert_Epsg() {
   if (isWkt1) {
     res = ValueInt(compoundPfx + "VERT_CS.AUTHORITY");
   } else {
-    res = ValueInt(compoundPfx + "PROJCRS.ID");
+    res = ValueInt(compoundPfx + "VERTCRS.ID");
   }
   return res;
 }
@@ -319,7 +380,7 @@ int WktParserSem::Gcs_Epsg() {
   return res;
 }
 
-bool WktParserSem::HasProjection(PROJECTION_METHOD &pm) {
+bool WktParserSem::HasProjection(PROJECTION_METHOD& pm) {
   std::string key;
   std::string projection;
   if (isWkt1) {
@@ -387,7 +448,7 @@ double WktParserSem::ProjectionCentralMeridian() {
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "central_meridian");
   } else {
-    res = ValueSubDouble(compoundPfx + "PROJCRS.CONVERSION.PARAMETER", "Longitude of natural origin");    
+    res = ValueSubDouble(compoundPfx + "PROJCRS.CONVERSION.PARAMETER", "Longitude of natural origin");
   }
   return res;
 }
@@ -413,9 +474,9 @@ double WktParserSem::ProjectionCentralStandardParallel2() {
 double WktParserSem::ProjectionScaleFactor() {
   double res;
   if (isWkt1) {
-    res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "scale_factor",1);
+    res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "scale_factor", 1);
   } else {
-    res = ValueSubDouble(compoundPfx + "PROJCRS.CONVERSION.PARAMETER", "Scale factor at natural origin",1);
+    res = ValueSubDouble(compoundPfx + "PROJCRS.CONVERSION.PARAMETER", "Scale factor at natural origin", 1);
   }
   return res;
 }
@@ -423,9 +484,9 @@ double WktParserSem::ProjectionScaleFactor() {
 double WktParserSem::Pcs_Unit() {
   double res;
   if (isWkt1) {
-    res = ValueDouble(compoundPfx + "PROJCS.UNIT",1);
+    res = ValueDouble(compoundPfx + "PROJCS.UNIT", 1);
   } else {
-    res = ValueDouble(compoundPfx + "PROJCRS.CS.AXIS.LENGTHUNIT",1);
+    res = ValueDouble(compoundPfx + "PROJCRS.CS.AXIS.LENGTHUNIT", 1);
   }
   return res;
 }
@@ -433,9 +494,9 @@ double WktParserSem::Pcs_Unit() {
 double WktParserSem::Vert_Unit() {
   double res;
   if (isWkt1) {
-    res = ValueDouble(compoundPfx + "VERT_CS.UNIT",1);
+    res = ValueDouble(compoundPfx + "VERT_CS.UNIT", 1);
   } else {
-    res = ValueDouble(compoundPfx + "VERTCRS.CS.AXIS.LENGTHUNIT",1);
+    res = ValueDouble(compoundPfx + "VERTCRS.CS.AXIS.LENGTHUNIT", 1);
   }
   return res;
 }
@@ -443,9 +504,9 @@ double WktParserSem::Vert_Unit() {
 double WktParserSem::Gcs_Unit() {
   double res;
   if (isWkt1) {
-    res = ValueDouble(compoundPfx + "GEOCCS.UNIT",1);
+    res = ValueDouble(compoundPfx + "GEOCCS.UNIT", 1);
   } else {
-    res = ValueDouble(compoundPfx + "GEODCRS.CS.AXIS.LENGTHUNIT",1);
+    res = ValueDouble(compoundPfx + "GEODCRS.CS.AXIS.LENGTHUNIT", 1);
   }
   return res;
 }
