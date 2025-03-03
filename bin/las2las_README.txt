@@ -20,10 +20,10 @@ this file is deprecated - see *.md version of this file
   for example from latitude/longitude to UTM or the stateplane
   of Ohio_North or to Earth-centered Earth-fixed (ECEF). You can
   also use common EPSG codes with '-epsg 32754'. For LAS 1.4 it
-  is important to '-set_ogc_wkt' which translates the GeoTIFF
+  is important to '-set_ogc_wkt' or '-set_proj_wkt' which translates the GeoTIFF
   keys into an CRS string in the OGC WKT format and adds them as
   the payload of the corresponding VLR. For LAS 1.4 files you
-  can use '-set_ogc_wkt_in_evlr' to put that string into the
+  can use '-set_ogc_wkt_in_evlr' or '-set_proj_wkt_in_evlr' to put that string into the
   EVLR instead of the VLR (but we don't recommend that).
 
   Another typical use is extract only first (-first_only) or only
@@ -233,6 +233,8 @@ other commandline arguments are
 -set_user_data 0               : sets all user_data fields to zero
 -set_ogc_wkt                   : translate GeoTIFF keys into CRS string in OGC WKT format and add it as VLR
 -set_ogc_wkt_in_evlr           : same as above but adds it as LAS 1.4 EVLR instead. really not recommended!!!
+-set_proj_wkt                  : translate GeoTIFF keys into CRS string in OGC WKT1 format using the proj lib and add it as VLR
+-set_proj_wkt_in_evlr          : same as above but adds it as LAS 1.4 EVLR instead. really not recommended!!!
 -remove_padding                : remove user-defined bytes before and after the header
 -remove_all_vlrs               : remove all VLRs
 -remove_vlr 2                  : remove third VLR with index 2 (counting starts at 0)

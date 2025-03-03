@@ -34,9 +34,9 @@ las2las can add missing projection information to the LAS/LAZ file
 or reproject (using the same ellipsoid) for example from latitude/longitude
 to UTM or the stateplane of Ohio_North or to Earth-centered Earth-fixed (ECEF).
 You can also use common EPSG codes with '-epsg 32754'. 
-For LAS 1.4 it is important to '-set_ogc_wkt' which translates the GeoTIFF
+For LAS 1.4 it is important to '-set_ogc_wkt' or '-set_proj_wkt' which translates the GeoTIFF
 keys into an CRS string in the OGC WKT format and adds them as the payload
-of the corresponding VLR. For LAS 1.4 files you can use '-set_ogc_wkt_in_evlr'
+of the corresponding VLR. For LAS 1.4 files you can use '-set_ogc_wkt_in_evlr' or '-set_proj_wkt_in_evlr' 
 to put that string into the EVLR instead of the VLR (but we don't recommend that).
 
 ## las2las with PROJ
@@ -285,6 +285,8 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -set_lastiling_buffer_flag [0/1]    : sets buffer flag in LAStiling VLR (if it exists) to [0/1]  
 -set_ogc_wkt [n]                    : translate GeoTIFF keys [n] into CRS string in OGC WKT format and add it as VLR  
 -set_ogc_wkt_in_evlr [n]            : same as "set_ogc_wkt" but adds [n] as LAS 1.4 EVLR instead. Really not recommended!!!  
+-set_proj_wkt [n]                   : translate GeoTIFF keys [n] into CRS string in OGC WKT1 format using the proj lib format and add it as VLR  
+-set_proj_wkt_in_evlr [n]           : same as "set_ogc_wkt" but adds [n] as LAS 1.4 EVLR instead. Really not recommended!!!
 -set_point_data_format [n]          : force point type to be [n]{1-10}  
 -set_point_data_record_length [n]   : CAREFUL! sets the point data record length field of the LAS header to size [n] without checking whether this will corrupt the file  
 -set_point_size [n]                 : force point size to be [n]  
