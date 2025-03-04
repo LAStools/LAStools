@@ -896,7 +896,7 @@ void ProjParameters::set_header_wkt_representation(PJ* proj_crs)
   // Calling up and outputting the WKT display
   if (proj_ctx && proj_crs) {
     const char* options[] = {"MULTILINE=NO", nullptr}; 
-    const char* wkt_representation = proj_as_wkt(proj_ctx, proj_crs, PJ_WKT2_2019, options);
+    const char* wkt_representation = proj_as_wkt(proj_ctx, proj_crs, PJ_WKT1_GDAL, options);
 
     if (!wkt_representation) {
       LASMessage(LAS_SERIOUS_WARNING, "The WKT representation could not be generated and could not be written to the output file header! It is therefore not possible to determine the CRS of the file.");
@@ -913,7 +913,7 @@ const char* ProjParameters::get_wkt_representation(bool source /*=true*/) const
   if (proj_ctx && ((proj_source_crs && source) || (proj_target_crs && !source))) {
     // Retrieving and outputting the WKT representation
     const char* options[] = {"MULTILINE=NO", nullptr}; 
-    const char* wkt = proj_as_wkt(proj_ctx, source ? proj_source_crs : proj_target_crs, PJ_WKT2_2019, options);
+    const char* wkt = proj_as_wkt(proj_ctx, source ? proj_source_crs : proj_target_crs, PJ_WKT1_GDAL, options);
     if (!wkt) {
       laserror("The WKT representation of the PROJ CRS could not be generated.");
     }
