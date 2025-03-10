@@ -276,29 +276,46 @@ std::string dir_current() {
   return std::string(curr_directory);
 }
 
-/// replace string and return new string
-std::string ReplaceString(std::string subject, const std::string& search, const std::string& replace) {
+/// replace all occurrences of search in subject with replace and return new string
+std::string ReplaceString(const std::string& subject, const std::string& search, const std::string& replace) {
+  // 'abc','a','ab' -> 'abbc'
+  // 'abc','ab','a' -> 'ac'
+  // 'aaa','a','aa' -> 'aaaaaa'
+  // '1|   2','| ','|' -> '1,2'
+  std::string result = subject;
   size_t pos = 0;
-  while ((pos = subject.find(search, pos)) != std::string::npos) {
-    subject.replace(pos, search.length(), replace);
-    pos += replace.length();
+  size_t add = 0;
+  // avoid endless replace if replace contains search token
+  if (replace.find(search) != std::string::npos) {
+    add = replace.length();
   }
-  return subject;
+  // replace loop
+  while ((pos = result.find(search, pos)) != std::string::npos) {
+    result.replace(pos, search.length(), replace);
+    pos += add;  // set startpoint for next loop
+  }
+  return result;
 }
 
-/// replace string in current string
+/// replace all occurrences of search in subject with replace
 void ReplaceStringInPlace(std::string& subject, const std::string& search, const std::string& replace) {
-  size_t pos = 0;
-  while ((pos = subject.find(search, pos)) != std::string::npos) {
-    subject.replace(pos, search.length(), replace);
-    pos += replace.length();
-  }
+  subject = ReplaceString(subject, search, replace);
 }
 
 /// checks if a fullString ends with a certain ending
 bool StringEndsWith(const std::string& fullString, const std::string& ending) {
   if (ending.size() > fullString.size()) return false;
   return fullString.compare(fullString.size() - ending.size(), ending.size(), ending) == 0;
+}
+
+/// returns TRUE if 'val' is found in 'vec'
+bool StringInVector(const std::string& val, const std::vector<std::string>& vec, bool casesense) {
+  if (casesense) {
+    return std::find(vec.begin(), vec.end(), val) != vec.end();
+  } else {
+    auto iterator = std::find_if(vec.begin(), vec.end(), [&](auto& s) { return (to_lower_copy(s).compare(to_lower_copy(val)) == 0); });
+    return iterator != vec.end();
+  }
 }
 
 /// extension of the realloc function to check memory allocation errors
@@ -360,7 +377,7 @@ int sscanf_las(const char* buffer, const char* format, ...) {
 }
 
 /// Wrapper for `strncpy` on other platforms than _MSC_VER and `strncpy_s` on Windows
-int strncpy_las(char *dest, size_t destsz, const char *src, size_t count) {
+int strncpy_las(char* dest, size_t destsz, const char* src, size_t count) {
   if (dest == nullptr || src == nullptr) {
     return -1;
   }
@@ -380,3 +397,138 @@ int strncpy_las(char *dest, size_t destsz, const char *src, size_t count) {
   return 0;
 }
 
+#ifdef BOOST_USE
+#else
+// simple NON BOOST implementations
+void to_lower(std::string& in) {
+  for (int i = 0; i < in.size(); i++) in[i] = std::tolower(in[i]);
+  return;
+}
+
+void to_upper(std::string& in) {
+  for (int i = 0; i < in.size(); i++) in[i] = std::toupper(in[i]);
+  return;
+}
+
+std::string to_lower_copy(const std::string& in) {
+  std::string result = in;
+  to_lower(result);
+  return result;
+}
+
+std::string to_upper_copy(const std::string& in) {
+  std::string result = in;
+  to_lower(result);
+  return result;
+}
+
+std::string trim(const std::string& in) {
+  if (in.empty()) return "";
+  size_t i = 0;
+  while (i < in.length() && (in[i] == ' ' || in[i] == '\n' || in[i] == '\t' || in[i] == '\r' || in[i] == '\f' || in[i] == '\v')) i++;
+  size_t j = in.length() - 1;
+  while (j > 0 && (in[j] == ' ' || in[j] == '\n' || in[j] == '\t' || in[i] == '\r' || in[i] == '\f' || in[i] == '\v')) j--;
+  if (j - i + 1 > 0) {
+    return in.substr(i, j - i + 1);
+  } else {
+    return "";
+  }
+}
+#endif
+
+/// <summary>
+/// Get next token till end of input
+/// </summary>
+/// <param name="in"></param>
+/// <param name="delim"></param>
+/// <param name="out"></param>
+/// <returns></returns>
+bool GetTokenNext(std::string& in, std::string delim, std::string& out) {
+  size_t pos = in.find(delim);
+  if (pos != std::string::npos) {
+    out = in.substr(0, pos);
+    in = in.substr(pos + delim.length(), in.length());
+  } else {
+    out = in;
+    in = "";
+  }
+  return !(in.empty() && out.empty());
+}
+
+/// returns next token, "" if done or first empty token
+std::string TokenNext(std::string& in, std::string delim) {
+  std::string out;
+  if (GetTokenNext(in, delim, out)) {
+    return out;
+  } else {
+    return "";
+  }
+}
+
+/// output all vector values separated by delimiter
+std::string VectorDelimited(const std::vector<std::string>& items, const std::string& delimiter) {
+  if (items.empty()) {
+    return "";
+  }
+  std::string result = items[0];
+  for (size_t i = 1; i < items.size(); ++i) {
+    result += delimiter + items[i];
+  }
+  return result;
+}
+
+int stoidefault(const std::string& val, int def) {
+  try {
+    return std::stoi(val);
+  } catch (const std::exception&) {
+    return def;
+  }
+}
+
+double stoddefault(const std::string& val, double def) {
+  try {
+    return std::stod(val);
+  } catch (const std::exception&) {
+    return def;
+  }
+}
+
+double DoubleRound(double value, int decimals) {
+  double scale = pow(10.0, decimals);  // e.g. 10^10 for 10 decimal places
+  return round(value * scale) / scale;
+}
+
+std::string DoubleToString(double dd, short decimals) {
+  std::stringstream ss;
+  ss << std::setprecision(decimals) << dd;
+  return ss.str();
+}
+
+std::string DoubleToFixLenString(double dd, short decimals) {
+  std::stringstream ss;
+  ss << std::fixed << std::setprecision(decimals) << dd;
+  return ss.str();
+}
+
+std::string CcToUnderline(const std::string& in) {
+  std::string res = "";
+  for (size_t ii = 0; ii < in.size(); ii++) {
+    if (isupper(in[ii])) {
+      if (ii > 0) {
+        res = '_' + res;
+      }
+      res = tolower(in[ii]);
+    } else {
+      res = in[ii];
+    }
+  }
+  return res;
+}
+
+/// returns the occurency count of 'toCount' in 'in'
+size_t StringCountChar(const std::string& in, const char toCount) {
+  int count = 0;
+  for (int i = 0; i < in.size(); i++)
+    if (in[i] == toCount) count++;
+  return count;
+}

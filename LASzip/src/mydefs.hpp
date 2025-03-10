@@ -53,8 +53,8 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <cstdarg>
+#include <vector>
 
 extern void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*), ...);
 
@@ -398,11 +398,16 @@ std::string exe_path();
 
 std::string dir_current();
 
-std::string ReplaceString(std::string subject, const std::string& search, const std::string& replace);
+/// replace all occurrences of search in subject with replace and return new string
+std::string ReplaceString(const std::string& subject, const std::string& search, const std::string& replace);
 
+/// replace all occurrences of search in subject with replace
 void ReplaceStringInPlace(std::string& subject, const std::string& search, const std::string& replace);
 
 bool StringEndsWith(const std::string& fullString, const std::string& ending);
+
+/// returns TRUE if 'val' is found in 'vec'
+bool StringInVector(const std::string& value, const std::vector<std::string>& array, bool casesense);
 
 void* realloc_las(void* ptr, size_t size);
 
@@ -411,4 +416,46 @@ int sscanf_las(const char* buffer, const char* format, ...);
 /// Wrapper for `strncpy` on other platforms than _MSC_VER and `strncpy_s` on Windows.
 int strncpy_las(char *dest, size_t destsz, const char *src, size_t count);
 
+#ifdef BOOST_USE
+#define BOOST_PRE boost::algorithm::
+#else
+#define BOOST_PRE
+void to_lower(std::string& in);
+void to_upper(std::string& in);
+std::string to_lower_copy(const std::string& in);
+std::string to_upper_copy(const std::string& in);
+std::string trim(const std::string& in);
 #endif
+
+/// Get next token till end of input. Shortens <in>, result in <out>. return TRUE if out contains another token.
+bool GetTokenNext(std::string& in, std::string delim, std::string& out);
+
+/// returns next token, "" if done or first empty token
+std::string TokenNext(std::string& in, std::string delim);
+
+/// output all vector values as single string, separated by delimiter
+std::string VectorDelimited(const std::vector<std::string>& items, const std::string& delimiter);
+
+/// string to integer with default value (no exception)
+int stoidefault(const std::string& val, int def = 0);
+
+/// string to double with default value (no exception)
+double stoddefault(const std::string& val, double def = 0);
+
+/// Function for rounding to a specific number of decimal places
+double DoubleRound(double value, int decimals);
+
+/// return double as string with a maximum number of decimal places
+std::string DoubleToString(double dd, short decimals);
+
+/// return double as string with a fix number of decimal places
+std::string DoubleToFixLenString(double dd, short decimals);
+
+/// CamelCase to non_camel_case converter
+std::string CcToUnderline(const std::string& in);
+
+/// returns the occurency count of 'toCount' in 'in'
+size_t StringCountChar(const std::string& in, const char toCount);
+
+#endif
+

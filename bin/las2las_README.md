@@ -34,25 +34,27 @@ las2las can add missing projection information to the LAS/LAZ file
 or reproject (using the same ellipsoid) for example from latitude/longitude
 to UTM or the stateplane of Ohio_North or to Earth-centered Earth-fixed (ECEF).
 You can also use common EPSG codes with '-epsg 32754'. 
-For LAS 1.4 it is important to '-set_ogc_wkt' or '-set_proj_wkt' which translates the GeoTIFF
-keys into an CRS string in the OGC WKT format and adds them as the payload
-of the corresponding VLR. For LAS 1.4 files you can use '-set_ogc_wkt_in_evlr' or '-set_proj_wkt_in_evlr' 
-to put that string into the EVLR instead of the VLR (but we don't recommend that).
+For LAS 1.4 it is important to '-set_ogc_wkt' or '-set_proj_wkt' which translates
+the GeoTIFF keys into an CRS string in the OGC WKT format and adds them
+as the payload of the corresponding VLR.
 
 ## las2las with PROJ
 
 Using the PROJ library it is possible to transform between 
 different Coordinate Reference Systems (CRSs) using the argument '-proj_epsg'.
-Specifying the source CRS is optional for all commands. If no source CRS is specified, 
-the tool will attempt to extract this information from the header of the input file 
+Specifying the source CRS is optional for all commands. If no source CRS is
+specified, the tool will attempt to extract this information from the header of
+the input file 
 'in.laz', which is recommended.
 There is a hierarchy for determining the source CRS for the PROJ transformation:
 1. the source CRS is passed as an argument.
 2. if not, the WKT is searched for in the header of the source file.
 3. if no WKT is available, it is generated from the GeoTIFF data.
-4. if this is not possible, the EPSG code from the GeoTIFF is used, which can lead to inaccuracies as GeoTIFF arguments could be ignored.
+4. if this is not possible, the EPSG code from the GeoTIFF is used, which can
+   lead to inaccuracies as GeoTIFF arguments could be ignored.
 
-Files with CompoundCRS are not yet supported for transformations using PROJ in LAStools.
+Files with CompoundCRS are not yet supported for transformations using PROJ in
+LAStools.
 The recommended methods for specifying CRSs are the use of EPSG codes or 
 WKT representations, as these adhere to well-defined standards:
  
@@ -67,13 +69,18 @@ can also be used directly to describe the transformation or operation.
     las2las64 -i in.laz -o out.laz -proj_string "proj_string_source" "proj_string_target"
 
 ## Offset
-The following options are available for automatically setting a sensible offset of the point coordinates to avoid overflows:
+The following options are available for automatically setting a sensible offset of
+the point coordinates to avoid overflows:
 
--auto_reoffset: This option sets an appropriate offset in the header and translates the points accordingly. 
-This option is only considered for LAS/LAZ input files and is recommended as long as no point coordinate operation or transformation is performed.
+-auto_reoffset: This option sets an appropriate offset in the header and
+translates the points accordingly. 
+This option is only considered for LAS/LAZ input files and is recommended as long
+as no point coordinate operation or transformation is performed.
 
--offset_adjust: This option sets the offset based on the selected point coordinate operations and transformations. 
-It is recommended to be used for such operations and transformations and is applicable to all supported input file formats.
+-offset_adjust: This option sets the offset based on the selected point coordinate
+operations and transformations. 
+It is recommended to be used for such operations and transformations and is
+applicable to all supported input file formats.
 
 
 ## Examples
@@ -286,7 +293,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -set_ogc_wkt [n]                    : translate GeoTIFF keys [n] into CRS string in OGC WKT format and add it as VLR  
 -set_ogc_wkt_in_evlr [n]            : same as "set_ogc_wkt" but adds [n] as LAS 1.4 EVLR instead. Really not recommended!!!  
 -set_proj_wkt [n]                   : translate GeoTIFF keys [n] into CRS string in OGC WKT1 format using the proj lib format and add it as VLR  
--set_proj_wkt_in_evlr [n]           : same as "set_ogc_wkt" but adds [n] as LAS 1.4 EVLR instead. Really not recommended!!!
+-set_proj_wkt_in_evlr [n]           : same as "set_ogc_wkt" but adds [n] as LAS 1.4 EVLR instead. Really not recommended!!!  
 -set_point_data_format [n]          : force point type to be [n]{1-10}  
 -set_point_data_record_length [n]   : CAREFUL! sets the point data record length field of the LAS header to size [n] without checking whether this will corrupt the file  
 -set_point_size [n]                 : force point size to be [n]  

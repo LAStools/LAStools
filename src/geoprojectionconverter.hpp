@@ -72,9 +72,11 @@
 
 #include "proj_loader.h"
 #include <stdio.h>
+#include <string>
+#include "lasdefinitions.hpp"
+#include "wktparser.h"
 
-struct GeoProjectionGeoKeys
-{
+struct GeoProjectionGeoKeys {
   unsigned short key_id;
   unsigned short tiff_tag_location;
   unsigned short count;
@@ -145,6 +147,7 @@ struct GeoProjectionGeoKeys
 #define GEO_VERTICAL_NAVD88_GEOID12  1125103
 #define GEO_VERTICAL_NAVD88_GEOID12A 1135103
 #define GEO_VERTICAL_NAVD88_GEOID12B 1145103
+#define GEO_VERTICAL_NAVD88_GEOID18  1185103
 
 #pragma warning(push)
 #pragma warning(disable : 26495)
@@ -170,6 +173,9 @@ public:
   short datum;
   char name[256];
   GeoProjectionParameters() { type = -1; geokey = 0; datum = 0; name[0] = '\0'; };
+  std::string info() {
+    return "epsg=" + std::to_string(geokey) + ", " + std::string(name);
+  }
 };
 
 class GeoProjectionParametersUTM : public GeoProjectionParameters
@@ -318,14 +324,13 @@ class ProjParameters
 class GeoProjectionConverter
 {
 public:
-
+  // direct access to current horizontal unit
+  short horizontal_epsg = EPSG_METER;
+  bool GeoTiffInfo(GeoProjectionGeoKeys* geokey, const std::string asciip, F64* doubleparams, std::string& keystr, std::string& value);
   // parse command line arguments
-
   void parse(int argc, char* argv[]);
   int unparse(char* string) const;
-
   // set & get current projection
-
   bool set_projection_from_geo_keys(int num_geo_keys, const GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description=0, bool source=true);
   bool get_geo_keys_from_projection(int& num_geo_keys, GeoProjectionGeoKeys** geo_keys, int& num_geo_double_params, double** geo_double_params, bool source=true);
   bool set_projection_from_ogc_wkt(const char* ogc_wkt, char* description=0);

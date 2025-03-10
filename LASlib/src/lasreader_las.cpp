@@ -684,13 +684,13 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
         }
         else
         {
-          header.vlrs[i].data = new U8[header.vlrs[i].record_length_after_header];
-
+          header.vlrs[i].data = new U8[header.vlrs[i].record_length_after_header+1]; // +final \0 to ensure char termination
           try { stream->getBytes(header.vlrs[i].data, header.vlrs[i].record_length_after_header); } catch(...)
           {
             laserror("reading %d bytes of data into header.vlrs[%d].data", header.vlrs[i].record_length_after_header, i);
             return FALSE;
           }
+          header.vlrs[i].data[header.vlrs[i].record_length_after_header] = 0; // ensure char termination
         }
       }
       else
@@ -1137,13 +1137,13 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             }
             else
             {
-              header.evlrs[i].data = new U8[(U32)header.evlrs[i].record_length_after_header];
-
+              header.evlrs[i].data = new U8[(U32)header.evlrs[i].record_length_after_header+1];
               try { stream->getBytes(header.evlrs[i].data, (U32)header.evlrs[i].record_length_after_header); } catch(...)
               {
                 laserror("reading %d bytes of data into header.evlrs[%d].data", (I32)header.evlrs[i].record_length_after_header, i);
                 return FALSE;
               }
+              header.evlrs[i].data[header.evlrs[i].record_length_after_header] = 0; // ensure char termination
             }
           }
           else

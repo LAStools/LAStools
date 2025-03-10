@@ -649,6 +649,7 @@ void LASreadOpener::z_from_attribute_bydefault()
 
 LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_other)
 {
+  inside_depth_opener = 0;
 	if (filter) filter->reset();
 	if (transform) transform->reset();
 
@@ -693,7 +694,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			if (inside_tile) lasreadermerged->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 			if (inside_circle) lasreadermerged->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 			if (inside_rectangle) lasreadermerged->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-			if (inside_depth) lasreadermerged->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
+			if (inside_depth_opener) lasreadermerged->inside_copc_depth(inside_depth_opener, copc_depth, copc_resolution);
 			LASreader* lasreader = 0;
 			if (stored)
 			{
@@ -957,7 +958,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 
 					// If no user-defined query we force a query anyway to never read a copc file in order but
 					// instead we enforce the use of the index to read in a spatially coherent order.
-					if (!inside_circle && !inside_rectangle && !inside_depth) set_max_depth(I32_MAX);
+					if (!inside_circle && !inside_rectangle && !inside_depth_opener) set_max_depth(I32_MAX);
 				}
 				if (files_are_flightlines)
 				{
@@ -973,7 +974,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 				if (inside_rectangle) lasreaderlas->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
 				else if (inside_tile) lasreaderlas->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				else if (inside_circle) lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
-				if (inside_depth)
+				if (inside_depth_opener)
 				{
 					if (!lasreaderlas->get_copcindex())
 					{
@@ -982,7 +983,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 						return 0;
 					}
 
-					lasreaderlas->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
+					lasreaderlas->inside_copc_depth(inside_depth_opener, copc_depth, copc_resolution);
 				}
 
 				if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderlas);
@@ -1629,7 +1630,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
 			if (inside_tile) lasreaderlas->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 			if (inside_circle) lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 			if (inside_rectangle) lasreaderlas->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
-			if (inside_depth) lasreaderlas->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
+			if (inside_depth_opener) lasreaderlas->inside_copc_depth(inside_depth_opener, copc_depth, copc_resolution);
 			LASreader* lasreader = 0;
 			if (stored)
 			{
@@ -1718,7 +1719,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				else if (inside_tile) lasreadermerged->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				else lasreadermerged->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 			}
-			if (inside_depth) lasreadermerged->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
+			if (inside_depth_opener) lasreadermerged->inside_copc_depth(inside_depth_opener, copc_depth, copc_resolution);
 			return TRUE;
 		}
 		else if ((buffer_size > 0) && ((file_name_number > 1) || (neighbor_file_name_number > 0)))
@@ -1736,7 +1737,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 				else if (inside_tile) lasreaderbuffered->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 				else lasreaderbuffered->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 			}
-			if (inside_depth) lasreaderbuffered->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
+			if (inside_depth_opener) lasreaderbuffered->inside_copc_depth(inside_depth_opener, copc_depth, copc_resolution);
 			if (!remain_buffered) lasreaderbuffered->remove_buffer();
 			return TRUE;
 		}
@@ -1758,7 +1759,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered)
 					else if (inside_tile) lasreaderlas->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
 					else lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
 				}
-				if (inside_depth) lasreaderlas->inside_copc_depth(inside_depth, copc_depth, copc_resolution);
+				if (inside_depth_opener) lasreaderlas->inside_copc_depth(inside_depth_opener, copc_depth, copc_resolution);
 				return TRUE;
 			}
 			else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN"))
@@ -3664,13 +3665,13 @@ void LASreadOpener::set_inside_rectangle(const F64 min_x, const F64 min_y, const
 
 void  LASreadOpener::set_max_depth(const I32 max_depth)
 {
-  	inside_depth = 1;
+  	inside_depth_opener = 1;
   	copc_depth = max_depth;
 }
 
 void  LASreadOpener::set_resolution(const F32 resolution)
 {
-  	inside_depth = 2;
+  	inside_depth_opener = 2;
   	copc_resolution = resolution;
 }
 
@@ -3756,7 +3757,7 @@ LASreadOpener::LASreadOpener()
     temp_file_base = ".";
 #endif
 	// COPC
-	inside_depth = 0;
+	inside_depth_opener = 0;
 	copc_stream_order = 1;
 	copc_resolution = 0;
 	copc_depth = -1;
