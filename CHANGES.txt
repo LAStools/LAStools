@@ -1,4 +1,4 @@
-10 March 2025 -- NEW: WKT/WKT2 to GeoTIFF conversion for raster output
+﻿10 March 2025 -- NEW: WKT/WKT2 to GeoTIFF conversion for raster output
 10 March 2025 -- NEW: NAVD88 GEOID18 information support
 10 March 2025 -- NEW: tool geotiffinfo to show detail infos about GeoKey directory entries of GeoTIFF files
 10 March 2025 -- NEW: tool wktformat to format WKT/WKT2 information as single line / multi line string
@@ -162,7 +162,7 @@
  6 January 2020 -- lasvalidate: fix for LAS 1.4 files with extra bytes and new option '-tile_size 1000' to check tile extend
  2 January 2020 -- lasgrid and las2dem: also support 3-band 8 bit RGB output ('-false', '-rgb') for IMG raster output 
  1 January 2020 -- lastile: fix for 64 bit combination of '-external_tiling tiles_utm_600m.shp NAME' and '-cpu64'
-24 December 2019 -- LASzip, LASlib, all LAStools: bug fix for file names with special characters like 'T��grupid.laz'
+24 December 2019 -- LASzip, LASlib, all LAStools: bug fix for file names with special characters
 10 December 2019 -- lascolor: support 3-band 8 bit RGB '-image' input from IMG format in addition to TIF and PNG formats 
 26 November 2019 -- lastile: option '-external_tiling tiles_utm_600m.shp NAME' creates tiles from SHP file with names
 23 November 2019 -- demzip: bug fix for '-nodata ....' command line switches and out-of-core handling for large raster
