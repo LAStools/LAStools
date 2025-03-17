@@ -318,7 +318,7 @@ bool StringInVector(const std::string& val, const std::vector<std::string>& vec,
   if (casesense) {
     return std::find(vec.begin(), vec.end(), val) != vec.end();
   } else {
-    auto iterator = std::find_if(vec.begin(), vec.end(), [&](auto& s) { return (to_lower_copy(s).compare(to_lower_copy(val)) == 0); });
+    auto iterator = std::find_if(vec.begin(), vec.end(), [&](std::string s) { return (to_lower_copy(s).compare(to_lower_copy(val)) == 0); });
     return iterator != vec.end();
   }
 }
