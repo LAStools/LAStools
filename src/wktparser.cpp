@@ -28,6 +28,7 @@
 #include "mydefs.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <map>
 #include <sstream>

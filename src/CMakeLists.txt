@@ -10,6 +10,7 @@ add_definitions(-DNDEBUG )
 include_directories(../LASzip/include/laszip)
 include_directories(../LASzip/src)
 include_directories(../LASlib/inc)
+include_directories(.)
 
 set(GEOPROJECTION_TARGETS
   laszip
