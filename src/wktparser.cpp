@@ -34,6 +34,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <math.h>
 
 int UnitValueToEpsg(double val) {
   if (val == 1.0) {

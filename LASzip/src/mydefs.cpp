@@ -41,6 +41,8 @@
 #ifdef _MSC_VER
 #include <windows.h>
 #else
+#include <math.h>
+#include <algorithm>
 #include <iomanip>
 #include <unistd.h>
 #endif

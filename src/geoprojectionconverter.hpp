@@ -73,6 +73,7 @@
 #include "proj_loader.h"
 #include <stdio.h>
 #include <string>
+#include <algorithm>
 #include "lasdefinitions.hpp"
 #include "wktparser.h"
 
