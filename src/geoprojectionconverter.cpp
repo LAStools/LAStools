@@ -3430,10 +3430,12 @@ short GeoProjectionConverter::get_GeogGeodeticDatumGeoKey() const {
       }
     }
   }
+  /* this is not always true - better nothing than the wrong one
   // if not in geo keys derive from GCS code
   if (gcs_code != -1) {
     return gcs_code + 2000;
   }
+  */
   return 0;
 }
 
