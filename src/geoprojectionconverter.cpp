@@ -33,6 +33,7 @@
 */
 #include "geoprojectionconverter.hpp"
 
+#include <algorithm>
 #include <map>
 #include <math.h>
 #include <stdio.h>

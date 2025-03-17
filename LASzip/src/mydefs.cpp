@@ -33,6 +33,9 @@
 #include "lasmessage.hpp"
 #include "laszip_common.h"
 
+#include <algorithm>
+#include <cmath>
+#include <cstdarg>
 #include <cstring>
 #include <filesystem>
 #include <stdarg.h>
