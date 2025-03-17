@@ -2230,6 +2230,7 @@ U32 LASreadOpener::get_file_name_current() const {
   return file_name_current;
 }
 
+#ifdef LASTOOLS_FULL
 std::string LASreadOpener::get_file_name_opt_only(bool name_only) {
   if (name_only)
     return std::string(get_file_name_only());
@@ -2239,6 +2240,7 @@ std::string LASreadOpener::get_file_name_opt_only(bool name_only) {
     return std::filesystem::absolute(ffn).string();
   }
 }
+#endif
 
 const CHAR* LASreadOpener::get_file_name() const {
   if (file_name) return file_name;

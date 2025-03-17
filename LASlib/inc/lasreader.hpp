@@ -275,7 +275,9 @@ class LASLIB_DLL LASreadOpener {
   U32 get_file_name_current() const;
   const CHAR* get_file_name() const;
   const CHAR* get_file_name_only() const;
+#ifdef LASTOOLS_FULL
   std::string get_file_name_opt_only(bool name_only);
+#endif
   const CHAR* get_file_extension_only() const;
   const CHAR* get_file_name(U32 number) const;
   const CHAR* get_file_name_only(U32 number) const;
