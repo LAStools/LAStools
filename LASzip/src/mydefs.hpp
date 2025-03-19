@@ -329,16 +329,17 @@ class pnt_cnt_error : public exception_file_loop {
   explicit pnt_cnt_error() noexcept : exception_file_loop("too less points"){};
 };
 
-extern bool wait_on_exit;
-extern bool halt_on_error;
-extern bool print_log_stats;
+extern void LASLIB_DLL wait_on_exit(bool woe = true);
+extern void LASLIB_DLL print_log_stats(bool pls = true);
+extern void LASLIB_DLL halt_on_error(bool hoe);
+extern bool LASLIB_DLL do_halt_on_error();
 
 enum LAS_EXIT_CODE { LAS_EXIT_OK = 0, LAS_EXIT_ERROR, LAS_EXIT_WARNING };
 
 LAS_EXIT_CODE las_exit_code(bool error);
 
 // void byebye(LAS_EXIT_CODE code = LAS_EXIT_OK);
-void byebye();
+extern void LASLIB_DLL byebye();
 
 #if 0
   // Non Windows - specific conversion ANSI to UTF-8
@@ -354,7 +355,7 @@ const char* indent_text(const char* text, const char* indent);
 template <typename... Args>
 void laserror(LAS_FORMAT_STRING(const char*) fmt, Args... args) {
   LASMessage(LAS_ERROR, fmt, args...);
-  if (halt_on_error) {
+  if (do_halt_on_error()) {
     byebye();
   }
   return;
@@ -365,7 +366,7 @@ template <typename... Args>
 void laserrorm(LAS_FORMAT_STRING(const char*) fmt, Args... args) {
   LASMessage(LAS_ERROR, fmt, args...);
   LASMessage(LAS_INFO, "\tcontact info@rapidlasso.de for support\n");
-  if (halt_on_error) {
+  if (do_halt_on_error()) {
     byebye();
   }
   return;

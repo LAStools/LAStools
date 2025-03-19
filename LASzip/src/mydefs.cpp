@@ -73,26 +73,38 @@ wchar_t* ANSItoUTF16(const char* ansi) {
 }
 #endif
 
-bool wait_on_exit
-#if defined(__GNUC__)
-    __attribute__((unused))
-#endif
-    = false;
-bool print_log_stats = false;
-bool halt_on_error = true;
+static bool wait_on_exit_ = false;
+static bool print_log_stats_ = false;
+static bool halt_on_error_ = true;
+
+extern void LASLIB_DLL wait_on_exit(bool woe) {
+  wait_on_exit_ = woe;
+}
+
+extern void LASLIB_DLL print_log_stats(bool pls) {
+  print_log_stats_ = pls;
+}
+
+extern void LASLIB_DLL halt_on_error(bool hoe) {
+  halt_on_error_ = hoe;
+}
+
+extern bool LASLIB_DLL do_halt_on_error() {
+  return halt_on_error_;
+}
 
 LAS_EXIT_CODE las_exit_code(bool error) {
   return (error ? LAS_EXIT_ERROR : LAS_EXIT_OK);
 }
 
-void byebye() {
+extern void LASLIB_DLL byebye() {
   // optional: print stats
-  if (print_log_stats) {
+  if (print_log_stats_) {
     LASMessage(
         LAS_INFO, "Log stats: FE=%lu,E=%lu,SW=%lu,W=%lu,I=%lu", lasmessage_cnt[LAS_FATAL_ERROR], lasmessage_cnt[LAS_ERROR],
         lasmessage_cnt[LAS_SERIOUS_WARNING], lasmessage_cnt[LAS_WARNING], lasmessage_cnt[LAS_INFO]);
   }
-  if (wait_on_exit) {
+  if (wait_on_exit_) {
     std::fprintf(stderr, "<press ENTER>\n");
     (void)std::getc(stdin);
   }

@@ -137,7 +137,7 @@ class LasTool
         else if (strcmp(argv[i], "-errors_ignore") == 0)
         {
             if (active)
-                halt_on_error = false;
+                halt_on_error(false);
         }
         else if (strcmp(argv[i], "-force") == 0)
         {
@@ -147,7 +147,7 @@ class LasTool
         else if (strcmp(argv[i], "-print_log_stats") == 0)
         {
             if (active)
-                print_log_stats = true;
+                print_log_stats();
         }
         else
         {

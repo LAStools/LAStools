@@ -284,7 +284,7 @@ class LasTool_lasinfo : public LasTool {
 #ifdef COMPILE_WITH_GUI
       lasinfo_gui(argc, argv, 0);
 #else
-      wait_on_exit = true;
+      wait_on_exit();
       fprintf(stderr, "%s is better run in the command line\n", argv[0]);
       char file_name[256];
       fprintf(stderr, "enter input file: ");

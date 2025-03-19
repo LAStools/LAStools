@@ -20,4 +20,6 @@ if (BUILD_SHARED_LIBS AND UNIX AND NOT APPLE)
 endif()
 
 add_subdirectory(LASlib/src)
+if (NOT BUILD_SHARED_LIBS)
 add_subdirectory(src)
+endif()

@@ -872,7 +872,7 @@ int main(int argc, char *argv[])
 #ifdef COMPILE_WITH_GUI
     return lasdiff_gui(argc, argv, 0);
 #else
-    wait_on_exit = true;
+    wait_on_exit();
     char file_name[256];
     fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     fprintf(stderr,"enter input file1: "); fgets(file_name, 256, stdin);
