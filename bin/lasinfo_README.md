@@ -310,7 +310,7 @@ Further examples
 -js                                 : output in json format  
 -progress [n]                       : report progress every [n] points  
 -proj_info [wkt] [js] [str] [epsg] [el] [datum] [cs] : get CRS representations and information of the input file: [wkt] WKT, [js] PROJJSON, [str] PROJ string or [epsg] EPSG code representation and [el] ellipsoid, [datum] datum or [cs] coordinate system information  
--rename [n]                         : renames input file 'fusa.laz' to '[n]_277750_6122250.laz'  
+-rename [n]                         : renames input file 'fusa.laz' to '[n]_123_456.laz' where 123 and 456 is the x and y header minimum value
 -repair                             : repair both bounding box and counters  
 -repair_bb                          : repair bounding box  
 -repair_counters                    : set (in place) the counters for point number and (extended) return histograms in header  
@@ -324,20 +324,9 @@ Further examples
 -set_file_source_ID_from_point_source_ID: set (in place) file source ID in header to value that *all* points have in point source ID  
 -set_generating_software [n]        : set generating software header entry to [n] (max. 31 char string)  
 -set_geotiff_epsg [n]               : adds EPSG code [n] in-place when other GeoTIFF tags present  
--set_global_encoding [0/1]          : CAREFUL! sets the global encoding field of the LAS header to [0/1] without checking whether this will corrupt the file  
 -set_GUID [n]                       : sets the GUID [n] in header (assuming it is given in example hexadecimal format shown)  
--set_header_size [n]                : CAREFUL! sets the header size field of the LAS header to [n] without checking whether this will corrupt the file  
--set_number_of_point_records [n]    : set number of point records to [n]  
--set_number_of_points_by_return  [m] [n] [o] [p] [q]: set "number of points by return" header info [m] [n] [o] [p] [q]  
--set_number_of_variable_length_records [n]: set number of variable length records to [n]  
--set_offset [x] [y] [z]             : CAREFUL! sets the offset in the LAS header to [x] [y] [z] without changing the point coordinates  
--set_offset_to_point_data [n]       : CAREFUL! sets the offset to point data field of the LAS header to [n] without checking whether this will corrupt the file  
--set_point_data_format [n]          : CAREFUL! sets the point data format field of the LAS header to point type [n]{1-10} without checking whether this will corrupt the file  
--set_point_data_record_length [n]   : CAREFUL! sets the point data record length field of the LAS header to size [n] without checking whether this will corrupt the file  
 -set_scale [x] [y] [z]              : quantize ASCII points with [x] [y] [z] (unit meters)  
--set_start_of_waveform_data_packet_record [n]: CAREFUL! sets the start of waveform data packet record field of the LAS header to [n] without checking whether this will corrupt the file  
 -set_system_identifier [n]          : set the system identifier header entry to [n] (max 31 characters)  
--set_version [n]                    : CAREFUL! sets the version field of the LAS header to [n]{e.g. 1.2}  without checking whether this will corrupt the file  
 -set_vlr_description [m] [n]        : set description of vlr [m] to [n]  
 -set_vlr_record_id [m] [n]          : set record id of vlr [m] to [n]  
 -set_vlr_user_id [m] [n]            : set user id of vlr [m] to [n]  
@@ -355,6 +344,22 @@ Further examples
 -suppress_z                         : do not decompress z coordinates for native-compressed LAS 1.4 point types 6 or higher  
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS
 -wkt_format                         : formats WKT output with line breaks and indent for better readability
+
+## lasinfo patch arguments
+
+CAREFUL! this arguments patch LAS/LAZ files and they will become probably invalid
+
+-set_number_of_point_records [n]    : set number of point records to [n]  
+-set_number_of_points_by_return  [m] [n] [o] [p] [q]: set "number of points by return" header info [m] [n] [o] [p] [q]  
+-set_number_of_variable_length_records [n]: set number of variable length records to [n]  
+-set_global_encoding [0/1]          : CAREFUL! sets the global encoding field of the LAS header to [0/1] without checking whether this will corrupt the file  
+-set_header_size [n]                : CAREFUL! sets the header size field of the LAS header to [n] without checking whether this will corrupt the file  
+-set_offset [x] [y] [z]             : CAREFUL! sets the offset in the LAS header to [x] [y] [z] without changing the point coordinates  
+-set_offset_to_point_data [n]       : CAREFUL! sets the offset to point data field of the LAS header to [n] without checking whether this will corrupt the file  
+-set_point_data_format [n]          : CAREFUL! sets the point data format field of the LAS header to point type [n]{1-10} without checking whether this will corrupt the file  
+-set_point_data_record_length [n]   : CAREFUL! sets the point data record length field of the LAS header to size [n] without checking whether this will corrupt the file  
+-set_version [n]                    : CAREFUL! sets the version field of the LAS header to [n]{e.g. 1.2}  without checking whether this will corrupt the file  
+-set_start_of_waveform_data_packet_record [n]: CAREFUL! sets the start of waveform data packet record field of the LAS header to [n] without checking whether this will corrupt the file  
 
 ### Basics
 -cores [n]: process multiple inputs on [n] cores in parallel  
