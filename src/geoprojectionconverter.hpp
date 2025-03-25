@@ -474,11 +474,11 @@ public:
   bool to_target(const double* point, double& x, double& y, double& elevation) const;
 
   bool has_target_precision() const;
-  double get_target_precision() const;
+  double get_target_precision(double header_precision = 0.0) const;
   void set_target_precision(double target_precision);
 
   bool has_target_elevation_precision() const;
-  double get_target_elevation_precision() const;
+  double get_target_elevation_precision(double header_precision = 0.0) const;
   void set_target_elevation_precision(double target_elevation_precision);
 
   // for interfacing with common geo-spatial formats

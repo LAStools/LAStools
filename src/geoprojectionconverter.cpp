@@ -7920,21 +7920,29 @@ bool GeoProjectionConverter::has_target_precision() const {
   return (target_precision ? true : false);
 }
 
-double GeoProjectionConverter::get_target_precision() const {
+double GeoProjectionConverter::get_target_precision(double header_precision) const {
   if (target_precision) {
     return target_precision;
   } else if (target_projection && (target_projection->type == GEO_PROJECTION_LONG_LAT || target_projection->type == GEO_PROJECTION_LAT_LONG)) {
     return 1e-7;
+  } else if (source_projection && (source_projection->type == GEO_PROJECTION_LONG_LAT || source_projection->type == GEO_PROJECTION_LAT_LONG)) {
+    return 0.01;
   } else if (projParameters.proj_target_crs && projParameters.proj_ctx) {
-    PJ* coord_system = proj_crs_get_coordinate_system(projParameters.proj_ctx, projParameters.proj_target_crs);
+    PJ* target_coord_system = proj_crs_get_coordinate_system(projParameters.proj_ctx, projParameters.proj_target_crs);
 
-    if (coord_system) {
-      PJ_COORDINATE_SYSTEM_TYPE cs_type = proj_cs_get_type(projParameters.proj_ctx, coord_system);
+    if (target_coord_system) {
+      PJ* source_coord_system = proj_crs_get_coordinate_system(projParameters.proj_ctx, projParameters.proj_source_crs);
+      PJ_COORDINATE_SYSTEM_TYPE target_cs_type = proj_cs_get_type(projParameters.proj_ctx, target_coord_system);
+      PJ_COORDINATE_SYSTEM_TYPE source_cs_type = proj_cs_get_type(projParameters.proj_ctx, source_coord_system);
 
-      if (cs_type == PJ_CS_TYPE_ELLIPSOIDAL) {
+      if (target_cs_type == PJ_CS_TYPE_ELLIPSOIDAL) {
         return 1e-7;
+      } else if (source_coord_system && source_cs_type == PJ_CS_TYPE_ELLIPSOIDAL && target_cs_type != PJ_CS_TYPE_ELLIPSOIDAL) {
+        return 0.01;
       }
     }
+  } else if (header_precision > 0.0) {
+    return header_precision;
   }
   return 0.01;
 }
@@ -7947,9 +7955,11 @@ bool GeoProjectionConverter::has_target_elevation_precision() const {
   return (target_elevation_precision ? true : false);
 }
 
-double GeoProjectionConverter::get_target_elevation_precision() const {
+double GeoProjectionConverter::get_target_elevation_precision(double header_precision) const {
   if (target_elevation_precision) {
     return target_elevation_precision;
+  } else if (header_precision > 0.0) {
+    return header_precision;
   }
   return 0.01;
 }

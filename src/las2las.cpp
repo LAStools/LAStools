@@ -1782,24 +1782,30 @@ int main(int argc, char* argv[])
           point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
           point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
           geoprojectionconverter.to_target(point);
-          reproject_quantizer->x_scale_factor = 
-              geoprojectionconverter.has_target_precision() 
-                  ? geoprojectionconverter.get_target_precision()
-                  : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[0] > 0.0 
-                      ? lasreadopener.get_scale_factor()[0] 
-                      : lasreader->header.x_scale_factor);
-          reproject_quantizer->y_scale_factor = 
-              geoprojectionconverter.has_target_precision() 
-                  ? geoprojectionconverter.get_target_precision()
-                  : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[1] > 0.0 
-                      ? lasreadopener.get_scale_factor()[1] 
-                      : lasreader->header.y_scale_factor);
-          reproject_quantizer->z_scale_factor = 
-              geoprojectionconverter.has_target_elevation_precision() 
-                  ? geoprojectionconverter.get_target_elevation_precision()
-                  : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[2] > 0.0 
-                      ? lasreadopener.get_scale_factor()[2] 
-                      : lasreader->header.z_scale_factor);          
+          if (!geoprojectionconverter.has_target_precision() && lasreadopener.get_scale_factor() != nullptr &&
+              lasreadopener.get_scale_factor()[0] > 0.0) {
+            LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for x scaling", lasreadopener.get_scale_factor()[0]);
+            reproject_quantizer->x_scale_factor = lasreadopener.get_scale_factor()[0];
+          } else {
+            LASMessage(LAS_VERBOSE, "target precision is used for x scaling");
+            reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.x_scale_factor);
+          }
+          if (!geoprojectionconverter.has_target_precision() && lasreadopener.get_scale_factor() != nullptr &&
+              lasreadopener.get_scale_factor()[1] > 0.0) {
+            LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for y scaling", lasreadopener.get_scale_factor()[1]);
+            reproject_quantizer->y_scale_factor = lasreadopener.get_scale_factor()[1];
+          } else {
+            LASMessage(LAS_VERBOSE, "target precision is used for y scaling");
+            reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.y_scale_factor);
+          }
+          if (!geoprojectionconverter.has_target_elevation_precision() && lasreadopener.get_scale_factor() != nullptr &&
+              lasreadopener.get_scale_factor()[2] > 0.0) {
+            LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for z scaling", lasreadopener.get_scale_factor()[2]);
+            reproject_quantizer->z_scale_factor = lasreadopener.get_scale_factor()[2];
+          } else {
+            LASMessage(LAS_VERBOSE, "target elevation precision is used for z scaling");
+            reproject_quantizer->z_scale_factor = geoprojectionconverter.get_target_elevation_precision(lasreader->header.z_scale_factor);
+          }      
           reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
           reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
           reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
@@ -1865,24 +1871,30 @@ int main(int argc, char* argv[])
         point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
         point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
         geoprojectionconverter.to_target(point);
-        reproject_quantizer->x_scale_factor = 
-            geoprojectionconverter.has_target_precision() 
-                ? geoprojectionconverter.get_target_precision()
-                : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[0] > 0.0 
-                    ? lasreadopener.get_scale_factor()[0] 
-                    : lasreader->header.x_scale_factor);
-        reproject_quantizer->y_scale_factor = 
-            geoprojectionconverter.has_target_precision() 
-                ? geoprojectionconverter.get_target_precision()
-                : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[1] > 0.0 
-                    ? lasreadopener.get_scale_factor()[1] 
-                    : lasreader->header.y_scale_factor);
-        reproject_quantizer->z_scale_factor = 
-            geoprojectionconverter.has_target_elevation_precision() 
-                ? geoprojectionconverter.get_target_elevation_precision()
-                : (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[2] > 0.0 
-                    ? lasreadopener.get_scale_factor()[2] 
-                    : lasreader->header.z_scale_factor);
+        if (!geoprojectionconverter.has_target_precision() && lasreadopener.get_scale_factor() != nullptr &&
+            lasreadopener.get_scale_factor()[0] > 0.0) {
+          LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for x scaling", lasreadopener.get_scale_factor()[0]);
+          reproject_quantizer->x_scale_factor = lasreadopener.get_scale_factor()[0];
+        } else {
+          LASMessage(LAS_VERBOSE, "target precision is used for x scaling");
+          reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.x_scale_factor);
+        }
+        if (!geoprojectionconverter.has_target_precision() && lasreadopener.get_scale_factor() != nullptr &&
+            lasreadopener.get_scale_factor()[1] > 0.0) {
+          LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for y scaling", lasreadopener.get_scale_factor()[1]);
+          reproject_quantizer->y_scale_factor = lasreadopener.get_scale_factor()[1];
+        } else {
+          LASMessage(LAS_VERBOSE, "target precision is used for y scaling");
+          reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.y_scale_factor);
+        }
+        if (!geoprojectionconverter.has_target_elevation_precision() && lasreadopener.get_scale_factor() != nullptr &&
+            lasreadopener.get_scale_factor()[2] > 0.0) {
+          LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for z scaling", lasreadopener.get_scale_factor()[2]);
+          reproject_quantizer->z_scale_factor = lasreadopener.get_scale_factor()[2];
+        } else {
+          LASMessage(LAS_VERBOSE, "target elevation precision is used for z scaling");
+          reproject_quantizer->z_scale_factor = geoprojectionconverter.get_target_elevation_precision(lasreader->header.z_scale_factor);
+        }
         reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
         reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
         reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
