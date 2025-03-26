@@ -368,7 +368,7 @@ public:
   bool set_VerticalUnitsGeoKey(short value);
   short get_VerticalUnitsGeoKey(bool source=true) const;
 
-  bool set_VerticalCSTypeGeoKey(short value, char* description=0);
+  bool set_VerticalCSTypeGeoKey(short value, char* description = 0, size_t descs = 0);
   short get_VerticalCSTypeGeoKey();
 
   bool set_reference_ellipsoid(int id, char* description=0);

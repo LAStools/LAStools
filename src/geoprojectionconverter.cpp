@@ -1787,8 +1787,8 @@ bool GeoProjectionConverter::GeoTiffInfo(
           break;
         case 4096:  // VerticalCSTypeGeoKey
           if (!mapFindAssign(geokeye->value_offset, mapVerticalCSTypeGeoKey)) {
-            char* data = (char*)malloc(280);
-            if (set_VerticalCSTypeGeoKey(geokeye->value_offset, data)) {
+            char* data = (char*)malloc(200);
+            if (set_VerticalCSTypeGeoKey(geokeye->value_offset, data, 200)) {
               value = std::string(data);
             }
             free(data);
@@ -3964,7 +3964,7 @@ short GeoProjectionConverter::get_VerticalUnitsGeoKey(bool source) const {
   }
 }
 
-bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* description) {
+bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* description, size_t descs) {
   if (value == GEO_VERTICAL_WGS84) {
     vertical_geokey = GEO_VERTICAL_WGS84;
     if (description) sprintf(description, "WGS 84 Ellipsoid");
@@ -4058,8 +4058,7 @@ bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* descrip
             // this is where the name ends
             line[run] = '\0';
           }
-          size_t len = strlen(name) + 1;
-          if (description) snprintf(description, len, "%s", name);
+          if (description) snprintf(description, descs, "%s", name);
           run++;
           // skip two commas
           while (line[run] != ',') run++;
@@ -7920,7 +7919,7 @@ bool GeoProjectionConverter::to_target(const double* point, double& x, double& y
 }
 
 bool GeoProjectionConverter::has_target_precision() const {
-  return (target_precision ? true : false);
+  return target_precision;
 }
 
 double GeoProjectionConverter::get_target_precision() const {
@@ -7947,7 +7946,7 @@ void GeoProjectionConverter::set_target_precision(double target_precision) {
 }
 
 bool GeoProjectionConverter::has_target_elevation_precision() const {
-  return (target_elevation_precision ? true : false);
+  return target_elevation_precision;
 }
 
 double GeoProjectionConverter::get_target_elevation_precision() const {
