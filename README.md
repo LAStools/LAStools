@@ -84,7 +84,7 @@ The documentation is located in
 * `lastile` tiles huge amounts of LAS points into square tiles
 * `lastool` is an old GUI for multiple LAStools (now each tool has its own GUI)
 * `lastrack` classifies LiDAR point based on distance from a trajectory
-* `lasvdatum` transforms iDAR from ellipsoidal to orthometric elevations using a grid
+* `lasvdatum` transforms LiDAR from ellipsoidal to orthometric elevations using a grid
 * `lasvoxel` computes voxelization of points
 * `shp2las` turns an ESRI's Shapefile into binary LAS
 
