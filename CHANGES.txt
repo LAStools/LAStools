@@ -1,4 +1,9 @@
-﻿10 March 2025 -- NEW: WKT/WKT2 to GeoTIFF conversion for raster output
+﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
+
+27 March 2025 -- NEW: las2dem,... TIFF output writes compound WKT input to GeoTIFF vertical geokeys
+27 March 2025 -- NEW: demzip support for BigTIFF files
+25 March 2025 -- fix: set target_precision by default on lat/long conversions
+10 March 2025 -- NEW: WKT/WKT2 to GeoTIFF conversion for raster output
 10 March 2025 -- NEW: NAVD88 GEOID18 information support
 10 March 2025 -- NEW: tool geotiffinfo to show detail infos about GeoKey directory entries of GeoTIFF files
 10 March 2025 -- NEW: tool wktformat to format WKT/WKT2 information as single line / multi line string
