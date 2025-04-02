@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+2 April 2025 -- fix: las2dem TIFF output writer if no projection is given
 27 March 2025 -- NEW: las2dem,... TIFF output writes compound WKT input to GeoTIFF vertical geokeys
 27 March 2025 -- NEW: demzip support for BigTIFF files
 25 March 2025 -- fix: set target_precision by default on lat/long conversions
