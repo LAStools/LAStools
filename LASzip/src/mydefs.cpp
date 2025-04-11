@@ -346,47 +346,18 @@ void* realloc_las(void* ptr, size_t size) {
   }
 }
 
-/// Wrapper for `sscanf` on other platforms than _MSC_VER and `sscanf_s` on Windows and ensures that the size is passed correctly for strings.
+/// Wrapper for `vsscanf` on other platforms than _MSC_VER and `vsscanf_s` on Windows and ensures that the size is passed correctly for strings.
 int sscanf_las(const char* buffer, const char* format, ...) {
   va_list args;
   va_start(args, format);
+  int result = 0;
 
 #ifdef _MSC_VER
-  // On Windows we use sscanf_s and may need `sizeof` for strings
-  int result = 0;
-  const char* cursor = format;
-
-  // Temporary argument stack for handling `sizeof` strings
-  va_list args_copy;
-  va_copy(args_copy, args);
-
-  // Count the arguments in the format string and insert `sizeof` where necessary
-  char adjusted_format[512] = {0};
-  char* adjusted_cursor = adjusted_format;
-
-  while (*cursor) {
-    if (*cursor == '%' && (*(cursor + 1) != '%')) {
-      *adjusted_cursor++ = *cursor++;
-      if (*cursor == 's') {
-        // Copy argument and add size
-        void* str_arg = va_arg(args_copy, void*);
-#pragma warning(push)
-#pragma warning(disable : 6269)
-        va_arg(args_copy, unsigned int);  // sizeof argument
-#pragma warning(pop)
-        adjusted_cursor += sprintf(adjusted_cursor, "%%s");
-      }
-    }
-    *adjusted_cursor++ = *cursor++;
-  }
-
-  *adjusted_cursor = '\0';
-  result = vsscanf_s(buffer, adjusted_format, args_copy);
-
-  va_end(args_copy);
+  // Windows-specific implementation if _MSC_VER is defined
+  result = vsscanf_s(buffer, format, args);
 #else
   // On other platforms we use sscanf without size specifications
-  int result = vsscanf(buffer, format, args);
+  result = vsscanf(buffer, format, args);
 #endif
 
   va_end(args);
@@ -394,24 +365,36 @@ int sscanf_las(const char* buffer, const char* format, ...) {
 }
 
 /// Wrapper for `strncpy` on other platforms than _MSC_VER and `strncpy_s` on Windows
-int strncpy_las(char* dest, size_t destsz, const char* src, size_t count) {
-  if (dest == nullptr || src == nullptr) {
-    return -1;
-  }
+void strncpy_las(char* dest, size_t destsz, const char* src, size_t count /*=0*/) {
+  try {
+    if (dest == nullptr || src == nullptr) {
+      throw std::invalid_argument("nullptr transfer");
+    }
+    if (count == 0) {
+      count = strlen(src) + 1;  // If count = 0 calculated string length + null termination
+    }
+    if (destsz < count) {
+      throw std::length_error("Target buffer too small");
+    }
+
 #ifdef _MSC_VER
-  if (strncpy_s(dest, destsz, src, count) != 0) {
-    return -1;
-  }
+    errno_t err = strncpy_s(dest, destsz, src, count);
+    if (err != 0) {
+      throw std::runtime_error("strncpy_s has failed");
+    }
 #else
-  strncpy(dest, src, count);
+    strncpy(dest, src, count);
 #endif
-  // Nulltermination
-  if (count < destsz) {
-    dest[count] = '\0';
-  } else {
-    dest[destsz - 1] = '\0';
+
+    if (count < destsz) {
+      dest[count] = '\0';
+    } else {
+      dest[destsz - 1] = '\0';
+    }
+  } catch (const std::exception& e) {
+    // Error handling directly here in the function
+    fprintf(stderr, "Error in strncpy_las: %s\n", e.what());
   }
-  return 0;
 }
 
 #ifdef BOOST_USE
