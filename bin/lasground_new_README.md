@@ -120,26 +120,36 @@ lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 
 ## lasground_new specific arguments
 
--all_returns                  : use all returns for ground classification instead of only last return  
+### terrain (steps)
+-step [n]                     : set resolution of grid used for initial ground to [n]{default=5.0}  
 -archeology                   : use archeology setting (step=1)  
--bulge [n]                    : bulge sloped neighbourhoods of TIN triangles by [n]{default=step/10}  
+-wilderness                   : use wilderness setting (step=3)  
+-nature                       : use nature setting (step=5)  
+-town                         : use town setting (step=10)  
 -city                         : use city setting (step=25)  
+-metro                        : use metro setting (step=50)  
+
+### granularity (substeps)
+-sub [n]                      : use [n] substeps for analysis  
+-extra_coarse                 : use default setting for very flat terrains (3 substeps)  
 -coarse                       : use default setting for flat terrains (4 substeps)  
+-fine                         : use fine setting (6 substeps)  
+-extra_fine                   : use extra fine setting (7 substeps)  
+-ultra_fine                   : use ultra fine setting for steep hills (8 substeps)  
+-hyper_fine                   : use hyper fine setting for very steep hills (9 substeps)  
+
+### other
+-all_returns                  : use all returns for ground classification instead of only last return  
+-bulge [n]                    : bulge sloped neighbourhoods of TIN triangles by [n]{default=step/10}  
 -compute_height               : compute height of each point  
 -cutoff_z_above [z]           : points above elevation [z] are completely excluded from ground search  
 -down_spike [n]               : remove down spikes > [n] centimeter  
--extra_coarse                 : use default setting for very flat terrains (3 substeps)  
--extra_fine                   : use extra fine setting (7 substeps)  
 -extra_pass                   : do extra read pass to count points (only makes sense when filtering)  
--fine                         : use fine setting (6 substeps)  
 -ground_class [n]             : use class [n] for ground class (default=2)  
--hyper_fine                   : use hyper fine setting for very steep hills (9 substeps)  
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ...  
 -ilay [n]                     : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]                  : look for corresponding *.lay file in directory [n]  
 -iterate [n]                  : set number of iteration loops to [n]{default=1}  
--metro                        : use metro setting (step=50)  
--nature                       : use nature setting (step=5)  
 -no_bulge                     : set bulge to zero  
 -no_clean                     : do not perform cleaning steps that remove spikes from the current ground TIN estimate  
 -no_iterate                   : disable iteration loops  
@@ -159,13 +169,8 @@ lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 -spike [n]                    : remove up and down spikes > [n] centimeter  
 -spike_down [n]               : remove down spikes > [n] centimeter  
 -stddev [n]                   : set maximal standard deviation of [n]{meter} for planar patches  
--step [n]                     : set resolution of grid used for initial ground to [n]{default=5.0}  
 -store_in_user_data           : store computed height in user data  
--sub [n]                      : use [n] substeps for analysis  
--town                         : use town setting (step=10)  
--ultra_fine                   : use ultra fine setting for steep hills (8 substeps)  
 -week_to_adjusted [n]         : converts time stamps from GPS week [n] to Adjusted Standard GPS  
--wilderness                   : use wilderness setting (step=3)  
 
 ### Basics
 -cores [n]    : process multiple inputs on [n] cores in parallel  
