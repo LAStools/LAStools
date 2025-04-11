@@ -415,7 +415,7 @@ void* realloc_las(void* ptr, size_t size);
 /// Wrapper for `sscanf` on other platforms than _MSC_VER and `sscanf_s` on Windows and ensures that the size is passed correctly for strings.
 int sscanf_las(const char* buffer, const char* format, ...);
 /// Wrapper for `strncpy` on other platforms than _MSC_VER and `strncpy_s` on Windows.
-int strncpy_las(char *dest, size_t destsz, const char *src, size_t count);
+void strncpy_las(char* dest, size_t destsz, const char* src, size_t count = 0);
 
 #ifdef BOOST_USE
 #define BOOST_PRE boost::algorithm::
