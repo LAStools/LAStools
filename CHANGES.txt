@@ -1,5 +1,7 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+15 April 2025 -- NEW: ArcGIS Pro plugin rework: add lascopy, las3dpoly, lasdatum, lasvdatum, lasdistance, lasground_new, lasvoxel
+14 April 2025 -- fix: asc reader, string parser
 2 April 2025 -- fix: las2dem TIFF output writer if no projection is given
 27 March 2025 -- NEW: las2dem,... TIFF output writes compound WKT input to GeoTIFF vertical geokeys
 27 March 2025 -- NEW: demzip support for BigTIFF files
