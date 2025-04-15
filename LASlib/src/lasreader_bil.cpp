@@ -408,7 +408,6 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
 
   CHAR line[512];
   CHAR dummy[32];
-  unsigned int dummy_size = static_cast<unsigned int>(sizeof(dummy));
   col = 0;
   row = 0;
   ncols = 0;
@@ -430,19 +429,19 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "ncols") || strstr(line, "NCOLS"))
     {
-      sscanf_las(line, "%s %d", dummy, dummy_size, & ncols);
+      sscanf_las(line, "%s %d", dummy, &ncols);
     }
     else if (strstr(line, "nrows") || strstr(line, "NROWS"))
     {
-      sscanf_las(line, "%s %d", dummy, dummy_size, &nrows);
+      sscanf_las(line, "%s %d", dummy, &nrows);
     }
     else if (strstr(line, "nbands") || strstr(line, "NBANDS"))
     {
-      sscanf_las(line, "%s %d", dummy, dummy_size, &nbands);
+      sscanf_las(line, "%s %d", dummy, &nbands);
     }
     else if (strstr(line, "nbits") || strstr(line, "NBITS"))
     {
-      sscanf_las(line, "%s %d", dummy, dummy_size, &nbits);
+      sscanf_las(line, "%s %d", dummy, &nbits);
     }
     else if (strstr(line, "layout") || strstr(line, "LAYOUT"))
     {
@@ -462,7 +461,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     else if (strstr(line, "pixeltype") || strstr(line, "PIXELTYPE"))
     {
       CHAR pixeltype[32] = {0};
-      sscanf_las(line, "%s %s", dummy, dummy_size, pixeltype);
+      sscanf_las(line, "%s %s", dummy, pixeltype);
       if ((strcmp(pixeltype, "float") == 0) || (strcmp(pixeltype, "FLOAT") == 0))
       {
         floatpixels = TRUE;
@@ -478,12 +477,12 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "nodata") || strstr(line, "NODATA"))
     {
-      sscanf_las(line, "%s %f", dummy, dummy_size, &nodata);
+      sscanf_las(line, "%s %f", dummy, &nodata);
     }
     else if (strstr(line, "byteorder") || strstr(line, "BYTEORDER")) // if little or big endian machine (i == intel, m == motorola)
     {
       CHAR byteorder[32] = {0};
-      sscanf_las(line, "%s %s", dummy, dummy_size, byteorder);
+      sscanf_las(line, "%s %s", dummy, byteorder);
       if (strcmp(byteorder, "i") && strcmp(byteorder, "I"))
       {
         LASMessage(LAS_WARNING, "byteorder '%s' not recognized by LASreader_bil", byteorder);
@@ -491,19 +490,19 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "ulxmap") || strstr(line, "ULXMAP"))
     {
-      sscanf_las(line, "%s %lf", dummy, dummy_size, &ulxmap);
+      sscanf_las(line, "%s %lf", dummy, &ulxmap);
     }
     else if (strstr(line, "ulymap") || strstr(line, "ULYMAP"))
     {
-      sscanf_las(line, "%s %lf", dummy, dummy_size, &ulymap);
+      sscanf_las(line, "%s %lf", dummy, &ulymap);
     }
     else if (strstr(line, "xdim") || strstr(line, "XDIM"))
     {
-      sscanf_las(line, "%s %f", dummy, dummy_size, &xdim);
+      sscanf_las(line, "%s %f", dummy, &xdim);
     }
     else if (strstr(line, "ydim") || strstr(line, "YDIM"))
     {
-      sscanf_las(line, "%s %f", dummy, dummy_size, &ydim);
+      sscanf_las(line, "%s %f", dummy, &ydim);
     }
   }
 

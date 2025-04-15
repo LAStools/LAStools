@@ -346,19 +346,12 @@ void* realloc_las(void* ptr, size_t size) {
   }
 }
 
-/// Wrapper for `vsscanf` on other platforms than _MSC_VER and `vsscanf_s` on Windows and ensures that the size is passed correctly for strings.
+/// Wrapper for `vsscanf`
 int sscanf_las(const char* buffer, const char* format, ...) {
   va_list args;
   va_start(args, format);
-  int result = 0;
 
-#ifdef _MSC_VER
-  // Windows-specific implementation if _MSC_VER is defined
-  result = vsscanf_s(buffer, format, args);
-#else
-  // On other platforms we use sscanf without size specifications
-  result = vsscanf(buffer, format, args);
-#endif
+  int result = vsscanf(buffer, format, args);
 
   va_end(args);
   return result;
