@@ -106,8 +106,8 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
   header.number_of_point_records = (npoints > U32_MAX ? 0 : (U32)npoints);
   header.extended_number_of_point_records = npoints;
 
-  snprintf(header.system_identifier, sizeof(header.system_identifier), "LAStools (c) by rapidlasso GmbH");
-  snprintf(header.generating_software, sizeof(header.generating_software), "via LASreaderPLY (%d)", LAS_TOOLS_VERSION);
+  snprintf(header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
+  snprintf(header.generating_software, LAS_HEADER_CHAR_LEN, "via LASreaderPLY (%d)", LAS_TOOLS_VERSION);
 
   // maybe set creation date
 

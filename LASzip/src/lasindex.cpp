@@ -383,7 +383,7 @@ BOOL LASindex::append(const char* file_name) const
     {
       bytestreamin->seek(total);
 
-      CHAR user_id[16];
+      CHAR user_id[LAS_VLR_USER_ID_CHAR_LEN];
       try { bytestreamin->getBytes((U8*)user_id, 16); } catch(...)
       {
         laserror("reading header.vlrs[%d].user_id", u);

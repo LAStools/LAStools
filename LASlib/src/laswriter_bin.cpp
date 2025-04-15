@@ -64,12 +64,13 @@ struct TSpoint
   U16 intensity;
 };
 
+#define TSHEADER_RECOG_STR_LEN 5
 struct TSheader
 {
   I32 size;
   I32 version;
   I32 recog_val;
-  I8 recog_str[4];
+  I8 recog_str[TSHEADER_RECOG_STR_LEN];  // 4 + \0
   I32 npoints;
   I32 units;
   F64 origin_x;
@@ -171,7 +172,7 @@ BOOL LASwriterBIN::open(ByteStreamOut* stream, const LASheader* header, const ch
   tsheader.size = sizeof(TSheader);
   tsheader.version = this->version;
   tsheader.recog_val = 970401;
-  strncpy_las(tsheader.recog_str, sizeof(tsheader.recog_str), "CXYZ", 4);
+  strncpy_las(tsheader.recog_str, TSHEADER_RECOG_STR_LEN, "CXYZ", 4);
   tsheader.npoints = (header->number_of_point_records ? header->number_of_point_records : (U32)header->extended_number_of_point_records);
   double scale = header->x_scale_factor;
   if (header->y_scale_factor < scale) scale = header->y_scale_factor; 

@@ -108,8 +108,8 @@ BOOL LASreaderBIL::open(const CHAR* file_name)
 
   // populate the header as much as it makes sense
 
-  snprintf(header.system_identifier, sizeof(header.system_identifier), "LAStools (c) by rapidlasso GmbH");
-  snprintf(header.generating_software, sizeof(header.generating_software), "via LASreaderBIL (%d)", LAS_TOOLS_VERSION);
+  snprintf(header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
+  snprintf(header.generating_software, LAS_HEADER_CHAR_LEN, "via LASreaderBIL (%d)", LAS_TOOLS_VERSION);
 
   // maybe set creation date
 

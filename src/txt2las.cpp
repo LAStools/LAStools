@@ -572,27 +572,25 @@ int main(int argc, char* argv[])
 
     if (set_system_identifier)
     {
-      strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), set_system_identifier, 32);
+      strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, set_system_identifier);
     }
     else
     {
-      strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), "LAStools (c) by rapidlasso GmbH", 32);
+      strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
     }
-    lasreader->header.system_identifier[31] = '\0';
 
-    memset(lasreader->header.generating_software, 0, 32);
+    memset(lasreader->header.generating_software, 0, LAS_HEADER_CHAR_LEN);
     if (set_generating_software)
     {
-      strncpy_las(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), set_generating_software, 32);
+      strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, set_generating_software);
     }
     else
     {
       char temp[64];
       snprintf(temp, sizeof(temp), "txt2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
-      strncpy_las(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), temp, 32);
+      strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp);
     }
-    lasreader->header.generating_software[31] = '\0';
-
+    
     // maybe set global encoding
 
     if (set_global_encoding != -1)

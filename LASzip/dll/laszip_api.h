@@ -117,13 +117,16 @@ typedef struct laszip_geokey
   laszip_U16 value_offset;
 } laszip_geokey_struct;
 
+#define LAS_VLR_USER_ID_CHAR_LEN 17
+#define LAS_VLR_DESC_CHAR_LEN 33
+
 typedef struct laszip_vlr
 {
   laszip_U16 reserved;
-  laszip_CHAR user_id[16];
+  laszip_CHAR user_id[LAS_VLR_USER_ID_CHAR_LEN];
   laszip_U16 record_id;
   laszip_U16 record_length_after_header;
-  laszip_CHAR description[32];
+  laszip_CHAR description[LAS_VLR_DESC_CHAR_LEN];
   laszip_U8* data;
 } laszip_vlr_struct;
 

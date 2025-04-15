@@ -431,18 +431,18 @@ class LasTool_lasinfo : public LasTool {
             laserror("'%s' needs 1 argument: name", argv[i]);
           }
           i++;
-          set_system_identifier = new I8[32];
-          memset(set_system_identifier, 0, 32);
-          strncpy_las(set_system_identifier, 32, argv[i], 32);
+          set_system_identifier = new I8[LAS_HEADER_CHAR_LEN];
+          memset(set_system_identifier, 0, LAS_HEADER_CHAR_LEN);
+          strncpy_las(set_system_identifier, LAS_HEADER_CHAR_LEN, argv[i]);
           edit_header = true;
         } else if (strcmp(argv[i], "-set_generating_software") == 0) {
           if ((i + 1) >= argc) {
             laserror("'%s' needs 1 argument: name", argv[i]);
           }
           i++;
-          set_generating_software = new I8[32];
-          memset(set_generating_software, 0, 32);
-          strncpy_las(set_generating_software, 32, argv[i], 32);
+          set_generating_software = new I8[LAS_HEADER_CHAR_LEN];
+          memset(set_generating_software, 0, LAS_HEADER_CHAR_LEN);
+          strncpy_las(set_generating_software, LAS_HEADER_CHAR_LEN, argv[i]);
           edit_header = true;
         } else if (strcmp(argv[i], "-set_bb") == 0 || strcmp(argv[i], "-set_bounding_box") == 0) {
           if ((i + 6) >= argc) {

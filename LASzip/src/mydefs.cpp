@@ -357,49 +357,71 @@ int sscanf_las(const char* buffer, const char* format, ...) {
   return result;
 }
 
-/// Wrapper for `strncpy` on other platforms than _MSC_VER and `strncpy_s` on Windows
+/// <summary>
+/// secure wrapper for `strncpy`
+/// target size defined, source size detected or defined.
+/// target size needs to be 1 larger than bytes to copy to ensure trailing 0.
+/// WARNING if target size is smaller than source data or requested size to copy.
+/// ERROR (and halt by default) if strncopy failed.
+/// </summary>
+/// <param name="dest">target buffer</param>
+/// <param name="destsz">size of target buffer include trailing 0</param>
+/// <param name="src">source buffer</param>
+/// <param name="count">number of bytes to copy without trailing 0; 0=detect number of bytes by src length</param>
 void strncpy_las(char* dest, size_t destsz, const char* src, size_t count /*=0*/) {
-  try {
-    if (dest == nullptr || src == nullptr) {
-      throw std::invalid_argument("nullptr transfer");
-    }
-    if (count == 0) {
-      count = strlen(src) + 1;  // If count = 0 calculated string length + null termination
-    }
-    if (destsz < count) {
-      throw std::length_error("Target buffer too small");
-    }
-
-#ifdef _MSC_VER
-    errno_t err = strncpy_s(dest, destsz, src, count);
-    if (err != 0) {
-      throw std::runtime_error("strncpy_s has failed");
-    }
-#else
-    strncpy(dest, src, count);
-#endif
-
-    if (count < destsz) {
-      dest[count] = '\0';
-    } else {
-      dest[destsz - 1] = '\0';
-    }
-  } catch (const std::exception& e) {
-    // Error handling directly here in the function
-    fprintf(stderr, "Error in strncpy_las: %s\n", e.what());
+  // source is empty -> set target empty and return
+  if (src == nullptr) {
+    if (destsz > 0 && dest != nullptr) {
+      dest[0] = '\0';
+    } 
+    return;
   }
+  // target NULL -> nothing to do
+  if (dest == nullptr) {
+    return;
+  }
+  // calculate src len if not given; crop len if src is shorter than defined len
+  if (count == 0) {
+    count = strlen(src);
+  }
+  // if target is smaller than source: copy as much as possible
+  bool free = false;
+  char* source;
+  if (destsz <= count) {
+    source = new char[destsz];
+    memcpy(source, src, destsz - 1);
+    source[destsz-1] = '\0';
+    free = true;
+    LASMessage(LAS_WARNING, "target buffer too small [%d < %d] for \"%s\"", destsz-1, count, src);
+    count = destsz-1;
+  } else {
+    source = const_cast<char*>(src);
+  }
+#ifdef _MSC_VER
+  errno_t err = strncpy_s(dest, destsz, source, count);
+  if (err != 0) {
+    laserror("strncpy_s failed: %d", err);
+  }
+#else
+  strncpy(dest, source, count);
+#endif
+  if (free) {
+    delete[] source;
+  }
+  // ensure string termination
+  dest[count] = '\0';
 }
 
 #ifdef BOOST_USE
 #else
 // simple NON BOOST implementations
 void to_lower(std::string& in) {
-  for (int i = 0; i < in.size(); i++) in[i] = std::tolower(in[i]);
+  for (size_t i = 0; i < in.size(); i++) in[i] = std::tolower(in[i]);
   return;
 }
 
 void to_upper(std::string& in) {
-  for (int i = 0; i < in.size(); i++) in[i] = std::toupper(in[i]);
+  for (size_t i = 0; i < in.size(); i++) in[i] = std::toupper(in[i]);
   return;
 }
 
@@ -521,7 +543,7 @@ std::string CcToUnderline(const std::string& in) {
 /// returns the occurency count of 'toCount' in 'in'
 size_t StringCountChar(const std::string& in, const char toCount) {
   int count = 0;
-  for (int i = 0; i < in.size(); i++)
+  for (size_t i = 0; i < in.size(); i++)
     if (in[i] == toCount) count++;
   return count;
 }
