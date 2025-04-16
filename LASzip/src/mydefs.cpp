@@ -359,34 +359,50 @@ int sscanf_las(const char* buffer, const char* format, ...) {
 
 /// Wrapper for `strncpy` on other platforms than _MSC_VER and `strncpy_s` on Windows
 void strncpy_las(char* dest, size_t destsz, const char* src, size_t count /*=0*/) {
-  try {
-    if (dest == nullptr || src == nullptr) {
-      throw std::invalid_argument("nullptr transfer");
-    }
-    if (count == 0) {
-      count = strlen(src) + 1;  // If count = 0 calculated string length + null termination
-    }
-    if (destsz < count) {
-      throw std::length_error("Target buffer too small");
-    }
-
+  // source is empty -> set target empty and return
+  if (src == nullptr) {
+    if (destsz > 0) {
+      dest[0] = '\0';
+    } 
+    return;
+  }
+  // target NULL -> nothing to do
+  if (dest == nullptr) {
+    return;
+  }
+  // calculate src len if not given; crop len if src is shorter than defined len
+  if (count == 0) {
+    count = strlen(src);  //  + 1;  // +1 = null termination char 
+  }
+  // optional: if target is smaller than source: copy as much we can
+  bool free = false;
+  char* source;
+  if (destsz <= count) {
+    source = new char[destsz];
+    memcpy(source, src, destsz - 1);
+    source[destsz-1] = '\0';
+    free = true;
+    LASMessage(LAS_WARNING, "target buffer too small [%d <= %d] for \"%s\"", destsz, count, src);
+    count = destsz-1;
+  } else {
+    source = (char *)src;
+  }
 #ifdef _MSC_VER
-    errno_t err = strncpy_s(dest, destsz, src, count);
-    if (err != 0) {
-      throw std::runtime_error("strncpy_s has failed");
-    }
+  errno_t err = strncpy_s(dest, destsz, source, count);
+  if (err != 0) {
+    laserror("strncpy_s failed: %d", err);
+  }
 #else
-    strncpy(dest, src, count);
+  strncpy(dest, source, count);
 #endif
-
-    if (count < destsz) {
-      dest[count] = '\0';
-    } else {
-      dest[destsz - 1] = '\0';
-    }
-  } catch (const std::exception& e) {
-    // Error handling directly here in the function
-    fprintf(stderr, "Error in strncpy_las: %s\n", e.what());
+  if (free) {
+    delete[] source;
+  }
+  // ensure string termination
+  if (count < destsz) {
+    dest[count] = '\0';
+  } else {
+    dest[destsz - 1] = '\0';
   }
 }
 

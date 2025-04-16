@@ -599,7 +599,7 @@ public:
     if (vlrs != nullptr) {
       memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
       vlrs[i].reserved = 0; // used to be 0xAABB
-      strncpy_las(vlrs[i].user_id, sizeof(vlrs[i].user_id), user_id, 16);
+      strncpy(vlrs[i].user_id, user_id, 16);
       vlrs[i].record_id = record_id;
       vlrs[i].record_length_after_header = record_length_after_header;
 
