@@ -865,10 +865,10 @@ laszip_set_header(
       for (i = 0; i < header->number_of_variable_length_records; i++)
       {
         laszip_dll->header.vlrs[i].reserved = header->vlrs[i].reserved;
-        memcpy(laszip_dll->header.vlrs[i].user_id, header->vlrs[i].user_id, 16);
+        memcpy(laszip_dll->header.vlrs[i].user_id, header->vlrs[i].user_id, LAS_VLR_USER_ID_CHAR_LEN);
         laszip_dll->header.vlrs[i].record_id = header->vlrs[i].record_id;
         laszip_dll->header.vlrs[i].record_length_after_header = header->vlrs[i].record_length_after_header;
-        memcpy(laszip_dll->header.vlrs[i].description, header->vlrs[i].description, 32);
+        memcpy(laszip_dll->header.vlrs[i].description, header->vlrs[i].description, LAS_VLR_DESC_CHAR_LEN);
         if (header->vlrs[i].record_length_after_header)
         {
           if (header->vlrs[i].data == 0)
@@ -1667,12 +1667,12 @@ laszip_add_vlr(
     // copy the VLR
 
     laszip_dll->header.vlrs[i].reserved = 0x0;
-    strncpy_las(laszip_dll->header.vlrs[i].user_id, sizeof(laszip_dll->header.vlrs[i].user_id), user_id, 16);
+    strncpy_las(laszip_dll->header.vlrs[i].user_id, LAS_VLR_USER_ID_CHAR_LEN, user_id);
     laszip_dll->header.vlrs[i].record_id = record_id;
     laszip_dll->header.vlrs[i].record_length_after_header = record_length_after_header;
     if (description)
     {
-      strncpy_las(laszip_dll->header.vlrs[i].description, sizeof(laszip_dll->header.vlrs[i].description), description, 32);
+      strncpy_las(laszip_dll->header.vlrs[i].description, LAS_VLR_DESC_CHAR_LEN, description);
     }
     else
     {
@@ -4216,7 +4216,7 @@ laszip_read_header(
         LASattributer attributer;
         for (i = 0; i < laszip_dll->header.number_of_variable_length_records; i++)
         {
-          if ((strncmp(laszip_dll->header.vlrs[i].user_id, "LASF_Spec\0\0\0\0\0\0", 16) == 0) && (laszip_dll->header.vlrs[i].record_id == 4))
+          if ((strncmp(laszip_dll->header.vlrs[i].user_id, "LASF_Spec\0", 10) == 0) && (laszip_dll->header.vlrs[i].record_id == 4))
           {
             attributer.init_attributes(laszip_dll->header.vlrs[i].record_length_after_header/192, (LASattribute*)laszip_dll->header.vlrs[i].data);
             laszip_dll->start_scan_angle = attributer.get_attribute_start("LAS 1.4 scan angle");

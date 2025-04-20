@@ -63,6 +63,8 @@
 #include "laspoint.hpp"
 #include "lasmessage.hpp"
 
+#define LAS_TOOLS_COPYRIGHT "LAStools (c) by rapidlasso GmbH"
+
 #define LAS_TOOLS_FORMAT_DEFAULT 0
 #define LAS_TOOLS_FORMAT_LAS     1
 #define LAS_TOOLS_FORMAT_LAZ     2
@@ -87,14 +89,17 @@
 #define LAS_TOOLS_IO_IBUFFER_SIZE   262144
 #define LAS_TOOLS_IO_OBUFFER_SIZE   262144
 
+#define LAS_HEADER_CHAR_LEN 33
+#define LAS_VLR_USER_ID_CHAR_LEN 17
+
 class LASLIB_DLL LASvlr
 {
 public:
   U16 reserved;
-  CHAR user_id[16]; 
+  CHAR user_id[LAS_VLR_USER_ID_CHAR_LEN]; 
   U16 record_id;
   U16 record_length_after_header;
-  CHAR description[32];
+  CHAR description[LAS_HEADER_CHAR_LEN];
   U8* data;
   LASvlr() { memset(this, 0, sizeof(LASvlr)); };
 };
@@ -103,10 +108,10 @@ class LASLIB_DLL LASevlr
 {
 public:
   U16 reserved;
-  CHAR user_id[16]; 
+  CHAR user_id[LAS_VLR_USER_ID_CHAR_LEN]; 
   U16 record_id;
   I64 record_length_after_header;
-  CHAR description[32];
+  CHAR description[LAS_HEADER_CHAR_LEN];
   U8* data;
   LASevlr() { memset(this, 0, sizeof(LASevlr)); };
 };
@@ -202,8 +207,8 @@ public:
   U8 project_ID_GUID_data_4[8];            // starts at byte  16
   U8 version_major;                        // starts at byte  24
   U8 version_minor;                        // starts at byte  25
-  CHAR system_identifier[32];              // starts at byte  26
-  CHAR generating_software[32];            // starts at byte  58
+  CHAR system_identifier[LAS_HEADER_CHAR_LEN]; // [32]chars+\0 - starts at byte  26
+  CHAR generating_software[LAS_HEADER_CHAR_LEN]; // [32]chars+\0 at byte  58
   U16 file_creation_day;                   // starts at byte  90
   U16 file_creation_year;                  // starts at byte  92
   U16 header_size;                         // starts at byte  94
@@ -599,7 +604,7 @@ public:
     if (vlrs != nullptr) {
       memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
       vlrs[i].reserved = 0; // used to be 0xAABB
-      strncpy(vlrs[i].user_id, user_id, 16);
+      strncpy_las(vlrs[i].user_id, LAS_VLR_USER_ID_CHAR_LEN, user_id, LAS_VLR_USER_ID_CHAR_LEN-1);
       vlrs[i].record_id = record_id;
       vlrs[i].record_length_after_header = record_length_after_header;
 
@@ -609,6 +614,7 @@ public:
       }
       else if (description)
       {
+        // to be optimized: could hold 32 chars without trailing 0
         snprintf(vlrs[i].description, sizeof(vlrs[i].description), "%.31s", description);
       }
       else
@@ -727,7 +733,7 @@ public:
     }
     if (evlrs != nullptr) {
       evlrs[i].reserved = 0;  // used to be 0xAABB
-      strncpy_las(evlrs[i].user_id, sizeof(evlrs[i].user_id), user_id, 16);
+      strncpy_las(evlrs[i].user_id, LAS_VLR_USER_ID_CHAR_LEN, user_id);
       evlrs[i].record_id = record_id;
       evlrs[i].record_length_after_header = record_length_after_header;
 

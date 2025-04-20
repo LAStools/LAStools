@@ -212,12 +212,6 @@ typedef union I64U32I32F32 {
 #define NULL 0
 #endif
 
-//#ifdef _MSC_VER -> has been replaced by the wrapper of the same name
-//#define strncpy_las(dest, destsz, src, count) strncpy_s((dest), (destsz), (src), (count)); 
-//#else
-//#define strncpy_las(dest, destsz, src, count) strncpy((dest), (src), (count)); 
-//#endif
-
 #ifdef _MSC_VER
 #define strcpy_las(dest, destsz, src) strcpy_s((dest), (destsz), (src))
 #else

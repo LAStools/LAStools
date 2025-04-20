@@ -1127,7 +1127,7 @@ int main(int argc, char* argv[])
         lasreader->header.vlrs[0].data = (U8*)info;
       }
 
-      strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), "LAStools (c) by rapidlasso GmbH", 32);
+      strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT, 32);
 
       // Placeholder to write a proper header. The actual content is resolved when closing the writer.
       lasreader->header.add_evlr("copc", 1000, 1, new U8[1], FALSE, "EPT hierarchy");

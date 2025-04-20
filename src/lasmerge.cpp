@@ -223,14 +223,12 @@ int main(int argc, char *argv[])
 
   // prepare the header for the surviving points
 
-  strncpy_las(lasreader->header.system_identifier, sizeof(lasreader->header.system_identifier), "LAStools (c) by rapidlasso GmbH", 32);
-  lasreader->header.system_identifier[31] = '\0';
+  strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
   char temp[64];
   snprintf(temp, sizeof(temp), "lasmerge%s (version %d)", (IS64?"64":""), LAS_TOOLS_VERSION);
-  memset(lasreader->header.generating_software, 0, 32);
-  strncpy_las(lasreader->header.generating_software, sizeof(lasreader->header.generating_software), temp, 32);
-  lasreader->header.generating_software[31] = '\0';
-
+  memset(lasreader->header.generating_software, 0, LAS_HEADER_CHAR_LEN);
+  strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp);
+  
   if (projection_was_set)
   {
     lasreader->header.set_geo_keys(number_of_keys, (LASvlr_key_entry*)geo_keys);

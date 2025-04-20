@@ -71,8 +71,8 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
 
   // populate the header as much as it makes sense
 
-  snprintf(header.system_identifier, sizeof(header.system_identifier), "LAStools (c) by rapidlasso GmbH");
-  snprintf(header.generating_software, sizeof(header.generating_software), "via LASreaderASC (%d)", LAS_TOOLS_VERSION);
+  snprintf(header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
+  snprintf(header.generating_software, LAS_HEADER_CHAR_LEN, "via LASreaderASC (%d)", LAS_TOOLS_VERSION);
 
   // maybe set creation date
 

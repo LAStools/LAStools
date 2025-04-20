@@ -35,11 +35,12 @@
 #include "bytestreamin_array.hpp"
 #include "bytestreamout_array.hpp"
 #include "lasmessage.hpp"
+#include "lasdefinitions.hpp"
 
 class LASvlrPayload
 {
 public:
-  CHAR user_id[16] = {0}; 
+  CHAR user_id[LAS_VLR_USER_ID_CHAR_LEN] = {0}; 
   virtual U16 get_record_id() const = 0;
   virtual const CHAR* get_user_id() const = 0;
   virtual I64 get_payload_size() const = 0;
@@ -69,7 +70,7 @@ public:
   F64 sigmaxy;  // horizontal uncertainty [meters] 
   LASvlrRasterLAZ()
   {
-    memcpy(user_id, "Raster LAZ\0\0\0\0\0", 16);
+    memcpy(user_id, "Raster LAZ\0\0\0\0\0\0", LAS_VLR_USER_ID_CHAR_LEN-1);
     nbands = -1;
     nbits = -1;
     ncols = -1;
