@@ -49,19 +49,22 @@
 #define LAS_ATTRIBUTE_F32 8
 #define LAS_ATTRIBUTE_F64 9
 
+#define LAS_ATTRIBUTE_CHAR_LEN 32
+
 class LASLIB_DLL LASattribute {
  public:
+  // do not change the data struct - 1:1 copy to vlr
   U8 reserved[2];        // 2 bytes
   U8 data_type;          // 1 byte
   U8 options;            // 1 byte
-  CHAR name[32];         // 32 bytes
+  CHAR name[LAS_ATTRIBUTE_CHAR_LEN];  // 32 bytes incl. termination
   U8 unused[4];          // 4 bytes
   U64I64F64 no_data[3];  // 24 = 3*8 bytes
   U64I64F64 min[3];      // 24 = 3*8 bytes
   U64I64F64 max[3];      // 24 = 3*8 bytes
   F64 scale[3];          // 24 = 3*8 bytes
   F64 offset[3];         // 24 = 3*8 bytes
-  CHAR description[32];  // 32 bytes
+  CHAR description[LAS_ATTRIBUTE_CHAR_LEN];  // 32 bytes incl termination
 
   LASattribute(U8 size) {
     if (size == 0) throw;
@@ -76,8 +79,8 @@ class LASLIB_DLL LASattribute {
     memset(this, 0, sizeof(LASattribute));
     scale[0] = scale[1] = scale[2] = 1.0;
     this->data_type = type + 1;
-    strncpy_las(this->name, sizeof(this->name), name, 32);
-    if (description) strncpy_las(this->description, sizeof(this->description), description, 32);
+    strncpy_las(this->name, LAS_ATTRIBUTE_CHAR_LEN, name);
+    if (description) strncpy_las(this->description, LAS_ATTRIBUTE_CHAR_LEN, description);
   };
 
   inline BOOL set_no_data(U8 no_data) {

@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+21 April 2025 -- fix: lasdatum: report error and set errorcode on invalid input grids
 15 April 2025 -- NEW: ArcGIS Pro plugin rework: add lascopy, las3dpoly, lasdatum, lasvdatum, lasdistance, lasground_new, lasvoxel
 14 April 2025 -- fix: asc reader, string parser
 2 April 2025 -- fix: las2dem TIFF output writer if no projection is given

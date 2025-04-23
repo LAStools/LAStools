@@ -2254,7 +2254,7 @@ int main(int argc, char* argv[])
         char temp[64];
         snprintf(temp, sizeof(temp), "las2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
         memset(lasreader->header.generating_software, 0, LAS_HEADER_CHAR_LEN);
-        strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp, 32);
+        strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp);
         
         // open laswriter
 
