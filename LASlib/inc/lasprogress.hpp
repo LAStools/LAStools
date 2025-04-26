@@ -62,7 +62,7 @@ public:
 
     inline void update(const LASreader* lasreader) 
     { 
-        update((U64)lasreader->p_count); 
+        update((U64)lasreader->p_idx); 
     };
 
     inline void update(U64 current) 

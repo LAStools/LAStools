@@ -59,7 +59,8 @@ LASreader::LASreader(LASreadOpener* opener) {
   this->opener = opener;
   if (!opener) LASMessage(LAS_VERBOSE, "reader opened without opener");
   npoints = 0;
-  p_count = 0;
+  p_idx = 0;
+  p_cnt = 0;
   read_simple = &LASreader::read_point_default;
   read_complex = 0;
   index = 0;
@@ -1351,7 +1352,8 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered) {
 
   if (pipe_on) {
     LASreaderPipeOn* lasreaderpipeon = (LASreaderPipeOn*)lasreader;
-    lasreaderpipeon->p_count = 0;
+    lasreaderpipeon->p_idx = 0;
+    lasreaderpipeon->p_cnt = 0;
     lasreader = lasreaderpipeon->get_lasreader();
   }
 

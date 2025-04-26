@@ -506,8 +506,8 @@ BOOL LASreaderPLY::open(FILE* file, const CHAR* file_name, U8 point_type, BOOL p
     populate_scale_and_offset();
   }
 
-  p_count = 0;
-
+  p_idx = 0;
+  p_cnt = 0;
   return TRUE;
 }
 
@@ -591,11 +591,11 @@ void LASreaderPLY::add_attribute(I32 attribute_type, const char* name, const cha
 BOOL LASreaderPLY::seek(const I64 p_index)
 {
   U32 delta = 0;
-  if (p_index > p_count)
+  if (p_index > p_idx)
   {
-    delta = (U32)(p_index - p_count);
+    delta = (U32)(p_index - p_idx);
   }
-  else if (p_index < p_count)
+  else if (p_index < p_idx)
   {
     if (piped) return FALSE;
     fseek(file, 0, SEEK_SET);
@@ -632,15 +632,15 @@ BOOL LASreaderPLY::seek(const I64 p_index)
     read_point_default();
     delta--;
   }
-  p_count = p_index;
+  p_idx = p_index;
   return TRUE;
 }
 
 BOOL LASreaderPLY::read_point_default()
 {
-  if (p_count < npoints)
+  if (p_idx < npoints)
   {
-    if (p_count > 0)
+    if (p_idx > 0)
     {
       if (streamin) // binary
       {
@@ -664,11 +664,11 @@ BOOL LASreaderPLY::read_point_default()
           }
           else
           {
-            if (p_count != npoints)
+            if (p_idx != npoints)
             {
-              LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_count, npoints);
+              LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_idx, npoints);
 
-              npoints = p_count;
+              npoints = p_idx;
               if (!populated_header)
               {
                 populate_bounding_box();
@@ -702,7 +702,8 @@ BOOL LASreaderPLY::read_point_default()
       else
         point.set_Z((I32)(((point.coordinates[2] - orig_z_offset) / orig_z_scale_factor) - 0.5));
     }
-    p_count++;
+    p_idx++;
+  p_cnt++;
     if (!populated_header)
     {
       // update number of point records
@@ -811,8 +812,8 @@ BOOL LASreaderPLY::reopen(const char* file_name)
     return FALSE;
   }
 
-  p_count = 0;
-
+  p_idx = 0;
+  p_cnt = 0;
   return TRUE;
 }
 

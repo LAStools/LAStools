@@ -2175,7 +2175,7 @@ int main(int argc, char* argv[])
           if (subsequence_start) lasreader->seek(subsequence_start);
           while (lasreader->read_point())
           {
-            if (lasreader->p_count > subsequence_stop) break;
+            if (lasreader->p_cnt > subsequence_stop) break;
         
             if (clip_to_bounding_box)
             {
@@ -2293,7 +2293,7 @@ int main(int argc, char* argv[])
         {
           while (lasreader->read_point())
           {
-            if (lasreader->p_count > subsequence_stop) break;
+            if (lasreader->p_cnt > subsequence_stop) break;
 
             if (clip_to_bounding_box)
             {
@@ -2321,7 +2321,7 @@ int main(int argc, char* argv[])
         {
           while (lasreader->read_point())
           {
-            if (lasreader->p_count > subsequence_stop) break;
+            if (lasreader->p_cnt > subsequence_stop) break;
 
             if (clip_to_bounding_box)
             {

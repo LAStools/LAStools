@@ -522,7 +522,7 @@ BOOL COPCindex::seek_next(LASreader* reader)
     if (!has_intervals()) return FALSE;
     reader->seek(start);
   }
-  if (reader->p_count == (I64)end)
+  if (reader->p_idx == (I64)end)
   {
     have_interval = FALSE;
   }

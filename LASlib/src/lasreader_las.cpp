@@ -387,7 +387,8 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
   }
 
   npoints = (header.number_of_point_records ? header.number_of_point_records : header.extended_number_of_point_records);
-  p_count = 0;
+  p_idx = 0;
+  p_cnt = 0;
 
   if (peek_only)
   {
@@ -1450,9 +1451,9 @@ BOOL LASreaderLAS::seek(const I64 p_index)
   {
     if (p_index < npoints)
     {
-      if (reader->seek((U32)p_count, (U32)p_index))
+      if (reader->seek((U32)p_idx, (U32)p_index))
       {
-        p_count = p_index;
+        p_idx = p_index;
         return TRUE;
       }
     }
@@ -1462,7 +1463,7 @@ BOOL LASreaderLAS::seek(const I64 p_index)
 
 BOOL LASreaderLAS::read_point_default()
 {
-  if (p_count < npoints)
+  if (p_idx < npoints)
   {
     if (reader->read(point.point) == FALSE)
     {
@@ -1472,11 +1473,11 @@ BOOL LASreaderLAS::read_point_default()
       }
       if (reader->error())
       {
-        laserror("'%s' after %u of %u points for '%s'", reader->error(), (U32)p_count, (U32)npoints, file_name);
+        laserror("'%s' after %u of %u points for '%s'", reader->error(), (U32)p_idx, (U32)npoints, file_name);
       }
       else
       {
-        LASMessage(LAS_WARNING, "end-of-file after %u of %u points for '%s'", (U32)p_count, (U32)npoints, file_name);
+        LASMessage(LAS_WARNING, "end-of-file after %u of %u points for '%s'", (U32)p_idx, (U32)npoints, file_name);
       }
       return FALSE;
     }
@@ -1503,7 +1504,8 @@ BOOL LASreaderLAS::read_point_default()
 //      point.wavepacket.setZt(-point.wavepacket.getZt()/point.wavepacket.getLocation());
     }
 */
-    p_count++;
+    p_idx++;
+    p_cnt++;
     return TRUE;
   }
   else
@@ -1513,7 +1515,8 @@ BOOL LASreaderLAS::read_point_default()
       if (reader->check_end() == FALSE)
       {
         laserror("'%s' when reaching end of encoding", reader->error());
-        p_count--;
+        p_idx--;
+        p_cnt--;
       }
       if (reader->warning())
       {

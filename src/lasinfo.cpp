@@ -2236,7 +2236,7 @@ class LasTool_lasinfo : public LasTool {
         if (subsequence_start) lasreader->seek(subsequence_start);
 
         while (lasreader->read_point()) {
-          if (lasreader->p_count > subsequence_stop) break;
+          if (lasreader->p_cnt > subsequence_stop) break;
 
           if (check_outside) {
             if (!lasreader->point.inside_bounding_box(
@@ -2245,7 +2245,7 @@ class LasTool_lasinfo : public LasTool {
               if (file_out && report_outside) {
                 if (json_out) {
                   JsonObject json_outside_box;
-                  json_outside_box["count"] = (U32)(lasreader->p_count - 1);
+                  json_outside_box["count"] = (U32)(lasreader->p_idx - 1);
                   json_outside_box["get_gps_time"] = lasreader->point.get_gps_time();
                   json_outside_box["x"] = lasreader->point.get_x();
                   json_outside_box["y"] = lasreader->point.get_y();
@@ -2262,7 +2262,7 @@ class LasTool_lasinfo : public LasTool {
                   json_sub_main["points_outside_boundig_box"].push_back(json_outside_box);
                 } else {
                   fprintf(
-                      file_out, "%u t %g x %g y %g z %g i %d (%d of %d) d %d e %d c %d s %d %u p %d \012", (U32)(lasreader->p_count - 1),
+                      file_out, "%u t %g x %g y %g z %g i %d (%d of %d) d %d e %d c %d s %d %u p %d \012", (U32)(lasreader->p_idx - 1),
                       lasreader->point.get_gps_time(), lasreader->point.get_x(), lasreader->point.get_y(), lasreader->point.get_z(),
                       lasreader->point.get_intensity(), lasreader->point.get_return_number(), lasreader->point.get_number_of_returns(),
                       lasreader->point.get_scan_direction_flag(), lasreader->point.get_edge_of_flight_line(), lasreader->point.get_classification(),
@@ -2296,11 +2296,11 @@ class LasTool_lasinfo : public LasTool {
             lashistogram.add(&lasreader->point);
           }
 
-          if (file_out && progress && (lasreader->p_count % progress) == 0) {
+          if (file_out && progress && (lasreader->p_cnt % progress) == 0) {
             if (json_out) {
-              if (lasreader->p_count > 0) json_sub_main["processed_points"] = lasreader->p_count;
+              if (lasreader->p_cnt > 0) json_sub_main["processed_points"] = lasreader->p_cnt;
             } else {
-              fprintf(file_out, " ... processed %lld points ...\012", lasreader->p_count);
+              fprintf(file_out, " ... processed %lld points ...\012", lasreader->p_cnt);
             }
           }
         }

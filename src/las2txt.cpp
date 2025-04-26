@@ -1304,10 +1304,10 @@ int main(int argc, char* argv[]) {
             fprintf(file_out, "%d", lasreader->point.rgb[3]);
             break;
           case 'm':  // the index of the point (count starts at 0)
-            fprintf(file_out, "%lld", lasreader->p_count - 1);
+            fprintf(file_out, "%lld", lasreader->p_idx - 1);
             break;
           case 'M':  // the index of the point  (count starts at 1)
-            fprintf(file_out, "%lld", lasreader->p_count);
+            fprintf(file_out, "%lld", lasreader->p_idx);
             break;
           case '_':  // the raw integer X difference to the last point
             fprintf(file_out, "%d", lasreader->point.get_X() - last_XYZ[0]);
@@ -1430,7 +1430,7 @@ int main(int argc, char* argv[]) {
       }
     }
     LASMessage(
-        LAS_VERBOSE, "converting %lld points of '%s' took %g sec.", lasreader->p_count, lasreadopener.get_file_name(), taketime() - start_time);
+        LAS_VERBOSE, "converting %lld points of '%s' took %g sec.", lasreader->p_cnt, lasreadopener.get_file_name(), taketime() - start_time);
     // close the reader
     lasreader->close();
     delete lasreader;
