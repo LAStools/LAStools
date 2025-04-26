@@ -356,14 +356,16 @@ BOOL LASreaderBuffered::open()
   }
 
   npoints = (header.number_of_point_records ? header.number_of_point_records : header.extended_number_of_point_records);
-  p_count = 0;
+  p_idx = 0;
+  p_cnt = 0;
 
   return TRUE;
 }
 
 BOOL LASreaderBuffered::reopen()
 {
-  p_count = 0;
+  p_idx = 0;
+  p_cnt = 0;
   point_count = 0;
   if (lasreader)
   {
@@ -467,13 +469,15 @@ BOOL LASreaderBuffered::read_point_default()
     if (lasreader->read_point())
     {
       point = lasreader->point;
-      p_count++;
+      p_idx++;
+      p_cnt++;
       return TRUE;
     }
     else if (point_count < buffered_points)
     {
       copy_point_from_buffer();
-      p_count++;
+      p_idx++;
+      p_cnt++;
       return TRUE;
     }
     lasreader->close();

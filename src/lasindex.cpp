@@ -382,7 +382,7 @@ int main(int argc, char *argv[])
 
     LASindex lasindex;
     lasindex.prepare(lasquadtree, threshold);
-    while (lasreader->read_point()) lasindex.add(lasreader->point.get_x(), lasreader->point.get_y(), (U32)(lasreader->p_count-1));
+    while (lasreader->read_point()) lasindex.add(lasreader->point.get_x(), lasreader->point.get_y(), (U32)(lasreader->p_idx-1));
 
     // delete the reader
 

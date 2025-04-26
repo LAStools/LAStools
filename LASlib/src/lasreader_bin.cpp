@@ -224,7 +224,8 @@ BOOL LASreaderBIN::open(ByteStreamIn* stream)
   
   // set point count to zero
 
-  p_count = 0;
+  p_idx = 0;
+  p_cnt = 0;
 
   // approximate bounding box init
 
@@ -263,7 +264,7 @@ BOOL LASreaderBIN::seek(const I64 p_index)
       pos += (sizeof(U32)*(U32)p_index);
     if (point.have_rgb)
       pos += (sizeof(U32)*(U32)p_index);
-    p_count = p_index;
+    p_idx = p_index;
     return stream->seek(pos);
   }
   return FALSE;
@@ -271,7 +272,7 @@ BOOL LASreaderBIN::seek(const I64 p_index)
 
 BOOL LASreaderBIN::read_point_default()
 {
-  if (p_count < npoints)
+  if (p_idx < npoints)
   {
     int echo;
     if (version == 20020715)
@@ -279,7 +280,7 @@ BOOL LASreaderBIN::read_point_default()
       TSpoint tspoint;
       try { stream->getBytes((U8*)&tspoint, sizeof(TSpoint)); } catch(...)
       {
-        laserror("reading terrasolid point after %u of %u", (U32)p_count, (U32)npoints);
+        laserror("reading terrasolid point after %u of %u", (U32)p_idx, (U32)npoints);
         return FALSE;
       }
       point.set_X(tspoint.x);
@@ -295,7 +296,7 @@ BOOL LASreaderBIN::read_point_default()
       TSrow tsrow;
       try { stream->getBytes((U8*)&tsrow, sizeof(TSrow)); } catch(...)
       {
-        laserror("reading terrasolid row after %u of %u", (U32)p_count, (U32)npoints);
+        laserror("reading terrasolid row after %u of %u", (U32)p_idx, (U32)npoints);
         return FALSE;
       }
       point.set_X(tsrow.x);
@@ -371,7 +372,8 @@ BOOL LASreaderBIN::read_point_default()
       point.rgb[1] = 256*rgba[1];
       point.rgb[2] = 256*rgba[2];
     }
-    p_count++;
+    p_idx++;
+  p_cnt++;
     return TRUE;
   }
   return FALSE;

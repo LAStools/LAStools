@@ -1014,9 +1014,8 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
 
     populate_scale_and_offset();
   }
-
-  p_count = 0;
-
+  p_idx = 0;
+  p_cnt = 0;
   return TRUE;
 }
 
@@ -1131,11 +1130,11 @@ void LASreaderTXT::add_attribute(I32 data_type, const char* name, const char* de
 BOOL LASreaderTXT::seek(const I64 p_index)
 {
   U32 delta = 0;
-  if (p_index > p_count)
+  if (p_index > p_idx)
   {
-    delta = (U32)(p_index - p_count);
+    delta = (U32)(p_index - p_idx);
   }
-  else if (p_index < p_count)
+  else if (p_index < p_idx)
   {
     if (piped) return FALSE;
     fseek(file, 0, SEEK_SET);
@@ -1175,13 +1174,13 @@ BOOL LASreaderTXT::seek(const I64 p_index)
     read_point_default();
     delta--;
   }
-  p_count = p_index;
+  p_idx = p_index;
   return TRUE;
 }
 
 BOOL LASreaderTXT::read_point_default()
 {
-  if (p_count)
+  if (p_idx)
   {
     while (true)
     {
@@ -1201,21 +1200,21 @@ BOOL LASreaderTXT::read_point_default()
       {
         if (populated_header)
         {
-          if (p_count != npoints)
+          if (p_idx != npoints)
           {
-            LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_count, npoints);
+            LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_idx, npoints);
           }
         }
         else
         {
           if (npoints)
           {
-            if (p_count != npoints)
+            if (p_idx != npoints)
             {
-              LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_count, npoints);
+              LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_idx, npoints);
             }
           }
-          npoints = p_count;
+          npoints = p_idx;
           populate_bounding_box();
         }
         return FALSE;
@@ -1244,7 +1243,8 @@ BOOL LASreaderTXT::read_point_default()
    else 
      point.set_Z((I32)(((point.coordinates[2] - orig_z_offset) / orig_z_scale_factor) - 0.5));
   }
-  p_count++;
+  p_idx++;
+  p_cnt++;
   if (!populated_header)
   {
     // update number of point records
@@ -1352,9 +1352,8 @@ BOOL LASreaderTXT::reopen(const char* file_name)
     file = 0;
     return FALSE;
   }
-
-  p_count = 0;
-
+  p_idx = 0;
+  p_cnt = 0;
   return TRUE;
 }
 

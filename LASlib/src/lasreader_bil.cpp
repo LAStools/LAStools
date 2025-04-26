@@ -662,7 +662,7 @@ BOOL LASreaderBIL::seek(const I64 p_index)
 BOOL LASreaderBIL::read_point_default()
 {
   F32 elevation;
-  while (p_count < npoints)
+  while (p_idx < npoints)
   {
     if (col == ncols)
     {
@@ -676,8 +676,8 @@ BOOL LASreaderBIL::read_point_default()
       {
         if (fread((void*)&elevation, 4, 1, file) != 1)
         {
-          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_count);
-          npoints = p_count;
+          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+          npoints = p_idx;
           return FALSE;
         }
       }
@@ -686,8 +686,8 @@ BOOL LASreaderBIL::read_point_default()
         I32 elev;
         if (fread((void*)&elev, 4, 1, file) != 1)
         {
-          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_count);
-          npoints = p_count;
+          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+          npoints = p_idx;
           return FALSE;
         }
         elevation = (F32)elev;
@@ -700,8 +700,8 @@ BOOL LASreaderBIL::read_point_default()
         I16 elev;
         if (fread((void*)&elev, 2, 1, file) != 1)
         {
-          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_count);
-          npoints = p_count;
+          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+          npoints = p_idx;
           return FALSE;
         }
         elevation = (F32)elev;
@@ -711,8 +711,8 @@ BOOL LASreaderBIL::read_point_default()
         U16 elev;
         if (fread((void*)&elev, 2, 1, file) != 1)
         {
-          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_count);
-          npoints = p_count;
+          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+          npoints = p_idx;
           return FALSE;
         }
         elevation = (F32)elev;
@@ -725,8 +725,8 @@ BOOL LASreaderBIL::read_point_default()
         I8 rgb[4];
         if (fread((void*)rgb, 1, nbands, file) != (U32)nbands)
         {
-          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_count);
-          npoints = p_count;
+          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+          npoints = p_idx;
           return FALSE;
         }
         elevation = rgb[0];
@@ -736,8 +736,8 @@ BOOL LASreaderBIL::read_point_default()
         U8 rgb[4];
         if (fread((void*)rgb, 1, nbands, file) != (U32)nbands)
         {
-          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_count);
-          npoints = p_count;
+          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+          npoints = p_idx;
           return FALSE;
         }
         elevation = rgb[0];
@@ -794,7 +794,8 @@ BOOL LASreaderBIL::read_point_default()
         else
           overflow_I32_z++;
       }
-      p_count++;
+      p_idx++;
+  p_cnt++;
       col++;
       return TRUE;    
     }
@@ -857,7 +858,8 @@ BOOL LASreaderBIL::reopen(const CHAR* file_name)
 
   col = 0;
   row = 0;
-  p_count = 0;
+  p_idx = 0;
+  p_cnt = 0;
 
   return TRUE;
 }

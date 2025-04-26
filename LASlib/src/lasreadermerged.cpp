@@ -1198,7 +1198,8 @@ BOOL LASreaderMerged::open()
     }
   }
 
-  p_count = 0;
+  p_idx = 0;
+  p_cnt = 0;
   file_name_current = 0;
 
   return TRUE;
@@ -1297,7 +1298,8 @@ BOOL LASreaderMerged::read_point_default()
     if (lasreader->read_point())
     {
       point = lasreader->point;
-      p_count++;
+      p_idx++;
+      p_cnt++;
       return TRUE;
     }
     if (lasreaderbin)
@@ -1349,7 +1351,8 @@ void LASreaderMerged::close(BOOL close_stream)
 
 BOOL LASreaderMerged::reopen()
 {
-  p_count = 0;
+  p_idx = 0;
+  p_cnt = 0;
   file_name_current = 0;
   if (inside) inside_none();
   if (filter) filter->reset();

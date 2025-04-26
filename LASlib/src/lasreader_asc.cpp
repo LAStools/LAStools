@@ -258,7 +258,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
       {
         if (!fgets(line, line_size, file))
         {
-          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_count);
+          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
         }
 
         // special handling for European numbers
@@ -381,14 +381,14 @@ BOOL LASreaderASC::seek(const I64 p_index)
 BOOL LASreaderASC::read_point_default()
 {
   F64 elevation;
-  while (p_count < npoints)
+  while (p_idx < npoints)
   {
     if (line[line_curr] == '\0')
     {
       if (!fgets(line, line_size, file))
       {
-        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_count);
-        npoints = p_count;
+        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+        npoints = p_idx;
         return FALSE;
       }
 
@@ -472,7 +472,8 @@ BOOL LASreaderASC::read_point_default()
         else
           overflow_I32_z++;
       }
-      p_count++;
+      p_idx++;
+      p_cnt++;
       col++;
       return TRUE;
     }
@@ -555,8 +556,8 @@ BOOL LASreaderASC::reopen(const CHAR* file_name)
 
   col = 0;
   row = 0;
-  p_count = 0;
-
+  p_idx = 0;
+  p_cnt = 0;
   // skip leading spaces
   line_curr = 0;
   while ((line[line_curr] != '\0') && (line[line_curr] <= ' ')) line_curr++;

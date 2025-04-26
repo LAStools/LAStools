@@ -616,7 +616,7 @@ BOOL LASindex::seek_next(LASreader* lasreader)
     if (!has_intervals()) return FALSE;
     lasreader->seek(start);
   }
-  if (lasreader->p_count == end)
+  if (lasreader->p_idx == end)
   {
     have_interval = FALSE;
   }

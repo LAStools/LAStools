@@ -247,8 +247,8 @@ BOOL LASreaderSHP::open(const char* file_name)
 
   populate_bounding_box();
   
-  p_count = 0;
-
+  p_idx = 0;
+  p_cnt = 0;
   return TRUE;
 }
 
@@ -294,9 +294,9 @@ BOOL LASreaderSHP::read_point_default()
   if (point_count == number_of_points)
   {
     int i, int_input;
-    if (fread(&int_input, sizeof(int), 1, file) != 1) { npoints = p_count; return FALSE; }; // record number (BIG)
-    if (fread(&int_input, sizeof(int), 1, file) != 1) { npoints = p_count; return FALSE; }; // content length (BIG)
-    if (fread(&int_input, sizeof(int), 1, file) != 1) { npoints = p_count; return FALSE; }; // shape type (LITTLE)
+    if (fread(&int_input, sizeof(int), 1, file) != 1) { npoints = p_idx; return FALSE; }; // record number (BIG)
+    if (fread(&int_input, sizeof(int), 1, file) != 1) { npoints = p_idx; return FALSE; }; // content length (BIG)
+    if (fread(&int_input, sizeof(int), 1, file) != 1) { npoints = p_idx; return FALSE; }; // shape type (LITTLE)
     from_little_endian(&int_input);
     if (int_input != shape_type)
     {
@@ -305,11 +305,11 @@ BOOL LASreaderSHP::read_point_default()
     double double_input;
     if (shape_type == 8 || shape_type == 18 || shape_type == 28) // Multipoint
     {
-      if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // xmin (LITTLE)
-      if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // ymin (LITTLE)
-      if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // xmax (LITTLE)
-      if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // ymax (LITTLE)
-      if (fread(&int_input, sizeof(int), 1, file) != 1) { npoints = p_count; return FALSE; }; // number of points (LITTLE)
+      if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // xmin (LITTLE)
+      if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // ymin (LITTLE)
+      if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // xmax (LITTLE)
+      if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // ymax (LITTLE)
+      if (fread(&int_input, sizeof(int), 1, file) != 1) { npoints = p_idx; return FALSE; }; // number of points (LITTLE)
       from_little_endian(&int_input);
       number_of_points = int_input;
     }
@@ -328,7 +328,7 @@ BOOL LASreaderSHP::read_point_default()
       // read points x and y
       for (i = 0; i < number_of_points; i++)
       {
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // x of point (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // x of point (LITTLE)
         from_little_endian(&double_input);
         if (opener->is_offset_adjust() == FALSE) 
         {
@@ -339,7 +339,7 @@ BOOL LASreaderSHP::read_point_default()
           else 
             points[3 * i + 0] = (I32)(((double_input - orig_x_offset) / orig_x_scale_factor) - 0.5);
         }
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // y of point (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // y of point (LITTLE)
         from_little_endian(&double_input);
         if (opener->is_offset_adjust() == FALSE) {
           points[3 * i + 1] = (I32)header.get_Y(double_input);
@@ -353,12 +353,12 @@ BOOL LASreaderSHP::read_point_default()
       // read points z and write LAS points
       if (shape_type == 18) // Multipoint
       {
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // zmin (LITTLE)
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // zmin (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // zmin (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // zmin (LITTLE)
       }
       for (i = 0; i < number_of_points; i++)
       {
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // z of point (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // z of point (LITTLE)
         from_little_endian(&double_input);
         if (opener->is_offset_adjust() == FALSE) {
           points[3 * i + 2] = (I32)header.get_Z(double_input);
@@ -381,7 +381,7 @@ BOOL LASreaderSHP::read_point_default()
       // read points x and y and write LAS points
       for (i = 0; i < number_of_points; i++)
       {
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // x of point (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // x of point (LITTLE)
         from_little_endian(&double_input);
         if (opener->is_offset_adjust() == FALSE) {
           points[2 * i + 0] = (I32)header.get_X(double_input);
@@ -391,7 +391,7 @@ BOOL LASreaderSHP::read_point_default()
           else
             points[2 * i + 0] = (I32)(((double_input - orig_x_offset) / orig_x_scale_factor) - 0.5);
         }
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // y of point (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // y of point (LITTLE)
         from_little_endian(&double_input);
         if (opener->is_offset_adjust() == FALSE) {
           points[2 * i + 1] = (I32)header.get_Y(double_input);
@@ -408,12 +408,12 @@ BOOL LASreaderSHP::read_point_default()
     {
       if (shape_type == 18 || shape_type == 28) // Multipoint
       {
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // mmin (LITTLE)
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // mmin (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // mmin (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // mmin (LITTLE)
       }
       for (i = 0; i < number_of_points; i++)
       {
-        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_count; return FALSE; }; // m of point (LITTLE)
+        if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // m of point (LITTLE)
       }
     }
     point_count = 0;
@@ -451,7 +451,8 @@ BOOL LASreaderSHP::read_point_default()
         point.set_Z((I32)(((z - orig_z_offset) / orig_z_scale_factor) - 0.5));
     }
   }
-  p_count++;
+  p_idx++;
+  p_cnt++;
   point_count++;
   return TRUE;
 }
@@ -508,8 +509,8 @@ BOOL LASreaderSHP::reopen(const char* file_name)
   if (fread(&double_input, sizeof(double), 1, file) != 1) return FALSE; // mmin (LITTLE)
   if (fread(&double_input, sizeof(double), 1, file) != 1) return FALSE; // mmax (LITTLE)
 
-  p_count = 0;
-
+  p_idx = 0;
+  p_cnt = 0;
   return TRUE;
 }
 

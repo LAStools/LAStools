@@ -274,15 +274,11 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
   {
     pulse_width_start = point.attributer->get_attribute_start("pulse width");
   }
-
   // set point count to zero
-
-  p_count = 0;
-
+  p_idx = 0;
+  p_cnt = 0;
   // approximate bounding box init
-
   populated_header = FALSE;
-
   if (!read_point()) return FALSE;
 
   header.min_x = header.max_x = point.get_x();
@@ -294,7 +290,6 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
     if (!seek(i)) return FALSE;
     if (!read_point()) return FALSE;
   }
-
   return seek(0);
 }
 
@@ -302,7 +297,7 @@ BOOL LASreaderQFIT::seek(const I64 p_index)
 {
   if (p_index < npoints)
   {
-    p_count = p_index;
+    p_idx = p_index;
     return stream->seek(p_index*version+offset);
   }
   return FALSE;
@@ -310,11 +305,11 @@ BOOL LASreaderQFIT::seek(const I64 p_index)
 
 BOOL LASreaderQFIT::read_point_default()
 {
-  if (p_count < npoints)
+  if (p_idx < npoints)
   {
     try { stream->getBytes((U8*)buffer, version); } catch(...)
     {
-      laserror("reading QFIT point after %u of %u", (U32)p_count, (U32)npoints);
+      laserror("reading QFIT point after %u of %u", (U32)p_idx, (U32)npoints);
       return FALSE;
     }
 
@@ -378,7 +373,8 @@ BOOL LASreaderQFIT::read_point_default()
       }
     }
     
-    p_count++;
+    p_idx++;
+    p_cnt++;
     return TRUE;
   }
   populated_header = TRUE;
@@ -430,8 +426,8 @@ BOOL LASreaderQFIT::reopen(const char* file_name)
   else
     stream = new ByteStreamInFileBE(file);
 
-  p_count = 0;
-
+  p_idx = 0;
+  p_cnt = 0;
   return stream->seek(offset);
 }
 

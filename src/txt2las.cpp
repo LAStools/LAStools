@@ -725,9 +725,9 @@ int main(int argc, char* argv[])
     {
       // write the point
       laswriter->write_point(&lasreader->point);
-      if (progress && ((lasreader->p_count % progress) == 0))
+      if (progress && ((lasreader->p_cnt % progress) == 0))
       {
-        fprintf(stderr, " ... processed %lld points ...\012", lasreader->p_count);
+        fprintf(stderr, " ... processed %lld points ...\012", lasreader->p_cnt);
       }
     }
     lasreader->close();
