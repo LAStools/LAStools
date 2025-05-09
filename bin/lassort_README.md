@@ -42,7 +42,7 @@ IDs and then by time).
 
     lassort64 *.laz  
 
-z-orders all LAZ files with a default bucket size. 
+z-orders all LAZ files with a default bucket size of 1. 
 
 
     lassort64 flight1*.las flight2*.las -gps_time
@@ -90,8 +90,8 @@ z-orders the points from lidar.las with bucket size 2.
 ## lassort specific arguments
 
 -average         : lower level as needed to get specified average points per cell  
--bucket          : bucket size used for spatial sort (and when no subtiling for tiles is desired)  
--bucket_size     : bucket size used for spatial sort (and when no subtiling for tiles is desired)  
+-bucket          : bucket size used for spatial sort (and when no subtiling for tiles is desired) (default=1)
+-bucket_size     : bucket size used for spatial sort (and when no subtiling for tiles is desired) (default=1)
 -destroy_tiling  : for files that are tiles a bucket size destroys the subtiling. remove tiling info.  
 -extra_pass      : do extra read pass to count points (only makes sense when filtering)  
 -gps_time        : sort points based on their GPS time stamps  

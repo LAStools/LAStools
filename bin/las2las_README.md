@@ -876,7 +876,10 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -filtered_transform : do the transformation only on points of the current filter  
 
 ### Input
--i [fnp]        : input file or input file mask [fnp] (e.g. *.laz;fo?.la?;esri.shp,...)  
+-i [fnp]        : input file or input file mask [fnp] (e.g. *.laz;fo?.la?;esri.shp,...)
+                  if a file mask contains spaces " " use:
+                    windows: -i "c:\this is space\*.laz"
+                    linux:   -i "c:\this is space"\*.laz"
 -io_ibuffer [n] : use read-input-buffer of size [n] bytes  
 -iparse [xyz]   : define fields [xyz] for text input parser  
 -ipts           : input as PTS (plain text lidar source), store header in VLR  
