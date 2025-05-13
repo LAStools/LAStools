@@ -54,6 +54,7 @@
  ===============================================================================
  */
 
+#include <cstdint>
 #include <errno.h>
 #include <stdlib.h>
 #include <time.h>
