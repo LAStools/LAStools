@@ -56,14 +56,22 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -remain_buffered     : write all data to the output, even if they are part of a boundary buffer
 
 ### Basics
--h,-help        : print help output  
--version        : reports this tool's version number  
--v,-verbose     : verbose output (print extra information)  
--vv             : very verbose output (print even more information)  
--quiet          : nothing reported in console  
+-cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
--fail           : fail if license expired or invalid  
--mem            : use [n] MB of main memory (500-2000; default=1500)
+-demo           : use LAStools in demo mode (64bit only)  
+-fail           : fail if license expired or invalid (default for 64bit)
+-h, -help       : print help output  
+-v, -verbose    : verbose output (print extra information)  
+-vv             : very verbose output (print even more information)  
+-silent         : only output on errors or warnings
+-quiet          : no output at all
+-force          : continue, even if serious warnings occur  
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-print_log_stats: print additional log statistics  
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-gui            : start with files loaded into GUI  
+-version        : reports this tool's version number  
+
 
 ## Module arguments
 
@@ -102,8 +110,10 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -drop_RGB_green [min] [max]         : drop points with green color value between [min] and [max]  
 -drop_RGB_red [min] [max]           : drop points with red color value between [min] and [max]  
 -force_RGB                          : force the use of the RGB value even if the point format does not support RGB  
+-keep_NDVI [min] [max]              : keep NDVI (Normalized Difference Vegetation Index) between [min] [max]  
 -keep_NDVI_from_CIR [min] [max]     : keep NDVI (Normalized Difference Vegetation Index) from CIR between [min] [max]  
 -keep_NDVI_green_is_NIR [min] [max] : keep NDVI (Normalized Difference Vegetation Index) where green is NIR between [min] [max]  
+-keep_NDVI_blue_is_NIR [min] [max]  : keep NDVI (Normalized Difference Vegetation Index) where blue is NIR between [min] [max]  
 -keep_NDVI_intensity_is_NIR [min] [max]: keep NDVI (Normalized Difference Vegetation Index) where intensity is NIR between [min] [max]  
 -keep_RGB_blue [m] [n]              : keep points with RGB blue color values between [min] [max]  
 -keep_RGB_green [min] [max]         : keep points with green color value between [min] and [max]  

@@ -24,17 +24,18 @@ https://groups.google.com/d/topic/lastools/nMPU75zpqPw/discussion
 -sigmaxy [n]        : horizontal accuracy expected at [n] meters (inactive)  
 
 ### Basics
--cores [n]: process multiple inputs on [n] cores in parallel  
--cpu64    : start 64 bit executable (instead of default 32 bit executable)  
--fail     : fail if license expired or invalid  
--gui      : start with files loaded into GUI  
--h        : print help output  
--help     : print help output  
--quiet    : nothing reported in console  
--v        : verbose output (print extra information)  
--verbose  : verbose output (print extra information)  
--version  : reports this tool's version number  
--vv       : very verbose output (print even more information)  
+-cores [n]      : process multiple inputs on [n] cores in parallel  
+-h, -help       : print help output  
+-v, -verbose    : verbose output (print extra information)  
+-vv             : very verbose output (print even more information)  
+-silent         : only output on errors or warnings
+-quiet          : no output at all
+-force          : continue, even if serious warnings occur  
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-print_log_stats: print additional log statistics  
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-gui            : start with files loaded into GUI  
+-version        : reports this tool's version number  
 
 
 ## License

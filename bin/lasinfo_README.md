@@ -362,15 +362,19 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -set_start_of_waveform_data_packet_record [n]: CAREFUL! sets the start of waveform data packet record field of the LAS header to [n] without checking whether this will corrupt the file  
 
 ### Basics
--cores [n]: process multiple inputs on [n] cores in parallel  
--cpu64    : start 64 bit executable (instead of default 32 bit executable)  
--fail     : fail if license expired or invalid  
--gui      : start with files loaded into GUI  
--h        : print help output  
--quiet    : nothing reported in console  
--v        : verbose output (print extra information)  
--version  : reports this tool's version number  
--wait     : wait for <ENTER> in the console at end of process  
+-cores [n]      : process multiple inputs on [n] cores in parallel  
+-h, -help       : print help output  
+-v, -verbose    : verbose output (print extra information)  
+-vv             : very verbose output (print even more information)  
+-silent         : only output on errors or warnings
+-quiet          : no output at all
+-force          : continue, even if serious warnings occur  
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-print_log_stats: print additional log statistics  
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-gui            : start with files loaded into GUI  
+-version        : reports this tool's version number  
+
 
 ## Module arguments
 
@@ -409,8 +413,10 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -drop_RGB_green [min] [max]         : drop points with green color value between [min] and [max]  
 -drop_RGB_red [min] [max]           : drop points with red color value between [min] and [max]  
 -force_RGB                          : force the use of the RGB value even if the point format does not support RGB  
+-keep_NDVI [min] [max]              : keep NDVI (Normalized Difference Vegetation Index) between [min] [max]  
 -keep_NDVI_from_CIR [min] [max]     : keep NDVI (Normalized Difference Vegetation Index) from CIR between [min] [max]  
 -keep_NDVI_green_is_NIR [min] [max] : keep NDVI (Normalized Difference Vegetation Index) where green is NIR between [min] [max]  
+-keep_NDVI_blue_is_NIR [min] [max]  : keep NDVI (Normalized Difference Vegetation Index) where blue is NIR between [min] [max]  
 -keep_NDVI_intensity_is_NIR [min] [max]: keep NDVI (Normalized Difference Vegetation Index) where intensity is NIR between [min] [max]  
 -keep_RGB_blue [m] [n]              : keep points with RGB blue color values between [min] [max]  
 -keep_RGB_green [min] [max]         : keep points with green color value between [min] and [max]  

@@ -186,19 +186,22 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 -withheld               : keep all points in file (do not thin) but flag surviving points as withheld instead  
 
 ### Basics
--cores [n]    : process multiple inputs on [n] cores in parallel  
--cpu64        : start 64 bit executable (instead of default 32 bit executable)  
--fail         : fail if license expired or invalid  
--gui          : start with files loaded into GUI  
--h            : print help output  
--help         : print help output  
--license      : show license information  
--quiet        : nothing reported in console  
--v            : verbose output (print extra information)  
--verbose      : verbose output (print extra information)  
--version      : reports this tool's version number  
--very_verbose : very verbose output (print even more information)  
--vv           : very verbose output (print even more information)  
+-cores [n]      : process multiple inputs on [n] cores in parallel  
+-license        : show license information  
+-demo           : use LAStools in demo mode (64bit only)  
+-fail           : fail if license expired or invalid (default for 64bit)
+-h, -help       : print help output  
+-v, -verbose    : verbose output (print extra information)  
+-vv             : very verbose output (print even more information)  
+-silent         : only output on errors or warnings
+-quiet          : no output at all
+-force          : continue, even if serious warnings occur  
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-print_log_stats: print additional log statistics  
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-gui            : start with files loaded into GUI  
+-version        : reports this tool's version number  
+
 
 ## Module arguments
 
@@ -237,8 +240,10 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 -drop_RGB_green [min] [max]         : drop points with green color value between [min] and [max]  
 -drop_RGB_red [min] [max]           : drop points with red color value between [min] and [max]  
 -force_RGB                          : force the use of the RGB value even if the point format does not support RGB  
+-keep_NDVI [min] [max]              : keep NDVI (Normalized Difference Vegetation Index) between [min] [max]  
 -keep_NDVI_from_CIR [min] [max]     : keep NDVI (Normalized Difference Vegetation Index) from CIR between [min] [max]  
 -keep_NDVI_green_is_NIR [min] [max] : keep NDVI (Normalized Difference Vegetation Index) where green is NIR between [min] [max]  
+-keep_NDVI_blue_is_NIR [min] [max]  : keep NDVI (Normalized Difference Vegetation Index) where blue is NIR between [min] [max]  
 -keep_NDVI_intensity_is_NIR [min] [max]: keep NDVI (Normalized Difference Vegetation Index) where intensity is NIR between [min] [max]  
 -keep_RGB_blue [m] [n]              : keep points with RGB blue color values between [min] [max]  
 -keep_RGB_green [min] [max]         : keep points with green color value between [min] and [max]  
