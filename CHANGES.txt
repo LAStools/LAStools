@@ -1,5 +1,11 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+16 May 2025 -- fix: lascanopy very_verbose sync
+15 May 2025 -- fix: lasheight -store_precise_as_extra_bytes calculation
+15 May 2025 -- fix: point clean for uninitialized points
+14 May 2025 -- fix: doc update demo mode and error handling (-demo, -quit, -fail, -force,...)
+9 May 2025 -- fix: compilation error on Fedora 42 (with gcc 15.1)
+9 May 2025 -- fix: las header char len validation and limitation
 25 April 2025 -- fix: point index and point count separation to allow e.g. "-stop_at_point" for copc files
 21 April 2025 -- fix: lasdatum: report error and set errorcode on invalid input grids
 15 April 2025 -- NEW: ArcGIS Pro plugin rework: add lascopy, las3dpoly, lasdatum, lasvdatum, lasdistance, lasground_new, lasvoxel
@@ -62,14 +68,14 @@
 11 June 2024 -- fix: argument handler multi core support; pass 64bit to all multicore tools; fix 64bit executeable param
 04 June 2024 -- NEW: lasheight: -kill and -prohibit_extrapolation options
 03 June 2024 -- fix: lasclassify: z_from_attrib support
-31 Mai 2024 -- fix: lasvoxel: support ignore_xxx arguments
-29 Mai 2024 -- NEW: lasdatum: support >16 (sub)grids (up to 255); print very_verbose log output about grid selection
-22 Mai 2024 -- fix: lasground64, lasground_new64: continue with next file on single file abort  
-21 Mai 2024 -- bugfix error handling
-18 Mai 2024 -- NEW: lasclip: support filename_as_prefix and filename_as_suffix
-7 Mai 2024 -- lascopy redesign: multiple match and copy options
-7 Mai 2024 -- unify exit codes; refactoring error handling
-7 Mai 2024 -- fix: lasinfo output point iterator
+31 May 2024 -- fix: lasvoxel: support ignore_xxx arguments
+29 May 2024 -- NEW: lasdatum: support >16 (sub)grids (up to 255); print very_verbose log output about grid selection
+22 May 2024 -- fix: lasground64, lasground_new64: continue with next file on single file abort  
+21 May 2024 -- bugfix error handling
+18 May 2024 -- NEW: lasclip: support filename_as_prefix and filename_as_suffix
+7 May 2024 -- lascopy redesign: multiple match and copy options
+7 May 2024 -- unify exit codes; refactoring error handling
+7 May 2024 -- fix: lasinfo output point iterator
 19 March 2024 -- NEW: read z from attribute (-z_from_attribute) 
 19 March 2024 -- fix: find licensefile at bin location (linux)
 19 March 2024 -- fix: multicore bin localization (linux)
@@ -126,11 +132,11 @@
 17 January 2021 -- lascolor: new options: -band_into_red 0 -band_into_green 1 -band_into_blue 2 -band_into_nir 3 -band_into_intensity 5
 15 January 2021 -- LASlib: new magic while reading files: '-divide_registers 0 1 2' and '-subtract_registers 0 1 2'
 14 January 2021 -- las2las: new option to add an empty VLR: -add_empty_vlr "hello martin" 4711 "i like laser chickens"
- 7 December 2020 -- fixed new bug introduced 28 September 2020 for command-line combo '-o out.laz -odix _mist -cpu64'
+7 December 2020 -- fixed new bug introduced 28 September 2020 for command-line combo '-o out.laz -odix _mist -cpu64'
 22 November 2020 -- las2las: when reprojecting only x and y, preserve resolution of z coordinate, if not set explicitely
 11 November 2020 -- lasinfo: new option '-set_vlr_record_id 2 4711' changes 'record ID' field of VLR with index 2
 11 November 2020 -- lasinfo: new option '-set_vlr_user_id 1 "hello martin"' changes 'user ID' field of VLR with index 1
-10 November 2020 -- lasinfo: new option '-set_vlr_description 0 "hello martin"' changes 'description' field of VLR with index 0
+ 10 November 2020 -- lasinfo: new option '-set_vlr_description 0 "hello martin"' changes 'description' field of VLR with index 0
  1 November 2020 -- lascanopy: new option to output either minimal or maximal GPS time stamp with '-gps_min' or '-gps_max' 
 30 October 2020 -- las2las: fail / exit with error code when input file is corrupt
 10 October 2020 -- LASlib: new '-copy_register_into_R 0', '-copy_register_into_G 1', '-copy_register_into_B 2', '-copy_register_into_NIR 3'
@@ -593,7 +599,6 @@
 20 August 2015 -- LASlayers: using '-olay' with a filter or transform adds them to the LAY file
 19 August 2015 -- lasground: new '-bulge 1.0' offers more control for what is added to the ground
 19 August 2015 -- lastile: new '-flag_as_withheld' or '-flag_as_synthetic' for buffer points
-
 19 August 2015 -- lastile: multi-core tiling to be used with spatially indexed input
 18 August 2015 -- lasdiff: fixed report for truncated files (fewer or more points) 
 1 August 2015 -- LASlib: moving LASpoint, LASquantizer, and LASattributer to LASzip for "compatibility"
