@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+26 May 2025 -- fix: memsize grid for linux; win ifdefs fix
 16 May 2025 -- fix: lascanopy very_verbose sync
 15 May 2025 -- fix: lasheight -store_precise_as_extra_bytes calculation
 15 May 2025 -- fix: point clean for uninitialized points
