@@ -221,7 +221,9 @@ BOOL LASsummary::add(const LASpoint* point)
       max.extra_bytes_number = point->extra_bytes_number;
     }
     // initialize min and max
+    min.extended_point_type = point->extended_point_type;
     min = *point;
+    max.extended_point_type = point->extended_point_type;
     max = *point;
     // initialize fluff detection
     xyz_low_digits_10[0] = (U16)(point->get_X()%10);

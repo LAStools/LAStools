@@ -2232,7 +2232,6 @@ class LasTool_lasinfo : public LasTool {
         if (file_out && !no_min_max && !json_out) fprintf(file_out, "reporting minimum and maximum for all LAS point record entries ...\012");
 
         // maybe seek to start position
-
         if (subsequence_start) lasreader->seek(subsequence_start);
 
         while (lasreader->read_point()) {
@@ -2241,6 +2240,7 @@ class LasTool_lasinfo : public LasTool {
           if (check_outside) {
             if (!lasreader->point.inside_bounding_box(
                     enlarged_min_x, enlarged_min_y, enlarged_min_z, enlarged_max_x, enlarged_max_y, enlarged_max_z)) {
+              // report each single point outside the bounding box
               outside_bounding_box++;
               if (file_out && report_outside) {
                 if (json_out) {
@@ -2256,17 +2256,27 @@ class LasTool_lasinfo : public LasTool {
                   json_outside_box["scan_direction_flag"] = lasreader->point.get_scan_direction_flag();
                   json_outside_box["edge_flight_line"] = lasreader->point.get_edge_of_flight_line();
                   json_outside_box["classification"] = lasreader->point.get_classification();
-                  json_outside_box["scan_angle_rank"] = lasreader->point.get_scan_angle_rank();
+                  json_outside_box["scan_angle"] = lasreader->point.get_scan_angle_string();
                   json_outside_box["user_data"] = lasreader->point.get_user_data();
                   json_outside_box["point_source_id"] = lasreader->point.get_point_source_ID();
                   json_sub_main["points_outside_boundig_box"].push_back(json_outside_box);
                 } else {
                   fprintf(
-                      file_out, "%u t %g x %g y %g z %g i %d (%d of %d) d %d e %d c %d s %d %u p %d \012", (U32)(lasreader->p_idx - 1),
-                      lasreader->point.get_gps_time(), lasreader->point.get_x(), lasreader->point.get_y(), lasreader->point.get_z(),
-                      lasreader->point.get_intensity(), lasreader->point.get_return_number(), lasreader->point.get_number_of_returns(),
-                      lasreader->point.get_scan_direction_flag(), lasreader->point.get_edge_of_flight_line(), lasreader->point.get_classification(),
-                      lasreader->point.get_scan_angle_rank(), lasreader->point.get_user_data(), lasreader->point.get_point_source_ID());
+                      file_out, "%u t %g x %g y %g z %g i %d (%d of %d) d %d e %d c %d s %s %u p %d \012", 
+                      (U32)(lasreader->p_idx - 1),
+                      lasreader->point.get_gps_time(), 
+                      lasreader->point.get_x(), 
+                      lasreader->point.get_y(), 
+                      lasreader->point.get_z(),
+                      lasreader->point.get_intensity(), 
+                      lasreader->point.get_return_number(), 
+                      lasreader->point.get_number_of_returns(),
+                      lasreader->point.get_scan_direction_flag(), 
+                      lasreader->point.get_edge_of_flight_line(), 
+                      lasreader->point.get_classification(),
+                      lasreader->point.get_scan_angle_string().c_str(), 
+                      lasreader->point.get_user_data(), 
+                      lasreader->point.get_point_source_ID());
                 }
               }
             }
@@ -2325,8 +2335,8 @@ class LasTool_lasinfo : public LasTool {
             json_las_point_report["scan_direction_flag"]["max"] = static_cast<int>(lassummary.max.scan_direction_flag);
             json_las_point_report["classification"]["min"] = static_cast<int>(lassummary.min.classification);
             json_las_point_report["classification"]["max"] = static_cast<int>(lassummary.max.classification);
-            json_las_point_report["scan_angle_rank"]["min"] = lassummary.min.scan_angle_rank;
-            json_las_point_report["scan_angle_rank"]["max"] = lassummary.max.scan_angle_rank;
+            json_las_point_report["scan_angle"]["min"] = lassummary.min.get_scan_angle_string();
+            json_las_point_report["scan_angle"]["max"] = lassummary.max.get_scan_angle_string();
             json_las_point_report["user_data"]["min"] = lassummary.min.user_data;
             json_las_point_report["user_data"]["max"] = lassummary.max.user_data;
             json_las_point_report["point_source_id"]["min"] = lassummary.min.point_source_ID;
@@ -2341,7 +2351,7 @@ class LasTool_lasinfo : public LasTool {
             fprintf(file_out, "  edge_of_flight_line %d %10d\012", lassummary.min.edge_of_flight_line, lassummary.max.edge_of_flight_line);
             fprintf(file_out, "  scan_direction_flag %d %10d\012", lassummary.min.scan_direction_flag, lassummary.max.scan_direction_flag);
             fprintf(file_out, "  classification  %5d %10d\012", lassummary.min.classification, lassummary.max.classification);
-            fprintf(file_out, "  scan_angle_rank %5d %10d\012", lassummary.min.scan_angle_rank, lassummary.max.scan_angle_rank);
+            fprintf(file_out, "  scan_angle %10s %10s\012", lassummary.min.get_scan_angle_string().c_str(), lassummary.max.get_scan_angle_string().c_str());
             fprintf(file_out, "  user_data       %5d %10d\012", lassummary.min.user_data, lassummary.max.user_data);
             fprintf(file_out, "  point_source_ID %5d %10d\012", lassummary.min.point_source_ID, lassummary.max.point_source_ID);
           }
@@ -2432,8 +2442,8 @@ class LasTool_lasinfo : public LasTool {
               json_las_point_report["extended_number_of_returns"]["max"] = static_cast<int>(lassummary.max.extended_number_of_returns);
               json_las_point_report["extended_classification"]["min"] = lassummary.min.extended_classification;
               json_las_point_report["extended_classification"]["max"] = lassummary.max.extended_classification;
-              json_las_point_report["extended_scan_angle"]["min"] = lassummary.min.extended_scan_angle;
-              json_las_point_report["extended_scan_angle"]["max"] = lassummary.max.extended_scan_angle;
+              json_las_point_report["extended_scan_angle"]["min"] = lassummary.min.get_scan_angle_string();
+              json_las_point_report["extended_scan_angle"]["max"] = lassummary.max.get_scan_angle_string();
               json_las_point_report["extended_scanner_channel"]["min"] = static_cast<int>(lassummary.min.extended_scanner_channel);
               json_las_point_report["extended_scanner_channel"]["max"] = static_cast<int>(lassummary.max.extended_scanner_channel);
             } else {
@@ -2445,7 +2455,9 @@ class LasTool_lasinfo : public LasTool {
               fprintf(
                   file_out, "  extended_classification    %6d %6d\012", lassummary.min.extended_classification,
                   lassummary.max.extended_classification);
-              fprintf(file_out, "  extended_scan_angle        %6d %6d\012", lassummary.min.extended_scan_angle, lassummary.max.extended_scan_angle);
+              fprintf(
+                  file_out, "  extended_scan_angle %10s %10s\012", 
+                    lassummary.min.get_scan_angle_string().c_str(), lassummary.max.get_scan_angle_string().c_str());
               fprintf(
                   file_out, "  extended_scanner_channel   %6d %6d\012", lassummary.min.extended_scanner_channel,
                   lassummary.max.extended_scanner_channel);

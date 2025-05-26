@@ -510,19 +510,19 @@ double stoddefault(const std::string& val, double def) {
 
 double DoubleRound(double value, int decimals) {
   double scale = pow(10.0, decimals);  // e.g. 10^10 for 10 decimal places
-  return round(value * scale) / scale;
+  return std::round(value * scale) / scale;
 }
 
-std::string DoubleToString(double dd, short decimals) {
-  std::stringstream ss;
-  ss << std::setprecision(decimals) << dd;
-  return ss.str();
-}
-
-std::string DoubleToFixLenString(double dd, short decimals) {
-  std::stringstream ss;
-  ss << std::fixed << std::setprecision(decimals) << dd;
-  return ss.str();
+std::string DoubleToString(double dd, short decimals, bool trim_right_zeros) {
+  char xx[44];
+  int cnt = snprintf(xx, 44, "%.*f", decimals, dd);
+  if (trim_right_zeros) {
+    while ((cnt > 0) && ((xx[cnt - 1] == '0') || (xx[cnt - 1] == '.'))) {
+      xx[cnt - 1] = '\0';
+      cnt--;
+    }
+  }
+  return xx;
 }
 
 std::string CcToUnderline(const std::string& in) {

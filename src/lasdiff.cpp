@@ -573,9 +573,10 @@ static int check_points(const CHAR* file_name1, LASreader* lasreader1, const CHA
             if (different_points < shutup) fprintf(stderr, "  withheld_flag: %d %d\n", lasreader1->point.get_withheld_flag(), lasreader2->point.get_withheld_flag());
             difference = true;
           }
-          if (lasreader1->point.scan_angle_rank != lasreader2->point.scan_angle_rank)
+          if (lasreader1->point.get_scan_angle() != lasreader2->point.get_scan_angle())
           {
-            if (different_points < shutup) fprintf(stderr, "  scan_angle_rank: %d %d\n", lasreader1->point.scan_angle_rank, lasreader2->point.scan_angle_rank);
+            if (different_points < shutup)
+              fprintf(stderr, "  scan_angle_rank: %s %s\n", lasreader1->point.get_scan_angle_string().c_str(), lasreader2->point.get_scan_angle_string().c_str());
             difference = true;
           }
           if (lasreader1->point.user_data != lasreader2->point.user_data)
@@ -753,7 +754,7 @@ static int check_points(const CHAR* file_name1, LASreader* lasreader1, const CHA
         {
           if (lasreader1->point.extended_scan_angle != lasreader2->point.extended_scan_angle)
           {
-            if (different_points < shutup) fprintf(stderr, "  extended_scan_angle: %d %d (point index %u)\n", lasreader1->point.extended_scan_angle, lasreader2->point.extended_scan_angle, (U32)(lasreader1->p_idx-1));
+            if (different_points < shutup) fprintf(stderr, "  extended_scan_angle: %s %s (point index %u)\n", lasreader1->point.get_scan_angle_string().c_str(), lasreader2->point.get_scan_angle_string().c_str(), (U32)(lasreader1->p_idx-1));
             difference = true;
           }
           if (lasreader1->point.extended_scanner_channel != lasreader2->point.extended_scanner_channel)

@@ -440,11 +440,8 @@ double stoddefault(const std::string& val, double def = 0);
 /// Function for rounding to a specific number of decimal places
 double DoubleRound(double value, int decimals);
 
-/// return double as string with a maximum number of decimal places
-std::string DoubleToString(double dd, short decimals);
-
-/// return double as string with a fix number of decimal places
-std::string DoubleToFixLenString(double dd, short decimals);
+/// return double as string rounded to a maximum number of decimal places. optional trim trailing 0s
+std::string DoubleToString(double dd, short decimals, bool trim_right_zeros = false);
 
 /// CamelCase to non_camel_case converter
 std::string CcToUnderline(const std::string& in);
