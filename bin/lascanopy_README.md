@@ -173,37 +173,82 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 
 ## lascanopy arguments for metrics 
 
--abv                       : report number of points above the cutoff  
--all                       : report total number of points  
--avg                       : for each grid cell compute average  
--b [n]                     : deliver the percentage or fraction of points between the height cutoff (aka breast height) and the maximum height [n]  
--b_upper [n]               : specifies a certain height [n] percentile to be used instead of the maximum height as "upper" limit for the bins  
--c [m] [n] [o] ...         : compute those height rasters [m-n,n-o,...]  
--cov                       : cover is computed as the number of first returns above the cover cutoff divided by the number of all first returns and output as a percentage  
--d [m] [n] [o] ...         : compute a height raster [m-n,n-o,...] in which the counts are divided by the total number of points and scaled to a percentage  
--dns                       : compute the canopy density as the number of all points above the cover cutoff divided by the number of all returns  
--gap                       : compute the inverse of the canopy cover (100% - canopy)  
--gps_max                   : compute GPS max value  
--gps_min                   : compute GPS min value  
--hom                       : compute the height & intensity metric known as "Height of Median Energy"  
--int_avg                   : compute intensity average  
--int_c [m] [n] [o] ...     : produce intensity bands with gap values [m] [n] [o] ...  
--int_d [m] [n] [o] ...     : produce intensity bands with absolute values [m] [n] [o] ...  
--int_kur                   : compute intensity kurtosis  
--int_max                   : compute intensity maximum  
--int_min                   : compute intensity minimum  
--int_p [m] [n] [o] ...     : produce intensity percentiles with percent values [m] [n] [o] ...  
--int_qav                   : compute intensity quadratic average  
--int_ske                   : compute intensity skewness  
--int_std                   : compute intensity standard deviation  
--kur                       : compute kurtosis / bulge  
--max                       : for each grid cell keep highest value  
--min                       : for each grid cell keep lowest value  
--p [m] [n] [o] ...         : compute height percentiles [m] [n] [o] ...  
--qav                       : computer the average square height above the height cutoff  
--ske                       : compute height skewness  
--std                       : for each grid cell compute standard deviation  
--vc [m] [n] [o] ...        : compute the Vertical Complexity Index (VCI) with bin sizes width of [m] [n] [o] ...  
+-abv                     : report number of points above the cutoff  
+-all                     : report total number of points  
+-avg                     : for each grid cell compute average  
+-b [n]                   : deliver the percentage or fraction of points between the height cutoff (aka breast height) and the maximum height [n]  
+-b_upper [n]             : specifies a certain height [n] percentile to be used instead of the maximum height as "upper" limit for the bins  
+-c [m] [n] [o] ...       : compute those height rasters [m-n,n-o,...]  
+-cov                     : cover is computed as the number of first returns above the cover cutoff divided by the number of all first returns and output as a percentage  
+-d [m] [n] [o] ...       : compute a height raster [m-n,n-o,...] in which the counts are divided by the total number of points and scaled to a percentage  
+-dns                     : compute the canopy density as the number of all points above the cover cutoff divided by the number of all returns  
+-gap                     : compute the inverse of the canopy cover (100% - canopy)  
+-gps_max                 : compute GPS max value  
+-gps_min                 : compute GPS min value  
+-hom                     : compute the height & intensity metric known as "Height of Median Energy"  
+-kur                     : compute kurtosis / bulge  
+-max                     : for each grid cell keep highest value  
+-min                     : for each grid cell keep lowest value  
+-p [m] [n] [o] ...       : compute height percentiles [m] [n] [o] ...  
+-qav                     : computer the average square height above the height cutoff  
+-ske                     : compute height skewness  
+-std                     : for each grid cell compute standard deviation  
+-vc [m] [n] [o] ...      : compute the Vertical Complexity Index (VCI) with bin sizes width of [m] [n] [o] ...  
+
+-int_avg                 : compute intensity average  
+-int_c [m] [n] [o] ...   : produce intensity bands with gap values [m] [n] [o] ...  
+-int_d [m] [n] [o] ...   : produce intensity bands with absolute values [m] [n] [o] ...  
+-int_kur                 : compute intensity kurtosis  
+-int_max                 : compute intensity maximum  
+-int_min                 : compute intensity minimum  
+-int_p [m] [n] [o] ...   : produce intensity percentiles with percent values [m] [n] [o] ...  
+-int_qav                 : compute intensity quadratic average  
+-int_ske                 : compute intensity skewness  
+-int_std                 : compute intensity standard deviation  
+
+-red_avg                 : compute red color value average  
+-red_c [m] [n] [o] ...   : produce red color value bands with gap values [m] [n] [o] ...  
+-red_d [m] [n] [o] ...   : produce red color value bands with absolute values [m] [n] [o] ...  
+-red_kur                 : compute red color value kurtosis  
+-red_max                 : compute red color value maximum  
+-red_min                 : compute red color value minimum  
+-red_p [m] [n] [o] ...   : produce red color value percentiles with percent values [m] [n] [o] ...  
+-red_qav                 : compute red color value quadratic average  
+-red_ske                 : compute red color value skewness  
+-red_std                 : compute red color value standard deviation  
+
+-green_avg               : compute green color value average  
+-green_c [m] [n] [o] ... : produce green color value bands with gap values [m] [n] [o] ...  
+-green_d [m] [n] [o] ... : produce green color value bands with absolute values [m] [n] [o] ...  
+-green_kur               : compute green color value kurtosis  
+-green_max               : compute green color value maximum  
+-green_min               : compute green color value minimum  
+-green_p [m] [n] [o] ... : produce green color value percentiles with percent values [m] [n] [o] ...  
+-green_qav               : compute green color value quadratic average  
+-green_ske               : compute green color value skewness  
+-green_std               : compute green color value standard deviation  
+
+-blue_avg                : compute blue color value average  
+-blue_c [m] [n] [o] ...  : produce blue color value bands with gap values [m] [n] [o] ...  
+-blue_d [m] [n] [o] ...  : produce blue color value bands with absolute values [m] [n] [o] ...  
+-blue_kur                : compute blue color value kurtosis  
+-blue_max                : compute blue color value maximum  
+-blue_min                : compute blue color value minimum  
+-blue_p [m] [n] [o] ...  : produce blue color value percentiles with percent values [m] [n] [o] ...  
+-blue_qav                : compute blue color value quadratic average  
+-blue_ske                : compute blue color value skewness  
+-blue_std                : compute blue color value standard deviation  
+
+-nir_avg                 : compute near infrared valuel average  
+-nir_c [m] [n] [o] ...   : produce near infrared valuel bands with gap values [m] [n] [o] ...  
+-nir_d [m] [n] [o] ...   : produce near infrared valuel bands with absolute values [m] [n] [o] ...  
+-nir_kur                 : compute near infrared valuel kurtosis  
+-nir_max                 : compute near infrared valuel maximum  
+-nir_min                 : compute near infrared valuel minimum  
+-nir_p [m] [n] [o] ...   : produce near infrared valuel percentiles with percent values [m] [n] [o] ...  
+-nir_qav                 : compute near infrared valuel quadratic average  
+-nir_ske                 : compute near infrared valuel skewness  
+-nir_std                 : compute near infrared valuel standard deviation  
 
 ## lascanopy other specific arguments
 

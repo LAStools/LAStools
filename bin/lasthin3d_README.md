@@ -11,7 +11,8 @@ using e. g. 'step_z 2.0'.
 The other possibility is to thin the data by taking either 
 each n-th point or using a random generator to take each 
 n-th point on average. With '-seed 121' you can specify a 
-different random seed for the generator.
+different random seed for the generator. These two options
+are very fast and memory efficient.
 
 You can exclude certain point classes from the thinning with
 option '-ignore_class 2' or '-ignore_class 3 4 5 6' and they
@@ -43,11 +44,39 @@ sets the grid cell steps to '4.0', but sets the step size in
 z-direction to '2.0'
 
 
-    lasthin3d64 -i in.laz -step 4.0 -use_voxel_center -o out.laz
+    lasthin3d64 -i in.laz -step 4.0 -use_cell_center -o out.laz
 
-sets the grid cell steps to '4.0' and uses the voxel center as 
+sets the grid cell steps to '4.0' and uses the cell center as 
 x,y,z-coordinates for the point in that cell which is selected
 for writing.
+
+
+    lasthin3d64 -i in.laz -step 4.0 -step_z 2.0 -random_cell_occurrence -seed 42 -o out.laz
+
+sets the grid cell steps to '4.0' for x-y and '2.0' for z and chooses
+a random point within the cell boundaries to survive. The argument 'seed'
+sets a custom seed to the random generators and allow to have some influence
+on the random selection.
+
+
+    lasthin3d64 -i in.laz -step 4.0 -step_z 2.0 -closest -o out.laz
+
+sets the grid cell steps to '4.0' for x-y and '2.0' for z and chooses
+the point closest to the cell center to survive.
+
+
+    lasthin3d64 -i in.laz -step 4.0 -step_z 2.0 -highest -o out.laz
+
+sets the grid cell steps to '4.0' for x-y and '2.0' for z and chooses
+the point largest z-coordinate to survive.
+
+
+    lasthin3d64 -i in.laz -step 4.0 -count_to_user_byte -highest -o out.laz
+
+sets the grid cell steps to '4.0', chooses the point largest z-coordinate
+to survive and counts how many points lie within the cell boundaries. 
+The result will only count up to 255, if more points are expected, use 
+'-count_to_intensity' instead (maximum of 65,535 points).
 
 
     lasthin3d64 -i in.laz -every_nth 100 -o out.laz
@@ -81,16 +110,22 @@ which points are selected as keypoints.
 
 
 ## lasthin3d specific arguments
-
--step [n]                     : set grid cell size to [n] for thinning/flagging (default=2)  
--step_z [n]                   : set grid cell size in z-direction to [n]  
--use_voxel_center             : set's the xyz to the corresponding voxel center  
+-every_nth [n]                : keep every [n]th point  
+-random_nth [n]               : keep on avarage every [n]th point  
+-step [n]                     : set grid cell size to [n] for thinning/flagging (default=2 and uses first point found in cell) 
+-step_z [n]                   : set grid cell size in z-direction to [n]
+-random_cell_occurrence       : keeps a random point which lies in a cell
+-closest                      : keeps the point that is closest (x-y coordinate) to the cell center
+-highest                      : keeps the point that has the highest z-coordinate in a cell
+-lowest                       : keeps the point that has the lowest z-coordinate in a cell
+-use_cell_center              : set the xyz to the corresponding cell center  
+-count_to_user_byte           : counts the number of points in a cell and writes it to the surviving points 'user byte'
+-count_to_intensity           : counts the number of points in a cell and writes it to the surviving points 'intensity'
 -flatten_points               : set all z values to minimal z header value  
+-flatten_all_points           : set all z values to minimal z header value, even when point is ignored 
 -flag_as_keypoint             : keep all points in file (do not thin) but flag surviving points as keypoint instead  
 -flag_as_withheld             : keep all points in file (do not thin) but flag surviving points as withheld instead
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ... (maximum 8 classes)  
--every_nth [n]                : keep every [n]th point  
--random_nth [n]               : keep on avarage every [n]th point  
 -seed [n]                     : seeds the random generator with [n]  
 -ilay [n]                     : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]                  : look for corresponding *.lay file in directory [n]  
