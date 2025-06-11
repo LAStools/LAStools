@@ -1,36 +1,33 @@
 ﻿# lasthin3d
 
 A fast 3d LIDAR thinning algorithm for pointcloud data. 
-The data is thinnened by placing a 3d-grid over the data 
-points and taking only one point for each cell. 
-The grid spacing default is 2 unit and it can be changed, 
-for example to 0.1 units, with '-step 0.1'. Additionally
-you an specify a different step size in z-direction by
-using e. g. 'step_z 2.0'.
+The data is thinnened by placing a 3d-grid over the data points and taking
+only one point for each cell.
+The grid spacing is 2 units by default and can be changed to a different
+step size with the '-step [n]' argument.
 
-The other possibility is to thin the data by taking either 
-each n-th point or using a random generator to take each 
-n-th point on average. With '-seed 121' you can specify a 
-different random seed for the generator. These two options
-are very fast and memory efficient.
+Another option for thinning out point clouds is to use either exactly every
+nth point or every nth point on average. With '-seed [n]' you can specify
+a seed value for the random generator.
+These two options are very fast and memory efficient.
 
-You can exclude certain point classes from the thinning with
-option '-ignore_class 2' or '-ignore_class 3 4 5 6' and they
-will all be written back to the thinned file. Then the thinning 
-operation will be applied exclusively to the other points.
+You can exclude certain point classes from the thinning with option
+'-ignore_class 2' or '-ignore_class 3 4 5 6' and they will all be written
+to the thinned file. The thinning is then applied exclusively to the remaining
+points.
  
 ## Examples
 
     lasthin3d64 -i in.laz -o out.laz
 
-does LAS thinning with the grid spacing default of 2 units and 
-keeps the first point per 3d-grid cell
+does LAS thinning with the grid spacing default of 2 units and keeps the
+first point per 3d-grid cell
 
 
     lasthin3d64 -i in.laz -ignore_class 1 3 5 -o out.laz
 
-a maximum of 8 different classes ca be ignored for the processing
-and will not be thined.
+a maximum of 8 different classes can be ignored for the processing and will
+not be thinned out.
 
 
     lasthin3d64 -i in.laz -step 4.0 -o out.laz
@@ -46,37 +43,36 @@ z-direction to '2.0'
 
     lasthin3d64 -i in.laz -step 4.0 -use_cell_center -o out.laz
 
-sets the grid cell steps to '4.0' and uses the cell center as 
-x,y,z-coordinates for the point in that cell which is selected
-for writing.
+sets the grid cell steps to '4.0' and uses the cell center as
+x,y,z-coordinates for the point in that cell which is selected for writing.
 
 
     lasthin3d64 -i in.laz -step 4.0 -step_z 2.0 -random_cell_occurrence -seed 42 -o out.laz
 
 sets the grid cell steps to '4.0' for x-y and '2.0' for z and chooses
 a random point within the cell boundaries to survive. The argument 'seed'
-sets a custom seed to the random generators and allow to have some influence
+sets a custom seed to the random generator and allow to have some influence
 on the random selection.
 
 
     lasthin3d64 -i in.laz -step 4.0 -step_z 2.0 -closest -o out.laz
 
 sets the grid cell steps to '4.0' for x-y and '2.0' for z and chooses
-the point closest to the cell center to survive.
+the point closest to the cell center for the result.
 
 
     lasthin3d64 -i in.laz -step 4.0 -step_z 2.0 -highest -o out.laz
 
 sets the grid cell steps to '4.0' for x-y and '2.0' for z and chooses
-the point largest z-coordinate to survive.
+the point with the largest z-coordinate to survive.
 
 
     lasthin3d64 -i in.laz -step 4.0 -count_to_user_byte -highest -o out.laz
 
-sets the grid cell steps to '4.0', chooses the point largest z-coordinate
-to survive and counts how many points lie within the cell boundaries. 
-The result will only count up to 255, if more points are expected, use 
-'-count_to_intensity' instead (maximum of 65,535 points).
+sets the grid cell steps to '4.0', chooses the point with the largest
+z-coordinate to survive, and counts how many points lie within the cell
+boundaries. The result will only count up to 255, if more points are expected,
+use '-count_to_intensity' instead with a maximum of 65535 points.
 
 
     lasthin3d64 -i in.laz -every_nth 100 -o out.laz
@@ -110,15 +106,19 @@ which points are selected as keypoints.
 
 
 ## lasthin3d specific arguments
--every_nth [n]                : keep every [n]th point  
--random_nth [n]               : keep on avarage every [n]th point  
--step [n]                     : set grid cell size to [n] for thinning/flagging (default=2 and uses first point found in cell) 
--step_z [n]                   : set grid cell size in z-direction to [n]
--random_cell_occurrence       : keeps a random point which lies in a cell
+
+### target point selection
 -closest                      : keeps the point that is closest (x-y coordinate) to the cell center
 -highest                      : keeps the point that has the highest z-coordinate in a cell
 -lowest                       : keeps the point that has the lowest z-coordinate in a cell
+-random_cell_occurrence       : keeps a random point which lies in a cell
+-every_nth [n]                : keep every [n]th point  
+-random_nth [n]               : keep on avarage every [n]th point  
 -use_cell_center              : set the xyz to the corresponding cell center  
+
+### other specific arguments
+-step [n]                     : set grid cell size to [n] for thinning/flagging (default=2 and uses first point found in cell) 
+-step_z [n]                   : set grid cell size in z-direction to [n]
 -count_to_user_byte           : counts the number of points in a cell and writes it to the surviving points 'user byte'
 -count_to_intensity           : counts the number of points in a cell and writes it to the surviving points 'intensity'
 -flatten_points               : set all z values to minimal z header value  
@@ -810,8 +810,7 @@ Supported [sep] values:
 
 ## License
 
-Please license from info@rapidlasso.de to use the tool
-commercially. 
+Please license from info@rapidlasso.de to use the tool commercially. 
 You may use the tool to do tests with up to 3 mio points.
 Please note that the unlicensed version may will adjust
 some data and add a bit of white noise to the coordinates.
@@ -830,4 +829,3 @@ Check for latest updates at
 https://rapidlasso.de/category/blog/releases/
 
 If you have any suggestions please let us (info@rapidlasso.de) know.
-
