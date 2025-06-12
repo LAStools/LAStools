@@ -1,4 +1,4 @@
-﻿# lasthin3d
+﻿7# lasthin3d
 
 A fast 3d LIDAR thinning algorithm for pointcloud data. 
 The data is thinnened by placing a 3d-grid over the data points and taking
@@ -117,7 +117,7 @@ which points are selected as keypoints.
 -use_cell_center              : set the xyz to the corresponding cell center  
 
 ### other specific arguments
--step [n]                     : set grid cell size to [n] for thinning/flagging (default=2 and uses first point found in cell) 
+-step [n]                     : set grid cell size to [n] for thinning/flagging (default=2) 
 -step_z [n]                   : set grid cell size in z-direction to [n]
 -count_to_user_byte           : counts the number of points in a cell and writes it to the surviving points 'user byte'
 -count_to_intensity           : counts the number of points in a cell and writes it to the surviving points 'intensity'
