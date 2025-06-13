@@ -686,12 +686,12 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
         else
         {
           header.vlrs[i].data = new U8[header.vlrs[i].record_length_after_header+1]; // +final \0 to ensure char termination
-          try { stream->getBytes(header.vlrs[i].data, header.vlrs[i].record_length_after_header); } catch(...)
-          {
+          try { 
+            stream->getBytes(header.vlrs[i].data, header.vlrs[i].record_length_after_header); 
+            header.vlrs[i].data[header.vlrs[i].record_length_after_header] = 0;  // ensure char termination
+          } catch(...) {
             laserror("reading %d bytes of data into header.vlrs[%d].data", header.vlrs[i].record_length_after_header, i);
-            return FALSE;
           }
-          header.vlrs[i].data[header.vlrs[i].record_length_after_header] = 0; // ensure char termination
         }
       }
       else
@@ -909,11 +909,11 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
   if (header.user_data_after_header_size)
   {
     header.user_data_after_header = new U8[header.user_data_after_header_size];
-
-    try { stream->getBytes((U8*)header.user_data_after_header, header.user_data_after_header_size); } catch(...)
-    {
+    try 
+    { 
+      stream->getBytes((U8*)header.user_data_after_header, header.user_data_after_header_size); 
+    } catch(...) {
       laserror("reading %d bytes of data into header.user_data_after_header", header.user_data_after_header_size);
-      return FALSE;
     }
   }
 
@@ -931,16 +931,12 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
         I64 here = stream->tell();
         stream->seek(header.start_of_first_extended_variable_length_record);
 
-		header.evlrs = (LASevlr*)calloc(header.number_of_extended_variable_length_records, sizeof(LASevlr));
-
+        header.evlrs = (LASevlr*)calloc(header.number_of_extended_variable_length_records, sizeof(LASevlr));
         // read the extended variable length records into the header
-
         I64 evlrs_size = 0;
-
         for (i = 0; i < header.number_of_extended_variable_length_records; i++)
         {
           // read variable length records variable after variable (to avoid alignment issues)
-
           try { stream->get16bitsLE((U8*)&(header.evlrs[i].reserved)); } catch(...)
           {
             laserror("reading header.evlrs[%d].reserved", i);
@@ -968,20 +964,15 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
           }
 
           // keep track on the number of bytes we have read so far
-
           evlrs_size += 60;
-
           // check variable length record contents
-
 /*
           if (header.evlrs[i].reserved != 0)
           {
             LASMessage(LAS_WARNING, "wrong header.evlrs[%d].reserved: %d != 0", i, header.evlrs[i].reserved);
           }
 */
-
           // load data following the header of the variable length record
-
           if (header.evlrs[i].record_length_after_header)
           {
             if (strcmp(header.evlrs[i].user_id, "laszip encoded") == 0)
@@ -1138,26 +1129,28 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             }
             else
             {
-              header.evlrs[i].data = new U8[(U32)header.evlrs[i].record_length_after_header+1];
-              try { stream->getBytes(header.evlrs[i].data, (U32)header.evlrs[i].record_length_after_header); } catch(...)
-              {
-                laserror("reading %d bytes of data into header.evlrs[%d].data", (I32)header.evlrs[i].record_length_after_header, i);
-                return FALSE;
+              try 
+              { 
+                if (header.evlrs[i].record_length_after_header > MAXUINT32) {
+                  laserror("evlr size of %llu bytes in header.evlrs[%d] not supported", header.evlrs[i].record_length_after_header, i);
+                }
+                header.evlrs[i].data = new U8[header.evlrs[i].record_length_after_header + 1];
+                if (header.evlrs[i].record_length_after_header) {
+                  stream->getBytes(header.evlrs[i].data, header.evlrs[i].record_length_after_header);
+                  header.evlrs[i].data[header.evlrs[i].record_length_after_header] = 0;  // ensure char termination
+                }
+              } catch(...) {
+                laserror("reading %llu bytes of data into header.evlrs[%d].data", header.evlrs[i].record_length_after_header, i);
               }
-              header.evlrs[i].data[header.evlrs[i].record_length_after_header] = 0; // ensure char termination
             }
           }
           else
           {
             header.evlrs[i].data = 0;
           }
-
           // keep track on the number of bytes we have read so far
-
           evlrs_size += header.evlrs[i].record_length_after_header;
-
           // special handling for known variable header tags
-
           if (strcmp(header.evlrs[i].user_id, "LASF_Projection") == 0)
           {
             if (header.evlrs[i].record_id == 34735) // GeoKeyDirectoryTag
