@@ -942,22 +942,23 @@ out of this values:
   31-255 : reserved
 
 ### parse
-The '-parse [xyz]' flag specifies how to set the columns in a ASCII output file. 
-For example, 'tsxyzssa' means that the first number is the gpstime, the next 
-number should be skipped, the next three numbers are the x, y, and z coordinate, 
-the next two should be skipped and the next number is the scan angle.
+The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.
+For example, 'tsxyzssa' means that the first number is the gpstime, the next
+number should be skipped, the next three numbers are the x, y, and z coordinate,
+the next two should be skipped, and the next number is the scan angle.
 
 The other supported entries are:  
   x : [x] coordinate  
   y : [y] coordinate  
   z : [z] coordinate  
-  X : unscaled raw [X] value 
-  Y : unscaled raw [Y] value
-  Z : unscaled raw [Z] value
+  X : unscaled raw [X] value  
+  Y : unscaled raw [Y] value  
+  Z : unscaled raw [Z] value  
   t : gps [t]ime  
   R : RGB [R]ed channel  
   G : RGB [G]reen channel  
   B : RGB [B]lue channel  
+  I : N[I]R channel of LAS 1.4 point type 8  
   s : [s]kip a string or a number that we don't care about  
   i : [i]ntensity  
   a : scan [a]ngle  
@@ -972,7 +973,7 @@ The other supported entries are:
   M : point index, starting at 1
   W : all wavepacket attributes
   w : [w]avepacket descriptor index
-  c : [c]lassification  
+  c : [c]lassification. If extended classes are used: Use o,l or I to force 1.4 format.. If extended classes are used: Use o,l or I to force 1.4 format.
   u : [u]ser data  
   p : [p]oint source ID  
   e : [e]dge of flight line flag  

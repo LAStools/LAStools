@@ -22,19 +22,19 @@ and 6 across-connected vertices. All of the Delaunay-connected
 vertices but only 2 of the across-connected vertices are shown:
 
 
-				   D-------D
-				  / \     / \          * - considered vertex 
-				 /   \   /   \         D - Delaunay-connected
-				/     \ /     \        X - across-connected
-			   D-------*-------D
-			  / \     / \     /                       
-				 \   /   \   /
-			/     \ /     \ /          
-		   X- - - -D-------D
-					\     /
-						 
-					  \ /
-					   X
+             D-------D
+            / \     / \          * - considered vertex 
+           /   \   /   \         D - Delaunay-connected
+          /     \ /     \        X - across-connected
+         D-------*-------D
+        / \     / \     /                       
+       /   \   /   \   /
+      /     \ /     \ /          
+     X-------D-------D
+              \     /
+               \   /
+                \ /
+                 X
 
 
 ## Examples
