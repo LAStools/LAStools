@@ -808,23 +808,26 @@ Supported [sep] values:
   hyphen
   space
 
-## License
+## Licensing
 
-All licensed tools can be tested up to the point limit (about 1.5 million points)
-without a license. For a quality test, use small samples. If your file is too
-large, split it into smaller files first. For a performance test, use files of
-any size. The output will contain diagonal lines/output distortions due to the
-license protection. Info on licensing and pricing: https://rapidlasso.de/pricing/.
+Info on licensing and pricing: https://rapidlasso.de/pricing/.
 If you have any questions or need assistance, email to info@rapidlasso.de.
+
+## Evaluation and demo mode
+
+Please use the "-demo" argument to run the tool in demo mode. For quality tests,
+use small files (< 1.5 million points). If you use larger files, the output will
+contain diagonal lines/output distortions due to the license protection.
 
 ## Support
 
-- We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
-  If you are looking for information about a specific tool, enter the tool name
-  in the search function and you'll find all discussions related to the respective tool.
-- Customer Support Page: https://rapidlasso.de/customer-support/.
-- Download LAStools: https://rapidlasso.de/downloads/.
-- Changelog: https://rapidlasso.de/changelog/.
+1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
+   If you are looking for information about a specific tool, enter the tool name in the search 
+   function and you'll find all discussions related to the respective tool. 
+2. Customer Support Page: https://rapidlasso.de/customer-support/.  
+3. Download LAStools: https://rapidlasso.de/downloads/.  
+4. Changelog: https://rapidlasso.de/changelog/.  
 
-If you want to send us feedback or have questions that are not answered in
-the resources above, please email to info@rapidlasso.de.
+
+If you want to send us feedback or have questions that are not answered in the resources above, 
+please email to info@rapidlasso.de.
