@@ -824,9 +824,8 @@ class LasTool_lasinfo : public LasTool {
           edit_header = false;
         }
         const CHAR* file_name = lasreadopener.get_file_name(lasreadopener.get_file_name_current());
-        if ((strstr(file_name, ".laz") == 0) && (strstr(file_name, ".las") == 0) && (strstr(file_name, ".LAZ") == 0) &&
-            (strstr(file_name, ".LAS") == 0)) {
-          laserror("can only edit for LAS or LAZ files, not for '%s'", file_name);
+        if (!IsLasLazFile(std::string(file_name))) {
+          LASMessage(LAS_WARNING, "can only edit for LAS or LAZ files, not for '%s'", file_name);
           edit_header = false;
         }
         if (set_file_source_ID_from_point_source_ID) {

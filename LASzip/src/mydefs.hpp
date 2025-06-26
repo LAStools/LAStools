@@ -401,6 +401,12 @@ void ReplaceStringInPlace(std::string& subject, const std::string& search, const
 
 bool StringEndsWith(const std::string& fullString, const std::string& ending);
 
+bool HasFileExt(std::string fn, std::string ext);
+
+std::string FileExtSet(std::string fn_in, std::string ext_new);
+
+bool IsLasLazFile(std::string fn);
+
 /// returns TRUE if 'val' is found in 'vec'
 bool StringInVector(const std::string& value, const std::vector<std::string>& array, bool casesense);
 

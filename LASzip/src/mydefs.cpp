@@ -325,6 +325,37 @@ bool StringEndsWith(const std::string& fullString, const std::string& ending) {
   return fullString.compare(fullString.size() - ending.size(), ending.size(), ending) == 0;
 }
 
+/// <summary>
+/// Check if file has a certain file extension (case insensitive)
+/// </summary>
+/// <param name="fn">filename</param>
+/// <param name="ext">extension, like ".laz" or "laz"</param>
+/// <returns>TRUE if filename has the given extension</returns>
+bool HasFileExt(std::string fn, std::string ext) {
+  if (fn.empty()) return false;
+  if (ext.empty()) return false;
+  if (ext[0] != '.') ext = '.' + ext;
+  to_lower(ext);
+  to_lower(fn);
+  return (fn.substr(fn.find_last_of(".")) == ext);
+}
+
+// replace file extension of input_file with new extension (with or without leading '.')
+std::string FileExtSet(std::string fn_in, std::string ext_new) {
+  if (!ext_new.empty() && (ext_new[0] != '.')) ext_new = '.' + ext_new;
+  size_t pos = fn_in.find_last_of('.');
+  if (pos == std::string::npos) {
+    return fn_in  + ext_new;
+  } else {
+    return fn_in.substr(0, pos) + ext_new;
+  }
+}
+
+// checks if given file is a las/laz file
+bool IsLasLazFile(std::string fn) {
+  return HasFileExt(fn, "las") || HasFileExt(fn, "laz");
+}
+
 /// returns TRUE if 'val' is found in 'vec'
 bool StringInVector(const std::string& val, const std::vector<std::string>& vec, bool casesense) {
   if (casesense) {
@@ -392,7 +423,7 @@ void strncpy_las(char* dest, size_t destsz, const char* src, size_t count /*=0*/
     memcpy(source, src, destsz - 1);
     source[destsz-1] = '\0';
     free = true;
-    LASMessage(LAS_WARNING, "target buffer too small [%d < %d] for \"%s\"", destsz-1, count, src);
+    LASMessage(LAS_WARNING, "target buffer too small [%llu < %llu] for \"%s\"", destsz-1, count, src);
     count = destsz-1;
   } else {
     source = const_cast<char*>(src);

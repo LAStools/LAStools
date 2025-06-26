@@ -485,9 +485,7 @@ BOOL LASreadOpener::is_buffered() const {
 }
 
 BOOL LASreadOpener::is_header_populated() const {
-  return (
-      populate_header ||
-      (file_name && (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))));
+  return (populate_header || (file_name && IsLasLazFile(std::string(file_name))));
 }
 
 void LASreadOpener::reset() {
@@ -700,7 +698,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       if (files_are_flightlines) {
         transform->setPointSource(file_name_current + files_are_flightlines + files_are_flightlines_index);
       }
-      if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ")) {
+      if (IsLasLazFile(file_name)) {
         LASreaderLAS* lasreaderlas = nullptr;
         if (scale_factor == 0 && offset == 0) {
           if (auto_reoffset || (offset_adjust && !transform))
@@ -804,7 +802,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         } else {
           return lasreader;
         }
-      } else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN")) {
+      } else if (HasFileExt(std::string(file_name), ".bin")) {
         LASreaderBIN* lasreaderbin;
         if (offset_adjust) {
           if (offset != 0 && !transform)
@@ -860,7 +858,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         } else {
           return lasreader;
         }
-      } else if (strstr(file_name, ".shp") || strstr(file_name, ".SHP")) {
+      } else if (HasFileExt(std::string(file_name), ".shp")) {
         LASreaderSHP* lasreadershp;
         if (offset_adjust) {
           if (offset != 0 && !transform)
@@ -911,7 +909,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         } else {
           return lasreader;
         }
-      } else if (strstr(file_name, ".asc") || strstr(file_name, ".ASC")) {
+      } else if (HasFileExt(std::string(file_name), ".asc")) {
         LASreaderASC* lasreaderasc;
         if (offset_adjust) {
           if (offset != 0 && !transform)
@@ -962,7 +960,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         } else {
           return lasreader;
         }
-      } else if (strstr(file_name, ".bil") || strstr(file_name, ".BIL")) {
+      } else if (HasFileExt(std::string(file_name), ".bil")) {
         LASreaderBIL* lasreaderbil;
         if (offset_adjust) {
           if (offset != 0 && !transform)
@@ -1013,7 +1011,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         } else {
           return lasreader;
         }
-      } else if (strstr(file_name, ".dtm") || strstr(file_name, ".DTM")) {
+      } else if (HasFileExt(std::string(file_name), ".dtm")) {
         LASreaderDTM* lasreaderdtm;
         if (offset_adjust) {
           if (offset != 0 && !transform)
@@ -1064,7 +1062,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         } else {
           return lasreader;
         }
-      } else if (strstr(file_name, ".ply") || strstr(file_name, ".PLY")) {
+      } else if (HasFileExt(std::string(file_name), ".ply")) {
         LASreaderPLY* lasreaderply = new LASreaderPLY(this);
         if (translate_intensity != 0.0f) lasreaderply->set_translate_intensity(translate_intensity);
         if (scale_intensity != 1.0f) lasreaderply->set_scale_intensity(scale_intensity);
@@ -1106,7 +1104,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         } else {
           return lasreader;
         }
-      } else if (strstr(file_name, ".qi") || strstr(file_name, ".QI")) {
+      } else if (HasFileExt(std::string(file_name), ".qi")) {
         LASreaderQFIT* lasreaderqfit;
         if (offset_adjust) {
           if (offset != 0 && !transform)
@@ -1402,7 +1400,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered) {
       return TRUE;
     } else {
       if (!file_name) return FALSE;
-      if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ")) {
+      if (IsLasLazFile(std::string(file_name))) {
         LASreaderLAS* lasreaderlas = (LASreaderLAS*)lasreader;
         if (!lasreaderlas->open(file_name, io_ibuffer_size, FALSE, decompress_selective)) {
           laserror("cannot reopen lasreaderlas with file name '%s'", file_name);
@@ -1419,7 +1417,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered) {
         }
         if (inside_depth_opener) lasreaderlas->inside_copc_depth(inside_depth_opener, copc_depth, copc_resolution);
         return TRUE;
-      } else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN")) {
+      } else if (HasFileExt(std::string(file_name), ".bin")) {
         LASreaderBIN* lasreaderbin = (LASreaderBIN*)lasreader;
         if (!lasreaderbin->open(file_name)) {
           laserror("cannot reopen lasreaderbin with file name '%s'", file_name);
@@ -1435,7 +1433,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered) {
             lasreaderbin->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         }
         return TRUE;
-      } else if (strstr(file_name, ".shp") || strstr(file_name, ".SHP")) {
+      } else if (HasFileExt(std::string(file_name), ".shp")) {
         LASreaderSHP* lasreadershp = (LASreaderSHP*)lasreader;
         if (!lasreadershp->reopen(file_name)) {
           laserror("cannot reopen lasreadershp with file name '%s'", file_name);
@@ -1451,7 +1449,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered) {
             lasreadershp->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         }
         return TRUE;
-      } else if (strstr(file_name, ".qi") || strstr(file_name, ".QI")) {
+      } else if (HasFileExt(std::string(file_name), ".qi")) {
         LASreaderQFIT* lasreaderqfit = (LASreaderQFIT*)lasreader;
         if (!lasreaderqfit->reopen(file_name)) {
           laserror("cannot reopen lasreaderqfit with file name '%s'", file_name);
@@ -1467,7 +1465,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered) {
             lasreaderqfit->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         }
         return TRUE;
-      } else if (strstr(file_name, ".asc") || strstr(file_name, ".ASC")) {
+      } else if (HasFileExt(std::string(file_name), ".asc")) {
         LASreaderASC* lasreaderasc = (LASreaderASC*)lasreader;
         if (!lasreaderasc->reopen(file_name)) {
           laserror("cannot reopen lasreaderasc with file name '%s'", file_name);
@@ -1483,7 +1481,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered) {
             lasreaderasc->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         }
         return TRUE;
-      } else if (strstr(file_name, ".bil") || strstr(file_name, ".BIL")) {
+      } else if (HasFileExt(std::string(file_name), ".bil")) {
         LASreaderBIL* lasreaderbil = (LASreaderBIL*)lasreader;
         if (!lasreaderbil->reopen(file_name)) {
           laserror("cannot reopen lasreaderbil with file name '%s'", file_name);
@@ -1499,7 +1497,7 @@ BOOL LASreadOpener::reopen(LASreader* lasreader, BOOL remain_buffered) {
             lasreaderbil->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         }
         return TRUE;
-      } else if (strstr(file_name, ".dtm") || strstr(file_name, ".DTM")) {
+      } else if (HasFileExt(std::string(file_name), ".dtm")) {
         LASreaderDTM* lasreaderdtm = (LASreaderDTM*)lasreader;
         if (!lasreaderdtm->reopen(file_name)) {
           laserror("cannot reopen lasreaderdtm with file name '%s'", file_name);
@@ -2317,21 +2315,19 @@ const CHAR* LASreadOpener::get_file_extension_only(U32 number) const {
 }
 
 I32 LASreadOpener::get_file_format(U32 number) const {
-  if (strstr(file_names[number], ".las") || strstr(file_names[number], ".LAS")) {
+  if (IsLasLazFile(std::string(file_names[number]))) {
     return LAS_TOOLS_FORMAT_LAS;
-  } else if (strstr(file_names[number], ".laz") || strstr(file_names[number], ".LAZ")) {
-    return LAS_TOOLS_FORMAT_LAZ;
-  } else if (strstr(file_names[number], ".bin") || strstr(file_names[number], ".BIN")) {
+  } else if (HasFileExt(std::string(file_names[number]), ".bin")) {
     return LAS_TOOLS_FORMAT_BIN;
-  } else if (strstr(file_names[number], ".shp") || strstr(file_names[number], ".SHP")) {
+  } else if (HasFileExt(std::string(file_names[number]), ".shp")) {
     return LAS_TOOLS_FORMAT_SHP;
-  } else if (strstr(file_names[number], ".qi") || strstr(file_names[number], ".QI")) {
+  } else if (HasFileExt(std::string(file_names[number]), ".qi")) {
     return LAS_TOOLS_FORMAT_QFIT;
-  } else if (strstr(file_names[number], ".asc") || strstr(file_names[number], ".ASC")) {
+  } else if (HasFileExt(std::string(file_names[number]), ".asc")) {
     return LAS_TOOLS_FORMAT_ASC;
-  } else if (strstr(file_names[number], ".bil") || strstr(file_names[number], ".BIL")) {
+  } else if (HasFileExt(std::string(file_names[number]), ".bil")) {
     return LAS_TOOLS_FORMAT_BIL;
-  } else if (strstr(file_names[number], ".dtm") || strstr(file_names[number], ".DTM")) {
+  } else if (HasFileExt(std::string(file_names[number]), ".dtm")) {
     return LAS_TOOLS_FORMAT_DTM;
   } else {
     return LAS_TOOLS_FORMAT_TXT;
