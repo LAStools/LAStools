@@ -149,7 +149,7 @@ class LASLIB_DLL LASpoint {
 
   const LASquantizer* quantizer = nullptr;
   F64 coordinates[3];
-
+  
   // for attributed access to the extra bytes
 
   const LASattributer* attributer;

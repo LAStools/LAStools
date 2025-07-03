@@ -470,7 +470,6 @@ public:
   bool to_lon_lat_ele(const double* point, double& longitude, double& latitude, double& elevation_in_meter) const;
 
   // from current projection to target projection
-
   bool to_target(double* point) const;
   bool to_target(const double* point, double& x, double& y, double& elevation) const;
 

@@ -1745,9 +1745,7 @@ int main(int argc, char* argv[])
       }
 
       // reproject or just set the projection?
-
       LASquantizer* reproject_quantizer = 0;
-      LASquantizer* saved_quantizer = 0;
       bool set_projection_in_header = false;
       bool set_wkt_global_encoding_bit = false;
 
@@ -1822,7 +1820,7 @@ int main(int argc, char* argv[])
       if (geoprojectionconverter.is_proj_request && !set_ogc_wkt) 
       {
         LASMessage(LAS_VERY_VERBOSE, "the PROJ transformation is prepared within las2las");
-        //1. If the source CRS is not specified as an argument (cmd line), try to generate it from the input file
+        // 1. If the source CRS is not specified as an argument (cmd line), try to generate it from the input file
         if (geoprojectionconverter.check_header_for_crs) 
         {      
           LASMessage(LAS_VERY_VERBOSE, "the header of the input file is checked for its CRS");
@@ -2163,6 +2161,9 @@ int main(int argc, char* argv[])
           extra_pass = true;
         }
 
+        LASheader* header_writer = new LASheader();
+        *header_writer = lasreader->header;
+
         // for piped output we need an extra pass
         if (extra_pass)
         {
@@ -2212,27 +2213,18 @@ int main(int argc, char* argv[])
             }
           }
 
-          if (reproject_quantizer) lasreader->header = *reproject_quantizer;
-        
-          lasinventory.update_header(&lasreader->header);
-        
+          lasinventory.update_header(header_writer);
+       
           LASMessage(LAS_VERBOSE, "extra pass took %g sec.", taketime() - start_time);
           start_time = taketime();
           LASMessage(LAS_VERBOSE, "piped output: reading %lld and writing %lld points ...", lasreader->npoints, lasinventory.extended_number_of_point_records);
         }
         else
         {
-          if (reproject_quantizer)
-          {
-            saved_quantizer = new LASquantizer();
-            *saved_quantizer = lasreader->header;
-            lasreader->header = *reproject_quantizer;
-          }
           LASMessage(LAS_VERBOSE, "reading %lld and writing all surviving points ...", lasreader->npoints);
         }
 
         // check output
-
         if (!laswriteopener.active())
         {
           // create name from input name
@@ -2241,7 +2233,6 @@ int main(int argc, char* argv[])
         else
         {
           // make sure we do not corrupt the input file
-
           if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
           {
             laserror("input and output file name are identical: '%s'", lasreadopener.get_file_name());
@@ -2249,7 +2240,6 @@ int main(int argc, char* argv[])
         }
 
         // prepare the header for the surviving points
-
         strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
         char temp[64];
         snprintf(temp, sizeof(temp), "las2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
@@ -2257,16 +2247,16 @@ int main(int argc, char* argv[])
         strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp);
         
         // open laswriter
-
-        LASwriter* laswriter = laswriteopener.open(&lasreader->header);
-
+        if (reproject_quantizer) {
+          *header_writer = *reproject_quantizer;
+        }
+        LASwriter* laswriter = laswriteopener.open(header_writer);
         if (laswriter == 0)
         {
           laserror("could not open laswriter");
         }
 
         // for piped output we need to re-open the input file
-
         if (extra_pass)
         {
           if (!lasreadopener.reopen(lasreader))
@@ -2274,21 +2264,11 @@ int main(int argc, char* argv[])
             laserror("could not re-open lasreader");
           }
         }
-        else
-        {
-          if (reproject_quantizer)
-          {
-            lasreader->header = *saved_quantizer;
-            delete saved_quantizer;
-          }
-        }
 
         // maybe seek to start position
-
         if (subsequence_start) lasreader->seek(subsequence_start);
 
         // loop over points
-
         if (point) // full rewrite: point copy
         {
           while (lasreader->read_point())
@@ -2344,10 +2324,8 @@ int main(int argc, char* argv[])
         }
 
         // without the extra pass we need to fix the header now
-
         if (!extra_pass)
         {
-          if (reproject_quantizer) lasreader->header = *reproject_quantizer;
           laswriter->update_header(&lasreader->header, TRUE);
           LASMessage(LAS_VERBOSE, "total time: %g sec. written %u surviving points to '%s'.", taketime() - start_time, (U32)laswriter->p_count, laswriteopener.get_file_name());
         }
