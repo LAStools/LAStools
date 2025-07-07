@@ -3167,8 +3167,7 @@ class LASoperationSetClassification : public LASoperation
     inline void transform(LASpoint* point)
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
-
-        point->set_extended_classification(classification);
+        point->set_classification_uni(classification);
     };
     LASoperationSetClassification(U8 classification)
     {
@@ -3200,19 +3199,10 @@ class LASoperationChangeClassificationFromTo : public LASoperation
     };
     inline void transform(LASpoint* point)
     {
-        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
-
-        if (class_from > 31)
-        {
-            if (point->get_extended_classification() == class_from)
-            {
-                point->set_extended_classification(class_to);
-            }
-        }
-        else if (point->get_classification() == class_from)
-        {
-            point->set_extended_classification(class_to);
-        }
+      if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+      if (point->get_classification_uni() == class_from) {
+          point->set_classification_uni(class_to);
+      }
     };
     LASoperationChangeClassificationFromTo(U8 class_from, U8 class_to)
     {
@@ -3250,7 +3240,8 @@ class LASoperationMoveAncientToExtendedClassification : public LASoperation
  
         if (point->get_withheld_flag() || point->get_keypoint_flag() || point->get_synthetic_flag())
         {
-            point->set_extended_classification((point->get_withheld_flag() ? 128 : 0) | (point->get_keypoint_flag() ? 64 : 0) | (point->get_synthetic_flag() ? 32 : 0) | point->get_classification());
+          point->set_classification_uni((point->get_withheld_flag() ? 128 : 0) | (point->get_keypoint_flag() ? 64 : 0) | 
+            (point->get_synthetic_flag() ? 32 : 0)|point->get_classification_uni());
             point->set_synthetic_flag(0);
             point->set_keypoint_flag(0);
             point->set_withheld_flag(0);
@@ -3294,7 +3285,7 @@ class LASoperationClassifyZbelowAs : public LASoperation
         }
         if (z < z_below)
         {
-          point->set_extended_classification(class_to);
+          point->set_classification_uni(class_to);
         }
     };
     LASoperationClassifyZbelowAs(F64 z_below, U8 class_to)
@@ -3342,7 +3333,7 @@ class LASoperationClassifyZaboveAs : public LASoperation
           z = point->get_z();
         }
         if (point->get_z() > z_above) {
-          point->set_extended_classification(class_to);
+          point->set_classification_uni(class_to);
         }
     };
     LASoperationClassifyZaboveAs(F64 z_above, U8 class_to)
@@ -3391,7 +3382,7 @@ class LASoperationClassifyZbetweenAs : public LASoperation
         }
         if ((z_below <= z) && (z <= z_above))
         {
-            point->set_extended_classification(class_to);
+            point->set_classification_uni(class_to);
         }
     };
     LASoperationClassifyZbetweenAs(F64 z_below, F64 z_above, U8 class_to)
@@ -3432,7 +3423,7 @@ class LASoperationClassifyIntensityBelowAs : public LASoperation
 
         if (point->get_intensity() < intensity_below)
         {
-            point->set_extended_classification(class_to);
+            point->set_classification_uni(class_to);
         }
     };
     LASoperationClassifyIntensityBelowAs(U16 intensity_below, U8 class_to)
@@ -3471,7 +3462,7 @@ class LASoperationClassifyIntensityAboveAs : public LASoperation
  
         if (point->get_intensity() > intensity_above)
         {
-            point->set_extended_classification(class_to);
+            point->set_classification_uni(class_to);
         }
     };
     LASoperationClassifyIntensityAboveAs(U16 intensity_above, U8 class_to)
@@ -3510,7 +3501,7 @@ class LASoperationClassifyIntensityBetweenAs : public LASoperation
  
         if ((intensity_below <= point->get_intensity()) && (point->get_intensity() <= intensity_above))
         {
-            point->set_extended_classification(class_to);
+            point->set_classification_uni(class_to);
         }
     };
     LASoperationClassifyIntensityBetweenAs(U16 intensity_below, U16 intensity_above, U8 class_to)
@@ -3551,7 +3542,7 @@ class LASoperationClassifyAttributeBelowAs : public LASoperation
  
         if (point->get_attribute_as_float(index) < below)
         {
-            point->set_extended_classification(class_to);
+            point->set_classification_uni(class_to);
         }
     };
     LASoperationClassifyAttributeBelowAs(U32 index, F64 below, U8 class_to)
@@ -3592,7 +3583,7 @@ class LASoperationClassifyAttributeAboveAs : public LASoperation
  
         if (point->get_attribute_as_float(index) > above)
         {
-            point->set_extended_classification(class_to);
+            point->set_classification_uni(class_to);
         }
     };
     LASoperationClassifyAttributeAboveAs(U32 index, F64 above, U8 class_to)
@@ -3634,7 +3625,7 @@ class LASoperationClassifyAttributeBetweenAs : public LASoperation
         F64 value = point->get_attribute_as_float(index);
         if ((below <= value) && (value <= above))
         {
-            point->set_extended_classification(class_to);
+            point->set_classification_uni(class_to);
         }
     };
     LASoperationClassifyAttributeBetweenAs(U32 index, F64 z_below, F64 z_above, U8 class_to)
@@ -4079,7 +4070,7 @@ class LASoperationCopyClassificationIntoUserData : public LASoperation
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
 
-        point->set_user_data(point->get_classification() ? point->get_classification() : point->get_extended_classification());
+        point->set_user_data(point->get_classification_uni());
     };
 };
 
@@ -4105,11 +4096,7 @@ class LASoperationCopyUserDataIntoClassification : public LASoperation
     inline void transform(LASpoint* point)
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
-
-        if (point->is_extended_point_type())
-            point->set_extended_classification(point->get_user_data());
-        else
-          point->set_classification_uni(point->get_user_data());
+        point->set_classification_uni(point->get_user_data());
     };
 };
 
@@ -4136,7 +4123,7 @@ class LASoperationCopyClassificationIntoPointSource : public LASoperation
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
 
-        point->set_point_source_ID(point->get_classification() ? point->get_classification() : point->get_extended_classification());
+        point->set_point_source_ID(point->get_classification_uni());
     };
 };
 
@@ -4944,7 +4931,7 @@ class LASoperationSetRGBofClass : public LASoperation
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
 
-        if (point->get_classification() == c)
+        if (point->get_classification_uni() == c)
             point->set_RGB(RGB);
     };
     LASoperationSetRGBofClass(U8 c, U16 R, U16 G, U16 B)
@@ -5013,7 +5000,7 @@ class LASoperationSetRGBofExtendedClass : public LASoperation
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
 
-        if (point->get_extended_classification() == c)
+        if (point->get_classification_uni() == c)
             point->set_RGB(RGB);
     };
     LASoperationSetRGBofExtendedClass(U8 c, U16 R, U16 G, U16 B)

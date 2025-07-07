@@ -553,9 +553,9 @@ static int check_points(const CHAR* file_name1, LASreader* lasreader1, const CHA
             if (different_points < shutup) fprintf(stderr, "  edge_of_flight_line: %d %d\n", lasreader1->point.edge_of_flight_line, lasreader2->point.edge_of_flight_line);
             difference = true;
           }
-          if (lasreader1->point.get_classification() != lasreader2->point.get_classification())
+          if (lasreader1->point.get_classification_uni() != lasreader2->point.get_classification_uni())
           {
-            if (different_points < shutup) fprintf(stderr, "  classification: %d %d\n", lasreader1->point.get_classification(), lasreader2->point.get_classification());
+            if (different_points < shutup) fprintf(stderr, "  classification: %d %d\n", lasreader1->point.get_classification_uni(), lasreader2->point.get_classification_uni());
             difference = true;
           }
           if (lasreader1->point.get_synthetic_flag() != lasreader2->point.get_synthetic_flag())

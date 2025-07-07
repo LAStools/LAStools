@@ -568,9 +568,6 @@ class LASLIB_DLL LASpoint {
   inline U8 get_edge_of_flight_line() const {
     return edge_of_flight_line;
   };
-  inline U8 get_classification() const {
-    return classification;
-  };
   inline U8 get_synthetic_flag() const {
     return synthetic_flag;
   };
@@ -646,10 +643,32 @@ class LASLIB_DLL LASpoint {
   inline void set_edge_of_flight_line(const U8 edge_of_flight_line) {
     this->edge_of_flight_line = edge_of_flight_line;
   };
-  inline void set_classification(U8 classification) {
-    if (classification < 32) {
-      this->classification = classification;
-      this->extended_classification = classification;
+  inline void set_classification_uni(U8 classification) {
+    if (extended_point_type) {
+      this->extended_classification = extended_classification;
+      if (extended_classification > 31)
+        this->classification = 0;
+      else
+        this->classification = extended_classification;
+    } else {
+      if (classification < 32) {
+        this->classification = classification;
+        this->extended_classification = classification;
+      }
+    }
+  };
+  U8 classification_max() {
+    return (extended_point_type ? 255 : 31);
+  };
+  inline void set_classification_int(I32 temp_i) {
+    if (temp_i < 0) {
+      LASMessage(LAS_WARNING, "classification %d is negative. zeroing ...", temp_i);
+      set_classification_uni(0);
+    } else if (temp_i > classification_max()) {
+      LASMessage(LAS_WARNING, "classification %d is larger than %d. clamping ...", temp_i, classification_max());
+      set_classification_uni(classification_max());
+    } else {
+      set_classification_uni((U8)temp_i);
     }
   };
   inline void set_synthetic_flag(U8 synthetic_flag) {
@@ -751,13 +770,12 @@ class LASLIB_DLL LASpoint {
       return TRUE;
     }
   };
-
-  inline BOOL is_extended_point_type() const {
-    return extended_point_type;
-  };
-
-  inline U8 get_extended_classification() const {
-    return extended_classification;
+  U8 get_classification_uni() const {
+    if (extended_point_type) {
+      return extended_classification;
+    } else {
+      return classification;
+    }
   };
   inline U8 get_extended_return_number() const {
     return extended_return_number;
@@ -774,14 +792,6 @@ class LASLIB_DLL LASpoint {
   inline U8 get_extended_scanner_channel() const {
     return extended_scanner_channel;
   };
-
-  U8 get_classification_uni() const {
-    if (extended_point_type) {
-      return get_extended_classification();
-    } else {
-      return get_classification();
-    }
-  };
   U8 get_return_number_uni() const {
     if (extended_point_type) {
       return get_extended_return_number();
@@ -797,13 +807,6 @@ class LASLIB_DLL LASpoint {
     }
   };
 
-  inline void set_extended_classification(U8 extended_classification) {
-    this->extended_classification = extended_classification;
-    if (extended_classification > 31)
-      this->classification = 0;
-    else
-      this->classification = extended_classification;
-  };
   inline void set_extended_return_number(U8 extended_return_number) {
     this->extended_return_number = extended_return_number;
   };
@@ -818,14 +821,6 @@ class LASLIB_DLL LASpoint {
   };
   inline void set_extended_scanner_channel(U8 extended_scanner_channel) {
     this->extended_scanner_channel = extended_scanner_channel;
-  };
-
-  inline void set_classification_uni(U8 classification) {
-    if (extended_point_type) {
-      set_extended_classification(classification);
-    } else {
-      set_classification(classification);
-    }
   };
   inline void set_return_number_uni(U8 return_number) {
     if (extended_point_type) {

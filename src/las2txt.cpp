@@ -1247,15 +1247,7 @@ int main(int argc, char* argv[]) {
             }
             break;
           case 'c':  // the classification
-            if (header->point_data_format > 5) {
-              if (lasreader->point.get_extended_classification()) {
-                fprintf(file_out, "%d", lasreader->point.get_extended_classification());
-              } else {
-                fprintf(file_out, "%d", lasreader->point.get_classification());
-              }
-            } else {
-              fprintf(file_out, "%d", lasreader->point.get_classification());
-            }
+            fprintf(file_out, "%d", lasreader->point.get_classification_uni());
             break;
           case 'u':  // the user data
             fprintf(file_out, "%d", lasreader->point.get_user_data());

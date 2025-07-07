@@ -343,7 +343,7 @@ BOOL LASignore::ignore(const LASpoint* point) const
   {
     if (ignore_mask & LASIGNORE_CLASSIFICATIONS)
     {
-      U32 classification = (point->is_extended_point_type() ? point->get_extended_classification() : point->get_classification());
+      U32 classification = point->get_classification_uni();
       U32 byte = classification >> 5;
       U32 rest = classification & 31;
       if (ignore_classification_mask[byte] & (1u << rest))

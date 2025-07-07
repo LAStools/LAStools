@@ -2043,36 +2043,7 @@ BOOL LASreaderTXT::parse(const char* parse_string)
     {
       if (!skip_pre()) return FALSE;
       if (sscanf(lptr, "%d", &temp_i) != 1) return FALSE;
-      if (temp_i < 0)
-      {
-        LASMessage(LAS_WARNING, "classification %d is negative. zeroing ...", temp_i);
-        point.set_classification(0);
-        point.set_extended_classification(0);
-      }
-      else if (point.extended_point_type)
-      {
-        if (temp_i > 255)
-        {
-          LASMessage(LAS_WARNING, "extended classification %d is larger than 255. clamping ...", temp_i);
-          point.set_extended_classification(255);
-        }
-        else
-        {
-          point.set_extended_classification((U8)temp_i);
-        }
-      }
-      else
-      {
-        if (temp_i > 31)
-        {
-          LASMessage(LAS_WARNING, "classification %d is larger than 31. clamping ...", temp_i);
-          point.set_classification(31);
-        }
-        else
-        {
-          point.set_classification((U8)temp_i);
-        }
-      }
+      point.set_classification_int(temp_i);
       skip_post();
     }
     else if (p[0] == 'u') // we expect the user data
