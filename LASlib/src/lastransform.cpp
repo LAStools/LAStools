@@ -3675,7 +3675,7 @@ class LASoperationCopyIntensityIntoClassification : public LASoperation
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
 
-        point->set_classification((U8)point->get_intensity());
+        point->set_classification_uni((U8)point->get_intensity());
     };
 };
 
@@ -4109,7 +4109,7 @@ class LASoperationCopyUserDataIntoClassification : public LASoperation
         if (point->is_extended_point_type())
             point->set_extended_classification(point->get_user_data());
         else
-            point->set_classification(point->get_user_data());
+          point->set_classification_uni(point->get_user_data());
     };
 };
 
