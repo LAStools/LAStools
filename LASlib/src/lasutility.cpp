@@ -221,7 +221,9 @@ BOOL LASsummary::add(const LASpoint* point)
       max.extra_bytes_number = point->extra_bytes_number;
     }
     // initialize min and max
+    min.extended_point_type = point->extended_point_type;
     min = *point;
+    max.extended_point_type = point->extended_point_type;
     max = *point;
     // initialize fluff detection
     xyz_low_digits_10[0] = (U16)(point->get_X()%10);
@@ -822,9 +824,9 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
           lidardouble2string(temp1, ((F64)bin)*step, step);
           lidardouble2string(temp2, ((F64)bin+1)*step, step);
           if (values_neg)
-            fprintf(file, "  bin [%s,%s) has average %g (of %d)\012", temp1, temp2, values_neg[i]/bins_neg[i], bins_neg[i]);
+            fprintf(file, "  bin [%s,%s] has average %g (of %d)\012", temp1, temp2, values_neg[i]/bins_neg[i], bins_neg[i]);
           else
-            fprintf(file, "  bin [%s,%s) has %d\012", temp1, temp2, bins_neg[i]);
+            fprintf(file, "  bin [%s,%s] has %d\012", temp1, temp2, bins_neg[i]);
         }
       }
     }
@@ -848,9 +850,9 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
           lidardouble2string(temp1, ((F64)bin)*step, step);
           lidardouble2string(temp2, ((F64)bin+1)*step, step);
           if (values_pos)
-            fprintf(file, "  bin [%s,%s) average has %g (of %d)\012", temp1, temp2, values_pos[i]/bins_pos[i], bins_pos[i]);
+            fprintf(file, "  bin [%s,%s] average has %g (of %d)\012", temp1, temp2, values_pos[i]/bins_pos[i], bins_pos[i]);
           else
-            fprintf(file, "  bin [%s,%s) has %d\012", temp1, temp2, bins_pos[i]);
+            fprintf(file, "  bin [%s,%s] has %d\012", temp1, temp2, bins_pos[i]);
         }
       }
     }

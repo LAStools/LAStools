@@ -57,7 +57,7 @@ public:
 /* read a single byte                                        */
   virtual U32 getByte() = 0;
 /* read an array of bytes                                    */
-  virtual void getBytes(U8* bytes, const U32 num_bytes) = 0;
+  virtual void getBytes(U8* bytes, const I64 num_bytes) = 0;
 /* read 16 bit low-endian field                              */
   virtual void get16bitsLE(U8* bytes) = 0;
 /* read 32 bit low-endian field                              */

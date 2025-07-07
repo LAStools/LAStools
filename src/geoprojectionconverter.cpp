@@ -1697,7 +1697,7 @@ bool GeoProjectionConverter::GeoTiffInfo(
     auto geoDoubleGet = [&](const int offs = 0, const int decimals = 10) -> std::string {
       if (doubleparams) {
         try {
-          return DoubleToString(doubleparams[geokeye->value_offset + offs], decimals);
+          return DoubleToString(doubleparams[geokeye->value_offset + offs], decimals, true);
         } catch (...) {
           return "?";
         }

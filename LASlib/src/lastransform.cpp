@@ -3038,7 +3038,6 @@ class LASoperationSetScanAngle : public LASoperation
     inline void transform(LASpoint* point)
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
-
         point->set_scan_angle(scan_angle);
     };
     LASoperationSetScanAngle(F32 scan_angle)
@@ -3072,15 +3071,12 @@ class LASoperationScaleScanAngle : public LASoperation
     inline void transform(LASpoint* point)
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
-
-        F32 scan_angle_rank = scale * point->scan_angle_rank;
-        point->scan_angle_rank = I8_CLAMP(I32_QUANTIZE(scan_angle_rank));
+        point->set_scan_angle(scale * point->get_scan_angle());
     };
     LASoperationScaleScanAngle(F32 scale)
     {
         this->scale = scale;
     };
-
    private:
     F32 scale;
 };
@@ -3107,9 +3103,7 @@ class LASoperationTranslateScanAngle : public LASoperation
     inline void transform(LASpoint* point)
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
-
-        F32 scan_angle_rank = offset + point->scan_angle_rank;
-        point->scan_angle_rank = I8_CLAMP(I32_QUANTIZE(scan_angle_rank));
+        point->set_scan_angle(offset + point->get_scan_angle());
     };
     LASoperationTranslateScanAngle(F32 offset)
     {
@@ -3142,9 +3136,7 @@ class LASoperationTranslateThenScaleScanAngle : public LASoperation
     inline void transform(LASpoint* point)
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
-
-        F32 scan_angle_rank = (offset + point->scan_angle_rank) * scale;
-        point->scan_angle_rank = I8_CLAMP(I32_QUANTIZE(scan_angle_rank));
+        point->set_scan_angle((offset + point->get_scan_angle()) * scale);
     };
     LASoperationTranslateThenScaleScanAngle(F32 offset, F32 scale)
     {
@@ -3683,7 +3675,7 @@ class LASoperationCopyIntensityIntoClassification : public LASoperation
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
 
-        point->set_classification((U8)point->get_intensity());
+        point->set_classification_uni((U8)point->get_intensity());
     };
 };
 
@@ -4117,7 +4109,7 @@ class LASoperationCopyUserDataIntoClassification : public LASoperation
         if (point->is_extended_point_type())
             point->set_extended_classification(point->get_user_data());
         else
-            point->set_classification(point->get_user_data());
+          point->set_classification_uni(point->get_user_data());
     };
 };
 
@@ -6330,7 +6322,6 @@ class LASoperationBinAbsScanAngleIntoPointSource : public LASoperation
     {
         this->bin_size = bin_size;
     };
-
    private:
     F32 bin_size;
 };

@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unordered_map>
 
 #include "lasquadtree.hpp"
 #include "lasinterval.hpp"
@@ -44,8 +45,7 @@
 #include "bytestreamin_file.hpp"
 #include "bytestreamout_file.hpp"
 #include "lasmessage.hpp"
-
-#include <unordered_map>
+#include "mydefs.hpp"
 
 typedef std::unordered_map<I32, U32> my_cell_hash;
 
@@ -297,39 +297,25 @@ BOOL LASindex::write(FILE* file) const
 
 BOOL LASindex::read(const char* file_name)
 {
-  if (file_name == 0) return FALSE;
-  char* name = LASCopyString(file_name);
-  if (strstr(file_name, ".las") || strstr(file_name, ".laz"))
-  {
-    name[strlen(name)-1] = 'x';
+  FILE* file;
+  std::string fn = std::string(file_name);
+  if (fn.empty()) return FALSE;
+  if (fn.length() <= 4) {
+    laserror("lasindex: file name invalid: '%s'", fn.c_str());
   }
-  else if (strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
-  {
-    name[strlen(name)-1] = 'X';
-  }
-  else
-  {
-    name[strlen(name)-3] = 'l';
-    name[strlen(name)-2] = 'a';
-    name[strlen(name)-1] = 'x';
-  }
-  FILE* file = LASfopen(name, "rb");
-
-  if (file == 0)
-  {
-    free(name);
+  fn = FileExtSet(fn, ".lax");
+  file = LASfopen(fn.c_str(), "rb");
+  if (file == 0) {
     return FALSE;
-  }
-  if (!read(file))
-  {
-    laserror("(LASindex): cannot read '%s'", name);
+  } 
+  else if (!read(file)) {
+    laserror("(LASindex): cannot read '%s'", fn);
     fclose(file);
-    free(name);
     return FALSE;
+  } else {
+    fclose(file);
+    return TRUE;
   }
-  fclose(file);
-  free(name);
-  return TRUE;
 }
 
 BOOL LASindex::append(const char* file_name) const
@@ -475,40 +461,25 @@ BOOL LASindex::append(const char* file_name) const
 
 BOOL LASindex::write(const char* file_name) const
 {
-  if (file_name == 0) return FALSE;
-  char* name = LASCopyString(file_name);
-  if (strstr(file_name, ".las") || strstr(file_name, ".laz"))
-  {
-    name[strlen(name)-1] = 'x';
+  FILE* file;
+  std::string fn = std::string(file_name);
+  if (fn.empty()) return FALSE;
+  if (fn.length() <= 4) {
+    laserror("lasindex: file name invalid: '%s'", fn.c_str());
   }
-  else if (strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
-  {
-    name[strlen(name)-1] = 'X';
-  }
-  else
-  {
-    name[strlen(name)-3] = 'l';
-    name[strlen(name)-2] = 'a';
-    name[strlen(name)-1] = 'x';
-  }
-  FILE* file = LASfopen(name, "wb");
-
-  if (file == 0)
-  {
-    laserror("(LASindex): cannot open file '%s' for write", name);
-    free(name);
+  fn = FileExtSet(fn, ".lax");
+  file = LASfopen(fn.c_str(), "wb");
+  if (file == 0) {
+    laserror("(LASindex): cannot open file '%s' for write", fn.c_str());
     return FALSE;
-  }
-  if (!write(file))
-  {
-    laserror("(LASindex): cannot write file '%s'", name);
+  } else if (!write(file)) {
+    laserror("(LASindex): cannot write '%s'", fn);
     fclose(file);
-    free(name);
     return FALSE;
+  } else {
+    fclose(file);
+    return TRUE;
   }
-  fclose(file);
-  free(name);
-  return TRUE;
 }
 
 BOOL LASindex::read(ByteStreamIn* stream)

@@ -1083,27 +1083,24 @@ I32 LASwriteOpener::get_format() const
   }
   else
   {
-    if (strstr(file_name, ".laz") || strstr(file_name, ".LAZ"))
-    {
+    if (HasFileExt(std::string(file_name), "laz")) {
       return LAS_TOOLS_FORMAT_LAZ;
-    }
-    else if (strstr(file_name, ".las") || strstr(file_name, ".LAS"))
+    } else if (HasFileExt(std::string(file_name), "las"))
     {
       return LAS_TOOLS_FORMAT_LAS;
-    }
-    else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN")) // terrasolid
+    } else if (HasFileExt(std::string(file_name), "bin"))  // terrasolid
     {
       return LAS_TOOLS_FORMAT_BIN;
     }
-    else if (strstr(file_name, ".qi") || strstr(file_name, ".QI")) // QFIT
+    else if (HasFileExt(std::string(file_name), ".qi")) // QFIT
     {
       return LAS_TOOLS_FORMAT_QFIT;
     }
-    else if (strstr(file_name, ".wrl") || strstr(file_name, ".WRL")) // VRML
+    else if (HasFileExt(std::string(file_name), ".wrl")) // VRML
     {
       return LAS_TOOLS_FORMAT_VRML;
     }
-    else if (strstr(file_name, ".json") || strstr(file_name, ".JSON"))  // json
+    else if (HasFileExt(std::string(file_name), ".json"))  // json
     {
       return LAS_TOOLS_FORMAT_JSON;
     }

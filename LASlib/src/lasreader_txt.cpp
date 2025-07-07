@@ -1876,7 +1876,7 @@ BOOL LASreaderTXT::parse(const char* parse_string)
       if (sscanf(lptr, "%lf", &(point.coordinates[1])) != 1) return FALSE;
       skip_post();
     }
-    else if (p[0] == 'z') // we expect the x coordinate
+    else if (p[0] == 'z') // we expect the z coordinate
     {
       if (!skip_pre()) return FALSE;
       if (sscanf(lptr, "%lf", &(point.coordinates[2])) != 1) return FALSE;

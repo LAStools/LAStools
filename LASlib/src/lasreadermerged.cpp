@@ -61,8 +61,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
   }
   fclose(file);
   // check file extension
-  if (strstr(file_name, ".las") || strstr(file_name, ".laz") || strstr(file_name, ".LAS") || strstr(file_name, ".LAZ"))
-  {
+  if (IsLasLazFile(std::string(file_name))) {
     if (lasreaderbin)
     {
       laserror("cannot mix BIN with LAS. skipping '%s' ...", file_name);
@@ -108,7 +107,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
       lasreader = lasreaderlas = new LASreaderLAS(opener);
     }
   }
-  else if (strstr(file_name, ".bin") || strstr(file_name, ".BIN"))
+  else if (HasFileExt(std::string(file_name), ".bin"))
   {
     if (lasreaderlas)
     {
@@ -155,7 +154,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
       lasreader = lasreaderbin = new LASreaderBIN(opener);
     }
   }
-  else if (strstr(file_name, ".shp") || strstr(file_name, ".SHP"))
+  else if (HasFileExt(std::string(file_name), ".shp"))
   {
     if (lasreaderlas)
     {
@@ -202,7 +201,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
       lasreader = lasreadershp = new LASreaderSHP(opener);
     }
   }
-  else if (strstr(file_name, ".asc") || strstr(file_name, ".ASC"))
+  else if (HasFileExt(std::string(file_name), ".asc"))
   {
     if (lasreaderlas)
     {
@@ -249,7 +248,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
       lasreader = lasreaderasc = new LASreaderASC(opener);
     }
   }
-  else if (strstr(file_name, ".bil") || strstr(file_name, ".BIL"))
+  else if (HasFileExt(std::string(file_name), ".bil"))
   {
     if (lasreaderlas)
     {
@@ -296,7 +295,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
       lasreader = lasreaderbil = new LASreaderBIL(opener);
     }
   }
-  else if (strstr(file_name, ".dtm") || strstr(file_name, ".DTM"))
+  else if (HasFileExt(std::string(file_name), ".dtm"))
   {
     if (lasreaderlas)
     {
@@ -343,7 +342,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
       lasreader = lasreaderdtm = new LASreaderDTM(opener);
     }
   }
-  else if (strstr(file_name, ".ply") || strstr(file_name, ".PLY"))
+  else if (HasFileExt(std::string(file_name), ".ply"))
   {
     if (lasreaderlas)
     {
@@ -390,7 +389,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
       lasreader = lasreaderply = new LASreaderPLY(opener);
     }
   }
-  else if (strstr(file_name, ".qi") || strstr(file_name, ".QI"))
+  else if (HasFileExt(std::string(file_name), ".qi"))
   {
     if (lasreaderlas)
     {

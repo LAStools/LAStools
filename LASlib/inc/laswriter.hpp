@@ -56,13 +56,11 @@ public:
   I64 npoints;
   I64 p_count;
   LASinventory inventory;
-
   virtual BOOL write_point(const LASpoint* point) = 0;
   virtual void update_inventory(const LASpoint* point) { inventory.add(point); };
   virtual BOOL chunk() = 0;
-
-  virtual BOOL update_header(const LASheader* header, BOOL use_inventory=FALSE, BOOL update_extra_bytes=FALSE) = 0;
-  virtual I64 close(BOOL update_npoints=TRUE) = 0;
+  virtual BOOL update_header(const LASheader* header, BOOL use_inventory = FALSE, BOOL update_extra_bytes = FALSE) = 0;
+  virtual I64 close(BOOL update_npoints = TRUE) = 0;
   virtual I64 tell() { return 0; };
 
   void dealloc();

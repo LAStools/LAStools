@@ -342,8 +342,7 @@ BOOL LASreaderQFIT::read_point_default()
     point.set_Y(buffer[1]);
     point.set_Z(buffer[3]);
     point.intensity = buffer[5];
-    point.scan_angle_rank = I8_CLAMP(I16_QUANTIZE((0.001*buffer[6])-180.0));
-
+    point.set_scan_angle(0.001*buffer[6]-180.0);
     point.set_attribute(scan_azimuth_start, (I32)buffer[6]);
     point.set_attribute(pitch_start, (I32)buffer[7]);
     point.set_attribute(roll_start, (I32)buffer[8]);

@@ -85,26 +85,19 @@ Both commands compare the raster difference between file 'lake1.tif' and 'lake2.
 -version        : reports this tool's version number  
 
 
-## License
+## Licensing
 
-Please send us an email to info@rapidlasso.de if you want to use the tool
-commercially. You can carry out tests up to 3 mio points free of charge.
-Please note that the unlicensed version may have output distortions 
-(diagonal lines or added white noise to the coordinates).
-
+This tool is free to use.
 
 ## Support
 
-To get more information about a tool, please visit 
-[LAStools Google Group](http://groups.google.com/group/lastools/)
-and enter the tool name in the search function.
-You will find numerous examples of the corresponding tool.
+1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
+   If you are looking for information about a specific tool, enter the tool name in the search 
+   function and you'll find all discussions related to the respective tool. 
+2. Customer Support Page: https://rapidlasso.de/customer-support/.  
+3. Download LAStools: https://rapidlasso.de/downloads/.  
+4. Changelog: https://rapidlasso.de/changelog/.  
 
-For further support, please see
-[rapidlasso service page](https://rapidlasso.de/service/)
 
-Latest updates can be found at
-https://rapidlasso.de/category/blog/releases/
-
-If you have any suggestions, please let us know (info@rapidlasso.de).
-We appreciate your feedback.
+If you want to send us feedback or have questions that are not answered in the resources above, 
+please email to info@rapidlasso.de.

@@ -104,7 +104,6 @@ public:
 
 private:
   BOOL merge_intervals();
-
   LASquadtree* spatial;
   LASinterval* interval;
   BOOL have_interval;

@@ -378,14 +378,13 @@ int main(int argc, char *argv[])
 
       if (lasreader->get_format() == LAS_TOOLS_FORMAT_LAZ)
       {
-        if ((strncmp(file_name + len, ".laz", 4) != 0) && (strncmp(file_name + len, ".LAZ", 4) != 0))
-        {
+        if (!HasFileExt(std::string(file_name), "laz")) {
           LASMessage(LAS_WARNING, "input LAZ file has wrong extension: '%s'", file_name);
         }
       }
       else
       {
-        if ((strncmp(file_name + len, ".las", 4) != 0) && (strncmp(file_name + len, ".LAS", 4) != 0))
+        if (!HasFileExt(std::string(file_name), "las"))
         {
           LASMessage(LAS_WARNING, "input LAS file has wrong extension: '%s'", file_name);
         }

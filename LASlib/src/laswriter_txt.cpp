@@ -453,7 +453,7 @@ BOOL LASwriterTXT::write_point(const LASpoint* point)
         fprintf(file, "%d", point->get_intensity());
       break;
     case 'a': // the scan angle
-      fprintf(file, "%d", point->get_scan_angle_rank());
+      fprintf(file, "%s", point->get_scan_angle_string().c_str());
       break;
     case 'r': // the number of the return
       fprintf(file, "%d", point->get_return_number());

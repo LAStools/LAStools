@@ -847,12 +847,10 @@ int main(int argc, char* argv[])
     if (laswriteopener.get_file_name())
     {
       CHAR* file_name = LASCopyString(laswriteopener.get_file_name());
-      I32 len = (I32)strlen(file_name);
-      while ((len >= 0) && (file_name[len] != '.')) len--;
-      if ((strncmp(file_name + len, ".las", 4) == 0) || (strncmp(file_name + len, ".LAS", 4) == 0))
+      if (HasFileExt(std::string(file_name),"las"))
       {
-        LASMessage(LAS_WARNING, "output file has wrong extension. COPC files must be LAZ files. Output was renamed automatically.");
-        len = (I32)strlen(file_name);
+        LASMessage(LAS_WARNING, "Output file has wrong extension. COPC files must be LAZ files. Output was renamed automatically.");
+        int len = (I32)strlen(file_name);
         if (file_name[len - 1] == 'S') file_name[len - 1] = 'Z'; else file_name[len - 1] = 'z';
         laswriteopener.set_file_name(file_name);
       }
@@ -860,7 +858,6 @@ int main(int argc, char* argv[])
     }
 
     // replace the extension with ".copc.laz" (not mandatory by the standard but nicer).
-
     if (laswriteopener.get_file_name())
     {
       if (!strstr(laswriteopener.get_file_name(), ".copc.laz"))
@@ -881,7 +878,6 @@ int main(int argc, char* argv[])
     }
 
     // make sure we do not corrupt the input file
-
     if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
     {
       laserror("input and output file name are identical: '%s'", lasreadopener.get_file_name());

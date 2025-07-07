@@ -36,6 +36,7 @@
 #ifndef LAS_POINT_HPP
 #define LAS_POINT_HPP
 
+#include <cmath>
 #include "lasattributer.hpp"
 #include "lasmessage.hpp"
 #include "lasquantizer.hpp"
@@ -104,7 +105,6 @@ class LASLIB_DLL LASwavepacket {
 class LASLIB_DLL LASpoint {
  public:
   // these fields contain the data that describe each point
-
   I32 X;
   I32 Y;
   I32 Z;
@@ -149,7 +149,7 @@ class LASLIB_DLL LASpoint {
 
   const LASquantizer* quantizer = nullptr;
   F64 coordinates[3];
-
+  
   // for attributed access to the extra bytes
 
   const LASattributer* attributer;
@@ -580,7 +580,9 @@ class LASLIB_DLL LASpoint {
   inline U8 get_withheld_flag() const {
     return withheld_flag;
   };
-  inline I8 get_scan_angle_rank() const {
+  [[deprecated("use get_scan_angle() for LAS 1.4 compatibility")]]
+  inline I8 get_scan_angle_rank() const
+  {
     return scan_angle_rank;
   };
   inline U8 get_user_data() const {
@@ -677,6 +679,7 @@ class LASLIB_DLL LASpoint {
       this->extended_classification_flags &= 0x0B;
     }
   };
+  [[deprecated("use set_scan_angle() for LAS 1.4 compatibility")]]
   inline void set_scan_angle_rank(I8 scan_angle_rank) {
     this->scan_angle_rank = scan_angle_rank;
   };
@@ -838,25 +841,46 @@ class LASLIB_DLL LASpoint {
       set_number_of_returns(number_of_returns);
     }
   };
-
+  // get raw scan angle (I8/I16) without conversion to degree e.g. for comparison or assignment
+  inline I16 get_scan_angle_raw() const {
+    if (extended_point_type)
+      return extended_scan_angle;
+    else
+      return scan_angle_rank;
+  };
+  // get scan angle without decimals for unified raster ops
+  inline I16 get_scan_angle_rounded() const {
+    if (extended_point_type)
+      return (I16)std::round(extended_scan_angle * 0.006f);
+    else
+      return (I16)scan_angle_rank;
+  };
+  // get scan angle in degree
   inline F32 get_scan_angle() const {
     if (extended_point_type)
       return 0.006f * extended_scan_angle;
     else
       return (F32)scan_angle_rank;
   };
+  // get scan angle as string
+  inline std::string get_scan_angle_string() const {
+    if (extended_point_type)
+      return DoubleToString(0.006f * extended_scan_angle, 3);
+    else
+      return std::to_string(scan_angle_rank);
+  };
+  // get absolute scan angle
   inline F32 get_abs_scan_angle() const {
     if (extended_point_type)
       return (extended_scan_angle < 0 ? -0.006f * extended_scan_angle : 0.006f * extended_scan_angle);
     else
       return (scan_angle_rank < 0 ? (F32)-scan_angle_rank : (F32)scan_angle_rank);
   };
-
   inline void set_scan_angle(F32 scan_angle) {
     if (extended_point_type)
-      set_extended_scan_angle(I16_QUANTIZE(scan_angle / 0.006f));
+      extended_scan_angle = I16_QUANTIZE(scan_angle / 0.006f);
     else
-      set_scan_angle_rank(I8_QUANTIZE(scan_angle));
+      scan_angle_rank = I8_QUANTIZE(scan_angle);
   };
 
   // Adapted from https://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
