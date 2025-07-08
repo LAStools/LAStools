@@ -74,6 +74,62 @@ z-coordinate to survive, and counts how many points lie within the cell
 boundaries. The result will only count up to 255, if more points are expected,
 use '-count_to_intensity' instead with a maximum of 65535 points.
 
+    
+    lasthin3d64 -i in.laz -step 4.0 -count_to_user_byte -intensity_min -o out.laz
+
+sets the grid cell steps to '4.0', chooses the point lowest intensity
+to survive and counts how many points lie within the cell boundaries. 
+The result will only count up to 255, if more points are expected, use 
+'-count_to_intensity' instead (maximum of 65,535 points).
+
+
+    lasthin3d64 -i in.laz -step 4.0 -count_to_user_byte -intensity_max -o out.laz
+
+sets the grid cell steps to '4.0', chooses the point highest intensity
+to survive and counts how many points lie within the cell boundaries. 
+The result will only count up to 255, if more points are expected, use 
+'-count_to_intensity' instead (maximum of 65,535 points).
+
+
+    lasthin3d64 -i in.laz -step 4.0 -count_to_user_byte -return_min -o out.laz
+
+sets the grid cell steps to '4.0', chooses the point lowest return number
+to survive and counts how many points lie within the cell boundaries. 
+The result will only count up to 255, if more points are expected, use 
+'-count_to_intensity' instead (maximum of 65,535 points).
+
+
+    lasthin3d64 -i in.laz -step 4.0 -count_to_user_byte -return_max -o out.laz
+
+sets the grid cell steps to '4.0', chooses the point highest return number
+to survive and counts how many points lie within the cell boundaries. 
+The result will only count up to 255, if more points are expected, use 
+'-count_to_intensity' instead (maximum of 65,535 points).
+
+
+    lasthin3d64 -i in.laz -step 4.0 -count_to_user_byte -attribute_min -o out.laz
+
+sets the grid cell steps to '4.0', chooses the point lowest return number
+to survive and counts how many points lie within the cell boundaries. 
+The result will only count up to 255, if more points are expected, use 
+'-count_to_intensity' instead (maximum of 65,535 points).
+
+
+    lasthin3d64 -i in.laz -step 4.0 -count_to_user_byte -attribute_min 0 -o out.laz
+
+sets the grid cell steps to '4.0', chooses the point lowest value of attribute 0
+to survive and counts how many points lie within the cell boundaries. 
+The result will only count up to 255, if more points are expected, use 
+'-count_to_intensity' instead (maximum of 65,535 points).
+
+
+    lasthin3d64 -i in.laz -step 4.0 -count_to_user_byte -attribute_max 0 -o out.laz
+
+sets the grid cell steps to '4.0', chooses the point highest value of attribute 0
+to survive and counts how many points lie within the cell boundaries. 
+The result will only count up to 255, if more points are expected, use 
+'-count_to_intensity' instead (maximum of 65,535 points).
+
 
     lasthin3d64 -i in.laz -every_nth 100 -o out.laz
 
@@ -115,6 +171,12 @@ which points are selected as keypoints.
 -every_nth [n]                : keep every [n]th point  
 -random_nth [n]               : keep on avarage every [n]th point  
 -use_cell_center              : set the xyz to the corresponding cell center  
+-intensity_min                : keeps point with lowest the intensity in a cell
+-intensity_max                : keeps point with highest the intensity in a cell
+-return_min                   : keeps point with lowest the return number in a cell
+-return_max                   : keeps point with highest the return number in a cell
+-attribute_min [n]            : keeps point with highest the lowest value of attribute [n] in a cell
+-attribute_max [n]            : keeps point with highest the highest value of attribute [n] in a cell
 
 ### other specific arguments
 -step [n]                     : set grid cell size to [n] for thinning/flagging (default=2) 
