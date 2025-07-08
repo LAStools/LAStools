@@ -751,9 +751,11 @@ int main(int argc, char* argv[])
         if (strcmp(argv[i], "-set_point_type") == 0 || strcmp(argv[i], "-set_point_data_format") == 0)
         {
           lastool.parse_arg_cnt_check(i, 1, "type");
-          if (sscanf_las(argv[i + 1], "%u", &set_point_data_format) != 1)
-          {
+          if (sscanf_las(argv[i + 1], "%u", &set_point_data_format) != 1) {
             lastool.error_parse_arg_n_invalid(i, 1);
+          } else {
+            // preset point type 
+            lasreadopener.set_point_type(set_point_data_format);
           }
           i++;
         }
