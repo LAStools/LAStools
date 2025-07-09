@@ -143,7 +143,6 @@ lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 -bulge [n]                    : bulge sloped neighbourhoods of TIN triangles by [n]{default=step/10}  
 -compute_height               : compute height of each point  
 -cutoff_z_above [z]           : points above elevation [z] are completely excluded from ground search  
--down_spike [n]               : remove down spikes > [n] centimeter  
 -extra_pass                   : do extra read pass to count points (only makes sense when filtering)  
 -ground_class [n]             : use class [n] for ground class (default=2)  
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ...  
@@ -166,8 +165,9 @@ lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 -remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
 -replace_z                    : replace z value with computed height  
 -skip_files                   : skip (instead of the default copy) files that have an insufficient number of ground points  
--spike [n]                    : remove up and down spikes > [n] centimeter  
--spike_down [n]               : remove down spikes > [n] centimeter  
+-spike [n]                    : remove up and down spikes > [n] meters {default = 1 meter}  
+-spike_down [n]               : remove down spikes > [n] meters  
+-down_spike [n]               : remove down spikes > [n] meters  
 -stddev [n]                   : set maximal standard deviation of [n]{meter} for planar patches  
 -store_in_user_data           : store computed height in user data  
 -week_to_adjusted [n]         : converts time stamps from GPS week [n] to Adjusted Standard GPS  

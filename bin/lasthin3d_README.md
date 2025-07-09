@@ -164,29 +164,29 @@ which points are selected as keypoints.
 ## lasthin3d specific arguments
 
 ### target point selection
--closest                      : keeps the point that is closest (x-y coordinate) to the cell center
--highest                      : keeps the point that has the highest z-coordinate in a cell
--lowest                       : keeps the point that has the lowest z-coordinate in a cell
--random_cell_occurrence       : keeps a random point which lies in a cell
+-closest                      : keeps the point that is closest (x-y coordinate) to the cell center  
+-highest                      : keeps the point that has the highest z-coordinate in a cell  
+-lowest                       : keeps the point that has the lowest z-coordinate in a cell  
+-random_cell_occurrence       : keeps a random point which lies in a cell  
 -every_nth [n]                : keep every [n]th point  
 -random_nth [n]               : keep on avarage every [n]th point  
 -use_cell_center              : set the xyz to the corresponding cell center  
--intensity_min                : keeps point with lowest the intensity in a cell
--intensity_max                : keeps point with highest the intensity in a cell
--return_min                   : keeps point with lowest the return number in a cell
--return_max                   : keeps point with highest the return number in a cell
--attribute_min [n]            : keeps point with highest the lowest value of attribute [n] in a cell
--attribute_max [n]            : keeps point with highest the highest value of attribute [n] in a cell
+-intensity_min                : keeps point with lowest the intensity in a cell  
+-intensity_max                : keeps point with highest the intensity in a cell  
+-return_min                   : keeps point with lowest the return number in a cell  
+-return_max                   : keeps point with highest the return number in a cell  
+-attribute_min [n]            : keeps point with highest the lowest value of attribute [n] in a cell  
+-attribute_max [n]            : keeps point with highest the highest value of attribute [n] in a cell  
 
 ### other specific arguments
--step [n]                     : set grid cell size to [n] for thinning/flagging (default=2) 
--step_z [n]                   : set grid cell size in z-direction to [n]
--count_to_user_byte           : counts the number of points in a cell and writes it to the surviving points 'user byte'
--count_to_intensity           : counts the number of points in a cell and writes it to the surviving points 'intensity'
+-step [n]                     : set grid cell size to [n] for thinning/flagging (default=2)  
+-step_z [n]                   : set grid cell size in z-direction to [n]  
+-count_to_user_byte           : counts the number of points in a cell and writes it to the surviving points 'user byte'  
+-count_to_intensity           : counts the number of points in a cell and writes it to the surviving points 'intensity'  
 -flatten_points               : set all z values to minimal z header value  
--flatten_all_points           : set all z values to minimal z header value, even when point is ignored 
+-flatten_all_points           : set all z values to minimal z header value, even when point is ignored  
 -flag_as_keypoint             : keep all points in file (do not thin) but flag surviving points as keypoint instead  
--flag_as_withheld             : keep all points in file (do not thin) but flag surviving points as withheld instead
+-flag_as_withheld             : keep all points in file (do not thin) but flag surviving points as withheld instead  
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ... (maximum 8 classes)  
 -seed [n]                     : seeds the random generator with [n]  
 -ilay [n]                     : apply [n] or all LASlayers found in corresponding *.lay file on read  

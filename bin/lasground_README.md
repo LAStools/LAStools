@@ -173,7 +173,7 @@ lasground64 -i *.laz -v -odir ground_classified  -olaz
 -remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
 -replace_z                    : replace z value with computed height  
 -skip_files                   : skip (instead of the default copy) files that have an insufficient number of ground points  
--spike [n]                    : remove up and down spikes > [n] centimeter  
+-spike [n]                    : remove up and down spikes > [n] meters {default = 1 meter}  
 -stddev [n]                   : set maximal standard deviation of [n]{meter} for planar patches  
 -step [n]                     : set resolution of grid used for initial ground to [n]{default=5}  
 -step [n]                     : use [n] as resolution of grid for initial ground (default=5)  
