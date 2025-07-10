@@ -2255,7 +2255,7 @@ class LasTool_lasinfo : public LasTool {
                   json_outside_box["scan_direction_flag"] = lasreader->point.get_scan_direction_flag();
                   json_outside_box["edge_flight_line"] = lasreader->point.get_edge_of_flight_line();
                   json_outside_box["classification"] = lasreader->point.get_classification_uni();
-                  json_outside_box["scan_angle"] = lasreader->point.get_scan_angle_string();
+                  json_outside_box["scan_angle"] = lasreader->point.get_scan_angle_disp();
                   json_outside_box["user_data"] = lasreader->point.get_user_data();
                   json_outside_box["point_source_id"] = lasreader->point.get_point_source_ID();
                   json_sub_main["points_outside_boundig_box"].push_back(json_outside_box);
@@ -2334,8 +2334,8 @@ class LasTool_lasinfo : public LasTool {
             json_las_point_report["scan_direction_flag"]["max"] = static_cast<int>(lassummary.max.scan_direction_flag);
             json_las_point_report["classification"]["min"] = static_cast<int>(lassummary.min.classification);
             json_las_point_report["classification"]["max"] = static_cast<int>(lassummary.max.classification);
-            json_las_point_report["scan_angle"]["min"] = lassummary.min.get_scan_angle_string();
-            json_las_point_report["scan_angle"]["max"] = lassummary.max.get_scan_angle_string();
+            json_las_point_report["scan_angle"]["min"] = lassummary.min.get_scan_angle_disp();
+            json_las_point_report["scan_angle"]["max"] = lassummary.max.get_scan_angle_disp();
             json_las_point_report["user_data"]["min"] = lassummary.min.user_data;
             json_las_point_report["user_data"]["max"] = lassummary.max.user_data;
             json_las_point_report["point_source_id"]["min"] = lassummary.min.point_source_ID;
@@ -2441,8 +2441,8 @@ class LasTool_lasinfo : public LasTool {
               json_las_point_report["extended_number_of_returns"]["max"] = static_cast<int>(lassummary.max.extended_number_of_returns);
               json_las_point_report["extended_classification"]["min"] = lassummary.min.extended_classification;
               json_las_point_report["extended_classification"]["max"] = lassummary.max.extended_classification;
-              json_las_point_report["extended_scan_angle"]["min"] = lassummary.min.get_scan_angle_string();
-              json_las_point_report["extended_scan_angle"]["max"] = lassummary.max.get_scan_angle_string();
+              json_las_point_report["extended_scan_angle"]["min"] = lassummary.min.get_scan_angle_disp();
+              json_las_point_report["extended_scan_angle"]["max"] = lassummary.max.get_scan_angle_disp();
               json_las_point_report["extended_scanner_channel"]["min"] = static_cast<int>(lassummary.min.extended_scanner_channel);
               json_las_point_report["extended_scanner_channel"]["max"] = static_cast<int>(lassummary.max.extended_scanner_channel);
             } else {
