@@ -645,11 +645,11 @@ class LASLIB_DLL LASpoint {
   };
   inline void set_classification_uni(U8 classification) {
     if (extended_point_type) {
-      this->extended_classification = extended_classification;
+      this->extended_classification = classification;
       if (extended_classification > 31)
         this->classification = 0;
       else
-        this->classification = extended_classification;
+        this->classification = classification;
     } else {
       if (classification < 32) {
         this->classification = classification;
