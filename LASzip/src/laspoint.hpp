@@ -859,7 +859,7 @@ class LASLIB_DLL LASpoint {
   };
   // get scan angle with common decimals
   inline F32 get_scan_angle_disp() const {
-      return DoubleRound(get_scan_angle(), extended_point_type?3:0);
+      return static_cast<F32>(DoubleRound(get_scan_angle(), extended_point_type?3:0));
   };
   // get scan angle as string
   inline std::string get_scan_angle_string() const {

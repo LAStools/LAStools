@@ -1,6 +1,14 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+9 July 2025 -- fix: blast2iso64 - command wrap
+9 July 2025 -- NEW: lasthin3d - thins point clouds in horizontal and vertical dimensions
+9 July 2025 -- NEW: extended classification support (>31) on all LAStools
+8 July 2025 -- NEW: las2las: preset point data format for text input on explicit point data format for output
+3 July 2025 -- fix: las2las separate write header from reader (https://groups.google.com/g/lastools/c/8bPIAwOvIyc)
 26 June 2025 -- fix: unify file extensions charcase handling
+20 June 2025 -- fix: lasinfo: unify brackets on bin output 
+13 June 2025 -- fix: vlr/evlr exception handling; allow stream reading >u32
+26 May 2025 -- NEW: lascanopy rgbn aggregate functions (-nir_avg,...)
 26 May 2025 -- fix: memsize grid for linux; win ifdefs fix
 26 May 2025 -- NEW: full support for 16 bit highres scan_angle (LAS 1.4)
 16 May 2025 -- fix: lascanopy very_verbose sync

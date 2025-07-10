@@ -122,7 +122,7 @@ inline U32 ByteStreamInFile::getByte()
 
 inline void ByteStreamInFile::getBytes(U8* bytes, const I64 num_bytes)
 {
-  if (fread(bytes, 1, num_bytes, file) != num_bytes)
+  if (fread(bytes, 1, num_bytes, file) != static_cast<size_t>(num_bytes))
   {
     throw EOF;
   }
