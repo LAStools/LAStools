@@ -334,6 +334,10 @@ bool StringEndsWith(const std::string& fullString, const std::string& ending) {
 bool HasFileExt(std::string fn, std::string ext) {
   if (fn.empty()) return false;
   if (ext.empty()) return false;
+  // if fn does not have a ext: it is maybe just an ext - compare those
+  if ((fn.length() == ext.length()) || (fn.find_last_of(".") == std::string::npos)) {
+    return fn.compare(ext) == 0;
+  }
   if (ext[0] != '.') ext = '.' + ext;
   to_lower(ext);
   to_lower(fn);

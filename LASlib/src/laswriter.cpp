@@ -1083,12 +1083,12 @@ I32 LASwriteOpener::get_format() const
   }
   else
   {
-    if (HasFileExt(std::string(file_name), "laz")) {
+    if (HasFileExt(std::string(file_name), ".laz")) {
       return LAS_TOOLS_FORMAT_LAZ;
-    } else if (HasFileExt(std::string(file_name), "las"))
+    } else if (HasFileExt(std::string(file_name), ".las"))
     {
       return LAS_TOOLS_FORMAT_LAS;
-    } else if (HasFileExt(std::string(file_name), "bin"))  // terrasolid
+    } else if (HasFileExt(std::string(file_name), ".bin"))  // terrasolid
     {
       return LAS_TOOLS_FORMAT_BIN;
     }

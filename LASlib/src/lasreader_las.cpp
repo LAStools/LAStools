@@ -1131,7 +1131,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             {
               try 
               { 
-                if (header.evlrs[i].record_length_after_header > MAXUINT32) {
+                if (header.evlrs[i].record_length_after_header > UINT32_MAX) {
                   laserror("evlr size of %llu bytes in header.evlrs[%d] not supported", header.evlrs[i].record_length_after_header, i);
                 }
                 header.evlrs[i].data = new U8[header.evlrs[i].record_length_after_header + 1];
