@@ -37,7 +37,7 @@ The removed points can also be recorded to a LAZ file with the
 option '-record_removed'.
 
 
-# See also
+## See also
 
 lascopy - Copy point properties from different sources to a target
 
