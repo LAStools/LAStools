@@ -45,6 +45,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <cstdint>
 
 BOOL LASreaderLAS::open(const char* file_name, I32 io_buffer_size, BOOL peek_only, U32 decompress_selective)
 {
