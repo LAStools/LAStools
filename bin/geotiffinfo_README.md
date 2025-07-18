@@ -45,7 +45,7 @@ KeyID   Loc Cnt Value: KeyDesc = Value
  4096     0   1  6647: VerticalGeoKey = Canadian Geodetic Vertical Datum of 2013  
  4099     0   1  9001: UnitsGeoKey(Vertical Units) = Linear_Meter  
 
-## wktformat specific arguments
+## geotiffinfo specific arguments
 -i [n]       : input file or input wildcard
 
 if only one argument is given this is assumed as input file or input wildcard

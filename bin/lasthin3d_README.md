@@ -21,7 +21,7 @@ points.
     lasthin3d64 -i in.laz -o out.laz
 
 does LAS thinning with the grid spacing default of 2 units and keeps the
-first point per 3d-grid cell
+first point per 3d-grid cell.
 
 
     lasthin3d64 -i in.laz -ignore_class 1 3 5 -o out.laz
@@ -38,7 +38,7 @@ sets the grid cell steps to '4.0'.
     lasthin3d64 -i in.laz -step 4.0 -step_z 2.0 -o out.laz
 
 sets the grid cell steps to '4.0', but sets the step size in 
-z-direction to '2.0'
+z-direction to '2.0'.
 
 
     lasthin3d64 -i in.laz -step 4.0 -use_cell_center -o out.laz

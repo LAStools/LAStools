@@ -6,11 +6,31 @@ are rasters containing elevation data such as DTM, DSM, or CHM
 rasters, or GEOID difference grids, or forestry metrics. These
 values will be compressed into the z coordinate of RasterLAZ.
 
+Advantages of storing elevation grids and rasters as RasterLAZ:
+1) highest compression as far as I can tell
+2) directly feed into existing LAZ processing pipelines
+3) raster and points are merging anyways (photogrammetic DSMs)
+4) elevation values with fixed-point resolution, not in floating-point
+5) any (!!!) reasonable raster order is supported
+6) spatial indexing is readily supported
+7) entire range can be used. "nodata" rasters are simply omitted
+8) optional fast coverage decompression (coded separately for LAS 1.4) 
+9) storage of additional (LAS-like) attributes supported 
+10) display rasters mixed with points via Potree and/or Entwine / Greyhound
+
+A RasterLAZ file is a LAZ file with an extra VLR that stores the raster
+relevant extra information such as ncols, nrows, stepx resolution, stepy resolution, ...
+
 ## Examples
 
-see
-https://groups.google.com/d/topic/lastools/39hR_4BvvIA/discussion  
-https://groups.google.com/d/topic/lastools/nMPU75zpqPw/discussion
+    demzip64 -i sample.tif -o sample.laz
+
+compress the input tif file into a RasterLAZ file.
+
+
+    demzip64 -o sample.laz -o sample.tif
+
+convert the RasterLAZ file into a TIFF file.
 
 
 ## demzip specific arguments
