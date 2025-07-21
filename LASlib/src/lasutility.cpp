@@ -187,7 +187,7 @@ LASsummary::LASsummary()
 BOOL LASsummary::add(const LASpoint* point)
 {
   number_of_point_records++;
-  U8 classex = point->get_classification_uni();
+  U8 classex = point->get_classification();
   if (point->extended_point_type)
   {
     number_of_points_by_return[point->get_extended_return_number()]++;
@@ -1218,7 +1218,7 @@ void LAShistogram::add(const LASpoint* point)
   if (Y_bin) Y_bin->add(point->get_Y());
   if (Z_bin) Z_bin->add(point->get_Z());
   if (intensity_bin) intensity_bin->add(point->get_intensity());
-  if (classification_bin) classification_bin->add(point->get_classification_uni());
+  if (classification_bin) classification_bin->add(point->get_classification());
   if (scan_angle_bin)
   {
     scan_angle_bin->add(point->get_scan_angle());
@@ -1252,10 +1252,10 @@ void LAShistogram::add(const LASpoint* point)
   if (wavepacket_size_bin) wavepacket_size_bin->add((I32)point->wavepacket.getSize());
   if (wavepacket_location_bin) wavepacket_location_bin->add(point->wavepacket.getLocation());
   // averages bins
-  if (classification_bin_intensity) classification_bin_intensity->add(point->get_classification_uni(), point->get_intensity());
+  if (classification_bin_intensity) classification_bin_intensity->add(point->get_classification(), point->get_intensity());
   if (classification_bin_scan_angle)
   {
-    classification_bin_scan_angle->add((F64)point->get_classification_uni(), (F64)point->get_scan_angle());
+    classification_bin_scan_angle->add((F64)point->get_classification(), (F64)point->get_scan_angle());
   }
   if (scan_angle_bin_z)
   {

@@ -459,7 +459,7 @@ BOOL LASwriterTXT::write_point(const LASpoint* point)
       fprintf(file, "%d", point->get_return_number());
       break;
     case 'c': // the classification
-  		fprintf(file, "%d", point->get_classification_uni());
+  		fprintf(file, "%d", point->get_classification());
       break;
     case 'u': // the user data
       fprintf(file, "%d", point->get_user_data());

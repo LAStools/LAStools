@@ -1247,7 +1247,7 @@ int main(int argc, char* argv[]) {
             }
             break;
           case 'c':  // the classification
-            fprintf(file_out, "%d", lasreader->point.get_classification_uni());
+            fprintf(file_out, "%d", lasreader->point.get_classification());
             break;
           case 'u':  // the user data
             fprintf(file_out, "%d", lasreader->point.get_user_data());

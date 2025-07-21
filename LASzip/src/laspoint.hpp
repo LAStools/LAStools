@@ -643,7 +643,7 @@ class LASLIB_DLL LASpoint {
   inline void set_edge_of_flight_line(const U8 edge_of_flight_line) {
     this->edge_of_flight_line = edge_of_flight_line;
   };
-  inline void set_classification_uni(U8 classification) {
+  inline void set_classification(U8 classification) {
     if (extended_point_type) {
       this->extended_classification = classification;
       if (extended_classification > 31)
@@ -663,12 +663,12 @@ class LASLIB_DLL LASpoint {
   inline void set_classification_int(I32 temp_i) {
     if (temp_i < 0) {
       LASMessage(LAS_WARNING, "classification %d is negative. zeroing ...", temp_i);
-      set_classification_uni(0);
+      set_classification(0);
     } else if (temp_i > classification_max()) {
       LASMessage(LAS_WARNING, "classification %d is larger than %d. clamping ...", temp_i, classification_max());
-      set_classification_uni(classification_max());
+      set_classification(classification_max());
     } else {
-      set_classification_uni((U8)temp_i);
+      set_classification((U8)temp_i);
     }
   };
   inline void set_synthetic_flag(U8 synthetic_flag) {
@@ -770,7 +770,7 @@ class LASLIB_DLL LASpoint {
       return TRUE;
     }
   };
-  U8 get_classification_uni() const {
+  U8 get_classification() const {
     if (extended_point_type) {
       return extended_classification;
     } else {

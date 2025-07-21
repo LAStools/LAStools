@@ -2254,7 +2254,7 @@ class LasTool_lasinfo : public LasTool {
                   json_outside_box["number_of_returns"] = lasreader->point.get_number_of_returns();
                   json_outside_box["scan_direction_flag"] = lasreader->point.get_scan_direction_flag();
                   json_outside_box["edge_flight_line"] = lasreader->point.get_edge_of_flight_line();
-                  json_outside_box["classification"] = lasreader->point.get_classification_uni();
+                  json_outside_box["classification"] = lasreader->point.get_classification();
                   json_outside_box["scan_angle"] = lasreader->point.get_scan_angle_disp();
                   json_outside_box["user_data"] = lasreader->point.get_user_data();
                   json_outside_box["point_source_id"] = lasreader->point.get_point_source_ID();
@@ -2272,7 +2272,7 @@ class LasTool_lasinfo : public LasTool {
                       lasreader->point.get_number_of_returns(),
                       lasreader->point.get_scan_direction_flag(), 
                       lasreader->point.get_edge_of_flight_line(), 
-                      lasreader->point.get_classification_uni(),
+                      lasreader->point.get_classification(),
                       lasreader->point.get_scan_angle_string().c_str(), 
                       lasreader->point.get_user_data(), 
                       lasreader->point.get_point_source_ID());

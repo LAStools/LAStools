@@ -610,7 +610,7 @@ BOOL LASwriterCompatibleUp::write_point(const LASpoint* point)
   pointCompatibleUp.extended_scan_angle = scan_angle + I16_QUANTIZE(((F32)pointCompatibleUp.scan_angle_rank) / 0.006f);
   pointCompatibleUp.extended_return_number = return_number_increment + pointCompatibleUp.return_number;
   pointCompatibleUp.extended_number_of_returns = number_of_returns_increment + pointCompatibleUp.number_of_returns;
-  pointCompatibleUp.extended_classification = classification + pointCompatibleUp.get_classification_uni();
+  pointCompatibleUp.extended_classification = classification + pointCompatibleUp.get_classification();
   pointCompatibleUp.extended_scanner_channel = scanner_channel;
   pointCompatibleUp.extended_classification_flags = (overlap_bit << 3) | ((pointCompatibleUp.withheld_flag) << 2) | ((pointCompatibleUp.keypoint_flag) << 1) | (pointCompatibleUp.synthetic_flag);
 
