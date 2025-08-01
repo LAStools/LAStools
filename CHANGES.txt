@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+30 July 2024 -- NEW: lasvdatum: report exact boundary violations if values are outside a GTX grid
 9 July 2025 -- fix: blast2iso64 - command wrap
 9 July 2025 -- NEW: lasthin3d - thins point clouds in horizontal and vertical dimensions
 9 July 2025 -- NEW: extended classification support (>31) on all LAStools
