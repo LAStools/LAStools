@@ -1853,7 +1853,7 @@ public:
       }
       else
       {
-        if (array != nullptr && *array != nullptr && (*array)[pos_y] != nullptr) (*array)[pos_y] = (U32*)malloc(array_sizes_new * sizeof(U32));
+        if (array != nullptr && *array != nullptr) (*array)[pos_y] = (U32*)malloc(array_sizes_new * sizeof(U32));
       }
       for (U16 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
       {
