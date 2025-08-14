@@ -3881,27 +3881,32 @@ laszip_read_header(
       try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip_dll->header.vlrs[i].reserved)); } catch(...)
       {
         snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading header.vlrs[%u].reserved", i);
+        delete laszip;
         return 1;
       }
 
       try { laszip_dll->streamin->getBytes((U8*)laszip_dll->header.vlrs[i].user_id, 16); } catch(...)
       {
         snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading header.vlrs[%u].user_id", i);
+        delete laszip;
         return 1;
       }
       try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip_dll->header.vlrs[i].record_id)); } catch(...)
       {
         snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading header.vlrs[%u].record_id", i);
+        delete laszip;
         return 1;
       }
       try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip_dll->header.vlrs[i].record_length_after_header)); } catch(...)
       {
         snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading header.vlrs[%u].record_length_after_header", i);
+        delete laszip;
         return 1;
       }
       try { laszip_dll->streamin->getBytes((U8*)laszip_dll->header.vlrs[i].description, 32); } catch(...)
       {
         snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading header.vlrs[%u].description", i);
+        delete laszip;
         return 1;
       }
 
@@ -3963,51 +3968,61 @@ laszip_read_header(
           try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip->compressor)); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading compressor %d", (I32)laszip->compressor);
+            delete laszip;
             return 1;
           }
           try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip->coder)); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading coder %d", (I32)laszip->coder);
+            delete laszip;
             return 1;
           }
           try { laszip_dll->streamin->getBytes((U8*)&(laszip->version_major), 1); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading version_major %d", (I32)laszip->version_major);
+            delete laszip;
             return 1;
           }
           try { laszip_dll->streamin->getBytes((U8*)&(laszip->version_minor), 1); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading version_minor %d", (I32)laszip->version_minor);
+            delete laszip;
             return 1;
           }
           try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip->version_revision)); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading version_revision %d", (I32)laszip->version_revision);
+            delete laszip;
             return 1;
           }
           try { laszip_dll->streamin->get32bitsLE((U8*)&(laszip->options)); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading options %u", laszip->options);
+            delete laszip;
             return 1;
           }
           try { laszip_dll->streamin->get32bitsLE((U8*)&(laszip->chunk_size)); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading chunk_size %u", laszip->chunk_size);
+            delete laszip;
             return 1;
           }
           try { laszip_dll->streamin->get64bitsLE((U8*)&(laszip->number_of_special_evlrs)); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading number_of_special_evlrs %d", (I32)laszip->number_of_special_evlrs);
+            delete laszip;
             return 1;
           }
           try { laszip_dll->streamin->get64bitsLE((U8*)&(laszip->offset_to_special_evlrs)); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading offset_to_special_evlrs %d", (I32)laszip->offset_to_special_evlrs);
+            delete laszip;
             return 1;
           }
           try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip->num_items)); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading num_items %d", (I32)laszip->num_items);
+            delete laszip;
             return 1;
           }
           laszip->items = new LASitem[laszip->num_items];
@@ -4018,17 +4033,20 @@ laszip_read_header(
             try { laszip_dll->streamin->get16bitsLE((U8*)&type); } catch(...)
             {
               snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading type of item %u", j);
+              delete laszip;
               return 1;
             }
             laszip->items[j].type = (LASitem::Type)type;
             try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip->items[j].size)); } catch(...)
             {
               snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading size of item %u", j);
+              delete laszip;
               return 1;
             }
             try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip->items[j].version)); } catch(...)
             {
               snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading version of item %u", j);
+              delete laszip;
               return 1;
             }
           }
@@ -4040,6 +4058,7 @@ laszip_read_header(
           try { laszip_dll->streamin->getBytes(laszip_dll->header.vlrs[i].data, laszip_dll->header.vlrs[i].record_length_after_header); } catch(...)
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading %d bytes of data into header.vlrs[%u].data", (I32)laszip_dll->header.vlrs[i].record_length_after_header, i);
+            delete laszip;
             return 1;
           }
         }
@@ -4090,6 +4109,7 @@ laszip_read_header(
     try { laszip_dll->streamin->getBytes((U8*)laszip_dll->header.user_data_after_header, laszip_dll->header.user_data_after_header_size); } catch(...)
     {
       snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading %u bytes of data into header.user_data_after_header", laszip_dll->header.user_data_after_header_size);
+      delete laszip;
       return 1;
     }
   }
@@ -4115,6 +4135,7 @@ laszip_read_header(
     if (!laszip->check(laszip_dll->header.point_data_record_length))
     {
       snprintf(laszip_dll->error, sizeof(laszip_dll->error), "%s upgrade to the latest release of LASzip or contact 'info@rapidlasso.de' for assistance", laszip->get_error());
+      delete laszip;
       return 1;
     }
   }
@@ -4131,6 +4152,7 @@ laszip_read_header(
     if (!laszip->setup(laszip_dll->header.point_data_format, laszip_dll->header.point_data_record_length, LASZIP_COMPRESSOR_NONE))
     {
       snprintf(laszip_dll->error, sizeof(laszip_dll->error), "invalid combination of point_data_format %d and point_data_record_length %d", (I32)laszip_dll->header.point_data_format, (I32)laszip_dll->header.point_data_record_length);
+      delete laszip;
       return 1;
     }
   }
@@ -4147,6 +4169,7 @@ laszip_read_header(
   if (laszip_dll->point_items == 0)
   {
     snprintf(laszip_dll->error, sizeof(laszip_dll->error), "could not alloc point_items");
+    delete laszip;
     return 1;
   }
 
@@ -4179,6 +4202,7 @@ laszip_read_header(
       break;
     default:
       snprintf(laszip_dll->error, sizeof(laszip_dll->error), "unknown LASitem type %d", (I32)laszip->items[i].type);
+      delete laszip;
       return 1;
     }
   }
@@ -4292,6 +4316,7 @@ laszip_read_header(
           if (laszip_remove_vlr(laszip_dll, "lascompatible\0\0", 22204))
           {
             snprintf(laszip_dll->error, sizeof(laszip_dll->error), "removing the compatibility VLR");
+            delete laszip;
             return 1;
           }
 
@@ -4310,6 +4335,7 @@ laszip_read_header(
             if (laszip_add_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4, (laszip_U16)(attributer.number_attributes*sizeof(LASattribute)), 0, (laszip_U8*)attributer.attributes))
             {
               snprintf(laszip_dll->error, sizeof(laszip_dll->error), "rewriting the extra bytes VLR without 'LAS 1.4 compatibility mode' attributes");
+              delete laszip;
               return 1;
             }
           }
@@ -4318,6 +4344,7 @@ laszip_read_header(
             if (laszip_remove_vlr(laszip_dll, "LASF_Spec\0\0\0\0\0\0", 4))
             {
               snprintf(laszip_dll->error, sizeof(laszip_dll->error), "removing the LAS 1.4 attribute VLR");
+              delete laszip;
               return 1;
             }
           }
@@ -4401,18 +4428,21 @@ laszip_read_header(
   if (laszip_dll->reader == 0)
   {
     snprintf(laszip_dll->error, sizeof(laszip_dll->error), "could not alloc LASreadPoint");
+    delete laszip;
     return 1;
   }
 
   if (!laszip_dll->reader->setup(laszip->num_items, laszip->items, laszip))
   {
     snprintf(laszip_dll->error, sizeof(laszip_dll->error), "setup of LASreadPoint failed");
+    delete laszip;
     return 1;
   }
 
   if (!laszip_dll->reader->init(laszip_dll->streamin))
   {
     snprintf(laszip_dll->error, sizeof(laszip_dll->error), "init of LASreadPoint failed");
+    delete laszip;
     return 1;
   }
 
