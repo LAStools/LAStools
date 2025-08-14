@@ -175,8 +175,8 @@ which points are selected as keypoints.
 -intensity_max                : keeps point with highest the intensity in a cell  
 -return_min                   : keeps point with lowest the return number in a cell  
 -return_max                   : keeps point with highest the return number in a cell  
--attribute_min [n]            : keeps point with highest the lowest value of attribute [n] in a cell  
--attribute_max [n]            : keeps point with highest the highest value of attribute [n] in a cell  
+-attribute_min [n]            : keeps point with lowest value of attribute [n] in a cell  
+-attribute_max [n]            : keeps point with highest value of attribute [n] in a cell  
 
 ### other specific arguments
 -step [n]                     : set grid cell size to [n] for thinning/flagging (default=2)  
