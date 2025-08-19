@@ -56,6 +56,9 @@
 #include <cstdarg>
 #include <vector>
 
+#include <cmath>
+#include <type_traits>
+
 extern void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*), ...);
 
 typedef char CHAR;
@@ -365,6 +368,15 @@ void laserrorm(LAS_FORMAT_STRING(const char*) fmt, Args... args) {
   }
   return;
 };
+
+// type-specific (float or double) equal compare
+template <typename T>
+inline bool fp_equal(T a, T b) {
+  static_assert(std::is_same<T, float>::value || std::is_same<T, double>::value, "fp_equal<T> only supports float or double types.");
+
+  constexpr T eps = std::is_same<T, float>::value ? static_cast<T>(1e-6f) : static_cast<T>(1e-12);
+  return std::fabs(a - b) < eps;
+}
 
 // 32bit/64bit detection
 #ifdef _WIN64
