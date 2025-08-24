@@ -67,7 +67,7 @@ LASreader::LASreader(LASreadOpener* opener) {
   copc_index = 0;
   copc_stream_order = 0;
   copc_resolution = 0;
-  copc_depth = I32_MAX;
+  copc_depth = -1;
   filter = 0;
   transform = 0;
   ignore = 0;
@@ -477,6 +477,52 @@ I32 LASreadOpener::unparse(CHAR* string) const {
   if (!temp_file_base.empty()) {
     n += sprintf(string + n, "-temp_files \"%s\" ", temp_file_base.c_str());
   }
+  if (parse_string) {
+    n += sprintf(string + n, "-iparse \"%s\" ", parse_string);
+  }
+  if (skip_lines) {
+    n += sprintf(string + n, "-iskip %d ", skip_lines);
+  }
+  if (itxt){
+    if (ipts) {
+      n += sprintf(string + n, "-ipts ");
+    } else if (iptx) {
+      n += sprintf(string + n, "-iptx ");
+    } else if (iptx_transform) {
+      n += sprintf(string + n, "-iptx_transform ");
+    } else {
+      n += sprintf(string + n, "-itxt ");
+    }
+  }
+  if (copc_resolution) {
+    n += sprintf(string + n, "-resolution %lf ", copc_resolution);
+  }
+  if (unique) {
+    n += sprintf(string + n, "-unique ");
+  }
+  if (comma_not_point) {
+    n += sprintf(string + n, "-comma_not_point ");
+  }
+  switch (copc_stream_order) { // non default args
+    case 2:
+      n += sprintf(string + n, "-stream_order_level ");
+      break;
+    case 1:
+      n += sprintf(string + n, "-stream_order_spatial ");
+      break;
+  }
+  if (copc_depth != -1) {
+    n += sprintf(string + n, "-max_depth %d ", copc_depth);
+  }
+  if (z_from_attribute) {
+    n += sprintf(string + n, "-z_from_attribute ");
+  }
+  /* optional in derivation 
+  _txt: if (translation) { ... "-itranslate_intensity"
+         if (scale_intensity) "-iscale_intensity"
+   translate_scan_angle ... "-itranslate_scan_angle"
+   scale_scan_angle "-iscale_scan_angle"
+  */
   return n;
 }
 
