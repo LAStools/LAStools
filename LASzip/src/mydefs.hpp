@@ -56,6 +56,9 @@
 #include <cstdarg>
 #include <vector>
 
+#include <cmath>
+#include <type_traits>
+
 extern void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*), ...);
 
 typedef char CHAR;
@@ -366,6 +369,15 @@ void laserrorm(LAS_FORMAT_STRING(const char*) fmt, Args... args) {
   return;
 };
 
+// type-specific (float or double) equal compare
+template <typename T>
+inline bool fp_equal(T a, T b) {
+  static_assert(std::is_same<T, float>::value || std::is_same<T, double>::value, "fp_equal<T> only supports float or double types.");
+
+  constexpr T eps = std::is_same<T, float>::value ? static_cast<T>(1e-6f) : static_cast<T>(1e-12);
+  return std::fabs(a - b) < eps;
+}
+
 // 32bit/64bit detection
 #ifdef _WIN64
 #define IS64 true
@@ -404,6 +416,8 @@ bool StringEndsWith(const std::string& fullString, const std::string& ending);
 bool HasFileExt(std::string fn, std::string ext);
 
 std::string FileExtSet(std::string fn_in, std::string ext_new);
+
+std::string getFileExtension(const char* filepath);
 
 bool IsLasLazFile(std::string fn);
 
@@ -454,6 +468,18 @@ std::string CcToUnderline(const std::string& in);
 
 /// returns the occurency count of 'toCount' in 'in'
 size_t StringCountChar(const std::string& in, const char toCount);
+
+/// Function for determining the standard programme paths
+const char** getDefaultProgramPaths(size_t& numPaths);
+
+/// Function to get the home directory of the current user
+const char* getHomeDirectory();
+
+/// Does the file exist
+BOOL file_exists(const std::string& path);
+
+/// Get the digits 
+I32 get_digits(F64 scale_factor); 
 
 #endif
 

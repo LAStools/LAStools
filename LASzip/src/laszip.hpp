@@ -58,6 +58,8 @@
 #ifndef LASZIP_HPP
 #define LASZIP_HPP
 
+#include <cstring>
+
 #if defined(_MSC_VER) && (_MSC_VER < 1300)
 #define LZ_WIN32_VC6
 typedef __int64   SIGNED_INT64;

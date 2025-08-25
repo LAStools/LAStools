@@ -120,6 +120,7 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 -disjoint             : allow polygon to fragment for point clusters farther than concavity apart  
 -disjoint_hull        : allow polygon to fragment for point clusters farther than concavity apart  
 -extra_pass           : do extra read pass to count points (only makes sense when filtering)  
+-gdal                 : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON and GPX as poly output. Can also be used for SHP and KML
 -holes                : find internal holes and output hole polygoons  
 -ilay [n]             : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]          : look for corresponding *.lay file in directory [n]  

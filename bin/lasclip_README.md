@@ -59,6 +59,13 @@ The values there means
 clips all the LAS files matching "*.las" against the polygon(s) in 
 "polygon.shp" and stores each result to a LAS file called "*_1.las".
 
+    lasclip64 -i TO_core_last_zoom.laz -poly polygon.gpkg -gdal -v
+
+clips the LAZ files against the polygon(s) in "polygon.gpkg". With the -gdal argument, input formats 
+such as GPKG, GML, GeoJSON, KML, GPX, and SHP are supported.
+Please note that GPKG, SHP, and GML are recommended for maximum precision, as KML, GPX, and GeoJSON 
+require transformation to geographic coordinates (EPSG:4326) during processing, which may introduce 
+very minor positional differences along polygon boundaries.
 
     lasclip64 -i *.txt -iparse xyzt -poly polygon.shp -otxt -oparse xyzt
 
@@ -116,6 +123,7 @@ following format:
 -donut                        : clip only lakes but no islands  
 -donuts                       : clip only lakes but no islands  
 -flag_as_withheld             : just flag the point as withheld instead of removing it  
+-gdal                         : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON, GPX and KML as -poly input file. Can also be used for SHP
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ...  
 -ilay [n]                     : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]                  : look for corresponding *.lay file in directory [n]  

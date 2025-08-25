@@ -16,6 +16,17 @@ can be adjusted up or down.
 Will classify all points within a range of 4 and step of 0.5 with class 20.   
 
     lasdistance64 -i ..\data\lake.laz ^
+                -poly ..\data\lake_breakline.gpkg ^
+                - gdal ^
+                -o lake.laz
+
+Will classify all points within a range of 4 and step of 0.5 with class 20.  from the line specifie "lake_breakline.gpkg". 
+With the -gdal argument, input formats such as GPKG, GML, GeoJSON, KML, GPX, and SHP are supported.
+Please note that GPKG, SHP, and GML are recommended for maximum precision, as KML, GPX, and GeoJSON require transformation to 
+geographic coordinates (EPSG:4326) during processing, which may introduce very minor positional differences along 
+polygon boundaries.
+
+    lasdistance64 -i ..\data\lake.laz ^
                 -poly ..\data\lake_breakline.shp ^
                 -distance_xy 10.0 -step_xy 1.0 ^
                 -o lake.laz
@@ -49,6 +60,7 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 -flag_as_keypoint             : flag points as keypoint (instead of classifying them)  
 -flag_as_synthetic            : flag points as synthetic (instead of classifying them)  
 -flag_as_withheld             : flag points as withheld (instead of classifying them)  
+-gdal                         : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON and GPX as -poly input file. Can also be used for SHP and KML
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ...  
 -ilay [n]                     : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]                  : look for corresponding *.lay file in directory [n]  
