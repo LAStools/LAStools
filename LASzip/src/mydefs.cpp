@@ -355,6 +355,19 @@ std::string FileExtSet(std::string fn_in, std::string ext_new) {
   }
 }
 
+/// Returns the extension of the file
+std::string getFileExtension(const char* filepath) {
+  if (!filepath) return "";
+
+  const char* dot = strrchr(filepath, '.');
+  if (!dot || *(dot + 1) == '\0') return "";  // No point or nothing after that
+
+  std::string ext(dot + 1);
+  // Optional: in lowercase letters
+  for (char& c : ext) c = std::tolower(static_cast<unsigned char>(c));
+  return ext;
+}
+
 // checks if given file is a las/laz file
 bool IsLasLazFile(std::string fn) {
   return HasFileExt(fn, "las") || HasFileExt(fn, "laz");
@@ -581,4 +594,67 @@ size_t StringCountChar(const std::string& in, const char toCount) {
   for (size_t i = 0; i < in.size(); i++)
     if (in[i] == toCount) count++;
   return count;
+}
+
+/// Function for determining the standard programme paths
+const char** getDefaultProgramPaths(size_t& numPaths) {
+#ifdef _WIN32
+  // Windows: Use environment variables or API for Program Files directories
+  static const char* defaultPaths[] = {getenv("ProgramFiles"), getenv("ProgramFiles(x86)"), nullptr};
+  // Count valid paths
+  numPaths = 0;
+  while (defaultPaths[numPaths] != nullptr) {
+    ++numPaths;
+  }
+  return defaultPaths;
+#elif __APPLE__
+  // macOS: Standard directories
+  static const char* defaultPaths[] = {"/Applications/", "/usr/local/", nullptr};
+  numPaths = sizeof(defaultPaths) / sizeof(defaultPaths[0]) - 1;
+  return defaultPaths;
+#else
+  // Linux/Unix: Standard directories
+  static const char* defaultPaths[] = {"/usr/local/", "/opt/", "/usr/share/", nullptr};
+  numPaths = sizeof(defaultPaths) / sizeof(defaultPaths[0]) - 1;
+  return defaultPaths;
+#endif
+}
+
+/// Function to get the home directory of the current user
+const char* getHomeDirectory() {
+#ifdef _WIN32
+  return getenv("USERPROFILE");
+#else
+  return getenv("HOME");
+#endif
+}
+
+/// Does the file exist
+BOOL file_exists(const std::string& path) {
+  FILE* file = std::fopen(path.c_str(), "r");
+  if (file) {
+    fclose(file);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/// Get the digits
+I32 get_digits(F64 scale_factor) {
+  if (fp_equal(scale_factor, 0.01)) {
+    return 2;
+  } else if (fp_equal(scale_factor, 0.001)) {
+    return 3;
+  } else if (fp_equal(scale_factor, 0.0025) || fp_equal(scale_factor, 0.0001)) {
+    return 4;
+  } else if (fp_equal(scale_factor, 0.00025) || fp_equal(scale_factor, 0.00001)) {
+    return 5;
+  } else if (fp_equal(scale_factor, 0.000001)) {
+    return 6;
+  } else if (fp_equal(scale_factor, 0.0000001)) {
+    return 7;
+  } else if (fp_equal(scale_factor, 0.00000001)) {
+    return 8;
+  }
+  return -1;
 }

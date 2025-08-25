@@ -79,42 +79,6 @@ proj_trans_t proj_trans_ptr = nullptr;
 proj_get_type_t proj_get_type_ptr = nullptr;
 proj_is_crs_t proj_is_crs_ptr = nullptr;
 
-/// Function to get the home directory of the current user
-const char* getHomeDirectory() {
-#ifdef _WIN32
-  return getenv("USERPROFILE");
-#else
-  return getenv("HOME"); 
-#endif
-}
-
-/// Function for determining the standard programme paths
-const char** getDefaultProgramPaths(size_t& numPaths) {
-#ifdef _WIN32
-  // Windows: Use environment variables or API for Program Files directories
-  static const char* defaultPaths[] = {
-      getenv("ProgramFiles"),
-      getenv("ProgramFiles(x86)"),
-      nullptr};
-  // Count valid paths
-  numPaths = 0;
-  while (defaultPaths[numPaths] != nullptr) {
-    ++numPaths;
-  }
-  return defaultPaths;
-#elif __APPLE__
-  // macOS: Standard directories
-  static const char* defaultPaths[] = {"/Applications/", "/usr/local/", nullptr};
-  numPaths = sizeof(defaultPaths) / sizeof(defaultPaths[0]) - 1;
-  return defaultPaths;
-#else
-  // Linux/Unix: Standard directories
-  static const char* defaultPaths[] = {"/usr/local/", "/opt/", "/usr/share/", nullptr};
-  numPaths = sizeof(defaultPaths) / sizeof(defaultPaths[0]) - 1;
-  return defaultPaths;
-#endif
-}
-
 /// Function for parsing the version number from the directory name
 static std::vector<int> parseVersion(const char* versionStr) {
   std::vector<int> versionNumbers;
