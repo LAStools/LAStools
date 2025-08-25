@@ -60,6 +60,7 @@ overview of all tool-specific switches:
 -poly [filename]                     : input shape file
 -flag_as_withheld                    : just flag the point as withheld instead of removing it 
 -gui                                 : start with files loaded into GUI
+-gdal                                : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON, GPX and KML as -poly input file. Can also be used for SHP
 -cores 4                           : process multiple inputs on 4 cores in parallel
 -interior                            : clip points INSIDE the polygons
 -ignore_class 0 1 3 5 6 7 9          : ignores points with specified classification codes

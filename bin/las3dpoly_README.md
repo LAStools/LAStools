@@ -26,6 +26,14 @@ to the line specified by line.shp and list a verbose report of what has been don
 
 clip away all points of in.laz which are less than 10 units vertically and 20 units horizontal from the line specified by line.csv
 
+   las3dpoly64 -i in.laz -poly line.gpkg -distance 10 20 -o out.laz -gdal -remove_points 
+
+clips away all points of in.laz which are less than 10 units vertically and 20 units horizontal from the line specifie "line.gpkg". 
+With the -gdal argument, input formats such as GPKG, GML, GeoJSON, KML, GPX, and SHP are supported.
+Please note that GPKG, SHP, and GML are recommended for maximum precision, as KML, GPX, and GeoJSON require transformation to 
+geographic coordinates (EPSG:4326) during processing, which may introduce very minor positional differences along 
+polygon boundaries.
+
 
 line.csv may look like
 
@@ -45,6 +53,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -poly [fns]          : input shape file [fns]  
 -sep                 : separator in a csv file to separate values. see table below. default [space]
 -distance [d]        : radial distance [d] or horizontal [d1] and vertical [d2] distance. default [4]
+-gdal                : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON, GPX and KML as -poly input file. Can also be used for SHP
 -remove_points       : remove points within distance to polyline
 -classify [n]        : classify points within distance to polyline as [n]  
 -classify_as [n]     : classify points within distance to polyline as [n]  

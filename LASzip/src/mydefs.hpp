@@ -417,6 +417,8 @@ bool HasFileExt(std::string fn, std::string ext);
 
 std::string FileExtSet(std::string fn_in, std::string ext_new);
 
+std::string getFileExtension(const char* filepath);
+
 bool IsLasLazFile(std::string fn);
 
 /// returns TRUE if 'val' is found in 'vec'
@@ -466,6 +468,18 @@ std::string CcToUnderline(const std::string& in);
 
 /// returns the occurency count of 'toCount' in 'in'
 size_t StringCountChar(const std::string& in, const char toCount);
+
+/// Function for determining the standard programme paths
+const char** getDefaultProgramPaths(size_t& numPaths);
+
+/// Function to get the home directory of the current user
+const char* getHomeDirectory();
+
+/// Does the file exist
+BOOL file_exists(const std::string& path);
+
+/// Get the digits 
+I32 get_digits(F64 scale_factor); 
 
 #endif
 

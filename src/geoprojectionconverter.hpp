@@ -76,6 +76,7 @@
 #include <algorithm>
 #include "lasdefinitions.hpp"
 #include "wktparser.h"
+#include "lasreader.hpp"
 
 struct GeoProjectionGeoKeys {
   unsigned short key_id;
@@ -494,6 +495,7 @@ public:
   void set_proj_crs_with_json(const char* json_filename, bool source = true);
   void set_proj_crs_with_wkt(const char* wkt_filename, bool source = true);
   void set_proj_crs_with_file_header_wkt(const char* wktContent, bool source = true);
+  void get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjectionConverter& geoprojectionconverter, LASreader* lasreader);
    
   // helps us to find the 'pcs.csv' file
   char* argv_zero;

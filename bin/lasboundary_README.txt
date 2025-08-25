@@ -118,6 +118,7 @@ overview of all tool-specific switches:
 -wait                                : wait for <ENTER> in the console at end of process
 -version                             : reports this tool's version number
 -fail                                : fail if license expired or invalid
+-gdal                                : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON and GPX as poly output. Can also be used for SHP and KML
 -gui                                 : start with files loaded into GUI
 -cores 4                             : process multiple inputs on 4 cores in parallel
 -extra_pass                          : do extra read pass to count points (only makes sense when filtering)
