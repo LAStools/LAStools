@@ -503,7 +503,7 @@ class LASLIB_DLL LASreadOpener {
 
   // optional resolution-of-interest query (copc indexed)
   U8 inside_depth_opener;  // 0 all, 1 max depth, 2 resolution
-  U8 copc_stream_order;    // 0 normal, 1 spatially, 2 depth
+  U8 copc_stream_order;    // 0 normal, 1 spatially (default), 2 depth
   F32 copc_resolution;
   I32 copc_depth;
 };

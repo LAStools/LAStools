@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+25 August 2024 -- fix: pass missing reader arguments to multi core environment
 30 July 2024 -- NEW: lasvdatum: report exact boundary violations if values are outside a GTX grid
 9 July 2025 -- fix: blast2iso64 - command wrap
 9 July 2025 -- NEW TOOL: lasthin3d - thins point clouds in horizontal and vertical dimensions (https://rapidlasso.de/new-tool-lasthin3d/)

@@ -474,7 +474,7 @@ I32 LASreadOpener::unparse(CHAR* string) const {
   if (io_ibuffer_size != LAS_TOOLS_IO_IBUFFER_SIZE) {
     n += sprintf(string + n, "-io_ibuffer %u ", io_ibuffer_size);
   }
-  if (!temp_file_base.empty()) {
+  if (!temp_file_base.empty() && (temp_file_base.compare(".")!=0)) {
     n += sprintf(string + n, "-temp_files \"%s\" ", temp_file_base.c_str());
   }
   if (parse_string) {
@@ -504,17 +504,22 @@ I32 LASreadOpener::unparse(CHAR* string) const {
     n += sprintf(string + n, "-comma_not_point ");
   }
   switch (copc_stream_order) { // non default args
+    case 0:
+      n += sprintf(string + n, "-stream_order_normal ");
+      break;
+      /* default
+    case 1: 
+      n += sprintf(string + n, "-stream_order_spatial ");
+      break;
+     */
     case 2:
       n += sprintf(string + n, "-stream_order_level ");
-      break;
-    case 1:
-      n += sprintf(string + n, "-stream_order_spatial ");
       break;
   }
   if (copc_depth != -1) {
     n += sprintf(string + n, "-max_depth %d ", copc_depth);
   }
-  if (z_from_attribute) {
+  if (z_from_attribute && !z_from_attribute_try) {
     n += sprintf(string + n, "-z_from_attribute ");
   }
   /* optional in derivation 
@@ -2067,17 +2072,14 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
       } else if (strcmp(argv[i], "-stored") == 0) {
         set_stored(TRUE);
         *argv[i] = '\0';
-      } else if (strcmp(argv[i], "-stream_order_spatial") == 0)  // COPC only
-      {
-        set_copc_stream_ordered_spatially();
+      } else if (strcmp(argv[i], "-stream_order_spatial") == 0) { // COPC only
+        set_copc_stream_ordered_spatially(); // 1 (default)
         *argv[i] = '\0';
-      } else if (strcmp(argv[i], "-stream_order_normal") == 0)  // COPC only
-      {
-        set_copc_stream_ordered_by_chunk();
+      } else if (strcmp(argv[i], "-stream_order_normal") == 0) { // COPC only
+        set_copc_stream_ordered_by_chunk(); // 0 
         *argv[i] = '\0';
-      } else if (strcmp(argv[i], "-stream_order_level") == 0)  // COPC only
-      {
-        set_copc_stream_ordered_by_level();
+      } else if (strcmp(argv[i], "-stream_order_level") == 0) { // COPC only
+        set_copc_stream_ordered_by_level(); // 2
         *argv[i] = '\0';
       }
     } else if (strcmp(argv[i], "-lof") == 0) {
