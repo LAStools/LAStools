@@ -123,23 +123,104 @@ extern void LASLIB_DLL byebye() {
 }
 
 /// Validates whether a given string is UTF-8 encoded.
-bool validate_utf8(const char* utf8) noexcept {
-  if (utf8 == nullptr) return false;
-
-  while (*utf8) {
-    if ((*utf8 & 0b10000000) != 0) {
-      if ((*utf8 & 0b01000000) == 0) return false;
-      if ((*utf8 & 0b00100000) != 0) {
-        if ((*utf8 & 0b00010000) != 0) {
-          if ((*utf8 & 0b00001000) != 0) return false;
-          if ((*++utf8 & 0b11000000) != 0b10000000) return false;
-        }
-        if ((*++utf8 & 0b11000000) != 0b10000000) return false;
-      }
-      if ((*++utf8 & 0b11000000) != 0b10000000) return false;
-    }
-    ++utf8;
+bool validate_utf8(const char* str, bool restrict_to_two_bytes) noexcept {
+  if (!str) {
+    return false;
   }
+
+  constexpr uint8_t UTF8_2BYTE_MASK = 0xE0;
+  constexpr uint8_t UTF8_2BYTE_PREFIX = 0xC0;
+  constexpr uint8_t UTF8_3BYTE_MASK = 0xF0;
+  constexpr uint8_t UTF8_3BYTE_PREFIX = 0xE0;
+  constexpr uint8_t UTF8_4BYTE_MASK = 0xF8;
+  constexpr uint8_t UTF8_4BYTE_PREFIX = 0xF0;
+  constexpr uint8_t UTF8_CONTINUATION_MASK = 0xC0;
+  constexpr uint8_t UTF8_CONTINUATION_PREFIX = 0x80;
+
+  bool has_two_byte = false;
+  const auto* p = reinterpret_cast<const unsigned char*>(str);
+
+  while (*p) {
+    uint8_t c = *p;
+
+    // Single-byte ASCII (U+0000 - U+007F)
+    if (c <= 0x7F) {
+      ++p;
+      continue;
+    }
+
+    // Detect standalone high bytes (0x80-0xFF), common in Windows-1252
+    if (c >= 0x80 && (c < 0xC2 || (c & UTF8_2BYTE_MASK) != UTF8_2BYTE_PREFIX) && (c & UTF8_3BYTE_MASK) != UTF8_3BYTE_PREFIX &&
+        (c & UTF8_4BYTE_MASK) != UTF8_4BYTE_PREFIX) {
+      return false;  // Invalid UTF-8 start byte, likely ANSI
+    }
+
+    // 2-byte sequence (U+0080 - U+07FF)
+    if ((c & UTF8_2BYTE_MASK) == UTF8_2BYTE_PREFIX) {
+      if (c < 0xC2 || !p[1]) {
+        return false;  // Overlong encoding or missing continuation byte
+      }
+      uint8_t c1 = p[1];
+      if ((c1 & UTF8_CONTINUATION_MASK) != UTF8_CONTINUATION_PREFIX) {
+        // Check for ANSI-like second byte (0x40-0x7F), common in GBK/Shift-JIS
+        if (c1 >= 0x40 && c1 <= 0x7F) {
+          return false;  // Likely GBK or Shift-JIS, not UTF-8
+        }
+        return false;  // Invalid continuation byte
+      }
+      // Decode and check code point to exclude rare ranges
+      uint32_t code_point = ((c & 0x1F) << 6) | (c1 & 0x3F);
+      if (code_point < 0x80 || code_point > 0x7FF || (code_point >= 0x0080 && code_point <= 0x05FF)) {
+        return false;  // Invalid or rare code point, likely ANSI
+      }
+      has_two_byte = true;
+      p += 2;
+      continue;
+    }
+
+    // Restrict to 2-byte sequences if specified
+    if (restrict_to_two_bytes) {
+      return false;
+    }
+
+    // 3-byte sequence (U+0800 - U+FFFF)
+    if ((c & UTF8_3BYTE_MASK) == UTF8_3BYTE_PREFIX) {
+      if (!p[1] || !p[2]) {
+        return false;  // Missing continuation bytes
+      }
+      uint8_t c1 = p[1], c2 = p[2];
+      if ((c1 & UTF8_CONTINUATION_MASK) != UTF8_CONTINUATION_PREFIX || (c2 & UTF8_CONTINUATION_MASK) != UTF8_CONTINUATION_PREFIX) {
+        return false;  // Invalid continuation bytes
+      }
+      // Check for overlong encoding or surrogate pairs (U+D800-U+DFFF)
+      if ((c == 0xE0 && c1 < 0xA0) || (c == 0xED && c1 >= 0xA0)) {
+        return false;
+      }
+      p += 3;
+      continue;
+    }
+
+    // 4-byte sequence (U+10000 - U+10FFFF)
+    if ((c & UTF8_4BYTE_MASK) == UTF8_4BYTE_PREFIX) {
+      if (!p[1] || !p[2] || !p[3]) {
+        return false;  // Missing continuation bytes
+      }
+      uint8_t c1 = p[1], c2 = p[2], c3 = p[3];
+      if ((c1 & UTF8_CONTINUATION_MASK) != UTF8_CONTINUATION_PREFIX || (c2 & UTF8_CONTINUATION_MASK) != UTF8_CONTINUATION_PREFIX ||
+          (c3 & UTF8_CONTINUATION_MASK) != UTF8_CONTINUATION_PREFIX) {
+        return false;  // Invalid continuation bytes
+      }
+      // Check valid code point range
+      if ((c == 0xF0 && c1 < 0x90) || (c == 0xF4 && c1 > 0x8F) || (c > 0xF4)) {
+        return false;
+      }
+      p += 4;
+      continue;
+    }
+
+    return false;  // Invalid start byte
+  }
+
   return true;
 }
 
@@ -173,6 +254,9 @@ FILE* LASfopen(const char* const filename, const char* const mode) {
   wchar_t* utf16_file_name = nullptr;
   wchar_t* utf16_mode = nullptr;
 
+#ifdef FORCE_UTF8_PATH
+  utf16_file_name = UTF8toUTF16(filename);
+#else
   if (validate_utf8(filename)) {
     utf16_file_name = UTF8toUTF16(filename);
   } else {
@@ -186,6 +270,7 @@ FILE* LASfopen(const char* const filename, const char* const mode) {
   }
   delete[] utf16_file_name;
   delete[] utf16_mode;
+#endif
 #else
 // The following block of code is deactivated as it is very unlikely to be needed under non-Windows systems.
 // To re-enable, change #if 0 to #if 1.
