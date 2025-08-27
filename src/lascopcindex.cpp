@@ -179,7 +179,7 @@ struct LASfinalizer
   {
     finalized = false;
     I32 cell = cell_from_xyz(point->get_x(), point->get_y(), point->get_z());
-    if (grid[cell] == 0) throw std::runtime_error("internal error in the finalizer. Please report");
+    if (grid[cell] == 0) laserror("internal error in the finalizer. Please report");
     grid[cell]--;
     npoints--;
     finalized = grid[cell] == 0;
@@ -259,7 +259,9 @@ struct Octant
   void sort()
   {
     load();
-    qsort((void*)point_buffer, point_count, point_size, compare_buffers);
+    if (point_buffer) {
+      qsort((void*)point_buffer, point_count, point_size, compare_buffers);
+    }
   };
   I32 npoints() const { return point_count; };
 
@@ -457,7 +459,6 @@ struct OctantOnDisk : public Octant
       if (f == 0)
       {
         laserror("cannot open file '%s': %s", filename_octant, strerror(errno));
-        throw std::runtime_error("Unexpected I/O error.");
       }
       while (fread(&cell, sizeof(I32), 1, f))
       {
@@ -482,7 +483,6 @@ struct OctantOnDisk : public Octant
       if (f == 0)
       {
         laserror("cannot open file '%s': %s", filename_octant, strerror(errno));
-        throw std::runtime_error("Unexpected I/O error.");
       }
       for (const auto& e : occupancy)
       {
@@ -505,7 +505,7 @@ struct OctantOnDisk : public Octant
 
   void load()
   {
-    if (point_buffer) throw std::runtime_error("ERROR: internal error load() has been called twice. Please report.");
+    if (point_buffer) laserror("internal error load() has been called twice. Please report.");
 
     reactivate("r+b");
 
@@ -514,6 +514,8 @@ struct OctantOnDisk : public Octant
     {
       fseek(fp, 0, SEEK_SET);
       fread(point_buffer, point_size, point_count, fp);
+    } else {
+      laserror("Memory allocation failed: requested %zu bytes for %d points: %s", point_count * point_size, point_count, strerror(errno));
     }
 
     close();
@@ -548,7 +550,6 @@ struct OctantOnDisk : public Octant
       if (fp == 0)
       {
         laserror("cannot open file '%s': %s", filename_points, strerror(errno));
-        throw std::runtime_error("Unexpected I/O error.");
       }
       fseek(fp, 0, SEEK_END);
       num_connexions++;
