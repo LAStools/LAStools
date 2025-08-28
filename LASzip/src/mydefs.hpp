@@ -343,7 +343,7 @@ extern void LASLIB_DLL byebye();
   char* ANSItoUTF8(const char* ansi);
 #endif
 // Validates whether a given string is UTF-8 encoded.
-bool validate_utf8(const char* utf8, bool restrict_to_two_bytes = false) noexcept;
+bool validate_utf8(const char* utf8) noexcept;
 // Opens a file with the specified filename and mode, converting filename and mode to UTF-16 on Windows.
 FILE* LASfopen(const char* const filename, const char* const mode);
 const char* indent_text(const char* text, const char* indent);
