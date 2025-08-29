@@ -10,10 +10,12 @@
     <ClCompile Include="..\LASzip\src\lasmessage.cpp" />
     <ClCompile Include="geoprojectionconverter.cpp" />
     <ClCompile Include="proj_loader.cpp" />
+    <ClCompile Include="wktparser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\LASzip\src\lasmessage.hpp" />
     <ClInclude Include="proj_loader.h" />
+    <ClInclude Include="wktparser.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
