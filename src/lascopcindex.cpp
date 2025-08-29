@@ -509,12 +509,13 @@ struct OctantOnDisk : public Octant
 
     reactivate("r+b");
 
-    point_buffer = (U8*)malloc(point_count * point_size);
-    if (point_buffer != nullptr)
-    {
-      fseek(fp, 0, SEEK_SET);
-      fread(point_buffer, point_size, point_count, fp);
-    }
+    const size_t size = size_t(point_count) * size_t(point_size);
+    point_buffer = (U8*)malloc(size);
+
+    if (point_buffer == nullptr) throw std::runtime_error("ERROR: couldn't allocate memory to read points");
+
+    fseek(fp, 0, SEEK_SET);
+    fread(point_buffer, point_size, point_count, fp);
 
     close();
   };
