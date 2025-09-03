@@ -161,8 +161,9 @@ struct LASfinalizer
 
     npoints = 0;
     finalized = false;
-    grid = new U32[ncols * nrows * nlays]();
-    memset((void*)grid, 0, ncols * nrows * nlays * sizeof(U32));
+    I64 total_elements = (I64)ncols * (I64)nrows * (I64)nlays;
+    grid = new U32[total_elements]();
+    memset((void*)grid, 0, total_elements * sizeof(U32));
   };
 
   ~LASfinalizer() { delete[] grid; };
@@ -278,7 +279,7 @@ struct Octant
   U8* point_buffer;
   I32 point_count;
   I32 point_size;
-  I32 point_capacity;
+  I64 point_capacity;
   std::unordered_map<I32, VoxelRecord> occupancy;
 };
 
@@ -289,7 +290,8 @@ struct OctantInMemory : public Octant
     point_size = size;
     point_count = 0;
     point_capacity = 25000;
-    point_buffer = (U8*)malloc(point_capacity * point_size);
+
+    point_buffer = (U8*)malloc((size_t)point_capacity * (size_t)point_size);
     occupancy.reserve(point_capacity);
   };
 
@@ -301,10 +303,10 @@ struct OctantInMemory : public Octant
     if (point_count == point_capacity)
     {
       point_capacity *= 2;
-      point_buffer = (U8*)realloc_las(point_buffer, point_capacity * point_size);
+      point_buffer = (U8*)realloc_las(point_buffer, (size_t)point_capacity * (size_t)point_size);
     }
 
-    memcpy(point_buffer + point_count * point_size, buffer, point_size);
+    memcpy(point_buffer + (size_t)point_count * (size_t)point_size, buffer, point_size);
 
     // cell = -1 means that recording the location of the point is useless (save memory)
     if (cell >= 0) occupancy.insert({ cell, VoxelRecord(chunk, point_count) });
@@ -317,10 +319,10 @@ struct OctantInMemory : public Octant
     if (point_count == point_capacity)
     {
       point_capacity *= 2;
-      point_buffer = (U8*)realloc_las(point_buffer, point_capacity * point_size);
+      point_buffer = (U8*)realloc_las(point_buffer, (size_t)point_capacity * (size_t)point_size);
     }
 
-    laspoint->copy_to(point_buffer + point_count * point_size);
+    laspoint->copy_to(point_buffer + (size_t)point_count * (size_t)point_size);
 
     // cell = -1 means that recording the location of the point is useless (save memory)
     if (cell >= 0) occupancy.insert({ cell, VoxelRecord(chunk, point_count) });
@@ -334,8 +336,8 @@ struct OctantInMemory : public Octant
     if (tmp != nullptr)
     {
       laspoint->copy_to(tmp);
-      laspoint->copy_from(point_buffer + pos * point_size);
-      memcpy(point_buffer + pos * point_size, tmp, point_size);
+      laspoint->copy_from(point_buffer + (size_t)pos * (size_t)point_size);
+      memcpy(point_buffer + (size_t)pos * (size_t)point_size, tmp, point_size);
       free(tmp);
     }
   };
@@ -433,13 +435,13 @@ struct OctantOnDisk : public Octant
     U8* buffer2 = (U8*)malloc(point_size);
     if (buffer1 != nullptr && buffer2 != nullptr) 
     {
-      fseek(fp, pos * point_size, SEEK_SET);
+      fseek_las(fp, (I64)pos * (I64)point_size, SEEK_SET);
       fread(buffer1, point_size, 1, fp);
       laspoint->copy_to(buffer2);
       laspoint->copy_from(buffer1);
-      fseek(fp, pos * point_size, SEEK_SET);
+      fseek_las(fp, (I64)pos * (I64)point_size, SEEK_SET);
       fwrite(buffer2, point_size, 1, fp);
-      fseek(fp, 0, SEEK_END);
+      fseek_las(fp, 0, SEEK_END);
       free(buffer1);
       free(buffer2);
     }
@@ -509,13 +511,15 @@ struct OctantOnDisk : public Octant
 
     reactivate("r+b");
 
-    point_buffer = (U8*)malloc(point_count * point_size);
+    size_t size = (size_t)point_count * (size_t)point_size;
+    point_buffer = (U8*)malloc(size);
+
     if (point_buffer != nullptr)
     {
-      fseek(fp, 0, SEEK_SET);
+      fseek_las(fp, 0, SEEK_SET);
       fread(point_buffer, point_size, point_count, fp);
     } else {
-      laserror("Memory allocation failed: requested %zu bytes for %d points: %s", point_count * point_size, point_count, strerror(errno));
+      laserror("Memory allocation failed: requested %zu bytes for %d points: %s", size, point_count, strerror(errno));
     }
 
     close();
@@ -551,7 +555,7 @@ struct OctantOnDisk : public Octant
       {
         laserror("cannot open file '%s': %s", filename_points, strerror(errno));
       }
-      fseek(fp, 0, SEEK_END);
+      fseek_las(fp, 0, SEEK_END);
       num_connexions++;
     }
   }
@@ -602,7 +606,7 @@ int main(int argc, char* argv[])
   I32 min_points_per_octant = 100;    // not absolute, use to (maybe) remove too small chunks
   F32 occupancy_resolution = 50;
   F32 proba_swap_event = 0.95F;
-  I32 num_points_buffer = 1000000; // Approx 40 MB
+  U32 num_points_buffer = 1000000; // Approx 40 MB
   CHAR* tmpdir = 0;
   I32 max_files_opened = (I32)(0.5 * MAX_FOPEN);
   const I32 limit_depth = 10;
@@ -1154,8 +1158,8 @@ int main(int argc, char* argv[])
 
       // Buffer of points
       U32 elem_size = laspoint->total_point_size;
-      I32 buffer_size = 0;
-      U8* buffer = (U8*)malloc(num_points_buffer * elem_size);
+      size_t buffer_size = 0;
+      U8* buffer = (U8*)malloc((size_t)num_points_buffer * (size_t)elem_size);
       U8* temp = (U8*)malloc(elem_size);
 
       // EPT hierarchy
@@ -1197,7 +1201,7 @@ int main(int argc, char* argv[])
         if (!skip)
         {
           *laspoint = lasreader->point; // Conversion to target format
-          laspoint->copy_to(buffer + buffer_size * elem_size);
+          laspoint->copy_to(buffer + buffer_size * (size_t)elem_size);
           buffer_size++;
           progressbar++;
           progressbar.print();
@@ -1209,11 +1213,11 @@ int main(int argc, char* argv[])
           // First, we shuffle the points
           if (shuffle)
           {
-            for (i = 0; i < buffer_size; i++)
+            for (size_t j = 0; j < buffer_size; j++)
             {
-              I32 j = rand() % buffer_size;
-              U8* block1 = buffer + i * elem_size;
-              U8* block2 = buffer + j * elem_size;
+              size_t j2 = rand() % buffer_size;
+              U8* block1 = buffer + j * (size_t)elem_size;
+              U8* block2 = buffer + j2 * (size_t)elem_size;
               memcpy(temp, block1, elem_size);
               memcpy(block1, block2, elem_size);
               memcpy(block2, temp, elem_size);
@@ -1221,9 +1225,9 @@ int main(int argc, char* argv[])
           }
 
           // We put the incoming points (coming in a random order) in the octree
-          for (i = 0; i < buffer_size; i++)
+          for (size_t j = 0; j < buffer_size; j++)
           {
-            laspoint->copy_from(buffer + i * elem_size);
+            laspoint->copy_from(buffer + j * (size_t)elem_size);
             lasfinalizer.remove(laspoint);
 
             // Search a place to insert the point
@@ -1367,7 +1371,7 @@ int main(int argc, char* argv[])
                 // Write the chunk
                 for (I32 k = 0; k < it->second->npoints(); k++)
                 {
-                  laspoint->copy_from(it->second->point_buffer + k * elem_size);
+                  laspoint->copy_from(it->second->point_buffer + (size_t)k * (size_t)elem_size);
                   laswriter->write_point(laspoint);
                   laswriter->update_inventory(laspoint);
 

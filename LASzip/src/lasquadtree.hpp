@@ -142,7 +142,7 @@ private:
   U32 sub_level_index;
   U32 level_offset[20];
   U32 coarser_indices[4] = {0};
-  U32 adaptive_alloc;
+  size_t adaptive_alloc;
   U32* adaptive;
 
   void intersect_rectangle_with_cells(const F64 r_min_x, const F64 r_min_y, const F64 r_max_x, const F64 r_max_y, const F32 cell_min_x, const F32 cell_max_x, const F32 cell_min_y, const F32 cell_max_y, U32 level, U32 level_index);

@@ -8727,13 +8727,13 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
   if (!Proj_file) {
     laserror("The proj_json file '%s' could not be opened", json_filename);
   }
-  fseek(Proj_file, 0, SEEK_END);
-  size_t fileSize = ftell(Proj_file);
+  fseek_las(Proj_file, 0, SEEK_END);
+  size_t fileSize = ftell_las(Proj_file);
   if (fileSize == -1L) {
     proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading file '%s'", json_filename);
   }
-  fseek(Proj_file, 0, SEEK_SET);
+  fseek_las(Proj_file, 0, SEEK_SET);
   char* jsonContent = new char[fileSize + 1];
 #pragma warning(push)
 #pragma warning(disable : 6001)
@@ -8801,13 +8801,13 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
     laserror("The WKT file '%s' could not be opened", wkt_filename);
   }
 
-  fseek(Proj_file, 0, SEEK_END);
-  fileSize = ftell(Proj_file);
+  fseek_las(Proj_file, 0, SEEK_END);
+  fileSize = ftell_las(Proj_file);
   if (fileSize == -1L) {
     proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading file '%s'", wkt_filename);
   }
-  fseek(Proj_file, 0, SEEK_SET);
+  fseek_las(Proj_file, 0, SEEK_SET);
   char* wktContent = new char[fileSize + 1];
 
   if (!wktContent) {

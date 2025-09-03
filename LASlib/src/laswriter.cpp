@@ -460,9 +460,9 @@ BOOL LASwriteOpener::set_directory(const CHAR* directory)
 
     if ((len > 0) && (this->directory[len-1] != ':'))
     {
-      struct stat info;
+      las_stat_t info;
 
-      if (stat(this->directory, &info) != 0)
+      if (stat_las(this->directory, &info) != 0)
       {
         return FALSE;
       }

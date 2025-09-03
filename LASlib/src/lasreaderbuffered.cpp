@@ -545,7 +545,7 @@ BOOL LASreaderBuffered::copy_point_to_buffer()
     }
     if (buffers != nullptr) 
     {
-      buffers[number_of_buffers] = (U8*)malloc(point.total_point_size * points_per_buffer);
+      buffers[number_of_buffers] = (U8*)malloc((size_t)point.total_point_size * (size_t)points_per_buffer);
       current_buffer = buffers[number_of_buffers];
     }
     number_of_buffers++;

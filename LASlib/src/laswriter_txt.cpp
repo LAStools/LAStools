@@ -554,7 +554,7 @@ BOOL LASwriterTXT::update_header(const LASheader* header, BOOL use_inventory, BO
 
 I64 LASwriterTXT::close(BOOL update_header)
 {
-  U32 bytes = (U32)ftell(file);
+  I64 bytes = ftell_las(file);
 
   if (file)
   {

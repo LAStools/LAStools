@@ -217,7 +217,7 @@ I64 LASwriterWRL::close(BOOL update_header)
   fprintf(file, "\t}\012");
   fprintf(file, "}\012");
 
-  I64 bytes = ftell(file);
+  I64 bytes = ftell_las(file);
 
   if (file)
   {
