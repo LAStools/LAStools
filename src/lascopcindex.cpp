@@ -971,9 +971,9 @@ int main(int argc, char* argv[])
       }
 
       // Estimate the binomial probabilities for point swapping. See algorithm implementation details
-      F64 area = occupancy_resolution * occupancy_resolution * lasoccupancygrid->get_num_occupied();
-      F64 density = num_points / area;
-      F64 voxel_sizes = octree.get_size() / octree.get_gridsize();
+      F64 area = (F64)occupancy_resolution * (F64)occupancy_resolution * (F64)lasoccupancygrid->get_num_occupied();
+      F64 density = (F64)num_points / area;
+      F64 voxel_sizes = octree.get_size() / (F64)octree.get_gridsize();
       F64 swap_probabilities[limit_depth + 1];
       for (i = 0; i <= limit_depth; i++)
       {
@@ -986,7 +986,7 @@ int main(int argc, char* argv[])
       delete lasinventory;
 
       U64 t1 = taketime();
-      if (get_message_log_level() >= LAS_VERBOSE) {
+      if (get_message_log_level() <= LAS_VERBOSE) {
         LASMessage(LAS_VERBOSE, "Area covered: %.0lf", area);
         LASMessage(LAS_VERBOSE, "Number of points: %llu", num_points);
         LASMessage(LAS_VERBOSE, "Density of points: %.1lf", density);
@@ -1121,7 +1121,7 @@ int main(int argc, char* argv[])
         for (U32 i = lasreader->header.number_of_variable_length_records - 1; i > 0; i--) lasreader->header.vlrs[i] = lasreader->header.vlrs[i - 1];
         memset((void*)&(lasreader->header.vlrs[0]), 0, sizeof(LASvlr));
         lasreader->header.vlrs[0].reserved = 0;
-        strncpy_las(lasreader->header.vlrs[0].user_id, sizeof(lasreader->header.vlrs[0].user_id), "copc", sizeof(lasreader->header.vlrs[0].user_id));
+        strncpy_las(lasreader->header.vlrs[0].user_id, sizeof(lasreader->header.vlrs[0].user_id), "copc");
         lasreader->header.vlrs[0].record_id = 1;
         lasreader->header.vlrs[0].record_length_after_header = sizeof(LASvlr_copc_info);
         lasreader->header.offset_to_point_data += lasreader->header.vlrs[0].record_length_after_header;
@@ -1329,7 +1329,7 @@ int main(int argc, char* argv[])
 
                       it->second->load();
                       for (I32 k = 0; k < it->second->npoints(); k++)
-                        it2->second->insert(it->second->point_buffer + k * elem_size, -1, id_buffer);
+                        it2->second->insert(it->second->point_buffer + (size_t)k * (size_t)elem_size, -1, id_buffer);
 
                       it->second->clean();
 
@@ -1399,7 +1399,7 @@ int main(int argc, char* argv[])
           id_buffer++;
           buffer_size = 0;
 
-          if (get_message_log_level() >= LAS_VERBOSE)
+          if (get_message_log_level() <= LAS_VERBOSE)
           {
             F32 million = (F32)((U64)num_points_buffer * id_buffer / 1000000.0);
             fprintf(stderr, "[%.0lf%%] Processed %.1f million points | LAZ chunks written: %u", progressbar.get_progress(), million, (U32)entries.size());
@@ -1443,7 +1443,7 @@ int main(int argc, char* argv[])
       free(tmpdir);
 
       U64 t5 = taketime();
-      if (get_message_log_level() >= LAS_VERBOSE)
+      if (get_message_log_level() <= LAS_VERBOSE)
       {
         U32 num_chunks = (U32)entries.size();
         U32 num_chunks_few_points = 0;
