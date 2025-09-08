@@ -437,14 +437,14 @@ BOOL LASinterval::merge(const BOOL erase)
     if (erase) delete cell;
     // merge intervals
     LASintervalCell* last_cell = merged_cells;
-    I32 diff;
+    I64 diff;
     while (map.size())
     {
       map_element = map.begin();
       cell = (*map_element).second;
       map.erase(map_element);
-      diff = cell->start - last_cell->end;
-      if (diff > (I32)threshold)
+      diff = (I64)cell->start - (I64)last_cell->end;
+      if (diff > (I64)threshold)
       {
         last_cell->next = new LASintervalCell(cell);
         last_cell = last_cell->next;
@@ -452,7 +452,7 @@ BOOL LASinterval::merge(const BOOL erase)
       }
       else
       {
-        diff = cell->end - last_cell->end;
+        diff = (I64)cell->end - (I64)last_cell->end;
         if (diff > 0)
         {
           last_cell->end = cell->end;
