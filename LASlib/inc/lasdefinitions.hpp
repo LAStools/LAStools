@@ -191,7 +191,7 @@ class LASLIB_DLL LASvlr_copc_entry
 public:
   LAScopc_voxelkey key;
   U64 offset;
-  I32 byte_size;
+  U32 byte_size;
   I32 point_count;
 };
 

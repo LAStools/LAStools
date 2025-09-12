@@ -395,8 +395,13 @@ struct OctantOnDisk : public Octant
   {
     reactivate("r+b");
 
-    fwrite(buffer, point_size, 1, fp);
-
+    if (fwrite(buffer, point_size, 1, fp) != 1) {
+      if (ferror(fp)) {
+        laserror("Error during writing file: %s", strerror(errno));
+      } else {
+        laserror("Incomplete writing process");
+      }
+    }
     // cell = -1 means that recording the location of the point is useless (save memory)
     if (cell >= 0)
       occupancy.insert({ cell, VoxelRecord(chunk, point_count) });
@@ -414,7 +419,13 @@ struct OctantOnDisk : public Octant
     if (buffer != nullptr)
     {
       laspoint->copy_to(buffer);
-      fwrite(buffer, point_size, 1, fp);
+      if (fwrite(buffer, point_size, 1, fp) != 1) {
+        if (ferror(fp)) {
+          laserror("Error during writing file: %s", strerror(errno));
+        } else {
+          laserror("Incomplete writing process");
+        }
+      }
       free(buffer);
     }
 
@@ -436,11 +447,19 @@ struct OctantOnDisk : public Octant
     if (buffer1 != nullptr && buffer2 != nullptr) 
     {
       fseek_las(fp, (I64)pos * (I64)point_size, SEEK_SET);
-      fread(buffer1, point_size, 1, fp);
+      if (fread(buffer1, point_size, 1, fp) != 1) {
+        laserror("Error reading file: %s", strerror(errno));
+      }
       laspoint->copy_to(buffer2);
       laspoint->copy_from(buffer1);
       fseek_las(fp, (I64)pos * (I64)point_size, SEEK_SET);
-      fwrite(buffer2, point_size, 1, fp);
+      if (fwrite(buffer2, point_size, 1, fp) != 1) {
+        if (ferror(fp)) {
+          laserror("Error during writing file: %s", strerror(errno));
+        } else {
+          laserror("Incomplete writing process");
+        }
+      }
       fseek_las(fp, 0, SEEK_END);
       free(buffer1);
       free(buffer2);
@@ -454,21 +473,26 @@ struct OctantOnDisk : public Octant
     if (!active)
     {
       // read occupancy map from disk
-      I32 cell;
-      U16 buffid;
-      I32 posid;
       FILE* f = LASfopen(filename_octant, "rb");
       if (f == 0)
       {
         laserror("cannot open file '%s': %s", filename_octant, strerror(errno));
+      } else {       
+        while (true) {
+          I32 cell;
+          U16 buffid;
+          I32 posid;
+        
+          if (fread(&cell, sizeof(I32), 1, f) != 1) break;
+          if (fread(&buffid, sizeof(U16), 1, f) != 1) break;
+          if (fread(&posid, sizeof(I32), 1, f) != 1) break;
+        
+          occupancy[cell] = VoxelRecord(buffid, posid);
+        }
+        
+        if (ferror(f)) laserror("Error reading occupancy map from disk '%s': %s", filename_octant, strerror(errno));     
+        fclose(f);
       }
-      while (fread(&cell, sizeof(I32), 1, f))
-      {
-        fread(&buffid, sizeof(U16), 1, f);
-        fread(&posid, sizeof(I32), 1, f);
-        occupancy[cell] = VoxelRecord(buffid, posid);
-      }
-      fclose(f);
       remove(filename_octant);
     }
 
@@ -485,14 +509,16 @@ struct OctantOnDisk : public Octant
       if (f == 0)
       {
         laserror("cannot open file '%s': %s", filename_octant, strerror(errno));
+      } else {
+        for (const auto& e : occupancy)
+        {
+          if (fwrite(&e.first, sizeof(I32), 1, f) != 1) break;
+          if (fwrite(&e.second.bufid, sizeof(U16), 1, f) != 1) break;
+          if (fwrite(&e.second.posid, sizeof(I32), 1, f) != 1) break;
+        }
+        if (ferror(f)) laserror("Error during writing file '%s': %s", filename_octant, strerror(errno));
+        fclose(f);
       }
-      for (const auto& e : occupancy)
-      {
-        fwrite(&e.first, sizeof(I32), 1, f);
-        fwrite(&e.second.bufid, sizeof(U16), 1, f);
-        fwrite(&e.second.posid, sizeof(I32), 1, f);
-      }
-      fclose(f);
 
       // clear occupancy grid
       occupancy.clear();
@@ -517,7 +543,9 @@ struct OctantOnDisk : public Octant
     if (point_buffer != nullptr)
     {
       fseek_las(fp, 0, SEEK_SET);
-      fread(point_buffer, point_size, point_count, fp);
+      if (fread(point_buffer, point_size, point_count, fp) != point_count) {
+        laserror("Error reading file: %s", strerror(errno));
+      }
     } else {
       laserror("Memory allocation failed: requested %zu bytes for %d points: %s", size, point_count, strerror(errno));
     }
@@ -1383,7 +1411,10 @@ int main(int argc, char* argv[])
                 LASMessage(LAS_VERY_VERBOSE, "[%.0lf%%] Octant %d-%d-%d-%d written in COPC file", progressbar.get_progress(), it->first.d, it->first.x, it->first.y, it->first.z);
 
                 // Record the VLR entry
-                entry.byte_size = (I32)(laswriter->tell() - entry.offset);
+                I64 current_pos = laswriter->tell();
+                if (current_pos < 0) laserror("Error determining file position when writing chunks to file: %s", strerror(errno));
+                if (entry.offset > current_pos) laserror("Error: offset(% llu) greater than file position(% lld) when writing chunks", entry.offset, current_pos);
+                entry.byte_size = (U32)(current_pos - entry.offset);
                 entries.push_back(entry);
 
                 // We will never see this octant again. Goodbye.
@@ -1448,17 +1479,20 @@ int main(int argc, char* argv[])
         U32 num_chunks = (U32)entries.size();
         U32 num_chunks_few_points = 0;
         I32 highest_num_points = 0;
+        U32 highest_byte_size = 0;
         I32 lowest_num_points = I32_MAX;
         for (const auto& chunk : entries)
         {
           if (chunk.point_count > highest_num_points) highest_num_points = chunk.point_count;
+          if (chunk.byte_size > highest_byte_size) highest_byte_size = chunk.byte_size;
           if (chunk.point_count < lowest_num_points) lowest_num_points = chunk.point_count;
           if (chunk.point_count <= (I32)min_points_per_octant) num_chunks_few_points++;
         }
         LASMessage(LAS_VERBOSE, "Number of chunks: %u", num_chunks);
-        LASMessage(LAS_VERBOSE, "Highest number of points in a chunk: %u", highest_num_points);
-        LASMessage(LAS_VERBOSE, "Lowest number of points in a chunk: %u", lowest_num_points);
-        LASMessage(LAS_VERBOSE, "Number of chunks with less than %u points: %u", min_points_per_octant, num_chunks_few_points);
+        LASMessage(LAS_VERBOSE, "Highest number of points in a chunk: %d", highest_num_points);
+        LASMessage(LAS_VERBOSE, "Lowest number of points in a chunk: %d", lowest_num_points);
+        LASMessage(LAS_VERBOSE, "Maximum byte size per chunk: %u", highest_byte_size);
+        LASMessage(LAS_VERBOSE, "Number of chunks with less than %d points: %u", min_points_per_octant, num_chunks_few_points);
         LASMessage(LAS_VERBOSE, "Pass 2 took %u sec.\n", (U32)(t5 - t4));
         LASMessage(LAS_VERBOSE, "Total time: %u sec.", (U32)(t5 - t0));
       }
