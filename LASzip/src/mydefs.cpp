@@ -36,6 +36,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdarg>
+#include <cstdint>
 #include <cstring>
 #include <filesystem>
 #include <stdarg.h>
