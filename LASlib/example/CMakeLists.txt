@@ -1,4 +1,4 @@
-if (!MSVC)
+if (NOT(MSVC))
 	add_compile_options(-Wno-unused-result)
 endif()
 
