@@ -1,5 +1,10 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+15 September 2025 -- NEW: lascanopy add metrics "-above_mean", "-pzabovex", "-p_ith_return", "-ground_class", "-l_mom"
+15 September 2025 -- NEW: refactor file I/O and memory assignment for large file support
+15 September 2025 -- fix: do relevant float comparison on a epsilon-based equality template
+2 September 2025 -- fix: improve UTF-8 file handling strictly according to (RFC 3629) RTC standard
+2 September 2025 -- NEW: integrate GDAL library for writing and reading vector formats other than SHP
 28 August 2025 -- NEW: lascanopy metrics: above_mean, pzabovex,p_ith_return,ground_class,l_mom (https://downloads.rapidlasso.de/html/lascanopy_README.html)
 27 August 2025 -- fix: filenames: UTF-8 validation adapted, strictly according to (RFC 3629) RTC standard
 27 August 2025 -- fix: handle malloc failure in load and guard qsort against null buffer
