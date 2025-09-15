@@ -7,7 +7,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 project("LAStools" CXX C)
 
-if (!MSVC)
+if (NOT(MSVC))
 	add_compile_options(-O3 -Wall -Wno-strict-aliasing)
 else()
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
