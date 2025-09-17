@@ -32,7 +32,8 @@ clips away all points of in.laz which are less than 10 units vertically and 20 u
 With the -gdal argument, input formats such as GPKG, GML, GeoJSON, KML, GPX, and SHP are supported.
 Please note that GPKG, SHP, and GML are recommended for maximum precision, as KML, GPX, and GeoJSON require transformation to 
 geographic coordinates (EPSG:4326) during processing, which may introduce very minor positional differences along 
-polygon boundaries.
+polygon boundaries. Only single-layer poly input files are supported. For multi-layer inputs, only the first layer is processed. 
+For GPX files, only routes or tracks layers are supported.
 
 
 line.csv may look like

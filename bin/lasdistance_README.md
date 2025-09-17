@@ -24,7 +24,8 @@ Will classify all points within a range of 4 and step of 0.5 with class 20.  fro
 With the -gdal argument, input formats such as GPKG, GML, GeoJSON, KML, GPX, and SHP are supported.
 Please note that GPKG, SHP, and GML are recommended for maximum precision, as KML, GPX, and GeoJSON require transformation to 
 geographic coordinates (EPSG:4326) during processing, which may introduce very minor positional differences along 
-polygon boundaries.
+polygon boundaries. Only single-layer poly input files are supported. For multi-layer inputs, only the first layer is processed. 
+For GPX files, only routes or tracks layers are supported.
 
     lasdistance64 -i ..\data\lake.laz ^
                 -poly ..\data\lake_breakline.shp ^
