@@ -311,8 +311,7 @@ inline void ENDIAN_SWAP_64(const U8* from, U8* to) {
   to[7] = from[0];
 }
 
-#if defined(_MSC_VER)
-#include <windows.h>
+#if defined(_WIN32)
 wchar_t* UTF8toUTF16(const char* utf8);
 wchar_t* ANSItoUTF16(const char* ansi);
 #endif

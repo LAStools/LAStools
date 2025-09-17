@@ -39,20 +39,15 @@
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
-#include <stdarg.h>
-#include <stdio.h>
 #include <string>
-#ifdef _MSC_VER
+#include <stdio.h>
+#ifdef _WIN32
 #include <windows.h>
 #else
-#include <math.h>
-#include <algorithm>
-#include <iomanip>
 #include <unistd.h>
 #endif
 
-#if defined(_MSC_VER)
-#include <windows.h>
+#if defined(_WIN32)
 /// Converting UTF-8 to UTF-16
 wchar_t* UTF8toUTF16(const char* utf8) {
   if (utf8 == nullptr) return nullptr;
@@ -229,7 +224,7 @@ FILE* LASfopen(const char* const filename, const char* const mode) {
   }
   FILE* file = nullptr;
 
-#ifdef _MSC_VER
+#ifdef _WIN32
   wchar_t* utf16_file_name = nullptr;
   wchar_t* utf16_mode = nullptr;
 
@@ -349,7 +344,7 @@ std::string exe_path() {
 /// </summary>
 std::string dir_current() {
   char curr_directory[MAX_PATH];
-#ifdef _MSC_VER
+#ifdef _WIN32
   GetCurrentDirectory(MAX_PATH, curr_directory);
 #else
   getcwd(curr_directory, MAX_PATH);
