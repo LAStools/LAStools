@@ -535,7 +535,7 @@ BOOL LASreaderBuffered::copy_point_to_buffer()
     if (buffers == 0)
     {
       size_of_buffers_array = 1024;
-      buffers = (U8**)malloc(sizeof(U8*)*size_of_buffers_array);
+      buffers = (U8**)malloc_las(sizeof(U8*) * size_of_buffers_array);
       number_of_buffers = 0;
     }
     else if (number_of_buffers == size_of_buffers_array)
@@ -545,7 +545,7 @@ BOOL LASreaderBuffered::copy_point_to_buffer()
     }
     if (buffers != nullptr) 
     {
-      buffers[number_of_buffers] = (U8*)malloc((size_t)point.total_point_size * (size_t)points_per_buffer);
+      buffers[number_of_buffers] = (U8*)malloc_las((size_t)point.total_point_size * (size_t)points_per_buffer);
       current_buffer = buffers[number_of_buffers];
     }
     number_of_buffers++;

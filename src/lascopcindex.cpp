@@ -291,7 +291,7 @@ struct OctantInMemory : public Octant
     point_count = 0;
     point_capacity = 25000;
 
-    point_buffer = (U8*)malloc((size_t)point_capacity * (size_t)point_size);
+    point_buffer = (U8*)malloc_las((size_t)point_capacity * (size_t)point_size);
     occupancy.reserve(point_capacity);
   };
 
@@ -332,7 +332,7 @@ struct OctantInMemory : public Octant
 
   void swap(LASpoint* laspoint, const I32 pos)
   {
-    U8* tmp = (U8*)malloc(point_size);
+    U8* tmp = (U8*)malloc_las(point_size);
     if (tmp != nullptr)
     {
       laspoint->copy_to(tmp);
@@ -369,13 +369,13 @@ struct OctantOnDisk : public Octant
     char suffix[32];
 
     size_t buffer_size = (strlen(dir) + 32) * sizeof(char);
-    filename_points = (char*)malloc(buffer_size);
+    filename_points = (char*)malloc_las(buffer_size);
     if (filename_points != 0) {
       strcpy_las(filename_points, buffer_size, dir);
       snprintf(suffix, sizeof(suffix), "points-%d-%d-%d-%d.bin", key.x, key.y, key.z, key.d);
       strcat_las(filename_points, buffer_size, suffix);
     }
-    filename_octant = (char*)malloc(buffer_size);
+    filename_octant = (char*)malloc_las(buffer_size);
     if (filename_octant != nullptr) {
       strcpy_las(filename_octant, buffer_size, dir);
       snprintf(suffix, sizeof(suffix), "octant-%d-%d-%d-%d.bin", key.x, key.y, key.z, key.d);
@@ -415,7 +415,7 @@ struct OctantOnDisk : public Octant
   {
     reactivate("r+b");
 
-    U8* buffer = (U8*)malloc(point_size);
+    U8* buffer = (U8*)malloc_las(point_size);
     if (buffer != nullptr)
     {
       laspoint->copy_to(buffer);
@@ -442,8 +442,8 @@ struct OctantOnDisk : public Octant
   {
     reactivate("r+b");
 
-    U8* buffer1 = (U8*)malloc(point_size);
-    U8* buffer2 = (U8*)malloc(point_size);
+    U8* buffer1 = (U8*)malloc_las(point_size);
+    U8* buffer2 = (U8*)malloc_las(point_size);
     if (buffer1 != nullptr && buffer2 != nullptr) 
     {
       fseek_las(fp, (I64)pos * (I64)point_size, SEEK_SET);
@@ -538,7 +538,7 @@ struct OctantOnDisk : public Octant
     reactivate("r+b");
 
     size_t size = (size_t)point_count * (size_t)point_size;
-    point_buffer = (U8*)malloc(size);
+    point_buffer = (U8*)malloc_las(size);
 
     if (point_buffer != nullptr)
     {
@@ -899,7 +899,7 @@ int main(int argc, char* argv[])
         char* file_name;
         const char* extension = ".copc.laz";
         size_t buffer_size = (strlen(file_name_base) + 10) * sizeof(char);
-        file_name = (char*)malloc(buffer_size);
+        file_name = (char*)malloc_las(buffer_size);
         if (file_name != 0) {
           strcpy_las(file_name, buffer_size, file_name_base);
           strcat_las(file_name, buffer_size, extension);
@@ -1187,8 +1187,8 @@ int main(int argc, char* argv[])
       // Buffer of points
       U32 elem_size = laspoint->total_point_size;
       size_t buffer_size = 0;
-      U8* buffer = (U8*)malloc((size_t)num_points_buffer * (size_t)elem_size);
-      U8* temp = (U8*)malloc(elem_size);
+      U8* buffer = (U8*)malloc_las((size_t)num_points_buffer * (size_t)elem_size);
+      U8* temp = (U8*)malloc_las(elem_size);
 
       // EPT hierarchy
       std::vector<LASvlr_copc_entry> entries;

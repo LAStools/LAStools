@@ -2526,7 +2526,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique)
       file_names = (CHAR**)realloc_las(file_names, sizeof(CHAR*) * file_name_allocated);
     } else {
       file_name_allocated = 16;
-      file_names = (CHAR**)malloc(sizeof(CHAR*) * file_name_allocated);
+      file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
     }
     if (file_names == 0) {
       laserror("alloc for file_names pointer array failed at %d", file_name_allocated);
@@ -2553,8 +2553,8 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, BOOL unique) {
       file_names_ID = (U32*)realloc_las(file_names_ID, sizeof(U32) * file_name_allocated);
     } else {
       file_name_allocated = 16;
-      file_names = (CHAR**)malloc(sizeof(CHAR*) * file_name_allocated);
-      file_names_ID = (U32*)malloc(sizeof(U32) * file_name_allocated);
+      file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
+      file_names_ID = (U32*)malloc_las(sizeof(U32) * file_name_allocated);
     }
     if (file_names == 0) {
       laserror("alloc for file_names pointer array failed at %d", file_name_allocated);
@@ -2592,13 +2592,13 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, I64 npoints, F6
       file_names_max_y = (F64*)realloc_las(file_names_max_y, sizeof(F64) * file_name_allocated);
     } else {
       file_name_allocated = 16;
-      file_names = (CHAR**)malloc(sizeof(CHAR*) * file_name_allocated);
-      file_names_ID = (U32*)malloc(sizeof(U32) * file_name_allocated);
-      file_names_npoints = (I64*)malloc(sizeof(I64) * file_name_allocated);
-      file_names_min_x = (F64*)malloc(sizeof(F64) * file_name_allocated);
-      file_names_min_y = (F64*)malloc(sizeof(F64) * file_name_allocated);
-      file_names_max_x = (F64*)malloc(sizeof(F64) * file_name_allocated);
-      file_names_max_y = (F64*)malloc(sizeof(F64) * file_name_allocated);
+      file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
+      file_names_ID = (U32*)malloc_las(sizeof(U32) * file_name_allocated);
+      file_names_npoints = (I64*)malloc_las(sizeof(I64) * file_name_allocated);
+      file_names_min_x = (F64*)malloc_las(sizeof(F64) * file_name_allocated);
+      file_names_min_y = (F64*)malloc_las(sizeof(F64) * file_name_allocated);
+      file_names_max_x = (F64*)malloc_las(sizeof(F64) * file_name_allocated);
+      file_names_max_y = (F64*)malloc_las(sizeof(F64) * file_name_allocated);
       if (kdtree_rectangles == 0) {
         kdtree_rectangles = new LASkdtreeRectangles();
         if (kdtree_rectangles == 0) {
@@ -2733,12 +2733,12 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, I64 n
       neighbor_file_names_max_y = (F64*)realloc_las(neighbor_file_names_max_y, sizeof(F64) * neighbor_file_name_allocated);
     } else {
       neighbor_file_name_allocated = 16;
-      neighbor_file_names = (CHAR**)malloc(sizeof(CHAR*) * neighbor_file_name_allocated);
-      neighbor_file_names_npoints = (I64*)malloc(sizeof(I64) * neighbor_file_name_allocated);
-      neighbor_file_names_min_x = (F64*)malloc(sizeof(F64) * neighbor_file_name_allocated);
-      neighbor_file_names_min_y = (F64*)malloc(sizeof(F64) * neighbor_file_name_allocated);
-      neighbor_file_names_max_x = (F64*)malloc(sizeof(F64) * neighbor_file_name_allocated);
-      neighbor_file_names_max_y = (F64*)malloc(sizeof(F64) * neighbor_file_name_allocated);
+      neighbor_file_names = (CHAR**)malloc_las(sizeof(CHAR*) * neighbor_file_name_allocated);
+      neighbor_file_names_npoints = (I64*)malloc_las(sizeof(I64) * neighbor_file_name_allocated);
+      neighbor_file_names_min_x = (F64*)malloc_las(sizeof(F64) * neighbor_file_name_allocated);
+      neighbor_file_names_min_y = (F64*)malloc_las(sizeof(F64) * neighbor_file_name_allocated);
+      neighbor_file_names_max_x = (F64*)malloc_las(sizeof(F64) * neighbor_file_name_allocated);
+      neighbor_file_names_max_y = (F64*)malloc_las(sizeof(F64) * neighbor_file_name_allocated);
       if (neighbor_kdtree_rectangles == 0) {
         neighbor_kdtree_rectangles = new LASkdtreeRectangles();
         if (neighbor_kdtree_rectangles == 0) {
@@ -2913,7 +2913,7 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
       neighbor_file_names = (CHAR**)realloc_las(neighbor_file_names, sizeof(CHAR*) * neighbor_file_name_allocated);
     } else {
       neighbor_file_name_allocated = 16;
-      neighbor_file_names = (CHAR**)malloc(sizeof(CHAR*) * neighbor_file_name_allocated);
+      neighbor_file_names = (CHAR**)malloc_las(sizeof(CHAR*) * neighbor_file_name_allocated);
     }
     if (neighbor_file_names == 0) {
       laserror("alloc for neighbor_file_names pointer array failed at %d", neighbor_file_name_allocated);

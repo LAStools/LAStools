@@ -614,7 +614,7 @@ BOOL LASreadPoint::read_chunk_table()
     }
     // otherwise we build the chunk table as we read the file
     number_chunks = 256;
-    chunk_starts = (I64*)malloc(sizeof(I64)*(number_chunks+1));
+    chunk_starts = (I64*)malloc_las(sizeof(I64) * (number_chunks + 1));
     if (chunk_starts == 0)
     {
       return FALSE;
@@ -687,7 +687,7 @@ BOOL LASreadPoint::read_chunk_table()
       }
       chunk_totals[0] = 0;
     }
-    chunk_starts = (I64*)malloc(sizeof(I64)*(number_chunks+1));
+    chunk_starts = (I64*)malloc_las(sizeof(I64) * (number_chunks + 1));
     if (chunk_starts == 0)
     {
       throw 1;
@@ -733,7 +733,7 @@ BOOL LASreadPoint::read_chunk_table()
     {
       // then compressor was interrupted before getting a chance to write the chunk table
       number_chunks = 256;
-      chunk_starts = (I64*)malloc(sizeof(I64)*(number_chunks+1));
+      chunk_starts = (I64*)malloc_las(sizeof(I64) * (number_chunks + 1));
       if (chunk_starts == 0)
       {
         return FALSE;

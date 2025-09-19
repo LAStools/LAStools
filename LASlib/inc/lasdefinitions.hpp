@@ -599,7 +599,7 @@ public:
     {
       number_of_variable_length_records = 1;
       offset_to_point_data += 54;
-      vlrs = (LASvlr*)malloc(sizeof(LASvlr));
+      vlrs = (LASvlr*)malloc_las(sizeof(LASvlr));
     }
     if (vlrs != nullptr) {
       memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
@@ -729,7 +729,7 @@ public:
     else
     {
       number_of_extended_variable_length_records = 1;
-      evlrs = (LASevlr*)malloc(sizeof(LASevlr)*number_of_extended_variable_length_records);
+      evlrs = (LASevlr*)malloc_las(sizeof(LASevlr) * number_of_extended_variable_length_records);
     }
     if (evlrs != nullptr) {
       evlrs[i].reserved = 0;  // used to be 0xAABB

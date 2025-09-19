@@ -1825,9 +1825,9 @@ public:
       }
       else
       {
-        if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)malloc(array_size_new * sizeof(I32));
-        *array = (U32**)malloc(array_size_new * sizeof(U32*));
-        *array_sizes = (U16*)malloc(array_size_new * sizeof(U16));
+        if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)malloc_las(array_size_new * sizeof(I32));
+        *array = (U32**)malloc_las(array_size_new * sizeof(U32*));
+        *array_sizes = (U16*)malloc_las(array_size_new * sizeof(U16));
       }
       for (U32 i = *array_size; i < array_size_new; i++)
       {
@@ -1853,7 +1853,7 @@ public:
       }
       else
       {
-        if (array != nullptr && *array != nullptr) (*array)[pos_y] = (U32*)malloc(array_sizes_new * sizeof(U32));
+        if (array != nullptr && *array != nullptr) (*array)[pos_y] = (U32*)malloc_las(array_sizes_new * sizeof(U32));
       }
       for (U16 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
       {

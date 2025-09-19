@@ -1759,7 +1759,7 @@ bool GeoProjectionConverter::GeoTiffInfo(
           value += "]";
           break;
         case 3072: {  // ProjectedCSTypeGeoKey
-          char* data = (char*)malloc(280);
+          char* data = (char*)malloc_las(280);
           if (set_ProjectedCSTypeGeoKey(geokeye->value_offset, data)) {
             horizontal_epsg = get_ProjLinearUnitsGeoKey();
             value = std::string(data);
@@ -1787,7 +1787,7 @@ bool GeoProjectionConverter::GeoTiffInfo(
           break;
         case 4096:  // VerticalCSTypeGeoKey
           if (!mapFindAssign(geokeye->value_offset, mapVerticalCSTypeGeoKey)) {
-            char* data = (char*)malloc(200);
+            char* data = (char*)malloc_las(200);
             if (set_VerticalCSTypeGeoKey(geokeye->value_offset, data, 200)) {
               value = std::string(data);
             }
@@ -1824,7 +1824,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(
       unsigned short geokey = get_ProjectedCSTypeGeoKey(source);
       if (geokey && geokey != 32767) {
         num_geo_keys = 4 + (vertical_geokey ? 1 : 0);
-        (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
+        (*geo_keys) = (GeoProjectionGeoKeys*)malloc_las(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
         (*geo_double_params) = 0;
 
         // projected coordinates
@@ -1863,9 +1863,9 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(
         GeoProjectionParametersLCC* lcc = (GeoProjectionParametersLCC*)projection;
 
         num_geo_keys = 12 + (vertical_geokey ? 1 : 0);
-        (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
+        (*geo_keys) = (GeoProjectionGeoKeys*)malloc_las(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
         num_geo_double_params = 6;
-        (*geo_double_params) = (double*)malloc(sizeof(double) * num_geo_double_params);
+        (*geo_double_params) = (double*)malloc_las(sizeof(double) * num_geo_double_params);
 
         // projected coordinates
         (*geo_keys)[0].key_id = 1024;  // GTModelTypeGeoKey
@@ -1959,9 +1959,9 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(
         GeoProjectionParametersTM* tm = (GeoProjectionParametersTM*)projection;
 
         num_geo_keys = 11 + (vertical_geokey ? 1 : 0);
-        (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
+        (*geo_keys) = (GeoProjectionGeoKeys*)malloc_las(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
         num_geo_double_params = 5;
-        (*geo_double_params) = (double*)malloc(sizeof(double) * num_geo_double_params);
+        (*geo_double_params) = (double*)malloc_las(sizeof(double) * num_geo_double_params);
 
         // projected coordinates
         (*geo_keys)[0].key_id = 1024;  // GTModelTypeGeoKey
@@ -2049,9 +2049,9 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(
         GeoProjectionParametersAEAC* aeac = (GeoProjectionParametersAEAC*)projection;
 
         num_geo_keys = 12 + (vertical_geokey ? 1 : 0);
-        (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
+        (*geo_keys) = (GeoProjectionGeoKeys*)malloc_las(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
         num_geo_double_params = 6;
-        (*geo_double_params) = (double*)malloc(sizeof(double) * num_geo_double_params);
+        (*geo_double_params) = (double*)malloc_las(sizeof(double) * num_geo_double_params);
 
         // projected coordinates
         (*geo_keys)[0].key_id = 1024;  // GTModelTypeGeoKey
@@ -2145,9 +2145,9 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(
         GeoProjectionParametersHOM* hom = (GeoProjectionParametersHOM*)projection;
 
         num_geo_keys = 13 + (vertical_geokey ? 1 : 0);
-        (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
+        (*geo_keys) = (GeoProjectionGeoKeys*)malloc_las(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
         num_geo_double_params = 7;
-        (*geo_double_params) = (double*)malloc(sizeof(double) * num_geo_double_params);
+        (*geo_double_params) = (double*)malloc_las(sizeof(double) * num_geo_double_params);
 
         // projected coordinates
         (*geo_keys)[0].key_id = 1024;  // GTModelTypeGeoKey
@@ -2248,7 +2248,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(
       }
     } else if (projection->type == GEO_PROJECTION_LAT_LONG || projection->type == GEO_PROJECTION_LONG_LAT) {
       num_geo_keys = 3 + (vertical_geokey ? 1 : 0);
-      (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
+      (*geo_keys) = (GeoProjectionGeoKeys*)malloc_las(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
       (*geo_double_params) = 0;
 
       // projected coordinates
@@ -2279,7 +2279,7 @@ bool GeoProjectionConverter::get_geo_keys_from_projection(
       return true;
     } else if (projection->type == GEO_PROJECTION_ECEF) {
       num_geo_keys = 2;
-      (*geo_keys) = (GeoProjectionGeoKeys*)malloc(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
+      (*geo_keys) = (GeoProjectionGeoKeys*)malloc_las(sizeof(GeoProjectionGeoKeys) * num_geo_keys);
       (*geo_double_params) = 0;
 
       // projected coordinates
@@ -2514,7 +2514,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
   if (projection) {
     int n = 0;
     const int buffer_size = 4096;
-    char* string = (char*)malloc(buffer_size);
+    char* string = (char*)malloc_las(buffer_size);
     memset(string, 0, buffer_size);
     // maybe geocentric
     if (projection->type == GEO_PROJECTION_ECEF) {
@@ -2533,7 +2533,7 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
           epsg_name = get_epsg_name_from_pcs_file(projection->geokey);
         } else {
           len += (int)strlen(gcs_name) + 16;
-          epsg_name = (char*)malloc(len);
+          epsg_name = (char*)malloc_las(len);
           snprintf(epsg_name, len, "%s / %s", gcs_name, projection->name);
         }
         // maybe output a compound CRS
@@ -2942,7 +2942,7 @@ bool GeoProjectionConverter::get_prj_from_projection(int& len, char** prj, bool 
   if (projection) {
     int n = 0;
     const int buffer_size = 4096;
-    char* string = (char*)malloc(buffer_size);
+    char* string = (char*)malloc_las(buffer_size);
     memset(string, 0, buffer_size);
     // maybe geocentric
     if (projection->type == GEO_PROJECTION_ECEF) {
@@ -3227,7 +3227,7 @@ bool GeoProjectionConverter::get_proj4_string_from_projection(int& len, char** p
   if (projection) {
     int n = 0;
     const int buffer_size = 1024;
-    char* string = (char*)malloc(1024);
+    char* string = (char*)malloc_las(1024);
     memset(string, 0, 1024);
     if (projection->type == GEO_PROJECTION_UTM) {
       GeoProjectionParametersUTM* utm = (GeoProjectionParametersUTM*)projection;
@@ -7057,14 +7057,14 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
       load_proj_library(nullptr);
 
       size_t buffer_size = strlen(argv[i + 1]) + 1;
-      char* proj_source_string = (char*)malloc(buffer_size);
+      char* proj_source_string = (char*)malloc_las(buffer_size);
 
       if (proj_source_string) {
         strcpy_las(proj_source_string, buffer_size, argv[i + 1]);
 
         if (argv[i + 2] != nullptr && argv[i + 2][0] != '\0' && argv[i + 2][0] != '-') {
           buffer_size = strlen(argv[i + 2]) + 1;
-          char* proj_target_string = (char*)malloc(buffer_size);
+          char* proj_target_string = (char*)malloc_las(buffer_size);
 
           if (proj_target_string) {
             strcpy_las(proj_target_string, buffer_size, argv[i + 2]);
@@ -7096,14 +7096,14 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
         load_proj_library(nullptr);
 
         size_t buffer_size = strlen(argv[i + 1]) + 1;
-        char* proj_source_json = (char*)malloc(buffer_size);
+        char* proj_source_json = (char*)malloc_las(buffer_size);
 
         if (proj_source_json) {
           strcpy_las(proj_source_json, buffer_size, argv[i + 1]);
 
           if (argv[i + 2] != nullptr && argv[i + 2][0] != '\0' && argv[i + 2][0] != '-') {
             buffer_size = strlen(argv[i + 2]) + 1;
-            char* proj_target_json = (char*)malloc(buffer_size);
+            char* proj_target_json = (char*)malloc_las(buffer_size);
 
             if (proj_target_json) {
               strcpy_las(proj_target_json, buffer_size, argv[i + 2]);
@@ -7141,14 +7141,14 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
         load_proj_library(nullptr);
 
         size_t buffer_size = strlen(argv[i + 1]) + 1;
-        char* proj_source_wkt = (char*)malloc(buffer_size);
+        char* proj_source_wkt = (char*)malloc_las(buffer_size);
 
         if (proj_source_wkt) {
           strcpy_las(proj_source_wkt, buffer_size, argv[i + 1]);
 
           if (argv[i + 2] != nullptr && argv[i + 2][0] != '\0' && argv[i + 2][0] != '-') {
             buffer_size = strlen(argv[i + 2]) + 1;
-            char* proj_target_wkt = (char*)malloc(buffer_size);
+            char* proj_target_wkt = (char*)malloc_las(buffer_size);
 
             if (proj_target_wkt) {
               strcpy_las(proj_target_wkt, buffer_size, argv[i + 2]);
@@ -7208,13 +7208,13 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
         j++;
       }
       // Reserve the memory for the number of parameters read
-      projParameters.proj_info_args = (char**)malloc(projParameters.arg_count * sizeof(char*));
+      projParameters.proj_info_args = (char**)malloc_las(projParameters.arg_count * sizeof(char*));
 
       if (projParameters.proj_info_args) {
         // Saving the parameters
         for (int k = 0; k < projParameters.arg_count; k++) {
           size_t buffer_size = strlen(argv[i + 1 + k]) + 1;
-          projParameters.proj_info_args[k] = (char*)malloc(buffer_size);
+          projParameters.proj_info_args[k] = (char*)malloc_las(buffer_size);
           if (projParameters.proj_info_args[k]) {
             strcpy_las(projParameters.proj_info_args[k], buffer_size, argv[i + 1 + k]);
           }

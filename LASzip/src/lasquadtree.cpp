@@ -765,7 +765,7 @@ BOOL LASquadtree::manage_cell(const U32 cell_index, const BOOL finalize)
     {
 #pragma warning(push)
 #pragma warning(disable : 6011)
-      adaptive = (U32*)malloc(((size_t)adaptive_pos + 1) * sizeof(U32));
+      adaptive = (U32*)malloc_las(((size_t)adaptive_pos + 1) * sizeof(U32));
       for (size_t i = adaptive_alloc; i <= adaptive_pos; i++) adaptive[i] = 0;
       adaptive_alloc = (size_t)adaptive_pos + 1;
 #pragma warning(pop)

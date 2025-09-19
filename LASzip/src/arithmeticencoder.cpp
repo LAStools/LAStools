@@ -110,7 +110,7 @@ ArithmeticEncoder::ArithmeticEncoder()
   length = 0;
   outbyte = 0;
 
-  outbuffer = (U8*)malloc(sizeof(U8)*2*AC_BUFFER_SIZE);
+  outbuffer = (U8*)malloc_las(sizeof(U8) * 2 * AC_BUFFER_SIZE);
   endbuffer = outbuffer + 2 * AC_BUFFER_SIZE;
 }
 

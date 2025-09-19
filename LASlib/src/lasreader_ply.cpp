@@ -1554,8 +1554,8 @@ BOOL LASreaderPLY::parse_header()
   if (parse_string) free(parse_string);
   if (type_string) free(type_string);
 
-  parse_string = (CHAR*)malloc(64);
-  type_string = (CHAR*)malloc(64);
+  parse_string = (CHAR*)malloc_las(64);
+  type_string = (CHAR*)malloc_las(64);
   memset(parse_string, 0, 64);
   memset(type_string, 0, 64);
 

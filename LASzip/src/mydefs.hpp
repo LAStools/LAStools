@@ -432,8 +432,8 @@ inline int stat_las(const char* path, las_stat_t* buf) {
 #define DIRECTORY_SLASH '/'
 #endif
 
-#ifndef MAX_PATH  // linux
-#define MAX_PATH FILENAME_MAX
+#ifndef MAX_PATH_LAS  // linux
+#define MAX_PATH_LAS FILENAME_MAX
 #endif
 
 // char helpers
@@ -464,6 +464,11 @@ bool IsLasLazFile(std::string fn);
 bool StringInVector(const std::string& value, const std::vector<std::string>& array, bool casesense);
 
 void* realloc_las(void* ptr, size_t size);
+void* malloc_las(size_t size);
+void bytes_to_readable(size_t bytes, double* value_out, const char** unit_out);
+
+size_t get_available_RAM();
+bool check_available_RAM(size_t size);
 
 /// Wrapper for `sscanf` on other platforms than _MSC_VER and `sscanf_s` on Windows and ensures that the size is passed correctly for strings.
 int sscanf_las(const char* buffer, const char* format, ...);
