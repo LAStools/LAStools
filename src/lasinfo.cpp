@@ -199,20 +199,24 @@ class LasTool_lasinfo : public LasTool {
   bool do_scale_header = false;
   bool header_preread = false;
   bool edit_header = false;
+  bool no_warnings = false;
   F64* set_offset = 0;
   F64* set_scale = 0;
   F64* scale_header = 0;
-
+  void WarnHeadermodification(std::string argument) {
+    if (!no_warnings) {
+      LASMessage(LAS_WARNING, "set_%s used. File may become invalid.", argument.c_str());
+    }
+  }
 #pragma warning(push)
 #pragma warning(disable : 6262)
- public:
+public:
   void run() {
     int i;
     bool no_header = false;
     bool no_variable_header = false;
     bool no_returns = false;
     bool no_min_max = false;
-    bool no_warnings = false;
     bool check_points = true;
     bool compute_density = false;
     bool gps_week = false;
@@ -992,6 +996,7 @@ class LasTool_lasinfo : public LasTool {
             fwrite(&file_source_ID, sizeof(U16), 1, file);
           }
           if (set_global_encoding != -1) {
+            WarnHeadermodification("global_encoding");
             U16 global_encoding = U16_CLAMP(set_global_encoding);
             fseek_las(file, 6, SEEK_SET);
             fwrite(&global_encoding, sizeof(U16), 1, file);
@@ -1007,10 +1012,12 @@ class LasTool_lasinfo : public LasTool {
             fwrite(&set_project_ID_GUID_data_4[0], 8, 1, file);
           }
           if (set_version_major != -1) {
+            WarnHeadermodification("version");
             fseek_las(file, 24, SEEK_SET);
             fwrite(&set_version_major, sizeof(I8), 1, file);
           }
           if (set_version_minor != -1) {
+            WarnHeadermodification("version");
             fseek_las(file, 25, SEEK_SET);
             fwrite(&set_version_minor, sizeof(I8), 1, file);
           }
@@ -1033,10 +1040,12 @@ class LasTool_lasinfo : public LasTool {
             fwrite(&creation_year, sizeof(U16), 1, file);
           }
           if (set_header_size) {
+            WarnHeadermodification("header_size");
             fseek_las(file, 94, SEEK_SET);
             fwrite(&set_header_size, sizeof(U16), 1, file);
           }
           if (set_offset_to_point_data) {
+            WarnHeadermodification("offset_to_point_data");
             fseek_las(file, 96, SEEK_SET);
             fwrite(&set_offset_to_point_data, sizeof(U32), 1, file);
           }
@@ -1045,11 +1054,13 @@ class LasTool_lasinfo : public LasTool {
             fwrite(&set_number_of_variable_length_records, sizeof(U32), 1, file);
           }
           if (set_point_data_format != -1) {
+            WarnHeadermodification("point_data_format");
             U8 point_data_format = U8_CLAMP(set_point_data_format);
             fseek_las(file, 104, SEEK_SET);
             fwrite(&point_data_format, sizeof(U8), 1, file);
           }
           if (set_point_data_record_length != -1) {
+            WarnHeadermodification("point_data_record_length");
             U16 point_data_record_length = U16_CLAMP(set_point_data_record_length);
             fseek_las(file, 105, SEEK_SET);
             fwrite(&point_data_record_length, sizeof(U16), 1, file);
@@ -1088,6 +1099,7 @@ class LasTool_lasinfo : public LasTool {
             }
           }
           if (set_offset) {
+            WarnHeadermodification("offset");
             fseek_las(file, 155, SEEK_SET);
             fwrite(set_offset, 3 * sizeof(F64), 1, file);
             if (do_scale_header)  // clear offset on file-based-offset
@@ -1106,6 +1118,7 @@ class LasTool_lasinfo : public LasTool {
             }
           }
           if (set_start_of_waveform_data_packet_record != -1) {
+            WarnHeadermodification("start_of_waveform_data_packet_record");
             fseek_las(file, 227, SEEK_SET);
             fwrite(&set_start_of_waveform_data_packet_record, sizeof(I64), 1, file);
           }

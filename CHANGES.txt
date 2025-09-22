@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+22 September 2025 -- lasinfo: add log warnings when header data is patched by arguments. avoidable with "-no_warnings"
 15 September 2025 -- NEW: lascanopy add metrics "-above_mean", "-pzabovex", "-p_ith_return", "-ground_class", "-l_mom"
 15 September 2025 -- NEW: refactor file I/O and memory assignment for large file support
 15 September 2025 -- fix: do relevant float comparison on a epsilon-based equality template
