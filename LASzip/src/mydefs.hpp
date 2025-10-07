@@ -149,6 +149,15 @@ typedef union I64U32I32F32 {
 #define I64_MIN ((I64)0x8000000000000000)
 #define I64_MAX ((I64)0x7FFFFFFFFFFFFFFF)
 
+typedef union U32F32 {
+  U32 u32;
+  F32 f32;
+} U32F32;
+typedef union U64F64 {
+  U64 u64;
+  F64 f64;
+} U64F64;
+
 #define U8_FOLD(n) (((n) < U8_MIN) ? (n + U8_MAX_PLUS_ONE) : (((n) > U8_MAX) ? (n - U8_MAX_PLUS_ONE) : (n)))
 
 #define I8_CLAMP(n) (((n) <= I8_MIN) ? I8_MIN : (((n) >= I8_MAX) ? I8_MAX : ((I8)(n))))
