@@ -157,10 +157,13 @@ public:
   };
 };
 
+//Unused
+/**
 static double taketime()
 {
   return (double)(clock())/CLOCKS_PER_SEC;
 }
+**/
 
 #ifdef COMPILE_WITH_GUI
 extern int lasprecision_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
@@ -186,8 +189,6 @@ int main(int argc, char *argv[])
   U32 report_lines = 20;
   U32 array_max = 5000000;
   bool projection_was_set = false;
-  double start_time = 0;
-  double full_start_time = 0;
 
   LASreadOpener lasreadopener;
   GeoProjectionConverter geoprojectionconverter;
@@ -359,8 +360,6 @@ int main(int argc, char *argv[])
 
   while (lasreadopener.active())
   {
-    full_start_time = start_time = taketime();
-
     // open lasreader
 
     LASreader* lasreader = lasreadopener.open();
@@ -778,7 +777,7 @@ int main(int argc, char *argv[])
       char temp[64];
       snprintf(temp, sizeof(temp), "lasprecision (%d)", LAS_TOOLS_VERSION);
       strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp);
-      
+
       if (projection_was_set)
       {
         lasreader->header.set_geo_keys(number_of_keys, (LASvlr_key_entry*)geo_keys);

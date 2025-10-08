@@ -254,7 +254,7 @@ struct Octant
     point_size = 0;
     point_capacity = 0;
   };
-  ~Octant() {};
+  virtual ~Octant() {};
 
   void sort()
   {
@@ -266,9 +266,9 @@ struct Octant
   I32 npoints() const { return point_count; };
 
   virtual void load() { return; };
-  virtual void open() { return; };
+  virtual void open(const char *) { return; };
   virtual void close(bool force) { return; };
-  virtual void reactivate() { return; }
+  virtual void reactivate(const char *) { return; }
   virtual void desactivate() { return; }
   virtual void clean() = 0;
   virtual void swap(LASpoint* laspoint, const I32 pos) = 0;
@@ -385,6 +385,7 @@ struct OctantOnDisk : public Octant
 
     occupancy.reserve(25000);
   };
+  virtual ~OctantOnDisk() = default;
 
   // No copy constructor. We don't want any copy of dynamically allocated U8* point_buffer.
   // Desallocation is performed manually with clean() at appropriate places
@@ -431,7 +432,7 @@ struct OctantOnDisk : public Octant
 
     U8* buffer1 = (U8*)malloc(point_size);
     U8* buffer2 = (U8*)malloc(point_size);
-    if (buffer1 != nullptr && buffer2 != nullptr) 
+    if (buffer1 != nullptr && buffer2 != nullptr)
     {
       fseek(fp, pos * point_size, SEEK_SET);
       fread(buffer1, point_size, 1, fp);
@@ -597,7 +598,6 @@ int main(int argc, char* argv[])
   U32 seed = 0;
   I64 num_points = 0;
   I32 max_depth = -1;
-  BOOL error = FALSE;
   U32 max_points_per_octant = 100000; // not absolute, only used to estimate the depth.
   I32 min_points_per_octant = 100;    // not absolute, use to (maybe) remove too small chunks
   F32 occupancy_resolution = 50;
@@ -1463,7 +1463,6 @@ int main(int argc, char* argv[])
     catch (std::exception& e)
     {
       laserror("%s", e.what());
-      error = true;
     }
     catch (...)
     {

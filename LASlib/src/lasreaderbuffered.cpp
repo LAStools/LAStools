@@ -2,17 +2,17 @@
 ===============================================================================
 
   FILE:  lasreaderbuffered.cpp
-  
+
   CONTENTS:
-  
+
     see corresponding header file
-  
+
   PROGRAMMERS:
-  
+
     info@rapidlasso.de  -  https://rapidlasso.de
-  
+
   COPYRIGHT:
-  
+
     (c) 2007-2012, rapidlasso GmbH - fast tools to catch reality
 
     This is free software; you can redistribute and/or modify it under the
@@ -21,11 +21,11 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
+
     see corresponding header file
-  
+
 ===============================================================================
 */
 #include "lasreaderbuffered.hpp"
@@ -302,7 +302,7 @@ BOOL LASreaderBuffered::open()
       reoffset = TRUE;
     }
   }
-    
+
   // check y
 
   if ((((header.max_y - header.y_offset) / header.y_scale_factor) > I32_MAX) || (((header.min_y - header.y_offset) / header.y_scale_factor) < I32_MIN))
@@ -328,7 +328,7 @@ BOOL LASreaderBuffered::open()
       reoffset = TRUE;
     }
   }
-    
+
   // check z
 
   if ((((header.max_z - header.z_offset) / header.z_scale_factor) > I32_MAX) || (((header.min_z - header.z_offset) / header.z_scale_factor) < I32_MIN))
@@ -488,7 +488,7 @@ BOOL LASreaderBuffered::read_point_default()
 
 void LASreaderBuffered::close(BOOL close_stream)
 {
-  if (lasreader) 
+  if (lasreader)
   {
     lasreader->close(close_stream);
   }
@@ -498,7 +498,7 @@ void LASreaderBuffered::close(BOOL close_stream)
 void LASreaderBuffered::clean()
 {
 /*
-  if (lasreader) 
+  if (lasreader)
   {
     delete lasreader;
     lasreader = 0;
@@ -543,7 +543,7 @@ BOOL LASreaderBuffered::copy_point_to_buffer()
       size_of_buffers_array *= 2;
       buffers = (U8**)realloc_las(buffers, sizeof(U8*)*size_of_buffers_array);
     }
-    if (buffers != nullptr) 
+    if (buffers != nullptr)
     {
       buffers[number_of_buffers] = (U8*)malloc(point.total_point_size * points_per_buffer);
       current_buffer = buffers[number_of_buffers];
@@ -572,7 +572,7 @@ BOOL LASreaderBuffered::copy_point_from_buffer()
   return TRUE;
 }
 
-LASreaderBuffered::LASreaderBuffered(LASreadOpener* opener): points_per_buffer(10000), LASreader(opener)
+LASreaderBuffered::LASreaderBuffered(LASreadOpener* opener): LASreader(opener), points_per_buffer(10000)
 {
   lasreader = 0;
   lasreadopener_neighbors.set_merged(TRUE);
