@@ -73,8 +73,7 @@ within 0.5 units in source exists. Set all other z-values to 0.
 -match_scan_direction    : uses scan direction flag for point matching  
 -match_user_data         : uses user data for point matching  
 -match_xy [d]            : Match points by x-y coordinates and the specified maximum distance [d] 
--match_xyz [d] <[e] [f]> : One  argument passed: Match points by x-y-z coordinates and the specified maximum distance [d] 
-                           Two arguments passed: Match points by x-y-z coordinates which are within a bounding box [d] [e] [f]. 
+-match_xyz [dx] <[y] [z]> : Match points by x-y-z coordinates and a spherical distance [dx] or a bounding box [dx] [y] [z]. 
 
 ### copy operations
 -copy_attribute [n]   : copy attribute with index [n]. Attribute must exist in source and target with matching data type  
