@@ -78,6 +78,7 @@ proj_coord_t proj_coord_ptr = nullptr;
 proj_trans_t proj_trans_ptr = nullptr;
 proj_get_type_t proj_get_type_ptr = nullptr;
 proj_is_crs_t proj_is_crs_ptr = nullptr;
+proj_info_FUNC proj_info_ptr = nullptr;
 
 /// Function for parsing the version number from the directory name
 static std::vector<int> parseVersion(const char* versionStr) {
@@ -144,6 +145,22 @@ static bool compareVersions(const char* v1, const char* v2) {
   }
 
   return version1.size() > version2.size();
+}
+
+/// Checks whether the loaded PROJ version reaches at least minMajor.minMinor.
+/// Returns a warning if this version is too old.
+void checkProjVersion() {
+  PJ_INFO info = proj_info();
+  
+  if (info.version) {
+    LASMessage(LAS_VERBOSE, "Loaded PROJ version: %s\n", info.version);
+
+    if (info.major && info.major < 9) {
+      LASMessage(LAS_WARNING, "The loaded PROJ version '%s' is older than version 9.0.0. Full functionality cannot be guaranteed with this version.", info.version);
+    }
+  } else {
+    LASMessage(LAS_WARNING, "The loaded PROJ version could not be determined");
+  }
 }
 
 /// Finds the latest QGIS installation path by first checking the `QGIS_PREFIX_PATH` environment variable.
@@ -307,6 +324,7 @@ static char* findLatestProjLibraryPath(const char* binPath) {
       }
     }
   }
+  LASMessage(LAS_VERBOSE, "Latest installed PROJ version found: %s\n", latestVersionName);
   free(latestVersionName);
   return latestVersionPath;
 #else
@@ -339,6 +357,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
     char* projLibPath = findLatestProjLibraryPath(proj_path);
     if (projLibPath) {
       proj_lib_handle = LOAD_LIBRARY(projLibPath);
+      LASMessage(LAS_VERY_VERBOSE, "PROJ library used via environment variable 'LASTOOLS_PROJ': %s\n", projLibPath);
       delete[] projLibPath;  // Free memory after usage
     }
   }
@@ -348,13 +367,14 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
     char* qgisPath = findLatestQGISInstallationPath();
     if (qgisPath) {
       char* proj_lib_path = findLatestProjLibraryPath(qgisPath);
-      delete[] qgisPath;
 
       if (proj_lib_path) {  
         // Try to load the library
         proj_lib_handle = LOAD_LIBRARY(proj_lib_path);
+        LASMessage(LAS_VERY_VERBOSE, "PROJ library used via QGIS installation: %s\n", qgisPath);
         delete[](proj_lib_path);
       }
+      delete[] qgisPath;
     }
   }
 
@@ -363,13 +383,14 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
     char* condaPath = findLatestCondaInstallationPath();
     if (condaPath) {
       char* proj_lib_path = findLatestProjLibraryPath(condaPath);
-      delete[] condaPath;
 
       if (proj_lib_path) {
         // Try to load the library
         proj_lib_handle = LOAD_LIBRARY(proj_lib_path);
+        LASMessage(LAS_VERY_VERBOSE, "PROJ library used via conda installation: %s\n", condaPath);
         delete[] proj_lib_path;
       }
+      delete[] condaPath;
     }
   }
 
@@ -417,6 +438,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
   proj_trans_ptr = (proj_trans_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_trans");
   proj_get_type_ptr = (proj_get_type_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_get_type");
   proj_is_crs_ptr = (proj_is_crs_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_is_crs");
+  proj_info_ptr = (proj_info_FUNC)GET_PROC_ADDRESS(proj_lib_handle, "proj_info");
 
   if (!proj_as_wkt_ptr || !proj_as_proj_string_ptr || !proj_as_projjson_ptr || !proj_get_source_crs_ptr || !proj_get_target_crs_ptr ||
       !proj_destroy_ptr || !proj_context_create_ptr || !proj_context_destroy_ptr || !proj_get_id_code_ptr || !proj_get_ellipsoid_ptr ||
@@ -424,11 +446,20 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       !proj_datum_ensemble_get_accuracy_ptr || !proj_datum_ensemble_get_member_ptr || !proj_crs_get_datum_ptr ||
       !proj_crs_get_coordinate_system_ptr || !proj_cs_get_type_ptr || !proj_cs_get_axis_count_ptr || !proj_cs_get_axis_info_ptr || !proj_create_ptr ||
       !proj_create_argv_ptr || !proj_create_crs_to_crs_ptr || !proj_create_crs_to_crs_from_pj_ptr || !proj_create_from_wkt_ptr ||
-      !proj_context_errno_ptr || !proj_context_errno_string_ptr || !proj_coord_ptr || !proj_trans_ptr || !proj_get_type_ptr || !proj_is_crs_ptr)
+      !proj_context_errno_ptr || !proj_context_errno_string_ptr || !proj_coord_ptr || !proj_trans_ptr || !proj_get_type_ptr || !proj_is_crs_ptr ||
+      !proj_info_ptr)
   {
+    std::string version = "Unknown";
+    if (proj_info_ptr) {
+      PJ_INFO info = proj_info();
+      if (info.version) version = info.version;
+    }
     unload_proj_library();
-    laserror("Failed to load necessary PROJ functions.");
+    laserror("Failed to load necessary PROJ functions. This application requires PROJ version 9.0.0 or later for full functionality. Loaded PROJ version: %s", version.c_str());
   }
+
+  checkProjVersion();
+
   return true;
 #pragma warning(pop)
 }
@@ -473,4 +504,5 @@ void unload_proj_library() {
   proj_trans_ptr = nullptr;
   proj_get_type_ptr = nullptr;
   proj_is_crs_ptr = nullptr;
+  proj_info_ptr = nullptr;
 }

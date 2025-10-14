@@ -6795,6 +6795,15 @@ GeoProjectionConverter::GeoProjectionConverter() {
   is_proj_request = false;
   disable_messages = false;
   source_header_epsg = 0;
+
+  source_code = 0;
+  target_code = 0;
+  proj_source_string = nullptr;
+  proj_target_string = nullptr;
+  proj_source_json = nullptr;
+  proj_target_json = nullptr;
+  proj_source_wkt = nullptr;
+  proj_target_wkt = nullptr;
 }
 
 GeoProjectionConverter::~GeoProjectionConverter() {
@@ -7017,12 +7026,6 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
     }
     // proj lib transformation
     else if (strcmp(argv[i], "-proj_epsg") == 0) {
-      unsigned int source_code = 0;
-      unsigned int target_code = 0;
-
-      // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
-      load_proj_library(nullptr);
-
       if (argv[i + 1] != nullptr && argv[i + 1][0] != '\0' && argv[i + 1][0] != '-' && argv[i + 2] != nullptr && argv[i + 2][0] != '\0' &&
           argv[i + 2][0] != '-') {
         if (sscanf_las(argv[i + 1], "%u", &source_code) != 1) {
@@ -7031,7 +7034,6 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
         if (sscanf_las(argv[i + 2], "%u", &target_code) != 1) {
           laserror("EPSG code for the target '%s' not valid", argv[i + 2]);
         }
-        set_proj_param_for_transformation_with_epsg(source_code, target_code);
         *argv[i] = '\0';
         *argv[i + 1] = '\0';
         *argv[i + 2] = '\0';
@@ -7040,7 +7042,6 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
         if (sscanf_las(argv[i + 1], "%u", &target_code) != 1) {
           laserror("EPSG code from source '%s' not valid", argv[i + 1]);
         }
-        set_proj_crs_with_epsg(target_code, false);
         check_header_for_crs = true;
         *argv[i] = '\0';
         *argv[i + 1] = '\0';
@@ -7053,24 +7054,18 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
       if (argv[i + 1] == nullptr || argv[i + 1][0] == '\0') {
         laserror("'%s' needs at least 1 argument: PROJ string not specified", argv[i]);
       }
-      // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
-      load_proj_library(nullptr);
-
       size_t buffer_size = strlen(argv[i + 1]) + 1;
-      char* proj_source_string = (char*)malloc_las(buffer_size);
+      proj_source_string = (char*)malloc_las(buffer_size);
 
       if (proj_source_string) {
         strcpy_las(proj_source_string, buffer_size, argv[i + 1]);
 
         if (argv[i + 2] != nullptr && argv[i + 2][0] != '\0' && argv[i + 2][0] != '-') {
           buffer_size = strlen(argv[i + 2]) + 1;
-          char* proj_target_string = (char*)malloc_las(buffer_size);
+          proj_target_string = (char*)malloc_las(buffer_size);
 
           if (proj_target_string) {
             strcpy_las(proj_target_string, buffer_size, argv[i + 2]);
-
-            set_proj_param_for_transformation_with_string(proj_source_string, proj_target_string);
-            free((char*)proj_target_string);
             *argv[i] = '\0';
             *argv[i + 1] = '\0';
             *argv[i + 2] = '\0';
@@ -7080,36 +7075,28 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
             laserror("Failed to read the PROJ string target from the command line");
           }
         } else {
-          set_proj_param_for_transformation_with_string(proj_source_string, nullptr);
           *argv[i] = '\0';
           *argv[i + 1] = '\0';
           i += 1;
         }
-        free((char*)proj_source_string);
       } else {
         laserror("Failed to read the source PROJ string from the command line");
       }
       is_proj_request = true;
     } else if (strcmp(argv[i], "-proj_json") == 0) {
       if (argv[i + 1] != nullptr && argv[i + 1][0] != '\0' && argv[i + 1][0] != '-') {
-        // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
-        load_proj_library(nullptr);
-
         size_t buffer_size = strlen(argv[i + 1]) + 1;
-        char* proj_source_json = (char*)malloc_las(buffer_size);
+        proj_source_json = (char*)malloc_las(buffer_size);
 
         if (proj_source_json) {
           strcpy_las(proj_source_json, buffer_size, argv[i + 1]);
 
           if (argv[i + 2] != nullptr && argv[i + 2][0] != '\0' && argv[i + 2][0] != '-') {
             buffer_size = strlen(argv[i + 2]) + 1;
-            char* proj_target_json = (char*)malloc_las(buffer_size);
+            proj_target_json = (char*)malloc_las(buffer_size);
 
             if (proj_target_json) {
               strcpy_las(proj_target_json, buffer_size, argv[i + 2]);
-
-              set_proj_param_for_transformation_with_json(proj_source_json, proj_target_json);
-              free((char*)proj_target_json);
             } else {
               free((char*)proj_source_json);
               laserror("Failed to read the PROJJSON target filename from the command line");
@@ -7119,15 +7106,12 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
             *argv[i + 2] = '\0';
             i += 2;
           } else {
-            // If only one json file is specified in the cmd, it is used as the target
-            set_proj_crs_with_json(proj_source_json, false);
             check_header_for_crs = true;
 
             *argv[i] = '\0';
             *argv[i + 1] = '\0';
             i += 1;
           }
-          free((char*)proj_source_json);
         } else {
           laserror("Failed to read the PROJJSON source or target filename from the command line");
         }
@@ -7137,24 +7121,18 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
       is_proj_request = true;
     } else if (strcmp(argv[i], "-proj_wkt") == 0) {
       if (argv[i + 1] != nullptr && argv[i + 1][0] != '\0' && argv[i + 1][0] != '-') {
-        // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
-        load_proj_library(nullptr);
-
         size_t buffer_size = strlen(argv[i + 1]) + 1;
-        char* proj_source_wkt = (char*)malloc_las(buffer_size);
+        proj_source_wkt = (char*)malloc_las(buffer_size);
 
         if (proj_source_wkt) {
           strcpy_las(proj_source_wkt, buffer_size, argv[i + 1]);
 
           if (argv[i + 2] != nullptr && argv[i + 2][0] != '\0' && argv[i + 2][0] != '-') {
             buffer_size = strlen(argv[i + 2]) + 1;
-            char* proj_target_wkt = (char*)malloc_las(buffer_size);
+            proj_target_wkt = (char*)malloc_las(buffer_size);
 
             if (proj_target_wkt) {
               strcpy_las(proj_target_wkt, buffer_size, argv[i + 2]);
-
-              set_proj_param_for_transformation_with_wkt(proj_source_wkt, proj_target_wkt);
-              free((char*)proj_target_wkt);
             } else {
               free((char*)proj_source_wkt);
               laserror("Failed to read the WKT target filename from the command line");
@@ -7164,15 +7142,12 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
             *argv[i + 2] = '\0';
             i += 2;
           } else {
-            // If only one json file is specified in the cmd, it is used as the target
-            set_proj_crs_with_wkt(proj_source_wkt, false);
             check_header_for_crs = true;
 
             *argv[i] = '\0';
             *argv[i + 1] = '\0';
             i += 1;
           }
-          free((char*)proj_source_wkt);
         } else {
           laserror("Failed to read the WKT source or target filename from the command line");
         }
@@ -7188,9 +7163,6 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
       if (argv[j] == nullptr || argv[j][0] == '\0' || argv[j][0] == '-') {
         laserror("'%s' needs minimum 1 arguments", argv[i]);
       }
-      // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
-      load_proj_library(nullptr);
-
       // Read parameters until a new argument (starting with '-') or the end is reached
       while (argv[j] != nullptr && argv[j][0] != '-' && projParameters.arg_count < projParameters.max_param) {
         // Validation: Check whether the parameter is valid
@@ -8892,6 +8864,50 @@ void GeoProjectionConverter::set_proj_crs_with_file_header_wkt(const char* wktCo
     projParameters.proj_target_crs = proj_crs;
     projParameters.set_header_wkt_representation(projParameters.proj_target_crs);
     LASMessage(LAS_VERY_VERBOSE, "the PROJ target object was successfully created");
+  }
+}
+
+/// load the proj lib and set the source and target PROJ objects
+void GeoProjectionConverter::load_proj() {
+  if (is_proj_request == true) {   
+    // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
+    load_proj_library(nullptr);
+
+    // Set the correct source and target arguments
+    if (target_code > 0) {
+      if (source_code > 0) {
+        set_proj_param_for_transformation_with_epsg(source_code, target_code);
+      } else {
+        set_proj_crs_with_epsg(target_code, false);
+      }
+    } else if (proj_source_string != nullptr) {
+      if (proj_target_string != nullptr) {
+        set_proj_param_for_transformation_with_string(proj_source_string, proj_target_string);
+        free((char*)proj_target_string);
+      } else {
+        // If only one PROJ-string is specified in the cmd, it is used as the target
+        set_proj_param_for_transformation_with_string(proj_source_string, nullptr);
+      }
+      free((char*)proj_source_string);
+    } else if (proj_source_json != nullptr) {
+      if (proj_target_json != nullptr) {
+        set_proj_param_for_transformation_with_json(proj_source_json, proj_target_json);
+        free((char*)proj_target_json);
+      } else {
+        // If only one json file is specified in the cmd, it is used as the target
+        set_proj_crs_with_json(proj_source_json, false);
+      }
+      free((char*)proj_source_json);
+    } else if (proj_source_wkt != nullptr) {
+      if (proj_target_wkt != nullptr) {
+        set_proj_param_for_transformation_with_wkt(proj_source_wkt, proj_target_wkt);
+        free((char*)proj_target_wkt);
+      } else {
+        // If only one wkt file is specified in the cmd, it is used as the target
+        set_proj_crs_with_wkt(proj_source_wkt, false);
+      }
+      free((char*)proj_source_wkt);
+    }
   }
 }
 

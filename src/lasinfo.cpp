@@ -766,6 +766,12 @@ class LasTool_lasinfo : public LasTool {
       laserror("no input specified");
     }
 
+    // check proj options
+
+    if (geoprojectionconverter.is_proj_request == true) {
+      geoprojectionconverter.load_proj();
+    }
+
     // omit "suppressed" layers from LAZ decompression (for new LAS 1.4 point types only)
 
     U32 decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL;
