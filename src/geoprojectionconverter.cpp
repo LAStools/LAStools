@@ -6812,6 +6812,12 @@ GeoProjectionConverter::~GeoProjectionConverter() {
   delete ellipsoid;
   if (source_projection) delete source_projection;
   if (target_projection) delete target_projection;
+  if (proj_source_string) free((char*)proj_source_string);
+  if (proj_target_string) free((char*)proj_target_string);
+  if (proj_source_json) free((char*)proj_source_json);
+  if (proj_target_json) free((char*)proj_target_json);
+  if (proj_source_wkt) free((char*)proj_source_wkt);
+  if (proj_target_wkt) free((char*)proj_target_wkt);
 }
 
 void GeoProjectionConverter::parse(int argc, char* argv[]) {
@@ -7593,6 +7599,36 @@ int GeoProjectionConverter::unparse(char* string) const {
   }
   if (target_elevation_precision != 0.0) {
     n += sprintf(&string[n], "-target_elevation_precision %lf ", target_elevation_precision);
+  }
+  if (is_proj_request == true) {
+    if (target_code > 0) {
+      if (source_code > 0) {
+        n += sprintf(&string[n], "-proj_epsg %u %u ", source_code, target_code);
+      } else {
+        n += sprintf(&string[n], "-proj_epsg %u ", target_code);
+      }
+    }
+    if (proj_source_string != nullptr) {
+      if (proj_target_string != nullptr) {
+        n += sprintf(&string[n], "-proj_string %s %s ", proj_source_string, proj_target_string);
+      } else {
+        n += sprintf(&string[n], "-proj_string %s ", proj_source_string);
+      }
+    }
+    if (proj_source_json != nullptr) {
+      if (proj_target_json != nullptr) {
+        n += sprintf(&string[n], "-proj_json %s %s ", proj_source_json, proj_target_json);
+      } else {
+        n += sprintf(&string[n], "-proj_json %s ", proj_source_json);
+      }
+    }
+    if (proj_source_wkt != nullptr) {
+      if (proj_target_wkt != nullptr) {
+        n += sprintf(&string[n], "-proj_wkt %s %s ", proj_source_wkt, proj_target_wkt);
+      } else {
+        n += sprintf(&string[n], "-proj_wkt %s ", proj_source_wkt);
+      }
+    }
   }
 
   return n;
@@ -8883,30 +8919,24 @@ void GeoProjectionConverter::load_proj() {
     } else if (proj_source_string != nullptr) {
       if (proj_target_string != nullptr) {
         set_proj_param_for_transformation_with_string(proj_source_string, proj_target_string);
-        free((char*)proj_target_string);
       } else {
         // If only one PROJ-string is specified in the cmd, it is used as the target
         set_proj_param_for_transformation_with_string(proj_source_string, nullptr);
       }
-      free((char*)proj_source_string);
     } else if (proj_source_json != nullptr) {
       if (proj_target_json != nullptr) {
         set_proj_param_for_transformation_with_json(proj_source_json, proj_target_json);
-        free((char*)proj_target_json);
       } else {
         // If only one json file is specified in the cmd, it is used as the target
         set_proj_crs_with_json(proj_source_json, false);
       }
-      free((char*)proj_source_json);
     } else if (proj_source_wkt != nullptr) {
       if (proj_target_wkt != nullptr) {
         set_proj_param_for_transformation_with_wkt(proj_source_wkt, proj_target_wkt);
-        free((char*)proj_target_wkt);
       } else {
         // If only one wkt file is specified in the cmd, it is used as the target
         set_proj_crs_with_wkt(proj_source_wkt, false);
       }
-      free((char*)proj_source_wkt);
     }
   }
 }
