@@ -733,6 +733,10 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 -oshp            : output as SHP *.shp file  
 -otxt            : output as textfile  
 -owkt            : output as wkt (well-known-text)  
+-ogpkg           : output as GPKG (GeoPackage) 
+-ogml            : output as GML (Geography Markup Language)
+-ogpx            : output as GPX (GPS Exchange Format)
+-ogeojson        : output as GeoJSON  
 -pipe_on         : write output to command pipe, see also -std_in  
 -populate        : populate header on output  
 -stdout          : pipe to stdout  
