@@ -105,6 +105,15 @@ typedef enum {
   PJ_WKT1_ESRI
 } PJ_WKT_TYPE;
 
+typedef struct PJ_INFO {
+  int major;
+  int minor;
+  int patch;
+  const char* release;    /* Release info (e.g. "Rel. 6.2.1, September 1st, 2019") */
+  const char* version;    /* Short version string (e.g. "6.2.1") */
+  const char* searchpath; /* Where PROJ looks for resource files */
+} PJ_INFO;
+
 // Function pointer type definitions
 typedef const char* (*proj_as_wkt_t)(PJ_CONTEXT*, const PJ*, PJ_WKT_TYPE, const char* const*);
 typedef const char* (*proj_as_proj_string_t)(PJ_CONTEXT*, const PJ*, PJ_PROJ_STRING_TYPE, const char* const*);
@@ -138,6 +147,7 @@ typedef PJ_COORD (*proj_coord_t)(double, double, double, double);
 typedef PJ_COORD (*proj_trans_t)(PJ*, PJ_DIRECTION, PJ_COORD);
 typedef PJ_TYPE (*proj_get_type_t)(const PJ*);
 typedef int (*proj_is_crs_t)(const PJ*);
+typedef PJ_INFO (*proj_info_FUNC)(void);
 
 // External variables for function pointers
 extern proj_as_wkt_t proj_as_wkt_ptr;
@@ -172,6 +182,7 @@ extern proj_coord_t proj_coord_ptr;
 extern proj_trans_t proj_trans_ptr;
 extern proj_get_type_t proj_get_type_ptr;
 extern proj_is_crs_t proj_is_crs_ptr;
+extern proj_info_FUNC proj_info_ptr;
 
 // Function for dynamic loading of the PROJ library
 bool load_proj_library(const char* path, bool isNecessary = true);
@@ -259,5 +270,7 @@ void unload_proj_library();
 #define proj_get_type(P) (proj_get_type_ptr ? proj_get_type_ptr(P) : PJ_TYPE{})
 
 #define proj_is_crs(P) (proj_is_crs_ptr ? proj_is_crs_ptr(P) : 0)
+
+#define proj_info() (proj_info_ptr ? proj_info_ptr() : PJ_INFO{0, 0, 0, nullptr, nullptr, nullptr})
 
 #endif  // PROJ_LOADER_H

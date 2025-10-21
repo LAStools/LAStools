@@ -1131,6 +1131,12 @@ int main(int argc, char* argv[])
     laserror("no input specified");
   }
 
+  // check proj options
+
+  if (geoprojectionconverter.is_proj_request == true) {
+    geoprojectionconverter.load_proj();
+  }
+
   BOOL extra_pass = laswriteopener.is_piped();
 
   // we only really need an extra pass if the coordinates are altered or if points are filtered

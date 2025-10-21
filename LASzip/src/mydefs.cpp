@@ -741,7 +741,7 @@ size_t StringCountChar(const std::string& in, const char toCount) {
 const char** getDefaultProgramPaths(size_t& numPaths) {
 #ifdef _WIN32
   // Windows: Use environment variables or API for Program Files directories
-  static const char* defaultPaths[] = {getenv("ProgramFiles"), getenv("ProgramFiles(x86)"), nullptr};
+  static const char* defaultPaths[] = {getenv("ProgramFiles"), getenv("ProgramFiles(x86)"), "C:\\", nullptr};
   // Count valid paths
   numPaths = 0;
   while (defaultPaths[numPaths] != nullptr) {
