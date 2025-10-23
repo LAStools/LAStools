@@ -307,9 +307,9 @@ BOOL LASindex::read(const char* file_name)
   file = LASfopen(fn.c_str(), "rb");
   if (file == 0) {
     return FALSE;
-  } 
+  }
   else if (!read(file)) {
-    laserror("(LASindex): cannot read '%s'", fn);
+    laserror("(LASindex): cannot read '%s'", fn.c_str());
     fclose(file);
     return FALSE;
   } else {
@@ -473,7 +473,7 @@ BOOL LASindex::write(const char* file_name) const
     laserror("(LASindex): cannot open file '%s' for write", fn.c_str());
     return FALSE;
   } else if (!write(file)) {
-    laserror("(LASindex): cannot write '%s'", fn);
+    laserror("(LASindex): cannot write '%s'", fn.c_str());
     fclose(file);
     return FALSE;
   } else {

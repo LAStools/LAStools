@@ -80,6 +80,8 @@ proj_get_type_t proj_get_type_ptr = nullptr;
 proj_is_crs_t proj_is_crs_ptr = nullptr;
 
 /// Function for parsing the version number from the directory name
+//Unused
+/**
 static std::vector<int> parseVersion(const char* versionStr) {
   std::vector<int> versionNumbers;
   std::regex versionRegex("(\\d+)");
@@ -94,7 +96,7 @@ static std::vector<int> parseVersion(const char* versionStr) {
 
   return versionNumbers;
 }
-
+**/
 #if defined(__unix__) || defined(__APPLE__)
 static char* findUnixLibProjPath() {
   // Check system-wide directories
@@ -133,6 +135,8 @@ static char* findUnixLibProjPath() {
 #endif
 
 /// Comparison function for version numbers
+//Unused
+/**
 static bool compareVersions(const char* v1, const char* v2) {
   std::vector<int> version1 = parseVersion(v1);
   std::vector<int> version2 = parseVersion(v2);
@@ -145,6 +149,7 @@ static bool compareVersions(const char* v1, const char* v2) {
 
   return version1.size() > version2.size();
 }
+**/
 
 /// Finds the latest QGIS installation path by first checking the `QGIS_PREFIX_PATH` environment variable.
 /// If the environment variable is not set, it searches through default installation directories and selects the latest version based on directory names.
@@ -350,7 +355,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       char* proj_lib_path = findLatestProjLibraryPath(qgisPath);
       delete[] qgisPath;
 
-      if (proj_lib_path) {  
+      if (proj_lib_path) {
         // Try to load the library
         proj_lib_handle = LOAD_LIBRARY(proj_lib_path);
         delete[](proj_lib_path);

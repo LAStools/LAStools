@@ -2,9 +2,9 @@
 ===============================================================================
 
   FILE:  lasreaditemcompressed_v2.hpp
-  
+
   CONTENTS:
-  
+
     Implementation of LASitemReadCompressed for *all* items (version 2).
 
   PROGRAMMERS:
@@ -21,13 +21,13 @@
 
     This software is distributed WITHOUT ANY WARRANTY and without even the
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  
+
   CHANGE HISTORY:
-  
-    28 August 2017 -- moving 'context' from global development hack to interface  
+
+    28 August 2017 -- moving 'context' from global development hack to interface
     6 September 2014 -- removed inheritance of EntropyEncoder and EntropyDecoder
     5 March 2011 -- created first night in ibiza to improve the RGB compressor
-  
+
 ===============================================================================
 */
 #ifndef LAS_READ_ITEM_COMPRESSED_V2_HPP
@@ -84,9 +84,9 @@ public:
 private:
   ArithmeticDecoder* dec;
   U32 last, next;
-  U64I64F64 last_gpstime[4] = {0};
-  I32 last_gpstime_diff[4] = {0};
-  I32 multi_extreme_counter[4] = {0};
+  U64I64F64 last_gpstime[4] = { {} };
+  I32 last_gpstime_diff[4] = {};
+  I32 multi_extreme_counter[4] = {};
 
   ArithmeticModel* m_gpstime_multi;
   ArithmeticModel* m_gpstime_0diff;
