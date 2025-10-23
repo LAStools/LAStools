@@ -397,15 +397,15 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       proj_lib_handle = LOAD_LIBRARY(projLibPath);
       LASMessage(LAS_VERY_VERBOSE, "PROJ library used via environment variable 'LASTOOLS_PROJ': %s", projLibPath);
 
-      // Load gdal data path via environment variable
-      const char* projDataPath = getenv("PROJ_LIB");
-      if (projDataPath) {
-        LASMessage(LAS_VERY_VERBOSE, "PROJ data path used via environment variable 'PROJ_LIB': %s", projDataPath);
-      }
       delete[] projLibPath;  // Free memory after usage
     } else {
       LASMessage(LAS_WARNING, "The environment variable LASTOOLS_PROJ: '%s' is set, but no PROJ library can be found at this location. Continued...", proj_path);
     }
+  }
+  // Get proj data path via environment variable
+  const char* projDataPath = getenv("PROJ_LIB");
+  if (projDataPath) {
+    LASMessage(LAS_VERY_VERBOSE, "PROJ data path used via environment variable 'PROJ_LIB': %s", projDataPath);
   }
 
   //2. fallback : load library from QGIS environments (default directorys)
