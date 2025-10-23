@@ -368,10 +368,7 @@ BOOL LASreader::read_point_inside_rectangle_indexed() {
 }
 
 BOOL LASreader::read_point_inside_rectangle_copc_indexed() {
-  bool inrect;
   while (copc_index->seek_next((LASreader*)this)) {
-    inrect = point.get_x() >= r_min_x && point.get_x() <= r_max_x && point.get_y() >= r_min_y && point.get_y() <= r_max_y;
-
     if (read_point_default() && point.inside_rectangle(r_min_x, r_min_y, r_max_x, r_max_y)) {
       return TRUE;
     }
@@ -508,7 +505,7 @@ I32 LASreadOpener::unparse(CHAR* string) const {
       n += sprintf(string + n, "-stream_order_normal ");
       break;
       /* default
-    case 1: 
+    case 1:
       n += sprintf(string + n, "-stream_order_spatial ");
       break;
      */
@@ -522,7 +519,7 @@ I32 LASreadOpener::unparse(CHAR* string) const {
   if (z_from_attribute && !z_from_attribute_try) {
     n += sprintf(string + n, "-z_from_attribute ");
   }
-  /* optional in derivation 
+  /* optional in derivation
   _txt: if (translation) { ... "-itranslate_intensity"
          if (scale_intensity) "-iscale_intensity"
    translate_scan_angle ... "-itranslate_scan_angle"
@@ -2076,7 +2073,7 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
         set_copc_stream_ordered_spatially(); // 1 (default)
         *argv[i] = '\0';
       } else if (strcmp(argv[i], "-stream_order_normal") == 0) { // COPC only
-        set_copc_stream_ordered_by_chunk(); // 0 
+        set_copc_stream_ordered_by_chunk(); // 0
         *argv[i] = '\0';
       } else if (strcmp(argv[i], "-stream_order_level") == 0) { // COPC only
         set_copc_stream_ordered_by_level(); // 2
@@ -2284,7 +2281,7 @@ std::string LASreadOpener::get_file_name_opt_only(bool name_only) {
     return std::string(get_file_name_only());
   else {
     // get FULL filename
-    std::filesystem::path ffn = get_file_name();  
+    std::filesystem::path ffn = get_file_name();
     return std::filesystem::absolute(ffn).string();
   }
 }

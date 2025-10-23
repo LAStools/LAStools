@@ -66,9 +66,6 @@ static const double EPSILON = 0.0000000001;
 static const double deg2rad = PI / 180.0;
 static const double rad2deg = 180.0 / PI;
 
-static const double feet2meter = 0.3048;
-static const double surveyfeet2meter = 0.3048006096012;
-
 static const int GEO_PROJECTION_UTM = 0;
 static const int GEO_PROJECTION_LCC = 1;
 static const int GEO_PROJECTION_TM = 2;
@@ -254,7 +251,7 @@ static const short PCS_NAD27_St_Croix = 32060;
 
 static const short PCS_NAD83_Alabama_East = 26929;
 static const short PCS_NAD83_Alabama_West = 26930;
-static const short PCS_NAD83_Alaska_zone_1 = 26931; /* Hotine Oblique Mercator Projection not supported*/
+//static const short PCS_NAD83_Alaska_zone_1 = 26931; /* Hotine Oblique Mercator Projection not supported*/
 static const short PCS_NAD83_Alaska_zone_2 = 26932;
 static const short PCS_NAD83_Alaska_zone_3 = 26933;
 static const short PCS_NAD83_Alaska_zone_4 = 26934;
@@ -424,7 +421,7 @@ static const short GCTP_NAD83_Iowa_South = 1402;
 static const short GCTP_NAD83_Kansas_North = 1501;
 static const short GCTP_NAD83_Kansas_South = 1502;
 static const short GCTP_NAD83_Kentucky_North = 1601;
-static const short GCTP_NAD83_Kentucky_South = 1602;
+//static const short GCTP_NAD83_Kentucky_South = 1602;
 static const short GCTP_NAD83_Louisiana_North = 1701;
 static const short GCTP_NAD83_Louisiana_South = 1702;
 static const short GCTP_NAD83_Maine_East = 1801;
@@ -813,14 +810,15 @@ static const short EPSG_EOV_HD72 = 23700;
 ProjParameters::ProjParameters()
     : arg_count(0),
       max_param(7),
+      proj_info_args(nullptr),
       valid_proj_info_params{"wkt", "js", "str", "epsg", "el", "datum", "cs"},
-      header_wkt_representation(nullptr),
-      proj_crs_infos(nullptr),
       proj_ctx(nullptr),
       proj_source_crs(nullptr),
       proj_target_crs(nullptr),
       proj_transform_crs(nullptr),
-      proj_info_args(nullptr) {
+      header_wkt_representation(nullptr),
+      proj_crs_infos(nullptr)
+{
 }
 
 ProjParameters::~ProjParameters() {
@@ -1159,7 +1157,6 @@ bool ProjParameters::proj_info_arg_contains(const char* arg) const {
 
 bool GeoProjectionConverter::set_projection_from_geo_keys(
     int num_geo_keys, const GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description, bool source) {
-  bool user_defined_ellipsoid = false;
   int user_defined_projection = 0;
   int offsetProjStdParallel1GeoKey = -1;
   int offsetProjStdParallel2GeoKey = -1;
@@ -1179,7 +1176,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
   int offsetProjRectifiedGridAngleGeoKey = -1;
   bool has_projection = false;
   int ellipsoid = -1;
-  int datum_code = -1;
+  //int datum_code = -1;  // Unused
   int gcs_code = -1;
 
   this->num_geo_keys = num_geo_keys;
@@ -1213,7 +1210,6 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
       case 2048:  // GeographicTypeGeoKey
         switch (geo_keys[i].value_offset) {
           case 32767:  // user-defined GCS
-            user_defined_ellipsoid = true;
             break;
           case 4326:  // GCS_WGS_84
             gcs_code = GEO_GCS_WGS84;
@@ -1235,7 +1231,7 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
             break;
           case 4140:  // Datum_NAD83_CSRS
           case 4617:  // Datum_NAD83_CSRS
-            datum_code = GEO_GCS_NAD83_CSRS;
+            //datum_code = GEO_GCS_NAD83_CSRS;
             break;
           case 4759:  // NAD83_2007
           case 4893:  // NAD83_2007_3D
@@ -1321,28 +1317,27 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
       case 2050:  // GeogGeodeticDatumGeoKey
         switch (geo_keys[i].value_offset) {
           case 32767:  // user-defined GCS
-            user_defined_ellipsoid = true;
             break;
           case 6326:  // Datum_WGS84
-            datum_code = GEO_GCS_WGS84;
+            //datum_code = GEO_GCS_WGS84;
             break;
           case 6269:  // Datum_North_American_Datum_1983
-            datum_code = GEO_GCS_NAD83;
+            //datum_code = GEO_GCS_NAD83;
             break;
           case 6322:  // Datum_WGS72
-            datum_code = GEO_GCS_WGS72;
+            //datum_code = GEO_GCS_WGS72;
             break;
           case 6267:  // Datum_North_American_Datum_1927
-            datum_code = GEO_GCS_NAD27;
+            //datum_code = GEO_GCS_NAD27;
             break;
           case 6283:  // Datum_Geocentric_Datum_of_Australia_1994
-            datum_code = GEO_GCS_GDA94;
+            //datum_code = GEO_GCS_GDA94;
             break;
           case 9844:  // Datum_Geocentric_Datum_of_Australia_2020
-            datum_code = GEO_GCS_GDA94;
+            //datum_code = GEO_GCS_GDA94;
             break;
           case 6140:  // Datum_NAD83_CSRS
-            datum_code = GEO_GCS_NAD83_CSRS;
+            //datum_code = GEO_GCS_NAD83_CSRS;
             break;
           case 6030:  // DatumE_WGS84
             ellipsoid = GEO_ELLIPSOID_WGS84;
@@ -1351,10 +1346,10 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
             ellipsoid = GEO_ELLIPSOID_GRS1980;
             break;
           case 6167:  // Datum_SWEREF99
-            datum_code = GEO_GCS_SWEREF99;
+            //datum_code = GEO_GCS_SWEREF99;
             break;
           case 6619:  // Datum_NZGD2000
-            datum_code = GEO_GCS_NZGD2000;
+            //datum_code = GEO_GCS_NZGD2000;
             break;
           case 6202:  // Datum_Australian_Geodetic_Datum_1966
           case 6203:  // Datum_Australian_Geodetic_Datum_1984
@@ -2441,6 +2436,8 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
         set_transverse_mercator_projection(unit * false_easting, unit * false_northing, latitude_of_origin, central_meridian, scale_factor);
         LASMessage(LAS_VERBOSE, "source transverse projection [%s] set", source_projection->info().c_str());
         return true;
+        break;
+      default:  // Unhandled values exist.
         break;
     }
   } else {
@@ -8365,6 +8362,7 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(
           case PCS_NAD83_Kentucky_North:
             *coordinate_zone = GCTP_NAD83_Kentucky_North;
             break;
+//ABELL = This looks like a typo.
           case PCS_NAD83_Kentucky_South:
             *coordinate_zone = GCTP_NAD83_Kentucky_North;
             break;

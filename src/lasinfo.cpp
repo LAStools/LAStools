@@ -112,6 +112,8 @@ static const char* LASpointClassification[32] = {
     "Reserved for ASPRS Definition",
     "Reserved for ASPRS Definition"};
 
+//Unused
+/**
 static inline void VecUpdateMinMax3dv(double min[3], double max[3], const double v[3]) {
   if (v[0] < min[0])
     min[0] = v[0];
@@ -126,12 +128,16 @@ static inline void VecUpdateMinMax3dv(double min[3], double max[3], const double
   else if (v[2] > max[2])
     max[2] = v[2];
 }
+**/
 
+//Unused
+/**
 static inline void VecCopy3dv(double v[3], const double a[3]) {
   v[0] = a[0];
   v[1] = a[1];
   v[2] = a[2];
 }
+**/
 
 // Function for converting formatted character string to double
 static double parseFormattedDouble(const char* formattedString) {
@@ -973,8 +979,8 @@ public:
               set_offset[1] = lasreader->header.y_offset * scale_header[1];
               set_offset[2] = lasreader->header.z_offset * scale_header[2];
               // clang-format off
-                            LASMessage(LAS_VERBOSE, "set offset from [%f/%f/%f] to [%f/%f/%f]", 
-                              lasreader->header.x_offset, lasreader->header.y_offset, lasreader->header.z_offset, 
+                            LASMessage(LAS_VERBOSE, "set offset from [%f/%f/%f] to [%f/%f/%f]",
+                              lasreader->header.x_offset, lasreader->header.y_offset, lasreader->header.z_offset,
                               set_offset[0], set_offset[1], set_offset[2]);
               // clang-format on
               set_bounding_box = new F64[6];  // x2,x1,y2,y1,z2,z1
@@ -985,10 +991,10 @@ public:
               set_bounding_box[2] = lasreader->header.max_y * scale_header[1];
               set_bounding_box[4] = lasreader->header.max_z * scale_header[2];
               // clang-format off
-                            LASMessage(LAS_VERBOSE, "set bounding box from [%f/%f/%f-%f/%f/%f] to [%f/%f/%f-%f/%f/%f]", 
-                              lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, 
-                              lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z, 
-                              set_bounding_box[1], set_bounding_box[3], set_bounding_box[5], 
+                            LASMessage(LAS_VERBOSE, "set bounding box from [%f/%f/%f-%f/%f/%f] to [%f/%f/%f-%f/%f/%f]",
+                              lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z,
+                              lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z,
+                              set_bounding_box[1], set_bounding_box[3], set_bounding_box[5],
                               set_bounding_box[0], set_bounding_box[2], set_bounding_box[4]);
               // clang-format on
             }
@@ -1667,8 +1673,8 @@ public:
                     asciip = std::string(lasheader->vlr_geo_ascii_params);
                   };
                   geoprojectionconverter.GeoTiffInfo(
-                      (GeoProjectionGeoKeys*)&lasheader->vlr_geo_key_entries[j], 
-                          asciip, lasheader->vlr_geo_double_params, 
+                      (GeoProjectionGeoKeys*)&lasheader->vlr_geo_key_entries[j],
+                          asciip, lasheader->vlr_geo_double_params,
                           key, value);
                   if (json_out) {
                     json_geo_key_entry[CcToUnderline(key)] = value;
@@ -2058,12 +2064,10 @@ public:
                   fprintf(file_out, "    Octree with %d levels\012", max_octree_level);
                 }
 
-                U64 total = 0;
                 U64* point_count = (U64*)calloc(max_octree_level, sizeof(U64));
                 U32* voxel_count = (U32*)calloc(max_octree_level, sizeof(U32));
 
                 for (U32 j = 0; j < lasheader->number_of_copc_entries; j++) {
-                  total += lasheader->vlr_copc_entries[j].point_count;
                   point_count[lasheader->vlr_copc_entries[j].key.depth] += lasheader->vlr_copc_entries[j].point_count;
                   voxel_count[lasheader->vlr_copc_entries[j].key.depth]++;
                 }
@@ -2280,20 +2284,20 @@ public:
                   json_sub_main["points_outside_boundig_box"].push_back(json_outside_box);
                 } else {
                   fprintf(
-                      file_out, "%u t %g x %g y %g z %g i %d (%d of %d) d %d e %d c %d s %s %u p %d \012", 
+                      file_out, "%u t %g x %g y %g z %g i %d (%d of %d) d %d e %d c %d s %s %u p %d \012",
                       (U32)(lasreader->p_idx - 1),
-                      lasreader->point.get_gps_time(), 
-                      lasreader->point.get_x(), 
-                      lasreader->point.get_y(), 
+                      lasreader->point.get_gps_time(),
+                      lasreader->point.get_x(),
+                      lasreader->point.get_y(),
                       lasreader->point.get_z(),
-                      lasreader->point.get_intensity(), 
-                      lasreader->point.get_return_number(), 
+                      lasreader->point.get_intensity(),
+                      lasreader->point.get_return_number(),
                       lasreader->point.get_number_of_returns(),
-                      lasreader->point.get_scan_direction_flag(), 
-                      lasreader->point.get_edge_of_flight_line(), 
+                      lasreader->point.get_scan_direction_flag(),
+                      lasreader->point.get_edge_of_flight_line(),
                       lasreader->point.get_classification(),
-                      lasreader->point.get_scan_angle_string().c_str(), 
-                      lasreader->point.get_user_data(), 
+                      lasreader->point.get_scan_angle_string().c_str(),
+                      lasreader->point.get_user_data(),
                       lasreader->point.get_point_source_ID());
                 }
               }
@@ -2474,7 +2478,7 @@ public:
                   file_out, "  extended_classification    %6d %6d\012", lassummary.min.extended_classification,
                   lassummary.max.extended_classification);
               fprintf(
-                  file_out, "  extended_scan_angle %10s %10s\012", 
+                  file_out, "  extended_scan_angle %10s %10s\012",
                     lassummary.min.get_scan_angle_string().c_str(), lassummary.max.get_scan_angle_string().c_str());
               fprintf(
                   file_out, "  extended_scanner_channel   %6d %6d\012", lassummary.min.extended_scanner_channel,
