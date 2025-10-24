@@ -714,6 +714,7 @@ las2tin64 -i lidar.laz -last_only -histo_only min_edge_length 0.1
 -lof [fnf]      : use input out of a list of files [fnf]  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
 ### Output

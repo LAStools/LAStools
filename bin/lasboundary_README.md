@@ -719,6 +719,7 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 -lof [fnf]      : use input out of a list of files [fnf]  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
 ### Output

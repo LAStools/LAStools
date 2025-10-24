@@ -305,7 +305,6 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
@@ -868,6 +867,7 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 -lof [fnf]      : use input out of a list of files [fnf]  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
 ### Output

@@ -178,7 +178,7 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 -olaydir [dir]          : write the output *.lay file in directory [dir]  
 -percentile [m] [n]     : thins, flags, or classifies points closest to [m]th percentile in z (optional: if a cell has [n] or more points)  
 -random                 : thins, flags, or classifies some random point per cell  
--remain_buffered        : write all data to the output, even if they are part of a boundary buffer  
+-remain_buffered        : write on-the-fly buffer to the output  
 -seed [n]               : seeds the random generator with [n]  
 -sparse                 : always use hash to map points to cells internally  
 -step [n]               : set grid cell size to [n] for thinning/classifying/flagging (default=2)  
@@ -206,7 +206,6 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
@@ -782,6 +781,7 @@ spacing of 1 unit and outputs them compressed to 'combined.laz'
 -lof [fnf]      : use input out of a list of files [fnf]  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
 ### Output

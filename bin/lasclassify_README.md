@@ -105,7 +105,7 @@ lasclassify64 -i *.laz -verbose -feet -elevation_feet
 -olay                         : write or append classification changes to a LASlayers *.lay file  
 -olaydir [dir]                : write the output *.lay file in directory [dir]  
 -planar [n]                   : grid cell points up to standard deviation of [n] are potential roofs (default=0.1)  
--remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
+-remain_buffered              : write on-the-fly buffer to the output
 -rugged [n]                   : grid cell points above standard deviation [n] are potential vegetation (default=0.4)  
 -small_buildings              : don't discard overly small buildings  
 -small_trees                  : don't discard overly small trees  
@@ -136,7 +136,6 @@ lasclassify64 -i *.laz -verbose -feet -elevation_feet
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
@@ -707,6 +706,7 @@ lasclassify64 -i *.laz -verbose -feet -elevation_feet
 -lof [fnf]      : use input out of a list of files [fnf]  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
 ### Output

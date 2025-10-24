@@ -162,7 +162,7 @@ lasduplicate64 -i in.las -nil
 -olay                 : write or append classification changes to a LASlayers *.lay file  
 -olaydir [dir]        : write the output *.lay file in directory [dir]  
 -record_removed       : record all removed points into a separate file with appendix "_removed"  
--remain_buffered      : write all data to the output, even if they are part of a boundary buffer  
+-remain_buffered      : write on-the-fly buffer to the output  
 -single_returns       : mark single returns (used for converting first.txt and last.txt ASCII files to LAS)  
 -switch_G_B           : switch green and blue value  
 -two_pass             : find duplicates in two instead of one pass over the file  
@@ -191,7 +191,6 @@ lasduplicate64 -i in.las -nil
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
@@ -753,6 +752,7 @@ lasduplicate64 -i in.las -nil
 -lof [fnf]      : use input out of a list of files [fnf]  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
 ### Output

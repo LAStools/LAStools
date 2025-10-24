@@ -162,7 +162,7 @@ lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 -olaydir [dir]                : write the output *.lay file in directory [dir]  
 -pertube                      : optional pertube x/y values by random value  
 -refine [n]                   : set number of refinement loops to [n]{default=40}  
--remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
+-remain_buffered              : write on-the-fly buffer to the output
 -replace_z                    : replace z value with computed height  
 -skip_files                   : skip (instead of the default copy) files that have an insufficient number of ground points  
 -spike [n]                    : remove up and down spikes > [n] meters {default = 1 meter}  
@@ -193,7 +193,6 @@ lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
@@ -768,6 +767,7 @@ lasground_new64 -i *.laz -v -odir ground_classified -olaz -cores 8
 -lof [fnf]      : use input out of a list of files [fnf]  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
 ### Output

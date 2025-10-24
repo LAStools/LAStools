@@ -55,7 +55,7 @@ the above workflow is for larger areas and/or tiny voxels sizes
 -mem [n]                      : use [n] MB of main memory (500-2000; default=1500)  
 -olay                         : write or append classification changes to a LASlayers *.lay file  
 -olaydir [dir]                : write the output *.lay file in directory [dir]  
--remain_buffered              : write all data to the output, even if they are part of a boundary buffer  
+-remain_buffered              : write on-the-fly buffer to the output
 -step [n]                     : use a [n]x[n]x[n] uniform grid for finding isolated points  
 -step_xy [n]                  : set the horizontal x and y spacing of the grid to [n]  
 -step_z [n]                   : set the vertical z spacing of the grid to [n]  
@@ -86,7 +86,6 @@ the above workflow is for larger areas and/or tiny voxels sizes
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
@@ -648,6 +647,7 @@ the above workflow is for larger areas and/or tiny voxels sizes
 -lof [fnf]      : use input out of a list of files [fnf]  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
 ### Output

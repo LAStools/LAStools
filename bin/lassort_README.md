@@ -106,7 +106,7 @@ z-orders the points from lidar.las with bucket size 2.
 -pointsource     : sort points based on their point source ID (usually the flightline number)  
 -pointsource     : use point source  
 -pointsourceid   : sort points based on their point source ID (usually the flightline number)  
--remain_buffered : write all data to the output, even if they are part of a boundary buffer  
+-remain_buffered : write on-the-fly buffer to the output  
 -return          : sort by return number  
 -return_number   : sort by return number  
 -scanner         : sort points based on the scanner channel (point types 6 or higher only)  
@@ -135,7 +135,6 @@ z-orders the points from lidar.las with bucket size 2.
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
@@ -699,6 +698,7 @@ z-orders the points from lidar.las with bucket size 2.
 -lof [fnf]      : use input out of a list of files [fnf]  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
 ### Output
