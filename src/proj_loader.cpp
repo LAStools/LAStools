@@ -81,8 +81,6 @@ proj_is_crs_t proj_is_crs_ptr = nullptr;
 proj_info_FUNC proj_info_ptr = nullptr;
 
 /// Function for parsing the version number from the directory name
-//Unused
-/**
 static std::vector<int> parseVersion(const char* versionStr) {
   std::vector<int> versionNumbers;
   std::regex versionRegex("(\\d+)");
@@ -97,7 +95,7 @@ static std::vector<int> parseVersion(const char* versionStr) {
 
   return versionNumbers;
 }
-**/
+
 #if defined(__unix__) || defined(__APPLE__)
 static char* findUnixLibProjPath() {
   // Check system-wide directories
@@ -136,8 +134,6 @@ static char* findUnixLibProjPath() {
 #endif
 
 /// Comparison function for version numbers
-//Unused
-/**
 static bool compareVersions(const char* v1, const char* v2) {
   std::vector<int> version1 = parseVersion(v1);
   std::vector<int> version2 = parseVersion(v2);
@@ -150,7 +146,6 @@ static bool compareVersions(const char* v1, const char* v2) {
 
   return version1.size() > version2.size();
 }
-**/
 
 /// Checks whether the loaded PROJ version reaches at least minMajor.minMinor.
 /// Returns a warning if this version is too old.
@@ -210,6 +205,7 @@ static char* findLatestQGISInstallationPath() {
             free(latestVersionName);
             latestVersionName = nullptr;
             delete[] latestVersionPath;
+            latestVersionPath = nullptr;
             latestVersionName = strdup_las(dirName);
             std::filesystem::path path(programEntry.path());
             path /= "bin";  // Append "bin" to the path

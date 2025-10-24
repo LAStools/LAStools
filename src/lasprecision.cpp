@@ -157,14 +157,6 @@ public:
   };
 };
 
-//Unused
-/**
-static double taketime()
-{
-  return (double)(clock())/CLOCKS_PER_SEC;
-}
-**/
-
 #ifdef COMPILE_WITH_GUI
 extern int lasprecision_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 #endif

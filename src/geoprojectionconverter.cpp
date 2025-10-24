@@ -251,7 +251,7 @@ static const short PCS_NAD27_St_Croix = 32060;
 
 static const short PCS_NAD83_Alabama_East = 26929;
 static const short PCS_NAD83_Alabama_West = 26930;
-//static const short PCS_NAD83_Alaska_zone_1 = 26931; /* Hotine Oblique Mercator Projection not supported*/
+static const short PCS_NAD83_Alaska_zone_1 = 26931;
 static const short PCS_NAD83_Alaska_zone_2 = 26932;
 static const short PCS_NAD83_Alaska_zone_3 = 26933;
 static const short PCS_NAD83_Alaska_zone_4 = 26934;
@@ -374,6 +374,7 @@ static const short PCS_NAD83_Puerto_Rico = 32161;
 
 static const short GCTP_NAD83_Alabama_East = 101;
 static const short GCTP_NAD83_Alabama_West = 102;
+static const short GCTP_NAD83_Alaska_zone_1 = 5001;
 static const short GCTP_NAD83_Alaska_zone_2 = 5002;
 static const short GCTP_NAD83_Alaska_zone_3 = 5003;
 static const short GCTP_NAD83_Alaska_zone_4 = 5004;
@@ -421,7 +422,7 @@ static const short GCTP_NAD83_Iowa_South = 1402;
 static const short GCTP_NAD83_Kansas_North = 1501;
 static const short GCTP_NAD83_Kansas_South = 1502;
 static const short GCTP_NAD83_Kentucky_North = 1601;
-//static const short GCTP_NAD83_Kentucky_South = 1602;
+static const short GCTP_NAD83_Kentucky_South = 1602;
 static const short GCTP_NAD83_Louisiana_North = 1701;
 static const short GCTP_NAD83_Louisiana_South = 1702;
 static const short GCTP_NAD83_Maine_East = 1801;
@@ -750,6 +751,7 @@ static const StatePlaneTM state_plane_tm_nad83_list[] = {
     // geotiff key, zone, false east [m], false north [m], ProjOrig(Lat), CentMerid(Long), scale factor
     StatePlaneTM(PCS_NAD83_Alabama_East, "AL_E", 200000, 0, 30.5, -85.83333333, 0.99996),
     StatePlaneTM(PCS_NAD83_Alabama_West, "AL_W", 600000, 0, 30, -87.5, 0.999933333),
+    StatePlaneTM(PCS_NAD83_Alaska_zone_1, "AK_1", 500000, 0, 54, -130, 0.9999),
     StatePlaneTM(PCS_NAD83_Alaska_zone_2, "AK_2", 500000, 0, 54, -142, 0.9999),
     StatePlaneTM(PCS_NAD83_Alaska_zone_3, "AK_3", 500000, 0, 54, -146, 0.9999),
     StatePlaneTM(PCS_NAD83_Alaska_zone_4, "AK_4", 500000, 0, 54, -150, 0.9999),
@@ -8221,6 +8223,9 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(
           case PCS_NAD83_Alabama_West:
             *coordinate_zone = GCTP_NAD83_Alabama_West;
             break;
+          case PCS_NAD83_Alaska_zone_1:
+            *coordinate_zone = GCTP_NAD83_Alaska_zone_1;
+            break;
           case PCS_NAD83_Alaska_zone_2:
             *coordinate_zone = GCTP_NAD83_Alaska_zone_2;
             break;
@@ -8362,9 +8367,8 @@ bool GeoProjectionConverter::get_dtm_projection_parameters(
           case PCS_NAD83_Kentucky_North:
             *coordinate_zone = GCTP_NAD83_Kentucky_North;
             break;
-//ABELL = This looks like a typo.
           case PCS_NAD83_Kentucky_South:
-            *coordinate_zone = GCTP_NAD83_Kentucky_North;
+            *coordinate_zone = GCTP_NAD83_Kentucky_South;
             break;
           case PCS_NAD83_Louisiana_North:
             *coordinate_zone = GCTP_NAD83_Louisiana_North;

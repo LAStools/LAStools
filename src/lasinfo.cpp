@@ -112,33 +112,6 @@ static const char* LASpointClassification[32] = {
     "Reserved for ASPRS Definition",
     "Reserved for ASPRS Definition"};
 
-//Unused
-/**
-static inline void VecUpdateMinMax3dv(double min[3], double max[3], const double v[3]) {
-  if (v[0] < min[0])
-    min[0] = v[0];
-  else if (v[0] > max[0])
-    max[0] = v[0];
-  if (v[1] < min[1])
-    min[1] = v[1];
-  else if (v[1] > max[1])
-    max[1] = v[1];
-  if (v[2] < min[2])
-    min[2] = v[2];
-  else if (v[2] > max[2])
-    max[2] = v[2];
-}
-**/
-
-//Unused
-/**
-static inline void VecCopy3dv(double v[3], const double a[3]) {
-  v[0] = a[0];
-  v[1] = a[1];
-  v[2] = a[2];
-}
-**/
-
 // Function for converting formatted character string to double
 static double parseFormattedDouble(const char* formattedString) {
   return std::stod(formattedString);
