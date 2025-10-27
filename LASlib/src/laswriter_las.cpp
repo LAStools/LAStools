@@ -196,7 +196,7 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
       return FALSE;
     }
     else if (requested_version) laszip->request_version(requested_version);
-    else laszip->request_version(2);
+    else laszip->request_version(laszip->get_default_version(point_data_format, header->version_major, header->version_minor));
     laszip_vlr_data_size = 34 + 6 * laszip->num_items;
   }
 
@@ -218,6 +218,14 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
       laserror("point type %d of size %d not supported", header->point_data_format, header->point_data_record_length);
       return FALSE;
     }
+  }
+
+  // LAS 1.5 doesn't allow point types 0-5 anymore. 
+  // print a warning, but allow it if the user requests this 
+  // Resulting file might not be supported by every reader though
+  if ((header->version_minor >= 5) && ((point_data_format & 63) < 6))
+  {
+      LASMessage(LAS_WARNING, "point type %d is not supported for version %d.%d anymore", header->point_data_format, header->version_major, header->version_minor);
   }
 
   // save the position where we start writing the header
@@ -275,10 +283,10 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
   }
   // check version minor
   U8 version_minor = header->version_minor;
-  if (version_minor > 4)
+  if (version_minor > 5)
   {
-    LASMessage(LAS_WARNING, "header->version_minor is %d. writing 4 instead.", version_minor);
-    version_minor = 4;
+    LASMessage(LAS_WARNING, "header->version_minor is %d. writing 5 instead.", version_minor);
+    version_minor = 5;
   }
   if (!stream->putByte(version_minor))
   {
@@ -483,6 +491,27 @@ BOOL LASwriterLAS::open(ByteStreamOut* stream, const LASheader* header, U32 comp
     writing_las_1_4 = FALSE;
     writing_new_point_type = FALSE;
   }
+
+  // special handling for LAS 1.5 or higher.
+  if (version_minor >= 5)
+  {
+      if (!stream->put64bitsLE((const U8*)&(header->max_gps_time)))
+      {
+          laserror("writing header->max_gps_time");
+          return FALSE;
+      }
+      if (!stream->put64bitsLE((const U8*)&(header->min_gps_time)))
+      {
+          laserror("writing header->min_gps_time");
+          return FALSE;
+      }
+      if (!stream->put16bitsLE((const U8*)&(header->time_offset)))
+      {
+          laserror("writing header->time_offset");
+          return FALSE;
+      }
+  }
+
 
   // write any number of user-defined bytes that might have been added into the header
 
@@ -1032,6 +1061,21 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
         }
       }
     }
+    // special handling for LAS 1.5 or higher.
+    if (header->version_minor >= 5)
+    {
+        stream->seek(header_start_position + 375);
+        if (!stream->put64bitsLE((const U8*)&(inventory.max_gps_time)))
+        {
+            laserror("updating inventory.max_gps_time");
+            return FALSE;
+        }
+        if (!stream->put64bitsLE((const U8*)&(inventory.min_gps_time)))
+        {
+            laserror("updating inventory.min_gps_time");
+            return FALSE;
+        }
+    }
   }
   else
   {
@@ -1157,6 +1201,26 @@ BOOL LASwriterLAS::update_header(const LASheader* header, BOOL use_inventory, BO
           return FALSE;
         }
       }
+    }
+    // special handling for LAS 1.5 or higher.
+    if (header->version_minor >= 5)
+    {
+        stream->seek(header_start_position + 375);
+        if (!stream->put64bitsLE((const U8*)&(header->max_gps_time)))
+        {
+            laserror("updating header->max_gps_time");
+            return FALSE;
+        }
+        if (!stream->put64bitsLE((const U8*)&(header->min_gps_time)))
+        {
+            laserror("updating header->min_gps_time");
+            return FALSE;
+        }
+        if (!stream->put16bitsLE((const U8*)&(header->time_offset)))
+        {
+            laserror("updating header->time_offset");
+            return FALSE;
+        }
     }
   }
   stream->seekEnd();

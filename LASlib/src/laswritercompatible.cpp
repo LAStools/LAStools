@@ -37,6 +37,7 @@
 BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteopener, BOOL moveCRSfromEVLRtoVLR, BOOL moveEVLRtoVLR)
 {
   U32 i;
+  U8 version_minor_orig = header->version_minor;
 
   if (header == 0)
   {
@@ -67,17 +68,31 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
   // downgrade it to LAS 1.2 or LAS 1.3
   if (header->point_data_format <= 8)
   {
-    header->version_minor = 2;
-    // LAS 1.2 header is 148 bytes less than LAS 1.4+ header
-    header->header_size -= 148;
-    header->offset_to_point_data -= 148;
+      if (header->version_minor >= 4) {
+          // LAS 1.2 header is 148 bytes less than LAS 1.4 header
+          header->header_size -= 148;
+          header->offset_to_point_data -= 148;
+      }
+      if (header->version_minor >= 5) {
+          // LAS 1.4 header is 18 bytes less than LAS 1.5 header
+          header->header_size -= 18;
+          header->offset_to_point_data -= 18;
+      }
+      header->version_minor = 2;
   }
   else
   {
-    header->version_minor = 3;
-    // LAS 1.3 header is 140 bytes less than LAS 1.4+ header
-    header->header_size -= 140;
-    header->offset_to_point_data -= 140;
+      if (header->version_minor >= 4) {
+          // LAS 1.3 header is 140 bytes less than LAS 1.4 header
+          header->header_size -= 140;
+          header->offset_to_point_data -= 140;
+      }
+      if (header->version_minor >= 5) {
+          // LAS 1.4 header is 18 bytes less than LAS 1.5 header
+          header->header_size -= 18;
+          header->offset_to_point_data -= 18;
+      }
+      header->version_minor = 3;
   }
 
   // turn off the bit indicating the presence of the OGC WKT
@@ -88,7 +103,7 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
   // but we add 5 bytes of attributes
   header->point_data_record_length += 5;
 
-  // create 2+2+4+148 bytes payload for compatibility VLR
+  // create 2+2+4+148 bytes payload for compatibility VLR, +18 for LAS 1.5
   ByteStreamOutArray* out;
   if (IS_LITTLE_ENDIAN())
     out = new ByteStreamOutArrayLE();
@@ -98,6 +113,9 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
   U16 laszip_version = (U16)LASZIP_VERSION_BUILD_DATE;
   out->put16bitsLE((U8*)&laszip_version);
   U16 compatible_version = 3;
+  if (version_minor_orig == 5) {
+      compatible_version = 4;
+  }
   out->put16bitsLE((U8*)&compatible_version);
   U32 unused = 0;
   out->put32bitsLE((U8*)&unused);
@@ -157,8 +175,23 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
     }
     out->put64bitsLE((U8*)&extended_number_of_points_by_return);
   }
+  
+  U16 vlr_size = 2 + 2 + 4 + 148;
+
+  // add 18 bytes for the las 1.5 header
+  if (version_minor_orig >= 5) {
+      F64 max_gps_time = header->max_gps_time;
+      out->put64bitsLE((U8*)&max_gps_time);
+      F64 min_gps_time = header->min_gps_time;
+      out->put64bitsLE((U8*)&min_gps_time);
+      U16 time_offset = header->time_offset;
+      out->put16bitsLE((U8*)&time_offset);
+
+      vlr_size += 18;
+  }
+  
   // add the compatibility VLR
-  header->add_vlr("lascompatible\0\0", 22204, 2+2+4+148, out->takeData());
+  header->add_vlr("lascompatible\0\0", 22204, vlr_size, out->takeData());
   delete out;
 
   // scan_angle (difference or remainder) is stored as a I16
@@ -423,9 +456,9 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
     return FALSE;
   }
   // the compatibility VLR must have the right length
-  if (compatibility_vlr->record_length_after_header != (2+2+4+148))
+  if (compatibility_vlr->record_length_after_header != (2+2+4+148) && compatibility_vlr->record_length_after_header != (2 + 2 + 4 + 148 + 18))
   {
-    laserror("compatibility VLR has %u instead of %u bytes in payload", compatibility_vlr->record_length_after_header, 2+2+4+148);
+    laserror("compatibility VLR has %u instead of %u or %u bytes in payload", compatibility_vlr->record_length_after_header, 2+2+4+148, 2+2+4+148+18);
     return FALSE;
   }
   I32 index_scan_angle = header->get_attribute_index("LAS 1.4 scan angle");
@@ -459,6 +492,8 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
 
   this->header = header;
 
+  bool compatibility_for_1_5 = (compatibility_vlr->record_length_after_header == (2 + 2 + 4 + 148 + 18));
+  
   // upgrade it to LAS 1.4
 
   if (header->version_minor < 3)
@@ -473,7 +508,15 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
     header->header_size += 140;
     header->offset_to_point_data += 140;
   }
-  header->version_minor = 4;
+  // add the LAS 1.5 header
+  if (compatibility_for_1_5 == true) {
+      header->header_size += 18;
+      header->offset_to_point_data += 18;
+      header->version_minor = 5;
+  }
+  else {
+      header->version_minor = 4;
+  }
 
   // maybe turn on the bit indicating the presence of the OGC WKT
   for (i = 0; i < header->number_of_variable_length_records; i++)
@@ -485,18 +528,18 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
     }
   }
 
-  // read the 2+2+4+148 bytes payload from the compatibility VLR
+  // read the 2+2+4+148(+18) bytes payload from the compatibility VLR
   ByteStreamInArray* in;
   if (IS_LITTLE_ENDIAN())
     in = new ByteStreamInArrayLE(compatibility_vlr->data, compatibility_vlr->record_length_after_header);
   else
     in = new ByteStreamInArrayBE(compatibility_vlr->data, compatibility_vlr->record_length_after_header);
-  // read the 2+2+4+148 bytes of the extended LAS 1.4 header
+  // read the 2+2+4+148(+18) bytes of the extended LAS 1.4/1.5 header
   U16 lastools_version;
   in->get16bitsLE((U8*)&lastools_version);
   U16 compatible_version;
   in->get16bitsLE((U8*)&compatible_version);
-  if (compatible_version != 3)
+  if ((compatible_version != 3) && (compatible_version != 4))
   {
     laserror("compatibility mode version %u not implemented", compatible_version);
     return FALSE;
@@ -514,6 +557,12 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
   for (i = 0; i < 15; i++)
   {
     in->get64bitsLE((U8*)&(header->extended_number_of_points_by_return[i]));
+  }
+  // las 1.5
+  if (compatibility_for_1_5) {
+      in->get64bitsLE((U8*)&(header->max_gps_time));
+      in->get64bitsLE((U8*)&(header->min_gps_time));
+      in->get16bitsLE((U8*)&(header->time_offset));
   }
   // delete the compatibility VLR
   header->remove_vlr("lascompatible", 22204);

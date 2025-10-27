@@ -24,6 +24,7 @@
   
   CHANGE HISTORY:
   
+    30 December 2021 -- fix small memory leak
     19 March 2019 -- set "legacy classification" to zero if "classification > 31"  
     28 December 2017 -- fix incorrect 'context switch' reported by Wanwannodao 
     28 August 2017 -- moving 'context' from global development hack to interface  

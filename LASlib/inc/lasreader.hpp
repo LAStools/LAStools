@@ -180,6 +180,16 @@ class LASLIB_DLL LASreader {
   inline F64 get_max_z() const {
     return header.max_z;
   };
+  // LAS 1.5
+  inline F64 get_max_gps_time() const {
+      return header.max_gps_time;
+  };
+  inline F64 get_min_gps_time() const {
+      return header.min_gps_time;
+  };
+  inline U16 get_time_offset() const {
+      return header.time_offset;
+  };
 
   inline F64 get_x() const {
     return get_x(point.get_X());

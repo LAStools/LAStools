@@ -149,6 +149,11 @@ typedef struct demzip_header
   demzip_U64 extended_number_of_point_records;
   demzip_U64 extended_number_of_points_by_return[15];
 
+  // LAS 1.5 and higher only
+  demzip_F64 max_gps_time;
+  demzip_F64 min_gps_time;
+  demzip_U16 time_offset;
+
   // optional
   demzip_U32 user_data_in_header_size;
   demzip_U8* user_data_in_header;

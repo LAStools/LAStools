@@ -426,7 +426,7 @@ int main(int argc, char* argv[])
       {
         laserror("major version %d not supported", set_version_major);
       }
-      if ((set_version_minor < 0) || (set_version_minor > 4))
+      if ((set_version_minor < 0) || (set_version_minor > 5))
       {
         laserror("minor version %d not supported", set_version_minor);
       }
@@ -645,6 +645,11 @@ int main(int argc, char* argv[])
           lasreader->header.header_size += 148;
           lasreader->header.offset_to_point_data += 148;
         }
+        else if (set_version_minor == 5)
+        {
+            lasreader->header.header_size += (148 + 18);
+            lasreader->header.offset_to_point_data += (148 + 18);
+        }
       }
       else if (lasreader->header.version_minor == 3)
       {
@@ -657,6 +662,11 @@ int main(int argc, char* argv[])
         {
           lasreader->header.header_size += 140;
           lasreader->header.offset_to_point_data += 140;
+        }
+        else if (set_version_minor == 5)
+        {
+            lasreader->header.header_size += (140 + 18);
+            lasreader->header.offset_to_point_data += (140 + 18);
         }
       }
       else if (lasreader->header.version_minor == 4)
@@ -671,6 +681,29 @@ int main(int argc, char* argv[])
           lasreader->header.header_size -= 140;
           lasreader->header.offset_to_point_data -= 140;
         }
+        else if (set_version_minor == 5)
+        {
+            lasreader->header.header_size += 18;
+            lasreader->header.offset_to_point_data += 18;
+        }
+      }
+      else if (lasreader->header.version_minor == 5)
+      {
+          if (set_version_minor < 3)
+          {
+              lasreader->header.header_size -= (148 + 18);
+              lasreader->header.offset_to_point_data -= (148 + 18);
+          }
+          else if (set_version_minor == 3)
+          {
+              lasreader->header.header_size -= (140 + 18);
+              lasreader->header.offset_to_point_data -= (140 + 18);
+          }
+          else if (set_version_minor == 4)
+          {
+              lasreader->header.header_size -= 18;
+              lasreader->header.offset_to_point_data -= 18;
+          }
       }
       lasreader->header.version_minor = (U8)set_version_minor;
     }

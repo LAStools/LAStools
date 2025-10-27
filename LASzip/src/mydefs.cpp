@@ -36,7 +36,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdarg>
-#include <cstdint>
 #include <cstring>
 #include <filesystem>
 #include <stdarg.h>
@@ -123,9 +122,9 @@ extern void LASLIB_DLL byebye() {
   exit(code);
 }
 
-/// Validates whether a given string is UTF-8 according to the RFC 3629/RTC standard
-bool validate_utf8(const char* utf8) noexcept {
-  if (!utf8) {
+/// Validates whether a given string is UTF-8 encoded.
+bool validate_utf8(const char* str, bool restrict_to_two_bytes) noexcept {
+  if (!str) {
     return false;
   }
 
@@ -138,7 +137,8 @@ bool validate_utf8(const char* utf8) noexcept {
   constexpr uint8_t UTF8_CONTINUATION_MASK = 0xC0;
   constexpr uint8_t UTF8_CONTINUATION_PREFIX = 0x80;
 
-  const auto* p = reinterpret_cast<const unsigned char*>(utf8);
+  bool has_two_byte = false;
+  const auto* p = reinterpret_cast<const unsigned char*>(str);
 
   while (*p) {
     uint8_t c = *p;
@@ -149,6 +149,12 @@ bool validate_utf8(const char* utf8) noexcept {
       continue;
     }
 
+    // Detect standalone high bytes (0x80-0xFF), common in Windows-1252
+    if (c >= 0x80 && (c < 0xC2 || (c & UTF8_2BYTE_MASK) != UTF8_2BYTE_PREFIX) && (c & UTF8_3BYTE_MASK) != UTF8_3BYTE_PREFIX &&
+        (c & UTF8_4BYTE_MASK) != UTF8_4BYTE_PREFIX) {
+      return false;  // Invalid UTF-8 start byte, likely ANSI
+    }
+
     // 2-byte sequence (U+0080 - U+07FF)
     if ((c & UTF8_2BYTE_MASK) == UTF8_2BYTE_PREFIX) {
       if (c < 0xC2 || !p[1]) {
@@ -156,13 +162,28 @@ bool validate_utf8(const char* utf8) noexcept {
       }
       uint8_t c1 = p[1];
       if ((c1 & UTF8_CONTINUATION_MASK) != UTF8_CONTINUATION_PREFIX) {
+        // Check for ANSI-like second byte (0x40-0x7F), common in GBK/Shift-JIS
+        if (c1 >= 0x40 && c1 <= 0x7F) {
+          return false;  // Likely GBK or Shift-JIS, not UTF-8
+        }
         return false;  // Invalid continuation byte
       }
+      // Decode and check code point to exclude rare ranges
+      uint32_t code_point = ((c & 0x1F) << 6) | (c1 & 0x3F);
+      if (code_point < 0x80 || code_point > 0x7FF || (code_point >= 0x0080 && code_point <= 0x05FF)) {
+        return false;  // Invalid or rare code point, likely ANSI
+      }
+      has_two_byte = true;
       p += 2;
       continue;
     }
 
-    // 3-byte sequence (U+0800 - U+FFFF, without Surrogates U+D800..U+DFFF)
+    // Restrict to 2-byte sequences if specified
+    if (restrict_to_two_bytes) {
+      return false;
+    }
+
+    // 3-byte sequence (U+0800 - U+FFFF)
     if ((c & UTF8_3BYTE_MASK) == UTF8_3BYTE_PREFIX) {
       if (!p[1] || !p[2]) {
         return false;  // Missing continuation bytes
