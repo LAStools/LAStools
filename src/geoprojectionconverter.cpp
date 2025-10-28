@@ -1051,8 +1051,9 @@ const char* ProjParameters::get_datum_info(bool source /*=true*/) {
         const char* datum_name = proj_get_name(datum);
         if (datum_name) {
           LASMessage(LAS_VERY_VERBOSE, "the PROJ datum name was successfully created '%s'", datum_name);
-          proj_crs_infos = new char[256];
-          snprintf(proj_crs_infos, sizeof(proj_crs_infos), "Name: %s\n", datum_name);
+          size_t bufSize = 256;
+          proj_crs_infos = new char[bufSize];
+          snprintf(proj_crs_infos, bufSize, "Name: %s\n", datum_name);
           return proj_crs_infos;
         }
       }
@@ -8771,8 +8772,8 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
     laserror("The proj_json file '%s' could not be opened", json_filename);
   }
   fseek_las(Proj_file, 0, SEEK_END);
-  size_t fileSize = ftell_las(Proj_file);
-  if (fileSize == -1L) {
+  I64 fileSize = ftell_las(Proj_file);
+  if (fileSize == -1) {
     proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading file '%s'", json_filename);
   }
@@ -8787,7 +8788,7 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
   }
   size_t readSize = fread(jsonContent, 1, fileSize, Proj_file);
 
-  if (readSize > fileSize) {
+  if (readSize > (size_t)fileSize) {
     delete[] jsonContent;
     fclose(Proj_file);
     proj_context_destroy(projParameters.proj_ctx);
@@ -8829,7 +8830,7 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
 /// create PROJ object using the wkt format (for source=true or target=false)
 /// Parse and validate the input wkt file and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, bool source /*= true*/) {
-  size_t fileSize = 0;
+  I64 fileSize = 0;
   int err_no;
 
   if (!wkt_filename) laserror("Wkt filename is missing");
@@ -8846,7 +8847,7 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
 
   fseek_las(Proj_file, 0, SEEK_END);
   fileSize = ftell_las(Proj_file);
-  if (fileSize == -1L) {
+  if (fileSize == -1) {
     proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading file '%s'", wkt_filename);
   }
@@ -8860,7 +8861,7 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
   }
   size_t readSize = fread(wktContent, 1, fileSize, Proj_file);
 
-  if (readSize > fileSize) {
+  if (readSize > (size_t)fileSize) {
     delete[] wktContent;
     fclose(Proj_file);
     proj_context_destroy(projParameters.proj_ctx);

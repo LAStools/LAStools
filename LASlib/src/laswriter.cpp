@@ -1194,8 +1194,8 @@ void LASwriteOpener::add_appendix(const CHAR* appendix)
 void LASwriteOpener::cut_characters() {
   if (file_name && cut)
   {
-    I32 len = (I32)strlen(file_name);
-    I32 new_len = (len > cut) ? (len - cut) : 0;
+    size_t len = strlen(file_name);
+    size_t new_len = (len > cut) ? (len - cut) : 0;
     CHAR* new_file_name = (CHAR*)malloc_las(new_len + 5);
     while ((len > 0) && (file_name[len] != '.') && (file_name[len] != '\\') && (file_name[len] != '/') && (file_name[len] != ':')) len--;
 
@@ -1203,7 +1203,7 @@ void LASwriteOpener::cut_characters() {
     {
       if ((len == 0) || (file_name[len] == '\\') || (file_name[len] == '/') || (file_name[len] == ':'))
       {
-        len = (I32)strlen(file_name);
+        len = strlen(file_name);
         memcpy(new_file_name, file_name, new_len);
       }
       else

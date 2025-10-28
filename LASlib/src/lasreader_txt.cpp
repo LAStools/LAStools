@@ -1859,8 +1859,8 @@ BOOL LASreaderTXT::parse(const char* parse_string)
   // HSL HSV special parsing
   BOOL has_hsl = false;
   BOOL has_hsv = false;
-  F32 hsl[3];
-  F32 hsv[3];
+  F32 hsl[3] = {};
+  F32 hsv[3] = {};
 
   while (p[0])
   {

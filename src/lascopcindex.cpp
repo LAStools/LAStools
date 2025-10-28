@@ -544,7 +544,7 @@ struct OctantOnDisk : public Octant
     if (point_buffer != nullptr)
     {
       fseek_las(fp, 0, SEEK_SET);
-      if (fread(point_buffer, point_size, point_count, fp) != point_count) {
+      if (fread(point_buffer, point_size, point_count, fp) != (size_t)point_count) {
         laserror("Error reading file: %s", strerror(errno));
       }
     } else {
@@ -1413,7 +1413,7 @@ int main(int argc, char* argv[])
                 // Record the VLR entry
                 I64 current_pos = laswriter->tell();
                 if (current_pos < 0) laserror("Error determining file position when writing chunks to file: %s", strerror(errno));
-                if (entry.offset > current_pos) laserror("Error: offset(% llu) greater than file position(% lld) when writing chunks", entry.offset, current_pos);
+                if (entry.offset > (size_t)current_pos) laserror("Error: offset(% llu) greater than file position(% lld) when writing chunks", entry.offset, current_pos);
                 entry.byte_size = (U32)(current_pos - entry.offset);
                 entries.push_back(entry);
 

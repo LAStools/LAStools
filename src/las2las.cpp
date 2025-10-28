@@ -66,7 +66,6 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cstdint> 
 
 #include "mydefs.hpp"
 #include "lastool.hpp"
@@ -271,7 +270,7 @@ static bool has_vlr_extension(const CHAR* filename) {
 
 // Validating and determining the VLR index and the parameters
 static U32 determine_vlr_index(const LASheader* header, const int& vlr_index, const CHAR* vlr_user_id, const int& vlr_record_id) {
-  U32 index = -1;
+  U32 index = UINT32_MAX;
 
   if (vlr_user_id == nullptr && vlr_record_id == -1) {
     //Using index for '-save_vlr'
@@ -279,7 +278,7 @@ static U32 determine_vlr_index(const LASheader* header, const int& vlr_index, co
       if (vlr_index < 0 || static_cast<unsigned int>(vlr_index) >= header->number_of_variable_length_records) {  //HIER NOCHMAL KONTROLLIEREN ' >= '
         laserror("Invalid index: The specified index '%d' for '-save_vlr' is out of range", vlr_index);
       }
-      index = vlr_index;
+      index = (U32)vlr_index;
     }
     //Default to index = 0 if no parameters are specified when using '-save_vlr'
     else {
@@ -296,7 +295,7 @@ static U32 determine_vlr_index(const LASheader* header, const int& vlr_index, co
         break;
       }
     }
-    if (index == -1) {
+    if (index == UINT32_MAX) {
       laserror("The specified user ID '%s' or record ID '%d' could not be found when using '-save_vlr'", vlr_user_id, vlr_record_id);
     }
   } 
@@ -309,7 +308,7 @@ static U32 determine_vlr_index(const LASheader* header, const int& vlr_index, co
 /// Saves a single VLR from a LAS header to a specified or default file, ensuring data integrity and file format validation.
 static bool save_single_vlr_to_file(const LASheader* header, const int& vlr_index, const CHAR* vlr_user_id, const int& vlr_record_id, const CHAR* vlr_output_filename)
 {
-  U32 i = -1;
+  U32 i = UINT32_MAX;
   FILE* file  = nullptr;
   // Save VLR to specified or default filename
   if (vlr_output_filename == nullptr) {
@@ -485,7 +484,7 @@ static bool load_single_vlr_from_file(LASheader* header, const int& vlr_index, c
       vlr.data = 0;
     }
 
-    if (vlr_index >= 0 && i == vlr_index) {
+    if (vlr_index >= 0 && i == (U32)vlr_index) {
       header->add_vlr(vlr.user_id, vlr.record_id, vlr.record_length_after_header, vlr.data, TRUE, vlr.description);
       LASMessage(LAS_VERBOSE, "load VLR with vlr_index '%d' from '%s' file", vlr_index, vlr_input_filename);
       break;
