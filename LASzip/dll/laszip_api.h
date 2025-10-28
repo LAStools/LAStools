@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    17 October 2025 -- support for LAS 1.5 
     22 August 2017 -- Add version info.
     4 August 2017 -- 'laszip_set_point_type_and_size()' as minimal setup for ostream writer
     3 August 2017 -- new 'laszip_create_laszip_vlr()' gets VLR as C++ std::vector
@@ -172,6 +173,11 @@ typedef struct laszip_header
   laszip_U32 number_of_extended_variable_length_records;
   laszip_U64 extended_number_of_point_records;
   laszip_U64 extended_number_of_points_by_return[15];
+
+  // LAS 1.5 and higher only
+  laszip_F64 max_gps_time;
+  laszip_F64 min_gps_time;
+  laszip_U16 time_offset;
 
   // optional
   laszip_U32 user_data_in_header_size;

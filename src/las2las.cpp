@@ -1329,7 +1329,7 @@ int main(int argc, char* argv[])
 
       if (set_version_minor >= 0)
       {
-        if (set_version_minor > 4)
+        if (set_version_minor > 5)
         {
           laserror("unknown version_minor %d", set_version_minor);
         }
@@ -1340,10 +1340,15 @@ int main(int argc, char* argv[])
             lasreader->header.header_size -= 8;
             lasreader->header.offset_to_point_data -= 8;
           }
-          else if (lasreader->header.version_minor >= 4)
+          else if (lasreader->header.version_minor == 4)
           {
             lasreader->header.header_size -= (8 + 140);
             lasreader->header.offset_to_point_data -= (8 + 140);
+          }
+          else if (lasreader->header.version_minor >= 5)
+          {
+              lasreader->header.header_size -= (8 + 140 + 18);
+              lasreader->header.offset_to_point_data -= (8 + 140 + 18);
           }
         }
         else if (set_version_minor == 3)
@@ -1354,10 +1359,15 @@ int main(int argc, char* argv[])
             lasreader->header.offset_to_point_data += 8;
             lasreader->header.start_of_waveform_data_packet_record = 0;
           }
-          else if (lasreader->header.version_minor >= 4)
+          else if (lasreader->header.version_minor == 4)
           {
             lasreader->header.header_size -= 140;
             lasreader->header.offset_to_point_data -= 140;
+          }
+          else if (lasreader->header.version_minor >= 5)
+          {
+              lasreader->header.header_size -= (140 + 18);
+              lasreader->header.offset_to_point_data -= (140 + 18);
           }
         }
         else if (set_version_minor == 4)
@@ -1373,6 +1383,11 @@ int main(int argc, char* argv[])
             lasreader->header.header_size += 140;
             lasreader->header.offset_to_point_data += 140;
           }
+          else if (lasreader->header.version_minor >= 5)
+          {
+              lasreader->header.header_size -= 18;
+              lasreader->header.offset_to_point_data -= 18;
+          }
 
           if (lasreader->header.version_minor < 4)
           {
@@ -1387,6 +1402,39 @@ int main(int argc, char* argv[])
               }
             }
           }
+        }
+        else if (set_version_minor == 5)
+        {
+            if (lasreader->header.version_minor < 3)
+            {
+                lasreader->header.header_size += (8 + 140 + 18);
+                lasreader->header.offset_to_point_data += (8 + 140 + 18);
+                lasreader->header.start_of_waveform_data_packet_record = 0;
+            }
+            else if (lasreader->header.version_minor == 3)
+            {
+                lasreader->header.header_size += (140 + 18);
+                lasreader->header.offset_to_point_data += (140 + 18);
+            }
+            else if (lasreader->header.version_minor == 4)
+            {
+                lasreader->header.header_size += 18;
+                lasreader->header.offset_to_point_data += 18;
+            }
+
+            if (lasreader->header.version_minor < 4)
+            {
+                if (set_point_data_format > 5)
+                {
+                    lasreader->header.extended_number_of_point_records = lasreader->header.number_of_point_records;
+                    lasreader->header.number_of_point_records = 0;
+                    for (i = 0; i < 5; i++)
+                    {
+                        lasreader->header.extended_number_of_points_by_return[i] = lasreader->header.number_of_points_by_return[i];
+                        lasreader->header.number_of_points_by_return[i] = 0;
+                    }
+                }
+            }
         }
 
         if ((set_version_minor <= 3) && (lasreader->header.version_minor >= 4))

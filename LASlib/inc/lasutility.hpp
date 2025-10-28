@@ -48,6 +48,8 @@ public:
   I32 min_Y;
   I32 max_Z;
   I32 min_Z;
+  F64 max_gps_time;
+  F64 min_gps_time;
   BOOL init(const LASheader* header);
   BOOL add(const LASpoint* point);
   BOOL update_header(LASheader* header) const;

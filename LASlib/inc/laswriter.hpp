@@ -25,6 +25,7 @@
 
   CHANGE HISTORY:
 
+    17 October 2025 -- add requested_version to select item version in laz compression
     14 June 2023 -- add tell() to the writers to be able to write copc files
     7 September 2018 -- replaced calls to _strdup with calls to the LASCopyString macro
     17 August 2017 -- switch on "native LAS 1.4 extension". turns off with '-no_native'.
@@ -84,6 +85,7 @@ public:
   BOOL set_format(I32 format);
   BOOL set_format(const CHAR* format);
   void set_force(BOOL force);
+  void set_requested_version(U32 requested_version);
   void set_chunk_size(U32 chunk_size);
   void make_numbered_file_name(const CHAR* file_name, I32 digits);
   void make_file_name(const CHAR* file_name, I32 file_number=-1);
@@ -131,6 +133,7 @@ private:
   U32 chunk_size;
   BOOL use_stdout;
   BOOL use_nil;
+  U32 requested_version;
 };
 
 #endif

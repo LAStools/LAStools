@@ -8,6 +8,7 @@
     Contains the Header and Point classes for reading and writing LiDAR points
     in the LAS format
 
+      Version 1.5,   Oct 13, 2025 
       Version 1.4,   Nov 14, 2011.
       Version 1.3,   Oct 24, 2010.
       Version 1.2, April 29, 2008.
@@ -30,7 +31,8 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
   CHANGE HISTORY:
-
+  
+    13 October 2025 -- support for LAS 1.5
     9 November 2022 -- support of COPC VLR and EVLR
     19 April 2017 -- support for selective decompression for new LAS 1.4 points
     1 February 2017 -- better support for OGC WKT strings in VLRs or EVLRs
@@ -80,11 +82,13 @@
 #define LAS_TOOLS_FORMAT_DTM    12
 #define LAS_TOOLS_FORMAT_JSON   13
 
-#define LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE 0
-#define LAS_TOOLS_GLOBAL_ENCODING_BIT_WDP_INTERNAL  1
-#define LAS_TOOLS_GLOBAL_ENCODING_BIT_WDP_EXTERNAL  2
-#define LAS_TOOLS_GLOBAL_ENCODING_BIT_SYNTHETIC     3
-#define LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS   4
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE    0
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_WDP_INTERNAL     1
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_WDP_EXTERNAL     2
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_SYNTHETIC        3
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS      4
+// bit 5 unused
+#define LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG 6
 
 #define LAS_TOOLS_IO_IBUFFER_SIZE   262144
 #define LAS_TOOLS_IO_OBUFFER_SIZE   262144
@@ -234,6 +238,11 @@ public:
   U64 extended_number_of_point_records;
   U64 extended_number_of_points_by_return[15];
 
+  // LAS 1.5 only
+  F64 max_gps_time;
+  F64 min_gps_time;
+  U16 time_offset;
+
   U32 user_data_in_header_size;
   U8* user_data_in_header;
 
@@ -339,6 +348,9 @@ public:
     y_offset = 0.0;
     z_offset = 0.0;
     z_from_attrib = -1;
+    time_offset = 0;
+    min_gps_time = 0;
+    max_gps_time = 0;
   };
 
   void clean_user_data_in_header()
@@ -491,14 +503,18 @@ public:
       laserror("wrong file signature '%4s'", file_signature);
       return FALSE;
     }
-    if ((version_major != 1) || (version_minor > 4))
+    if ((version_major != 1) || (version_minor > 5))
     {
-      LASMessage(LAS_WARNING, "unknown version %d.%d (allowed 1.0-1.4)", version_major, version_minor);
+      LASMessage(LAS_WARNING, "unknown version %d.%d (allowed 1.0-1.5)", version_major, version_minor);
     }
     U8 pdf = point_data_format & 0x7f; // remove LAZ bit 7
     if (((version_minor < 4) && (pdf >= 6)) ||
         ((version_minor < 3) && (pdf >= 4)) ||
         ((version_minor < 2) && (pdf >= 2))) {
+        LASMessage(LAS_WARNING, "LAS version %d.%d does not allow point format %d", version_major, version_minor, pdf);
+    }
+    // LAS 1.5 removed support for point format 0-5. 
+    if ((version_minor > 4) && (pdf < 6)) {
         LASMessage(LAS_WARNING, "LAS version %d.%d does not allow point format %d", version_major, version_minor, pdf);
     }
     if (header_size < 227)
@@ -530,6 +546,7 @@ public:
         LASMessage(LAS_WARNING, "invalid bounding box [ %g %g %g / %g %g %g ]", min_x, min_y, min_z, max_x, max_y, max_z);
       }
     }
+    // note: min_gps_time and max_gps_time not part of core fields and are not read at the time of this check
     return TRUE;
   };
 

@@ -44,6 +44,7 @@ LASinventory::LASinventory()
   max_X = min_X = 0;
   max_Y = min_Y = 0;
   max_Z = min_Z = 0;
+  max_gps_time = min_gps_time = 0;
   first = TRUE;
 }
 
@@ -62,6 +63,8 @@ BOOL LASinventory::init(const LASheader* header)
     min_Y = (I32)header->get_Y(header->min_y);
     max_Z = (I32)header->get_Z(header->max_z);
     min_Z = (I32)header->get_Z(header->min_z);
+    max_gps_time = header->max_gps_time;
+    min_gps_time = header->min_gps_time;
     first = FALSE;
     return TRUE;
   }
@@ -84,16 +87,23 @@ BOOL LASinventory::add(const LASpoint* point)
     min_X = max_X = point->get_X();
     min_Y = max_Y = point->get_Y();
     min_Z = max_Z = point->get_Z();
+    if (point->have_gps_time) {
+        min_gps_time = max_gps_time = point->get_gps_time();
+    }
     first = FALSE;
   }
   else
   {
-    if (point->get_X() < min_X) min_X = point->get_X();
-    else if (point->get_X() > max_X) max_X = point->get_X();
-    if (point->get_Y() < min_Y) min_Y = point->get_Y();
-    else if (point->get_Y() > max_Y) max_Y = point->get_Y();
-    if (point->get_Z() < min_Z) min_Z = point->get_Z();
-    else if (point->get_Z() > max_Z) max_Z = point->get_Z();
+      if (point->get_X() < min_X) { min_X = point->get_X(); }
+      else if (point->get_X() > max_X) { max_X = point->get_X(); }
+      if (point->get_Y() < min_Y) { min_Y = point->get_Y(); }
+      else if (point->get_Y() > max_Y) { max_Y = point->get_Y(); }
+      if (point->get_Z() < min_Z) { min_Z = point->get_Z(); }
+      else if (point->get_Z() > max_Z) { max_Z = point->get_Z(); }
+      if (point->have_gps_time) {
+          if (point->get_gps_time() < min_gps_time) { min_gps_time = point->get_gps_time(); }
+          else if (point->get_gps_time() > max_gps_time) { max_gps_time = point->get_gps_time(); }
+      }
   }
   return TRUE;
 }
@@ -142,6 +152,8 @@ BOOL LASinventory::update_header(LASheader* header) const
     header->min_y = header->get_y(min_Y);
     header->max_z = header->get_z(max_Z);
     header->min_z = header->get_z(min_Z);
+    header->max_gps_time = max_gps_time;
+    header->min_gps_time = min_gps_time;
     header->extended_number_of_point_records = extended_number_of_point_records;
     for (i = 0; i < 15; i++)
     {

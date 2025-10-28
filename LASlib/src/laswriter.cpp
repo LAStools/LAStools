@@ -57,7 +57,7 @@ LASwriter* LASwriteOpener::open(const LASheader* header)
   if (use_nil)
   {
     LASwriterLAS* laswriterlas = new LASwriterLAS();
-    if (!laswriterlas->open(header, (format == LAS_TOOLS_FORMAT_LAZ ? (native ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
+    if (!laswriterlas->open(header, (format == LAS_TOOLS_FORMAT_LAZ ? (native ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), requested_version, chunk_size))
     {
       laserror("cannot open laswriterlas to NULL");
       delete laswriterlas;
@@ -70,7 +70,7 @@ LASwriter* LASwriteOpener::open(const LASheader* header)
     if (format <= LAS_TOOLS_FORMAT_LAZ)
     {
       LASwriterLAS* laswriterlas = new LASwriterLAS();
-      if (!laswriterlas->open(file_name, header, (format == LAS_TOOLS_FORMAT_LAZ ? (native ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size, io_obuffer_size))
+      if (!laswriterlas->open(file_name, header, (format == LAS_TOOLS_FORMAT_LAZ ? (native ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), requested_version, chunk_size, io_obuffer_size))
       {
         laserror("cannot open laswriterlas with file name '%s'", file_name);
         delete laswriterlas;
@@ -136,7 +136,7 @@ LASwriter* LASwriteOpener::open(const LASheader* header)
     if (format <= LAS_TOOLS_FORMAT_LAZ)
     {
       LASwriterLAS* laswriterlas = new LASwriterLAS();
-      if (!laswriterlas->open(stdout, header, (format == LAS_TOOLS_FORMAT_LAZ ? (native ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), 2, chunk_size))
+      if (!laswriterlas->open(stdout, header, (format == LAS_TOOLS_FORMAT_LAZ ? (native ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_CHUNKED) : LASZIP_COMPRESSOR_NONE), requested_version, chunk_size))
       {
         laserror("cannot open laswriterlas to stdout");
         delete laswriterlas;
@@ -783,6 +783,16 @@ void LASwriteOpener::set_force(BOOL force)
   this->force = force;
 }
 
+// current default item version: 2 for point types 0-5, 3 for point types 6-10 (will be automatically selected. 
+// using version 4 is for the new, slightly fixed encoding of point types 6-10 
+// (not the default, so the supporting software can be spread first, along with LAS 1.5)
+void LASwriteOpener::set_requested_version(U32 requested_version ) 
+{
+    this->requested_version = requested_version;
+}
+
+
+
 void LASwriteOpener::set_chunk_size(U32 chunk_size)
 {
   this->chunk_size = chunk_size;
@@ -1239,6 +1249,7 @@ LASwriteOpener::LASwriteOpener()
   chunk_size = LASZIP_CHUNK_SIZE_DEFAULT;
   use_stdout = FALSE;
   use_nil = FALSE;
+  requested_version = 0;
 }
 
 LASwriteOpener::~LASwriteOpener()

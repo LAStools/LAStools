@@ -24,6 +24,7 @@
 
   CHANGE HISTORY:
 
+    17 October 2025 -- support for LAS 1.5
     24 March 2021 -- fix small memory leak
     15 October 2019 -- support reading from and writing to unicode file names under Windows
     20 March 2019 -- check consistent legacy and extended classification in laszip_write_point()
@@ -85,6 +86,8 @@ public:
   I32 min_Y;
   I32 max_Z;
   I32 min_Z;
+  F64 max_gps_time;
+  F64 min_gps_time;
   void add(const laszip_point_struct* point)
   {
     number_of_point_records++;
@@ -104,6 +107,7 @@ public:
       min_X = max_X = point->X;
       min_Y = max_Y = point->Y;
       min_Z = max_Z = point->Z;
+      min_gps_time = max_gps_time = point->gps_time;
       first = FALSE;
     }
     else
@@ -114,6 +118,8 @@ public:
       else if (point->Y > max_Y) max_Y = point->Y;
       if (point->Z < min_Z) min_Z = point->Z;
       else if (point->Z > max_Z) max_Z = point->Z;
+      if (point->gps_time < min_gps_time) { min_gps_time = point->gps_time; }
+      else if (point->gps_time > max_gps_time) { max_gps_time = point->gps_time; }
     }
   }
   laszip_dll_inventory()
@@ -123,6 +129,7 @@ public:
     max_X = min_X = 0;
     max_Y = min_Y = 0;
     max_Z = min_Z = 0;
+    min_gps_time = max_gps_time = 0;
     first = TRUE;
   }
 private:
@@ -828,6 +835,13 @@ laszip_set_header(
       laszip_dll->header.number_of_extended_variable_length_records = header->number_of_extended_variable_length_records;
       laszip_dll->header.extended_number_of_point_records = header->extended_number_of_point_records;
       for (i = 0; i < 15; i++) laszip_dll->header.extended_number_of_points_by_return[i] = header->extended_number_of_points_by_return[i];
+    }
+
+    if (laszip_dll->header.version_minor >= 5)
+    {
+        laszip_dll->header.max_gps_time = header->max_gps_time;
+        laszip_dll->header.min_gps_time = header->min_gps_time;
+        laszip_dll->header.time_offset = header->time_offset;
     }
 
     laszip_dll->header.user_data_in_header_size = header->user_data_in_header_size;
@@ -2060,6 +2074,7 @@ laszip_prepare_point_for_write(
 )
 {
   U32 i;
+  U8 version_minor_orig = laszip_dll->header.version_minor;
 
   if (laszip_dll->header.point_data_format > 5)
   {
@@ -2135,17 +2150,32 @@ laszip_prepare_point_for_write(
       // downgrade to LAS 1.2 or LAS 1.3
       if (laszip_dll->header.point_data_format <= 8)
       {
-        laszip_dll->header.version_minor = 2;
-        // LAS 1.2 header is 148 bytes less than LAS 1.4+ header
-        laszip_dll->header.header_size -= 148;
-        laszip_dll->header.offset_to_point_data -= 148;
+          if (laszip_dll->header.version_minor >= 4) {
+              // LAS 1.2 header is 148 bytes less than LAS 1.4 header
+              laszip_dll->header.header_size -= 148;
+              laszip_dll->header.offset_to_point_data -= 148;
+          }
+          if (laszip_dll->header.version_minor >= 5) {
+              // LAS 1.4 header is 18 bytes less than LAS 1.5 header
+              laszip_dll->header.header_size -= 18;
+              laszip_dll->header.offset_to_point_data -= 18;
+          }
+          laszip_dll->header.version_minor = 2;
+
       }
       else
       {
-        laszip_dll->header.version_minor = 3;
-        // LAS 1.3 header is 140 bytes less than LAS 1.4+ header
-        laszip_dll->header.header_size -= 140;
-        laszip_dll->header.offset_to_point_data -= 140;
+          if (laszip_dll->header.version_minor >= 4) {
+              // LAS 1.3 header is 140 bytes less than LAS 1.4 header
+              laszip_dll->header.header_size -= 140;
+              laszip_dll->header.offset_to_point_data -= 140;
+          }
+          if (laszip_dll->header.version_minor >= 5) {
+              // LAS 1.4 header is 18 bytes less than LAS 1.5 header
+              laszip_dll->header.header_size -= 18;
+              laszip_dll->header.offset_to_point_data -= 18;
+          }
+          laszip_dll->header.version_minor = 3;
       }
       // turn off the bit indicating the presence of the OGC WKT
       laszip_dll->header.global_encoding &= ~(1<<4);
@@ -2165,6 +2195,9 @@ laszip_prepare_point_for_write(
       U16 laszip_version = (U16)LASZIP_VERSION_BUILD_DATE;
       out->put16bitsLE((U8*)&laszip_version);
       U16 compatible_version = 3;
+      if (version_minor_orig == 5) {
+          compatible_version = 4;
+      }
       out->put16bitsLE((U8*)&compatible_version);
       U32 unused = 0;
       out->put32bitsLE((U8*)&unused);
@@ -2206,9 +2239,22 @@ laszip_prepare_point_for_write(
         out->put64bitsLE((U8*)&extended_number_of_points_by_return);
       }
 
-      // add the compatibility VLR
+      // standard vlr size for LAS 1.4
+      U16 vlr_size = 2 + 2 + 4 + 148; 
 
-      if (laszip_add_vlr(laszip_dll, "lascompatible\0\0", 22204, (laszip_U16)(2+2+4+148), 0, (laszip_U8*)out->takeData()))
+      // las 1.5
+      if (version_minor_orig >= 5) {
+          F64 max_gps_time = laszip_dll->header.max_gps_time;
+          out->put64bitsLE((U8*)&max_gps_time);
+          F64 min_gps_time = laszip_dll->header.min_gps_time;
+          out->put64bitsLE((U8*)&min_gps_time);
+          U16 time_offset = laszip_dll->header.time_offset;
+          out->put16bitsLE((U8*)&time_offset);
+          vlr_size += 18;
+      }
+
+      // add the compatibility VLR
+      if (laszip_add_vlr(laszip_dll, "lascompatible\0\0", 22204, (laszip_U16)(vlr_size), 0, (laszip_U8*)out->takeData()))
       {
         snprintf(laszip_dll->error, sizeof(laszip_dll->error), "adding the compatibility VLR");
         return 1;
@@ -2252,7 +2298,7 @@ laszip_prepare_point_for_write(
             }
           }
 
-          // describe any undocumented "extra bytes" as "unknown" U8  attributes
+          // describe any undocumented "extra bytes" as "unknown" U8 attributes
           for (I32 i = (I32)(laszip_dll->attributer->get_attributes_size()); i < number_of_existing_extrabytes; i++)
           {
             CHAR unknown_name[16];
@@ -2809,6 +2855,35 @@ laszip_write_header(
     }
   }
 
+  // special handling for LAS 1.5
+  if ((laszip_dll->header.version_major == 1) && (laszip_dll->header.version_minor >= 5))
+  {
+      if (laszip_dll->header.header_size < 393)
+      {
+          snprintf(laszip_dll->error, sizeof(laszip_dll->error), "for LAS 1.%d header_size should at least be 393 but it is only %d", laszip_dll->header.version_minor, laszip_dll->header.header_size);
+          return 1;
+      }
+      else
+      {
+          try { laszip_dll->streamout->put64bitsLE((const U8*)&(laszip_dll->header.max_gps_time)); } catch (...)
+          {
+              snprintf(laszip_dll->error, sizeof(laszip_dll->error), "writing header.max_gps_time");
+              return 1;
+          }
+          try { laszip_dll->streamout->put64bitsLE((const U8*)&(laszip_dll->header.min_gps_time)); } catch (...)
+          {
+              snprintf(laszip_dll->error, sizeof(laszip_dll->error), "writing header.min_gps_time");
+              return 1;
+          }
+          try { laszip_dll->streamout->put16bitsLE((const U8*)&(laszip_dll->header.time_offset)); } catch (...)
+          {
+              snprintf(laszip_dll->error, sizeof(laszip_dll->error), "writing header.time_offset");
+              return 1;
+          }
+          laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 393;
+      }
+  }
+
   // write any number of user-defined bytes that might have been added to the header
   if (laszip_dll->header.user_data_in_header_size)
   {
@@ -3025,9 +3100,8 @@ setup_laszip_items(
       }
     }
 
-    // request version (old point types only, new point types always use version 3)
-
-    laszip->request_version(2);
+    // request version 
+    laszip->request_version(laszip->get_default_version(point_type, laszip_dll->header.version_major, laszip_dll->header.version_minor));
 
     // maybe we should change the chunk size
 
@@ -3832,6 +3906,38 @@ laszip_read_header(
     }
   }
 
+  // special handling for LAS 1.5
+  if ((laszip_dll->header.version_major == 1) && (laszip_dll->header.version_minor >= 5))
+  {
+      if (laszip_dll->header.header_size < 393)
+      {
+          snprintf(laszip_dll->error, sizeof(laszip_dll->error), "for LAS 1.%d header_size should at least be 393 but it is only %d", laszip_dll->header.version_minor, laszip_dll->header.header_size);
+          return 1;
+      }
+      else
+      {
+          try { laszip_dll->streamin->get64bitsLE((U8*)&(laszip_dll->header.max_gps_time)); }
+          catch (...)
+          {
+              snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading header.max_gps_time");
+              return 1;
+          }
+          try { laszip_dll->streamin->get64bitsLE((U8*)&(laszip_dll->header.min_gps_time)); }
+          catch (...)
+          {
+              snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading header.min_gps_time");
+              return 1;
+          }
+          try { laszip_dll->streamin->get16bitsLE((U8*)&(laszip_dll->header.time_offset)); }
+          catch (...)
+          {
+              snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reading header.time_offset");
+              return 1;
+          }
+          laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 393;
+      }
+  }
+
   // load any number of user-defined bytes that might have been added to the header
   if (laszip_dll->header.user_data_in_header_size)
   {
@@ -4225,7 +4331,7 @@ laszip_read_header(
       {
         if ((strncmp(laszip_dll->header.vlrs[i].user_id, "lascompatible\0\0", 16) == 0) && (laszip_dll->header.vlrs[i].record_id == 22204))
         {
-          if (laszip_dll->header.vlrs[i].record_length_after_header == 2+2+4+148)
+          if ((laszip_dll->header.vlrs[i].record_length_after_header == 2+2+4+148) || (laszip_dll->header.vlrs[i].record_length_after_header == 2+2+4+148+18))
           {
             compatibility_VLR = &(laszip_dll->header.vlrs[i]);
             break;
@@ -4309,6 +4415,18 @@ laszip_read_header(
             }
             laszip_dll->header.extended_number_of_points_by_return[r] = extended_number_of_points_by_return;
           }
+          // read the additional 18 bytes of the extended LAS 1.5 header
+          if (compatible_version == 4) {
+              F64 max_gps_time;
+              in->get64bitsLE((U8*)&max_gps_time);
+              laszip_dll->header.max_gps_time = max_gps_time;
+              F64 min_gps_time;
+              in->get64bitsLE((U8*)&min_gps_time);
+              laszip_dll->header.min_gps_time = min_gps_time;
+              U16 time_offset;
+              in->get16bitsLE((U8*)&time_offset);
+              laszip_dll->header.time_offset = time_offset;
+          }
           delete in;
 
           // remove the compatibility VLR
@@ -4362,7 +4480,15 @@ laszip_read_header(
             laszip_dll->header.header_size += 140;
             laszip_dll->header.offset_to_point_data += 140;
           }
-          laszip_dll->header.version_minor = 4;
+          // upgrade to las 1.5, 18 additional bytes
+          if (compatible_version == 4) {
+              laszip_dll->header.header_size += 18;
+              laszip_dll->header.offset_to_point_data += 18;
+              laszip_dll->header.version_minor = 5;
+          }
+          else {
+              laszip_dll->header.version_minor = 4;
+          }
 
           // maybe turn on the bit indicating the presence of the OGC WKT
           for (i = 0; i < laszip_dll->header.number_of_variable_length_records; i++)
