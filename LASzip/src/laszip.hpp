@@ -24,6 +24,7 @@
     implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
   CHANGE HISTORY:
+    17 October 2025 -- upped to 3.5, general support for LAS 1.5
     20 October 2023 -- Fix int overflow of number_of_point_records when using laszip_update_inventory
     20 March 2019 -- upped to 3.3 r1 for consistent legacy and extended class check
     21 February 2019 -- bug fix when writing 4294967295+ points uncompressed to LAS
@@ -74,9 +75,9 @@ typedef long long SIGNED_INT64;
 #endif
 
 #define LASZIP_VERSION_MAJOR                3
-#define LASZIP_VERSION_MINOR                4
-#define LASZIP_VERSION_REVISION             4
-#define LASZIP_VERSION_BUILD_DATE      231020
+#define LASZIP_VERSION_MINOR                5
+#define LASZIP_VERSION_REVISION             0
+#define LASZIP_VERSION_BUILD_DATE      251017
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1
@@ -133,6 +134,7 @@ public:
   bool setup(const unsigned short num_items, const LASitem* items, const unsigned short compressor);
   bool set_chunk_size(const unsigned int chunk_size);             /* for compressor only */
   bool request_version(const unsigned short requested_version);   /* for compressor only */
+  unsigned short get_default_version(const unsigned char point_type, const unsigned char las_version_major, const unsigned char las_version_minor); 
 
   // in case a function returns false this string describes the problem
   const char* get_error() const;

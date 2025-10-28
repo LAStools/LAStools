@@ -375,6 +375,39 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
     }
   }
 
+  // special handling for LAS 1.5
+  if ((header.version_major == 1) && (header.version_minor >= 5))
+  {
+      if (header.header_size < 393)
+      {
+          laserror("for LAS 1.%d header_size should at least be 393 but it is only %d", header.version_minor, header.header_size);
+          return FALSE;
+      }
+      else
+      {
+          try { stream->get64bitsLE((U8*)&(header.max_gps_time)); }
+          catch (...)
+          {
+              laserror("reading header.max_gps_time");
+              return FALSE;
+          }
+          try { stream->get64bitsLE((U8*)&(header.min_gps_time)); }
+          catch (...)
+          {
+              laserror("reading header.min_gps_time");
+              return FALSE;
+          }
+          try { stream->get16bitsLE((U8*)&(header.time_offset)); }
+          catch (...)
+          {
+              laserror("reading header.time_offset");
+              return FALSE;
+          }
+          header.user_data_in_header_size = header.header_size - 393;
+      }
+  }
+
+
   // load any number of user-defined bytes that might have been added to the header
   if (header.user_data_in_header_size)
   {
@@ -632,6 +665,8 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
 
           // read the payload of this VLR which contains 176 bytes
 
+          // maybe add LAS 1.5 fields?
+
           if (header.vlrs[i].record_length_after_header == 176)
           {
             try { stream->get64bitsLE((U8*)&(header.vlr_lasoriginal->number_of_point_records)); } catch(...)
@@ -875,7 +910,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
               LASMessage(LAS_WARNING, "COPC VLR info should be the first vlr (not specification-conform)");
             }
 
-            if (header.version_major == 1 && header.version_minor == 4 && (header.point_data_format & 0x3F) >= 6 && (header.point_data_format & 0x3F) <= 8)
+            if (header.version_major == 1 && header.version_minor >= 4 && (header.point_data_format & 0x3F) >= 6 && (header.point_data_format & 0x3F) <= 8)
             {
               if (!header.vlr_copc_info)
               {
@@ -892,7 +927,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             }
             else
             {
-              LASMessage(LAS_WARNING, "COPC VLR info should belong in LAZ file 1.4 pdrf 6-8 not LAZ %u.%u pdrf %u (not specification-conform).", header.version_major, header.version_minor, header.point_data_format);
+              LASMessage(LAS_WARNING, "COPC VLR info should belong in LAZ file 1.4 or 1.5 pdrf 6-8 not LAZ %u.%u pdrf %u (not specification-conform).", header.version_major, header.version_minor, header.point_data_format);
             }
           }
         }

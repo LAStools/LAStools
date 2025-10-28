@@ -1576,6 +1576,24 @@ class LasTool_lasinfo : public LasTool {
                 lasheader->extended_number_of_points_by_return[14]);
           }
         }
+        if ((lasheader->version_major == 1) && (lasheader->version_minor >= 5)) {
+            if (json_out) {
+                lidardouble2string(printstring.data(), lasheader->max_gps_time);
+                json_sub_main_header_entries["max_gps_time"] = parseFormattedDouble(printstring.data());
+                lidardouble2string(printstring.data(), lasheader->min_gps_time);
+                json_sub_main_header_entries["min_gps_time"] = parseFormattedDouble(printstring.data());
+                json_sub_main_header_entries["time_offset"] = lasheader->time_offset;
+            }
+            else {
+                fprintf(file_out, "  max gps time:               ");
+                lidardouble2string(printstring.data(), lasheader->max_gps_time);
+                fprintf(file_out, "%s\012", printstring.c_str());
+                fprintf(file_out, "  min gps time:               ");
+                lidardouble2string(printstring.data(), lasheader->min_gps_time);
+                fprintf(file_out, "%s\012", printstring.c_str());
+                fprintf(file_out, "  time offset:                %d\012", lasheader->time_offset);
+            }
+        }
         if (lasheader->user_data_in_header_size) {
           if (json_out) {
             json_sub_main_header_entries["user_defined_bytes"] = lasheader->user_data_in_header_size;
