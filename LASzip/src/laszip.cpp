@@ -38,6 +38,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 LASzip::LASzip()
 {
@@ -671,7 +674,7 @@ bool LASzip::request_version(const U16 requested_version)
     case LASitem::GPSTIME11:
     case LASitem::RGB12:
     case LASitem::BYTE:
-      items[i].version = min(2, requested_version); // no version 3 or 4
+      items[i].version = (std::min)((U16)2, requested_version);  // no version 3 or 4
       break;
     case LASitem::WAVEPACKET13:
       items[i].version = 1; // no version 2, 3 or 4
@@ -681,7 +684,7 @@ bool LASzip::request_version(const U16 requested_version)
     case LASitem::RGBNIR14:
     case LASitem::WAVEPACKET14:
     case LASitem::BYTE14:
-        items[i].version = max(3, requested_version);   // no version 1 or 2
+      items[i].version = (std::max)((U16)3, requested_version);  // no version 1 or 2
       break;
     default:
       return return_error("item type not supported");
