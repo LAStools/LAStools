@@ -598,7 +598,7 @@ BOOL LASreaderPLY::seek(const I64 p_index)
   else if (p_index < p_idx)
   {
     if (piped) return FALSE;
-    fseek(file, 0, SEEK_SET);
+    fseek_las(file, 0, SEEK_SET);
     // read the first line with full parse_string
     I32 i = 0;
     while (fgets(line, 512, file))
@@ -1554,8 +1554,8 @@ BOOL LASreaderPLY::parse_header()
   if (parse_string) free(parse_string);
   if (type_string) free(type_string);
 
-  parse_string = (CHAR*)malloc(64);
-  type_string = (CHAR*)malloc(64);
+  parse_string = (CHAR*)malloc_las(64);
+  type_string = (CHAR*)malloc_las(64);
   memset(parse_string, 0, 64);
   memset(type_string, 0, 64);
 

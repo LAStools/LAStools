@@ -55,6 +55,7 @@
 #include <stdlib.h>
 #include <cstdarg>
 #include <vector>
+#include <sys/stat.h>
 
 #include <cmath>
 #include <type_traits>
@@ -86,6 +87,12 @@ typedef double F64;
 typedef int BOOL;
 #else
 typedef bool BOOL;
+#endif
+
+#ifdef _WIN32
+typedef struct _stat64 las_stat_t;
+#else
+typedef struct stat las_stat_t;
 #endif
 
 typedef union U32I32F32 {
@@ -141,6 +148,15 @@ typedef union I64U32I32F32 {
 
 #define I64_MIN ((I64)0x8000000000000000)
 #define I64_MAX ((I64)0x7FFFFFFFFFFFFFFF)
+
+typedef union U32F32 {
+  U32 u32;
+  F32 f32;
+} U32F32;
+typedef union U64F64 {
+  U64 u64;
+  F64 f64;
+} U64F64;
 
 #define U8_FOLD(n) (((n) < U8_MIN) ? (n + U8_MAX_PLUS_ONE) : (((n) > U8_MAX) ? (n - U8_MAX_PLUS_ONE) : (n)))
 
@@ -304,8 +320,7 @@ inline void ENDIAN_SWAP_64(const U8* from, U8* to) {
   to[7] = from[0];
 }
 
-#if defined(_MSC_VER)
-#include <windows.h>
+#if defined(_WIN32)
 wchar_t* UTF8toUTF16(const char* utf8);
 wchar_t* ANSItoUTF16(const char* ansi);
 #endif
@@ -378,6 +393,39 @@ inline bool fp_equal(T a, T b) {
   return std::fabs(a - b) < eps;
 }
 
+/// Moves the file pointer to offset, 64-bit capable, cross-platform
+inline int fseek_las(FILE* file, I64 offset, int origin) {
+#if defined(_WIN32) && !defined(__MINGW32__)
+  return _fseeki64(file, offset, origin);
+#elif defined(__MINGW32__)
+  return fseeko64(file, (off64_t)offset, origin);
+#else
+  return fseeko(file, (off_t)offset, origin);
+#endif
+}
+
+/// Returns the current file position as a 64-bit value, cross-platform
+inline I64 ftell_las(FILE* file) {
+#if defined _WIN32 && !defined(__MINGW32__)
+  return _ftelli64(file);
+#elif defined(__MINGW32__)
+  return (I64)ftello64(file);
+#else
+  return (I64)ftello(file);
+#endif
+}
+
+/// Reads file information (size, time, permissions) across platforms as a 64-bit compatible function
+inline int stat_las(const char* path, las_stat_t* buf) {
+#if defined(_WIN32) && !defined(__MINGW32__)
+  return _stati64(path, buf);
+#elif defined(__MINGW32__)
+  return stat64(path, buf);
+#else
+  return stat(path, buf);
+#endif
+}
+
 // 32bit/64bit detection
 #ifdef _WIN64
 #define IS64 true
@@ -393,8 +441,8 @@ inline bool fp_equal(T a, T b) {
 #define DIRECTORY_SLASH '/'
 #endif
 
-#ifndef MAX_PATH  // linux
-#define MAX_PATH FILENAME_MAX
+#ifndef MAX_PATH_LAS  // linux
+#define MAX_PATH_LAS FILENAME_MAX
 #endif
 
 // char helpers
@@ -425,6 +473,11 @@ bool IsLasLazFile(std::string fn);
 bool StringInVector(const std::string& value, const std::vector<std::string>& array, bool casesense);
 
 void* realloc_las(void* ptr, size_t size);
+void* malloc_las(size_t size);
+void bytes_to_readable(size_t bytes, double* value_out, const char** unit_out);
+
+size_t get_available_RAM();
+bool check_available_RAM(size_t size);
 
 /// Wrapper for `sscanf` on other platforms than _MSC_VER and `sscanf_s` on Windows and ensures that the size is passed correctly for strings.
 int sscanf_las(const char* buffer, const char* format, ...);

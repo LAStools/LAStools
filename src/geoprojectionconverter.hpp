@@ -489,6 +489,7 @@ public:
   bool set_dtm_projection_parameters(short horizontal_units, short vertical_units, short coordinate_system, short coordinate_zone, short horizontal_datum, short vertical_datum, bool source=true);
 
   // using PROJ lib
+  void load_proj();
   void set_proj_crs_transform();
   void set_proj_crs_with_epsg(unsigned int& epsg_code, bool source = true);
   void set_proj_crs_with_string(const char* proj_string, bool source = true);
@@ -520,6 +521,16 @@ private:
   int datum_code;
   char datum_name[60];
   int spheroid_code;
+
+  //PROJ options 
+  unsigned int source_code;
+  unsigned int target_code;
+  char* proj_source_string;
+  char* proj_target_string;
+  char* proj_source_json;
+  char* proj_target_json;
+  char* proj_source_wkt;
+  char* proj_target_wkt;
 
   // parameters for the reference ellipsoid
   GeoProjectionEllipsoid* ellipsoid;

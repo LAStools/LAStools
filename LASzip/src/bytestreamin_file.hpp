@@ -38,11 +38,6 @@
 
 #include <stdio.h>
 
-#if defined(_MSC_VER) && (_MSC_VER < 1300)
-extern "C" __int64 _cdecl _ftelli64(FILE*);
-extern "C" int _cdecl _fseeki64(FILE*, __int64, int);
-#endif
-
 class ByteStreamInFile : public ByteStreamIn
 {
 public:
@@ -135,39 +130,21 @@ inline BOOL ByteStreamInFile::isSeekable() const
 
 inline I64 ByteStreamInFile::tell() const
 {
-#if defined _WIN32 && ! defined (__MINGW32__)
-  return _ftelli64(file);
-#elif defined (__MINGW32__)
-  return (I64)ftello64(file);
-#else
-  return (I64)ftello(file);
-#endif
+  return ftell_las(file);
 }
 
 inline BOOL ByteStreamInFile::seek(const I64 position)
 {
   if (tell() != position)
   {
-#if defined _WIN32 && ! defined (__MINGW32__)
-    return !(_fseeki64(file, position, SEEK_SET));
-#elif defined (__MINGW32__)
-    return !(fseeko64(file, (off64_t)position, SEEK_SET));
-#else
-    return !(fseeko(file, (off_t)position, SEEK_SET));
-#endif
+    return !(fseek_las(file, position, SEEK_SET));
   }
   return TRUE;
 }
 
 inline BOOL ByteStreamInFile::seekEnd(const I64 distance)
 {
-#if defined _WIN32 && ! defined (__MINGW32__)
-  return !(_fseeki64(file, -distance, SEEK_END));
-#elif defined (__MINGW32__)
-  return !(fseeko64(file, (off64_t)-distance, SEEK_END));
-#else
-  return !(fseeko(file, (off_t)-distance, SEEK_END));
-#endif
+  return !(fseek_las(file, -distance, SEEK_END));
 }
 
 inline ByteStreamInFileLE::ByteStreamInFileLE(FILE* file) : ByteStreamInFile(file)

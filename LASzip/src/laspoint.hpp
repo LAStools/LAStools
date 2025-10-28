@@ -958,7 +958,7 @@ class LASLIB_DLL LASpoint {
   };
 
   // Adapted from https://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
-  void set_RGB_from_HSL(const F32* hsl) {
+  void set_RGB_from_HSL(const F32 (&hsl)[3]) {
     if (!have_rgb) return;
 
     F32 h = hsl[0];

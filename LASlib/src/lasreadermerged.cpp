@@ -502,7 +502,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
     }
     else
     {
-      file_names = (CHAR**)malloc(sizeof(CHAR*) * file_name_allocated);
+      file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
     }
     if (file_names == 0)
     {
@@ -521,7 +521,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name, U32 ID)
   {
     if (file_names_ID == 0)
     {
-      file_names_ID = (U32*)malloc(sizeof(U32) * file_name_allocated);
+      file_names_ID = (U32*)malloc_las(sizeof(U32) * file_name_allocated);
       if (file_names_ID == 0)
       {
         laserror("alloc for file_names_ID array failed at %d", file_name_allocated);

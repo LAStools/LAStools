@@ -607,16 +607,16 @@ class LASLIB_DLL LASattributer {
     U32 i;
     clean_attributes();
     this->number_attributes = number_attributes;
-    this->attributes = (LASattribute*)malloc(sizeof(LASattribute) * number_attributes);
+    this->attributes = (LASattribute*)malloc_las(sizeof(LASattribute) * number_attributes);
     if (this->attributes == 0) {
       return FALSE;
     }
     memcpy(this->attributes, attributes, sizeof(LASattribute) * number_attributes);
-    attribute_starts = (I32*)malloc(sizeof(I32) * number_attributes);
+    attribute_starts = (I32*)malloc_las(sizeof(I32) * number_attributes);
     if (attribute_starts == 0) {
       return FALSE;
     }
-    attribute_sizes = (I32*)malloc(sizeof(I32) * number_attributes);
+    attribute_sizes = (I32*)malloc_las(sizeof(I32) * number_attributes);
     if (attribute_sizes == 0) {
       return FALSE;
     }
@@ -651,15 +651,15 @@ class LASLIB_DLL LASattributer {
         attribute_sizes[number_attributes - 1] = attributes[number_attributes - 1].get_size();
       } else {
         number_attributes = 1;
-        attributes = (LASattribute*)malloc(sizeof(LASattribute));
+        attributes = (LASattribute*)malloc_las(sizeof(LASattribute));
         if (attributes == 0) {
           return -1;
         }
-        attribute_starts = (I32*)malloc(sizeof(I32));
+        attribute_starts = (I32*)malloc_las(sizeof(I32));
         if (attribute_starts == 0) {
           return -1;
         }
-        attribute_sizes = (I32*)malloc(sizeof(I32));
+        attribute_sizes = (I32*)malloc_las(sizeof(I32));
         if (attribute_sizes == 0) {
           return -1;
         }

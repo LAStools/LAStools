@@ -1,7 +1,19 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
-25 August 2024 -- fix: pass missing reader arguments to multi core environment
-30 July 2024 -- NEW: lasvdatum: report exact boundary violations if values are outside a GTX grid
+24 September 2025 -- NEW: GeoTIFF/LAZ raster reader/writer: support GTRasterTypeGeoKey for PixelIsArea/PixelIsPoint
+22 September 2025 -- lasinfo: add log warnings when header data is patched by arguments. avoidable with "-no_warnings"
+15 September 2025 -- NEW: lascanopy add metrics "-above_mean", "-pzabovex", "-p_ith_return", "-ground_class", "-l_mom"
+15 September 2025 -- NEW: refactor file I/O and memory assignment for large file support
+15 September 2025 -- fix: do relevant float comparison on a epsilon-based equality template
+2 September 2025 -- fix: improve UTF-8 file handling strictly according to (RFC 3629) RTC standard
+2 September 2025 -- NEW: integrate GDAL library for writing and reading vector formats other than SHP
+28 August 2025 -- NEW: lascanopy metrics: above_mean, pzabovex,p_ith_return,ground_class,l_mom (https://downloads.rapidlasso.de/html/lascanopy_README.html)
+27 August 2025 -- fix: filenames: UTF-8 validation adapted, strictly according to (RFC 3629) RTC standard
+27 August 2025 -- fix: handle malloc failure in load and guard qsort against null buffer
+27 August 2025 -- NEW: Epsilon-based float comparison for all vector formats
+26 August 2025 -- NEW: GDAL integration for new vector formats GML, GPKG, GeoJSON, GPX and KML + SHP
+25 August 2025 -- fix: pass missing reader arguments to multi core environment
+30 July 2025 -- NEW: lasvdatum: report exact boundary violations if values are outside a GTX grid
 9 July 2025 -- fix: blast2iso64 - command wrap
 9 July 2025 -- NEW TOOL: lasthin3d - thins point clouds in horizontal and vertical dimensions (https://rapidlasso.de/new-tool-lasthin3d/)
 9 July 2025 -- NEW: extended classification support (>31) on all LAStools

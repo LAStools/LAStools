@@ -392,7 +392,6 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     file_name_hdr[len+3] = 'R';
 
     file = LASfopen(file_name_hdr, "r");
-    free(file_name_hdr);
 
     if (file == 0)
     {
@@ -400,6 +399,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
       laserror("cannot open files '%s.hdr' or '%s.HDR'", file_name_hdr, file_name_hdr);
       return FALSE;
     }
+    free(file_name_hdr);
   }
   else
   {

@@ -110,7 +110,7 @@ private:
 
 inline ByteStreamOutArray::ByteStreamOutArray(I64 alloc)
 {
-  this->data = (U8*)malloc((U32)alloc);
+  this->data = (U8*)malloc_las((size_t)alloc);
   this->alloc = alloc;
   this->size = 0;
   this->curr = 0;

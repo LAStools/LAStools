@@ -78,6 +78,7 @@ proj_coord_t proj_coord_ptr = nullptr;
 proj_trans_t proj_trans_ptr = nullptr;
 proj_get_type_t proj_get_type_ptr = nullptr;
 proj_is_crs_t proj_is_crs_ptr = nullptr;
+proj_info_FUNC proj_info_ptr = nullptr;
 
 /// Function for parsing the version number from the directory name
 static std::vector<int> parseVersion(const char* versionStr) {
@@ -146,6 +147,22 @@ static bool compareVersions(const char* v1, const char* v2) {
   return version1.size() > version2.size();
 }
 
+/// Checks whether the loaded PROJ version reaches at least minMajor.minMinor.
+/// Returns a warning if this version is too old.
+void checkProjVersion() {
+  PJ_INFO info = proj_info();
+  
+  if (info.version) {
+    LASMessage(LAS_VERBOSE, "Loaded PROJ version: %s", info.version);
+
+    if (info.major && info.major < 9) {
+      LASMessage(LAS_WARNING, "The loaded PROJ version '%s' is older than version 9.0.0. Full functionality cannot be guaranteed with this version.", info.version);
+    }
+  } else {
+    LASMessage(LAS_WARNING, "The loaded PROJ version could not be determined");
+  }
+}
+
 /// Finds the latest QGIS installation path by first checking the `QGIS_PREFIX_PATH` environment variable.
 /// If the environment variable is not set, it searches through default installation directories and selects the latest version based on directory names.
 /// appends "bin" to the path, where the proj lib is located
@@ -181,23 +198,27 @@ static char* findLatestQGISInstallationPath() {
     for (const auto& programEntry : std::filesystem::directory_iterator(defaultPaths[i])) {
       if (programEntry.is_directory()) {
         std::string directoryName = programEntry.path().filename().string();
-        // Check whether the name begins with �QGIS �
+        // Check whether the name begins with QGIS 
         if (directoryName.find("QGIS ") == 0) {
           const char* dirName = directoryName.c_str();
-          if (!latestVersionName || compareVersions(dirName, latestVersionName)) {
+          if (latestVersionName == nullptr || compareVersions(dirName, latestVersionName)) {
             free(latestVersionName);
+            latestVersionName = nullptr;
             delete[] latestVersionPath;
+            latestVersionPath = nullptr;
             latestVersionName = strdup_las(dirName);
             std::filesystem::path path(programEntry.path());
             path /= "bin";  // Append "bin" to the path
-            latestVersionPath = new char[path.string().size() + 1];
-            strcpy_las(latestVersionPath, path.string().size() + 1, path.string().c_str());
+            if (std::filesystem::exists(path)) {
+              latestVersionPath = new char[path.string().size() + 1];
+              strcpy_las(latestVersionPath, path.string().size() + 1, path.string().c_str());
+            }
           }
         }
       }
     }
   }
-  free(latestVersionName);
+  if (latestVersionName != nullptr) free(latestVersionName);
   return latestVersionPath;
 #else
   // First check the QGIS_PREFIX_PATH, then the system-wide library directories
@@ -217,6 +238,36 @@ static char* findLatestQGISInstallationPath() {
   return findUnixLibProjPath();
 #endif
 
+  return nullptr;
+}
+
+/// Finds the OSGeo4W installation path.
+/// It searches through default installation directories and appends "bin" to the path, where the proj lib is located
+static char* findLatestOSGeo4WInstallationPath() {
+#ifdef _WIN32
+  // 1. If the environment variable is not set, check default OSGeo4W paths
+  size_t numPaths = 0;
+  const char** defaultPaths = getDefaultProgramPaths(numPaths);
+
+  // Checking the standard paths (e.g. "C:\OSGeo4W\bin" or "C:\Program Files\OSGeo4W\bin\")
+  for (size_t i = 0; i < numPaths; ++i) {
+    for (const auto& programEntry : std::filesystem::directory_iterator(defaultPaths[i])) {
+      if (programEntry.is_directory()) {
+        std::string directoryName = programEntry.path().filename().string();
+        // Check whether the name is OSGeo4W64 or OSGeo4W
+        if (directoryName.find("OSGeo4W64") == 0 || directoryName.find("OSGeo4W") == 0) {
+          std::filesystem::path path(programEntry.path());
+          path /= "bin";  // Append "bin" to the path
+          if (std::filesystem::exists(path)) {
+            char* OSGeo4Wpath = new char[path.string().size() + 1];
+            strcpy_las(OSGeo4Wpath, path.string().size() + 1, path.string().c_str());
+            return OSGeo4Wpath;
+          }
+        }
+      }
+    }
+  }
+#endif
   return nullptr;
 }
 
@@ -307,6 +358,7 @@ static char* findLatestProjLibraryPath(const char* binPath) {
       }
     }
   }
+  LASMessage(LAS_VERBOSE, "Latest installed PROJ version found: %s", latestVersionName);
   free(latestVersionName);
   return latestVersionPath;
 #else
@@ -339,8 +391,17 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
     char* projLibPath = findLatestProjLibraryPath(proj_path);
     if (projLibPath) {
       proj_lib_handle = LOAD_LIBRARY(projLibPath);
+      LASMessage(LAS_VERY_VERBOSE, "PROJ library used via environment variable 'LASTOOLS_PROJ': %s", projLibPath);
+
       delete[] projLibPath;  // Free memory after usage
+    } else {
+      LASMessage(LAS_WARNING, "The environment variable LASTOOLS_PROJ: '%s' is set, but no PROJ library can be found at this location. Continued...", proj_path);
     }
+  }
+  // Get proj data path via environment variable
+  const char* projDataPath = getenv("PROJ_LIB");
+  if (projDataPath) {
+    LASMessage(LAS_VERY_VERBOSE, "PROJ data path used via environment variable 'PROJ_LIB': %s", projDataPath);
   }
 
   //2. fallback : load library from QGIS environments (default directorys)
@@ -348,28 +409,48 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
     char* qgisPath = findLatestQGISInstallationPath();
     if (qgisPath) {
       char* proj_lib_path = findLatestProjLibraryPath(qgisPath);
-      delete[] qgisPath;
 
       if (proj_lib_path) {
         // Try to load the library
         proj_lib_handle = LOAD_LIBRARY(proj_lib_path);
+        LASMessage(LAS_VERY_VERBOSE, "PROJ library used via QGIS installation: %s", qgisPath);
         delete[](proj_lib_path);
       }
+      delete[] qgisPath;
     }
   }
 
-  // 3. fallback : load library from Conda environments (default directorys)
+#ifdef _WIN32
+  // 3. fallback : load library from OSGeo4W environments (default directorys)
+  if (!proj_lib_handle) {
+    char* osgeoPath = findLatestOSGeo4WInstallationPath();
+    if (osgeoPath) {
+      char* proj_lib_path = findLatestProjLibraryPath(osgeoPath);
+
+      if (proj_lib_path) {
+        // Try to load the library
+        proj_lib_handle = LOAD_LIBRARY(proj_lib_path);
+        LASMessage(LAS_VERY_VERBOSE, "PROJ library used via OCGeo4W installation: %s", osgeoPath);
+        delete[](proj_lib_path);
+      }
+      delete[] osgeoPath;
+    }
+  }
+#endif
+
+  // 4. fallback : load library from Conda environments (default directorys)
   if (!proj_lib_handle) {
     char* condaPath = findLatestCondaInstallationPath();
     if (condaPath) {
       char* proj_lib_path = findLatestProjLibraryPath(condaPath);
-      delete[] condaPath;
 
       if (proj_lib_path) {
         // Try to load the library
         proj_lib_handle = LOAD_LIBRARY(proj_lib_path);
+        LASMessage(LAS_VERY_VERBOSE, "PROJ library used via conda installation: %s", condaPath);
         delete[] proj_lib_path;
       }
+      delete[] condaPath;
     }
   }
 
@@ -417,6 +498,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
   proj_trans_ptr = (proj_trans_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_trans");
   proj_get_type_ptr = (proj_get_type_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_get_type");
   proj_is_crs_ptr = (proj_is_crs_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_is_crs");
+  proj_info_ptr = (proj_info_FUNC)GET_PROC_ADDRESS(proj_lib_handle, "proj_info");
 
   if (!proj_as_wkt_ptr || !proj_as_proj_string_ptr || !proj_as_projjson_ptr || !proj_get_source_crs_ptr || !proj_get_target_crs_ptr ||
       !proj_destroy_ptr || !proj_context_create_ptr || !proj_context_destroy_ptr || !proj_get_id_code_ptr || !proj_get_ellipsoid_ptr ||
@@ -424,11 +506,20 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       !proj_datum_ensemble_get_accuracy_ptr || !proj_datum_ensemble_get_member_ptr || !proj_crs_get_datum_ptr ||
       !proj_crs_get_coordinate_system_ptr || !proj_cs_get_type_ptr || !proj_cs_get_axis_count_ptr || !proj_cs_get_axis_info_ptr || !proj_create_ptr ||
       !proj_create_argv_ptr || !proj_create_crs_to_crs_ptr || !proj_create_crs_to_crs_from_pj_ptr || !proj_create_from_wkt_ptr ||
-      !proj_context_errno_ptr || !proj_context_errno_string_ptr || !proj_coord_ptr || !proj_trans_ptr || !proj_get_type_ptr || !proj_is_crs_ptr)
+      !proj_context_errno_ptr || !proj_context_errno_string_ptr || !proj_coord_ptr || !proj_trans_ptr || !proj_get_type_ptr || !proj_is_crs_ptr ||
+      !proj_info_ptr)
   {
+    std::string version = "Unknown";
+    if (proj_info_ptr) {
+      PJ_INFO info = proj_info();
+      if (info.version) version = info.version;
+    }
     unload_proj_library();
-    laserror("Failed to load necessary PROJ functions.");
+    laserror("Failed to load necessary PROJ functions. This application requires PROJ version 9.0.0 or later for full functionality. Loaded PROJ version: %s", version.c_str());
   }
+
+  checkProjVersion();
+
   return true;
 #pragma warning(pop)
 }
@@ -473,4 +564,5 @@ void unload_proj_library() {
   proj_trans_ptr = nullptr;
   proj_get_type_ptr = nullptr;
   proj_is_crs_ptr = nullptr;
+  proj_info_ptr = nullptr;
 }

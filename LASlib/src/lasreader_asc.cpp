@@ -103,7 +103,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
   if (line == 0)
   {
     line_size = 1024;
-    line = (CHAR*)malloc(sizeof(CHAR) * line_size);
+    line = (CHAR*)malloc_las(sizeof(CHAR) * line_size);
   }
 
   CHAR dummy[32];
@@ -141,7 +141,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
       sscanf_las(line, "%s %d", dummy, &ncols);
       free(line);
       line_size = 1024 + 50 * ncols;
-      line = (CHAR*)malloc(sizeof(CHAR) * line_size);
+      line = (CHAR*)malloc_las(sizeof(CHAR) * line_size);
     }
 #pragma warning(pop)
     else if (strstr(line, "nrows") || strstr(line, "NROWS"))

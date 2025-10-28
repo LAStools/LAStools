@@ -120,7 +120,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     for (i = 0; i < this->skip_lines; i++) fgets(line, 512, file);
     char* auto_parse_string = 0;
     has_column_description = parse_column_description(&auto_parse_string);
-    fseek(file, 0, SEEK_SET);
+    fseek_las(file, 0, SEEK_SET);
     if (has_column_description && auto_parse_string == 0)
     {
       return FALSE;
@@ -136,7 +136,7 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     // User did not provide a parse_string the file may contain the column description
     for (i = 0; i < this->skip_lines; i++) fgets(line, 512, file);
     has_column_description = parse_column_description(&this->parse_string);
-    fseek(file, 0, SEEK_SET);
+    fseek_las(file, 0, SEEK_SET);
     // Column description found but nothing parsed.
     if (has_column_description && this->parse_string == 0) return FALSE;
   }
@@ -1137,7 +1137,7 @@ BOOL LASreaderTXT::seek(const I64 p_index)
   else if (p_index < p_idx)
   {
     if (piped) return FALSE;
-    fseek(file, 0, SEEK_SET);
+    fseek_las(file, 0, SEEK_SET);
     // skip lines if we have to
     int i;
     for (i = 0; i < skip_lines; i++) fgets(line, 512, file);
@@ -1642,7 +1642,7 @@ BOOL LASreaderTXT::parse_extended_flags(CHAR* parse_string)
 BOOL LASreaderTXT::parse_column_description(CHAR** parse_string)
 {
   // Read the first line
-  I32 here = ftell(file);
+  I64 here = ftell_las(file);
   fgets(line, 512, file);
 
   // If it contains column description
@@ -1795,7 +1795,7 @@ BOOL LASreaderTXT::parse_column_description(CHAR** parse_string)
   }
   else
   {
-    fseek(file, here, SEEK_SET);
+    fseek_las(file, here, SEEK_SET);
     return FALSE;
   }
 }
@@ -1859,8 +1859,8 @@ BOOL LASreaderTXT::parse(const char* parse_string)
   // HSL HSV special parsing
   BOOL has_hsl = false;
   BOOL has_hsv = false;
-  F32 hsl[3];
-  F32 hsv[3];
+  F32 hsl[3] = {};
+  F32 hsv[3] = {};
 
   while (p[0])
   {

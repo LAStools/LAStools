@@ -65,7 +65,9 @@ clips the LAZ files against the polygon(s) in "polygon.gpkg". With the -gdal arg
 such as GPKG, GML, GeoJSON, KML, GPX, and SHP are supported.
 Please note that GPKG, SHP, and GML are recommended for maximum precision, as KML, GPX, and GeoJSON 
 require transformation to geographic coordinates (EPSG:4326) during processing, which may introduce 
-very minor positional differences along polygon boundaries.
+very minor positional differences along polygon boundaries. Only single-layer poly input files are 
+supported. For multi-layer inputs, only the first layer is processed. For GPX files, only routes or 
+tracks layers are supported.
 
     lasclip64 -i *.txt -iparse xyzt -poly polygon.shp -otxt -oparse xyzt
 

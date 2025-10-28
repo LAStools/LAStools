@@ -169,7 +169,7 @@ lascanopy64 -i *.laz -p 25 50 75 95 -loc list_of_circles.txt
 lascanopy64 -i *.laz -d 2.0 4.0 6.0 8.0 -fractions -lor list_of_rectangles.txt  
 lascanopy64 -i *.laz -p 95 -int_p 95 -cov -fractions -lop list_of_polygons.shp  
 lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -cov -p 50 95
-
+lascanopy64 -i *.laz -ocsv -ground_class 2 -p_ith_return 3 4 -l_mom -pzabovex 5 -above_mean
 
 ## lascanopy arguments for metrics 
 
@@ -194,6 +194,11 @@ lascanopy64 -i 2014_07.laz -ll 470000 5550000 -step 10 -ncols 500 -nrows 200 -co
 -ske                     : compute height skewness  
 -std                     : for each grid cell compute standard deviation  
 -vc [m] [n] [o] ...      : compute the Vertical Complexity Index (VCI) with bin sizes width of [m] [n] [o] ...  
+-above_mean              : percentage of returns above mean height (Zmean). Reports percentage of points which are higher than the average height.
+-pzabovex [x]            : percentage of returns above X. Reports the proportion of all returns above the specified height X.
+-p_ith_return [m] [n]... : percentage of i-th returns. Reports what percentage of all returns are specifically the n-th return.
+-ground_class [c] [d]... : percentage of returns classified as ground with classification [c]. Reports the proportion of points with the given classification code (e.g., c=2=ground).
+-l_mom                   : compute L-moments of the height distribution.  L-L₂ = spread, L₃ = L-skewness, L₄ = L-kurtosis, τ₃ = L-skewness (L₃/L₂), τ₄ = L-kurtosis (L₄/L₂).
 
 -int_avg                 : compute intensity average  
 -int_c [m] [n] [o] ...   : produce intensity bands with gap values [m] [n] [o] ...  

@@ -861,7 +861,7 @@ laszip_set_header(
     }
     if (header->number_of_variable_length_records)
     {
-      laszip_dll->header.vlrs = (laszip_vlr*)malloc(sizeof(laszip_vlr)*header->number_of_variable_length_records);
+      laszip_dll->header.vlrs = (laszip_vlr*)malloc_las(sizeof(laszip_vlr) * header->number_of_variable_length_records);
       for (i = 0; i < header->number_of_variable_length_records; i++)
       {
         laszip_dll->header.vlrs[i].reserved = header->vlrs[i].reserved;
@@ -1652,7 +1652,7 @@ laszip_add_vlr(
     {
       laszip_dll->header.number_of_variable_length_records = 1;
       laszip_dll->header.offset_to_point_data += 54;
-      laszip_dll->header.vlrs = (laszip_vlr_struct*)malloc(sizeof(laszip_vlr_struct));
+      laszip_dll->header.vlrs = (laszip_vlr_struct*)malloc_las(sizeof(laszip_vlr_struct));
       if (laszip_dll->header.vlrs == 0)
       {
         snprintf(laszip_dll->error, sizeof(laszip_dll->error), "allocating vlrs[1] array");
@@ -3857,7 +3857,7 @@ laszip_read_header(
   {
     U32 i;
 
-    laszip_dll->header.vlrs = (laszip_vlr*)malloc(sizeof(laszip_vlr)*laszip_dll->header.number_of_variable_length_records);
+    laszip_dll->header.vlrs = (laszip_vlr*)malloc_las(sizeof(laszip_vlr) * laszip_dll->header.number_of_variable_length_records);
 
     if (laszip_dll->header.vlrs == 0)
     {
@@ -5118,7 +5118,7 @@ laszip_create_laszip_vlr(
     return 1;
   }
 
-  *vlr = (laszip_U8*)malloc(out->getSize());
+  *vlr = (laszip_U8*)malloc_las(out->getSize());
   *vlr_size = (U32)out->getSize();
   laszip_dll->buffers.push_back(*vlr);
   if (*vlr) memcpy(*vlr, out->getData(), out->getSize());

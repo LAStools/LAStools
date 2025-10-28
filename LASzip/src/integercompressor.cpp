@@ -94,10 +94,10 @@ IntegerCompressor::IntegerCompressor(ArithmeticEncoder* enc, U32 bits, U32 conte
   mCorrector = 0;
 
 #ifdef CREATE_HISTOGRAMS
-  corr_histogram = (int**)malloc(sizeof(int*) * (corr_bits+1));
+  corr_histogram = (int**)malloc_las(sizeof(int*) * (corr_bits + 1));
   for (int k = 0; k <= corr_bits; k++)
   {
-    corr_histogram[k] = (int*)malloc(sizeof(int) * ((1<<k)+1));
+    corr_histogram[k] = (int*)malloc_las(sizeof(int) * ((1 << k) + 1));
     for (int c = 0; c <= (1<<k); c++)
     {
       corr_histogram[k][c] = 0;

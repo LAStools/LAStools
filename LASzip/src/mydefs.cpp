@@ -39,20 +39,15 @@
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
-#include <stdarg.h>
-#include <stdio.h>
 #include <string>
-#ifdef _MSC_VER
+#include <stdio.h>
+#ifdef _WIN32
 #include <windows.h>
 #else
-#include <math.h>
-#include <algorithm>
-#include <iomanip>
 #include <unistd.h>
 #endif
 
-#if defined(_MSC_VER)
-#include <windows.h>
+#if defined(_WIN32)
 /// Converting UTF-8 to UTF-16
 wchar_t* UTF8toUTF16(const char* utf8) {
   if (utf8 == nullptr) return nullptr;
@@ -229,7 +224,7 @@ FILE* LASfopen(const char* const filename, const char* const mode) {
   }
   FILE* file = nullptr;
 
-#ifdef _MSC_VER
+#ifdef _WIN32
   wchar_t* utf16_file_name = nullptr;
   wchar_t* utf16_mode = nullptr;
 
@@ -323,16 +318,16 @@ void ExeNameToPathWithoutTrailingDelimiter(int& path_len, char* path) {
 std::string exe_path() {
   size_t len = 0;
 #ifdef _WIN32
-  TCHAR path[MAX_PATH];
-  GetModuleFileName(NULL, path, MAX_PATH);
+  TCHAR path[MAX_PATH_LAS];
+  GetModuleFileName(NULL, path, MAX_PATH_LAS);
 #ifdef UNICODE
   len = wcslen(path);
 #else
   len = strlen(path);
 #endif
 #else
-  char path[MAX_PATH];
-  len = readlink("/proc/self/exe", path, MAX_PATH);
+  char path[MAX_PATH_LAS];
+  len = readlink("/proc/self/exe", path, MAX_PATH_LAS);
 #endif
   while (len && (path[len] != '\\') && (path[len] != '/')) len--;
   path[len] = '\0';
@@ -348,11 +343,11 @@ std::string exe_path() {
 /// get the current directory (exclude trailing delimiter)
 /// </summary>
 std::string dir_current() {
-  char curr_directory[MAX_PATH];
-#ifdef _MSC_VER
-  GetCurrentDirectory(MAX_PATH, curr_directory);
+  char curr_directory[MAX_PATH_LAS];
+#ifdef _WIN32
+  GetCurrentDirectory(MAX_PATH_LAS, curr_directory);
 #else
-  getcwd(curr_directory, MAX_PATH);
+  getcwd(curr_directory, MAX_PATH_LAS);
 #endif
   return std::string(curr_directory);
 }
@@ -447,15 +442,97 @@ bool StringInVector(const std::string& val, const std::vector<std::string>& vec,
   }
 }
 
+/// Converts a byte count into a human-readable value and unit
+void bytes_to_readable(size_t bytes, double* value_out, const char** unit_out) {
+  double value = (double)bytes;
+  const char* unit = "Bytes";
+
+  if (bytes >= (1ULL << 30)) {  // 1 GB
+    value = value / (1ULL << 30);
+    unit = "GB";
+  } else if (bytes >= (1ULL << 20)) {  // 1 MB
+    value = value / (1ULL << 20);
+    unit = "MB";
+  } else if (bytes >= (1ULL << 10)) {  // 1 KB
+    value = value / (1ULL << 10);
+    unit = "KB";
+  }
+
+  if (value_out) *value_out = value;
+  if (unit_out) *unit_out = unit;
+}
+
+/// Returns the amount of currently available physical RAM in bytes
+/// Note that this value is only a snapshot.
+#ifdef _WIN32
+size_t get_available_RAM() {
+  MEMORYSTATUSEX statex;
+  statex.dwLength = sizeof(statex);
+  if (GlobalMemoryStatusEx(&statex)) {
+    return statex.ullAvailPhys;
+  }
+  return 0;
+}
+#else
+size_t get_available_RAM() {
+  FILE* f = fopen("/proc/meminfo", "r");
+  if (!f) return 0;
+  size_t avail = 0;
+  char line[256];
+  while (fgets(line, sizeof(line), f)) {
+    if (sscanf(line, "MemAvailable: %zu kB", &avail) == 1) {
+      avail *= 1024;
+      break;
+    }
+  }
+  fclose(f);
+  return avail;
+}
+#endif
+
+/// Checks whether the available RAM is larger than the requested allocation. 
+/// The check is only performed for requests of at least 1 MB to avoid overhead for small allocations.
+bool check_available_RAM(size_t size) {
+  const size_t MIN_MB = 1024 * 1024;  // 1 MB in Bytes
+
+  if (size > MIN_MB) {
+    size_t ram_size = get_available_RAM();
+
+    if (size > ram_size) {
+      double value_1, value_2;
+      const char *unit_1, *unit_2;
+    
+      bytes_to_readable(size, &value_1, &unit_1);
+      bytes_to_readable(ram_size, &value_2, &unit_2);
+      LASMessage(LAS_WARNING, "failed to allocate %.0f%s memory as only approx. %.0f%s free reported. An error may occur", value_1, unit_1, value_2, unit_2);
+      return true;
+    }
+  }
+  return false;
+}
+
 /// extension of the realloc function to check memory allocation errors
 void* realloc_las(void* ptr, size_t size) {
+  bool warning = check_available_RAM(size);
+
   void* temp = realloc(ptr, size);
-  if (temp == NULL) {
-    LASMessage(LAS_WARNING, "realloc_las: memory allocation failed\n");
+  if (!temp && !warning) {
+    LASMessage(LAS_WARNING, "memory reallocation failed");
     return ptr;
   } else {
     return temp;
   }
+}
+
+/// extension of the malloc function to check memory allocation errors
+void* malloc_las(size_t size) {
+  bool warning = check_available_RAM(size);
+
+  void* ptr = malloc(size);
+  if (!ptr && !warning) {
+    LASMessage(LAS_WARNING, "memory allocation failed");
+  }
+  return ptr;
 }
 
 /// Wrapper for `vsscanf`
@@ -664,7 +741,7 @@ size_t StringCountChar(const std::string& in, const char toCount) {
 const char** getDefaultProgramPaths(size_t& numPaths) {
 #ifdef _WIN32
   // Windows: Use environment variables or API for Program Files directories
-  static const char* defaultPaths[] = {getenv("ProgramFiles"), getenv("ProgramFiles(x86)"), nullptr};
+  static const char* defaultPaths[] = {getenv("ProgramFiles"), getenv("ProgramFiles(x86)"), "C:\\", nullptr};
   // Count valid paths
   numPaths = 0;
   while (defaultPaths[numPaths] != nullptr) {

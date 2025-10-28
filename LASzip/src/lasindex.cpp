@@ -83,7 +83,7 @@ BOOL LASindex::add(const F64 x, const F64 y, const U32 p_index)
 
 void LASindex::complete(U32 minimum_points, I32 maximum_intervals)
 {
-  LASMessage(LAS_VERBOSE, "before complete %d %d", minimum_points, maximum_intervals);
+  LASMessage(LAS_VERBOSE, "before complete %u %d", minimum_points, maximum_intervals);
   if (get_message_log_level() <= LAS_VERBOSE)
     print();
   if (minimum_points)
@@ -190,15 +190,15 @@ void LASindex::print()
     }
     if (total_check != interval->total)
     {
-      LASMessage(LAS_VERBOSE, "total_check %d != interval->total %d", total_check, interval->total);
+      LASMessage(LAS_VERBOSE, "total_check %u != interval->total %u", total_check, interval->total);
     }
-    LASMessage(LAS_VERY_VERBOSE, "cell %d intervals %d full %d total %d (%.2f)", interval->index, intervals, interval->full, interval->total, 100.0f*interval->full/interval->total);
+    LASMessage(LAS_VERY_VERBOSE, "cell %d intervals %u full %u total %u (%.2f)", interval->index, intervals, interval->full, interval->total, 100.0f*interval->full/interval->total);
     total_cells++;
     total_full += interval->full;
     total_total += interval->total;
     total_intervals += intervals;
   }
-  LASMessage(LAS_VERY_VERBOSE, "total cells/intervals %d/%d full %d (%.2f)", total_cells, total_intervals, total_full, 100.0f*total_full/total_total);
+  LASMessage(LAS_VERY_VERBOSE, "total cells/intervals %u/%u full %u (%.2f)", total_cells, total_intervals, total_full, 100.0f*total_full/total_total);
 }
 
 LASquadtree* LASindex::get_spatial() const

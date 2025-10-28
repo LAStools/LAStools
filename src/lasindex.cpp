@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
     {
       len = (I32)strlen(meta_file_name_base);
     }
-    CHAR* meta_file_name = (CHAR*)malloc(len + 9);
+    CHAR* meta_file_name = (CHAR*)malloc_las(len + 9);
     if (len)
     {
       snprintf(meta_file_name, len + 9, "%s\\lax.txt", meta_file_name_base);

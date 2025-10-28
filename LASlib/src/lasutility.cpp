@@ -497,7 +497,7 @@ void LASbin::add_to_bin(I32 bin)
       if (size_pos == 0)
       {
         size_pos = bin + 1024;
-        bins_pos = (U32*)malloc(sizeof(U32)*size_pos);
+        bins_pos = (U32*)malloc_las(sizeof(U32) * size_pos);
         if (bins_pos == 0)
         {
           laserror("allocating %u pos bins", size_pos);
@@ -529,7 +529,7 @@ void LASbin::add_to_bin(I32 bin)
       if (size_neg == 0)
       {
         size_neg = bin + 1024;
-        bins_neg = (U32*)malloc(sizeof(U32)*size_neg);
+        bins_neg = (U32*)malloc_las(sizeof(U32) * size_neg);
         if (bins_neg == 0)
         {
           laserror("allocating %u neg bins", size_neg);
@@ -576,8 +576,8 @@ void LASbin::add(I32 item, I32 value)
       if (size_pos == 0)
       {
         size_pos = 1024;
-        bins_pos = (U32*)malloc(sizeof(U32)*size_pos);
-        values_pos = (F64*)malloc(sizeof(F64)*size_pos);
+        bins_pos = (U32*)malloc_las(sizeof(U32) * size_pos);
+        values_pos = (F64*)malloc_las(sizeof(F64) * size_pos);
         if (bins_pos == 0)
         {
           laserror("allocating %u pos bins", size_pos);
@@ -621,8 +621,8 @@ void LASbin::add(I32 item, I32 value)
       if (size_neg == 0)
       {
         size_neg = 1024;
-        bins_neg = (U32*)malloc(sizeof(U32)*size_neg);
-        values_neg = (F64*)malloc(sizeof(F64)*size_neg);
+        bins_neg = (U32*)malloc_las(sizeof(U32) * size_neg);
+        values_neg = (F64*)malloc_las(sizeof(F64) * size_neg);
         if (bins_neg == 0)
         {
           laserror("allocating %u neg bins", size_neg);
@@ -681,8 +681,8 @@ void LASbin::add(F64 item, F64 value)
       if (size_pos == 0)
       {
         size_pos = 1024;
-        bins_pos = (U32*)malloc(sizeof(U32)*size_pos);
-        values_pos = (F64*)malloc(sizeof(F64)*size_pos);
+        bins_pos = (U32*)malloc_las(sizeof(U32) * size_pos);
+        values_pos = (F64*)malloc_las(sizeof(F64) * size_pos);
         if (bins_pos == 0)
         {
           laserror("allocating %u pos bins", size_pos);
@@ -726,8 +726,8 @@ void LASbin::add(F64 item, F64 value)
       if (size_neg == 0)
       {
         size_neg = 1024;
-        bins_neg = (U32*)malloc(sizeof(U32)*size_neg);
-        values_neg = (F64*)malloc(sizeof(F64)*size_neg);
+        bins_neg = (U32*)malloc_las(sizeof(U32) * size_neg);
+        values_neg = (F64*)malloc_las(sizeof(F64) * size_neg);
         if (bins_neg == 0)
         {
           laserror("allocating %u neg bins", size_neg);
@@ -1487,9 +1487,9 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
     }
     else
     {
-      if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)malloc(array_size_new*sizeof(I32));
-      *array = (U32**)malloc(array_size_new*sizeof(U32*));
-      *array_sizes = (U16*)malloc(array_size_new*sizeof(U16));
+      if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)malloc_las(array_size_new * sizeof(I32));
+      *array = (U32**)malloc_las(array_size_new * sizeof(U32*));
+      *array_sizes = (U16*)malloc_las(array_size_new * sizeof(U16));
     }
     for (U32 i = *array_size; i < array_size_new; i++)
     {
@@ -1515,7 +1515,7 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
     }
     else
     {
-      (*array)[pos_y] = (U32*)malloc(array_sizes_new*sizeof(U32));
+      (*array)[pos_y] = (U32*)malloc_las(array_sizes_new * sizeof(U32));
     }
     for (U16 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
     {

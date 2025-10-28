@@ -77,7 +77,7 @@ BOOL LASwriterWRL::open(FILE* file, const LASheader* header, const CHAR* parse_s
         if (rgb == 0)
         {
           rgb_alloc = 1024;
-          rgb = (U8*)malloc(3*sizeof(U8)*rgb_alloc);
+          rgb = (U8*)malloc_las(3 * sizeof(U8) * rgb_alloc);
         }
       }
       else
@@ -99,7 +99,7 @@ BOOL LASwriterWRL::open(FILE* file, const LASheader* header, const CHAR* parse_s
       if (rgb == 0)
       {
         rgb_alloc = 1024;
-        rgb = (U8*)malloc(3*sizeof(U8)*rgb_alloc);
+        rgb = (U8*)malloc_las(3 * sizeof(U8) * rgb_alloc);
       }
     }
     else
@@ -217,7 +217,7 @@ I64 LASwriterWRL::close(BOOL update_header)
   fprintf(file, "\t}\012");
   fprintf(file, "}\012");
 
-  I64 bytes = ftell(file);
+  I64 bytes = ftell_las(file);
 
   if (file)
   {

@@ -756,17 +756,18 @@ BOOL LASquadtree::manage_cell(const U32 cell_index, const BOOL finalize)
   {
     if (adaptive)
     {
-      adaptive = (U32*)realloc_las(adaptive, adaptive_pos*2*sizeof(U32));
-      for (U32 i = adaptive_alloc; i < adaptive_pos*2; i++) adaptive[i] = 0;
-      adaptive_alloc = adaptive_pos*2;
+      size_t n_pos = (size_t)adaptive_pos * 2;
+      adaptive = (U32*)realloc_las(adaptive, n_pos * sizeof(U32));
+      for (size_t i = adaptive_alloc; i < n_pos; i++) adaptive[i] = 0;
+      adaptive_alloc = n_pos;
     }
     else
     {
 #pragma warning(push)
 #pragma warning(disable : 6011)
-      adaptive = (U32*)malloc((adaptive_pos+1)*sizeof(U32));
-      for (U32 i = adaptive_alloc; i <= adaptive_pos; i++) adaptive[i] = 0;
-      adaptive_alloc = adaptive_pos+1;
+      adaptive = (U32*)malloc_las(((size_t)adaptive_pos + 1) * sizeof(U32));
+      for (size_t i = adaptive_alloc; i <= adaptive_pos; i++) adaptive[i] = 0;
+      adaptive_alloc = (size_t)adaptive_pos + 1;
 #pragma warning(pop)
     }
   }
