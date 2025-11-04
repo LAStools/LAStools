@@ -146,7 +146,6 @@ lasprobe64 -i fusa.laz -keep_class 2 -probe 277760.00 6122260 -o probe.txt -xyz
 ## Module arguments
 
 ### General
--buffered [n]      : define read or write buffer of size [n] (default=262144)
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  

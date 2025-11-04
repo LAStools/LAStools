@@ -157,7 +157,6 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 ## Module arguments
 
 ### General
--buffered [n]             : define read or write buffer of size [n]{default=262144}  
 -comma_not_point          : use comma instead of point as decimal separator  
 -kml_absolute             : set kml elevation to absolute values  
 -kml_elevation_offset [n] : add an elevation offset of [n]  

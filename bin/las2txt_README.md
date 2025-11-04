@@ -127,7 +127,6 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 
 ### General
 -comma_not_point   : use comma instead of point as decimal separator  
--buffered [n]      : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  

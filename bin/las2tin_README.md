@@ -151,7 +151,6 @@ las2tin64 -i lidar.laz -last_only -histo_only min_edge_length 0.1
 ## Module arguments
 
 ### General
--buffered [n]          : define read or write buffer of size [n]{default=262144}  
 -chunk_size [n]        : set chunk size [n] in number of bytes  
 -comma_not_point       : use comma instead of point as decimal separator  
 -histo_avg [m] [n] [o] : histogram output about [m] with step width [n] and average [o]  
