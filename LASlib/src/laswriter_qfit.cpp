@@ -91,7 +91,7 @@ BOOL LASwriterQFIT::open(FILE* file, const LASheader* header, I32 version)
 #endif
 
   ByteStreamOut* out;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
   {
     out = new ByteStreamOutFileLE(file);
     endian_swap = FALSE;

@@ -107,20 +107,20 @@ BOOL LASwritePoint::setup(const U32 num_items, const LASitem* items, const LASzi
     switch (items[i].type)
     {
     case LASitem::POINT10:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         writers_raw[i] = new LASwriteItemRaw_POINT10_LE();
       else
         writers_raw[i] = new LASwriteItemRaw_POINT10_BE();
       break;
     case LASitem::GPSTIME11:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         writers_raw[i] = new LASwriteItemRaw_GPSTIME11_LE();
       else
         writers_raw[i] = new LASwriteItemRaw_GPSTIME11_BE();
       break;
     case LASitem::RGB12:
     case LASitem::RGB14:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         writers_raw[i] = new LASwriteItemRaw_RGB12_LE();
       else
         writers_raw[i] = new LASwriteItemRaw_RGB12_BE();
@@ -130,20 +130,20 @@ BOOL LASwritePoint::setup(const U32 num_items, const LASitem* items, const LASzi
       writers_raw[i] = new LASwriteItemRaw_BYTE(items[i].size);
       break;
     case LASitem::POINT14:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         writers_raw[i] = new LASwriteItemRaw_POINT14_LE();
       else
         writers_raw[i] = new LASwriteItemRaw_POINT14_BE();
       break;
     case LASitem::RGBNIR14:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         writers_raw[i] = new LASwriteItemRaw_RGBNIR14_LE();
       else
         writers_raw[i] = new LASwriteItemRaw_RGBNIR14_BE();
       break;
     case LASitem::WAVEPACKET13:
     case LASitem::WAVEPACKET14:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         writers_raw[i] = new LASwriteItemRaw_WAVEPACKET13_LE();
       else
         writers_raw[i] = new LASwriteItemRaw_WAVEPACKET13_BE();

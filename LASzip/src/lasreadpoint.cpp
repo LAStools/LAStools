@@ -122,20 +122,20 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
     switch (items[i].type)
     {
     case LASitem::POINT10:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         readers_raw[i] = new LASreadItemRaw_POINT10_LE();
       else
         readers_raw[i] = new LASreadItemRaw_POINT10_BE();
       break;
     case LASitem::GPSTIME11:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         readers_raw[i] = new LASreadItemRaw_GPSTIME11_LE();
       else
         readers_raw[i] = new LASreadItemRaw_GPSTIME11_BE();
        break;
     case LASitem::RGB12:
     case LASitem::RGB14:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         readers_raw[i] = new LASreadItemRaw_RGB12_LE();
       else
         readers_raw[i] = new LASreadItemRaw_RGB12_BE();
@@ -145,20 +145,20 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
       readers_raw[i] = new LASreadItemRaw_BYTE(items[i].size);
       break;
     case LASitem::POINT14:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         readers_raw[i] = new LASreadItemRaw_POINT14_LE();
       else
         readers_raw[i] = new LASreadItemRaw_POINT14_BE();
       break;
     case LASitem::RGBNIR14:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         readers_raw[i] = new LASreadItemRaw_RGBNIR14_LE();
       else
         readers_raw[i] = new LASreadItemRaw_RGBNIR14_BE();
       break;
     case LASitem::WAVEPACKET13:
     case LASitem::WAVEPACKET14:
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         readers_raw[i] = new LASreadItemRaw_WAVEPACKET13_LE();
       else
         readers_raw[i] = new LASreadItemRaw_WAVEPACKET13_BE();

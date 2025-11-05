@@ -41,20 +41,9 @@
 
 extern "C" FILE* fopen_compressed(const char* filename, const char* mode, bool* piped);
 
-static bool is_little_endian = true;
-
-static void initialize_endianness()
-{
-  int i = 1;
-  if (*((unsigned char*)&i) == 1)
-    is_little_endian = true;
-  else
-    is_little_endian = false;
-}
-
 static void from_big_endian(int* value)
 {
-  if (is_little_endian)
+  if (Endian::IS_LITTLE_ENDIAN)
   {
     char help;
     char* field = (char*)value;
@@ -69,7 +58,7 @@ static void from_big_endian(int* value)
 
 static void from_little_endian(int* value)
 {
-  if (!is_little_endian)
+  if (!Endian::IS_LITTLE_ENDIAN)
   {
     char help;
     char* field = (char*)value;
@@ -84,7 +73,7 @@ static void from_little_endian(int* value)
 
 static void from_little_endian(double* value)
 {
-  if (!is_little_endian)
+  if (!Endian::IS_LITTLE_ENDIAN)
   {
     char help;
     char* field = (char*)value;
@@ -528,8 +517,6 @@ void LASreaderSHP::clean()
 
 LASreaderSHP::LASreaderSHP(LASreadOpener* opener):LASreader(opener)
 {
-  initialize_endianness();
-
   file = 0;
   piped = false;
   scale_factor = 0;

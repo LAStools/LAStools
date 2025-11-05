@@ -255,11 +255,6 @@ typedef union U64F64 {
 #define strdup_las(string) strdup(string);
 #endif
 
-inline BOOL IS_LITTLE_ENDIAN() {
-  const U32 i = 1;
-  return (*((const U8*)&i) == 1);
-}
-
 #define ENDIANSWAP16(n) (((((U16)n) << 8) & 0xFF00) | ((((U16)n) >> 8) & 0x00FF))
 
 #define ENDIANSWAP32(n)                                                                                                                              \
@@ -533,6 +528,16 @@ BOOL file_exists(const std::string& path);
 
 /// Get the digits 
 I32 get_digits(F64 scale_factor); 
+
+/// Checks at runtime whether the system stores its multi-byte numbers in little-endian format in memory
+namespace Endian {
+extern const bool IS_LITTLE_ENDIAN;
+
+void to_big_endian(int* value);
+void to_little_endian(int* value);
+void to_big_endian(double* value);
+void to_little_endian(double* value);
+}
 
 #endif
 

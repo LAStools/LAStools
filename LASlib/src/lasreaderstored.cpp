@@ -82,7 +82,7 @@ BOOL LASreaderStored::open(LASreader* lasreader)
   if (streamoutarray) delete streamoutarray;
   streamoutarray = 0;
 
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     streamoutarray = new ByteStreamOutArrayLE((header.number_of_point_records ? (I64)header.number_of_point_records : header.extended_number_of_point_records)*2);
   else
     streamoutarray = new ByteStreamOutArrayBE((header.number_of_point_records ? (I64)header.number_of_point_records : header.extended_number_of_point_records)*2);
@@ -145,7 +145,7 @@ BOOL LASreaderStored::reopen()
       return FALSE;
     }
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
       streaminarray = new ByteStreamInArrayLE(streamoutarray->takeData(), streamoutarray->getSize());
     else
       streaminarray = new ByteStreamInArrayBE(streamoutarray->takeData(), streamoutarray->getSize());

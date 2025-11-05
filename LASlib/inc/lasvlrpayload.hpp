@@ -102,7 +102,7 @@ public:
     U8* payload = 0;
     I64 size = get_payload_size();
     ByteStreamOutArray* stream = 0;
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
       stream = new ByteStreamOutArrayLE(size);
     else
       stream = new ByteStreamOutArrayBE(size);
@@ -119,7 +119,7 @@ public:
   BOOL set_payload(const U8* payload, I64 size)
   {
     ByteStreamInArray* stream = 0;
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
       stream = new ByteStreamInArrayLE(payload, size);
     else
       stream = new ByteStreamInArrayBE(payload, size);
