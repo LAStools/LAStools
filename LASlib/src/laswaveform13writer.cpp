@@ -158,7 +158,7 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
 
   // create stream
 
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
   {
     stream = new ByteStreamOutFileLE(file);
   }

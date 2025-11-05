@@ -418,7 +418,7 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item, U32& context)
   {
     /* create instreams */
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       instream_channel_returns_XY = new ByteStreamInArrayLE();
       instream_Z = new ByteStreamInArrayLE();
@@ -1237,7 +1237,7 @@ BOOL LASreadItemCompressed_RGB14_v3::init(const U8* item, U32& context)
   {
     /* create instreams */
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       instream_RGB = new ByteStreamInArrayLE();
     }
@@ -1581,7 +1581,7 @@ BOOL LASreadItemCompressed_RGBNIR14_v3::init(const U8* item, U32& context)
   {
     /* create instreams */
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       instream_RGB = new ByteStreamInArrayLE();
       instream_NIR = new ByteStreamInArrayLE();
@@ -1969,7 +1969,7 @@ BOOL LASreadItemCompressed_WAVEPACKET14_v3::init(const U8* item, U32& context)
   {
     /* create instreams */
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       instream_wavepacket = new ByteStreamInArrayLE();
     }
@@ -2282,7 +2282,7 @@ BOOL LASreadItemCompressed_BYTE14_v3::init(const U8* item, U32& context)
 
     /* create instreams */
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       for (i = 0; i < number; i++)
       {

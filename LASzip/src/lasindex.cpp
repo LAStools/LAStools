@@ -265,7 +265,7 @@ BOOL LASindex::read(FILE* file)
 {
   if (file == 0) return FALSE;
   ByteStreamIn* stream;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     stream = new ByteStreamInFileLE(file);
   else
     stream = new ByteStreamInFileBE(file);
@@ -282,7 +282,7 @@ BOOL LASindex::write(FILE* file) const
 {
   if (file == 0) return FALSE;
   ByteStreamOut* stream;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     stream = new ByteStreamOutFileLE(file);
   else
     stream = new ByteStreamOutFileBE(file);
@@ -340,7 +340,7 @@ BOOL LASindex::append(const char* file_name) const
   FILE* file = LASfopen(file_name, "rb");
 
   ByteStreamIn* bytestreamin = 0;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     bytestreamin = new ByteStreamInFileLE(file);
   else
     bytestreamin = new ByteStreamInFileBE(file);
@@ -404,7 +404,7 @@ BOOL LASindex::append(const char* file_name) const
   ByteStreamOut* bytestreamout;
   file = LASfopen(file_name, "rb+");
 
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     bytestreamout = new ByteStreamOutFileLE(file);
   else
     bytestreamout = new ByteStreamOutFileBE(file);

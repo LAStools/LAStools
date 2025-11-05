@@ -60,7 +60,7 @@ BOOL LASreaderQFIT::open(const char* file_name)
   // create input stream
 
   ByteStreamIn* in;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     in = new ByteStreamInFileLE(file);
   else
     in = new ByteStreamInFileBE(file);
@@ -144,7 +144,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
   if (version == 40 || version == 48 || version == 56)
   {
     little_endian = TRUE;
-    endian_swap = (IS_LITTLE_ENDIAN() == FALSE);
+    endian_swap = (Endian::IS_LITTLE_ENDIAN == FALSE);
   }
   else
   {
@@ -152,7 +152,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
     if (version == 40 || version == 48 || version == 56)
     {
       little_endian = FALSE;
-      endian_swap = (IS_LITTLE_ENDIAN() == TRUE);
+      endian_swap = (Endian::IS_LITTLE_ENDIAN == TRUE);
     }
     else
     {
@@ -420,7 +420,7 @@ BOOL LASreaderQFIT::reopen(const char* file_name)
 
   // create input stream
 
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     stream = new ByteStreamInFileLE(file);
   else
     stream = new ByteStreamInFileBE(file);

@@ -109,7 +109,7 @@ BOOL LASwriterBIN::open(const char* file_name, const LASheader* header, const ch
   }
 
   ByteStreamOut* out;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     out = new ByteStreamOutFileLE(file);
   else
     out = new ByteStreamOutFileBE(file);
@@ -136,7 +136,7 @@ BOOL LASwriterBIN::open(FILE* file, const LASheader* header, const char* version
 #endif
 
   ByteStreamOut* out;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     out = new ByteStreamOutFileLE(file);
   else
     out = new ByteStreamOutFileBE(file);

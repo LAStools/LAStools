@@ -158,7 +158,7 @@ BOOL LASwaveform13reader::open(const char* file_name, I64 start_of_waveform_data
     return FALSE;
   }
 
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
   {
     stream = new ByteStreamInFileLE(file);
   }

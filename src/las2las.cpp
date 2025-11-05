@@ -115,7 +115,7 @@ static bool save_vlrs_to_file(const LASheader* header)
       return false;
   }
   ByteStreamOut* out;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     out = new ByteStreamOutFileLE(file);
   else
     out = new ByteStreamOutFileBE(file);
@@ -178,7 +178,7 @@ static bool load_vlrs_from_file(LASheader* header)
       return false;
   }
   ByteStreamIn* in;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     in = new ByteStreamInFileLE(file);
   else
     in = new ByteStreamInFileBE(file);
@@ -334,7 +334,7 @@ static bool save_single_vlr_to_file(const LASheader* header, const int& vlr_inde
   i = determine_vlr_index(header, vlr_index, vlr_user_id, vlr_record_id);
 
   ByteStreamOut* out;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     out = new ByteStreamOutFileLE(file);
   else
     out = new ByteStreamOutFileBE(file);
@@ -410,7 +410,7 @@ static bool load_single_vlr_from_file(LASheader* header, const int& vlr_index, c
     laserror("VLR file '%s' could not be found", vlr_input_filename);
   }
   ByteStreamIn* in;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     in = new ByteStreamInFileLE(file);
   else
     in = new ByteStreamInFileBE(file);

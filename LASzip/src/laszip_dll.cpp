@@ -2157,7 +2157,7 @@ laszip_prepare_point_for_write(
 
       // create 2+2+4+148 bytes payload for compatibility VLR
       ByteStreamOutArray* out;
-      if (IS_LITTLE_ENDIAN())
+      if (Endian::IS_LITTLE_ENDIAN)
         out = new ByteStreamOutArrayLE();
       else
         out = new ByteStreamOutArrayBE();
@@ -3095,7 +3095,7 @@ laszip_open_writer(
 
     // create the outstream
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
       laszip_dll->streamout = new ByteStreamOutFileLE(laszip_dll->file);
     else
       laszip_dll->streamout = new ByteStreamOutFileBE(laszip_dll->file);
@@ -4259,7 +4259,7 @@ laszip_read_header(
           // yes ... so let's fix the header (using the content from the compatibility VLR)
 
           ByteStreamInArray* in;
-          if (IS_LITTLE_ENDIAN())
+          if (Endian::IS_LITTLE_ENDIAN)
             in = new ByteStreamInArrayLE(compatibility_VLR->data, compatibility_VLR->record_length_after_header);
           else
             in = new ByteStreamInArrayBE(compatibility_VLR->data, compatibility_VLR->record_length_after_header);
@@ -4509,7 +4509,7 @@ laszip_open_reader(
       snprintf(laszip_dll->warning, sizeof(laszip_dll->warning), "setvbuf() failed with buffer size 262144\n");
     }
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
       laszip_dll->streamin = new ByteStreamInFileLE(laszip_dll->file);
     else
       laszip_dll->streamin = new ByteStreamInFileBE(laszip_dll->file);
@@ -4951,7 +4951,7 @@ laszip_open_reader_stream(
 
     // open the file
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
       laszip_dll->streamin = new ByteStreamInIstreamLE(stream);
     else
       laszip_dll->streamin = new ByteStreamInIstreamBE(stream);
@@ -5003,7 +5003,7 @@ laszip_open_writer_stream(
 
     // create the outstream
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
       laszip_dll->streamout = new ByteStreamOutOstreamLE(stream);
     else
       laszip_dll->streamout = new ByteStreamOutOstreamBE(stream);
@@ -5097,7 +5097,7 @@ laszip_create_laszip_vlr(
 
   ByteStreamOutArray* out = 0;
 
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     out = new ByteStreamOutArrayLE();
   else
     out = new ByteStreamOutArrayBE();

@@ -103,7 +103,7 @@ BOOL LASreaderBIN::open(const char* file_name)
   // create input stream
 
   ByteStreamIn* in;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     in = new ByteStreamInFileLE(file);
   else
     in = new ByteStreamInFileBE(file);

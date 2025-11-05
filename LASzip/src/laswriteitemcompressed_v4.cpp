@@ -378,7 +378,7 @@ BOOL LASwriteItemCompressed_POINT14_v4::init(const U8* item, U32& context)
 
   if (outstream_channel_returns_XY == 0)
   {
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       outstream_channel_returns_XY = new ByteStreamOutArrayLE();
       outstream_Z = new ByteStreamOutArrayLE();
@@ -1224,7 +1224,7 @@ BOOL LASwriteItemCompressed_RGB14_v4::init(const U8* item, U32& context)
   {
     /* create outstreams */
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       outstream_RGB = new ByteStreamOutArrayLE();
     }
@@ -1515,7 +1515,7 @@ BOOL LASwriteItemCompressed_RGBNIR14_v4::init(const U8* item, U32& context)
   {
     /* create outstreams */
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       outstream_RGB = new ByteStreamOutArrayLE();
       outstream_NIR = new ByteStreamOutArrayLE();
@@ -1846,7 +1846,7 @@ BOOL LASwriteItemCompressed_WAVEPACKET14_v4::init(const U8* item, U32& context)
   {
     /* create outstreams */
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       outstream_wavepacket = new ByteStreamOutArrayLE();
     }
@@ -2150,7 +2150,7 @@ BOOL LASwriteItemCompressed_BYTE14_v4::init(const U8* item, U32& context)
 
     /* create outstreams */
 
-    if (IS_LITTLE_ENDIAN())
+    if (Endian::IS_LITTLE_ENDIAN)
     {
       for (i = 0; i < number; i++)
       {

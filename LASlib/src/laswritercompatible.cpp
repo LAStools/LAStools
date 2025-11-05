@@ -90,7 +90,7 @@ BOOL LASwriterCompatibleDown::open(LASheader* header, LASwriteOpener* laswriteop
 
   // create 2+2+4+148 bytes payload for compatibility VLR
   ByteStreamOutArray* out;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     out = new ByteStreamOutArrayLE();
   else
     out = new ByteStreamOutArrayBE();
@@ -487,7 +487,7 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
 
   // read the 2+2+4+148 bytes payload from the compatibility VLR
   ByteStreamInArray* in;
-  if (IS_LITTLE_ENDIAN())
+  if (Endian::IS_LITTLE_ENDIAN)
     in = new ByteStreamInArrayLE(compatibility_vlr->data, compatibility_vlr->record_length_after_header);
   else
     in = new ByteStreamInArrayBE(compatibility_vlr->data, compatibility_vlr->record_length_after_header);

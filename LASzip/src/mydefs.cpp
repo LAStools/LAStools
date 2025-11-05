@@ -799,3 +799,77 @@ I32 get_digits(F64 scale_factor) {
   }
   return -1;
 }
+
+/// endians 
+namespace Endian {
+/// Checks at runtime whether the system stores its multi-byte numbers in little-endian format in memory
+/// Initialisation when the programme starts, once only
+const bool IS_LITTLE_ENDIAN = []() {
+  uint16_t test = 1;
+  return *reinterpret_cast<uint8_t*>(&test) == 1;
+}();
+
+void to_big_endian(int* value) {
+  if (Endian::IS_LITTLE_ENDIAN) {
+    char help;
+    char* field = (char*)value;
+    help = field[0];
+    field[0] = field[3];
+    field[3] = help;
+    help = field[1];
+    field[1] = field[2];
+    field[2] = help;
+  }
+}
+
+void to_little_endian(int* value) {
+  if (!Endian::IS_LITTLE_ENDIAN) {
+    char help;
+    char* field = (char*)value;
+    help = field[0];
+    field[0] = field[3];
+    field[3] = help;
+    help = field[1];
+    field[1] = field[2];
+    field[2] = help;
+  }
+}
+
+void to_big_endian(double* value) {
+  if (Endian::IS_LITTLE_ENDIAN) {
+    char help;
+    char* field = (char*)value;
+    help = field[0];
+    field[0] = field[7];
+    field[7] = help;
+    help = field[1];
+    field[1] = field[6];
+    field[6] = help;
+    help = field[2];
+    field[2] = field[5];
+    field[5] = help;
+    help = field[3];
+    field[3] = field[4];
+    field[4] = help;
+  }
+}
+
+void to_little_endian(double* value) {
+  if (!Endian::IS_LITTLE_ENDIAN) {
+    char help;
+    char* field = (char*)value;
+    help = field[0];
+    field[0] = field[7];
+    field[7] = help;
+    help = field[1];
+    field[1] = field[6];
+    field[6] = help;
+    help = field[2];
+    field[2] = field[5];
+    field[5] = help;
+    help = field[3];
+    field[3] = field[4];
+    field[4] = help;
+  }
+}
+}  // namespace Endian
