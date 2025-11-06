@@ -60,7 +60,8 @@ class LasTool
         this->argc = argc;
         this->argv = argv;
         this->name = name;
-        std::filesystem::current_path(exe_path().c_str());
+        // optional: set default dir to exe
+        // std::filesystem::current_path(exe_path().c_str());
     }
 
     virtual std::string sBlast()

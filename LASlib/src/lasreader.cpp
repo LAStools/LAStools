@@ -471,7 +471,7 @@ I32 LASreadOpener::unparse(CHAR* string) const {
   if (io_ibuffer_size != LAS_TOOLS_IO_IBUFFER_SIZE) {
     n += sprintf(string + n, "-io_ibuffer %u ", io_ibuffer_size);
   }
-  if (!temp_file_base.empty() && (temp_file_base.compare(".")!=0)) {
+  if (!temp_file_base.empty()) {
     n += sprintf(string + n, "-temp_files \"%s\" ", temp_file_base.c_str());
   }
   if (parse_string) {
@@ -2142,6 +2142,7 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
       if ((i + 1) >= argc) {
         laserror("'%s' needs 1 argument: base name", argv[i]);
       }
+      // we expect trailed path separator, if not, the filename will be extended
       temp_file_base = std::string(argv[i + 1]);
       *argv[i] = '\0';
       *argv[i + 1] = '\0';
@@ -3137,11 +3138,7 @@ LASreadOpener::LASreadOpener() {
   filter = 0;
   transform = 0;
   ignore = 0;
-#if defined(_WIN32)
   temp_file_base = "";
-#else
-  temp_file_base = ".";
-#endif
   // COPC
   inside_depth_opener = 0;
   copc_stream_order = 1;
