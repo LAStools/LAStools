@@ -389,11 +389,7 @@ class LASLIB_DLL LASreadOpener {
   };
   void reset();
   std::string get_temp_file_base() const {
-    if (temp_file_base.empty()) {
-      std::filesystem::temp_directory_path();     
-    } else {
-      return temp_file_base;
-    }
+    return temp_path(temp_file_base);
   };
   LASreader* open(const CHAR* other_file_name = 0, BOOL reset_after_other = TRUE);
   BOOL reopen(LASreader* lasreader, BOOL remain_buffered = TRUE);

@@ -356,6 +356,7 @@ extern void LASLIB_DLL byebye();
 bool validate_utf8(const char* utf8, bool restrict_to_two_bytes = false) noexcept;
 // Opens a file with the specified filename and mode, converting filename and mode to UTF-16 on Windows.
 FILE* LASfopen(const char* const filename, const char* const mode);
+void FileDelete(std::string filename, LAS_MESSAGE_TYPE onFailMsg = LAS_WARNING);
 const char* indent_text(const char* text, const char* indent);
 
 // las error message function which leads to an immediate program stop by default
@@ -447,6 +448,8 @@ void ExeNameToPathWithoutTrailingDelimiter(int& path_len, char* path);
 std::string exe_path();
 
 std::string dir_current();
+
+std::string temp_path(std::string temp_user = "");
 
 /// replace all occurrences of search in subject with replace and return new string
 std::string ReplaceString(const std::string& subject, const std::string& search, const std::string& replace);

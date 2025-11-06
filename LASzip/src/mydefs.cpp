@@ -132,7 +132,7 @@ bool validate_utf8(const char* str, bool restrict_to_two_bytes) noexcept {
   constexpr uint8_t UTF8_CONTINUATION_MASK = 0xC0;
   constexpr uint8_t UTF8_CONTINUATION_PREFIX = 0x80;
 
-  bool has_two_byte = false;
+  // bool has_two_byte = false;
   const auto* p = reinterpret_cast<const unsigned char*>(str);
 
   while (*p) {
@@ -168,7 +168,7 @@ bool validate_utf8(const char* str, bool restrict_to_two_bytes) noexcept {
       if (code_point < 0x80 || code_point > 0x7FF || (code_point >= 0x0080 && code_point <= 0x05FF)) {
         return false;  // Invalid or rare code point, likely ANSI
       }
-      has_two_byte = true;
+      // has_two_byte = true;
       p += 2;
       continue;
     }
@@ -287,6 +287,28 @@ FILE* LASfopen(const char* const filename, const char* const mode) {
   return file;
 }
 
+/// <summary>
+/// delete a file on common OS and report failure
+/// </summary>
+/// <param name="filename">absolute filename to delete</param>
+/// <param name="onFailMsg">message type on failure</param>
+void FileDelete(std::string filename, LAS_MESSAGE_TYPE onFailMsg) {
+  if (filename.empty()) return;
+  std::string cmd;
+#ifdef _WIN32
+  cmd = "del ";
+#else
+  cmd = "rm ";
+#endif
+  cmd += filename;
+  system(cmd.c_str());
+  LASMessage(LAS_VERY_VERBOSE, "deleting '%s'", filename.c_str());
+  int res = system(cmd.data());
+  if (res != 0) {
+    LASMessage(onFailMsg, "delete of file '%s' failed [%d]", filename.c_str(), res);
+  }
+}
+
 /// !!The caller is responsible for managing the memory of the returned const char*
 /// using 'delete[]' when done!!
 /// Indents each line of content by the given 'indent'
@@ -371,6 +393,20 @@ std::string dir_current() {
   getcwd(curr_directory, MAX_PATH_LAS);
 #endif
   return std::string(curr_directory);
+}
+
+/// <summary>
+/// get the temp path include trailing delimiter. system default or temp_user.
+/// responsitility of the user if temp_user is a valid and terminated path.
+/// </summary>
+/// <param name="temp_user">optional user defined temp path</param>
+/// <returns>temp path to use</returns>
+std::string temp_path(std::string temp_user) {
+  if (temp_user.empty()) {
+    return std::filesystem::temp_directory_path().string();
+  } else {
+    return temp_user;
+  }
 }
 
 /// replace all occurrences of search in subject with replace and return new string

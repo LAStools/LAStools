@@ -1207,25 +1207,13 @@ public:
       }
 
       if (delete_empty && lasreadopener.get_file_name()) {
-#ifdef _WIN32
         LASMessage(LAS_VERBOSE, "delete check for '%s' with %lld points", lasreadopener.get_file_name(), lasreader->npoints);
-#else
-        laserror("deleting not implemented ...");
-#endif
         if (lasreader->npoints == 0) {
           lasreader->close();
-
-          std::string command(4096, '\0');
-          snprintf(command.data(), sizeof(command), "del \"%s\"", lasreadopener.get_file_name());
-          LASMessage(LAS_VERBOSE, "executing '%s'", command.c_str());
-
-          if (system(command.data()) != 0) {
-            laserror("failed to execute '%s'", command.c_str());
-          }
+          FileDelete(lasreadopener.get_file_name());
         } else {
           lasreader->close();
         }
-
         delete lasreader;
         continue;
       }
