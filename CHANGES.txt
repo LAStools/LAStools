@@ -1,5 +1,7 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+06 November 2025 -- fix: multi core temp file issue on Linux (https://groups.google.com/g/lastools/c/FPIfHrWw3W4)
+05 November 2025 -- fix: endian handling failure for different OS
 27 October 2025 -- NEW: Support for LAS 1.5 LAZ 3.5.0 (enable v4)
 24 October 2025 -- fix: las2dem: Linux raster exports now follow Windows default color dephts (nbits)
 15 October 2025 -- fix: Allow PROJ conversions in multi core commands

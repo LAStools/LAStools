@@ -34,6 +34,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <filesystem>
 
 class LasTool
 {
@@ -59,6 +60,7 @@ class LasTool
         this->argc = argc;
         this->argv = argv;
         this->name = name;
+        std::filesystem::current_path(exe_path().c_str());
     }
 
     virtual std::string sBlast()
