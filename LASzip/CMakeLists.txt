@@ -6,7 +6,11 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set(ROOT_DIR "${PROJECT_SOURCE_DIR}")
 
-if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+if (NOT(MSVC))
+  add_compile_options(-std=c++17)
+endif()
+
+if(CMAKE_GNU_COMPILER_ID OR CMAKE_Clang_COMPILER_ID)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-security -Wno-format-truncation")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-format-truncation -std=c++17")
 endif()
