@@ -46,6 +46,11 @@ methods to install it (We recommend using the default standard installation path
   ```
   conda install -c conda-forge proj-data
   ```
+  If a warning appears in Linux stating that the library was found via the Conda installation but could not be loaded, this is usually because the dynamic loader finds the incompatible system libraries first. Using `export LD_LIBRARY_PATH=~/miniconda3/lib:$LD_LIBRARY_PATH` ensures that the Conda libraries and their dependencies are loaded first.  
+  Note that in this case, the environment variable only applies to the current shell session.
+
+The environment variable only applies to the current shell session.
+
 - **Docker**: Get the Docker image with:
   ```
   docker pull osgeo/proj
