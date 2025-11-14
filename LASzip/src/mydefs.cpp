@@ -301,9 +301,8 @@ void FileDelete(std::string filename, LAS_MESSAGE_TYPE onFailMsg) {
   cmd = "rm ";
 #endif
   cmd += filename;
-  system(cmd.c_str());
   LASMessage(LAS_VERY_VERBOSE, "deleting '%s'", filename.c_str());
-  int res = system(cmd.data());
+  int res = system(cmd.c_str());
   if (res != 0) {
     LASMessage(onFailMsg, "delete of file '%s' failed [%d]", filename.c_str(), res);
   }
@@ -402,11 +401,19 @@ std::string dir_current() {
 /// <param name="temp_user">optional user defined temp path</param>
 /// <returns>temp path to use</returns>
 std::string temp_path(std::string temp_user) {
+  std::string td;
   if (temp_user.empty()) {
-    return std::filesystem::temp_directory_path().string();
+    td = std::filesystem::temp_directory_path().string();
+    if (td.empty()) {
+      td = ".";
+    }
   } else {
-    return temp_user;
+    td = temp_user;
   }
+  if (td.back() != DIRECTORY_SLASH) {
+    td += DIRECTORY_SLASH;
+  }
+  return td;
 }
 
 /// replace all occurrences of search in subject with replace and return new string
