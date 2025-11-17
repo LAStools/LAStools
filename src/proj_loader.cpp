@@ -294,13 +294,13 @@ static std::string findProjLibInStandartPaths(std::set<std::filesystem::path>& s
 
 /// Checks whether the loaded PROJ version reaches at least minMajor.minMinor.
 /// Returns a warning if this version is too old.
-void checkProjVersion() {
+static void checkProjVersion() {
   PJ_INFO info = proj_info();
   
   if (info.version) {
     LASMessage(LAS_VERBOSE, "Loaded PROJ version: %s", info.version);
 
-    if (info.major && info.major < 9) {
+    if (info.major < 9) {
       LASMessage(LAS_WARNING, "The loaded PROJ version '%s' is older than version 9.0.0. Full functionality cannot be guaranteed with this version.", info.version);
     }
   } else {
@@ -641,10 +641,8 @@ static std::string findLatestCondaInstallationPath(std::set<std::filesystem::pat
 /// 6. fallback: try to load library from standard paths recursive
 bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
   proj_lib_handle = nullptr;
-  PROJ_LIB_HANDLE is_valid_handle = nullptr;
   std::set<std::filesystem::path> searchedPaths;
   std::set<std::string> latestVerionSet;
-  std::string latestValidProjVersion;
 
   // 1. Load library via environment variable
   const char* env = getenv("LASTOOLS_PROJ");
@@ -677,15 +675,8 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       const std::string proj_lib_path = findLatestProjLibraryPath(qgisPath);
 
       if (!proj_lib_path.empty()) {
-        // Try to load the library
-        is_valid_handle = LOAD_LIBRARY(proj_lib_path.c_str());
-        if (is_valid_handle) {
-          latestVerionSet.insert(proj_lib_path);
-          LASMessage(LAS_VERBOSE, "Latest PROJ library used via QGIS installation: %s", proj_lib_path.c_str());
-        } else {
-          LASMessage(LAS_WARNING,"PROJ Library '%s' was found but could not be loaded. "
-              "Please check that all dependencies are present and the library is compatible with your system.", proj_lib_path.c_str());
-        }
+        latestVerionSet.insert(proj_lib_path);
+        LASMessage(LAS_VERBOSE, "Latest PROJ library used via QGIS installation: %s", proj_lib_path.c_str());
       }
     }
   }
@@ -698,15 +689,8 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       const std::string proj_lib_path = findLatestProjLibraryPath(osgeoPath);
 
       if (!proj_lib_path.empty()) {
-        // Try to load the library
-        is_valid_handle = LOAD_LIBRARY(proj_lib_path.c_str());
-        if (is_valid_handle) {
-          latestVerionSet.insert(proj_lib_path);
-          LASMessage(LAS_VERBOSE, "Latest PROJ library used via OCGeo4W installation: %s", proj_lib_path.c_str());
-        } else {
-          LASMessage(LAS_WARNING, "PROJ Library '%s' was found but could not be loaded. "
-              "Please check that all dependencies are present and the library is compatible with your system.", proj_lib_path.c_str());
-        }
+        latestVerionSet.insert(proj_lib_path);
+        LASMessage(LAS_VERBOSE, "Latest PROJ library used via OCGeo4W installation: %s", proj_lib_path.c_str());
       }
     }
   }
@@ -719,15 +703,8 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       const std::string proj_lib_path = findLatestProjLibraryPath(condaPath);
 
       if (!proj_lib_path.empty()) {
-        // Try to load the library
-        is_valid_handle = LOAD_LIBRARY(proj_lib_path.c_str());
-        if (is_valid_handle) {
-          latestVerionSet.insert(proj_lib_path);
-          LASMessage(LAS_VERBOSE, "Latest PROJ library used via conda installation: %s", proj_lib_path.c_str());
-        } else {
-          LASMessage(LAS_WARNING, "PROJ Library '%s' was found but could not be loaded. "
-              "Please check that all dependencies are present and the library is compatible with your system.", proj_lib_path.c_str());
-        }
+        latestVerionSet.insert(proj_lib_path);
+        LASMessage(LAS_VERBOSE, "Latest PROJ library used via conda installation: %s", proj_lib_path.c_str());
       }
     }
   }
@@ -737,15 +714,8 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
     const std::string proj_lib_path = findProjLibInStandartPaths(searchedPaths);
     
     if (!proj_lib_path.empty()) {
-      // Try to load the library
-      is_valid_handle = LOAD_LIBRARY(proj_lib_path.c_str());
-      if (is_valid_handle) {
-        latestVerionSet.insert(proj_lib_path);
-        LASMessage(LAS_VERBOSE, "Latest PROJ library used via standard installation: %s", proj_lib_path.c_str());
-      } else {
-        LASMessage(LAS_WARNING, "PROJ Library '%s' was found but could not be loaded. "
-            "Please check that all dependencies are present and the library is compatible with your system.", proj_lib_path.c_str());
-      }
+      latestVerionSet.insert(proj_lib_path);
+      LASMessage(LAS_VERBOSE, "Latest PROJ library used via standard installation: %s", proj_lib_path.c_str());
     }
   }
 
@@ -754,37 +724,38 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
     const std::string proj_lib_path = findProjLibInStandartPathsRecursive(searchedPaths);
 
     if (!proj_lib_path.empty()) {
-      // Try to load the library
-      is_valid_handle = LOAD_LIBRARY(proj_lib_path.c_str());
-      if (is_valid_handle) {
-        latestVerionSet.insert(proj_lib_path);
-        LASMessage(LAS_VERBOSE, "Latest PROJ library used via installation: %s", proj_lib_path.c_str());
+      latestVerionSet.insert(proj_lib_path);
+      LASMessage(LAS_VERBOSE, "Latest PROJ library used via installation: %s", proj_lib_path.c_str());
+    }
+  }
+
+  //load final handle with latest PROJ version
+  if (!latestVerionSet.empty() && !proj_lib_handle) {
+    std::vector<std::string> sortedVersions;
+
+    // Collect all valid paths
+    for (const std::string& projPath : latestVerionSet) {
+      if (!projPath.empty()) {
+        sortedVersions.push_back(projPath);
+      }
+    }
+    
+    // Sort by version (highest first)
+    std::sort(sortedVersions.begin(), sortedVersions.end(), [](const std::string& a, const std::string& b) {
+      std::filesystem::path pa(a), pb(b);
+      return compareVersions(pa.filename().string(), pb.filename().string());
+    });
+    
+    // Now try to load iteratively
+    for (const std::string& candidate : sortedVersions) {
+      proj_lib_handle = LOAD_LIBRARY(candidate.c_str());
+      if (proj_lib_handle) {
+        LASMessage(LAS_VERBOSE, "The latest PROJ library found will be used: %s", candidate.c_str());
+        break;
       } else {
-        LASMessage(
-            LAS_WARNING, "PROJ Library '%s' was found but could not be loaded. "
-            "Please check that all dependencies are present and the library is compatible with your system.", proj_lib_path.c_str());
+        LASMessage(LAS_WARNING, "PROJ Library '%s' was found but could not be loaded. "
+            "Please check that all dependencies are present and the library is compatible with your system.", candidate.c_str());
       }
-    }
-  }
-
-  // load final handle with latest PROJ version
-  std::string latestVersionName; 
-
-  for (const std::string& projPath : latestVerionSet) {
-    if (!projPath.empty()) {
-      std::filesystem::path proj(projPath);
-      std::string fileName = proj.filename().string();
-
-      if (latestVersionName.empty() || compareVersions(fileName, latestVersionName)) {
-        latestVersionName = fileName;
-        latestValidProjVersion = projPath;
-      }
-    }
-  }
-  if (!latestValidProjVersion.empty() && !proj_lib_handle) {
-    proj_lib_handle = LOAD_LIBRARY(latestValidProjVersion.c_str());
-    if (proj_lib_handle) {
-      LASMessage(LAS_VERBOSE, "The latest PROJ library found will be used: %s", latestValidProjVersion.c_str());
     }
   }
 
