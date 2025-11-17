@@ -177,6 +177,11 @@ typedef struct laszip_dll
   I32 start_classification;
   I32 start_flags_and_channel;
   I32 start_NIR_band;
+  // LAS 1.5 and higher only
+  laszip_F64 max_gps_time;
+  laszip_F64 min_gps_time;
+  laszip_U16 time_offset;
+  //
   laszip_dll_inventory* inventory;
   std::vector<void *> buffers;
   laszip_message_callback_data_struct* message_callback_data;

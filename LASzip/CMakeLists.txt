@@ -6,7 +6,9 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set(ROOT_DIR "${PROJECT_SOURCE_DIR}")
 
-if (NOT(MSVC))
+if (MSVC)
+  add_compile_options("/std:c++17")
+else()
   add_compile_options(-std=c++17)
 endif()
 
