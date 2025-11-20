@@ -49,7 +49,6 @@
 #include "lasmessage.hpp"
 #include "lasutility.hpp"
 #include "mydefs.hpp"
-#include "proj_loader.h"
 #include "wktparser.h"
 
 #if defined(_MSC_VER) && (_MSC_FULL_VER >= 150000000)
@@ -830,22 +829,22 @@ ProjParameters::~ProjParameters() {
 
   // Free the PROJ context
   if (proj_ctx) {
-    proj_context_destroy(proj_ctx);
+    my_proj_context_destroy(proj_ctx);
     proj_ctx = nullptr;  // Set to nullptr to avoid dangling pointers
   }
   // Free the source CRS
   if (proj_source_crs) {
-    proj_destroy(proj_source_crs);
+    proj_destroy_ptr(proj_source_crs);
     proj_source_crs = nullptr;
   }
   // Free the target CRS
   if (proj_target_crs) {
-    proj_destroy(proj_target_crs);
+    proj_destroy_ptr(proj_target_crs);
     proj_target_crs = nullptr;
   }
   // Free the transform CRS
   if (proj_transform_crs) {
-    proj_destroy(proj_transform_crs);
+    proj_destroy_ptr(proj_transform_crs);
     proj_transform_crs = nullptr;
   }
   // Release memory if proj_info_args
@@ -883,7 +882,7 @@ void ProjParameters::set_header_wkt_representation(PJ* proj_crs) {
   // Calling up and outputting the WKT display
   if (proj_ctx && proj_crs) {
     const char* options[] = {"MULTILINE=NO", nullptr};
-    const char* wkt_representation = proj_as_wkt(proj_ctx, proj_crs, PJ_WKT1_GDAL, options);
+    const char* wkt_representation = proj_as_wkt_ptr(proj_ctx, proj_crs, PJ_WKT1_GDAL, options);
 
     if (!wkt_representation) {
       LASMessage(
@@ -902,7 +901,7 @@ const char* ProjParameters::get_wkt_representation(bool source /*=true*/) const 
   if (proj_ctx && ((proj_source_crs && source) || (proj_target_crs && !source))) {
     // Retrieving and outputting the WKT representation
     const char* options[] = {"MULTILINE=NO", nullptr};
-    const char* wkt = proj_as_wkt(proj_ctx, source ? proj_source_crs : proj_target_crs, PJ_WKT1_GDAL, options);
+    const char* wkt = proj_as_wkt_ptr(proj_ctx, source ? proj_source_crs : proj_target_crs, PJ_WKT1_GDAL, options);
     if (!wkt) {
       laserror("The WKT representation of the PROJ CRS could not be generated.");
     }
@@ -917,7 +916,7 @@ const char* ProjParameters::get_wkt_representation(bool source /*=true*/) const 
 const char* ProjParameters::get_json_representation(bool source /*=true*/) const {
   if (proj_ctx && ((proj_source_crs && source) || (proj_target_crs && !source))) {
     // Retrieving and outputting the JSON representation
-    const char* json = proj_as_projjson(proj_ctx, source ? proj_source_crs : proj_target_crs, nullptr);
+    const char* json = proj_as_projjson_ptr(proj_ctx, source ? proj_source_crs : proj_target_crs, nullptr);
     if (!json) {
       laserror("The json representation of the PROJ CRS could not be generated.");
     }
@@ -932,7 +931,7 @@ const char* ProjParameters::get_json_representation(bool source /*=true*/) const
 const char* ProjParameters::get_projString_representation(bool source /*=true*/) const {
   if (proj_ctx && ((proj_source_crs && source) || (proj_target_crs && !source))) {
     // Retrieving and outputting the PROJ string representation
-    const char* projString = proj_as_proj_string(proj_ctx, source ? proj_source_crs : proj_target_crs, PJ_PROJ_5, nullptr);
+    const char* projString = proj_as_proj_string_ptr(proj_ctx, source ? proj_source_crs : proj_target_crs, PJ_PROJ_5, nullptr);
     if (!projString) {
       laserror("The PROJ string representation of the PROJ CRS could not be generated.");
     }
@@ -948,7 +947,7 @@ const char* ProjParameters::get_epsg_representation(bool source /*=true*/) const
   if (proj_ctx && ((proj_source_crs && source) || (proj_target_crs && !source))) {
     // Run through all identification codes
     for (int i = 0;; ++i) {
-      const char* id_code = proj_get_id_code(source ? proj_source_crs : proj_target_crs, i);
+      const char* id_code = proj_get_id_code_ptr(source ? proj_source_crs : proj_target_crs, i);
 
       if (!id_code) break;
       LASMessage(LAS_VERY_VERBOSE, "the PROJ EPSG code representation object was successfully created, EPSG: '%s'", id_code);
@@ -962,7 +961,7 @@ const char* ProjParameters::get_epsg_representation(bool source /*=true*/) const
 /// IMPORTANT: the proj context and the PROJ crs object must have been created before calling the function
 const char* ProjParameters::get_ellipsoid_info(bool source /*=true*/) {
   if (proj_ctx && ((proj_source_crs && source) || (proj_target_crs && !source))) {
-    PJ* ellipsoid = proj_get_ellipsoid(proj_ctx, source ? proj_source_crs : proj_target_crs);
+    PJ* ellipsoid = proj_get_ellipsoid_ptr(proj_ctx, source ? proj_source_crs : proj_target_crs);
 
     if (ellipsoid) {
       double semi_major_metre = 0.0;
@@ -972,10 +971,10 @@ const char* ProjParameters::get_ellipsoid_info(bool source /*=true*/) {
       LASMessage(LAS_VERBOSE, "the PROJ ellipsoid object was successfully created");
 
       // Retrieving the ellipsoid parameters
-      int result = proj_ellipsoid_get_parameters(proj_ctx, ellipsoid, &semi_major_metre, &semi_minor_metre, &is_semi_minor_computed, &inv_flattening);
+      int result = proj_ellipsoid_get_parameters_ptr(proj_ctx, ellipsoid, &semi_major_metre, &semi_minor_metre, &is_semi_minor_computed, &inv_flattening);
 
       if (result == 0) {
-        proj_destroy(ellipsoid);
+        proj_destroy_ptr(ellipsoid);
         laserror("Failed to retrieve ellipsoid parameters.");
       }
       LASMessage(
@@ -991,7 +990,7 @@ const char* ProjParameters::get_ellipsoid_info(bool source /*=true*/) {
           "Inverse Flattening: %.6f",
           semi_major_metre, semi_minor_metre, is_semi_minor_computed ? " (computed)" : "", inv_flattening);
 
-      proj_destroy(ellipsoid);
+      proj_destroy_ptr(ellipsoid);
       return proj_crs_infos;
     }
   }
@@ -1002,12 +1001,12 @@ const char* ProjParameters::get_ellipsoid_info(bool source /*=true*/) {
 /// IMPORTANT: the proj context and the PROJ crs object must have been created before calling the function
 const char* ProjParameters::get_datum_info(bool source /*=true*/) {
   if (proj_ctx && ((proj_source_crs && source) || (proj_target_crs && !source))) {
-    PJ* datum_ensemble = proj_crs_get_datum_ensemble(proj_ctx, source ? proj_source_crs : proj_target_crs);
+    PJ* datum_ensemble = proj_crs_get_datum_ensemble_ptr(proj_ctx, source ? proj_source_crs : proj_target_crs);
 
     if (datum_ensemble) {
-      const char* datum_name = proj_get_name(source ? proj_source_crs : proj_target_crs);
-      int member_count = proj_datum_ensemble_get_member_count(proj_ctx, datum_ensemble);
-      double accuracy = proj_datum_ensemble_get_accuracy(proj_ctx, datum_ensemble);
+      const char* datum_name = proj_get_name_ptr(source ? proj_source_crs : proj_target_crs);
+      int member_count = proj_datum_ensemble_get_member_count_ptr(proj_ctx, datum_ensemble);
+      double accuracy = proj_datum_ensemble_get_accuracy_ptr(proj_ctx, datum_ensemble);
 
       // Formatted output of date information
       proj_crs_infos = new char[1024];
@@ -1031,24 +1030,24 @@ const char* ProjParameters::get_datum_info(bool source /*=true*/) {
 #endif
       // Get and format member information
       for (int i = 0; i < member_count; ++i) {
-        PJ* member = proj_datum_ensemble_get_member(proj_ctx, datum_ensemble, i);
+        PJ* member = proj_datum_ensemble_get_member_ptr(proj_ctx, datum_ensemble, i);
         if (member) {
-          const char* member_name = proj_get_name(member);
+          const char* member_name = proj_get_name_ptr(member);
           if (member_name) {
             offset += snprintf(
                 proj_crs_infos + offset, sizeof(proj_crs_infos) - offset, "Member %d: %s%s", i + 1, member_name, (i < member_count - 1) ? "\n" : "");
           }
-          proj_destroy(member);
+          proj_destroy_ptr(member);
         }
       }
-      proj_destroy(datum_ensemble);
+      proj_destroy_ptr(datum_ensemble);
       return proj_crs_infos;
     } else {
       // If the date is not available as an ensemble, get it directly
-      PJ* datum = proj_crs_get_datum(proj_ctx, source ? proj_source_crs : proj_target_crs);
+      PJ* datum = proj_crs_get_datum_ptr(proj_ctx, source ? proj_source_crs : proj_target_crs);
       if (datum) {
         LASMessage(LAS_VERBOSE, "the PROJ datum object was successfully created");
-        const char* datum_name = proj_get_name(datum);
+        const char* datum_name = proj_get_name_ptr(datum);
         if (datum_name) {
           LASMessage(LAS_VERY_VERBOSE, "the PROJ datum name was successfully created '%s'", datum_name);
           size_t bufSize = 256;
@@ -1057,7 +1056,7 @@ const char* ProjParameters::get_datum_info(bool source /*=true*/) {
           return proj_crs_infos;
         }
       }
-      proj_destroy(datum);
+      proj_destroy_ptr(datum);
     }
   }
   return nullptr;
@@ -1067,11 +1066,11 @@ const char* ProjParameters::get_datum_info(bool source /*=true*/) {
 /// IMPORTANT: the proj context and the PROJ crs object must have been created before calling the function
 const char* ProjParameters::get_coord_system_info(bool source /*=true*/) {
   if (proj_ctx && ((proj_source_crs && source) || (proj_target_crs && !source))) {
-    PJ* coord_system = proj_crs_get_coordinate_system(proj_ctx, source ? proj_source_crs : proj_target_crs);
+    PJ* coord_system = proj_crs_get_coordinate_system_ptr(proj_ctx, source ? proj_source_crs : proj_target_crs);
 
     if (coord_system) {
       LASMessage(LAS_VERBOSE, "the PROJ coordinate system object was successfully created");
-      PJ_COORDINATE_SYSTEM_TYPE cs_type = proj_cs_get_type(proj_ctx, coord_system);
+      PJ_COORDINATE_SYSTEM_TYPE cs_type = proj_cs_get_type_ptr(proj_ctx, coord_system);
 
       const int buffer_size = 2048;
       proj_crs_infos = new char[buffer_size];
@@ -1111,7 +1110,7 @@ const char* ProjParameters::get_coord_system_info(bool source /*=true*/) {
           break;
       }
       // Retrieving the axis information
-      int axis_count = proj_cs_get_axis_count(proj_ctx, coord_system);
+      int axis_count = proj_cs_get_axis_count_ptr(proj_ctx, coord_system);
       if (axis_count > 0) {
         LASMessage(LAS_VERY_VERBOSE, "the PROJ axis count object are successfully created");
         for (int i = 0; i < axis_count; ++i) {
@@ -1123,7 +1122,7 @@ const char* ProjParameters::get_coord_system_info(bool source /*=true*/) {
           const char* unit_auth_name = nullptr;
           const char* unit_code = nullptr;
 
-          proj_cs_get_axis_info(
+          proj_cs_get_axis_info_ptr(
               proj_ctx, coord_system, i, &axis_name, &axis_abbreviation, &axis_direction, &unit_conv_factor, &unit_name, &unit_auth_name, &unit_code);
 
           // Attach the axis information
@@ -1138,7 +1137,7 @@ const char* ProjParameters::get_coord_system_info(bool source /*=true*/) {
           strcat_las(proj_crs_infos, buffer_size - strlen(proj_crs_infos) - 1, axis_info);
         }
       }
-      proj_destroy(coord_system);
+      proj_destroy_ptr(coord_system);
 
       return proj_crs_infos;
     } else {
@@ -7973,12 +7972,12 @@ double GeoProjectionConverter::get_target_precision(double header_precision) con
   } else if (source_projection && (source_projection->type == GEO_PROJECTION_LONG_LAT || source_projection->type == GEO_PROJECTION_LAT_LONG)) {
     return 0.01;
   } else if (projParameters.proj_target_crs && projParameters.proj_ctx) {
-    PJ* target_coord_system = proj_crs_get_coordinate_system(projParameters.proj_ctx, projParameters.proj_target_crs);
+    PJ* target_coord_system = proj_crs_get_coordinate_system_ptr(projParameters.proj_ctx, projParameters.proj_target_crs);
 
     if (target_coord_system) {
-      PJ* source_coord_system = proj_crs_get_coordinate_system(projParameters.proj_ctx, projParameters.proj_source_crs);
-      PJ_COORDINATE_SYSTEM_TYPE target_cs_type = proj_cs_get_type(projParameters.proj_ctx, target_coord_system);
-      PJ_COORDINATE_SYSTEM_TYPE source_cs_type = proj_cs_get_type(projParameters.proj_ctx, source_coord_system);
+      PJ* source_coord_system = proj_crs_get_coordinate_system_ptr(projParameters.proj_ctx, projParameters.proj_source_crs);
+      PJ_COORDINATE_SYSTEM_TYPE target_cs_type = proj_cs_get_type_ptr(projParameters.proj_ctx, target_coord_system);
+      PJ_COORDINATE_SYSTEM_TYPE source_cs_type = proj_cs_get_type_ptr(projParameters.proj_ctx, source_coord_system);
 
       if (target_cs_type == PJ_CS_TYPE_ELLIPSOIDAL) {
         return 1e-7;
@@ -8679,29 +8678,29 @@ bool GeoProjectionConverter::set_dtm_projection_parameters(
 /// create PROJ object using the epsg code (for source=true or target=false)
 /// Parse and validate the input epsg and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int& epsg_code, bool source /*=true*/) {
-  int err_no;
+  int err_no = 0;
 
   if (epsg_code == 0 || epsg_code > 999999) laserror("Invalid epsg code: %u", epsg_code);
 
-  projParameters.proj_ctx = proj_context_create();
+  projParameters.proj_ctx = my_proj_context_create();
 
   if (!projParameters.proj_ctx) laserror("Failed to create PROJ context");
 
   char crs_epsg[20];
   snprintf(crs_epsg, sizeof(crs_epsg), "EPSG:%u", epsg_code);
 
-  PJ* proj_crs = proj_create(projParameters.proj_ctx, crs_epsg);
+  PJ* proj_crs = my_proj_create(projParameters.proj_ctx, crs_epsg);
 
   // Check whether the CRS is valid
   if (!proj_crs) {
-    err_no = proj_context_errno(projParameters.proj_ctx);
+    err_no = my_proj_context_errno(projParameters.proj_ctx);
 
     if (err_no == 0) {
-      proj_context_destroy(projParameters.proj_ctx);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS object using PROJ epsg code '%f'", crs_epsg);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
-      proj_context_destroy(projParameters.proj_ctx);
+      const char* errstr = my_proj_context_errno_string(projParameters.proj_ctx, err_no);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS object using PROJ epsg code: %s", errstr);
     }
   }
@@ -8720,26 +8719,26 @@ void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int& epsg_code, boo
 /// create PROJ object using the proj string (for source=true or target=false)
 /// Parse and validate the input proj string and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_string(const char* proj_string, bool source /*= true*/) {
-  int err_no;
+  int err_no = 0;
 
   if (proj_string == nullptr) laserror("PROJ string is empty");
 
-  projParameters.proj_ctx = proj_context_create();
+  projParameters.proj_ctx = my_proj_context_create();
 
   if (!projParameters.proj_ctx) laserror("Failed to create PROJ context");
 
-  PJ* proj_crs = proj_create(projParameters.proj_ctx, proj_string);
+  PJ* proj_crs = my_proj_create(projParameters.proj_ctx, proj_string);
 
   // Check whether the CRS is valid
   if (!proj_crs) {
-    err_no = proj_context_errno(projParameters.proj_ctx);
+    err_no = my_proj_context_errno(projParameters.proj_ctx);
 
     if (err_no == 0) {
-      proj_context_destroy(projParameters.proj_ctx);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using PROJ string '%s'", proj_string);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
-      proj_context_destroy(projParameters.proj_ctx);
+      const char* errstr = my_proj_context_errno_string(projParameters.proj_ctx, err_no);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using PROJ string: %s", errstr);
     }
   }
@@ -8758,11 +8757,11 @@ void GeoProjectionConverter::set_proj_crs_with_string(const char* proj_string, b
 /// create PROJ object using the json format (for source=true or target=false)
 /// Parse and validate the input json file and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, bool source /*= true*/) {
-  int err_no;
+  int err_no = 0;
 
   if (json_filename == nullptr) laserror("Json filename is missing");
 
-  projParameters.proj_ctx = proj_context_create();
+  projParameters.proj_ctx = my_proj_context_create();
 
   if (!projParameters.proj_ctx) laserror("Failed to create PROJ context");
 
@@ -8774,7 +8773,7 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
   fseek_las(Proj_file, 0, SEEK_END);
   I64 fileSize = ftell_las(Proj_file);
   if (fileSize == -1) {
-    proj_context_destroy(projParameters.proj_ctx);
+    my_proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading file '%s'", json_filename);
   }
   fseek_las(Proj_file, 0, SEEK_SET);
@@ -8783,7 +8782,7 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
 #pragma warning(disable : 6001)
   if (!jsonContent) {
     fclose(Proj_file);
-    proj_context_destroy(projParameters.proj_ctx);
+    my_proj_context_destroy(projParameters.proj_ctx);
     laserror("Memory allocation failed for WKT content");
   }
   size_t readSize = fread(jsonContent, 1, fileSize, Proj_file);
@@ -8791,27 +8790,27 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
   if (readSize > (size_t)fileSize) {
     delete[] jsonContent;
     fclose(Proj_file);
-    proj_context_destroy(projParameters.proj_ctx);
+    my_proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading the PROJJSON file '%s'", json_filename);
   }
   jsonContent[readSize] = '\0';
   fclose(Proj_file);
 
-  PJ* proj_crs = proj_create(projParameters.proj_ctx, jsonContent);
+  PJ* proj_crs = my_proj_create(projParameters.proj_ctx, jsonContent);
 
   delete[] jsonContent;
 #pragma warning(pop)
 
   // Check whether the CRS is valid
   if (!proj_crs) {
-    err_no = proj_context_errno(projParameters.proj_ctx);
+    err_no = my_proj_context_errno(projParameters.proj_ctx);
 
     if (err_no == 0) {
-      proj_context_destroy(projParameters.proj_ctx);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS object using PROJJSON file '%f'", json_filename);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
-      proj_context_destroy(projParameters.proj_ctx);
+      const char* errstr = my_proj_context_errno_string(projParameters.proj_ctx, err_no);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS object using PROJJSON file: %s", errstr);
     }
   }
@@ -8831,11 +8830,11 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
 /// Parse and validate the input wkt file and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, bool source /*= true*/) {
   I64 fileSize = 0;
-  int err_no;
+  int err_no = 0;
 
   if (!wkt_filename) laserror("Wkt filename is missing");
 
-  projParameters.proj_ctx = proj_context_create();
+  projParameters.proj_ctx = my_proj_context_create();
 
   if (!projParameters.proj_ctx) laserror("Failed to create PROJ context");
 
@@ -8848,7 +8847,7 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
   fseek_las(Proj_file, 0, SEEK_END);
   fileSize = ftell_las(Proj_file);
   if (fileSize == -1) {
-    proj_context_destroy(projParameters.proj_ctx);
+    my_proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading file '%s'", wkt_filename);
   }
   fseek_las(Proj_file, 0, SEEK_SET);
@@ -8856,7 +8855,7 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
 
   if (!wktContent) {
     fclose(Proj_file);
-    proj_context_destroy(projParameters.proj_ctx);
+    my_proj_context_destroy(projParameters.proj_ctx);
     laserror("Memory allocation failed for WKT content");
   }
   size_t readSize = fread(wktContent, 1, fileSize, Proj_file);
@@ -8864,25 +8863,25 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
   if (readSize > (size_t)fileSize) {
     delete[] wktContent;
     fclose(Proj_file);
-    proj_context_destroy(projParameters.proj_ctx);
+    my_proj_context_destroy(projParameters.proj_ctx);
     laserror("Error reading the WKT file '%s'", wkt_filename);
   }
   wktContent[readSize] = '\0';
   fclose(Proj_file);
 
-  PJ* proj_crs = proj_create(projParameters.proj_ctx, wktContent);
+  PJ* proj_crs = my_proj_create(projParameters.proj_ctx, wktContent);
 
   // Check whether the CRS is valid
   if (!proj_crs) {
-    err_no = proj_context_errno(projParameters.proj_ctx);
+    err_no = my_proj_context_errno(projParameters.proj_ctx);
     delete[] wktContent;
 
     if (err_no == 0) {
-      proj_context_destroy(projParameters.proj_ctx);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using WKT file '%f'", wkt_filename);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
-      proj_context_destroy(projParameters.proj_ctx);
+      const char* errstr = my_proj_context_errno_string(projParameters.proj_ctx, err_no);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using WKT file: %s", errstr);
     }
   }
@@ -8905,26 +8904,26 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
 /// create PROJ object using the wkt content e.g. from the file header (for source=true or target=false)
 /// Parse and validate the input wkt content and set the ProjParameter crs
 void GeoProjectionConverter::set_proj_crs_with_file_header_wkt(const char* wktContent, bool source /*= true*/) {
-  int err_no;
+  int err_no = 0;
 
   if (!wktContent) laserror("Wkt content is empty");
 
-  projParameters.proj_ctx = proj_context_create();
+  projParameters.proj_ctx = my_proj_context_create();
 
   if (!projParameters.proj_ctx) laserror("Failed to create PROJ context");
 
-  PJ* proj_crs = proj_create(projParameters.proj_ctx, wktContent);
+  PJ* proj_crs = my_proj_create(projParameters.proj_ctx, wktContent);
 
   // Check whether the CRS is valid
   if (!proj_crs) {
-    err_no = proj_context_errno(projParameters.proj_ctx);
+    err_no = my_proj_context_errno(projParameters.proj_ctx);
 
     if (err_no == 0) {
-      proj_context_destroy(projParameters.proj_ctx);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using WKT content '%f'", wktContent);
     } else {
-      const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
-      proj_context_destroy(projParameters.proj_ctx);
+      const char* errstr = my_proj_context_errno_string(projParameters.proj_ctx, err_no);
+      my_proj_context_destroy(projParameters.proj_ctx);
       laserror("Failed to create the CRS objects using WKT content: %s", errstr);
     }
   }
@@ -8981,20 +8980,20 @@ void GeoProjectionConverter::load_proj() {
 /// IMPORTANT: The source and target CRS must have been generated before to create a transformation object
 /// create PROJ object for the transformation
 void GeoProjectionConverter::set_proj_crs_transform() {
-  int err_no;
+  int err_no = 0;
   // Create the transformation PROJ object
   if (projParameters.proj_source_crs && projParameters.proj_target_crs) {
     // Check whether transformation between CRSs is valid
     projParameters.proj_transform_crs =
-        proj_create_crs_to_crs_from_pj(projParameters.proj_ctx, projParameters.proj_source_crs, projParameters.proj_target_crs, nullptr, nullptr);
+        proj_create_crs_to_crs_from_pj_ptr(projParameters.proj_ctx, projParameters.proj_source_crs, projParameters.proj_target_crs, nullptr, nullptr);
 
     if (!projParameters.proj_transform_crs) {
-      err_no = proj_context_errno(projParameters.proj_ctx);
+      err_no = my_proj_context_errno(projParameters.proj_ctx);
 
-      if (!proj_is_crs(projParameters.proj_source_crs) || !proj_is_crs(projParameters.proj_target_crs)) {
-        proj_destroy(projParameters.proj_source_crs);
-        proj_destroy(projParameters.proj_target_crs);
-        proj_context_destroy(projParameters.proj_ctx);
+      if (!proj_is_crs_ptr(projParameters.proj_source_crs) || !proj_is_crs_ptr(projParameters.proj_target_crs)) {
+        proj_destroy_ptr(projParameters.proj_source_crs);
+        proj_destroy_ptr(projParameters.proj_target_crs);
+        my_proj_context_destroy(projParameters.proj_ctx);
         laserror(
             "Failed to create PROJ object for the transformation. Currently, only transformations between different Coordinate Reference Systems "
             "(CRS) are supported. "
@@ -9002,15 +9001,15 @@ void GeoProjectionConverter::set_proj_crs_transform() {
             "(CS) "
             "operations are not supported at the moment.");
       }
-      proj_destroy(projParameters.proj_source_crs);
-      proj_destroy(projParameters.proj_target_crs);
+      proj_destroy_ptr(projParameters.proj_source_crs);
+      proj_destroy_ptr(projParameters.proj_target_crs);
 
       if (err_no == 0) {
-        proj_context_destroy(projParameters.proj_ctx);
+        my_proj_context_destroy(projParameters.proj_ctx);
         laserror("Failed to create PROJ object for the transformation, reason unknown");
       } else {
-        const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
-        proj_context_destroy(projParameters.proj_ctx);
+        const char* errstr = my_proj_context_errno_string(projParameters.proj_ctx, err_no);
+        my_proj_context_destroy(projParameters.proj_ctx);
         laserror("Failed to create PROJ object for the transformation: %s", errstr);
       }
     }
@@ -9037,7 +9036,7 @@ void GeoProjectionConverter::set_proj_param_for_transformation_with_epsg(unsigne
 /// PROJ transformation using the PROJ string
 /// Parse and validate the input values and set the ProjParameter
 void GeoProjectionConverter::set_proj_param_for_transformation_with_string(const char* proj_source_string, const char* proj_target_string) {
-  int err_no;
+  int err_no = 0;
 
   // If source and target PROJ string is given
   if (proj_source_string && proj_target_string) {
@@ -9049,30 +9048,31 @@ void GeoProjectionConverter::set_proj_param_for_transformation_with_string(const
     set_proj_crs_transform();
   } else if (proj_source_string) {
     // Check whether the individual PORJ string describes a transformation/operation/conversion or a single CRS
-    projParameters.proj_ctx = proj_context_create();
+    projParameters.proj_ctx = my_proj_context_create();
 
     if (!projParameters.proj_ctx) laserror("Failed to create PROJ context");
 
-    PJ* proj_crs = proj_create(projParameters.proj_ctx, proj_source_string);
+    PJ* proj_crs = my_proj_create(projParameters.proj_ctx, proj_source_string);
 
     // Check whether the CRS is valid
     if (!proj_crs) {
-      err_no = proj_context_errno(projParameters.proj_ctx);
+      err_no = my_proj_context_errno(projParameters.proj_ctx);
 
       if (err_no == 0) {
-        proj_context_destroy(projParameters.proj_ctx);
+        my_proj_context_destroy(projParameters.proj_ctx);
         laserror("Failed to create the CRS objects using PROJ string '%s'", proj_source_string);
       } else {
-        const char* errstr = proj_context_errno_string(projParameters.proj_ctx, err_no);
-        proj_context_destroy(projParameters.proj_ctx);
+        const char* errstr = my_proj_context_errno_string(projParameters.proj_ctx, err_no);
+        my_proj_context_destroy(projParameters.proj_ctx);
         laserror("Failed to create the CRS objects using PROJ string: %s", errstr);
       }
     }
-    PJ_TYPE type = proj_get_type(proj_crs);
+    MyPJ_TYPE proj_type = my_proj_get_type(proj_crs);
     // Here the PROJ string already describes a complete transformation/conversion/operation
-    if (type == PJ_TYPE_TRANSFORMATION || type == PJ_TYPE_CONVERSION || type == PJ_TYPE_CONCATENATED_OPERATION) {
+    if (proj_type.type == MY_PJ_TYPE_TRANSFORMATION || proj_type.type == MY_PJ_TYPE_CONVERSION ||
+        proj_type.type == MY_PJ_TYPE_CONCATENATED_OPERATION) {
       projParameters.proj_transform_crs = proj_crs;
-      projParameters.proj_target_crs = proj_get_target_crs(projParameters.proj_ctx, projParameters.proj_transform_crs);
+      projParameters.proj_target_crs = proj_get_target_crs_ptr(projParameters.proj_ctx, projParameters.proj_transform_crs);
 
       if (projParameters.proj_target_crs) {
         LASMessage(LAS_VERBOSE, "using PROJ transformation (piped) string '%s'", proj_source_string);
@@ -9123,15 +9123,12 @@ void GeoProjectionConverter::set_proj_param_for_transformation_with_wkt(const ch
 bool GeoProjectionConverter::do_proj_crs_transformation(double& x, double& y, double& elevation) const {
   if (!projParameters.proj_transform_crs) return false;
 
-  // Prepare Proj input coordinates
-  PJ_COORD coord = proj_coord(x, y, elevation, 0);
-  // Perform the Proj transformation
-  PJ_COORD result = proj_trans(projParameters.proj_transform_crs, PJ_FWD, coord);
+  MyPJ_COORD result = transform_point(projParameters.proj_transform_crs, PJ_FWD, x, y, elevation, 0);
 
   // Assign transformed coordinates
-  x = result.xyzt.x;
-  y = result.xyzt.y;
-  elevation = result.xyzt.z;
+  x = result.x;
+  y = result.y;
+  elevation = result.z;
 
   return true;
 }

@@ -70,7 +70,7 @@
 */
 #pragma once
 
-#include "proj_loader.h"
+#include "proj_wrapper.h"
 #include <stdio.h>
 #include <string>
 #include <algorithm>
