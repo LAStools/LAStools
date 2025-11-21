@@ -231,6 +231,10 @@ typedef union U64F64 {
 #define NULL 0
 #endif
 
+#ifdef _MSC_VER  // Microsoft Visual C++ Compiler only
+#define strdup _strdup
+#endif
+
 #ifdef _MSC_VER
 #define strcpy_las(dest, destsz, src) strcpy_s((dest), (destsz), (src))
 #else

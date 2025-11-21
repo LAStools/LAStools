@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+22 November 2025 -- fix: PDAL/GDAL dynamic DLL/SO loader
 6 November 2025 -- fix: multi core temp file issue on Linux (https://groups.google.com/g/lastools/c/FPIfHrWw3W4)
 5 November 2025 -- fix: endian handling failure for different OS
 27 October 2025 -- NEW: Support for LAS 1.5 LAZ 3.5.0 (enable v4)

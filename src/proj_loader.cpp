@@ -30,6 +30,7 @@
 */
 #include "lasmessage.hpp"
 #include "proj_loader.h"
+#include "proj_wrapper.h"
 
 #include <vector>
 #include <filesystem>
@@ -67,7 +68,6 @@ proj_datum_ensemble_get_accuracy_t proj_datum_ensemble_get_accuracy_ptr = nullpt
 proj_datum_ensemble_get_member_t proj_datum_ensemble_get_member_ptr = nullptr;
 proj_crs_get_datum_t proj_crs_get_datum_ptr = nullptr;
 proj_crs_get_coordinate_system_t proj_crs_get_coordinate_system_ptr = nullptr;
-proj_cs_get_type_t proj_cs_get_type_ptr = nullptr;
 proj_cs_get_axis_count_t proj_cs_get_axis_count_ptr = nullptr;
 proj_cs_get_axis_info_t proj_cs_get_axis_info_ptr = nullptr;
 proj_create_t proj_create_ptr = nullptr;
@@ -81,7 +81,8 @@ proj_coord_t proj_coord_ptr = nullptr;
 proj_trans_t proj_trans_ptr = nullptr;
 proj_get_type_t proj_get_type_ptr = nullptr;
 proj_is_crs_t proj_is_crs_ptr = nullptr;
-proj_info_FUNC proj_info_ptr = nullptr;
+proj_cs_get_type_t proj_cs_get_type_ptr = nullptr;
+proj_info_t proj_info_ptr = nullptr;
 
 /// Function for parsing the version number from the directory name
 static std::vector<int> parseVersion(std::string versionStr) {
@@ -295,7 +296,7 @@ static std::string findProjLibInStandartPaths(std::set<std::filesystem::path>& s
 /// Checks whether the loaded PROJ version reaches at least minMajor.minMinor.
 /// Returns a warning if this version is too old.
 static void checkProjVersion() {
-  PJ_INFO info = proj_info();
+  MyPJ_INFO info = my_proj_info();
   
   if (info.version) {
     LASMessage(LAS_VERBOSE, "Loaded PROJ version: %s", info.version);
@@ -750,7 +751,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
     for (const std::string& candidate : sortedVersions) {
       proj_lib_handle = LOAD_LIBRARY(candidate.c_str());
       if (proj_lib_handle) {
-        LASMessage(LAS_VERBOSE, "The latest PROJ library found will be used: %s", candidate.c_str());
+        LASMessage(LAS_VERBOSE, "The latest valid PROJ library found will be used: %s", candidate.c_str());
         break;
       } else {
         LASMessage(LAS_WARNING, "PROJ Library '%s' was found but could not be loaded. "
@@ -808,7 +809,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
   proj_trans_ptr = (proj_trans_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_trans");
   proj_get_type_ptr = (proj_get_type_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_get_type");
   proj_is_crs_ptr = (proj_is_crs_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_is_crs");
-  proj_info_ptr = (proj_info_FUNC)GET_PROC_ADDRESS(proj_lib_handle, "proj_info");
+  proj_info_ptr = (proj_info_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_info");
 
   if (!proj_as_wkt_ptr || !proj_as_proj_string_ptr || !proj_as_projjson_ptr || !proj_get_source_crs_ptr || !proj_get_target_crs_ptr ||
       !proj_destroy_ptr || !proj_context_create_ptr || !proj_context_destroy_ptr || !proj_get_id_code_ptr || !proj_get_ellipsoid_ptr ||
@@ -821,7 +822,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
   {
     std::string version = "Unknown";
     if (proj_info_ptr) {
-      PJ_INFO info = proj_info();
+      MyPJ_INFO info = my_proj_info();
       if (info.version) version = info.version;
     }
     unload_proj_library();
