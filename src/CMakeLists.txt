@@ -30,11 +30,11 @@ set(STANDALONE_TARGETS
 set(ALL_TARGETS ${GEOPROJECTION_TARGETS} ${STANDALONE_TARGETS})
 
 foreach(TARGET ${GEOPROJECTION_TARGETS})
-  add_executable(${TARGET} ${TARGET}.cpp wktparser.cpp geoprojectionconverter.cpp proj_loader.cpp)
+  add_executable(${TARGET} ${TARGET}.cpp wktparser.cpp geoprojectionconverter.cpp proj_loader.cpp proj_wrapper.cpp)
 endforeach(TARGET)
 
 foreach(TARGET ${STANDALONE_TARGETS})
-  add_executable(${TARGET} ${TARGET}.cpp proj_loader.cpp)
+  add_executable(${TARGET} ${TARGET}.cpp proj_loader.cpp proj_wrapper.cpp)
 endforeach(TARGET)
 
 foreach(TARGET ${ALL_TARGETS})
