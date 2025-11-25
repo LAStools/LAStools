@@ -120,4 +120,9 @@ typedef struct {
 }
 #endif
 
+// PROJ log levels (ABI-safe)
+constexpr int PJ_LOG_ERROR = 0;
+constexpr int PJ_LOG_DEBUG = 1;
+constexpr int PJ_LOG_TRACE = 2;
+
 #endif

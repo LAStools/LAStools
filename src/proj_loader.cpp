@@ -83,6 +83,7 @@ proj_get_type_t proj_get_type_ptr = nullptr;
 proj_is_crs_t proj_is_crs_ptr = nullptr;
 proj_cs_get_type_t proj_cs_get_type_ptr = nullptr;
 proj_info_t proj_info_ptr = nullptr;
+proj_log_func_t proj_log_func_ptr = nullptr;
 
 /// Function for parsing the version number from the directory name
 static std::vector<int> parseVersion(std::string versionStr) {
@@ -810,6 +811,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
   proj_get_type_ptr = (proj_get_type_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_get_type");
   proj_is_crs_ptr = (proj_is_crs_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_is_crs");
   proj_info_ptr = (proj_info_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_info");
+  proj_log_func_ptr = (proj_log_func_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_log_func");
 
   if (!proj_as_wkt_ptr || !proj_as_proj_string_ptr || !proj_as_projjson_ptr || !proj_get_source_crs_ptr || !proj_get_target_crs_ptr ||
       !proj_destroy_ptr || !proj_context_create_ptr || !proj_context_destroy_ptr || !proj_get_id_code_ptr || !proj_get_ellipsoid_ptr ||
@@ -818,7 +820,7 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       !proj_crs_get_coordinate_system_ptr || !proj_cs_get_type_ptr || !proj_cs_get_axis_count_ptr || !proj_cs_get_axis_info_ptr || !proj_create_ptr ||
       !proj_create_argv_ptr || !proj_create_crs_to_crs_ptr || !proj_create_crs_to_crs_from_pj_ptr || !proj_create_from_wkt_ptr ||
       !proj_context_errno_ptr || !proj_context_errno_string_ptr || !proj_coord_ptr || !proj_trans_ptr || !proj_get_type_ptr || !proj_is_crs_ptr ||
-      !proj_info_ptr)
+      !proj_info_ptr || !proj_log_func_ptr)
   {
     std::string version = "Unknown";
     if (proj_info_ptr) {
@@ -876,4 +878,14 @@ void unload_proj_library() {
   proj_get_type_ptr = nullptr;
   proj_is_crs_ptr = nullptr;
   proj_info_ptr = nullptr;
+  proj_log_func_ptr = nullptr;
+}
+
+/// User-specific error handler for PROJ errors and warnings
+extern "C" void myCustomProjErrorHandler(void* app_data, int level, const char* msg) {
+  if (!msg) return;
+
+  if (level != PJ_LOG_ERROR) return;
+
+  LASMessage(LAS_INFO, "PROJ error: %s", msg);
 }

@@ -88,6 +88,7 @@ using proj_coord_t = PROJ_COORD_OPAQUE (*)(double, double, double, double);
 using proj_trans_t = PROJ_COORD_OPAQUE (*)(PJ*, int, PROJ_COORD_OPAQUE);
 using proj_get_type_t = int (*)(PJ*);
 using proj_is_crs_t = int (*)(const PJ*);
+using proj_log_func_t = void (*)(PJ_CONTEXT*, void*, void(*)(void*, int, const char*));
 
 // MyPJ_INFO - own compatible type
 using proj_info_t = MyPJ_INFO (*)(void);
@@ -128,11 +129,14 @@ extern proj_coord_t proj_coord_ptr;
 extern proj_trans_t proj_trans_ptr;
 extern proj_get_type_t proj_get_type_ptr;
 extern proj_info_t proj_info_ptr;
+extern proj_log_func_t proj_log_func_ptr;
 
 // ------------------------
 // Library loader
 // ------------------------
 bool load_proj_library(const char* path, bool isNecessary = true);
 void unload_proj_library();
+
+extern "C" void myCustomProjErrorHandler(void* app_data, int level, const char* msg);
 
 #endif  // PROJ_LOADER_H

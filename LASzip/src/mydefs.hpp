@@ -60,8 +60,6 @@
 #include <cmath>
 #include <type_traits>
 
-extern void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*), ...);
-
 typedef char CHAR;
 
 typedef int I32;
@@ -71,6 +69,9 @@ typedef char I8;
 typedef unsigned int U32;
 typedef unsigned short U16;
 typedef unsigned char U8;
+
+extern void LASLIB_DLL LASMessage(LAS_MESSAGE_TYPE type, LAS_FORMAT_STRING(const char*), ...);
+extern LASLIB_DLL void LASMessageExt(LAS_MESSAGE_TYPE type, unsigned int rep_times, LAS_FORMAT_STRING(const char*), ...);
 
 #if defined(_WIN32) && !defined(__MINGW32__)  // 64 byte integer under Windows
 typedef unsigned __int64 U64;
