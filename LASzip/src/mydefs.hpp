@@ -83,11 +83,7 @@ typedef long long I64;
 typedef float F32;
 typedef double F64;
 
-#if defined(_MSC_VER) || defined(__MINGW32__)
-typedef int BOOL;
-#else
 typedef bool BOOL;
-#endif
 
 #ifdef _WIN32
 typedef struct _stat64 las_stat_t;
