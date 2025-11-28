@@ -1,5 +1,7 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+28 November 2025 -- NEW: logging: auto summarize of recurring log entries
+28 November 2025 -- fix: lasclip: split function on multi polygon
 22 November 2025 -- fix: PROJ/GDAL dynamic DLL/SO loader
 6 November 2025 -- fix: multi core temp file issue on Linux (https://groups.google.com/g/lastools/c/FPIfHrWw3W4)
 5 November 2025 -- fix: endian handling failure for different OS

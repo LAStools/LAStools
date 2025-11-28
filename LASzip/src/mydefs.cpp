@@ -103,6 +103,8 @@ extern void LASLIB_DLL byebye() {
     std::fprintf(stderr, "<press ENTER>\n");
     (void)std::getc(stdin);
   }
+  //duplicate log messages with the number of repeated times.
+  flush_repeated_logs();
   //
   int code = 0;
   if (lasmessage_cnt[LAS_FATAL_ERROR] > 0) {
