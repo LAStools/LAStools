@@ -623,7 +623,7 @@ bool LASzip::set_chunk_size(const U32 chunk_size)
 // shall be used to call LASzip::request_version()
 unsigned short LASzip::get_default_version(const unsigned char point_type, const unsigned char las_version_major, const unsigned char las_version_minor)
 {
-    if (((point_type & 63) >= 0) && ((point_type & 63) <= 5)) {
+    if ((point_type & 63) <= 5) {
         return 2;
     }
     else if (((point_type & 63) >= 6) && ((point_type & 63) <= 10)) {

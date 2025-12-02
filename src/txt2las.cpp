@@ -156,6 +156,8 @@ int main(int argc, char* argv[])
   U32 progress = 0;
   double full_start_time = 0.0;
   double start_time = 0.0;
+  I32 point_type = -1;
+
 
   LASreadOpener lasreadopener;
   GeoProjectionConverter geoprojectionconverter;
@@ -243,7 +245,6 @@ int main(int argc, char* argv[])
         laserror("'%s' needs 1 argument: point_type", argv[i]);
       }
       i++;
-      I32 point_type;
       if (sscanf_las(argv[i], "%d", &point_type) != 1)
       {
         laserror("cannot understand argument '%s' of '%s'", argv[i], argv[i - 1]);
@@ -562,6 +563,11 @@ int main(int argc, char* argv[])
 
     LASMessage(LAS_VERBOSE, "reading from '%s' and writing to '%s'", (lasreadopener.is_piped() ? "stdin" : lasreadopener.get_file_name()), (laswriteopener.is_piped() ? "stdout" : laswriteopener.get_file_name()));
 
+    // the point we write sometimes needs to be copied
+
+    LASpoint* point = 0;
+
+
     // populate header
 
     for (i = 0; i < 32; i++)
@@ -708,6 +714,51 @@ int main(int argc, char* argv[])
       lasreader->header.version_minor = (U8)set_version_minor;
     }
 
+    // maybe adjust point type if LAS 1.5 was set, and no point type was forced
+
+    if (lasreader->header.version_minor >= 5 && point_type == -1) 
+    {
+        if (lasreader->header.point_data_format <= 5) {
+            switch (lasreader->header.point_data_format)
+            {
+            case 0:
+                lasreader->header.point_data_format = 6;
+                lasreader->header.point_data_record_length += 10;
+                break;
+            case 1:
+                lasreader->header.point_data_format = 6;
+                lasreader->header.point_data_record_length += 2;
+                break;
+            case 2:
+                lasreader->header.point_data_format = 7;
+                lasreader->header.point_data_record_length += 10;
+                break;
+            case 3:
+                lasreader->header.point_data_format = 7;
+                lasreader->header.point_data_record_length += 2;
+                break;
+            case 4:
+                lasreader->header.point_data_format = 9;
+                lasreader->header.point_data_record_length += 2;
+                break;
+            case 5:
+                lasreader->header.point_data_format = 10;
+                lasreader->header.point_data_record_length += 4;
+                break;
+            default:
+                laserror("unknown point_data_format %d", lasreader->header.point_data_format);
+            }
+            point = new LASpoint;
+            lasreader->header.clean_laszip();
+        }
+    }
+
+    // if the point needs to be copied set up the data fields
+    if (point)
+    {
+        point->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
+    }
+
     // maybe set projection
 
     if (projection_was_set)
@@ -754,14 +805,30 @@ int main(int argc, char* argv[])
 
     // loop over points
 
-    while (lasreader->read_point())
-    {
-      // write the point
-      laswriter->write_point(&lasreader->point);
-      if (progress && ((lasreader->p_cnt % progress) == 0))
-      {
-        fprintf(stderr, " ... processed %lld points ...\012", lasreader->p_cnt);
-      }
+    if (point) {  // full rewrite: point copy
+        while (lasreader->read_point())
+        {
+            *point = lasreader->point;
+            // write the point
+            laswriter->write_point(point);
+            laswriter->update_inventory(point); 
+            if (progress && ((lasreader->p_cnt % progress) == 0))
+            {
+                fprintf(stderr, " ... processed %lld points ...\012", lasreader->p_cnt);
+            }
+        }
+    }
+    else {
+        while (lasreader->read_point())
+        {
+            // write the point
+            laswriter->write_point(&lasreader->point);
+            laswriter->update_inventory(&lasreader->point);  
+            if (progress && ((lasreader->p_cnt % progress) == 0))
+            {
+                fprintf(stderr, " ... processed %lld points ...\012", lasreader->p_cnt);
+            }
+        }
     }
     lasreader->close();
 
@@ -769,7 +836,7 @@ int main(int argc, char* argv[])
 
     if (!laswriteopener.is_piped())
     {
-      laswriter->update_header(&lasreader->header, FALSE, TRUE);
+      laswriter->update_header(&lasreader->header, TRUE, TRUE);
       LASMessage(LAS_VERY_VERBOSE, "npoints %lld min %g %g %g max %g %g %g", lasreader->npoints, lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z);
       if (lasreader->header.point_data_format > 5)
       {

@@ -518,6 +518,12 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     header.min_x = header.max_x = point.coordinates[0];
     header.min_y = header.max_y = point.coordinates[1];
     header.min_z = header.max_z = point.coordinates[2];
+    if (point.have_gps_time) {
+        header.min_gps_time = header.max_gps_time = point.gps_time;
+    }
+    else {
+        header.min_gps_time = header.max_gps_time = 0;
+    }
 
     // create return histogram
 
@@ -565,6 +571,15 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
         else if (point.coordinates[1] > header.max_y) header.max_y = point.coordinates[1];
         if (point.coordinates[2] < header.min_z) header.min_z = point.coordinates[2];
         else if (point.coordinates[2] > header.max_z) header.max_z = point.coordinates[2];
+        if (point.have_gps_time) {
+            if (header.min_gps_time > point.gps_time) {
+                header.min_gps_time = point.gps_time;
+            }
+            else if (header.max_gps_time < point.gps_time) {
+                header.max_gps_time = point.gps_time;
+            }
+        }
+
         // update the min and max of attributes in extra bytes
         if (number_attributes)
         {

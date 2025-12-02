@@ -78,7 +78,8 @@ public:
 	virtual void transform(LASpoint* point) = 0;
 	virtual void reset() { overflow = 0; };
 	inline void set_offset_adjust(BOOL offset_adjust) { this->offset_adjust = offset_adjust; };
-  void set_origins(F64 orig_x_offset, F64 orig_y_offset, F64 orig_z_offset, F64 orig_x_scale_factor, F64 orig_y_scale_factor, F64 orig_z_scale_factor);
+	void set_gps_origins(U16 orig_global_encoding, U16 orig_time_offset);
+	void set_origins(F64 orig_x_offset, F64 orig_y_offset, F64 orig_z_offset, F64 orig_x_scale_factor, F64 orig_y_scale_factor, F64 orig_z_scale_factor);
   void set_scale_factor(F64 scale_factor_x, F64 scale_factor_y, F64 scale_factor_z);
   void set_adjusted_offset(F64 adjusted_offset_x, F64 adjusted_offset_y, F64 adjusted_offset_z);
   void write_transformed_values_with_adjust_offset(F64 x, F64 y, F64 z, LASpoint* point);
@@ -90,6 +91,8 @@ public:
     orig_x_offset = 0.0;
     orig_y_offset = 0.0;
     orig_z_offset = 0.0;
+	orig_time_offset = 0;
+	orig_global_encoding = 0;
     adjusted_offset_x = 0.0;
     adjusted_offset_y = 0.0;
     adjusted_offset_z = 0.0;
@@ -109,7 +112,9 @@ protected:
   F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
   F64 adjusted_offset_x, adjusted_offset_y, adjusted_offset_z;
   F64 scale_factor_x, scale_factor_y, scale_factor_z;
-	BOOL offset_adjust;
+  BOOL offset_adjust;
+  U16 orig_time_offset; // LAS 1.5
+  U16 orig_global_encoding;
   LASheader* header;
 };
 
@@ -265,6 +270,7 @@ public:
 	void reset();
   void add_operation(LASoperation* operation);
   void adjust_offset(LASreader* lasreader, F64* scale_factor);
+  void addHeaderInfo(LASreader* lasreader);
   template <typename T>
   bool find_operation(T*& op)
   {

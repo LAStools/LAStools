@@ -2072,3 +2072,119 @@ BOOL LASreaderLASrescalereoffset::open(ByteStreamIn* stream, BOOL peek_only, U32
 
   return TRUE;
 }
+
+LASreaderLASrescalereoffsetgps::LASreaderLASrescalereoffsetgps(LASreadOpener* opener, BOOL rescale, BOOL reoffset, BOOL gps,
+    F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset,
+    F64 z_offset, U16 dest_global_encoding, U16 dest_time_offset):
+    LASreaderLAS(opener),
+    LASreaderLASrescalereoffset(opener, x_scale_factor, y_scale_factor, z_scale_factor, x_offset, y_offset, z_offset)
+{
+    this->dest_global_encoding = dest_global_encoding;
+    this->dest_time_offset = dest_time_offset;
+    this->rescale = rescale;
+    this->reoffset = reoffset;
+    this->gps = gps;
+}
+
+
+LASreaderLASrescalereoffsetgps::LASreaderLASrescalereoffsetgps(LASreadOpener* opener, BOOL rescale, BOOL gps, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor,
+    U16 dest_global_encoding, U16 dest_time_offset) :
+    LASreaderLAS(opener),
+    LASreaderLASrescalereoffset(opener, x_scale_factor, y_scale_factor, z_scale_factor)
+{
+    this->dest_global_encoding = dest_global_encoding;
+    this->dest_time_offset = dest_time_offset;
+    this->rescale = rescale;
+    this->reoffset = TRUE; // auto reoffset
+    this->gps = gps;
+}
+
+BOOL LASreaderLASrescalereoffsetgps::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_selective) {
+    if (rescale & reoffset) {
+        return LASreaderLASrescalereoffset::open(stream, peek_only, decompress_selective);
+    }
+    else if (rescale) {
+        return LASreaderLASrescale::open(stream, peek_only, decompress_selective);
+    }
+    else if (reoffset) {
+        return LASreaderLASreoffset::open(stream, peek_only, decompress_selective);
+    }
+    else {
+        return LASreaderLASrescale::open(stream, peek_only, decompress_selective);
+    }
+}
+
+BOOL LASreaderLASrescalereoffsetgps::read_point_default() {
+    if (rescale & reoffset) {
+        if (!LASreaderLASrescalereoffset::read_point_default()) return FALSE;
+    }
+    else if (rescale) {
+        if (!LASreaderLASrescale::read_point_default()) return FALSE;
+    }
+    else if (reoffset) {
+        if (!LASreaderLASreoffset::read_point_default()) return FALSE;
+    }
+
+    if (point.have_gps_time && point.gps_time != 0) {
+        // from week to anything -> as we do not know the actual week, we keep the value unchanged
+        if ((header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0) {
+            // do nothing
+        }
+        // from adjusted gps 
+        else if ((header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) == 0)
+        {
+            // adjusted to week
+            if ((dest_global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0)
+            {
+                F64 week_float = (point.gps_time / 604800.0 + 1653.4391534391534391534391534392);
+                I32 week = (I32)week_float;
+                if (week_float < 0) {
+                    week -= 1;
+                }
+                I64 secs = week * 604800 - 1000000000;
+                point.gps_time -= secs;
+                if (point.gps_time == 604800.0)
+                {
+                    point.gps_time = 0;
+                }
+            }
+            // adjusted to adjusted 
+            else if ((dest_global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) == 0)
+            {
+            }
+            // adjusted to offset time
+            else {
+                point.gps_time += (1000 - (I64)dest_time_offset) * 1000 * 1000;
+            }
+        }
+        // from offset time
+        else
+        {
+            // offset to week
+            if ((dest_global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0)
+            {
+                F64 week_float = (point.gps_time / 604800.0 + 1.6534391534391534391534391534392*(I64)header.time_offset);
+                I32 week = (I32)week_float;
+                if (week_float < 0) {
+                    week -= 1;
+                }
+                I64 secs = week * 604800 - (I64)header.time_offset*1000*1000;
+                point.gps_time -= secs;
+                if (point.gps_time == 604800.0)
+                {
+                    point.gps_time = 0;
+                }
+            }
+            // offset to adjusted
+            else if ((dest_global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) == 0)
+            {
+                point.gps_time += ((I64)header.time_offset - 1000) * 1000 * 1000;
+            }
+            // offset to offset
+            else {
+                point.gps_time += ((I64)header.time_offset - (I64)dest_time_offset) * 1000 * 1000;
+            }
+        }
+    }
+    return TRUE;
+}

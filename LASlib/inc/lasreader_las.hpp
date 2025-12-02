@@ -120,15 +120,36 @@ protected:
   F64 orig_x_offset, orig_y_offset, orig_z_offset;
 };
 
-class LASreaderLASrescalereoffset : public LASreaderLASrescale, LASreaderLASreoffset
+class LASreaderLASrescalereoffset : public LASreaderLASrescale, public LASreaderLASreoffset
 {
 public:
   LASreaderLASrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset);
   LASreaderLASrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor); // auto reoffset
 
 protected:
-  BOOL open(ByteStreamIn* stream, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
-  BOOL read_point_default();
+  virtual BOOL open(ByteStreamIn* stream, BOOL peek_only=FALSE, U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);
+  virtual BOOL read_point_default();
 };
+
+class LASreaderLASrescalereoffsetgps : public LASreaderLASrescalereoffset
+{
+public:
+    LASreaderLASrescalereoffsetgps(LASreadOpener* opener, BOOL rescale, BOOL reoffset, BOOL gps, 
+                                   F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, 
+                                   F64 z_offset, U16 dest_global_encoding, U16 dest_time_offset);
+    LASreaderLASrescalereoffsetgps(LASreadOpener* opener, BOOL rescale, BOOL gps, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, 
+                                   U16 dest_global_encoding, U16 dest_time_offset); // auto reoffset
+
+protected:
+    virtual BOOL open(ByteStreamIn* stream, BOOL peek_only = FALSE, U32 decompress_selective = LASZIP_DECOMPRESS_SELECTIVE_ALL);
+    virtual BOOL read_point_default();
+
+    U16 dest_global_encoding;
+    U16 dest_time_offset;
+    BOOL rescale;
+    BOOL reoffset;
+    BOOL gps;
+};
+
 
 #endif

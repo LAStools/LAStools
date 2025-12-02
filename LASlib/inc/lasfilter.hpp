@@ -38,6 +38,7 @@
 
 #include "lasdefinitions.hpp"
 #include "laszip_decompress_selective_v3.hpp"
+#include "lasreader.hpp"
 
 class LAScriterion
 {
@@ -48,6 +49,13 @@ public:
   virtual BOOL filter(const LASpoint* point) = 0;
   virtual void reset(){};
   virtual ~LAScriterion(){};
+  void set_gps_origins(U16 global_encoding, U16 time_offset) {
+      this->time_offset = time_offset;
+      this->global_encoding = global_encoding;
+  }
+protected:
+    U16 time_offset = 0;
+    U16 global_encoding = 0;
 };
 
 class LASfilter
@@ -65,6 +73,8 @@ public:
   void addClipCircle(F64 x, F64 y, F64 radius);
   void addClipBox(F64 min_x, F64 min_y, F64 min_z, F64 max_x, F64 max_y, F64 max_z);
   void addKeepScanDirectionChange();
+
+  void addHeaderInfo(LASreader* lasreader);
 
   BOOL filter(const LASpoint* point);
   void reset();

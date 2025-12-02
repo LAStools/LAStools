@@ -357,6 +357,7 @@ BOOL LASreaderBIN::read_point_default()
         laserror("reading terrasolid time");
         return FALSE;
       }
+      // this is gps week
       point.gps_time = 0.0002*time;
     }
 

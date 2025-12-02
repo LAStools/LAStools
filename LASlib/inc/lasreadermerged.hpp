@@ -106,6 +106,7 @@ private:
   LASreaderQFIT* lasreaderqfit;
   LASreaderTXT* lasreadertxt;
   BOOL point_type_change;
+  BOOL gps_transform;
   BOOL point_size_change;
   BOOL additional_attribute_change;
   BOOL rescale;
