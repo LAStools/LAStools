@@ -35,17 +35,18 @@ methods to install it (We recommend using the default standard installation path
  4. Finish installation
 
 - **Conda**: Use this **Cross-Platform** package manager to install GDAL with the following command:
-  ```
-  conda install -c conda-forge gdal
-  ```
+
+    conda install -c conda-forge gdal
+
   If a warning appears in Linux stating that the library was found via the Conda installation but could not be loaded, this is usually because the dynamic loader finds the incompatible system libraries first. Using `export LD_LIBRARY_PATH=~/miniconda3/lib:$LD_LIBRARY_PATH` ensures that the Conda libraries and their dependencies are loaded first.  
   Note that in this case, the environment variable only applies to the current shell session.
 
 
 - **Docker**: Get the Docker image with:
-  ```
-  docker pull ghcr.io/osgeo/gdal
-  ```
+
+    docker pull ghcr.io/osgeo/gdal
+
+
 ### QGIS/OSGeo4W Installation
 
 By installing QGIS, you automatically get the GDAL library installed 
@@ -60,46 +61,34 @@ and configured.
   **Debian/Ubuntu**:
   QGIS can also be installed on Linux distributions, which will 
   include the GDAL library.
+  
  1. Add the QGIS repository:
-    ```bash
     sudo add-apt-repository ppa:ubuntugis/ppa
     sudo apt update
-    ```
+    
  2. Install QGIS:
-    ```
     sudo apt install qgis qgis-plugin-grass
-    ```
-     The GDAL library is now installed with QGIS.
+
+  The GDAL library is now installed with QGIS.
      
-     **Fedora:**:
-      ```
-      sudo dnf install qgis qgis-grass
-      ```
+  **Fedora:**:
+    sudo dnf install qgis qgis-grass
 
 ### Further installation options
 - **Linux**:
   **Debian/Ubuntu**:
-  ```
-  sudo apt-get install gdal-bin
-  ```
+    sudo apt-get install gdal-bin
+
   **Fedora**:
-  ```
-  sudo dnf install gdal
-  ```
+    sudo dnf install gdal
   **Red Hat**:
-  ```
-  sudo yum install gdal
-  ```
+    sudo yum install gdal
 
 - **Mac OS X**:
   Using Homebrew:
-  ```
-  brew install gdal
-  ```
+    brew install gdal
   Or MacPorts:
-  ```
-  sudo port install gdal
-  ```
+    sudo port install gdal
 
 ### Required Files for GDAL in LASTools
 
@@ -122,106 +111,65 @@ QGIS or OSGeo4W or Conda.
 
 - **Custom Directory**: Alternatively, you can place the library 
 files and GDAL data in custom directories of your choice via environment variables. We recommend only using this option if the GDAL lib is not found automatically via the QGIS or OSGeo4W or Conda installations.
-  ```
-  LASTOOLS_GDAL
-  ```
+    LASTOOLS_GDAL
   for the GDAL library directory.
   If the GDAL library cannot find the GDAL data directory itself set
-  ```
-  GDAL_DATA
-  ```
+    GDAL_DATA
   Which is a GDAL-specific environment variable and specifies the directory to GDAL data.
 
 To use these custom directories,set the environment variables via command line (cmd) as shown in the following example:
 
 - **Windows**:
   **Temporary** for the current session:
-  ```
-  set LASTOOLS_GDAL=C:\path\to\gdal_lib
-  ```
+    set LASTOOLS_GDAL=C:\path\to\gdal_lib
   and if required
-  ```
-  set GDAL_DATA=C:\path\to\gdal_data
-  ```
+    set GDAL_DATA=C:\path\to\gdal_data
 
   Set environment variable **permanently** (applies to new CMD windows, but not to the current session):
-  ```
-  setx LASTOOLS_GDAL "C:\path\to\gdal_lib"
-  ```
+    setx LASTOOLS_GDAL "C:\path\to\gdal_lib"
   and if required
-  ```
-  setx GDAL_DATA "C:\path\to\gdal_data"
-  ```
+    setx GDAL_DATA "C:\path\to\gdal_data"
 
   Set environment variable **permanently and system-wide** for all users (need to run with admin rights):
-  ```
-  setx LASTOOLS_GDAL "C:\path\to\gdal_lib" /M
-  ```
+    setx LASTOOLS_GDAL "C:\path\to\gdal_lib" /M
   and if required
-  ```
-  setx GDAL_DATA "C:\path\to\gdal_data" /M
-  ```
+    setx GDAL_DATA "C:\path\to\gdal_data" /M
 
 - **Linux**:
   **Temporary** for the current session:
-  ```
-  export LASTOOLS_GDAL=/path/to/gdal_lib
-  ```
+    export LASTOOLS_GDAL=/path/to/gdal_lib
   and if required
-  ```
-  export GDAL_DATA=/path/to/gdal_data
-  ```
+    export GDAL_DATA=/path/to/gdal_data
+
   Set environment variable **permanently** for this user:
   Open your Bash configuration file:
-  ```
-  nano ~/.bashrc
-  ```
+    nano ~/.bashrc
   Add this line at the end of the file:
-  ```
-  export LASTOOLS_GDAL=/path/to/gdal_lib
-  ```
+    export LASTOOLS_GDAL=/path/to/gdal_lib
   and if required
-  ```
-  export GDAL_DATA=/path/to/gdal_data
-  ```
+    export GDAL_DATA=/path/to/gdal_data
   save and close the file and then execute the command
-  ```
-  source ~/.bashrc
-  ```
+    source ~/.bashrc
 
   Set environment variable **permanently and system-wide** for all users:
   Open the system file for environment variables:
-  ```
-  sudo nano /etc/environment
-  ```
+    sudo nano /etc/environment
   Add the variable to the file:
-  ```
-  LASTOOLS_GDAL="/path/to/gdal_lib"
-  ```
+    LASTOOLS_GDAL="/path/to/gdal_lib"
   and if required
-  ```
-  GDAL_DATA="/path/to/gdal_data"
-  ```
+    GDAL_DATA="/path/to/gdal_data"
   save and close the file and then execute the command
-  ```
-  source /etc/environment
-  ```
+    source /etc/environment
 
 **Check the environment variables**:
 - **cmd - windows**:
-  ```
-  echo %LASTOOLS_GDAL%
-  ```
-  ```
-  echo %GDAL_DATA%
-  ```
+    echo %LASTOOLS_GDAL%
+    echo %GDAL_DATA%
+
 - **linux**:
-  ```
-  echo $LASTOOLS_GDAL
-  ```
-  ```
-  echo $GDAL_DATA
-  ```
+    echo $LASTOOLS_GDAL
+    echo $GDAL_DATA
+
 If you want to use the GDAL library later via QGIS, OSGeo4W or another installation, you must first delete the environment variables LASTOOLS_GDAL and GDAL_DATA if they have been set permanently.
 
 ### Note
@@ -251,4 +199,3 @@ library, refer to the official GDAL repository or the official website
 
 If you want to send us feedback or have questions that are not answered in the resources above, 
 please email to info@rapidlasso.de.
-

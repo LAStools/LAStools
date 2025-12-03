@@ -50,13 +50,13 @@ contents of the LAS header *in place* without copying the file
 and the GUI will teach you these command line options. Some not
 listed in the GUI are: 
 
--set_GUID F794F8A4-A23E-421E-A134-ACF7754E1C54
--set_system_identifier "RIEGL Optech Leica"
--set_generating_software "awesome LAStools"
--set_file_source_ID 27
--set_file_creation 8 2007
--auto_date
--set_global_encoding 1
+-set_GUID F794F8A4-A23E-421E-A134-ACF7754E1C54  
+-set_system_identifier "RIEGL Optech Leica"  
+-set_generating_software "awesome LAStools"  
+-set_file_source_ID 27  
+-set_file_creation 8 2007  
+-auto_date  
+-set_global_encoding 1  
 
 lasinfo provides detail information about this VLR records:
     (user_id/record_id)  
@@ -311,7 +311,7 @@ Further examples
 -json                               : output in json format  
 -progress [n]                       : report progress every [n] points  
 -proj_info [wkt] [js] [str] [epsg] [el] [datum] [cs] : get CRS representations and information of the input file: [wkt] WKT, [js] PROJJSON, [str] PROJ string or [epsg] EPSG code representation and [el] ellipsoid, [datum] datum or [cs] coordinate system information  
--rename [n]                         : renames input file 'fusa.laz' to '[n]_123_456.laz' where 123 and 456 is the x and y header minimum value
+-rename [n]                         : renames input file 'fusa.laz' to '[n]_123_456.laz' where 123 and 456 is the x and y header minimum value  
 -repair                             : repair both bounding box and counters  
 -repair_bb                          : repair bounding box  
 -repair_counters                    : set (in place) the counters for point number and (extended) return histograms in header  
@@ -343,8 +343,8 @@ Further examples
 -suppress_scan_angle                : do not decompress scan angle for native-compressed LAS 1.4 point types 6 or higher  
 -suppress_user_data                 : do not decompress user data field for native-compressed LAS 1.4 point types 6 or higher  
 -suppress_z                         : do not decompress z coordinates for native-compressed LAS 1.4 point types 6 or higher  
--week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS
--wkt_format                         : formats WKT output with line breaks and indent for better readability
+-week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
+-wkt_format                         : formats WKT output with line breaks and indent for better readability  
 
 ## lasinfo patch arguments
 
@@ -367,12 +367,12 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -492,7 +492,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
@@ -902,7 +902,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### Basics
--help : print help output
+-help : print help output  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.
@@ -944,13 +944,13 @@ The other supported entries are:
 The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
 Supported [sep] values:
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
 
 ### aggregate options
 This parameters can be used in "-histo" and "-histo_avg" argument as first parameter  

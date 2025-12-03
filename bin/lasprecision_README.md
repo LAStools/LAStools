@@ -19,13 +19,13 @@ that LAS files compress much better with laszip without this
 "fluff" in the low-order bits.
 
 For example I find "fluff" in those examples:
-- Grass Lake Small.las
-- MARS_Sample_Filtered_LiDAR.las
-- Mount St Helens Oct 4 2004.las
-- IowaDNR-CloudPeakSoft-1.0-UTM15N.las
-- LAS12_Sample_withRGB_QT_Modeler.las
-- Lincoln.las
-- Palm Beach Pre Hurricane.las
+- Grass Lake Small.las  
+- MARS_Sample_Filtered_LiDAR.las  
+- Mount St Helens Oct 4 2004.las  
+- IowaDNR-CloudPeakSoft-1.0-UTM15N.las  
+- LAS12_Sample_withRGB_QT_Modeler.las  
+- Lincoln.las  
+- Palm Beach Pre Hurricane.las  
 
 There are also options to look at the '-gps' time and the '-rgb'
 colors in the same manner. You can change the amount of lines
@@ -508,16 +508,16 @@ lasprecision64 -i in.las -o out.las -rescale 0.333333333 0.333333333 0.01
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
--fail           : fail if license expired or invalid (default for 64bit)
+-fail           : fail if license expired or invalid (default for 64bit)  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -637,7 +637,7 @@ lasprecision64 -i in.las -o out.las -rescale 0.333333333 0.333333333 0.01
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
 -rescale_z [z]                      : rescale z by [z]  
 -rotate_xy [a] [x] [y]              : rotate points by [a] degrees, center at [x] [y]  
@@ -1151,13 +1151,13 @@ The other supported entries are:
 The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
 Supported [sep] values:
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
 
 ## Licensing
 

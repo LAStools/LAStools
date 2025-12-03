@@ -43,8 +43,8 @@ If the SHP file with plots has a DBF file with  that contain either an
 integer number or a string attributes for each plot you can add the name
 or the index of the field to the argument as shown below:
 
--lop polygons.shp plot_ID
--lop polygons.shp 3
+-lop polygons.shp plot_ID  
+-lop polygons.shp 3  
 
 The tool can concurrently compute a number height percentiles
 ('-p 5 10 25 50 75 90'), the '-min', the '-max', the average
@@ -194,11 +194,11 @@ lascanopy64 -i *.laz -ocsv -ground_class 2 -p_ith_return 3 4 -l_mom -pzabovex 5 
 -ske                     : compute height skewness  
 -std                     : for each grid cell compute standard deviation  
 -vc [m] [n] [o] ...      : compute the Vertical Complexity Index (VCI) with bin sizes width of [m] [n] [o] ...  
--above_mean              : percentage of returns above mean height (Zmean). Reports percentage of points which are higher than the average height.
--pzabovex [x]            : percentage of returns above X. Reports the proportion of all returns above the specified height X.
--p_ith_return [m] [n]... : percentage of i-th returns. Reports what percentage of all returns are specifically the n-th return.
--ground_class [c] [d]... : percentage of returns classified as ground with classification [c]. Reports the proportion of points with the given classification code (e.g., c=2=ground).
--l_mom                   : compute L-moments of the height distribution.  L-L₂ = spread, L₃ = L-skewness, L₄ = L-kurtosis, τ₃ = L-skewness (L₃/L₂), τ₄ = L-kurtosis (L₄/L₂).
+-above_mean              : percentage of returns above mean height (Zmean). Reports percentage of points which are higher than the average height.  
+-pzabovex [x]            : percentage of returns above X. Reports the proportion of all returns above the specified height X.  
+-p_ith_return [m] [n]... : percentage of i-th returns. Reports what percentage of all returns are specifically the n-th return.  
+-ground_class [c] [d]... : percentage of returns classified as ground with classification [c]. Reports the proportion of points with the given classification code (e.g., c=2=ground).  
+-l_mom                   : compute L-moments of the height distribution.  L-L₂ = spread, L₃ = L-skewness, L₄ = L-kurtosis, τ₃ = L-skewness (L₃/L₂), τ₄ = L-kurtosis (L₄/L₂).  
 
 -int_avg                 : compute intensity average  
 -int_c [m] [n] [o] ...   : produce intensity bands with gap values [m] [n] [o] ...  
@@ -293,16 +293,16 @@ lascanopy64 -i *.laz -ocsv -ground_class 2 -p_ith_return 3 4 -l_mom -pzabovex 5 
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
--fail           : fail if license expired or invalid (default for 64bit)
+-fail           : fail if license expired or invalid (default for 64bit)  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -423,7 +423,7 @@ lascanopy64 -i *.laz -ocsv -ground_class 2 -p_ith_return 3 4 -l_mom -pzabovex 5 
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
@@ -901,7 +901,7 @@ lascanopy64 -i *.laz -ocsv -ground_class 2 -p_ith_return 3 4 -l_mom -pzabovex 5 
 -pipe_on                 : write output to command pipe, see also -std_in  
 -populate                : populate header on output  
 -target_ecef             : output is geocentric (Earth-centered Earth-fixed)  
--temp_files [n]          : set base file name [n] for temp files (example: E:\tmp)
+-temp_files [n]          : set base file name [n] for temp files (example: E:\tmp)  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.
@@ -943,13 +943,13 @@ The other supported entries are:
 The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
 Supported [sep] values:
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
   
 ## Licensing
 

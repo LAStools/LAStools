@@ -28,7 +28,7 @@ formats the input string as argument. Result is
 ## wktformat specific arguments
 -i [n]       : input file or input string  
 -flat        : output as flat WKT (1 line)  
--indent [n]  : indent each output level by [n] spaces
+-indent [n]  : indent each output level by [n] spaces  
 
 if only one argument is given this is assumed as input string or input file (ending .txt or .wkt)
 

@@ -521,16 +521,16 @@ If a subtoken is not present and a (default) is defined, this will be used.
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
--fail           : fail if license expired or invalid (default for 64bit)
+-fail           : fail if license expired or invalid (default for 64bit)  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -543,7 +543,7 @@ If a subtoken is not present and a (default) is defined, this will be used.
 -neighbors_lof [n] : set neighbors list of files [fnf]  
 -no_data [n]       : use [n] as the nodata value in the BIL / ASC / TIF format  
 -no_data_alpha     : adds an alpha channel to the GeoTIFF output, designating areas with no data as transparent  
--no_data_map [n]   : use [n] to specify the key from the color_map and set its value to all rasters with no data
+-no_data_map [n]   : use [n] to specify the key from the color_map and set its value to all rasters with no data  
 -no_kml            : avoids auto-creation of KML wrapper  
 -no_world_file     : avoid world-file for PNG, JPG, TIF and BIL output  
 -stored            : use in memory reader  
@@ -651,7 +651,7 @@ If a subtoken is not present and a (default) is defined, this will be used.
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
@@ -1170,13 +1170,13 @@ The other supported entries are:
 The '-osep [sep]' argument specifies the output format of a text(xyz) output.
 Supported [sep] values:
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
 
 ## Licensing
 

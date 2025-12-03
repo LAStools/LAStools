@@ -46,7 +46,7 @@ KeyID   Loc Cnt Value: KeyDesc = Value
  4099     0   1  9001: UnitsGeoKey(Vertical Units) = Linear_Meter  
 
 ## geotiffinfo specific arguments
--i [n]       : input file or input wildcard
+-i [n]       : input file or input wildcard  
 
 if only one argument is given this is assumed as input file or input wildcard
 

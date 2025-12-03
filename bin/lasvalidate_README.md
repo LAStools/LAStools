@@ -400,16 +400,16 @@ C:\LASvalidator\lasvalidate\bin> more  ..\unit\validate.xml
 
 ## lasvalidate specific arguments
 
--i [fnp]       : input file or input file mask [fnp] (e.g. *.laz;fo?.la?;esri.shp,...)
--lof           : use input out of a list of files [fnf]
--o [n]         : use [n] as output file
--oxml          : xml filename like input filename
--stdin         : pipe from stdin
--h             : print help output
--v             : verbose output (print extra information)
--verbose       : verbose output (print extra information)
--very_verbose  : very verbose output (print even more information)
--vv            : very verbose output (print even more information)
+-i [fnp]       : input file or input file mask [fnp] (e.g. *.laz;fo?.la?;esri.shp,...)  
+-lof           : use input out of a list of files [fnf]  
+-o [n]         : use [n] as output file  
+-oxml          : xml filename like input filename  
+-stdin         : pipe from stdin  
+-h             : print help output  
+-v             : verbose output (print extra information)  
+-verbose       : verbose output (print extra information)  
+-very_verbose  : very verbose output (print even more information)  
+-vv            : very verbose output (print even more information)  
 
 ## Licensing
 

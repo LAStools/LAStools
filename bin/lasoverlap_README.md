@@ -155,7 +155,7 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -fill [n]                         : fills voids in the grid with a square search radius of [n]  
 -gray                             : map values to gray values instead of colors  
 -grey                             : map values to gray values instead of colors  
--grid_center                      : aligns the grid's origin to the center of a cell instead of its corner
+-grid_center                      : aligns the grid's origin to the center of a cell instead of its corner  
 -high                             : use highest value per cell to checking difference  
 -highest                          : use highest value per cell to checking difference  
 -ilay [n]                         : apply [n] or all LASlayers found in corresponding *.lay file on read  
@@ -193,16 +193,16 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
--fail           : fail if license expired or invalid (default for 64bit)
+-fail           : fail if license expired or invalid (default for 64bit)  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -800,7 +800,7 @@ difference raster maps range -100 ... 0 ... 100 (e.g. '-max_diff 100').
 -force_bigTif            : force output in BigTIFF format, regardless of data size. Used in combination with GeoTIFF output  
 -pipe_on                 : write output to command pipe, see also -std_in  
 -populate                : populate header on output  
--target_ecef             : output is geocentric (Earth-centered Earth-fixed)
+-target_ecef             : output is geocentric (Earth-centered Earth-fixed)  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.
@@ -842,13 +842,13 @@ The other supported entries are:
 The '-osep [sep]' argument specifies the output format of a text(xyz) output.
 Supported [sep] values:
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
 
 ## Licensing
 

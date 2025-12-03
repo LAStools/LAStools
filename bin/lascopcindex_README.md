@@ -49,15 +49,15 @@ memory required depends on the density and extent of the point clouds, as
 well as the spatial coherence of the points in the files. Here are the order 
 of magnitudes for memory usage based on different scenarios:
 
-For spatially coherent streams:
-- 10 million points: approximately 500 MB
-- 100 million points: approximately 2 GB
-- 1 billion points: approximately 5 GB
+For spatially coherent streams:  
+- 10 million points: approximately 500 MB  
+- 100 million points: approximately 2 GB  
+- 1 billion points: approximately 5 GB  
 
-For non-spatially coherent streams:
-- 10 million points: approximately 800 MB
-- 50 million points: approximately 7 GB
-- 1 billion points: not tested
+For non-spatially coherent streams:  
+- 10 million points: approximately 800 MB  
+- 50 million points: approximately 7 GB  
+- 1 billion points: not tested  
 
 To mitigate the memory usage, there are options available to reduce the memory footprint.
 See -unordered, -tls and -ondisk examples.
@@ -104,20 +104,20 @@ in processing time.
 
 overview of all tool-specific switches:
 
--v -verbose         : info reported in console
--vv -very_verbose   : more info reported in console
--version            : reports this tool's version number
--progress           : displays a progress bar (disable with verbose)
--depth [n]          : set a maximum depth [n] for the octree instead of relying on internal inference.
--m                  : set the units to meters (default)
--ft                 : set the units to feets
--root_light         : low density for the root of the octree (128 cell divisions)
--root_medium        : medium density for the root of the octree (256 cell divisions)
--root_dense         : hight density for the root of the octree (512 cell divisions)
--unordered          : memory optimisation for dense files without a spatially coherent order
--tls                : use it for terrestrial lidar data. It includes -unordered and -root_light
--ondisk             : stores processing data on disk to save memory.
--tmpdir             : if ondisk is set, an optionnal path to a directory where to store temporary files.
+-v -verbose         : info reported in console  
+-vv -very_verbose   : more info reported in console  
+-version            : reports this tool's version number  
+-progress           : displays a progress bar (disable with verbose)  
+-depth [n]          : set a maximum depth [n] for the octree instead of relying on internal inference.  
+-m                  : set the units to meters (default)  
+-ft                 : set the units to feets  
+-root_light         : low density for the root of the octree (128 cell divisions)  
+-root_medium        : medium density for the root of the octree (256 cell divisions)  
+-root_dense         : hight density for the root of the octree (512 cell divisions)  
+-unordered          : memory optimisation for dense files without a spatially coherent order  
+-tls                : use it for terrestrial lidar data. It includes -unordered and -root_light  
+-ondisk             : stores processing data on disk to save memory.  
+-tmpdir             : if ondisk is set, an optionnal path to a directory where to store temporary files.  
 
 ## Module arguments
 
@@ -182,7 +182,7 @@ overview of all tool-specific switches:
 ### Coordinates
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
--auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly. Only applicable to LAS/LAZ input files 
+-auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly. Only applicable to LAS/LAZ input files  
 -bin_Z_into_point_source [n]        : set point source to z/[n]  
 -clamp_raw_z [min] [max]            : limit raw z values to [min] and [max]  
 -clamp_z [min] [max]                : limit z values to [min] and [max]  
@@ -225,7 +225,7 @@ overview of all tool-specific switches:
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  

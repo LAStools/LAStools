@@ -55,7 +55,7 @@ the above workflow is for larger areas and/or tiny voxels sizes
 -mem [n]                      : use [n] MB of main memory (500-2000; default=1500)  
 -olay                         : write or append classification changes to a LASlayers *.lay file  
 -olaydir [dir]                : write the output *.lay file in directory [dir]  
--remain_buffered              : write on-the-fly buffer to the output
+-remain_buffered              : write on-the-fly buffer to the output  
 -step [n]                     : use a [n]x[n]x[n] uniform grid for finding isolated points  
 -step_xy [n]                  : set the horizontal x and y spacing of the grid to [n]  
 -step_z [n]                   : set the vertical z spacing of the grid to [n]  
@@ -69,16 +69,16 @@ the above workflow is for larger areas and/or tiny voxels sizes
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
--fail           : fail if license expired or invalid (default for 64bit)
+-fail           : fail if license expired or invalid (default for 64bit)  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -197,7 +197,7 @@ the above workflow is for larger areas and/or tiny voxels sizes
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
@@ -676,7 +676,7 @@ the above workflow is for larger areas and/or tiny voxels sizes
 -populate        : populate header on output  
 -stdout          : pipe to stdout  
 -target_ecef     : output is geocentric (Earth-centered Earth-fixed)  
--temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)
+-temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.
@@ -718,13 +718,13 @@ The other supported entries are:
 The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
 Supported [sep] values:
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
 
 ## Licensing
 

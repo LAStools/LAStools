@@ -4,8 +4,8 @@ This tool modifies points within a certain distance of polylines.
 As an input take, for example, a LAS/LAZ/TXT file and a SHP/TXT file with one
 or many polylines (e.g. powerlines).
 There are two separate options for running point selection; you can either:
-- Specify a radial distance to the 3D polygon
-- Specify a vertical and a horizontal distance to the 3D polygon
+- Specify a radial distance to the 3D polygon  
+- Specify a vertical and a horizontal distance to the 3D polygon  
 
 Affected points can be classified, clipped, or flaged.
 
@@ -35,10 +35,9 @@ geographic coordinates (EPSG:4326) during processing, which may introduce very m
 polygon boundaries. Only single-layer poly input files are supported. For multi-layer inputs, only the first layer is processed. 
 For GPX files, only routes or tracks layers are supported.
 
-
 line.csv may look like
 
--10,0,0
+-10,0,0  
 10,0,0
 0,0,0
 0,-10,0
@@ -52,33 +51,33 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 ## las3dpoly specific arguments
 
 -poly [fns]          : input shape file [fns]  
--sep                 : separator in a csv file to separate values. see table below. default [space]
--distance [d]        : radial distance [d] or horizontal [d1] and vertical [d2] distance. default [4]
--gdal                : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON, GPX and KML as -poly input file. Can also be used for SHP
--remove_points       : remove points within distance to polyline
+-sep                 : separator in a csv file to separate values. see table below. default [space]  
+-distance [d]        : radial distance [d] or horizontal [d1] and vertical [d2] distance. default [4]  
+-gdal                : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON, GPX and KML as -poly input file. Can also be used for SHP  
+-remove_points       : remove points within distance to polyline  
 -classify [n]        : classify points within distance to polyline as [n]  
 -classify_as [n]     : classify points within distance to polyline as [n]  
 -flag_as_withheld    : flag the points within distance to polyline as withheld  
--flag_as_keypoint    : flag the points within distance to polyline as keypoint
--flag_as_synthetic   : flag the points within distance to polyline as synthetic
--match_all_above     : match all points above the given distance of the polyline
--match_all_below     : match all points below the given distance of the polyline
--remain_buffered     : write on-the-fly buffer to the output
+-flag_as_keypoint    : flag the points within distance to polyline as keypoint  
+-flag_as_synthetic   : flag the points within distance to polyline as synthetic  
+-match_all_above     : match all points above the given distance of the polyline  
+-match_all_below     : match all points below the given distance of the polyline  
+-remain_buffered     : write on-the-fly buffer to the output  
 
 ### Basics
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
--fail           : fail if license expired or invalid (default for 64bit)
+-fail           : fail if license expired or invalid (default for 64bit)  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -198,7 +197,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
@@ -692,7 +691,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### Basics
--help : print help output
+-help : print help output  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.
@@ -734,13 +733,13 @@ The other supported entries are:
 The '-osep [sep]' argument specifies the output format of a text(xyz) output.
 Supported [sep] values:
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
 
 ## Licensing
 

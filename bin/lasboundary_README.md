@@ -108,7 +108,7 @@ lasboundary64 -i *.laz -merged -o merged.kml -disjoint -utm 17S
 lasboundary64 -i lidar.las -o boundary.kml -longlat -concavity 0.00002  
 lasboundary64 -i *.txt -iparse ssxyz -otxt -first_only  
 lasboundary64 -i tiles\*.laz -merged -keep_class 4 5 -convavity 2.5 -o vegetation_layer.shp  
-lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.shp
+lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.shp  
 
 
 ## lasboundary specific arguments
@@ -120,7 +120,7 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 -disjoint             : allow polygon to fragment for point clusters farther than concavity apart  
 -disjoint_hull        : allow polygon to fragment for point clusters farther than concavity apart  
 -extra_pass           : do extra read pass to count points (only makes sense when filtering)  
--gdal                 : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON and GPX as poly output. Can also be used for SHP and KML
+-gdal                 : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON and GPX as poly output. Can also be used for SHP and KML  
 -holes                : find internal holes and output hole polygoons  
 -ilay [n]             : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]          : look for corresponding *.lay file in directory [n]  
@@ -140,16 +140,16 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
--fail           : fail if license expired or invalid (default for 64bit)
+-fail           : fail if license expired or invalid (default for 64bit)  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -268,7 +268,7 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
@@ -733,9 +733,9 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 -oshp            : output as SHP *.shp file  
 -otxt            : output as textfile  
 -owkt            : output as wkt (well-known-text)  
--ogpkg           : output as GPKG (GeoPackage) 
--ogml            : output as GML (Geography Markup Language)
--ogpx            : output as GPX (GPS Exchange Format)
+-ogpkg           : output as GPKG (GeoPackage)  
+-ogml            : output as GML (Geography Markup Language)  
+-ogpx            : output as GPX (GPS Exchange Format)  
 -ogeojson        : output as GeoJSON  
 -pipe_on         : write output to command pipe, see also -std_in  
 -populate        : populate header on output  
@@ -744,7 +744,7 @@ lasboundary64 -i lidar.las -keep_class 6 -convavity 1.5 -o building_footprints.s
 -temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### Basics
--help : print help output
+-help : print help output  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.

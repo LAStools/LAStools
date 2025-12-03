@@ -50,7 +50,7 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -o out.laz
 lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 0.5 -classify_as 6 -o out.laz  
 lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -flag_as_withheld -o out.laz  
 lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 2.0 -remove_points -o out.laz  
-lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o out.laz
+lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o out.laz  
 
 
 ## lasdistance specific arguments
@@ -61,7 +61,7 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 -flag_as_keypoint             : flag points as keypoint (instead of classifying them)  
 -flag_as_synthetic            : flag points as synthetic (instead of classifying them)  
 -flag_as_withheld             : flag points as withheld (instead of classifying them)  
--gdal                         : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON and GPX as -poly input file. Can also be used for SHP and KML
+-gdal                         : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON and GPX as -poly input file. Can also be used for SHP and KML  
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ...  
 -ilay [n]                     : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]                  : look for corresponding *.lay file in directory [n]  
@@ -69,7 +69,7 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 -olay                         : write or append classification changes to a LASlayers *.lay file  
 -olaydir [dir]                : write the output *.lay file in directory [dir]  
 -poly [fns]                   : use file [fns] as source for polygonal segments  
--remain_buffered              : write on-the-fly buffer to the output
+-remain_buffered              : write on-the-fly buffer to the output  
 -remove_points                : remove points from output file (instead of classifying them)  
 -step [n]                     : use granularity [n] to compute the approximated distances (default=0.5)  
 -step_xy [n]                  : granularity [n] with which the approximated distances are computed (default=0.5)  
@@ -80,16 +80,16 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
--fail           : fail if license expired or invalid (default for 64bit)
+-fail           : fail if license expired or invalid (default for 64bit)  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -208,7 +208,7 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
@@ -699,7 +699,7 @@ lasdistance64 -i in.laz -poly breaklines.shp -distance_xy 5.0 -step_xy 1.0 -o ou
 -populate        : populate header on output  
 -stdout          : pipe to stdout  
 -target_ecef     : output is geocentric (Earth-centered Earth-fixed)  
--temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)
+-temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.
@@ -741,13 +741,13 @@ The other supported entries are:
 The '-osep [sep]' argument specifies the output format of a text(xyz or csv) output.
 Supported [sep] values:
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
 
 ## Licensing
 

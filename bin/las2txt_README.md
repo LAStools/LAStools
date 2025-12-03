@@ -104,8 +104,8 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 -optx        : output as PTX (plain text with header)  
 -parse [xyz] : use parse string [xyz] to access point values  
 -parse_all   : set "txyzirndecaup" as parse string to parse all available information  
--sep [n]     : output separator [comma,space,semicolon,tab,colon,hyphen,dot], (default=space)
--coldesc     : write a header line to the output containing the column description
+-sep [n]     : output separator [comma,space,semicolon,tab,colon,hyphen,dot], (default=space)  
+-coldesc     : write a header line to the output containing the column description  
                (this enables to omit -parse during import using txt2las)
 
 ### Basics
@@ -113,12 +113,12 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -253,7 +253,7 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
@@ -661,7 +661,7 @@ las2txt -i lidar.las -parse xyztE -extra 99 -o ascii.txt
 -pipe_on         : write output to command pipe, see also -std_in  
 -populate        : populate header on output  
 -stdout          : pipe to stdout  
--temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)
+-temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.
@@ -713,66 +713,66 @@ The other supported entries are:
     + : the byte-wise B difference to the last point  
     V : the waveform data  
     E : extra string (-extra)  
- (HSV): color in HSV model [0,360|100]. Converted from RGB.
- (HSL): color in HSL model [0,360|100]. Converted from RGB.
- (hsv): color in HSV model [0,1]. Converted from RGB.
- (hsl): color in HSL model [0,1]. Converted from RGB.
+ (HSV): color in HSV model [0,360|100]. Converted from RGB.  
+ (HSL): color in HSL model [0,360|100]. Converted from RGB.  
+ (hsv): color in HSV model [0,1]. Converted from RGB.  
+ (hsl): color in HSL model [0,1]. Converted from RGB.  
 
 ### column descriptions
 If argument '-coldesc' is given a header row with the column description
-will be generated:
+will be generated:  
 
-  Column description  Corresponding parse character 
-  x                   x coordinate
-  y                   y coordinate
-  z                   z coordinate
-  X                   X (unscaled raw X value)
-  Y                   Y (unscaled raw Y value)
-  Z                   Z (unscaled raw Z value)
-  gps_time            t (gps time)
-  intensity           i 
-  scan_angle          a
-  point_source_id     p
-  classification      c
-  user_data           u
-  return_number       r
-  number_of_returns   n
-  edge_of_flight_line e
-  scan_direction_flag d
-  withheld_flag       h
-  keypoint_flag       k
-  synthetic_flag      g
-  skip                s (skip this column without warning)
-  overlap_flag        o
-  scanner_channel     l
-  R                   R (RGB red)
-  G                   G (RGB green)
-  B                   B (RGB blue)
-  HSV_H               (HSV) HSV color model hue [0..360]
-  HSV_S                                     saturation [0..100]
-  HSV_V                                     value [0..100]
-  HSV_h               (hsv) HSV color model hue [0..1]
-  HSV_s                                     saturation [0..1]
-  HSV_v                                     value [0..1] 
-  HSL_H               (HSL) HSL color model hue [0..360]
-  HSL_S                                     saturation [0..100]
-  HSL_L                                     luminance [0..100] 
-  HSL_h               (hsl) HSL color model hue [0..1]
-  HSL_s                                     saturation [0..1]
-  HSL_l                                     luminance [0..1] 
+  Column description  Corresponding parse character  
+  x                   x coordinate  
+  y                   y coordinate  
+  z                   z coordinate  
+  X                   X (unscaled raw X value)  
+  Y                   Y (unscaled raw Y value)  
+  Z                   Z (unscaled raw Z value)  
+  gps_time            t (gps time)  
+  intensity           i   
+  scan_angle          a  
+  point_source_id     p  
+  classification      c  
+  user_data           u  
+  return_number       r  
+  number_of_returns   n  
+  edge_of_flight_line e  
+  scan_direction_flag d  
+  withheld_flag       h  
+  keypoint_flag       k  
+  synthetic_flag      g  
+  skip                s (skip this column without warning)  
+  overlap_flag        o  
+  scanner_channel     l  
+  R                   R (RGB red)  
+  G                   G (RGB green)  
+  B                   B (RGB blue)  
+  HSV_H               (HSV) HSV color model hue [0..360]  
+  HSV_S                                     saturation [0..100]  
+  HSV_V                                     value [0..100]  
+  HSV_h               (hsv) HSV color model hue [0..1]  
+  HSV_s                                     saturation [0..1]  
+  HSV_v                                     value [0..1]   
+  HSL_H               (HSL) HSL color model hue [0..360]  
+  HSL_S                                     saturation [0..100]  
+  HSL_L                                     luminance [0..100]   
+  HSL_h               (hsl) HSL color model hue [0..1]  
+  HSL_s                                     saturation [0..1]  
+  HSL_l                                     luminance [0..1]  
 
 
 ### output separator
-The '-osep [sep]' argument specifies the output format of a text(xyz) output.
-Supported [sep] values:
+The '-osep [sep]' argument specifies the output format of a text(xyz) output.  
+Supported [sep] values:  
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
 
 ## Licensing
 

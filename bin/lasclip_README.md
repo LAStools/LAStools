@@ -25,9 +25,9 @@ files) into one output file per polygon. If your SHP file has an
 associated DBF file then you can use '-split 0' to give output
 files the name or number stored in attribute with index 0. Or
 you can use '-split IDX' with IDX being the attribute's name.
--split        : one file each shape
--split 1      : split by attrib with index 0
--split abc    : split by attrib with name abc
+-split        : one file each shape  
+-split 1      : split by attrib with index 0  
+-split abc    : split by attrib with name abc  
 
 You can exclude certain point classes from the clipping or the
 reclassifying with option '-ignore_class 2' or '-ignore_class
@@ -113,7 +113,7 @@ following format:
 757600 3.69171e+006  
 757741 3.69172e+006  
 757800 3.6917e+006  
-[...]
+[...]  
 
 
 ## lasclip specific arguments
@@ -125,7 +125,7 @@ following format:
 -donut                        : clip only lakes but no islands  
 -donuts                       : clip only lakes but no islands  
 -flag_as_withheld             : just flag the point as withheld instead of removing it  
--gdal                         : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON, GPX and KML as -poly input file. Can also be used for SHP
+-gdal                         : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON, GPX and KML as -poly input file. Can also be used for SHP  
 -ignore_class [m] [n] [o] ... : ignores points with classification codes [m] [n] [o] ...  
 -ilay [n]                     : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]                  : look for corresponding *.lay file in directory [n]  
@@ -136,9 +136,9 @@ following format:
 -poly [fns]                   : input shape file [fns]  
 -split                        : one file each shape  
 -split [n]                    : split by attribute [n], filename by attribute value  
--split [s]                    : split by attrib with name "[s]", filename by attribute value
--filename_as_prefix           : extend attribute filename with input filename as prefix (64bit only)
--filename_as_suffix           : extend attribute filename with input filename as suffix (64bit only)
+-split [s]                    : split by attrib with name "[s]", filename by attribute value  
+-filename_as_prefix           : extend attribute filename with input filename as prefix (64bit only)  
+-filename_as_suffix           : extend attribute filename with input filename as suffix (64bit only)  
 -tin                          : write output.shp TIN  
 -week_to_adjusted [n]         : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
@@ -146,16 +146,16 @@ following format:
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
--fail           : fail if license expired or invalid (default for 64bit)
+-fail           : fail if license expired or invalid (default for 64bit)  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
 -vv             : very verbose output (print even more information)  
--silent         : only output on errors or warnings
--quiet          : no output at all
+-silent         : only output on errors or warnings  
+-quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
--errors_ignore  : continue, even if errors occur (if possible). Use with caution!
+-errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
 -print_log_stats: print additional log statistics  
--cpu64          : force 32bit version to start 64 bit in multi core (obsolete)
+-cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
@@ -232,7 +232,7 @@ following format:
 ### Coordinates
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
--auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly. Only applicable to LAS/LAZ input files
+-auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly. Only applicable to LAS/LAZ input files  
 -bin_Z_into_point_source [n]        : set point source to z/[n]  
 -clamp_raw_z [min] [max]            : limit raw z values to [min] and [max]  
 -clamp_z [min] [max]                : limit z values to [min] and [max]  
@@ -275,7 +275,7 @@ following format:
 -keep_z [m] [n]                     : keep points with z value between [m] and [n]  
 -keep_z_above [n]                   : keep points with z value above [n]  
 -keep_z_below [n]                   : keep points with z value below [n]  
--offset_adjust                      : adjusting the offset based on the results of point operations and transformations
+-offset_adjust                      : adjusting the offset based on the results of point operations and transformations  
 -reoffset [x] [y] [z]               : puts a new offset [x] [y] [z] into the header and translates the points accordingly  
 -rescale [x] [y] [z]                : puts a new scale [x] [y] [z] into the header and rescales the points accordingly  
 -rescale_xy [x] [y]                 : rescale x y by [x] [y]  
@@ -769,7 +769,7 @@ following format:
 -temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
 ### Basics
--help : print help output
+-help : print help output  
 
 ### parse
 The '-parse [xyz]' flag specifies how to interpret each line of the ASCII file.
@@ -811,13 +811,13 @@ The other supported entries are:
 The '-osep [sep]' argument specifies the output format of a text(xyz) output.
 Supported [sep] values:
 
-  comma
-  tab
-  dot
-  colon
-  semicolon
-  hyphen
-  space
+  comma  
+  tab  
+  dot  
+  colon  
+  semicolon  
+  hyphen  
+  space  
 
 ## Licensing
 

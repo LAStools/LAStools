@@ -9,7 +9,7 @@ various coordinate reference systems and to retrieve detailed
 represenations and information about CRS (lasinfo).
 
 **Key features include:**
-- Transformation of point coordinates between different CRS.
+- Transformation of point coordinates between different CRS.  
 - Conversion and representation of CRS in various formats (EPSG, 
 WKT, PROJ string, PROJJSON).
 - Retrieval of metadata such as ellipsoids, axes, and datum 
@@ -39,22 +39,22 @@ methods to install it (We recommend using the default standard installation path
  4. Finish installation
 
 - **Conda**: Use this **Cross-Platform** package manager to install PROJ with the following command:
-  ```
-  conda install -c conda-forge proj
-  ```
+
+    conda install -c conda-forge proj
   And for the PROJ data:
-  ```
-  conda install -c conda-forge proj-data
-  ```
+
+    conda install -c conda-forge proj-data
+
   If a warning appears in Linux stating that the library was found via the Conda installation but could not be loaded, this is usually because the dynamic loader finds the incompatible system libraries first. Using `export LD_LIBRARY_PATH=~/miniconda3/lib:$LD_LIBRARY_PATH` ensures that the Conda libraries and their dependencies are loaded first.  
   Note that in this case, the environment variable only applies to the current shell session.
 
 The environment variable only applies to the current shell session.
 
 - **Docker**: Get the Docker image with:
-  ```
-  docker pull osgeo/proj
-  ```
+
+    docker pull osgeo/proj
+
+
 ### QGIS Installation
 
 By installing QGIS, you automatically get the PROJ library installed 
@@ -70,58 +70,56 @@ and configured.
   QGIS can also be installed on Linux distributions, which will 
   include the PROJ library.
  1. Add the QGIS repository:
-    ```bash
+
     sudo add-apt-repository ppa:ubuntugis/ppa
     sudo apt update
-    ```
+
  2. Install QGIS:
-    ```
+
     sudo apt install qgis qgis-plugin-grass
-    ```
-     The PROJ library is now installed with QGIS.
+
+   The PROJ library is now installed with QGIS.
      
-     **Fedora:**:
-      ```
-      sudo dnf install qgis qgis-grass
-      ```
+   **Fedora:**:
+    sudo dnf install qgis qgis-grass
 
 ### Further installation options
 - **Linux**:
   **Debian/Ubuntu**:
-  ```
-  sudo apt-get install proj-bin
-  ```
+
+    sudo apt-get install proj-bin
+
   **Fedora**:
-  ```
-  sudo dnf install proj
-  ```
+
+    sudo dnf install proj
+
   **Red Hat**:
-  ```
-  sudo yum install proj
-  ```
+
+    sudo yum install proj
+
 
 - **Mac OS X**:
   Using Homebrew:
-  ```
-  brew install proj
-  ```
+
+    brew install proj
+
   Or MacPorts:
-  ```
-  sudo port install proj
-  ```
+
+    sudo port install proj
+
 
 ### Required Files for PROJ in LASTools
 
 To ensure that the PROJ library functions correctly with LASTools,
  you need to have the following library files available:
 
-- `proj`
-- `libcrypto`
-- `libcurl`
-- `libssl`
-- `sqlite3`
-- `tiff`
-- `zlib`
+- `proj`  
+- `libcrypto`  
+- `libcurl`  
+- `libssl`  
+- `sqlite3`  
+- `tiff`  
+- `zlib`  
 
 Additionally, ensure that the PROJ data files, including the 
 `proj.db`, are installed for full functionality.
@@ -135,106 +133,98 @@ QGIS or OSGeo4W or Conda.
 
 - **Custom Directory**: Alternatively, you can place the library 
 files and PROJ data in custom directories of your choice via environment variables. We recommend only using this option if the PROJ lib is not found automatically via the QGIS or OSGeo4W or Conda installations.
-  ```
-  LASTOOLS_PROJ
-  ```
+
+    LASTOOLS_PROJ
+
   for the PROJ library directory.
   If the PROJ library cannot find the PROJ data directory itself set
-  ```
-  PROJ_LIB
-  ```
+
+    PROJ_LIB
+
   Which is a PROJ-specific environment variable and specifies the directory to PROJ data.
 
 To use these custom directories, set the environment variables via command line (cmd) as shown in the following example:
 
 - **Windows**:
   **Temporary** for the current session:
-  ```
-  set LASTOOLS_PROJ=C:\path\to\proj_lib
-  ```
+
+    set LASTOOLS_PROJ=C:\path\to\proj_lib
+
   and if required
-  ```
-  set PROJ_LIB=C:\path\to\proj_data
-  ```
+
+    set PROJ_LIB=C:\path\to\proj_data
+
 
   Set environment variable **permanently** (applies to new CMD windows, but not to the current session):
-  ```
-  setx LASTOOLS_PROJ "C:\path\to\proj_lib"
-  ```
+
+    setx LASTOOLS_PROJ "C:\path\to\proj_lib"
   and if required
-  ```
-  setx PROJ_LIB "C:\path\to\proj_data"
-  ```
+
+    setx PROJ_LIB "C:\path\to\proj_data"
 
   Set environment variable **permanently and system-wide** for all users (need to run with admin rights):
-  ```
-  setx LASTOOLS_PROJ "C:\path\to\proj_lib" /M
-  ```
+
+    setx LASTOOLS_PROJ "C:\path\to\proj_lib" /M
+
   and if required
-  ```
-  setx PROJ_LIB "C:\path\to\proj_data" /M
-  ```
+
+    setx PROJ_LIB "C:\path\to\proj_data" /M
 
 - **Linux**:
   **Temporary** for the current session:
-  ```
-  export LASTOOLS_PROJ=/path/to/proj_lib
-  ```
+
+    export LASTOOLS_PROJ=/path/to/proj_lib
+
   and if required
-  ```
-  export PROJ_LIB=/path/to/proj_data
-  ```
+
+    export PROJ_LIB=/path/to/proj_data
+
   Set environment variable **permanently** for this user:
   Open your Bash configuration file:
-  ```
-  nano ~/.bashrc
-  ```
+
+    nano ~/.bashrc
+
   Add this line at the end of the file:
-  ```
-  export LASTOOLS_PROJ=/path/to/proj_lib
-  ```
+
+    export LASTOOLS_PROJ=/path/to/proj_lib
+
   and if required
-  ```
-  export PROJ_LIB=/path/to/proj_data
-  ```
+
+    export PROJ_LIB=/path/to/proj_data
+
   save and close the file and then execute the command
-  ```
-  source ~/.bashrc
-  ```
+
+    source ~/.bashrc
 
   Set environment variable **permanently and system-wide** for all users:
   Open the system file for environment variables:
-  ```
-  sudo nano /etc/environment
-  ```
+
+    sudo nano /etc/environment
+    
   Add the variable to the file:
-  ```
-  LASTOOLS_PROJ="/path/to/proj_lib"
-  ```
+
+    LASTOOLS_PROJ="/path/to/proj_lib"
+
   and if required
-  ```
-  PROJ_LIB="/path/to/proj_data"
-  ```
+
+    PROJ_LIB="/path/to/proj_data"
+
   save and close the file and then execute the command or (best) reboot your system to ensure the changes are affecting  
-  ```
-  source /etc/environment
-  ```
+
+    source /etc/environment
+
 
 **Check the environment variables**:
 - **cmd - windows**:
-  ```
-  echo %LASTOOLS_PROJ%
-  ```
-  ```
-  echo %PROJ_LIB%
-  ```
+
+    echo %LASTOOLS_PROJ%
+    echo %PROJ_LIB%
+
 - **linux**:
-  ```
-  echo $LASTOOLS_PROJ
-  ```
-  ```
-  echo $PROJ_LIB
-  ```
+
+    echo $LASTOOLS_PROJ
+    echo $PROJ_LIB
+
 If you want to use the PROJ library later via QGIS, OSGeo4W or another installation, you must first delete the environment variables LASTOOLS_PROJ and PROJ_LIB if they have been set permanently.
 
 ### Important Note
