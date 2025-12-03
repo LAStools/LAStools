@@ -1296,10 +1296,10 @@ int main(int argc, char* argv[]) {
             fprintf(file_out, "%d", lasreader->point.rgb[3]);
             break;
           case 'm':  // the index of the point (count starts at 0)
-            fprintf(file_out, "%lld", lasreader->p_idx - 1);
+            fprintf(file_out, "%lld", lasreader->p_cnt - 1);
             break;
           case 'M':  // the index of the point  (count starts at 1)
-            fprintf(file_out, "%lld", lasreader->p_idx);
+            fprintf(file_out, "%lld", lasreader->p_cnt);
             break;
           case '_':  // the raw integer X difference to the last point
             fprintf(file_out, "%d", lasreader->point.get_X() - last_XYZ[0]);

@@ -309,7 +309,7 @@ BOOL LASreaderQFIT::read_point_default()
   {
     try { stream->getBytes((U8*)buffer, version); } catch(...)
     {
-      laserror("reading QFIT point after %u of %u", (U32)p_idx, (U32)npoints);
+      laserror("reading QFIT point after %u of %u", (U32)p_cnt, (U32)npoints);
       return FALSE;
     }
 

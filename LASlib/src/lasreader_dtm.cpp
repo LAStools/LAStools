@@ -1238,7 +1238,7 @@ BOOL LASreaderDTM::read_point_default()
     {
       if (fread((void*)&elevation, 4, 1, file) != 1)
       {
-        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_cnt);
         npoints = p_idx;
         return FALSE;
       }
@@ -1248,7 +1248,7 @@ BOOL LASreaderDTM::read_point_default()
       I32 elev;
       if (fread((void*)&elev, 4, 1, file) != 1)
       {
-        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_cnt);
         npoints = p_idx;
         return FALSE;
       }
@@ -1259,7 +1259,7 @@ BOOL LASreaderDTM::read_point_default()
       I16 elev;
       if (fread((void*)&elev, 2, 1, file) != 1)
       {
-        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_cnt);
         npoints = p_idx;
         return FALSE;
       }
@@ -1270,7 +1270,7 @@ BOOL LASreaderDTM::read_point_default()
       F64 elev;
       if (fread((void*)&elev, 8, 1, file) != 1)
       {
-        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_cnt);
         npoints = p_idx;
         return FALSE;
       }
@@ -1334,7 +1334,7 @@ BOOL LASreaderDTM::read_point_default()
           overflow_I32_z++;
       }
       p_idx++;
-  p_cnt++;
+      p_cnt++;
       row++;
       return TRUE;
     }

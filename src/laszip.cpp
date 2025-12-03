@@ -409,9 +409,9 @@ int main(int argc, char *argv[])
       while (lasreader->read_point());
       if (check_integrity)
       {
-        if (lasreader->p_idx != lasreader->npoints)
+        if (lasreader->p_cnt != lasreader->npoints)
         {
-          LASMessage(LAS_INFO, "FAILED integrity check for '%s' after %lld of %lld points", lasreadopener.get_file_name(), lasreader->p_idx, lasreader->npoints);
+          LASMessage(LAS_INFO, "FAILED integrity check for '%s' after %lld of %lld points", lasreadopener.get_file_name(), lasreader->p_cnt, lasreader->npoints);
         }
         else
         {
@@ -607,7 +607,7 @@ int main(int argc, char *argv[])
                 if (!waveform_with_map)
                 {
                   LASMessage(LAS_WARNING, "gap in waveform offsets.");
-                  LASMessage(LAS_WARNING, "last offset plus size was %lld but new offset is %lld (for point %lld)", (last_offset + last_size), lasreader->point.wavepacket.getOffset(), lasreader->p_idx);
+                  LASMessage(LAS_WARNING, "last offset plus size was %lld but new offset is %lld (for point %lld)", (last_offset + last_size), lasreader->point.wavepacket.getOffset(), lasreader->p_cnt);
                 }
               }
               waves_written++;
@@ -650,7 +650,7 @@ int main(int argc, char *argv[])
                 laserror("waveform offsets not in monotonically increasing order.\n" \
                   "last offset was %lld but new offset is %lld (for point %lld)\n" \
                   "use option '-waveforms_with_map' to compress.", 
-                  last_offset, lasreader->point.wavepacket.getOffset(), lasreader->p_idx);
+                  last_offset, lasreader->point.wavepacket.getOffset(), lasreader->p_cnt);
               }
             }
           }
@@ -838,7 +838,7 @@ int main(int argc, char *argv[])
       }
 
       delete laswriter;
-      LASMessage(LAS_VERBOSE, "%g secs to write %lld bytes for '%s' with %lld points of type %d", taketime()-start_time, bytes_written, laswriteopener.get_file_name(), lasreader->p_idx, lasreader->header.point_data_format);
+      LASMessage(LAS_VERBOSE, "%g secs to write %lld bytes for '%s' with %lld points of type %d", taketime()-start_time, bytes_written, laswriteopener.get_file_name(), lasreader->p_cnt, lasreader->header.point_data_format);
       if (start_of_waveform_data_packet_record && !waveform)
       {
         lasreader->close(FALSE);

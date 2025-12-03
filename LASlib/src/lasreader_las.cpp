@@ -1498,11 +1498,11 @@ BOOL LASreaderLAS::read_point_default()
       }
       if (reader->error())
       {
-        laserror("'%s' after %u of %u points for '%s'", reader->error(), (U32)p_idx, (U32)npoints, file_name);
+        laserror("'%s' after %u of %u points for '%s'", reader->error(), (U32)p_cnt, (U32)npoints, file_name);
       }
       else
       {
-        LASMessage(LAS_WARNING, "end-of-file after %u of %u points for '%s'", (U32)p_idx, (U32)npoints, file_name);
+        LASMessage(LAS_WARNING, "end-of-file after %u of %u points for '%s'", (U32)p_cnt, (U32)npoints, file_name);
       }
       return FALSE;
     }

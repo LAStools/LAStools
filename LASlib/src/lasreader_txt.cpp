@@ -1202,7 +1202,7 @@ BOOL LASreaderTXT::read_point_default()
         {
           if (p_idx != npoints)
           {
-            LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_idx, npoints);
+            LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_cnt, npoints);
           }
         }
         else
@@ -1211,7 +1211,7 @@ BOOL LASreaderTXT::read_point_default()
           {
             if (p_idx != npoints)
             {
-              LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_idx, npoints);
+              LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_cnt, npoints);
             }
           }
           npoints = p_idx;

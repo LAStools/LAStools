@@ -2246,7 +2246,7 @@ public:
               if (file_out && report_outside) {
                 if (json_out) {
                   JsonObject json_outside_box;
-                  json_outside_box["count"] = (U32)(lasreader->p_idx - 1);
+                  json_outside_box["count"] = (U32)(lasreader->p_cnt - 1);
                   json_outside_box["get_gps_time"] = lasreader->point.get_gps_time();
                   json_outside_box["x"] = lasreader->point.get_x();
                   json_outside_box["y"] = lasreader->point.get_y();
@@ -2264,7 +2264,7 @@ public:
                 } else {
                   fprintf(
                       file_out, "%u t %g x %g y %g z %g i %d (%d of %d) d %d e %d c %d s %s %u p %d \012",
-                      (U32)(lasreader->p_idx - 1),
+                      (U32)(lasreader->p_cnt - 1),
                       lasreader->point.get_gps_time(),
                       lasreader->point.get_x(),
                       lasreader->point.get_y(),

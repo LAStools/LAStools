@@ -666,7 +666,7 @@ BOOL LASreaderPLY::read_point_default()
           {
             if (p_idx != npoints)
             {
-              LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_idx, npoints);
+              LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points", p_cnt, npoints);
 
               npoints = p_idx;
               if (!populated_header)
@@ -703,7 +703,7 @@ BOOL LASreaderPLY::read_point_default()
         point.set_Z((I32)(((point.coordinates[2] - orig_z_offset) / orig_z_scale_factor) - 0.5));
     }
     p_idx++;
-  p_cnt++;
+    p_cnt++;
     if (!populated_header)
     {
       // update number of point records

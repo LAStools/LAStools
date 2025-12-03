@@ -258,7 +258,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
       {
         if (!fgets(line, line_size, file))
         {
-          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+          LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_cnt);
         }
 
         // special handling for European numbers
@@ -387,7 +387,7 @@ BOOL LASreaderASC::read_point_default()
     {
       if (!fgets(line, line_size, file))
       {
-        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_idx);
+        LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_cnt);
         npoints = p_idx;
         return FALSE;
       }

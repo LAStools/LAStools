@@ -74,7 +74,7 @@ class LASLIB_DLL LASreader {
   LASheader header;
   LASpoint point;
   I64 npoints;
-  I64 p_idx; // current point index
+  I64 p_idx; // current point index (may modified by seek)
   I64 p_cnt; // number points read
   LASTransformMatrix transform_matrix;
 

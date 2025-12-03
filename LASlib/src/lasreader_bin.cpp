@@ -280,7 +280,7 @@ BOOL LASreaderBIN::read_point_default()
       TSpoint tspoint;
       try { stream->getBytes((U8*)&tspoint, sizeof(TSpoint)); } catch(...)
       {
-        laserror("reading terrasolid point after %u of %u", (U32)p_idx, (U32)npoints);
+        laserror("reading terrasolid point after %u of %u", (U32)p_cnt, (U32)npoints);
         return FALSE;
       }
       point.set_X(tspoint.x);
@@ -296,7 +296,7 @@ BOOL LASreaderBIN::read_point_default()
       TSrow tsrow;
       try { stream->getBytes((U8*)&tsrow, sizeof(TSrow)); } catch(...)
       {
-        laserror("reading terrasolid row after %u of %u", (U32)p_idx, (U32)npoints);
+        laserror("reading terrasolid row after %u of %u", (U32)p_cnt, (U32)npoints);
         return FALSE;
       }
       point.set_X(tsrow.x);
@@ -373,7 +373,7 @@ BOOL LASreaderBIN::read_point_default()
       point.rgb[2] = 256*rgba[2];
     }
     p_idx++;
-  p_cnt++;
+    p_cnt++;
     return TRUE;
   }
   return FALSE;
