@@ -72,5 +72,7 @@ public:
   };
 };
 
+// do we need las original for LAS 1.5?
+
 
 #endif // LAS_VLR_HPP

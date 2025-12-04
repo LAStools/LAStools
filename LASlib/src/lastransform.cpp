@@ -90,6 +90,12 @@ void LASoperation::write_transformed_values_with_adjust_offset(F64 x, F64 y, F64
     overflow++;
 }
 
+/// setting the origin gps options
+void LASoperation::set_gps_origins(U16 orig_global_encoding, U16 orig_time_offset) {
+    this->orig_time_offset = orig_time_offset;
+    this->orig_global_encoding = orig_global_encoding;
+}
+
 /// setting the origin (input) offset and scaling factors
 void LASoperation::set_origins(F64 orig_x_offset, F64 orig_y_offset, F64 orig_z_offset, F64 orig_x_scale_factor, F64 orig_y_scale_factor, F64 orig_z_scale_factor)
 {
@@ -4807,9 +4813,18 @@ class LASoperationConvertAdjustedGpsToWeek : public LASoperation
     {
         if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
 
-        I32 week = (I32)(point->gps_time / 604800.0 + 1653.4391534391534391534391534392);
-        I32 secs = week * 604800 - 1000000000;
+        F64 week_float = (point->gps_time / 604800.0 + 1653.4391534391534391534391534392);
+        I32 week = (I32)week_float;
+        // we should not get negative values, but if we do, they are rounded upwards (towards 0), so fix this and substract one week
+        if (week_float < 0) {
+            week -= 1;
+        }
+        I64 secs = week * 604800 - 1000000000;
         point->gps_time -= secs;
+        if (point->gps_time == 604800.0) 
+        {
+            point->gps_time = 0;
+        }
     };
 };
 
@@ -4850,6 +4865,313 @@ class LASoperationConvertWeekToAdjustedGps : public LASoperation
     U32 week;
     I64 delta_secs;
 };
+
+class LASoperationConvertOffsetGpsToAdjustedGps : public LASoperation
+{
+public:
+    inline const CHAR* name() const
+    {
+        return "offset_to_adjusted";
+    };
+    inline I32 get_command(CHAR* string) const
+    {
+        return sprintf(string, "-%s ", name());
+    };
+    inline U32 get_decompress_selective() const
+    {
+        return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+        return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
+    inline void transform(LASpoint* point)
+    {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
+        I64 delta_secs = 1000 * 1000 * (I64)orig_time_offset - 1000 * 1000 * 1000;
+        point->gps_time += delta_secs;
+    };
+};
+
+class LASoperationConvertAdjustedGpsOrOffsetGpsToAdjustedGps : public LASoperation
+{
+public:
+    inline const CHAR* name() const
+    {
+        return "adjusted_or_offset_to_adjusted";
+    };
+    inline I32 get_command(CHAR* string) const
+    {
+        return sprintf(string, "-%s ", name());
+    };
+    inline U32 get_decompress_selective() const
+    {
+        return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+        return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
+    inline void transform(LASpoint* point)
+    {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
+        if ((orig_global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0) {
+            I64 delta_secs = 1000 * 1000 * (I64)orig_time_offset - 1000 * 1000 * 1000;
+            point->gps_time += delta_secs;
+        }
+        else {
+            // no transformation needed for adjusted to adjusted
+        }
+    };
+};
+
+class LASoperationConvertOffsetGpsToOffsetGps : public LASoperation
+{
+public:
+    inline const CHAR* name() const
+    {
+        return "offset_to_offset";
+    };
+    inline I32 get_command(CHAR* string) const
+    {
+        return sprintf(string, "-%s ", name());
+    };
+    inline U32 get_decompress_selective() const
+    {
+        return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+        return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
+    inline void transform(LASpoint* point)
+    {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
+        I64 delta_secs = 1000 * 1000 * (I64)orig_time_offset - 1000 * 1000 * (I64)time_offset;
+        point->gps_time += delta_secs;
+    };
+    LASoperationConvertOffsetGpsToOffsetGps(U16 time_offset)
+    {
+        this->time_offset = time_offset;
+    };
+private:
+    U16 time_offset;
+};
+
+
+
+class LASoperationConvertAdjustedGpsToOffsetGps : public LASoperation
+{
+public:
+    inline const CHAR* name() const
+    {
+        return "adjusted_to_offset";
+    };
+    inline I32 get_command(CHAR* string) const
+    {
+        return sprintf(string, "-%s ", name());
+    };
+    inline U32 get_decompress_selective() const
+    {
+        return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+        return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
+    inline void transform(LASpoint* point)
+    {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
+        point->gps_time += delta_secs;
+    };
+    LASoperationConvertAdjustedGpsToOffsetGps(U16 time_offset)
+    {
+        this->time_offset = time_offset;
+        this->delta_secs = 1000 * 1000 * 1000 - 1000 * 1000 * (I64)time_offset;
+    };
+private:
+    U16 time_offset;
+    I64 delta_secs;
+};
+
+class LASoperationConvertAdjustedGpsOrOffsetGpsToOffsetGps : public LASoperation
+{
+public:
+    inline const CHAR* name() const
+    {
+        return "adjusted_or_offset_to_offset";
+    };
+    inline I32 get_command(CHAR* string) const
+    {
+        return sprintf(string, "-%s ", name());
+    };
+    inline U32 get_decompress_selective() const
+    {
+        return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+        return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
+    inline void transform(LASpoint* point)
+    {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
+        if ((orig_global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0) {
+            I64 delta_secs = 1000 * 1000 * (I64)orig_time_offset - 1000 * 1000 * (I64)time_offset;
+            point->gps_time += delta_secs;
+        }
+        else {
+            I64 delta_secs = 1000 * 1000 * 1000 - 1000 * 1000 * (I64)time_offset;
+            point->gps_time += delta_secs;
+        }
+    };
+    LASoperationConvertAdjustedGpsOrOffsetGpsToOffsetGps(U16 time_offset)
+    {
+        this->time_offset = time_offset;
+    };
+private:
+    U16 time_offset;
+};
+
+
+
+class LASoperationConvertOffsetGpsToWeek : public LASoperation
+{
+public:
+    inline const CHAR* name() const
+    {
+        return "offset_to_week";
+    };
+    inline I32 get_command(CHAR* string) const
+    {
+        return sprintf(string, "-%s ", name());
+    };
+    inline U32 get_decompress_selective() const
+    {
+        return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+        return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
+    inline void transform(LASpoint* point)
+    {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
+        F64 week_float = (point->gps_time / 604800.0 + 1.6534391534391534391534391534392 * (I64)orig_time_offset);
+        I32 week = (I32)week_float;
+        // we should not get negative values, but if we do, they are rounded upwards (towards 0), so fix this and substract one week
+        if (week_float < 0) {
+            week -= 1;
+        }
+        I64 secs = week * 604800 - (I64)orig_time_offset * 1000 * 1000;
+        point->gps_time -= secs;
+        if (point->gps_time == 604800.0)
+        {
+            point->gps_time = 0;
+        }
+    };
+};
+
+class LASoperationConvertAdjustedGpsOrOffsetGpsToWeek : public LASoperation
+{
+public:
+    inline const CHAR* name() const
+    {
+        return "adjusted_or_offset_to_week";
+    };
+    inline I32 get_command(CHAR* string) const
+    {
+        return sprintf(string, "-%s ", name());
+    };
+    inline U32 get_decompress_selective() const
+    {
+        return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+        return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
+    inline void transform(LASpoint* point)
+    {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
+        I64 secs = 0;
+        F64 week_float = 0;
+
+        if ((orig_global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0) {
+            // offset gps time
+            week_float = (point->gps_time / 604800.0 + 1.6534391534391534391534391534392 * (I64)orig_time_offset);
+            I64 week = (I64)week_float;
+            secs = (I64)week * 604800 - (I64)orig_time_offset * 1000 * 1000;
+        }
+        else {
+            // adjusted standard gps time 
+            week_float = (point->gps_time / 604800.0 + 1653.4391534391534391534391534392); 
+            I64 week = (I64)week_float;
+            secs = (I64)week * 604800 - 1000 * 1000 * 1000;
+        }
+
+        // we should not get negative values, but if we do, they are rounded upwards (towards 0), so fix this and substract one week
+        if (week_float < 0) {
+            secs -= 604800;
+        }
+
+        point->gps_time -= secs;
+        
+        // by definition, 0 <= seconds of week < 604800
+        if (point->gps_time == 604800.0)
+        {
+            point->gps_time = 0;
+        }
+    };
+};
+
+class LASoperationConvertWeekToOffsetGps : public LASoperation
+{
+public:
+    inline const CHAR* name() const
+    {
+        return "week_to_offset";
+    };
+    inline I32 get_command(CHAR* string) const
+    {
+        return sprintf(string, "-%s %u ", name(), week);
+    };
+    inline U32 get_decompress_selective() const
+    {
+        return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME;
+    };
+    inline F64* transform_coords_for_offset_adjustment(F64 x, F64 y, F64 z)
+    {
+        return get_offset_adjust_coord_without_trafo_changes(x, y, z);
+    };
+    inline void transform(LASpoint* point)
+    {
+        if (offset_adjust) set_offset_adjust_coord_without_trafo_changes(point);
+
+        point->gps_time += delta_secs;
+    }
+    LASoperationConvertWeekToOffsetGps(U32 week, U16 time_offset)
+    {
+        this->week = week;
+        this->time_offset = time_offset;
+        delta_secs = week;
+        delta_secs *= 604800;
+        delta_secs -= 1000*1000*time_offset;
+    };
+
+private:
+    U32 week;
+    U16 time_offset;
+    I64 delta_secs;
+};
+
 
 class LASoperationForceRGB : public LASoperation
 {
@@ -6699,7 +7021,15 @@ void LAStransform::usage() const
         "Transform gps_time.\n"
         "  -set_gps_time 113556962.005715\n"
         "  -translate_gps_time 40.50\n"
+        "  -adjusted_or_offset_to_adjusted : converts time stamps from Adjusted Standard GPS or Offset GPS to Adjusted Standard GPS\n"
+        "  -adjusted_or_offset_to_offset n : converts time stamps from Adjusted Standard GPS or Offset GPS to Offset GPS [n]\n"
+        "  -adjusted_or_offset_to_week : converts time stamps from Adjusted Standard GPS or Offset GPS to GPS week\n"
         "  -adjusted_to_week : converts time stamps from Adjusted Standard GPS to GPS week\n"
+        "  -adjusted_to_offset n : converts time stamps from Adjusted Standard GPS to Offset GPS [n]\n"
+        "  -offset_to_adjusted : converts time stamps from Offset GPS to Adjusted Standard GPS\n"
+        "  -offset_to_offset n : converts time stamps from Offset GPS to Offset GPS [n]\n"
+        "  -offset_to_week : converts time stamps from Offset GPS to GPS week\n"
+        "  -week_to_offset m n : converts time stamps from GPS week [m] to Offset GPS [n]\n"
         "  -week_to_adjusted n : converts time stamps from GPS week [n] to Adjusted Standard GPS\n"
         "Transform RGB/NIR colors.\n"
         "  -set_RGB 255 0 127\n"
@@ -6747,6 +7077,10 @@ void LAStransform::usage() const
 BOOL LAStransform::parse(int argc, char* argv[])
 {
     int i;
+
+    // check if multiple time shifts are used
+    bool gps_modifier_used = false;
+    std::string gps_modifier = "";
 
     for (i = 1; i < argc; i++)
     {
@@ -10282,11 +10616,151 @@ BOOL LAStransform::parse(int argc, char* argv[])
         }
         else if (strcmp(argv[i], "-adjusted_to_week") == 0)
         {
+            if (gps_modifier_used) {
+                laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+                return FALSE;
+            }
+            gps_modifier_used = true;
+            gps_modifier = argv[i];
             add_operation(new LASoperationConvertAdjustedGpsToWeek());
             *argv[i] = '\0';
         }
+        else if (strcmp(argv[i], "-adjusted_to_offset") == 0)
+        {
+            if (gps_modifier_used) {
+                laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+                return FALSE;
+            }
+            gps_modifier_used = true;
+            gps_modifier = argv[i];
+            if ((i + 1) >= argc)
+            {
+               laserror("'%s' needs 1 argument: time_offset", argv[i]);
+               return FALSE;
+            }
+            U32 time_offset;
+            if (sscanf(argv[i + 1], "%u", &time_offset) != 1)
+            {
+               laserror("'%s' needs 1 argument: time_offset but '%s' is no valid time_offset", argv[i], argv[i + 1]);
+               return FALSE;
+            }
+            if (time_offset > U16_MAX) {
+               laserror("'%s' needs 1 argument: time_offset but '%s' is no valid 16 bit value", argv[i], argv[i + 1]);
+               return FALSE;
+            }
+            add_operation(new LASoperationConvertAdjustedGpsToOffsetGps((U16)time_offset));
+            *argv[i] = '\0';
+            *argv[i + 1] = '\0';
+            i += 1;
+        }
+        else if (strcmp(argv[i], "-adjusted_or_offset_to_offset") == 0)
+        {
+            if (gps_modifier_used) {
+                laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+                return FALSE;
+            }
+            gps_modifier_used = true;
+            gps_modifier = argv[i];
+            if ((i + 1) >= argc)
+            {
+               laserror("'%s' needs 1 argument: time_offset", argv[i]);
+               return FALSE;
+            }
+            U32 time_offset;
+            if (sscanf(argv[i + 1], "%u", &time_offset) != 1)
+            {
+               laserror("'%s' needs 1 argument: time_offset but '%s' is no valid time_offset", argv[i], argv[i + 1]);
+               return FALSE;
+            }
+            if (time_offset > U16_MAX) {
+               laserror("'%s' needs 1 argument: time_offset but '%s' is no valid 16 bit value", argv[i], argv[i + 1]);
+               return FALSE;
+            }
+            add_operation(new LASoperationConvertAdjustedGpsOrOffsetGpsToOffsetGps((U16)time_offset));
+            *argv[i] = '\0';
+            *argv[i + 1] = '\0';
+            i += 1;
+        }
+        else if (strcmp(argv[i], "-offset_to_adjusted") == 0)
+        {
+            if (gps_modifier_used) {
+                laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+                return FALSE;
+            }
+            gps_modifier_used = true;
+            gps_modifier = argv[i];
+            add_operation(new LASoperationConvertOffsetGpsToAdjustedGps());
+            *argv[i] = '\0';
+        }
+        else if (strcmp(argv[i], "-adjusted_or_offset_to_adjusted") == 0)
+        {
+            if (gps_modifier_used) {
+                laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+                return FALSE;
+            }
+            gps_modifier_used = true;
+            gps_modifier = argv[i];
+            add_operation(new LASoperationConvertAdjustedGpsOrOffsetGpsToAdjustedGps());
+            *argv[i] = '\0';
+        }
+        else if (strcmp(argv[i], "-offset_to_offset") == 0)
+        {
+            if (gps_modifier_used) {
+                laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+                return FALSE;
+            }
+            gps_modifier_used = true;
+            gps_modifier = argv[i];
+            if ((i + 1) >= argc)
+            {
+                laserror("'%s' needs 1 argument: time_offset", argv[i]);
+                return FALSE;
+            } 
+            U32 time_offset;
+            if (sscanf(argv[i + 1], "%u", &time_offset) != 1)
+            {
+                laserror("'%s' needs 1 argument: time_offset but '%s' is no valid time_offset", argv[i], argv[i + 1]);
+                return FALSE;
+            }
+            if (time_offset > U16_MAX) {
+                laserror("'%s' needs 1 argument: time_offset but '%s' is no valid 16 bit value", argv[i], argv[i + 1]);
+                return FALSE;
+            }
+            add_operation(new LASoperationConvertOffsetGpsToOffsetGps((U16)time_offset));
+            *argv[i] = '\0';
+            *argv[i + 1] = '\0';
+            i += 1;
+        }
+        else if (strcmp(argv[i], "-offset_to_week") == 0)
+        {
+           if (gps_modifier_used) {
+               laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+               return FALSE;
+           }
+           gps_modifier_used = true;
+           gps_modifier = argv[i];
+           add_operation(new LASoperationConvertOffsetGpsToWeek());
+           *argv[i] = '\0';
+        }
+        else if (strcmp(argv[i], "-adjusted_or_offset_to_week") == 0)
+        {
+           if (gps_modifier_used) {
+               laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+               return FALSE;
+           }
+           gps_modifier_used = true;
+           gps_modifier = argv[i];
+           add_operation(new LASoperationConvertAdjustedGpsOrOffsetGpsToWeek());
+           *argv[i] = '\0';
+        }
         else if (strcmp(argv[i], "-week_to_adjusted") == 0)
         {
+            if (gps_modifier_used) {
+                laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+                return FALSE;
+            }
+            gps_modifier_used = true;
+            gps_modifier = argv[i];
             if ((i + 1) >= argc)
             {
                 laserror("'%s' needs 1 argument: week", argv[i]);
@@ -10302,6 +10776,41 @@ BOOL LAStransform::parse(int argc, char* argv[])
             *argv[i] = '\0';
             *argv[i + 1] = '\0';
             i += 1;
+        }
+        else if (strcmp(argv[i], "-week_to_offset") == 0)
+        {
+            if (gps_modifier_used) {
+                laserror("Cannot use '%s' and '%s' at the same time", argv[i], gps_modifier.c_str());
+                return FALSE;
+            }
+            gps_modifier_used = true;
+            gps_modifier = argv[i];
+            if ((i + 2) >= argc)
+            {
+                laserror("'%s' needs 2 arguments: week time_offset", argv[i]);
+                return FALSE;
+            }
+            U32 week;
+            if (sscanf(argv[i + 1], "%u", &week) != 1)
+            {
+                laserror("'%s' needs 2 arguments: week time_offset but '%s' is no valid week", argv[i], argv[i + 1]);
+                return FALSE;
+            }
+            U32 time_offset;
+            if (sscanf(argv[i + 2], "%u", &time_offset) != 1)
+            {
+                laserror("'%s' needs 2 arguments: week time_offset but '%s' is no valid time_offset", argv[i], argv[i + 1]);
+                return FALSE;
+            }
+            if (time_offset > U16_MAX) {
+                laserror("'%s' needs 2 arguments: week time_offset but '%s' is no valid 16 bit value for time_offset.", argv[i], argv[i + 1]);
+                return FALSE;
+            }
+            add_operation(new LASoperationConvertWeekToOffsetGps(week, (U16)time_offset));
+            *argv[i] = '\0';
+            *argv[i + 1] = '\0';
+            *argv[i + 2] = '\0';
+            i += 2;
         }
         else if (strcmp(argv[i], "-filtered_transform") == 0)
         {
@@ -10794,6 +11303,17 @@ LAStransform::~LAStransform()
 {
     if (operations)
         clean();
+}
+
+// sets the original gps options (time offset, global encoding) to transform from
+void LAStransform::addHeaderInfo(LASreader* lasreader) 
+{
+    if (!operations || !lasreader) return;
+
+    for (U32 i = 0; i < num_operations; i++)
+    {
+        operations[i]->set_gps_origins(lasreader->header.global_encoding, lasreader->header.time_offset);
+    }
 }
 
 /// Calculates a new offset after operations (transformations) to avoid an I32 overflow.

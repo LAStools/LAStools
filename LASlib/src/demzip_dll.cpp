@@ -2886,7 +2886,6 @@ setup_demzip_items(
     // request version depending on las version and point type
     laszip->request_version(laszip->get_default_version(point_type, header->version_major, header->version_minor));
 
-
     // maybe we should change the chunk size
 
     if (demzip_dll->set_chunk_size != LASZIP_CHUNK_SIZE_DEFAULT)

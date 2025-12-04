@@ -661,6 +661,9 @@ BOOL LASreaderMerged::open()
   BOOL first = TRUE;
   BOOL attributes = FALSE;
 
+  BOOL gps_week_warning = FALSE;
+  BOOL gps_non_week_warning = FALSE;
+
   for (i = 0; i < file_name_number; i++)
   {
     // open the lasreader with the next file name
@@ -901,6 +904,40 @@ BOOL LASreaderMerged::open()
           //        if (!reoffset) LASMessage(LAS_WARNING, "files have different offsets: %g %g %g vs %g %g %g", header.x_offset, header.y_offset, header.z_offset, lasreader->header.x_offset, lasreader->header.y_offset, lasreader->header.z_offset);
           reoffset = TRUE;
         }
+        // if we merge a file with gps week into a file without it, the week is unknown, so issue a warning. we keep the week-gps unchanged
+        if ( ((header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) != 0) && 
+             ((lasreader->header.point_data_format & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0)) 
+        {
+            // only relevant if the point format of the current file has gps information (i.e. all but 0 and 2)
+            if ((lasreader->header.point_data_format != 0) && (lasreader->header.point_data_format != 2)) {
+                if (!gps_week_warning) LASMessage(LAS_WARNING, "merging a file with week gps into a file without week gps: cannot transform week gps times, leave their value unchanged.");
+                gps_week_warning = TRUE;
+            }
+        }
+        // if we merge a file without gps week into a file using it, the absolute gps value will be lost, so issue a warning (maybe we could leave gps values untouched?)
+        else if (((header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0) &&
+            ((lasreader->header.point_data_format & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) != 0))
+        {
+            // only relevant if the point format of the current file has gps information (i.e. all but 0 and 2)
+            if ((lasreader->header.point_data_format != 0) && (lasreader->header.point_data_format != 2)) {
+                if (!gps_non_week_warning) LASMessage(LAS_WARNING, "merging a file without week gps into a file with week gps will reduce the gps time stamps to a span of one week.");
+                gps_non_week_warning = TRUE;
+                gps_transform = TRUE;
+            }
+        }
+        // if the gps settings differ, we need to transform them
+        else if (  (   ((header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE))) 
+                    != ((lasreader->header.point_data_format & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE))) )
+                 || (   ((header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG))) 
+                     != ((lasreader->header.point_data_format & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG))) )
+                 || ( ((header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0)
+                      && (header.time_offset != lasreader->header.time_offset) ) 
+                )
+        { 
+            // we need to adjust gps time 
+            gps_transform = TRUE;
+        }
+
         // a point type change could be problematic
         if (header.point_data_format != lasreader->header.point_data_format)
         {
@@ -1088,22 +1125,28 @@ BOOL LASreaderMerged::open()
     }
   }
 
-  if (rescale || reoffset)
+  if (rescale || reoffset || gps_transform)
   {
     if (lasreaderlas)
     {
       delete lasreaderlas;
-      if (rescale && reoffset)
-        lasreaderlas = new LASreaderLASrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
-      else if (rescale)
-        lasreaderlas = new LASreaderLASrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
-      else
-        lasreaderlas = new LASreaderLASreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
+      if (gps_transform) {
+          lasreaderlas = new LASreaderLASrescalereoffsetgps(opener, rescale, reoffset, gps_transform, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset, header.global_encoding, header.time_offset);
+      }
+      else {
+          if (rescale && reoffset)
+              lasreaderlas = new LASreaderLASrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
+          else if (rescale)
+              lasreaderlas = new LASreaderLASrescale(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor);
+          else
+              lasreaderlas = new LASreaderLASreoffset(opener, header.x_offset, header.y_offset, header.z_offset);
+      }
       lasreader = lasreaderlas;
     }
     else if (lasreaderbin)
     {
       delete lasreaderbin;
+      // bin only uses gps week: we cannot properly adjust gps values, so skip gps transform
       if (rescale && reoffset)
         lasreaderbin = new LASreaderBINrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
@@ -1115,6 +1158,7 @@ BOOL LASreaderMerged::open()
     else if (lasreadershp)
     {
       delete lasreadershp;
+      // shp files do not have gps values, so skip gps transform
       if (rescale && reoffset)
         lasreadershp = new LASreaderSHPrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
@@ -1126,6 +1170,7 @@ BOOL LASreaderMerged::open()
     else if (lasreaderasc)
     {
       delete lasreaderasc;
+      // shp files do not have gps values, so skip gps transform
       if (rescale && reoffset)
         lasreaderasc = new LASreaderASCrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
@@ -1137,6 +1182,7 @@ BOOL LASreaderMerged::open()
     else if (lasreaderbil)
     {
       delete lasreaderbil;
+      // bil files do not have gps values, so skip gps transform
       if (rescale && reoffset)
         lasreaderbil = new LASreaderBILrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
@@ -1148,6 +1194,7 @@ BOOL LASreaderMerged::open()
     else if (lasreaderdtm)
     {
       delete lasreaderdtm;
+      // dtm files do not have gps values, so skip gps transform
       if (rescale && reoffset)
         lasreaderdtm = new LASreaderDTMrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
@@ -1159,6 +1206,7 @@ BOOL LASreaderMerged::open()
     else if (lasreaderply)
     {
       delete lasreaderply;
+      // ply only uses gps week: we cannot properly adjust gps values, so skip gps transform
       if (rescale && reoffset)
         lasreaderply = new LASreaderPLYrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
@@ -1170,6 +1218,7 @@ BOOL LASreaderMerged::open()
     else if (lasreaderqfit)
     {
       delete lasreaderqfit;
+      // ply only uses gps day (seconds of current day): we cannot properly adjust gps values, so skip gps transform
       if (rescale && reoffset)
         lasreaderqfit = new LASreaderQFITrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
@@ -1181,6 +1230,7 @@ BOOL LASreaderMerged::open()
     else
     {
       delete lasreadertxt;
+      // gps format unknown, we cannot properly adjust gps values, so skip gps transform
       if (rescale && reoffset)
         lasreadertxt = new LASreaderTXTrescalereoffset(opener, header.x_scale_factor, header.y_scale_factor, header.z_scale_factor, header.x_offset, header.y_offset, header.z_offset);
       else if (rescale)
@@ -1450,6 +1500,7 @@ LASreaderMerged::LASreaderMerged(LASreadOpener* opener) :LASreader(opener)
   file_names_ID = 0;
   bounding_boxes = 0;
   clean();
+  gps_transform = FALSE;
 }
 
 LASreaderMerged::~LASreaderMerged()

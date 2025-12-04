@@ -592,6 +592,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       if (inside_circle) lasreadermerged->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
       if (inside_rectangle) lasreadermerged->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
       if (inside_depth_opener) lasreadermerged->inside_copc_depth(inside_depth_opener, copc_depth, copc_resolution);
+      if (filter) { filter->addHeaderInfo(lasreadermerged); };
+      if (transform) { transform->addHeaderInfo(lasreadermerged); }
+
       LASreader* lasreader = 0;
       if (stored) {
         LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -710,6 +713,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       if (inside_tile) lasreaderbuffered->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
       if (inside_circle) lasreaderbuffered->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
       if (inside_rectangle) lasreaderbuffered->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+      if (filter) { filter->addHeaderInfo(lasreaderbuffered); };
+      if (transform) { transform->addHeaderInfo(lasreaderbuffered); }
+
       LASreader* lasreader = 0;
       if (stored) {
         LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -826,6 +832,8 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         }
 
         if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderlas);
+        if (filter) { filter->addHeaderInfo(lasreaderlas); };
+        if (transform) { transform->addHeaderInfo(lasreaderlas); }
 
         LASreader* lasreader = 0;
         if (stored) {
@@ -883,6 +891,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         if (inside_circle) lasreaderbin->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         if (inside_rectangle) lasreaderbin->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
         if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderbin);
+        if (filter) { filter->addHeaderInfo(lasreaderbin); };
+        if (transform) { transform->addHeaderInfo(lasreaderbin); }
+
         LASreader* lasreader = 0;
         if (stored) {
           LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -934,6 +945,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         if (inside_circle) lasreadershp->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         if (inside_rectangle) lasreadershp->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
         if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreadershp);
+        if (filter) { filter->addHeaderInfo(lasreadershp); };
+        if (transform) { transform->addHeaderInfo(lasreadershp); }
+
         LASreader* lasreader = 0;
         if (stored) {
           LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -985,6 +999,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         if (inside_circle) lasreaderasc->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         if (inside_rectangle) lasreaderasc->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
         if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderasc);
+        if (filter) { filter->addHeaderInfo(lasreaderasc); };
+        if (transform) { transform->addHeaderInfo(lasreaderasc); }
+
         LASreader* lasreader = 0;
         if (stored) {
           LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -1036,6 +1053,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         if (inside_circle) lasreaderbil->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         if (inside_rectangle) lasreaderbil->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
         if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderbil);
+        if (filter) { filter->addHeaderInfo(lasreaderbil); };
+        if (transform) { transform->addHeaderInfo(lasreaderbil); }
+
         LASreader* lasreader = 0;
         if (stored) {
           LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -1087,6 +1107,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         if (inside_circle) lasreaderdtm->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         if (inside_rectangle) lasreaderdtm->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
         if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderdtm);
+        if (filter) { filter->addHeaderInfo(lasreaderdtm); };
+        if (transform) { transform->addHeaderInfo(lasreaderdtm); }
+
         LASreader* lasreader = 0;
         if (stored) {
           LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -1129,6 +1152,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         if (inside_circle) lasreaderply->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         if (inside_rectangle) lasreaderply->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
         if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderply);
+        if (filter) { filter->addHeaderInfo(lasreaderply); };
+        if (transform) { transform->addHeaderInfo(lasreaderply); }
+
         LASreader* lasreader = 0;
         if (stored) {
           LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -1185,6 +1211,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         if (inside_circle) lasreaderqfit->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         if (inside_rectangle) lasreaderqfit->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
         if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreaderqfit);
+        if (filter) { filter->addHeaderInfo(lasreaderqfit); };
+        if (transform) { transform->addHeaderInfo(lasreaderqfit); }
+
         LASreader* lasreader = 0;
         if (stored) {
           LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -1247,6 +1276,8 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         if (inside_circle) lasreadertxt->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
         if (inside_rectangle) lasreadertxt->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
         if (offset_adjust && transform && offset == 0) adjust_offset_when_transformation(lasreadertxt);
+        if (filter) { filter->addHeaderInfo(lasreadertxt); };
+        if (transform) { transform->addHeaderInfo(lasreadertxt); }
 
         LASreader* lasreader = 0;
         if (stored) {
@@ -1309,6 +1340,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       if (inside_tile) lasreadertxt->inside_tile(inside_tile[0], inside_tile[1], inside_tile[2]);
       if (inside_circle) lasreadertxt->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
       if (inside_rectangle) lasreadertxt->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
+      if (filter) { filter->addHeaderInfo(lasreadertxt); };
+      if (transform) { transform->addHeaderInfo(lasreadertxt); }
+
       LASreader* lasreader = 0;
       if (stored) {
         LASreaderStored* lasreaderstored = new LASreaderStored(this);
@@ -1354,6 +1388,9 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
       if (inside_circle) lasreaderlas->inside_circle(inside_circle[0], inside_circle[1], inside_circle[2]);
       if (inside_rectangle) lasreaderlas->inside_rectangle(inside_rectangle[0], inside_rectangle[1], inside_rectangle[2], inside_rectangle[3]);
       if (inside_depth_opener) lasreaderlas->inside_copc_depth(inside_depth_opener, copc_depth, copc_resolution);
+      if (filter) { filter->addHeaderInfo(lasreaderlas); };
+      if (transform) { transform->addHeaderInfo(lasreaderlas); }
+
       LASreader* lasreader = 0;
       if (stored) {
         LASreaderStored* lasreaderstored = new LASreaderStored(this);

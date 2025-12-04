@@ -1571,11 +1571,10 @@ public:
                 json_sub_main_header_entries["time_offset"] = lasheader->time_offset;
             }
             else {
-                fprintf(file_out, "  max gps time:               ");
-                lidardouble2string(printstring.data(), lasheader->max_gps_time);
-                fprintf(file_out, "%s\012", printstring.c_str());
-                fprintf(file_out, "  min gps time:               ");
+                fprintf(file_out, "  min max gps time:           ");
                 lidardouble2string(printstring.data(), lasheader->min_gps_time);
+                fprintf(file_out, "%s ", printstring.c_str());
+                lidardouble2string(printstring.data(), lasheader->max_gps_time);
                 fprintf(file_out, "%s\012", printstring.c_str());
                 fprintf(file_out, "  time offset:                %d\012", lasheader->time_offset);
             }

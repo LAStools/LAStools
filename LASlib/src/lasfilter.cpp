@@ -30,6 +30,7 @@
 */
 #include "lasfilter.hpp"
 #include "lasmessage.hpp"
+#include "lasreader.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1541,13 +1542,19 @@ private:
   U16 below_point_source_id, above_point_source_id;
 };
 
+// for gps filters: if the file uses offset time, the value is translated to adjusted gps time, so the filter input value should always be in adjusted gps time
+
 class LAScriterionKeepGpsTime : public LAScriterion
 {
 public:
   inline const CHAR* name() const { return "keep_gps_time"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_gpstime, above_gpstime); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
-  inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && ((point->gps_time < below_gpstime) || (point->gps_time > above_gpstime))); };
+  inline BOOL filter(const LASpoint* point) { 
+      I64 offset = 0;
+      if ( ((global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) != 0) && ((global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0))
+      { offset = ((I64)time_offset - 1000) * 1000 * 1000; }
+      return (point->have_gps_time && ((point->gps_time < below_gpstime - offset) || (point->gps_time > above_gpstime - offset))); };
   LAScriterionKeepGpsTime(F64 below_gpstime, F64 above_gpstime) { this->below_gpstime = below_gpstime; this->above_gpstime = above_gpstime; };
 private:
   F64 below_gpstime, above_gpstime;
@@ -1559,7 +1566,11 @@ public:
   inline const CHAR* name() const { return "drop_gps_time_below"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), below_gpstime); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
-  inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && (point->gps_time < below_gpstime)); };
+  inline BOOL filter(const LASpoint* point) { 
+      I64 offset = 0;
+      if (((global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) != 0) && ((global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0))
+      { offset = ((I64)time_offset - 1000) * 1000 * 1000; }
+      return (point->have_gps_time && (point->gps_time < below_gpstime - offset)); };
   LAScriterionDropGpsTimeBelow(F64 below_gpstime) { this->below_gpstime = below_gpstime; };
 private:
   F64 below_gpstime;
@@ -1571,7 +1582,12 @@ public:
   inline const CHAR* name() const { return "drop_gps_time_above"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf ", name(), above_gpstime); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
-  inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && (point->gps_time > above_gpstime)); };
+  inline BOOL filter(const LASpoint* point) { 
+      I64 offset = 0;
+      if (((global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) != 0) && ((global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0))
+      { offset = ((I64)time_offset - 1000) * 1000 * 1000; }
+      return (point->have_gps_time && (point->gps_time > above_gpstime - offset)); 
+  };
   LAScriterionDropGpsTimeAbove(F64 above_gpstime) { this->above_gpstime = above_gpstime; };
 private:
   F64 above_gpstime;
@@ -1583,7 +1599,12 @@ public:
   inline const CHAR* name() const { return "drop_gps_time_between"; };
   inline I32 get_command(CHAR* string) const { return sprintf(string, "-%s %lf %lf ", name(), below_gpstime, above_gpstime); };
   inline U32 get_decompress_selective() const { return LASZIP_DECOMPRESS_SELECTIVE_GPS_TIME; };
-  inline BOOL filter(const LASpoint* point) { return (point->have_gps_time && ((below_gpstime <= point->gps_time) && (point->gps_time <= above_gpstime))); };
+  inline BOOL filter(const LASpoint* point) { 
+      I64 offset = 0;
+      if (((global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) != 0) && ((global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0))
+      { offset = ((I64)time_offset - 1000) * 1000 * 1000; }
+      return (point->have_gps_time && ((below_gpstime <= point->gps_time - offset) && (point->gps_time <= above_gpstime - offset))); 
+  };
   LAScriterionDropGpsTimeBetween(F64 below_gpstime, F64 above_gpstime) { this->below_gpstime = below_gpstime; this->above_gpstime = above_gpstime; };
 private:
   F64 below_gpstime, above_gpstime;
@@ -5418,6 +5439,14 @@ void LASfilter::addKeepScanDirectionChange()
 {
   add_criterion(new LAScriterionKeepScanDirectionChange());
 }
+
+void LASfilter::addHeaderInfo(LASreader* lasreader) {
+    for (U32 i = 0; i < num_criteria; i++)
+    {
+        criteria[i]->set_gps_origins(lasreader->header.global_encoding, lasreader->header.time_offset);
+    }
+}
+
 
 BOOL LASfilter::filter(const LASpoint* point)
 {

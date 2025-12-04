@@ -261,17 +261,24 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 
 -add_attribute [m] [n] [o] [p] [q] [t]: adds a new "extra_byte" attribute of data_type [m] name [n] description [o]; optional: scale[p] offset [q] no_data_value [t]  
 -add_empty_vlr [m] [n] [o]          : add an empty VLR with user-id [m], record-id [n] and description [o]  
--adjusted_to_week                   : converts time stamps from Adjusted Standard GPS to GPS week  
--crop_to_bb                         : removes points that falls outsize the bouding box specified in the LAS header  
--crop_to_bounding_box               : removes points that falls outsize the bouding box specified in the LAS header  
+-adjusted_or_offset_to_adjusted     : converts time stamps from either Adjusted Standard GPS or Offset GPS time to Adjusted Standard GPS 
+-adjusted_or_offset_to_offset [n]   : converts time stamps from either Adjusted Standard GPS or Offset GPS time to Offset GPS [n] 
+-adjusted_or_offset_to_week         : converts time stamps from either Adjusted Standard GPS or Offset GPS time to GPS week 
+-adjusted_to_week                   : converts time stamps from Adjusted Standard GPS to GPS week 
+-adjusted_to_offset [n]             : converts time stamps from Adjusted Standard GPS to Offset GPS [n] 
+-crop_to_bb                         : removes points that falls outsize the bounding box specified in the LAS header  
+-crop_to_bounding_box               : removes points that falls outsize the bounding box specified in the LAS header  
 -dont_remove_empty_files            : do not remove files that have zero points remaining from disk  
 -elevation_feet                     : use feet for elevation  
 -feet                               : use feet  
--force                              : force a GPS week conversion even if conversion is suspect.  
+-force                              : force a GPS conversion even if conversion is suspect
 -load_vlrs                          : loads all VLRs from a file called vlrs.vlr and adds them to each processed file  
 -load_vlr [i] [u] [r] [f]           : loads a single VLR specified by index [i] (default = 0) or user ID [u] and record ID [r] from the file [f] (default: save.vlr) and adds it to each processed file header  
 -load_ogc_wkt [f]                   : loads the first single-string from file [f] and puts it into the place of the OGC WKT  
 -move_evlrs_to_vlrs                 : move all EVLRs with small enough payload to VLR section  
+-offset_to_adjusted                 : converts time stamps from Offset GPS to Adjusted Standard GPS
+-offset_to_offset [n]               : converts time stamps from Offset GPS to Offset GPS [n] 
+-offset_to_week                     : converts time stamps from Offset GPS to GPS week 
 -remove_all_evlrs                   : remove all EVLRs  
 -remove_all_vlrs                    : remove all VLRs  
 -remove_evlr [n]                    : remove EVLR with index [n]{0=first}  
@@ -298,6 +305,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -set_point_data_record_length [n]   : CAREFUL! sets the point data record length field of the LAS header to size [n] without checking whether this will corrupt the file  
 -set_point_size [n]                 : force point size to be [n]  
 -set_point_type [n]                 : force point type to be [n]{1-10}  
+-set_time_offset [n]                : set time offset to [n] and set both the global encoding time offset bit and the global encoding gps bit, without converting the timestamps
 -set_version 1.2                    : set LAS version number to 1.2  
 -set_version_major 1                : set LAS major version number to 1  
 -set_version_minor 2                : set LAS minor version number to 2  
@@ -308,6 +316,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -unset_attribute_offset [n]         : unsets the offset of attribute [n]{0=first} in the extra bytes  
 -unset_attribute_scale [n]          : unsets the scale of attribute [n]{0=first} in the extra bytes  
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
+-week_to_offset [m] [n]             : converts time stamps from GPS week [m] Offset GPS to Adjusted Standard GPS [n]
 
 ### Basics
 -cores [n]      : process multiple inputs on [n] cores in parallel  
@@ -680,25 +689,25 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -set_synthetic_flag [0/1]        : set synthetic flag to [0/1]  
 -set_withheld_flag [0/1]         : set withheld flag to [0/1]  
 
-### GPS time
+### GPS time 
 -bin_gps_time_into_intensity [n]    : set intensity time to gps/[n]  
 -bin_gps_time_into_point_source [n] : set point source to gps/[n]  
--drop_gps_time_above [n]            : drop points with GPS time above [n]  
--drop_gps_time_below [n]            : drop points with GPS time below [n]  
--drop_gps_time_between [m] [n]      : drop points with GPS time between [m] and [n]  
--drop_gpstime_above [n]             : drop points with GPS time above [n]  
--drop_gpstime_below [n]             : drop points with GPS time below [n]  
--drop_gpstime_between [m] [n]       : drop points with GPS time between [m] and [n]  
--keep_gps_time [m] [n]              : keep points with GPS time between [m] and [n]  
--keep_gps_time_above [n]            : keep points with GPS time above [n]  
--keep_gps_time_below [n]            : keep points with GPS time below [n]  
--keep_gps_time_between [m] [n]      : keep points with GPS time between [m] and [n]  
--keep_gpstime [m] [n]               : keep points with GPS time between [m] and [n]  
--keep_gpstime_above [n]             : keep points with GPS time above [n]  
--keep_gpstime_below [n]             : keep points with GPS time below [n]  
--keep_gpstime_between [m] [n]       : keep points with GPS time between [m] and [n]  
+-drop_gps_time_above [n]            : drop points with GPS time above [n], offset times are translated to adjusted gps times
+-drop_gps_time_below [n]            : drop points with GPS time below [n], offset times are translated to adjusted gps times
+-drop_gps_time_between [m] [n]      : drop points with GPS time between [m] and [n], offset times are translated to adjusted gps times
+-drop_gpstime_above [n]             : drop points with GPS time above [n], offset times are translated to adjusted gps times  
+-drop_gpstime_below [n]             : drop points with GPS time below [n], offset times are translated to adjusted gps times  
+-drop_gpstime_between [m] [n]       : drop points with GPS time between [m] and [n], offset times are translated to adjusted gps times  
+-keep_gps_time [m] [n]              : keep points with GPS time between [m] and [n], offset times are translated to adjusted gps times  
+-keep_gps_time_above [n]            : keep points with GPS time above [n], offset times are translated to adjusted gps times  
+-keep_gps_time_below [n]            : keep points with GPS time below [n], offset times are translated to adjusted gps times  
+-keep_gps_time_between [m] [n]      : keep points with GPS time between [m] and [n], offset times are translated to adjusted gps times  
+-keep_gpstime [m] [n]               : keep points with GPS time between [m] and [n], offset times are translated to adjusted gps times  
+-keep_gpstime_above [n]             : keep points with GPS time above [n], offset times are translated to adjusted gps times 
+-keep_gpstime_below [n]             : keep points with GPS time below [n], offset times are translated to adjusted gps times  
+-keep_gpstime_between [m] [n]       : keep points with GPS time between [m] and [n], offset times are translated to adjusted gps times  
 -set_gps_time [n]                   : set gps time to [n]  
--translate_gps_time [n]             : translate GPS time by [n]  
+-translate_gps_time [n]             : translate GPS time by [n] 
 
 ### Intensity
 -bin_gps_time_into_intensity [n]    : set intensity time to gps/[n]  

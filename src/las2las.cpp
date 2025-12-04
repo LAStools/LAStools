@@ -566,6 +566,7 @@ int main(int argc, char* argv[])
   int set_point_data_format = -1;
   int set_point_data_record_length = -1;
   int set_global_encoding_gps_bit = -1;
+  int set_time_offset = -1;
   int set_lastiling_buffer_flag = -1;
   // variable header changes
   bool ogc_wkt_in_header = false;
@@ -617,6 +618,18 @@ int main(int argc, char* argv[])
   GeoProjectionConverter geoprojectionconverter;
   LASwriteOpener laswriteopener;
 
+  enum class gps_time_type
+  {
+      NONE,
+      GPS_WEEK_TIME,
+      ADJUSTED_GPS_TIME,
+      OFFSET_GPS_TIME,
+      ADJUSTED_OR_OFFSET_GPS_TIME
+  };
+
+  gps_time_type verify_current_gps_time_type = gps_time_type::NONE;
+
+
   if (argc == 1)
   {
 #ifdef COMPILE_WITH_GUI
@@ -635,21 +648,90 @@ int main(int argc, char* argv[])
   }
   else
   {
-    for (i = 1; i < argc; i++)
-    {
-      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
-      if (strcmp(argv[i], "-week_to_adjusted") == 0)
+      for (i = 1; i < argc; i++)
       {
-        set_global_encoding_gps_bit = 1;
+          if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
+          if (strcmp(argv[i], "-week_to_adjusted") == 0)
+          {
+              set_global_encoding_gps_bit = 1;
+              verify_current_gps_time_type = gps_time_type::GPS_WEEK_TIME;
+          }
+          else if (strcmp(argv[i], "-offset_to_adjusted") == 0) {
+              set_global_encoding_gps_bit = 1;
+              verify_current_gps_time_type = gps_time_type::OFFSET_GPS_TIME;
+          }
+          else if (strcmp(argv[i], "-adjusted_or_offset_to_adjusted") == 0) {
+              set_global_encoding_gps_bit = 1;
+              verify_current_gps_time_type = gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME;
+          }
+          else if (strcmp(argv[i], "-adjusted_to_week") == 0)
+          {
+              set_global_encoding_gps_bit = 0;
+              verify_current_gps_time_type = gps_time_type::ADJUSTED_GPS_TIME;
+          }
+          else if (strcmp(argv[i], "-adjusted_or_offset_to_week") == 0)
+          {
+              set_global_encoding_gps_bit = 0;
+              verify_current_gps_time_type = gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME;
+          }
+          else if (strcmp(argv[i], "-offset_to_week") == 0)
+          {
+              set_global_encoding_gps_bit = 0;
+              verify_current_gps_time_type = gps_time_type::OFFSET_GPS_TIME;
+          }
+          else if (strcmp(argv[i], "-adjusted_to_offset") == 0)
+          {
+              lastool.parse_arg_cnt_check(i, 1, "time_offset");
+              if (sscanf_las(argv[i + 1], "%u", &set_time_offset) != 1)
+              {
+                  lastool.error_parse_arg_n_invalid(i, 1);
+              }
+              if (set_time_offset < 0) {
+                  set_time_offset = 0;
+              }
+              verify_current_gps_time_type = gps_time_type::ADJUSTED_GPS_TIME;
+          }
+          else if (strcmp(argv[i], "-adjusted_or_offset_to_offset") == 0)
+          {
+              lastool.parse_arg_cnt_check(i, 1, "time_offset");
+              if (sscanf_las(argv[i + 1], "%u", &set_time_offset) != 1)
+              {
+                  lastool.error_parse_arg_n_invalid(i, 1);
+              }
+              if (set_time_offset < 0) {
+                  set_time_offset = 0;
+              }
+              verify_current_gps_time_type = gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME;
+          }
+          else if (strcmp(argv[i], "-week_to_offset") == 0)
+          {
+              lastool.parse_arg_cnt_check(i, 2, "week time_offset");
+              // week only used in lastransform, so we can skip it here
+              if (sscanf_las(argv[i + 2], "%u", &set_time_offset) != 1)
+              {
+                  lastool.error_parse_arg_n_invalid(i, 2);
+              }
+              if (set_time_offset < 0) {  
+                  set_time_offset = 0;
+              }
+              verify_current_gps_time_type = gps_time_type::GPS_WEEK_TIME;
+          }
+          else if (strcmp(argv[i], "-offset_to_offset") == 0)
+          {
+              lastool.parse_arg_cnt_check(i, 1, "time_offset");
+              if (sscanf_las(argv[i + 1], "%u", &set_time_offset) != 1)
+              {
+                  lastool.error_parse_arg_n_invalid(i, 1);
+              }
+              if (set_time_offset < 0) {
+                  set_time_offset = 0;
+              }
+              verify_current_gps_time_type = gps_time_type::OFFSET_GPS_TIME;
+          }
       }
-      else if (strcmp(argv[i], "-adjusted_to_week") == 0)
-      {
-        set_global_encoding_gps_bit = 0;
-      }
-    }
-    geoprojectionconverter.parse(argc, argv);
-    lasreadopener.parse(argc, argv);
-    laswriteopener.parse(argc, argv);
+      geoprojectionconverter.parse(argc, argv);
+      lasreadopener.parse(argc, argv);
+      laswriteopener.parse(argc, argv);
   }
 
   auto arg_local = [&](int& i) -> bool {
@@ -1202,7 +1284,8 @@ int main(int argc, char* argv[])
       LASpoint* point = 0;
 
       // prepare the header for output
-
+      
+      /*
       if (set_global_encoding_gps_bit != -1)
       {
         if (set_global_encoding_gps_bit == 0)
@@ -1231,6 +1314,85 @@ int main(int argc, char* argv[])
         {
           LASMessage(LAS_WARNING, "ignoring invalid option '-set_global_encoding_gps_bit %d'", set_global_encoding_gps_bit);
         }
+      }
+      */
+
+      // verify gps time type matches specified source type
+      if (verify_current_gps_time_type != gps_time_type::NONE) {
+          if (verify_current_gps_time_type == gps_time_type::GPS_WEEK_TIME) {
+              if ((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) != 0)
+              {
+                  lastool.laswarnforce("global encoding indicates file is not in GPS week time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
+              }
+          }
+          else if (verify_current_gps_time_type == gps_time_type::ADJUSTED_GPS_TIME) {
+              if (((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0) || ((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0))
+              {
+                  lastool.laswarnforce("global encoding indicates file is not in Adjusted Standard GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
+              }
+          }
+          else if (verify_current_gps_time_type == gps_time_type::OFFSET_GPS_TIME) {
+              if (((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0) || ((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) == 0))
+              {
+                  lastool.laswarnforce("global encoding indicates file is not in Offset GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
+              }
+          }
+          else if (verify_current_gps_time_type == gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME) {
+              if (((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0))
+              {
+                  lastool.laswarnforce("global encoding indicates file is neither in Adjusted Standard GPS nor in Offset GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
+              }
+          }
+      }
+      else {
+          // if we do not convert and still set options, we keep the old checks for consistency 
+          if (set_global_encoding_gps_bit != -1)
+          {
+              if (set_global_encoding_gps_bit == 0)
+              {
+                  if ((lasreader->header.global_encoding & 1) == 0)
+                  {
+                      lastool.laswarnforce("global encoding indicates file already in GPS week time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
+                  }
+              }
+              else if (set_global_encoding_gps_bit == 1)
+              {
+                  if ((lasreader->header.global_encoding & 1) == 1)
+                  {
+                      lastool.laswarnforce("global encoding indicates file already in Adjusted Standard GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
+                  }
+              }
+          }
+      }
+
+      // offset gps time?
+      if (set_time_offset > -1) {
+          if ((lasreader->header.version_minor >= 5) || (set_version_minor >= 5))
+          {
+              if (set_global_encoding_gps_bit > -1) {
+                  laserror("cannot set global encoding gps bit and set Offset GPS Time at the same time.");
+              }
+              lasreader->header.global_encoding |= ((1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE) | (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG));
+              lasreader->header.time_offset = set_time_offset;
+          }
+          else {
+              laserror("LAS %d.%d does not support Offset GPS Time, require at least LAS 1.5.", lasreader->header.version_major, (set_version_minor >= 0 ? set_version_minor : lasreader->header.version_minor));
+          }
+      }
+      else if (set_global_encoding_gps_bit != -1) {
+          if (set_global_encoding_gps_bit == 0) {
+              lasreader->header.global_encoding &= ~((1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE) | (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG));
+              lasreader->header.time_offset = 0;
+          }
+          else if (set_global_encoding_gps_bit == 1) {
+              lasreader->header.global_encoding |= (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE);
+              lasreader->header.global_encoding &= ~(1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG);
+              lasreader->header.time_offset = 0;
+          }
+          else
+          {
+              LASMessage(LAS_WARNING, "ignoring invalid option '-set_global_encoding_gps_bit %d'", set_global_encoding_gps_bit);
+          }
       }
 
       if (set_attribute_scales)
@@ -1312,9 +1474,11 @@ int main(int argc, char* argv[])
 
       if (set_point_data_format > 5)
       {
-        if (set_version_minor == -1)
+        if (set_version_minor == -1) 
         {
-          set_version_minor = 4;
+            if (lasreader->header.version_minor < 4) {
+                set_version_minor = 4;
+            }
         }
       }
 
@@ -1505,6 +1669,55 @@ int main(int argc, char* argv[])
               }
             }
           }
+        }
+       else if ((set_version_minor >= 5) && (lasreader->header.point_data_format <= 5)) {
+            // LAS 1.5 does not support point data formats 0 - 5 anymore, upgrade them
+            if (set_point_data_format == -1) // we accept unsupported point format if user requests it
+            {
+                switch (lasreader->header.point_data_format)
+                {
+                case 0:
+                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 6 and point_data_record_length from %d to %d",
+                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 10);
+                    lasreader->header.point_data_format = 6;
+                    lasreader->header.point_data_record_length += 10;
+                    break;
+                case 1:
+                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 6 and point_data_record_length from %d to %d",
+                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 2);
+                    lasreader->header.point_data_format = 6;
+                    lasreader->header.point_data_record_length += 2;
+                    break;
+                case 2:
+                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 7 and point_data_record_length from %d to %d",
+                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 10);
+                    lasreader->header.point_data_format = 7;
+                    lasreader->header.point_data_record_length += 10;
+                    break;
+                case 3:
+                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 7 and point_data_record_length from %d to %d",
+                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 2);
+                    lasreader->header.point_data_format = 7;
+                    lasreader->header.point_data_record_length += 2;
+                    break;
+                case 4:
+                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 9 and point_data_record_length from %d to %d",
+                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 2);
+                    lasreader->header.point_data_format = 9;
+                    lasreader->header.point_data_record_length += 2;
+                    break;
+                case 5:
+                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 10 and point_data_record_length from %d to %d",
+                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 4);
+                    lasreader->header.point_data_format = 10;
+                    lasreader->header.point_data_record_length += 4;
+                    break;
+                default:
+                    laserror("unknown point_data_format %d", lasreader->header.point_data_format);
+                }
+                point = new LASpoint;
+                lasreader->header.clean_laszip();
+            }
         }
 
         lasreader->header.version_minor = (U8)set_version_minor;
@@ -1739,7 +1952,7 @@ int main(int argc, char* argv[])
       {
         point->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
       }
-
+      
       // reproject or just set the projection?
       LASquantizer* reproject_quantizer = 0;
       bool set_projection_in_header = false;
@@ -2181,12 +2394,12 @@ int main(int argc, char* argv[])
                 continue;
               }
             }
-        
+
             if (reproject_quantizer)
             {
-              lasreader->point.compute_coordinates();
-              geoprojectionconverter.to_target(lasreader->point.coordinates);
-              lasreader->point.compute_XYZ(reproject_quantizer);
+                lasreader->point.compute_coordinates();
+                geoprojectionconverter.to_target(lasreader->point.coordinates);
+                lasreader->point.compute_XYZ(reproject_quantizer);
             }
             lasinventory.add(&lasreader->point);
 
