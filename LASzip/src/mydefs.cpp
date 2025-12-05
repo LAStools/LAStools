@@ -781,15 +781,16 @@ std::string DoubleToString(double dd, short decimals, bool trim_right_zeros) {
 }
 
 std::string CcToUnderline(const std::string& in) {
-  std::string res = "";
+  std::string res;
+  res.reserve(in.size() * 2);
   for (size_t ii = 0; ii < in.size(); ii++) {
     if (isupper(in[ii])) {
       if (ii > 0) {
-        res = '_' + res;
+        res.push_back('_');
       }
-      res = tolower(in[ii]);
+      res.push_back(tolower(in[ii]));
     } else {
-      res = in[ii];
+      res.push_back(in[ii]);
     }
   }
   return res;
