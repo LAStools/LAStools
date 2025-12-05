@@ -2112,13 +2112,13 @@ BOOL LASreaderLASrescalereoffsetgps::open(ByteStreamIn* stream, BOOL peek_only, 
 
 BOOL LASreaderLASrescalereoffsetgps::read_point_default() {
     if (rescale & reoffset) {
-        if (!LASreaderLASrescalereoffset::read_point_default()) return FALSE;
-    }
-    else if (rescale) {
-        if (!LASreaderLASrescale::read_point_default()) return FALSE;
-    }
-    else if (reoffset) {
-        if (!LASreaderLASreoffset::read_point_default()) return FALSE;
+      if (!LASreaderLASrescalereoffset::read_point_default()) return FALSE;
+    } else if (rescale) {
+      if (!LASreaderLASrescale::read_point_default()) return FALSE;
+    } else if (reoffset) {
+      if (!LASreaderLASreoffset::read_point_default()) return FALSE;
+    } else {
+      if (!LASreaderLAS::read_point_default()) return FALSE;
     }
 
     if (point.have_gps_time && point.gps_time != 0) {
