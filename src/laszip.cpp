@@ -411,7 +411,7 @@ int main(int argc, char *argv[])
       {
         if (lasreader->p_cnt != lasreader->npoints)
         {
-          LASMessage(LAS_INFO, "FAILED integrity check for '%s' after %lld of %lld points", lasreadopener.get_file_name(), lasreader->p_cnt, lasreader->npoints);
+          LASMessage(LAS_WARNING, "FAILED integrity check for '%s' after %lld of %lld points", lasreadopener.get_file_name(), lasreader->p_cnt, lasreader->npoints);
         }
         else
         {
