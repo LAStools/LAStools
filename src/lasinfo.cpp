@@ -1340,7 +1340,7 @@ public:
             if (json_out) {
               std::vector<char> buffer(256);
               int length = snprintf(
-                  buffer.data(), buffer.size(), "merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.\012",
+                  buffer.data(), buffer.size(), "merged file has %lld points, more than the 32 bits counters of LAS 1.%d can handle.",
                   lasreader->npoints, lasreader->header.version_minor);
               buffer.resize(length);
               json_sub_main_header_entries["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -2562,7 +2562,7 @@ public:
           if (json_out) {
             std::vector<char> buffer(256);
             int length = snprintf(
-                buffer.data(), buffer.size(), "there is coordinate resolution fluff (x10) in %s%s%s\012", (lassummary.has_fluff(0) ? "X" : ""),
+                buffer.data(), buffer.size(), "there is coordinate resolution fluff (x10) in %s%s%s", (lassummary.has_fluff(0) ? "X" : ""),
                 (lassummary.has_fluff(1) ? "Y" : ""), (lassummary.has_fluff(2) ? "Z" : ""));
             buffer.resize(length);
             json_sub_main["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -2575,7 +2575,7 @@ public:
             if (json_out) {
               std::vector<char> buffer(256);
               int length = snprintf(
-                  buffer.data(), buffer.size(), "there is serious coordinate resolution fluff (x100) in %s%s%s\012",
+                  buffer.data(), buffer.size(), "there is serious coordinate resolution fluff (x100) in %s%s%s",
                   (lassummary.has_serious_fluff(0) ? "X" : ""), (lassummary.has_serious_fluff(1) ? "Y" : ""),
                   (lassummary.has_serious_fluff(2) ? "Z" : ""));
               buffer.resize(length);
@@ -2590,7 +2590,7 @@ public:
               if (json_out) {
                 std::vector<char> buffer(256);
                 int length = snprintf(
-                    buffer.data(), buffer.size(), "there is very serious coordinate resolution fluff (x1000) in %s%s%s\012",
+                    buffer.data(), buffer.size(), "there is very serious coordinate resolution fluff (x1000) in %s%s%s",
                     (lassummary.has_very_serious_fluff(0) ? "X" : ""), (lassummary.has_very_serious_fluff(1) ? "Y" : ""),
                     (lassummary.has_very_serious_fluff(2) ? "Z" : ""));
                 buffer.resize(length);
@@ -2605,7 +2605,7 @@ public:
                 if (json_out) {
                   std::vector<char> buffer(256);
                   int length = snprintf(
-                      buffer.data(), buffer.size(), "there is extremely serious coordinate resolution fluff (x10000) in %s%s%s\012",
+                      buffer.data(), buffer.size(), "there is extremely serious coordinate resolution fluff (x10000) in %s%s%s",
                       (lassummary.has_extremely_serious_fluff(0) ? "X" : ""), (lassummary.has_extremely_serious_fluff(1) ? "Y" : ""),
                       (lassummary.has_extremely_serious_fluff(2) ? "Z" : ""));
                   buffer.resize(length);
@@ -2958,7 +2958,7 @@ public:
                   std::vector<char> buffer(256);
                   int length = snprintf(
                       buffer.data(), buffer.size(),
-                      "WARNING: real number of point records (%u) is different from header entry (%u). it was repaired. \n", number_of_point_records,
+                      "WARNING: real number of point records (%u) is different from header entry (%u). it was repaired.", number_of_point_records,
                       lasheader->number_of_point_records);
                   buffer.resize(length);
                   json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -2973,7 +2973,7 @@ public:
                 if (json_out) {
                   std::vector<char> buffer(256);
                   int length = snprintf(
-                      buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.\n",
+                      buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) exceeds 4,294,967,295. cannot repair. too big.",
                       lassummary.number_of_point_records);
                   buffer.resize(length);
                   json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -2992,7 +2992,7 @@ public:
                   std::vector<char> buffer(256);
                   int length = snprintf(
                       buffer.data(), buffer.size(),
-                      "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.\n",
+                      "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead zero. it was repaired.",
                       lassummary.number_of_point_records, lasheader->number_of_point_records);
                   buffer.resize(length);
                   json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3018,7 +3018,7 @@ public:
                 if (json_out) {
                   std::vector<char> buffer(256);
                   int length = snprintf(
-                      buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) is different from header entry (%u).\n",
+                      buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) is different from header entry (%u).",
                       lassummary.number_of_point_records, lasheader->number_of_point_records);
                   buffer.resize(length);
                   json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3031,7 +3031,7 @@ public:
                 if (json_out) {
                   std::vector<char> buffer(256);
                   int length = snprintf(
-                      buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) exceeds 4,294,967,295.\n",
+                      buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) exceeds 4,294,967,295.",
                       lassummary.number_of_point_records);
                   buffer.resize(length);
                   json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3043,7 +3043,7 @@ public:
                   std::vector<char> buffer(256);
                   int length = snprintf(
                       buffer.data(), buffer.size(),
-                      "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead of zero.\n",
+                      "WARNING: real number of point records (%lld) exceeds 4,294,967,295. but header entry is %u instead of zero.",
                       lassummary.number_of_point_records, lasheader->number_of_point_records);
                   buffer.resize(length);
                   json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3065,7 +3065,7 @@ public:
             if (json_out) {
               std::vector<char> buffer(256);
               int length = snprintf(
-                  buffer.data(), buffer.size(), "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s\n",
+                  buffer.data(), buffer.size(), "WARNING: point type is %d but (legacy) number of point records in header is %u instead zero.%s",
                   lasheader->point_data_format, lasheader->number_of_point_records, (repair_counters ? "it was repaired." : ""));
               buffer.resize(length);
               json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3103,7 +3103,7 @@ public:
               if (json_out) {
                 std::vector<char> buffer(256);
                 int length = snprintf(
-                    buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s\n",
+                    buffer.data(), buffer.size(), "WARNING: real number of point records (%lld) is different from extended header entry (%lld).%s",
                     lassummary.number_of_point_records, lasheader->extended_number_of_point_records, (repair_counters ? " it was repaired." : ""));
                 buffer.resize(length);
                 json_point_extended_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3148,7 +3148,7 @@ public:
                     std::vector<char> buffer(256);
                     int length = snprintf(
                         buffer.data(), buffer.size(),
-                        "WARNING: for return %d real number of points by return (%u) is different from header entry (%u).%s\n", i,
+                        "WARNING: for return %d real number of points by return (%u) is different from header entry (%u).%s", i,
                         number_of_points_by_return[i - 1], lasheader->number_of_points_by_return[i - 1],
                         (repair_counters ? " it was repaired." : ""));
                     buffer.resize(length);
@@ -3164,7 +3164,7 @@ public:
                     std::vector<char> buffer(256);
                     int length = snprintf(
                         buffer.data(), buffer.size(),
-                        "WARNING: for return %d real number of points by return is %u but header entry was not set.%s\n", i,
+                        "WARNING: for return %d real number of points by return is %u but header entry was not set.%s", i,
                         number_of_points_by_return[i - 1], (repair_counters ? " it was repaired." : ""));
                     buffer.resize(length);
                     json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3180,7 +3180,7 @@ public:
                 if (json_out) {
                   std::vector<char> buffer(256);
                   int length = snprintf(
-                      buffer.data(), buffer.size(), "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s\n", i,
+                      buffer.data(), buffer.size(), "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295.%s", i,
                       lassummary.number_of_points_by_return[i], (repair_counters ? " cannot repair. too big." : ""));
                   buffer.resize(length);
                   json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3199,7 +3199,7 @@ public:
                   int length = snprintf(
                       buffer.data(), buffer.size(),
                       "WARNING: for return %d real number of points by return (%lld) exceeds 4,294,967,295. but header entry is %u instead "
-                      "zero.%s\n",
+                      "zero.%s",
                       i, lassummary.number_of_points_by_return[i], lasheader->number_of_points_by_return[i - 1],
                       (repair_counters ? " it was repaired." : ""));
                   buffer.resize(length);
@@ -3224,7 +3224,7 @@ public:
                 std::vector<char> buffer(256);
                 int length = snprintf(
                     buffer.data(), buffer.size(),
-                    "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s\n",
+                    "WARNING: point type is %d but (legacy) number of points by return [%d] in header is %u instead zero.%s",
                     lasheader->point_data_format, i, lasheader->number_of_points_by_return[i - 1], (repair_counters ? "it was repaired." : ""));
                 buffer.resize(length);
                 json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3273,7 +3273,7 @@ public:
                     std::vector<char> buffer(256);
                     int length = snprintf(
                         buffer.data(), buffer.size(),
-                        "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s\n", i,
+                        "WARNING: real extended number of points by return [%d] is %lld - different from header entry %lld.%s", i,
                         lassummary.number_of_points_by_return[i], lasheader->extended_number_of_points_by_return[i - 1],
                         (repair_counters ? " it was repaired." : ""));
                     buffer.resize(length);
@@ -3289,7 +3289,7 @@ public:
                     std::vector<char> buffer(256);
                     int length = snprintf(
                         buffer.data(), buffer.size(),
-                        "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s\n", i,
+                        "WARNING: real extended number of points by return [%d] is %lld but header entry was not set.%s", i,
                         lassummary.number_of_points_by_return[i], (repair_counters ? " it was repaired." : ""));
                     buffer.resize(length);
                     json_point_extended_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3324,7 +3324,7 @@ public:
             if (json_out) {
               std::vector<char> buffer(256);
               int length = snprintf(
-                  buffer.data(), buffer.size(), "WARNING: there %s %lld point%s with return number 0\n",
+                  buffer.data(), buffer.size(), "WARNING: there %s %lld point%s with return number 0",
                   (lassummary.number_of_points_by_return[0] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[0],
                   (lassummary.number_of_points_by_return[0] > 1 ? "s" : ""));
               buffer.resize(length);
@@ -3340,7 +3340,7 @@ public:
               if (json_out) {
                 std::vector<char> buffer(256);
                 int length = snprintf(
-                    buffer.data(), buffer.size(), "WARNING: there %s %lld point%s with return number 6\n",
+                    buffer.data(), buffer.size(), "WARNING: there %s %lld point%s with return number 6",
                     (lassummary.number_of_points_by_return[6] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[6],
                     (lassummary.number_of_points_by_return[6] > 1 ? "s" : ""));
                 buffer.resize(length);
@@ -3355,7 +3355,7 @@ public:
               if (json_out) {
                 std::vector<char> buffer(256);
                 int length = snprintf(
-                    buffer.data(), buffer.size(), "WARNING: there %s %lld point%s with return number 7\n",
+                    buffer.data(), buffer.size(), "WARNING: there %s %lld point%s with return number 7",
                     (lassummary.number_of_points_by_return[7] > 1 ? "are" : "is"), lassummary.number_of_points_by_return[7],
                     (lassummary.number_of_points_by_return[7] > 1 ? "s" : ""));
                 buffer.resize(length);
@@ -3399,7 +3399,7 @@ public:
             if (json_out) {
               std::vector<char> buffer(256);
               int length = snprintf(
-                  buffer.data(), buffer.size(), "WARNING: there are %lld points with a number of returns of given pulse of 0\n",
+                  buffer.data(), buffer.size(), "WARNING: there are %lld points with a number of returns of given pulse of 0",
                   lassummary.number_of_returns[0]);
               buffer.resize(length);
               json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
@@ -3668,7 +3668,7 @@ public:
             if (!no_warnings && file_out) {
               if (json_out) {
                 std::vector<char> buffer(256);
-                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real max x larger than header max x by %lf\n", value - lasheader->max_x);
+                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real max x larger than header max x by %lf", value - lasheader->max_x);
                 buffer.resize(length);
                 json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else {
@@ -3681,7 +3681,7 @@ public:
             if (!no_warnings && file_out) {
               if (json_out) {
                 std::vector<char> buffer(256);
-                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real min x smaller than header min x by %lf\n", lasheader->min_x - value);
+                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real min x smaller than header min x by %lf", lasheader->min_x - value);
                 buffer.resize(length);
                 json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else {
@@ -3694,7 +3694,7 @@ public:
             if (!no_warnings && file_out) {
               if (json_out) {
                 std::vector<char> buffer(256);
-                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real max y larger than header max y by %lf\n", value - lasheader->max_y);
+                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real max y larger than header max y by %lf", value - lasheader->max_y);
                 buffer.resize(length);
                 json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else {
@@ -3707,7 +3707,7 @@ public:
             if (!no_warnings && file_out) {
               if (json_out) {
                 std::vector<char> buffer(256);
-                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real min y smaller than header min y by %lf\n", lasheader->min_y - value);
+                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real min y smaller than header min y by %lf", lasheader->min_y - value);
                 buffer.resize(length);
                 json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else {
@@ -3720,7 +3720,7 @@ public:
             if (!no_warnings && file_out) {
               if (json_out) {
                 std::vector<char> buffer(256);
-                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real max z larger than header max z by %lf\n", value - lasheader->max_z);
+                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real max z larger than header max z by %lf", value - lasheader->max_z);
                 buffer.resize(length);
                 json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else {
@@ -3733,7 +3733,7 @@ public:
             if (!no_warnings && file_out) {
               if (json_out) {
                 std::vector<char> buffer(256);
-                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real min z smaller than header min z by %lf\n", lasheader->min_z - value);
+                int length = snprintf(buffer.data(), buffer.size(), "WARNING: real min z smaller than header min z by %lf", lasheader->min_z - value);
                 buffer.resize(length);
                 json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else {
