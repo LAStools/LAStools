@@ -790,7 +790,7 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
         // Creation of the COPC index
         if (lasreaderlas->header.vlr_copc_entries) {
           if (index) {
-            LASMessage(LAS_WARNING, "both LAX file and COPC spatial indexing registered. COPC has the precedence.");
+            LASMessage(LAS_WARNING, "lasindex is ignored due to the COPC index, but COPC is not used by LAStools. Consider removing the COPC index during a LAStools pipeline.");
             lasreaderlas->set_index(0);
           }
 
