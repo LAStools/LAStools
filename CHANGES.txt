@@ -1,5 +1,8 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+12 December 2025 -- NEW: LAStools support for LAS 1.5 files and transformations
+12 December 2025 -- fix: lasinfo: formatted string output to JSON
+12 December 2025 -- fix: laszip: report -check failures as warning, not just info
 28 November 2025 -- NEW: logging: auto summarize of recurring log entries
 28 November 2025 -- fix: lasclip: split function on multi polygon
 22 November 2025 -- fix: PROJ/GDAL dynamic DLL/SO loader
