@@ -464,6 +464,24 @@ bool HasFileExt(std::string fn, std::string ext) {
   return (fn.substr(fn.find_last_of(".")) == ext);
 }
 
+/// Returns true if the extension pattern contains '*' or '?' wildcards
+/// Use this to decide whether wildcard based matching is required
+bool HasFileExtWildcard(const std::string& ext) {
+  return ext.find('*') != std::string::npos || ext.find('?') != std::string::npos;
+}
+
+/// Matches a string against a wildcard pattern supporting '*' and '?'
+/// Use this only when wildcard characters are present in the extension
+bool wildcardMatch(const char* pattern, const char* str) {
+  if (*pattern == '\0') return *str == '\0';
+
+  if (*pattern == '*') return wildcardMatch(pattern + 1, str) || (*str && wildcardMatch(pattern, str + 1));
+
+  if (*pattern == '?' || *pattern == *str) return wildcardMatch(pattern + 1, str + 1);
+
+  return false;
+}
+
 // replace file extension of input_file with new extension (with or without leading '.')
 std::string FileExtSet(std::string fn_in, std::string ext_new) {
   if (!ext_new.empty() && (ext_new[0] != '.')) ext_new = '.' + ext_new;
@@ -486,6 +504,21 @@ std::string getFileExtension(const char* filepath) {
   // Optional: in lowercase letters
   for (char& c : ext) c = std::tolower(static_cast<unsigned char>(c));
   return ext;
+}
+
+/// Compares a file extension with an extension pattern, supporting both strict and wildcard matching
+/// Use this to compare extensions, where the extension pattern may contain '*' or '?'
+bool matchExtension(const std::string& filename, std::string ext) {
+  if (ext.empty()) return true;
+
+  // extract extension from filename
+  std::string fileExt = getFileExtension(filename.c_str());
+
+  if (HasFileExtWildcard(ext)) {
+    return wildcardMatch(ext.c_str(), fileExt.c_str());
+  } else {
+    return HasFileExt(fileExt, ext);
+  }
 }
 
 // checks if given file is a las/laz file
