@@ -41,23 +41,23 @@ class ByteStreamOut;
 class LASintervalCell
 {
 public:
-  U32 start;
-  U32 end;
+  U64 start;
+  U64 end;
   LASintervalCell* next;
   LASintervalCell();
-  LASintervalCell(const U32 p_index);
+  LASintervalCell(const U64 p_index);
   LASintervalCell(const LASintervalCell* cell);
 };
 
 class LASintervalStartCell : public LASintervalCell
 {
 public:
-  U32 full;
-  U32 total;
+  U64 full;
+  U64 total;
   LASintervalCell* last;
   LASintervalStartCell();
-  LASintervalStartCell(const U32 p_index);
-  BOOL add(const U32 p_index, const U32 threshold=1000);
+  LASintervalStartCell(const U64 p_index);
+  BOOL add(const U64 p_index, const U32 threshold=1000);
 };
 
 class LASinterval
@@ -67,7 +67,7 @@ public:
   ~LASinterval();
 
   // add points and create cells with intervals
-  BOOL add(const U32 p_index, const I32 c_index);
+  BOOL add(const U64 p_index, const I32 c_index);
 
   // get total number of cells
   U32 get_number_cells() const;
@@ -80,6 +80,9 @@ public:
 
   // merge adjacent intervals with small gaps in cells to reduce total interval number to maximum
   void merge_intervals(U32 maximum);
+
+  //is cell start or end 64bits? 
+  BOOL requires_64bit_intervals() const;
 
   // read from file or write to file
   BOOL read(ByteStreamIn* stream);
@@ -103,10 +106,10 @@ public:
   BOOL has_intervals();
 
   I32 index;
-  U32 start;
-  U32 end;
-  U32 full;
-  U32 total;
+  U64 start;
+  U64 end;
+  U64 full;
+  U64 total;
 
 private:
   void* cells;

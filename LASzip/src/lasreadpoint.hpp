@@ -63,7 +63,7 @@ public:
   BOOL setup(const U32 num_items, const LASitem* items, const LASzip* laszip=0);
 
   BOOL init(ByteStreamIn* instream);
-  BOOL seek(const U32 current, const U32 target);
+  BOOL seek(const U64 current, const U64 target);
   BOOL read(U8* const * point);
   BOOL check_end();
   BOOL done();
@@ -81,15 +81,15 @@ private:
   BOOL layered_las14_compression;
   // used for chunking
   U32 chunk_size;
-  U32 chunk_count;
+  U64 chunk_count;
   U32 current_chunk;
   U32 number_chunks;
   U32 tabled_chunks;
   I64* chunk_starts;
-  U32* chunk_totals;
+  U64* chunk_totals;
   BOOL init_dec();
   BOOL read_chunk_table();
-  U32 search_chunk_table(const U32 index, const U32 lower, const U32 upper);
+  U32 search_chunk_table(const U64 index, const U32 lower, const U32 upper);
   // used for selective decompression (new LAS 1.4 point types only)
   U32 decompress_selective;
   // used for seeking

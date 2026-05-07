@@ -325,10 +325,10 @@ BOOL LASreadPoint::init(ByteStreamIn* instream)
   return TRUE;
 }
 
-BOOL LASreadPoint::seek(const U32 current, const U32 target)
+BOOL LASreadPoint::seek(const U64 current, const U64 target)
 {
   if (!instream->isSeekable()) return FALSE;
-  U32 delta = 0;
+  U64 delta = 0;
   if (dec)
   {
     if (point_start == 0)
@@ -680,7 +680,7 @@ BOOL LASreadPoint::read_chunk_table()
     chunk_starts = 0;
     if (chunk_size == U32_MAX)
     {
-      chunk_totals = new U32[number_chunks+1];
+      chunk_totals = new U64[number_chunks+1];
       if (chunk_totals == 0)
       {
         throw 1;
@@ -785,7 +785,7 @@ BOOL LASreadPoint::read_chunk_table()
   return TRUE;
 }
 
-U32 LASreadPoint::search_chunk_table(const U32 index, const U32 lower, const U32 upper)
+U32 LASreadPoint::search_chunk_table(const U64 index, const U32 lower, const U32 upper)
 {
   if (lower + 1 == upper) return lower;
   U32 mid = (lower+upper)/2;

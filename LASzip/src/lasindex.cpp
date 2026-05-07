@@ -47,7 +47,7 @@
 #include "lasmessage.hpp"
 #include "mydefs.hpp"
 
-typedef std::unordered_map<I32, U32> my_cell_hash;
+typedef std::unordered_map<I32, U64> my_cell_hash;
 
 LASindex::LASindex()
 {
@@ -75,7 +75,7 @@ void LASindex::prepare(LASquadtree* spatial, I32 threshold)
   this->interval = new LASinterval(threshold);
 }
 
-BOOL LASindex::add(const F64 x, const F64 y, const U32 p_index)
+BOOL LASindex::add(const F64 x, const F64 y, const U64 p_index)
 {
   I32 cell = spatial->get_cell_index(x, y);
   return interval->add(p_index, cell);
@@ -102,7 +102,8 @@ void LASindex::complete(U32 minimum_points, I32 maximum_intervals)
       cell_hash[hash2].clear();
       // coarsen if a coarser cell will still have fewer than minimum_points (and points in all subcells)
       BOOL coarsened = FALSE;
-      U32 i, full;
+      U32 i;
+      U64 full;
       I32 coarser_index;
       U32 num_indices;
       U32 num_filled;
@@ -173,10 +174,10 @@ void LASindex::complete(U32 minimum_points, I32 maximum_intervals)
 void LASindex::print()
 {
   U32 total_cells = 0;
-  U32 total_full = 0;
-  U32 total_total = 0;
+  U64 total_full = 0;
+  U64 total_total = 0;
   U32 total_intervals = 0;
-  U32 total_check;
+  U64 total_check;
   U32 intervals;
   interval->get_cells();
   while (interval->has_cells())
@@ -190,15 +191,15 @@ void LASindex::print()
     }
     if (total_check != interval->total)
     {
-      LASMessage(LAS_VERBOSE, "total_check %u != interval->total %u", total_check, interval->total);
+      LASMessage(LAS_VERBOSE, "total_check %llu != interval->total %llu", total_check, interval->total);
     }
-    LASMessage(LAS_VERY_VERBOSE, "cell %d intervals %u full %u total %u (%.2f)", interval->index, intervals, interval->full, interval->total, 100.0f*interval->full/interval->total);
+    LASMessage(LAS_VERY_VERBOSE, "cell %d intervals %u full %llu total %llu (%.2f)", interval->index, intervals, interval->full, interval->total, 100.0f*interval->full/interval->total);
     total_cells++;
     total_full += interval->full;
     total_total += interval->total;
     total_intervals += intervals;
   }
-  LASMessage(LAS_VERY_VERBOSE, "total cells/intervals %u/%u full %u (%.2f)", total_cells, total_intervals, total_full, 100.0f*total_full/total_total);
+  LASMessage(LAS_VERY_VERBOSE, "total cells/intervals %u/%u full %llu (%.2f)", total_cells, total_intervals, total_full, 100.0f*total_full/total_total);
 }
 
 LASquadtree* LASindex::get_spatial() const
@@ -362,12 +363,12 @@ BOOL LASindex::append(const char* file_name) const
 
     // find LASzip VLR
 
-    I64 total = lasreader->header.header_size + 2;
+    I64 total_tmp = lasreader->header.header_size + 2;
     U32 number_of_variable_length_records = lasreader->header.number_of_variable_length_records + 1 + (lasreader->header.vlr_lastiling != 0) + (lasreader->header.vlr_lasoriginal != 0);
 
     for (U32 u = 0; u < number_of_variable_length_records; u++)
     {
-      bytestreamin->seek(total);
+      bytestreamin->seek(total_tmp);
 
       CHAR user_id[LAS_VLR_USER_ID_CHAR_LEN];
       try { bytestreamin->getBytes((U8*)user_id, 16); } catch(...)
@@ -392,7 +393,7 @@ BOOL LASindex::append(const char* file_name) const
         laserror("reading header.vlrs[%d].record_length_after_header", u);
         return FALSE;
       }
-      total += (54 + record_length_after_header);
+      total_tmp += (54 + record_length_after_header);
     }
 
     if (number_of_special_evlrs == -1) return FALSE;
@@ -570,7 +571,7 @@ BOOL LASindex::seek_next(LASreadPoint* reader, I64 &p_count)
   if (!have_interval)
   {
     if (!has_intervals()) return FALSE;
-    reader->seek((U32)p_count, start);
+    reader->seek(p_count, start);
     p_count = start;
   }
   if (p_count == end)

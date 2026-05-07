@@ -505,7 +505,7 @@ BOOL COPCindex::seek_next(LASreadPoint* reader, I64 &p_count)
   if (!have_interval)
   {
     if (!has_intervals()) return FALSE;
-    reader->seek((U32)p_count, start);
+    reader->seek(p_count, start);
     p_count = start;
   }
   if (p_count == (I64)end)

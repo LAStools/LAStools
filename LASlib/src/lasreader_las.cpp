@@ -680,14 +680,14 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
           {
             try { stream->get64bitsLE((U8*)&(header.vlr_lasoriginal->number_of_point_records)); } catch(...)
             {
-              laserror("reading vlr_lasoriginal->number_of_point_records %u", (U32)header.vlr_lasoriginal->number_of_point_records);
+              laserror("reading vlr_lasoriginal->number_of_point_records %lld", header.vlr_lasoriginal->number_of_point_records);
               return FALSE;
             }
             for (j = 0; j < 15; j++)
             {
               try { stream->get64bitsLE((U8*)&(header.vlr_lasoriginal->number_of_points_by_return[j])); } catch(...)
               {
-                laserror("reading vlr_lasoriginal->number_of_points_by_return[%d] %u", j, (U32)header.vlr_lasoriginal->number_of_points_by_return[j]);
+                laserror("reading vlr_lasoriginal->number_of_points_by_return[%d] %lld", j, header.vlr_lasoriginal->number_of_points_by_return[j]);
                 return FALSE;
               }
             }
@@ -1170,7 +1170,7 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
               }
               else
               {
-                laserror("record_length_after_header of EVLR %s (%d) is %u instead of 28", header.evlrs[i].user_id, header.evlrs[i].record_id, (U32)header.evlrs[i].record_length_after_header);
+                laserror("record_length_after_header of EVLR %s (%d) is %lld instead of 28", header.evlrs[i].user_id, header.evlrs[i].record_id, header.evlrs[i].record_length_after_header);
                 return FALSE;
               }
             }
@@ -1489,7 +1489,7 @@ BOOL LASreaderLAS::seek(const I64 p_index)
   {
     if (p_index < npoints)
     {
-      if (reader->seek((U32)p_idx, (U32)p_index))
+      if (reader->seek(p_idx, p_index))
       {
         p_idx = p_index;
         return TRUE;
@@ -1511,11 +1511,11 @@ BOOL LASreaderLAS::read_point_default()
       }
       if (reader->error())
       {
-        laserror("'%s' after %u of %u points for '%s'", reader->error(), (U32)p_cnt, (U32)npoints, file_name);
+        laserror("'%s' after %lld of %lld points for '%s'", reader->error(), p_cnt, npoints, file_name);
       }
       else
       {
-        LASMessage(LAS_WARNING, "end-of-file after %u of %u points for '%s'", (U32)p_cnt, (U32)npoints, file_name);
+        LASMessage(LAS_WARNING, "end-of-file after %lld of %lld points for '%s'", p_cnt, npoints, file_name);
       }
       return FALSE;
     }
