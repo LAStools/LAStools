@@ -57,7 +57,7 @@ LASintervalCell::LASintervalCell()
   next = 0;
 }
 
-LASintervalCell::LASintervalCell(const U32 p_index)
+LASintervalCell::LASintervalCell(const U64 p_index)
 {
   start = p_index;
   end = p_index;
@@ -78,14 +78,14 @@ LASintervalStartCell::LASintervalStartCell() : LASintervalCell()
   last = 0;
 }
 
-LASintervalStartCell::LASintervalStartCell(const U32 p_index) : LASintervalCell(p_index)
+LASintervalStartCell::LASintervalStartCell(const U64 p_index) : LASintervalCell(p_index)
 {
   full = 1;
   total = 1;
   last = 0;
 }
 
-BOOL LASintervalStartCell::add(const U32 p_index, const U32 threshold)
+BOOL LASintervalStartCell::add(const U64 p_index, const U32 threshold)
 {
   U32 current_end = (last ? last->end : end);
   assert(p_index > current_end);
@@ -118,7 +118,7 @@ BOOL LASintervalStartCell::add(const U32 p_index, const U32 threshold)
   return FALSE; // added to interval
 }
 
-BOOL LASinterval::add(const U32 p_index, const I32 c_index)
+BOOL LASinterval::add(const U64 p_index, const I32 c_index)
 {
   if (last_cell == 0 || last_index != c_index)
   {
@@ -557,6 +557,26 @@ LASinterval::~LASinterval()
   if (cells_to_merge) delete ((my_cell_set*)cells_to_merge);
 }
 
+BOOL LASinterval::requires_64bit_intervals() const {
+  const U64 MAX32 = (U64)U32_MAX;
+
+  my_cell_hash* hash = (my_cell_hash*)cells;
+  my_cell_hash::iterator it = hash->begin();
+
+  while (it != hash->end()) {
+    LASintervalCell* cell = it->second;
+
+    while (cell) {
+      if (cell->start > MAX32 || cell->end > MAX32) {
+        return TRUE;  // 64-bit required
+      }
+      cell = cell->next;
+    }
+    ++it;
+  }
+  return FALSE;  // 32-bit is sufficient
+}
+
 BOOL LASinterval::read(ByteStreamIn* stream)
 {
   char signature[4];
@@ -576,6 +596,8 @@ BOOL LASinterval::read(ByteStreamIn* stream)
     laserror("(LASinterval): reading version");
     return FALSE;
   }
+  BOOL requires64bits = (version == 1);
+
   // read number of cells
   U32 number_cells;
   try { stream->get32bitsLE((U8*)&number_cells); } catch (...)
@@ -604,35 +626,80 @@ BOOL LASinterval::read(ByteStreamIn* stream)
       laserror("(LASinterval): reading number of intervals in cell");
       return FALSE;
     }
-    // read number of points in cell
-    U32 number_points;
-    try { stream->get32bitsLE((U8*)&number_points); } catch (...)
-    {
-      laserror("(LASinterval): reading number of points in cell");
-      return FALSE;
-    }
-    start_cell->full = number_points;
+
     start_cell->total = 0;
-    while (number_intervals)
-    {
-      // read start of interval
-      try { stream->get32bitsLE((U8*)&(cell->start)); } catch (...)
+
+    if (requires64bits) {
+      // read number of points in cell
+      U64 number_points;
+      try { stream->get64bitsLE((U8*)&number_points); } catch (...)
       {
-        laserror("(LASinterval): reading start %d of interval", cell->start);
+        laserror("(LASinterval): reading number of points in cell");
         return FALSE;
       }
-      // read end of interval
-      try { stream->get32bitsLE((U8*)&(cell->end)); } catch (...)
-      {
-        laserror("(LASinterval): reading end %d of interval", cell->end);
+      start_cell->full = number_points;
+
+      //64bit loop
+      while (number_intervals) {
+        // read start of interval
+        try {
+          stream->get64bitsLE((U8*)&(cell->start));
+        } catch (...) {
+          laserror("(LASinterval): reading start %llu of interval", cell->start);
+          return FALSE;
+        }
+        // read end of interval
+        try {
+          stream->get64bitsLE((U8*)&(cell->end));
+        } catch (...) {
+          laserror("(LASinterval): reading end %llu of interval", cell->end);
+          return FALSE;
+        }
+        start_cell->total += (cell->end - cell->start + 1);
+        number_intervals--;
+        if (number_intervals) {
+          cell->next = new LASintervalCell();
+          cell = cell->next;
+        }
+      }
+    } else {
+      // read number of points in cell
+      U32 number_points;
+      try {
+        stream->get32bitsLE((U8*)&number_points);
+      } catch (...) {
+        laserror("(LASinterval): reading number of points in cell");
         return FALSE;
       }
-      start_cell->total += (cell->end - cell->start + 1);
-      number_intervals--;
-      if (number_intervals)
-      {
-        cell->next = new LASintervalCell();
-        cell = cell->next;
+      start_cell->full = number_points;
+
+      //32bit loop
+      while (number_intervals) {
+        // read start of interval
+        U32 start32; 
+        try {
+          stream->get32bitsLE((U8*)&(start32));
+        } catch (...) {
+          laserror("(LASinterval): reading start %u of interval", start32);
+          return FALSE;
+        }
+        cell->start = start32;
+        // read end of interval
+        U32 end32;
+        try {
+          stream->get32bitsLE((U8*)&(end32));
+        } catch (...) {
+          laserror("(LASinterval): reading end %u of interval", end32);
+          return FALSE;
+        }
+        cell->end = end32;
+
+        start_cell->total += (cell->end - cell->start + 1);
+        number_intervals--;
+        if (number_intervals) {
+          cell->next = new LASintervalCell();
+          cell = cell->next;
+        }
       }
     }
     number_cells--;
@@ -649,16 +716,22 @@ BOOL LASinterval::write(ByteStreamOut* stream) const
     return FALSE;
   }
   U32 version = 0;
+  BOOL requires64bits = requires_64bit_intervals();
+
+  if (requires64bits) 
+  {
+    version = 1;
+  }
   if (!stream->put32bitsLE((const U8*)&version))
   {
-    laserror("(LASinterval): writing version");
+    laserror("(LASinterval): writing version %u", version);
     return FALSE;
   }
   // write number of cells
   U32 number_cells = (U32)((my_cell_hash*)cells)->size();
   if (!stream->put32bitsLE((const U8*)&number_cells))
   {
-    laserror("(LASinterval): writing number of cells %d", number_cells);
+    laserror("(LASinterval): writing number of cells %u", number_cells);
     return FALSE;
   }
   // loop over all cells
@@ -670,7 +743,7 @@ BOOL LASinterval::write(ByteStreamOut* stream) const
 #pragma warning(disable : 6011)
     // count number of intervals and points in cell
     U32 number_intervals = 0;
-    U32 number_points = ((LASintervalStartCell*)cell)->full;
+    U64 number_points = ((LASintervalStartCell*)cell)->full;
 #pragma warning(pop)
     while (cell)
     {
@@ -687,32 +760,54 @@ BOOL LASinterval::write(ByteStreamOut* stream) const
     // write number of intervals in cell
     if (!stream->put32bitsLE((const U8*)&number_intervals))
     {
-      laserror("(LASinterval): writing number of intervals %d in cell", number_intervals);
-      return FALSE;
-    }
-    // write number of points in cell
-    if (!stream->put32bitsLE((const U8*)&number_points))
-    {
-      laserror("(LASinterval): writing number of points %d in cell", number_points);
+      laserror("(LASinterval): writing number of intervals %u in cell", number_intervals);
       return FALSE;
     }
     // write intervals
     cell = (*hash_element).second;
-    while (cell)
-    {
-      // write start of interval
-      if (!stream->put32bitsLE((const U8*)&(cell->start)))
-      {
-        laserror("(LASinterval): writing start %d of interval", cell->start);
+    if (requires64bits) {
+      // write number of points in cell
+      if (!stream->put64bitsLE((const U8*)&number_points)) {
+        laserror("(LASinterval): writing number of points %llu in cell", number_points);
         return FALSE;
       }
-      // write end of interval
-      if (!stream->put32bitsLE((const U8*)&(cell->end)))
-      {
-        laserror("(LASinterval): writing end %d of interval", cell->end);
+
+      // 64bit loop
+      while (cell) {
+        U64 start64 = cell->start;
+        if (!stream->put64bitsLE((const U8*)&start64)) {
+          laserror("(LASinterval): writing start %llu of interval", start64);
+          return FALSE;
+        }
+        U64 end64 = cell->end;
+        if (!stream->put64bitsLE((const U8*)&end64)) {
+          laserror("(LASinterval): writing end %llu of interval", end64);
+          return FALSE;
+        }
+        cell = cell->next;
+      }
+    } else {
+      U32 number_points32 = (U32)number_points;
+      // write number of points in cell
+      if (!stream->put32bitsLE((const U8*)&number_points32)) {
+        laserror("(LASinterval): writing number of points %u in cell", number_points32);
         return FALSE;
       }
-      cell = cell->next;
+
+      // 32bit loop
+      while (cell) {
+        U32 start32 = (U32)cell->start;
+        if (!stream->put32bitsLE((const U8*)&start32)) {
+          laserror("(LASinterval): writing start %u of interval", start32);
+          return FALSE;
+        }
+        U32 end32 = (U32)cell->end;
+        if (!stream->put32bitsLE((const U8*)&end32)) {
+          laserror("(LASinterval): writing end %u of interval", end32);
+          return FALSE;
+        }
+        cell = cell->next;
+      }
     }
     hash_element++;
   }

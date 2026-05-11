@@ -2612,16 +2612,16 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique) {
       strncpy_las(full_file_name, sizeof(full_file_name), file_name, len);
       size_t remaining_size = (sizeof(full_file_name) > len) ? (sizeof(full_file_name) - len) : 0;
       do {
-        // windows wildcards also return partial matches. Here a strict check is performed for the exact file ext
-        if (!ext.empty() && !HasFileExt(info.cFileName, ext)) continue;
+        // windows wildcards also return partial matches. Here a strict extension check is used, while allowing wildcard patterns '*' and '?' in the ext
+        if (!ext.empty() && !matchExtension(info.cFileName, ext)) continue;
 
         snprintf(&full_file_name[len], remaining_size, "%s", info.cFileName);
         if (add_file_name_single(full_file_name, unique)) r = TRUE;
       } while (FindNextFile(h, &info));
     } else {
       do {
-        // windows wildcards also return partial matche. Here a strict check is performed for the exact file ext
-        if (!ext.empty() && !HasFileExt(info.cFileName, ext)) continue;
+        // windows wildcards also return partial matche. Here a strict extension check is used, while allowing wildcard patterns '*' and '?' in the ext
+        if (!ext.empty() && !matchExtension(info.cFileName, ext)) continue;
 
         if (add_file_name_single(info.cFileName, unique)) r = TRUE;
       } while (FindNextFile(h, &info));
@@ -2693,8 +2693,8 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique) {
       size_t pos = base.find_last_of("/\\");
       if (pos != std::string::npos) base = base.substr(pos + 1);
 
-      // wildcards also return partial matche. Here a strict check is performed for the exact file ext
-      if (!ext.empty() && !HasFileExt(base, ext)) continue;
+      // wildcards also return partial matche. Here a strict extension check is used, while allowing wildcard patterns '*' and '?' in the ext
+      if (!ext.empty() && !matchExtension(info.cFileName, ext)) continue;
 
       if (add_file_name_single(fname, unique)) r = TRUE;
     }

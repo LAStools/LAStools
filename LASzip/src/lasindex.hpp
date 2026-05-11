@@ -61,7 +61,7 @@ public:
 
   // create spatial index
   void prepare(LASquadtree* spatial, I32 threshold=1000);
-  BOOL add(const F64 x, const F64 y, const U32 index);
+  BOOL add(const F64 x, const F64 y, const U64 index);
   void complete(U32 minimum_points=100000, I32 maximum_intervals=-1);
 
   // read from file or write to file
@@ -82,10 +82,10 @@ public:
   BOOL get_intervals();
   BOOL has_intervals();
 
-  U32 start;
-  U32 end;
-  U32 full;
-  U32 total;
+  U64 start;
+  U64 end;
+  U64 full;
+  U64 total;
   U32 cells;
 
   // seek to next interval

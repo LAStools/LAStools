@@ -540,6 +540,13 @@ bool StringEndsWith(const std::string& fullString, const std::string& ending);
 
 bool HasFileExt(std::string fn, std::string ext);
 
+bool HasFileExtWildcard(const std::string& ext);
+
+bool wildcardMatch(const char* pattern, const char* str);
+
+/// Use this to compare extensions, where the extension pattern may contain '*' or '?'
+bool matchExtension(const std::string& filename, std::string ext);
+
 std::string FileExtSet(std::string fn_in, std::string ext_new);
 
 std::string getFileExtension(const char* filepath);
