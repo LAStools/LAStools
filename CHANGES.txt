@@ -1,8 +1,7 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+5 May 2026 -- NEW: lasinfo supports CSV table output to catalog files and decodes global encoding word to text info (https://rapidlasso.de/lasinfo-significant-enhancements/)
 5 May 2026 -- NEW: argument "-subdir" to scan recursive in all input subdirectories using wildcards (e.g. "*.laz")
-4 May 2026 -- NEW: lasinfo decodes global encoding word also to text info
-4 May 2026 -- NEW: lasinfo supports CSV table output to get an overview about many files at once
 23 April 2026 -- NEW: extended lasvalidate to support console output in CSV, TXT and XML formats via the -csv, -txt and -xml arguments
 22 April 2026 -- fix: POINT14 pointer and preserve deleted_flag during memcpy to prevent internal field corruption
 13 April 2026 -- fix: smooth argument for blast64
