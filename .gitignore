@@ -16,6 +16,7 @@ bin/*.exe
 *.ilk
 *.o
 *.a
+*.exp
 LASlib/example/lasexample
 LASlib/example/lasexample_add_rgb
 LASlib/example/lasexample_simple_classification

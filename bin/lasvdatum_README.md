@@ -635,7 +635,7 @@ lasvdatum64 -i in.laz -epsg 26917 -vgrid g2012bu0.gtx -backward -o out.laz
 -iskip [n]      : skip [n] lines at the beginning of the text input  
 -itxt           : expect input as text file  
 -lof [fnf]      : use input out of a list of files [fnf]  
--subdir         : enables recursive search in subdirectories. (Linux: enclose wildcard patterns like "*.laz" in quotes)
+-subdir         : enables recursive search in subdirectories. (Linux: enclose wildcard patterns like "*.laz" in quotes)  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
 -buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  

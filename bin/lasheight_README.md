@@ -759,7 +759,7 @@ lasheight64 -i tiles_ground\*.laz -store_precise_as_extra_bytes -odir tiles_heig
 -iskip [n]      : skip [n] lines at the beginning of the text input  
 -itxt           : expect input as text file  
 -lof [fnf]      : use input out of a list of files [fnf]  
--subdir         : enables recursive search in subdirectories. (Linux: enclose wildcard patterns like "*.laz" in quotes)
+-subdir         : enables recursive search in subdirectories. (Linux: enclose wildcard patterns like "*.laz" in quotes)  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
 -buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  

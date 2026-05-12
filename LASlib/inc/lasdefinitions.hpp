@@ -52,7 +52,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 260311
+#define LAS_TOOLS_VERSION 260507
 
 #include <stdio.h>
 #include <string.h>
@@ -802,6 +802,7 @@ public:
       evlrs = (LASevlr*)malloc_las(sizeof(LASevlr) * number_of_extended_variable_length_records);
     }
     if (evlrs != nullptr) {
+      memset((void*)&(evlrs[i]), 0, sizeof(LASevlr));
       evlrs[i].reserved = 0;  // used to be 0xAABB
       strncpy_las(evlrs[i].user_id, LAS_VLR_USER_ID_CHAR_LEN, user_id);
       evlrs[i].record_id = record_id;

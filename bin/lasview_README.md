@@ -194,9 +194,9 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 -object                             : render only points classified as vegetation or building  
 -olaydir [n]                        : write the output *.lay file (from editing) in directory [n]  
 -only_first                         : render only first returns  
--only_inside [x1] [y1] [x2] [y2]    : render only points inside the rectangle [x1] [y1] [x2] [y2]
--only_inside_circle [cx] [cy] [r]   : render only points inside the circle, center_x [cx], center_y [cy] and radius [r]
--only_class [n]                     : render only points with classification [n] (0-255)
+-only_inside [x1] [y1] [x2] [y2]    : render only points inside the rectangle [x1] [y1] [x2] [y2]  
+-only_inside_circle [cx] [cy] [r]   : render only points inside the circle, center_x [cx], center_y [cy] and radius [r]  
+-only_class [n]                     : render only points with classification [n] (0-255)  
 -only_last                          : render only last returns  
 -only_multi                         : render only multiple returns  
 -only_single                        : render only single returns  
@@ -217,7 +217,7 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 -steps [n]                          : visualize incremental loading of points from file in [n] steps (default=50)  
 -stop_at_point [n]                  : stop loading after [n] points  
 -subcircle [n]                      : prior to creating TIN with [t] replace each point with 8 segment circle of radius [n]  
--subseq [m] [n]                     : only load subsequence from point [m] to [n]  
+-subseq [m] [n]                     : only load subsequence from point [m] to ([n]-1)  
 -suppress_classification            : do not decompress classification for native-compressed LAS 1.4 point types 6 or higher  
 -suppress_intensity                 : do not decompress intensity for native-compressed LAS 1.4 point types 6 or higher  
 -suppress_point_source              : do not decompress point source ID for native-compressed LAS 1.4 point types 6 or higher  
@@ -735,7 +735,7 @@ reads around 10 million subsampled lidar points and displays in 11 steps
 -iskip [n]      : skip [n] lines at the beginning of the text input  
 -itxt           : expect input as text file  
 -lof [fnf]      : use input out of a list of files [fnf]  
--subdir         : enables recursive search in subdirectories. (Linux: enclose wildcard patterns like "*.laz" in quotes)
+-subdir         : enables recursive search in subdirectories. (Linux: enclose wildcard patterns like "*.laz" in quotes)  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
 -buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  

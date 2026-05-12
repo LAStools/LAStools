@@ -647,7 +647,7 @@ lasdatum64 -i in.laz -epsg 25833 -seven 577.326,90.129,463.920,-5.137,-1.474,-5.
 -iskip [n]      : skip [n] lines at the beginning of the text input  
 -itxt           : expect input as text file  
 -lof [fnf]      : use input out of a list of files [fnf]  
--subdir         : enables recursive search in subdirectories. (Linux: enclose wildcard patterns like "*.laz" in quotes)
+-subdir         : enables recursive search in subdirectories. (Linux: enclose wildcard patterns like "*.laz" in quotes)  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
 -buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  

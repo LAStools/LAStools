@@ -1,6 +1,14 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
-24 March 2026 -- NEW: no subdirectory "LAStools" in ZIP package to enable easy install by just extract to "c:\lastools"
+5 May 2026 -- NEW: argument "-subdir" to scan recursive in all input subdirectories using wildcards (e.g. "*.laz")
+4 May 2026 -- NEW: lasinfo decodes global encoding word also to text info
+4 May 2026 -- NEW: lasinfo supports CSV table output to get an overview about many files at once
+23 April 2026 -- NEW: extended lasvalidate to support console output in CSV, TXT and XML formats via the -csv, -txt and -xml arguments
+22 April 2026 -- fix: POINT14 pointer and preserve deleted_flag during memcpy to prevent internal field corruption
+13 April 2026 -- fix: smooth argument for blast64
+26 March 2026 -- NEW: no subdirectory "LAStools" in ZIP package to enable easy install by just extract to "c:\lastools"
+26 March 2026 -- NEW: lasvalidate64: complete redesign including LAS 1.5 and WKT support (https://rapidlasso.de/lasvalidate-redesign-including-las-1-5-and-wkt-support/)
+26 March 2026 -- NEW: lasview: -only_inside and -only_class argument for partial editing
 11 March 2026 -- fix: LAS 1.5 encoding gps format warning
 11 March 2026 -- fix: las2dem_new: hillshade rendering on linux
 6 March 2026 -- fix: laspublish: improvements for potree 1.8 file handling and documentation update
