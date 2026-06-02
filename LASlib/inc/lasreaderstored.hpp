@@ -39,7 +39,7 @@
 #include "bytestreamin_array.hpp"
 #include "bytestreamout_array.hpp"
 
-class LASreaderStored : public LASreader
+class LASLIB_DLL LASreaderStored : public LASreader
 {
 public:
 
