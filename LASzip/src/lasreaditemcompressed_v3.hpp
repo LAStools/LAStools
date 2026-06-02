@@ -43,7 +43,7 @@
 #include "laszip_common_v3.hpp"
 #include "laszip_decompress_selective_v3.hpp"
 
-class LASreadItemCompressed_POINT14_v3 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_POINT14_v3 : public LASreadItemCompressed
 {
 public:
 
@@ -119,7 +119,7 @@ private:
   void read_gps_time();
 };
 
-class LASreadItemCompressed_RGB14_v3 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_RGB14_v3 : public LASreadItemCompressed
 {
 public:
 
@@ -156,7 +156,7 @@ private:
   BOOL createAndInitModelsAndDecompressors(U32 context, const U8* item);
 };
 
-class LASreadItemCompressed_RGBNIR14_v3 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_RGBNIR14_v3 : public LASreadItemCompressed
 {
 public:
 
@@ -198,7 +198,7 @@ private:
   BOOL createAndInitModelsAndDecompressors(U32 context, const U8* item);
 };
 
-class LASreadItemCompressed_WAVEPACKET14_v3 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_WAVEPACKET14_v3 : public LASreadItemCompressed
 {
 public:
 
@@ -235,7 +235,7 @@ private:
   BOOL createAndInitModelsAndDecompressors(U32 context, const U8* item);
 };
 
-class LASreadItemCompressed_BYTE14_v3 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_BYTE14_v3 : public LASreadItemCompressed
 {
 public:
 

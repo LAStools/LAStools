@@ -39,7 +39,7 @@
 
 #include <stdio.h>
 
-class LASreaderBIL : public LASreader
+class LASLIB_DLL LASreaderBIL : public LASreader
 {
 public:
 
@@ -84,7 +84,7 @@ private:
   void populate_bounding_box();
 };
 
-class LASreaderBILrescale : public virtual LASreaderBIL
+class LASLIB_DLL LASreaderBILrescale : public virtual LASreaderBIL
 {
 public:
   virtual BOOL open(const CHAR* file_name);
@@ -94,7 +94,7 @@ protected:
   F64 scale_factor[3];
 };
 
-class LASreaderBILreoffset : public virtual LASreaderBIL
+class LASLIB_DLL LASreaderBILreoffset : public virtual LASreaderBIL
 {
 public:
   virtual BOOL open(const CHAR* file_name);
@@ -103,7 +103,7 @@ protected:
   F64 offset[3];
 };
 
-class LASreaderBILrescalereoffset : public LASreaderBILrescale, LASreaderBILreoffset
+class LASLIB_DLL LASreaderBILrescalereoffset : public LASreaderBILrescale, LASreaderBILreoffset
 {
 public:
   BOOL open(const CHAR* file_name);

@@ -91,7 +91,7 @@ private:
   BOOL keep_copc;
 };
 
-class LASreaderLASrescale : public virtual LASreaderLAS
+class LASLIB_DLL LASreaderLASrescale : public virtual LASreaderLAS
 {
 public:
   LASreaderLASrescale(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, BOOL check_for_overflow=TRUE);
@@ -105,7 +105,7 @@ protected:
   F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
 };
 
-class LASreaderLASreoffset : public virtual LASreaderLAS
+class LASLIB_DLL LASreaderLASreoffset : public virtual LASreaderLAS
 {
 public:
   LASreaderLASreoffset(LASreadOpener* opener, F64 x_offset, F64 y_offset, F64 z_offset);
@@ -120,7 +120,7 @@ protected:
   F64 orig_x_offset, orig_y_offset, orig_z_offset;
 };
 
-class LASreaderLASrescalereoffset : public LASreaderLASrescale, public LASreaderLASreoffset
+class LASLIB_DLL LASreaderLASrescalereoffset : public LASreaderLASrescale, public LASreaderLASreoffset
 {
 public:
   LASreaderLASrescalereoffset(LASreadOpener* opener, F64 x_scale_factor, F64 y_scale_factor, F64 z_scale_factor, F64 x_offset, F64 y_offset, F64 z_offset);
@@ -131,7 +131,7 @@ protected:
   virtual BOOL read_point_default();
 };
 
-class LASreaderLASrescalereoffsetgps : public LASreaderLASrescalereoffset
+class LASLIB_DLL LASreaderLASrescalereoffsetgps : public LASreaderLASrescalereoffset
 {
 public:
     LASreaderLASrescalereoffsetgps(LASreadOpener* opener, BOOL rescale, BOOL reoffset, BOOL gps, 

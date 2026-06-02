@@ -48,7 +48,7 @@
 #define LASIGNORE_WITHHELD        0x00004000
 #define LASIGNORE_OVERLAP         0x00008000
 
-class LASignore
+class LASLIB_DLL LASignore
 {
 public:
   void usage() const;

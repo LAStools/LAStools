@@ -37,7 +37,7 @@
 
 #include <stdio.h>
 
-class LASreaderBIN : public LASreader
+class LASLIB_DLL LASreaderBIN : public LASreader
 {
 public:
 
@@ -64,7 +64,7 @@ private:
   I32 version;
 };
 
-class LASreaderBINrescale : public virtual LASreaderBIN
+class LASLIB_DLL LASreaderBINrescale : public virtual LASreaderBIN
 {
 public:
   virtual BOOL open(ByteStreamIn* stream);
@@ -74,7 +74,7 @@ protected:
   F64 scale_factor[3];
 };
 
-class LASreaderBINreoffset : public virtual LASreaderBIN
+class LASLIB_DLL LASreaderBINreoffset : public virtual LASreaderBIN
 {
 public:
   virtual BOOL open(ByteStreamIn* stream);
@@ -83,7 +83,7 @@ protected:
   F64 offset[3];
 };
 
-class LASreaderBINrescalereoffset : public LASreaderBINrescale, LASreaderBINreoffset
+class LASLIB_DLL LASreaderBINrescalereoffset : public LASreaderBINrescale, LASreaderBINreoffset
 {
 public:
   BOOL open(ByteStreamIn* stream);

@@ -36,7 +36,7 @@
 #include "lasreader.hpp"
 #include "laswriter.hpp"
 
-class LASreaderPipeOn : public LASreader
+class LASLIB_DLL LASreaderPipeOn : public LASreader
 {
 public:
 

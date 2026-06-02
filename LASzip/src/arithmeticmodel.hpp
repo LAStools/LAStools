@@ -55,7 +55,7 @@ const U32 BM__MaxCount    = 1 << BM__LengthShift;  // for adaptive models
 const U32 DM__LengthShift = 15;     // length bits discarded before mult.
 const U32 DM__MaxCount    = 1 << DM__LengthShift;  // for adaptive models
 
-class ArithmeticModel
+class LASLIB_DLL ArithmeticModel
 {
 public:
   ArithmeticModel(U32 symbols, BOOL compress);
@@ -73,7 +73,7 @@ private:
   friend class ArithmeticDecoder;
 };
 
-class ArithmeticBitModel
+class LASLIB_DLL ArithmeticBitModel
 {
 public:
   ArithmeticBitModel();

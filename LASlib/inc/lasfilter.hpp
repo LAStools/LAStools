@@ -58,7 +58,7 @@ protected:
     U16 global_encoding = 0;
 };
 
-class LASfilter
+class LASLIB_DLL LASfilter
 {
 public:
 

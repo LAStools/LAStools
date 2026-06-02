@@ -35,7 +35,7 @@
 
 #include <stdio.h>
 
-class LASreaderSHP : public LASreader
+class LASLIB_DLL LASreaderSHP : public LASreader
 {
 public:
 
@@ -74,7 +74,7 @@ private:
   void clean();
 };
 
-class LASreaderSHPrescale : public virtual LASreaderSHP
+class LASLIB_DLL LASreaderSHPrescale : public virtual LASreaderSHP
 {
 public:
   virtual BOOL open(const char* file_name);
@@ -84,7 +84,7 @@ protected:
   F64 scale_factor[3];
 };
 
-class LASreaderSHPreoffset : public virtual LASreaderSHP
+class LASLIB_DLL LASreaderSHPreoffset : public virtual LASreaderSHP
 {
 public:
   virtual BOOL open(const char* file_name);
@@ -93,7 +93,7 @@ protected:
   F64 offset[3];
 };
 
-class LASreaderSHPrescalereoffset : public LASreaderSHPrescale, LASreaderSHPreoffset
+class LASLIB_DLL LASreaderSHPrescalereoffset : public LASreaderSHPrescale, LASreaderSHPreoffset
 {
 public:
   BOOL open(const char* file_name);
