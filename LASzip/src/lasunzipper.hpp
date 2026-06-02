@@ -49,7 +49,7 @@ using namespace std;
 class ByteStreamIn;
 class LASreadPoint;
 
-class LASunzipper
+class LASLIB_DLL LASunzipper
 {
 public:
   bool open(FILE* file, const LASzip* laszip);

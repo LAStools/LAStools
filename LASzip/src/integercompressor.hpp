@@ -51,7 +51,7 @@
 #include "arithmeticencoder.hpp"
 #include "arithmeticdecoder.hpp"
 
-class IntegerCompressor
+class LASLIB_DLL IntegerCompressor
 {
 public:
 

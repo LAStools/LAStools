@@ -38,7 +38,7 @@
 class ByteStreamIn;
 class ByteStreamOut;
 
-class LASintervalCell
+class LASLIB_DLL LASintervalCell
 {
 public:
   U32 start;
@@ -49,7 +49,7 @@ public:
   LASintervalCell(const LASintervalCell* cell);
 };
 
-class LASintervalStartCell : public LASintervalCell
+class LASLIB_DLL LASintervalStartCell : public LASintervalCell
 {
 public:
   U32 full;
@@ -60,7 +60,7 @@ public:
   BOOL add(const U32 p_index, const U32 threshold=1000);
 };
 
-class LASinterval
+class LASLIB_DLL LASinterval
 {
 public:
   LASinterval(const U32 threshold=1000);

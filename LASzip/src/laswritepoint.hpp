@@ -49,7 +49,7 @@
 class LASwriteItem;
 class ArithmeticEncoder;
 
-class LASwritePoint
+class LASLIB_DLL LASwritePoint
 {
 public:
   LASwritePoint();

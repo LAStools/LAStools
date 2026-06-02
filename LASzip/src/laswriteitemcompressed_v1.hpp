@@ -38,7 +38,7 @@
 #include "arithmeticencoder.hpp"
 #include "integercompressor.hpp"
 
-class LASwriteItemCompressed_POINT10_v1 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_POINT10_v1 : public LASwriteItemCompressed
 {
 public:
 
@@ -68,7 +68,7 @@ private:
   ArithmeticModel* m_user_data[256];
 };
 
-class LASwriteItemCompressed_GPSTIME11_v1 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_GPSTIME11_v1 : public LASwriteItemCompressed
 {
 public:
 
@@ -90,7 +90,7 @@ private:
   I32 last_gpstime_diff;
 };
 
-class LASwriteItemCompressed_RGB12_v1 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_RGB12_v1 : public LASwriteItemCompressed
 {
 public:
 
@@ -109,7 +109,7 @@ private:
   IntegerCompressor* ic_rgb;
 };
 
-class LASwriteItemCompressed_WAVEPACKET13_v1 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_WAVEPACKET13_v1 : public LASwriteItemCompressed
 {
 public:
 
@@ -134,7 +134,7 @@ private:
   IntegerCompressor* ic_xyz;
 };
 
-class LASwriteItemCompressed_BYTE_v1 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_BYTE_v1 : public LASwriteItemCompressed
 {
 public:
 

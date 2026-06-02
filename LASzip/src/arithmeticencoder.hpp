@@ -42,7 +42,7 @@
 class ArithmeticModel;
 class ArithmeticBitModel;
 
-class ArithmeticEncoder
+class LASLIB_DLL ArithmeticEncoder
 {
 public:
 
