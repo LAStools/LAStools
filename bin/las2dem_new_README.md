@@ -59,7 +59,9 @@ together with '-ncols 512' and '-nrows 512'.
 By default triangles whose edges are longer than 100 meters are
 not rasterized. This value can be changed with '-kill 200'. The
 value is always assumed to be meters and will be multipled with
-3.28 for LAS/LAZ files where x and y are known to be in feet.
+3.28 for LAS/LAZ files where x and y are known to be in feet. 
+'-kill3d 200' can be used for 3d lengths, in addition to '-kill'.
+'-kill3d' is disabled by default.
 
 Automatically a KML file is generated to allow the resulting
 DEM to be displayed inside Google Earth (for TIF/PNG/JPG). In
@@ -204,6 +206,7 @@ generated KML file:
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
 -invert_ramp               : invert color ramp for output  
 -kill [n]                  : do not raster triangles with edges longer than [n] meters  
+-kill3d [n]                : do not raster triangles with 3d edges longer than [n] meters
 -lakes [fns]               : respect lines in given shape or text file [fns]{closed polygons with elevations}  
 -light [x] [y] [z]         : change the direction of the light vector to [x] [y] [z] for hillside shading  
 -ll [x] [y]                : start rastering at these lower left [x] and [y] coordinates  
