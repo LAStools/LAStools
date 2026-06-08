@@ -46,7 +46,7 @@
 #include "lasreader_qfit.hpp"
 #include "lasreader_txt.hpp"
 
-class LASreaderMerged : public LASreader
+class LASLIB_DLL LASreaderMerged : public LASreader
 {
 public:
 

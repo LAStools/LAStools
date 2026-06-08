@@ -40,7 +40,7 @@
 
 #include "laszip_common_v3.hpp"
 
-class LASwriteItemCompressed_POINT14_v3 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_POINT14_v3 : public LASwriteItemCompressed
 {
 public:
 
@@ -104,7 +104,7 @@ private:
   void write_gps_time(const U64I64F64 gps_time);
 };
 
-class LASwriteItemCompressed_RGB14_v3 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_RGB14_v3 : public LASwriteItemCompressed
 {
 public:
 
@@ -137,7 +137,7 @@ private:
   BOOL createAndInitModelsAndCompressors(U32 context, const U8* item);
 };
 
-class LASwriteItemCompressed_RGBNIR14_v3 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_RGBNIR14_v3 : public LASwriteItemCompressed
 {
 public:
 
@@ -174,7 +174,7 @@ private:
   BOOL createAndInitModelsAndCompressors(U32 context, const U8* item);
 };
 
-class LASwriteItemCompressed_WAVEPACKET14_v3 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_WAVEPACKET14_v3 : public LASwriteItemCompressed
 {
 public:
 
@@ -207,7 +207,7 @@ private:
   BOOL createAndInitModelsAndCompressors(U32 context, const U8* item);
 };
 
-class LASwriteItemCompressed_BYTE14_v3 : public LASwriteItemCompressed
+class LASLIB_DLL LASwriteItemCompressed_BYTE14_v3 : public LASwriteItemCompressed
 {
 public:
 

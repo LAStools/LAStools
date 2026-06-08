@@ -40,7 +40,7 @@
 
 #include "lasreader.hpp"
 
-class LASreaderBuffered : public LASreader
+class LASLIB_DLL LASreaderBuffered : public LASreader
 {
 public:
 

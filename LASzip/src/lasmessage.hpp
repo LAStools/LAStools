@@ -73,7 +73,7 @@ void LASLIB_DLL unset_las_message_handler();
 
 // @brief Logger-Wrapper that allows to stream to the logger.
 // @usage LASMessageStream(LAS_FATAL_ERROR) << "Pi is approximately: " << LASMessageStream().precision(2) << 3.14159 << std::endl;
-class LASMessageStream
+class LASLIB_DLL LASMessageStream
 {
 public:
     LASMessageStream(LAS_MESSAGE_TYPE type) : setType(type) {}

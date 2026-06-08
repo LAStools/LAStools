@@ -38,7 +38,7 @@
 
 #include <stdio.h>
 
-class LASreaderQFIT : public LASreader
+class LASLIB_DLL LASreaderQFIT : public LASreader
 {
 public:
 
@@ -76,7 +76,7 @@ private:
   F64 orig_x_scale_factor, orig_y_scale_factor, orig_z_scale_factor;
 };
 
-class LASreaderQFITrescale : public virtual LASreaderQFIT
+class LASLIB_DLL LASreaderQFITrescale : public virtual LASreaderQFIT
 {
 public:
   virtual BOOL open(ByteStreamIn* stream);
@@ -86,7 +86,7 @@ protected:
   F64 scale_factor[3];
 };
 
-class LASreaderQFITreoffset : public virtual LASreaderQFIT
+class LASLIB_DLL LASreaderQFITreoffset : public virtual LASreaderQFIT
 {
 public:
   virtual BOOL open(ByteStreamIn* stream);
@@ -95,7 +95,7 @@ protected:
   F64 offset[3];
 };
 
-class LASreaderQFITrescalereoffset : public LASreaderQFITrescale, LASreaderQFITreoffset
+class LASLIB_DLL LASreaderQFITrescalereoffset : public LASreaderQFITrescale, LASreaderQFITreoffset
 {
 public:
   BOOL open(ByteStreamIn* stream);

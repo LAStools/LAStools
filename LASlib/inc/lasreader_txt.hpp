@@ -42,7 +42,7 @@
 
 #include <stdio.h>
 
-class LASreaderTXT : public LASreader
+class LASLIB_DLL LASreaderTXT : public LASreader
 {
 public:
   BOOL iptx_transform;
@@ -127,7 +127,7 @@ private:
     HSL_h = -10, HSL_s = -11, HSL_l = -12};
 };
 
-class LASreaderTXTrescale : public virtual LASreaderTXT
+class LASLIB_DLL LASreaderTXTrescale : public virtual LASreaderTXT
 {
 public:
   virtual BOOL open(const CHAR* file_name, U8 point_type = 0, const CHAR* parse_string = 0, I32 skip_lines = 0, BOOL populate_header = FALSE);
@@ -137,7 +137,7 @@ protected:
   F64 scale_factor[3];
 };
 
-class LASreaderTXTreoffset : public virtual LASreaderTXT
+class LASLIB_DLL LASreaderTXTreoffset : public virtual LASreaderTXT
 {
 public:
   virtual BOOL open(const CHAR* file_name, U8 point_type = 0, const CHAR* parse_string = 0, I32 skip_lines = 0, BOOL populate_header = FALSE);
@@ -146,7 +146,7 @@ protected:
   F64 offset[3];
 };
 
-class LASreaderTXTrescalereoffset : public LASreaderTXTrescale, LASreaderTXTreoffset
+class LASLIB_DLL LASreaderTXTrescalereoffset : public LASreaderTXTrescale, LASreaderTXTreoffset
 {
 public:
   BOOL open(const CHAR* file_name, U8 point_type = 0, const CHAR* parse_string = 0, I32 skip_lines = 0, BOOL populate_header = FALSE);
