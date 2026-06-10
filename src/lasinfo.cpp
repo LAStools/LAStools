@@ -4483,7 +4483,7 @@ public:
           if (lasreader->point.extended_point_type) {
             if (lassummary.flagged_extended_overlap) {
               if (json_out) {
-                json_histogram_classification["flagged_as_extended_overlap"]["count"] = lassummary.flagged_extended_overlap;
+                json_histogram_extended_classification["flagged_as_extended_overlap"]["count"] = lassummary.flagged_extended_overlap;
               } else if (csv_out) {
                 add_csv_field(file_csv, "flagged_as_overlap", lassummary.flagged_extended_overlap);
               } else {
@@ -4497,7 +4497,8 @@ public:
                     json_extended_overlap_classification["id"] = lassummary.flagged_extended_overlap_classification[i];
                     json_extended_overlap_classification["type"] = LASpointClassification[i];
                     json_extended_overlap_classification["index"] = i;
-                    json_histogram_classification["flagged_as_extended_overlap"]["classification"].push_back(json_extended_overlap_classification);
+                    json_histogram_extended_classification["flagged_as_extended_overlap"]["classification"].push_back(
+                        json_extended_overlap_classification);
                   } else if (csv_out) {
                     csv_key = "point_count_overlap_class_" + std::to_string(i);
                     add_csv_field(file_csv, csv_key, lassummary.flagged_extended_overlap_classification[i]);
@@ -4516,7 +4517,8 @@ public:
                     json_extended_overlap_classification["id"] = lassummary.flagged_extended_overlap_classification[i];
                     json_extended_overlap_classification["type"] = "classified";
                     json_extended_overlap_classification["index"] = i;
-                    json_histogram_classification["flagged_as_extended_overlap"]["classification"].push_back(json_extended_overlap_classification);
+                    json_histogram_extended_classification["flagged_as_extended_overlap"]["classification"].push_back(
+                        json_extended_overlap_classification);
                   } else if (csv_out) {
                     // Any additional classes are not listed explicitly
                     class_count += lassummary.flagged_extended_overlap_classification[i];
@@ -4561,6 +4563,8 @@ public:
               }
             }
           }
+          if (json_out && !json_histogram_classification.is_null())
+            json_sub_main["histogram_classification_of_points"] = json_histogram_classification;
           if (json_out && !json_histogram_extended_classification.is_null())
             json_sub_main["histogram_extended_classification_of_points"] = json_histogram_extended_classification;
         }
