@@ -355,6 +355,34 @@ public:
     return (BOOL)(global_encoding & (1 << bit));
   }
 
+  /// Returns a string list of the 'important' global_encoding flags, sorted by priority
+  std::vector<std::string> get_global_encoding_list() {
+    std::vector<std::string> result;
+
+    // bit 4
+    if (global_encoding & 16) {
+      result.emplace_back("WKT");
+    } else {
+      result.emplace_back("GeoTiff");
+    }
+
+    // bit 0 only if no GPS offset
+    if (global_encoding & 64) {  // bit 6
+      result.emplace_back("GpsOffs");
+    } else if (global_encoding & 1) {
+      result.emplace_back("GpsStd");
+    } else {
+      result.emplace_back("GpsWeek");
+    }
+
+    // other independent bits
+    if (global_encoding & 8) result.emplace_back("Syn");     // bit 3
+    if (global_encoding & 4) result.emplace_back("WDPext");  // bit 2
+    if (global_encoding & 2) result.emplace_back("WDPint");  // bit 1
+
+    return result;
+  }
+
   // clean functions
 
   void clean_las_header()

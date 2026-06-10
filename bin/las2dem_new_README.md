@@ -205,8 +205,8 @@ generated KML file:
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
 -invert_ramp               : invert color ramp for output  
--kill [n]                  : do not raster triangles with edges longer than [n] meters  
--kill3d [n]                : do not raster triangles with 3d edges longer than [n] meters
+-kill [n]                  : do not raster triangles with xy edges longer than [n] meters  
+-kill3d [n]                : do not raster triangles with 3d edges longer than [n] meters  
 -lakes [fns]               : respect lines in given shape or text file [fns]{closed polygons with elevations}  
 -light [x] [y] [z]         : change the direction of the light vector to [x] [y] [z] for hillside shading  
 -ll [x] [y]                : start rastering at these lower left [x] and [y] coordinates  

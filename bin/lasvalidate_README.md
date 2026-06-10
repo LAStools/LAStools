@@ -147,13 +147,14 @@ Further examples
 
 ## lasvalidate specific arguments
 
--ocsv                               : Simplified output as csv file  
--oxml                               : output as xml file  
--otxt                               : output as text file  
--ojs                                : output as json file  
--csv                                : simplified output in csv format (otherwise default json)  
--txt                                : output in txt format (otherwise default json)  
--xml                                : output in xml format (otherwise default json)  
+-otxt                               : output as textfile (or '-o file.txt')  
+-ojs                                : output as json file (or '-o file.json')  
+-oxml                               : output as xml file  (or '-o file.xml')  
+-ocsv                               : output as csv file (table style)  
+-txt                                : console output in text format  
+-js                                 : console output in json format (default)  
+-json                               : console output in json format (default)  
+-csv                                : console output in csv format (table style)  
 -report_per_file                    : creates a separate validation report file for each input file  
 -tile_size [n]                      : checks if header bounding box exceeds the tile size [n]  
 -no_CRS_fail                        : all CRS (Coordinate Reference System) validation errors are issued as warnings  

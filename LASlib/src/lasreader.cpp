@@ -2694,7 +2694,7 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, BOOL unique) {
       if (pos != std::string::npos) base = base.substr(pos + 1);
 
       // wildcards also return partial matche. Here a strict extension check is used, while allowing wildcard patterns '*' and '?' in the ext
-      if (!ext.empty() && !matchExtension(info.cFileName, ext)) continue;
+      if (!ext.empty() && !matchExtension(fname, ext)) continue;
 
       if (add_file_name_single(fname, unique)) r = TRUE;
     }

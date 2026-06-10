@@ -530,14 +530,6 @@ static void write_full_csv(FILE* file_out, const std::vector<FileMap>& all_files
   }
 }
 
-/// Adds a new entry to a string and separates it with ';' if necessary
-static void append_with_separator(std::string& target, const std::string& text, const std::string separator) {
-  if (!target.empty()) {
-    target += separator ;
-  }
-  target += text;
-}
-
 #ifdef COMPILE_WITH_GUI
 extern void lasinfo_gui(int argc, char* argv[], LASreadOpener* lasreadopener);
 #endif
@@ -1185,7 +1177,7 @@ public:
       LASreader* lasreader = nullptr;
       LASheader* lasheader = nullptr;
       FileMap file_csv;
-      std::string warnings_csv;
+      std::vector<std::string> warnings_csv;
 
       if (edit_header) {
         if (lasreadopener.is_piped()) {
@@ -1739,7 +1731,7 @@ public:
               if (json_out) {
                 json_sub_main_header_entries["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else if (csv_out) {
-                append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                warnings_csv.emplace_back(std::string(buffer.begin(), buffer.end()));
               }
             } else {
               fprintf(
@@ -1749,60 +1741,12 @@ public:
           }
         }
         //detailed information on set bits in global encoding
-        std::vector<std::string> global_encoding_bits_list;
-        // GPS bits first (bit 6 and bit 0)
+        //GPS bits first (bit 6 and bit 0)
         bool gpsOffs = (lasheader->global_encoding & 64) != 0;
         bool gpsStd = (lasheader->global_encoding & 1) != 0;
         int gps_mode = 0;  // 0 = week, 1 = std, 2 = std+offs
 
-        // bit 6
-        if (gpsOffs) {
-          gps_mode = 2;
-          global_encoding_bits_list.emplace_back("GpsOffs");
-        }
-        // bit 5
-        if (!no_warnings && (lasheader->global_encoding & 32) && (lasheader->version_major == 1) && (lasheader->version_minor <= 5)) {
-          const std::string warning = "bit 5 in global encoding is reserved and should not be set for this LAS " +
-                                        std::to_string(lasheader->version_major) + "." + std::to_string(lasheader->version_minor);
-          if (json_out) {
-            json_sub_main_header_entries["warnings"].push_back(warning);
-          } else if (csv_out) {
-            append_with_separator(warnings_csv, warning, "; ");
-          } else {
-            fprintf(file_out, "WARNING: %s\n", warning.c_str());
-          }
-        }
-        // bit 4
-        if (lasheader->global_encoding & 16) {
-          global_encoding_bits_list.emplace_back("WKT");
-          wkt_bit_set = true;
-        } else {
-          global_encoding_bits_list.emplace_back("GeoTiff");
-        }
-        // bit 3
-        if (lasheader->global_encoding & 8) {
-          global_encoding_bits_list.emplace_back("Syn");
-        }
-        // bit 2
-        if (lasheader->global_encoding & 4) {
-          global_encoding_bits_list.emplace_back("WDPext");
-        }
-        // bit 1
-        if (lasheader->global_encoding & 2) {
-          global_encoding_bits_list.emplace_back("WDPint");
-        }
-        // bit 0 only if no GPS offset
-        if (!gpsOffs) {
-          if (gpsStd)
-            global_encoding_bits_list.emplace_back("GpsStd");
-          else
-            global_encoding_bits_list.emplace_back("GpsWeek");
-        }
-        
-        std::string global_encoding_bits = "";
-        for (size_t idx = 0; idx < global_encoding_bits_list.size(); ++idx) {
-          append_with_separator(global_encoding_bits, global_encoding_bits_list[idx], ",");
-        }
+        std::string global_encoding_bits = VectorDelimited(lasheader->get_global_encoding_list(), ", ");
 
         if (json_out) {
           json_sub_main_header_entries["file_signature"] = std::string(lasheader->file_signature).substr(0, 4);
@@ -1973,7 +1917,7 @@ public:
             if (json_out) {
               json_sub_main_header_entries["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
             } else if (csv_out) {
-              append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+              warnings_csv.emplace_back(std::string(buffer.begin(), buffer.end()));
             }
           } else {
             fprintf(file_out, "WARNING: stored resolution of min_x not compatible with x_offset and x_scale_factor: ");
@@ -1991,7 +1935,7 @@ public:
             if (json_out) {
               json_sub_main_header_entries["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
             } else if (csv_out) {
-              append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+              warnings_csv.emplace_back(std::string(buffer.begin(), buffer.end()));
             }
           } else {
             fprintf(file_out, "WARNING: stored resolution of min_y not compatible with y_offset and y_scale_factor: ");
@@ -2009,7 +1953,7 @@ public:
             if (json_out) {
               json_sub_main_header_entries["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
             } else if (csv_out) {
-              append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+              warnings_csv.emplace_back(std::string(buffer.begin(), buffer.end()));
             }
           } else {
             fprintf(file_out, "WARNING: stored resolution of min_z not compatible with z_offset and z_scale_factor: ");
@@ -2027,7 +1971,7 @@ public:
             if (json_out) {
               json_sub_main_header_entries["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
             } else if (csv_out) {
-              append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+              warnings_csv.emplace_back(std::string(buffer.begin(), buffer.end()));
             }
           } else {
             fprintf(file_out, "WARNING: stored resolution of max_x not compatible with x_offset and x_scale_factor: ");
@@ -2045,7 +1989,7 @@ public:
             if (json_out) {
               json_sub_main_header_entries["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
             } else if (csv_out) {
-              append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+              warnings_csv.emplace_back(std::string(buffer.begin(), buffer.end()));
             }
           } else {
             fprintf(file_out, "WARNING: stored resolution of max_y not compatible with y_offset and y_scale_factor: ");
@@ -2063,7 +2007,7 @@ public:
             if (json_out) {
               json_sub_main_header_entries["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
             } else if (csv_out) {
-              append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+              warnings_csv.emplace_back(std::string(buffer.begin(), buffer.end()));
             }
           } else {
             fprintf(file_out, "WARNING: stored resolution of max_z not compatible with z_offset and z_scale_factor: ");
@@ -2150,9 +2094,9 @@ public:
           epsg = geoprojectionconverter.get_geokeys_projection_epsg(lasreader);
           vert_epsg = geoprojectionconverter.get_geokeys_projection_vert_epsg(lasreader);
         }
-        std::string vlr_user_ids = "";
-        std::string vlr_record_ids = "";
-        std::string vlr_descriptions = "";
+        std::vector<std::string> vlr_user_ids;
+        std::vector<std::string> vlr_record_ids;
+        std::vector<std::string> vlr_descriptions;
 
         for (int i = 0; i < (int)lasheader->number_of_variable_length_records; i++) {
           JsonObject json_vlr_record;
@@ -2166,9 +2110,9 @@ public:
             json_vlr_record["record_length_after_header"] = lasreader->header.vlrs[i].record_length_after_header;
             json_vlr_record["description"] = std::string(lasreader->header.vlrs[i].description).substr(0, 32);
           } else if (csv_out) {
-            append_with_separator(vlr_user_ids, std::string(lasreader->header.vlrs[i].user_id).substr(0, 16), ", ");
-            append_with_separator(vlr_record_ids, std::to_string(lasreader->header.vlrs[i].record_id), ", ");
-            append_with_separator(vlr_descriptions, std::string(lasreader->header.vlrs[i].description).substr(0, 32), ", ");
+            vlr_user_ids.emplace_back(std::string(lasreader->header.vlrs[i].user_id).substr(0, 16));
+            vlr_record_ids.emplace_back(std::to_string(lasreader->header.vlrs[i].record_id));
+            vlr_descriptions.emplace_back(std::string(lasreader->header.vlrs[i].description).substr(0, 32));
           } else {
             fprintf(file_out, "variable length header record %d of %d:\012", i + 1, (int)lasheader->number_of_variable_length_records);
             fprintf(file_out, "  reserved             %d\012", lasreader->header.vlrs[i].reserved);
@@ -2538,7 +2482,7 @@ public:
               if (json_out) {
                 json_vlr_record["warnings"].push_back("corrupt RasterLAZ VLR");
               } else if (csv_out) {
-                append_with_separator(warnings_csv, "corrupt RasterLAZ VLR", "; ");
+                warnings_csv.push_back("corrupt RasterLAZ VLR");
               } else {
                 fprintf(file_out, "WARNING: corrupt RasterLAZ VLR\n");
               }
@@ -2582,9 +2526,9 @@ public:
           if (json_out) json_sub_main["las_variable_length_records"].push_back(json_vlr_record);
         }
         if (csv_out) {
-          add_csv_field_full(file_csv, "vlr_user_ids", vlr_user_ids, full_csv_report);
-          add_csv_field_full(file_csv, "vlr_record_ids", vlr_record_ids, full_csv_report);
-          add_csv_field_full(file_csv, "vlr_descriptions", vlr_descriptions, full_csv_report);
+          add_csv_field_full(file_csv, "vlr_user_ids", VectorDelimited(vlr_user_ids, ", "), full_csv_report);
+          add_csv_field_full(file_csv, "vlr_record_ids", VectorDelimited(vlr_record_ids, ", "), full_csv_report);
+          add_csv_field_full(file_csv, "vlr_descriptions", VectorDelimited(vlr_descriptions, ", "), full_csv_report);
 
           if (epsg != 0) add_csv_field(file_csv, "epsg", epsg);
           if (vert_epsg != 0) add_csv_field(file_csv, "vert_epsg", vert_epsg);
@@ -3070,8 +3014,8 @@ public:
                 if (json_out) {
                   json_las_point_report["warnings"].push_back("range violates GPS week time specified by global encoding bit 0");
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, "range violates GPS week time specified by global encoding bit 0", "; ");
-                } else {
+                  warnings_csv.push_back("range violates GPS week time specified by global encoding bit 0");
+                 } else {
                   fprintf(file_out, "WARNING: range violates GPS week time specified by global encoding bit 0\012");
                 }
               }
@@ -3205,7 +3149,7 @@ public:
             lassummary.min.attributer = lasreader->point.attributer;
             lassummary.max.attributer = lasreader->point.attributer;
             I32 a;
-            std::string attribute_names = "";
+            std::vector<std::string> attribute_names;
 
             for (a = 0; a < lasreader->point.attributer->number_attributes; a++) {
               if (json_out) {
@@ -3216,7 +3160,7 @@ public:
                 json_attribute["name"] = lasreader->point.attributer->get_attribute_name(a);
                 json_las_point_report["attributes"].push_back(json_attribute);
               } else if (csv_out) {
-                append_with_separator(attribute_names, lasreader->point.attributer->get_attribute_name(a), ", ");
+                attribute_names.emplace_back(lasreader->point.attributer->get_attribute_name(a));
               } else {
                 fprintf(
                     file_out, "  attribute%d %10g %10g  ('%s')\012", a, lassummary.min.get_attribute_as_float(a),
@@ -3224,7 +3168,7 @@ public:
               }
             }
             if (csv_out) {
-              add_csv_field(file_csv, "attribute_names", attribute_names);
+              add_csv_field(file_csv, "attribute_names", VectorDelimited(attribute_names, ", "));
             }
             lassummary.min.attributer = 0;
             lassummary.max.attributer = 0;
@@ -3322,7 +3266,7 @@ public:
             if (json_out) {
               json_sub_main["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
             } else if (csv_out) {
-              append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+              warnings_csv.emplace_back(buffer.begin(), buffer.end());
             }
           } else {
             fprintf(file_out, "WARNING: %lld points outside of header bounding box\012", outside_bounding_box);
@@ -3338,7 +3282,7 @@ public:
             if (json_out) {
               json_sub_main["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
             } else if (csv_out) {
-              append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+              warnings_csv.emplace_back(buffer.begin(), buffer.end());
             }
           } else {
             fprintf(
@@ -3356,7 +3300,7 @@ public:
               if (json_out) {
                 json_sub_main["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else if (csv_out) {
-                append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                warnings_csv.emplace_back(buffer.begin(), buffer.end());
               }
             } else {
               fprintf(
@@ -3375,7 +3319,7 @@ public:
                 if (json_out) {
                   json_sub_main["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(
@@ -3394,7 +3338,7 @@ public:
                   if (json_out) {
                     json_sub_main["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                   } else if (csv_out) {
-                    append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                    warnings_csv.emplace_back(buffer.begin(), buffer.end());
                   }
                 } else {
                   fprintf(
@@ -3824,7 +3768,7 @@ public:
                   if (json_out) {
                     json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                   } else if (csv_out) {
-                    append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                    warnings_csv.emplace_back(buffer.begin(), buffer.end());
                   }
                 } else {
                   fprintf(
@@ -3843,7 +3787,7 @@ public:
                   if (json_out) {
                     json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                   } else if (csv_out) {
-                    append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                    warnings_csv.emplace_back(buffer.begin(), buffer.end());
                   }
                 } else {
                   fprintf(
@@ -3866,7 +3810,7 @@ public:
                   if (json_out) {
                     json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                   } else if (csv_out) {
-                    append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                    warnings_csv.emplace_back(buffer.begin(), buffer.end());
                   }
                 } else {
                   fprintf(
@@ -3896,7 +3840,7 @@ public:
                   if (json_out) {
                     json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                   } else if (csv_out) {
-                    append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                    warnings_csv.emplace_back(buffer.begin(), buffer.end());
                   }
                 } else {
                   fprintf(
@@ -3913,7 +3857,7 @@ public:
                   if (json_out) {
                     json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                   } else if (csv_out) {
-                    append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                    warnings_csv.emplace_back(buffer.begin(), buffer.end());
                   }
                 } else {
                   fprintf(file_out, "WARNING: real number of point records (%lld) exceeds 4,294,967,295.\n", lassummary.number_of_point_records);
@@ -3929,7 +3873,7 @@ public:
                   if (json_out) {
                     json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                   } else if (csv_out) {
-                    append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                    warnings_csv.emplace_back(buffer.begin(), buffer.end());
                   }
                 } else {
                   fprintf(
@@ -3955,7 +3899,7 @@ public:
               if (json_out) {
                 json_point_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else if (csv_out) {
-                append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                warnings_csv.emplace_back(buffer.begin(), buffer.end());
               }
             } else {
               fprintf(
@@ -3997,7 +3941,7 @@ public:
                 if (json_out) {
                   json_point_extended_number["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(
@@ -4047,7 +3991,7 @@ public:
                     if (json_out) {
                       json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                     } else if (csv_out) {
-                      append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                      warnings_csv.emplace_back(buffer.begin(), buffer.end());
                     }
                   } else {
                     fprintf(
@@ -4066,7 +4010,7 @@ public:
                     if (json_out) {
                       json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                     } else if (csv_out) {
-                      append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                      warnings_csv.emplace_back(buffer.begin(), buffer.end());
                     }
                   } else {
                     fprintf(
@@ -4086,7 +4030,7 @@ public:
                   if (json_out) {
                     json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                   } else if (csv_out) {
-                    append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                    warnings_csv.emplace_back(buffer.begin(), buffer.end());
                   }
                 } else {
                   fprintf(
@@ -4109,7 +4053,7 @@ public:
                   if (json_out) {
                     json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                   } else if (csv_out) {
-                    append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                    warnings_csv.emplace_back(buffer.begin(), buffer.end());
                   }
                 } else {
                   fprintf(
@@ -4136,7 +4080,7 @@ public:
                 if (json_out) {
                   json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(
@@ -4190,7 +4134,7 @@ public:
                     if (json_out) {
                       json_point_extended_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                     } else if (csv_out) {
-                      append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                      warnings_csv.emplace_back(buffer.begin(), buffer.end());
                     }
                   } else {
                     fprintf(
@@ -4209,7 +4153,7 @@ public:
                     if (json_out) {
                       json_point_extended_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                     } else if (csv_out) {
-                      append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                      warnings_csv.emplace_back(buffer.begin(), buffer.end());
                     }
                   } else {
                     fprintf(
@@ -4249,7 +4193,7 @@ public:
               if (json_out) {
                 json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else if (csv_out) {
-                append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                warnings_csv.emplace_back(buffer.begin(), buffer.end());
               }
             } else {
               fprintf(
@@ -4269,7 +4213,7 @@ public:
                 if (json_out) {
                   json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(
@@ -4288,7 +4232,7 @@ public:
                 if (json_out) {
                   json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(
@@ -4351,7 +4295,7 @@ public:
               if (json_out) {
                 json_point_by_return["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
               } else if (csv_out) {
-                append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                warnings_csv.emplace_back(buffer.begin(), buffer.end());
               }
             } else {
               fprintf(file_out, "WARNING: there are %lld points with a number of returns of given pulse of 0\n", lassummary.number_of_returns[0]);
@@ -4539,7 +4483,7 @@ public:
           if (lasreader->point.extended_point_type) {
             if (lassummary.flagged_extended_overlap) {
               if (json_out) {
-                json_histogram_classification["flagged_as_extended_overlap"]["count"] = lassummary.flagged_extended_overlap;
+                json_histogram_extended_classification["flagged_as_extended_overlap"]["count"] = lassummary.flagged_extended_overlap;
               } else if (csv_out) {
                 add_csv_field(file_csv, "flagged_as_overlap", lassummary.flagged_extended_overlap);
               } else {
@@ -4553,7 +4497,8 @@ public:
                     json_extended_overlap_classification["id"] = lassummary.flagged_extended_overlap_classification[i];
                     json_extended_overlap_classification["type"] = LASpointClassification[i];
                     json_extended_overlap_classification["index"] = i;
-                    json_histogram_classification["flagged_as_extended_overlap"]["classification"].push_back(json_extended_overlap_classification);
+                    json_histogram_extended_classification["flagged_as_extended_overlap"]["classification"].push_back(
+                        json_extended_overlap_classification);
                   } else if (csv_out) {
                     csv_key = "point_count_overlap_class_" + std::to_string(i);
                     add_csv_field(file_csv, csv_key, lassummary.flagged_extended_overlap_classification[i]);
@@ -4572,7 +4517,8 @@ public:
                     json_extended_overlap_classification["id"] = lassummary.flagged_extended_overlap_classification[i];
                     json_extended_overlap_classification["type"] = "classified";
                     json_extended_overlap_classification["index"] = i;
-                    json_histogram_classification["flagged_as_extended_overlap"]["classification"].push_back(json_extended_overlap_classification);
+                    json_histogram_extended_classification["flagged_as_extended_overlap"]["classification"].push_back(
+                        json_extended_overlap_classification);
                   } else if (csv_out) {
                     // Any additional classes are not listed explicitly
                     class_count += lassummary.flagged_extended_overlap_classification[i];
@@ -4617,6 +4563,8 @@ public:
               }
             }
           }
+          if (json_out && !json_histogram_classification.is_null())
+            json_sub_main["histogram_classification_of_points"] = json_histogram_classification;
           if (json_out && !json_histogram_extended_classification.is_null())
             json_sub_main["histogram_extended_classification_of_points"] = json_histogram_extended_classification;
         }
@@ -4683,7 +4631,7 @@ public:
                 if (json_out) {
                   json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(file_out, "WARNING: real max x larger than header max x by %lf\n", value - lasheader->max_x);
@@ -4700,7 +4648,7 @@ public:
                 if (json_out) {
                   json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(file_out, "WARNING: real min x smaller than header min x by %lf\n", lasheader->min_x - value);
@@ -4717,7 +4665,7 @@ public:
                 if (json_out) {
                   json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(file_out, "WARNING: real max y larger than header max y by %lf\n", value - lasheader->max_y);
@@ -4734,7 +4682,7 @@ public:
                 if (json_out) {
                   json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(file_out, "WARNING: real min y smaller than header min y by %lf\n", lasheader->min_y - value);
@@ -4751,7 +4699,7 @@ public:
                 if (json_out) {
                   json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(file_out, "WARNING: real max z larger than header max z by %lf\n", value - lasheader->max_z);
@@ -4768,7 +4716,7 @@ public:
                 if (json_out) {
                   json_bounding_box["warnings"].push_back(std::string(buffer.begin(), buffer.end()));
                 } else if (csv_out) {
-                  append_with_separator(warnings_csv, std::string(buffer.begin(), buffer.end()), "; ");
+                  warnings_csv.emplace_back(buffer.begin(), buffer.end());
                 }
               } else {
                 fprintf(file_out, "WARNING: real min z smaller than header min z by %lf\n", lasheader->min_z - value);
@@ -4785,7 +4733,7 @@ public:
       if (!json_out && !csv_out) laswriteopener.set_file_name(0);
       if (csv_out) { 
         // add all csv warnings
-        add_csv_field(file_csv, "warnings", warnings_csv);
+        add_csv_field(file_csv, "warnings", VectorDelimited(warnings_csv, "; "));
 
         all_files.push_back(std::move(file_csv));
       }

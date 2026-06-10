@@ -290,7 +290,6 @@ Further examples
 -cd                                 : compute rough approximation for covered area, density, and spacing  
 -compute_density                    : compute rough approximation for covered area, density, and spacing  
 -delete_empty                       : delete LAS files with zero points  
--full_csv                           : outputs all information.Use only in combination with csv format
 -gps_week                           : compute the GPS week (if data is Adjusted Standard GPS time)  
 -gw                                 : compute the GPS week (if data is Adjusted Standard GPS time)  
 -histo [m] [n]                      : histogram output about [m] with step width [n]  
@@ -309,12 +308,6 @@ Further examples
 -nr                                 : don't output return information  
 -nv                                 : don't output VLR information  
 -nw                                 : don't output warnings  
--otxt                               : output as textfile  
--ojs                                : output as json file  
--ocsv                               : reduced output as csv file. -nc is set by default use -full_csv for full output
--js                                 : output in json format  
--json                               : output in json format  
--csv                                : reduced output in csv format. -nc is set by default use -full_csv for full output
 -progress [n]                       : report progress every [n] points  
 -proj_info [wkt] [js] [str] [epsg] [el] [datum] [cs] : get CRS representations and information of the input file: [wkt] WKT, [js] PROJJSON, [str] PROJ string or [epsg] EPSG code representation and [el] ellipsoid, [datum] datum or [cs] coordinate system information  
 -rename [n]                         : renames input file 'fusa.laz' to '[n]_123_456.laz' where 123 and 456 is the x and y header minimum value  
@@ -323,7 +316,7 @@ Further examples
 -repair_counters                    : set (in place) the counters for point number and (extended) return histograms in header  
 -report_outside                     : report attributes of each point that falls outside of LAS header bounding box  
 -ro                                 : report attributes of each point that falls outside of LAS header bounding box  
--scale_header [x] [y] [z]           : scale whole file by scaling the header values with factor [x] [y] [z] or [xyz] (one for all) (64bit only)   
+-scale_header [x] [y] [z]           : scale whole file by scaling the header values with factor [x] [y] [z] or [xyz] (one for all) (64bit only)  
 -set_bb [x1] [y1] [z1] [x2] [y2] [z2]: set bounding box to [x1] [y1] [z1] [x2] [y2] [z2]  
 -set_bounding_box [x1] [y1] [z1] [x2] [y2] [z2]: set bounding box to [x1] [y1] [z1] [x2] [y2] [z2]  
 -set_creation_date [day] [year]     : set creation date to [day] [year]  
@@ -351,6 +344,15 @@ Further examples
 -suppress_z                         : do not decompress z coordinates for native-compressed LAS 1.4 point types 6 or higher  
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 -wkt_format                         : formats WKT output with line breaks and indent for better readability  
+
+## lasinfo output arguments
+-otxt                               : output as textfile (or '-o file.txt')  
+-ojs                                : output as json file (or '-o file.json')  
+-ocsv                               : output as csv file (table style; '-nc' is set by default; use '-full_csv' for all columns)  
+-js                                 : console output in json format  
+-json                               : console output in json format  
+-csv                                : console output in csv format (table style; '-nc' is set by default; use '-full_csv' for all columns)  
+-full_csv                           : outputs all information. Use only in combination with csv format  
 
 ## lasinfo patch arguments
 

@@ -1,5 +1,11 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+10 June 2026 -- fix: lasinfo: output classification histogram in JSON output
+9 June 2026 -- fix: lasthin3d: fix point per voxel writer; fix flag writer
+4 June 2026 -- NEW: las2dem_new: add option "-kill3d"
+7 May 2026 -- fix: file reader: restore wildcard extension support while keeping strict extension filtering
+7 May 2026 -- fix: 64bit interval support to lasindex and extend LAX format
+7 May 2026 -- fix: improve utf8 validation to correctly accept all valid multi-byte sequences
 5 May 2026 -- NEW: lasinfo supports CSV table output to catalog files and decodes global encoding word to text info (https://rapidlasso.de/lasinfo-significant-enhancements/)
 5 May 2026 -- NEW: argument "-subdir" to scan recursive in all input subdirectories using wildcards (e.g. "*.laz")
 23 April 2026 -- NEW: extended lasvalidate to support console output in CSV, TXT and XML formats via the -csv, -txt and -xml arguments
