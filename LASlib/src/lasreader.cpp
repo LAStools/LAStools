@@ -49,6 +49,7 @@
 #include "lasreaderpipeon.hpp"
 #include "lasreaderstored.hpp"
 #include "lastransform.hpp"
+#include "lasformula_api.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -522,6 +523,12 @@ I32 LASreadOpener::unparse(CHAR* string) const {
   if (z_from_attribute && !z_from_attribute_try) {
     n += sprintf(string + n, "-z_from_attribute ");
   }
+  if (!formula_expr.empty()) {
+    n += sprintf(string + n, "-formula \"%s\" ", formula_expr.c_str());
+  }
+  if (!fileformula_expr.empty()) {
+    n += sprintf(string + n, "-fileformula \"%s\" ", fileformula_expr.c_str());
+  }
   /* optional in derivation
   _txt: if (translation) { ... "-itranslate_intensity"
          if (scale_intensity) "-iscale_intensity"
@@ -529,6 +536,12 @@ I32 LASreadOpener::unparse(CHAR* string) const {
    scale_scan_angle "-iscale_scan_angle"
   */
   return n;
+}
+
+void LASreadOpener::file_formula(LASreader* lasreader) {
+  if (!lasreader) return;
+
+  file_formula_filtered = lasformula_bind_file_header_and_eval(&lasreader->header);
 }
 
 BOOL LASreadOpener::is_buffered() const {
@@ -553,6 +566,7 @@ void LASreadOpener::z_from_attribute_bydefault() {
 }
 
 LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_other) {
+  file_formula_filtered = false;
   inside_depth_opener = 0;
   if (filter) filter->reset();
   if (transform) transform->reset();
@@ -617,8 +631,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           delete lasreaderpipeon;
           return 0;
         }
+        // check formula and file formula
+        file_formula(lasreaderpipeon);
         return lasreaderpipeon;
       } else {
+        // check formula and file formula
+        file_formula(lasreader);
         return lasreader;
       }
     } else if ((buffer_size > 0) && ((file_name_number > 1) || (neighbor_file_name_number > 0))) {
@@ -738,8 +756,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           delete lasreaderpipeon;
           return 0;
         }
+        // check formula and file formula
+        file_formula(lasreaderpipeon);
         return lasreaderpipeon;
       } else {
+        // check formula and file formula
+        file_formula(lasreader);
         return lasreader;
       }
     } else {
@@ -857,8 +879,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             delete lasreaderpipeon;
             return 0;
           }
+          // check formula and file formula
+          file_formula(lasreaderpipeon);
           return lasreaderpipeon;
         } else {
+          // check formula and file formula
+          file_formula(lasreader);
           return lasreader;
         }
       } else if (HasFileExt(std::string(file_name), ".bin")) {
@@ -916,8 +942,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             delete lasreaderpipeon;
             return 0;
           }
+          // check formula and file formula
+          file_formula(lasreaderpipeon);
           return lasreaderpipeon;
         } else {
+          // check formula and file formula
+          file_formula(lasreader);
           return lasreader;
         }
       } else if (HasFileExt(std::string(file_name), ".shp")) {
@@ -970,8 +1000,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             delete lasreaderpipeon;
             return 0;
           }
+          // check formula and file formula
+          file_formula(lasreaderpipeon);
           return lasreaderpipeon;
         } else {
+          // check formula and file formula
+          file_formula(lasreader); 
           return lasreader;
         }
       } else if (HasFileExt(std::string(file_name), ".asc")) {
@@ -1024,8 +1058,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             delete lasreaderpipeon;
             return 0;
           }
+          // check formula and file formula
+          file_formula(lasreaderpipeon);
           return lasreaderpipeon;
         } else {
+          // check formula and file formula
+          file_formula(lasreader);
           return lasreader;
         }
       } else if (HasFileExt(std::string(file_name), ".bil")) {
@@ -1078,8 +1116,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             delete lasreaderpipeon;
             return 0;
           }
+          // check formula and file formula
+          file_formula(lasreaderpipeon);
           return lasreaderpipeon;
         } else {
+          // check formula and file formula
+          file_formula(lasreader);
           return lasreader;
         }
       } else if (HasFileExt(std::string(file_name), ".dtm")) {
@@ -1132,8 +1174,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             delete lasreaderpipeon;
             return 0;
           }
+          // check formula and file formula
+          file_formula(lasreaderpipeon);
           return lasreaderpipeon;
         } else {
+          // check formula and file formula
+          file_formula(lasreader);
           return lasreader;
         }
       } else if (HasFileExt(std::string(file_name), ".ply")) {
@@ -1177,8 +1223,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             delete lasreaderpipeon;
             return 0;
           }
+          // check formula and file formula
+          file_formula(lasreaderpipeon);
           return lasreaderpipeon;
         } else {
+          // check formula and file formula
+          file_formula(lasreader);
           return lasreader;
         }
       } else if (HasFileExt(std::string(file_name), ".qi")) {
@@ -1236,8 +1286,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             delete lasreaderpipeon;
             return 0;
           }
+          // check formula and file formula
+          file_formula(lasreaderpipeon);
           return lasreaderpipeon;
         } else {
+          // check formula and file formula
+          file_formula(lasreader);
           return lasreader;
         }
       } else {
@@ -1301,8 +1355,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
             delete lasreaderpipeon;
             return 0;
           }
+          // check formula and file formula
+          file_formula(lasreaderpipeon);
           return lasreaderpipeon;
         } else {
+          // check formula and file formula
+          file_formula(lasreader);
           return lasreader;
         }
       }
@@ -1365,8 +1423,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           delete lasreaderpipeon;
           return 0;
         }
+        // check formula and file formula
+        file_formula(lasreaderpipeon);
         return lasreaderpipeon;
       } else {
+        // check formula and file formula
+        file_formula(lasreader);
         return lasreader;
       }
     } else {
@@ -1413,8 +1475,12 @@ LASreader* LASreadOpener::open(const CHAR* other_file_name, BOOL reset_after_oth
           delete lasreaderpipeon;
           return 0;
         }
+        // check formula and file formula
+        file_formula(lasreaderpipeon);
         return lasreaderpipeon;
       } else {
+        // check formula and file formula
+        file_formula(lasreader);
         return lasreader;
       }
     }
@@ -2162,8 +2228,32 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
         *argv[i] = '\0';
         *argv[i + 1] = '\0';
         i += 1;
+      } 
+      else if (strcmp(argv[i], "-formula") == 0) {
+        if ((i + 1) >= argc) {
+          laserror("'%s' needs 1 argument: formula", argv[i]);
+        }
+
+        lasformula_parse_formula_string(argv[i + 1], LASFORMULA_POINT);
+        formula_expr = std::string(argv[i + 1]);
+
+        *argv[i] = '\0';
+        *argv[i + 1] = '\0';
+        i += 1;
+      } else if (strcmp(argv[i], "-fileformula") == 0) {
+        if ((i + 1) >= argc) {
+          laserror("'%s' needs 1 argument: formula", argv[i]);
+        }
+
+        lasformula_parse_formula_string(argv[i + 1], LASFORMULA_FILE);
+        fileformula_expr = std::string(argv[i + 1]);
+
+        *argv[i] = '\0';
+        *argv[i + 1] = '\0';
+        i += 1;
       }
-    } else if (strcmp(argv[i], "-offset_adjust") == 0) {
+    }   
+    else if (strcmp(argv[i], "-offset_adjust") == 0) {
       set_offset_adjust(TRUE);
       *argv[i] = '\0';
     } else if (strcmp(argv[i], "-merged") == 0) {
@@ -2286,9 +2376,12 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
     return;
   }
   if (!filter->active()) {
-    delete filter;
-    filter = 0;
+    if (!lasformula_has_filters()) {
+      delete filter;
+      filter = 0;
+    }
   }
+  if (filter && lasformula_has_filters()) filter->enable_formula_filter();
 
   if (transform)
     transform->clean();
@@ -2304,8 +2397,10 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
     if (transform->filtered()) {
       LASMessage(LAS_WARNING, "no LAStransform specified. '-filtered_transform' has no effect.");
     }
-    delete transform;
-    transform = 0;
+    if (!lasformula_has_transforms()) {
+      delete transform;
+      transform = 0;
+    }
   } else if (transform->filtered()) {
     if (filter == 0) {
       LASMessage(LAS_WARNING, "no LASfilter specified. '-filtered_transform' has no effect.");
@@ -2314,6 +2409,7 @@ void LASreadOpener::parse(int argc, char* argv[], BOOL parse_ignore, BOOL suppre
       filter = 0;
     }
   }
+  if (transform && lasformula_has_transforms()) transform->enable_formula_transform();
 
   if (files_are_flightlines || apply_file_source_ID) {
     if (transform == 0) transform = new LAStransform();
@@ -3325,6 +3421,7 @@ LASreadOpener::LASreadOpener() {
   pipe_on = FALSE;
   unique = FALSE;
   is_validate = FALSE;
+  file_formula_filtered = false;
   file_name_number = 0;
   file_name_allocated = 0;
   file_name_current = 0;
@@ -3338,6 +3435,8 @@ LASreadOpener::LASreadOpener() {
   transform = 0;
   ignore = 0;
   temp_file_base = "";
+  formula_expr = "";
+  fileformula_expr = "";
   // COPC
   inside_depth_opener = 0;
   copc_stream_order = 1;

@@ -1211,6 +1211,11 @@ public:
         I64 set_vlr_user_id_pos = -1;
         if (set_vlr_user_id_index != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+          // fileformula filtered
+          if (lasreadopener.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+            continue;
+          }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
@@ -1230,6 +1235,11 @@ public:
         I64 set_vlr_record_id_pos = -1;
         if (set_vlr_record_id_index != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+          // fileformula filtered
+          if (lasreadopener.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+            continue;
+          }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
@@ -1249,6 +1259,11 @@ public:
         I64 set_vlr_description_pos = -1;
         if (set_vlr_description_index != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+          // fileformula filtered
+          if (lasreadopener.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+            continue;
+          }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
@@ -1273,6 +1288,11 @@ public:
         U32 set_geotiff_vlr_geo_ascii_length = 0;
         if (set_geotiff_epsg != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+          // fileformula filtered
+          if (lasreadopener.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+            continue;
+          }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
@@ -1307,6 +1327,11 @@ public:
           // preread header actions
           if (header_preread) {
             LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+            // fileformula filtered
+            if (lasreadopener.is_file_formula_filtered()) {
+              LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+              continue;
+            }
             if (lasreader == 0) {
               laserror("cannot open lasreader for '%s'", file_name);
             }
@@ -1579,6 +1604,11 @@ public:
 
       // open lasreader
       lasreader = lasreadopener.open();
+      // fileformula filtered
+      if (lasreadopener.is_file_formula_filtered()) {
+        LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+        continue;
+      }
       if (lasreader == 0) {
         laserror("cannot open lasreader");
         continue;
@@ -1715,7 +1745,13 @@ public:
 
       // print header info
       std::string printstring(4096, '\0');
-      bool wkt_bit_set = false;  // false = GeoTiff, true = WKT
+      bool wkt_bit_set = false; // false = GeoTiff, true = WKT
+
+      if ((lasheader->version_major == 1) && (lasheader->version_minor <= 4)) {
+        wkt_bit_set = (lasheader->global_encoding & (1 << 4)) != 0;
+      } else {
+        wkt_bit_set = true;
+      }
 
       if (file_out && !no_header) {
         JsonObject json_sub_main_header_entries;
@@ -1741,11 +1777,6 @@ public:
           }
         }
         //detailed information on set bits in global encoding
-        //GPS bits first (bit 6 and bit 0)
-        bool gpsOffs = (lasheader->global_encoding & 64) != 0;
-        bool gpsStd = (lasheader->global_encoding & 1) != 0;
-        int gps_mode = 0;  // 0 = week, 1 = std, 2 = std+offs
-
         std::string global_encoding_bits = VectorDelimited(lasheader->get_global_encoding_list(), ", ");
 
         if (json_out) {

@@ -323,6 +323,13 @@ int main(int argc, char *argv[])
     // open lasreader
 
     LASreader* lasreader = lasreadopener.open();
+
+    // fileformula filtered
+    if (lasreadopener.is_file_formula_filtered()) {
+      LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+      continue;
+    }
+
     if (lasreader == 0)
     {
       laserror("could not open lasreader");

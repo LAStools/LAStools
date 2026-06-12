@@ -614,6 +614,13 @@ las2shp64 -i *.laz -drop_return 1
 -filter_or          : boolean OR combination of last 2 filters  
 -filtered_transform : do the transformation only on points of the current filter  
 
+### formula solver
+-formula [exp]       : Allows filtering or transforming point variables using formula expressions [exp]; LAS header variables may be used only for filtering  
+-fileformula [exp]   : Allows filtering input files or transforming LAS header variables using formula expressions [exp]; point variables are not allowed  
+
+For details about the formula features and how to write formula expressions, see the [formula solver documentation (formula_solver_README.md)]  
+The formula features require a full licensed build of LAStools and are not available in the open-source version.  
+ 
 ### Input
 -i [fnp]        : input file or input file mask [fnp] (e.g. *.laz;fo?.la?;esri.shp,...)  
 -io_ibuffer [n] : use read-input-buffer of size [n] bytes  

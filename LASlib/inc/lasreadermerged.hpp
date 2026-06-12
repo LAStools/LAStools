@@ -45,6 +45,7 @@
 #include "lasreader_ply.hpp"
 #include "lasreader_qfit.hpp"
 #include "lasreader_txt.hpp"
+#include <unordered_set>
 
 class LASreaderMerged : public LASreader
 {
@@ -130,6 +131,7 @@ private:
   CHAR** file_names;
   U32* file_names_ID;
   F64* bounding_boxes;
+  std::unordered_set<size_t> filtered_file_number;
 };
 
 #endif

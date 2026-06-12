@@ -1145,6 +1145,11 @@ public:
     return std::string(version_buffer);
   }
 
+  // LAS version as number: 1.3 equivalent to 13
+  U16 get_version_number() const {
+    return (version_major * 10) + version_minor;
+  }
+
   /// Converts the year and day of year stored in the LAS header into a YYYY-MM-DD date or 'unknown' if the values are invalid and retuns it
   std::string get_dayOfYear_to_date_string() {
     if (this->file_creation_year == 0 || this->file_creation_day == 0) {
@@ -1169,6 +1174,18 @@ public:
       return this->extended_number_of_point_records;
     }
     return this->number_of_point_records;
+  }
+
+  void set_number_of_point_records_uni(U64 value) {
+    if (this->version_major > 1 || (this->version_major == 1 && this->version_minor >= 4)) {
+      // LAS 1.4
+      this->extended_number_of_point_records = value;
+      this->number_of_point_records = 0;
+    } else {
+      // LAS 1.0-1.3
+      this->number_of_point_records = (U32)value;
+      this->extended_number_of_point_records = 0;
+    }
   }
 
   U64 get_number_of_points_by_return_uni(U8 idx) {

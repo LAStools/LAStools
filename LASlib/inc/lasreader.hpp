@@ -91,7 +91,7 @@ class LASLIB_DLL LASreader {
   inline COPCindex* get_copcindex() const {
     return copc_index;
   };
-  virtual void set_filter(LASfilter* filter);
+   void set_filter(LASfilter* filter);
   inline LASfilter* get_filter() const {
     return filter;
   };
@@ -351,6 +351,9 @@ class LASLIB_DLL LASreadOpener {
   inline const F64* get_offset() const {
     return offset;
   };
+  inline bool is_file_formula_filtered() {
+    return file_formula_filtered;
+  }
   void set_translate_intensity(const F32 translation);
   void set_scale_intensity(const F32 scale);
   void set_translate_scan_angle(const F32 translate_scan_angle);
@@ -380,6 +383,7 @@ class LASLIB_DLL LASreadOpener {
   BOOL active() const;
   BOOL is_inside() const;
   I32 unparse(CHAR* string) const;
+  void file_formula(LASreader* lasreader);
   void set_filter(LASfilter* filter);
   inline LASfilter* get_filter() {
     return filter;
@@ -510,6 +514,9 @@ class LASLIB_DLL LASreadOpener {
   BOOL use_stdin;
   BOOL unique;
   BOOL is_validate;
+  std::string formula_expr;
+  std::string fileformula_expr;
+  bool file_formula_filtered;
 
   // optional extras
   LASindex* index;
