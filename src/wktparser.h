@@ -60,11 +60,20 @@ const std::unordered_map<std::string, PROJECTION_METHOD> wkt1projection = {
     {"Oblique_Stereographic", pro_ObliqueStereographic},
     {"Transverse_Mercator", pro_TransverseMercator}};
 
+const std::unordered_map<std::string, PROJECTION_METHOD> wkt2projection = {
+    {"transverse mercator", pro_TransverseMercator},
+    {"lambert conic conformal (1sp)", pro_LambertConicConformal1},
+    {"lambert conic conformal (2sp)", pro_LambertConicConformal2},
+    {"albers equal area", pro_Albers},
+    {"oblique stereographic", pro_ObliqueStereographic},
+    {"hotine oblique mercator (variant a)", pro_HotineObliqueMercatorA},
+    {"hotine oblique mercator (variant b)", pro_HotineObliqueMercatorB}};
+
 // tokens to identify wkt1/wkt2
 const std::vector<std::string> Wkt1Tkn = {"COMPD_CS", "FITTED_CS", "GEOCCS", "GEOGCS", "LOCAL_CS", "PROJCS", "VERT_CS"};
-const std::vector<std::string> Wkt2Tkn = {"BOUNDCRS",    "COMPOUNDCRS",        "ENGCRS",  "ENGINEERINGCRS", "GEODCRS", "GEODETICCRS",
-                                          "IMAGECRS",    "PARAMETRICCRS",      "PROJCRS", "PROJECTEDCRS",   "TIMECRS", "VERTCRS",
-                                          "VERTICALCRS", "COORDINATEOPERATION"};
+const std::vector<std::string> Wkt2Tkn = {"GEOGCRS", "GEODCRS",     "GEODETICCRS", "PROJCRS",        "PROJECTEDCRS",
+                                          "VERTCRS", "VERTICALCRS", "ENGCRS",      "ENGINEERINGCRS", "PARAMETRICCRS",
+                                          "TIMECRS", "COMPOUNDCRS", "BOUNDCRS",    "IMAGECRS",       "COORDINATEOPERATION"};
 
 /// helper function to get unit-epsg out of unit value
 int UnitValueToEpsg(double val);

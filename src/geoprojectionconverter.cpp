@@ -818,6 +818,7 @@ ProjParameters::ProjParameters()
       proj_target_crs(nullptr),
       proj_transform_crs(nullptr),
       header_wkt_representation(nullptr),
+      header_wkt2_representation(nullptr),
       proj_crs_infos(nullptr)
 {
 }
@@ -825,6 +826,7 @@ ProjParameters::ProjParameters()
 ProjParameters::~ProjParameters() {
   // Free the WKT representation if it was dynamically allocated
   delete[] header_wkt_representation;
+  delete[] header_wkt2_representation;
   delete[] proj_crs_infos;
 
   // Free the PROJ context
@@ -870,7 +872,10 @@ void ProjParameters::set_proj_member(char*& member, const char* value) {
 }
 
 /// Returns the target CRS WKT representation after a PROJ transformation for the header metadata
-const char* ProjParameters::get_target_header_wkt_representation() {
+const char* ProjParameters::get_target_header_wkt_representation(LASheader& header) {
+  if (header_wkt2_representation && header.version_major == 1 && header.version_minor >= 5) {
+    return header_wkt2_representation;
+  } 
   if (header_wkt_representation) {
     return header_wkt_representation;
   }
@@ -878,30 +883,41 @@ const char* ProjParameters::get_target_header_wkt_representation() {
 }
 
 /// Creates the WKT representation of the CRS for the file header
-void ProjParameters::set_header_wkt_representation(PJ* proj_crs) {
+void ProjParameters::set_target_header_wkt_representation(PJ* proj_crs) {
   // Calling up and outputting the WKT display
   if (proj_ctx && proj_crs) {
     const char* options[] = {"MULTILINE=NO", nullptr};
     const char* wkt_representation = proj_as_wkt_ptr(proj_ctx, proj_crs, PJ_WKT1_GDAL, options);
+    const char* wkt2_representation = proj_as_wkt_ptr(proj_ctx, proj_crs, PJ_WKT2_2019, options);
 
-    if (!wkt_representation) {
+    if (!wkt_representation && !wkt2_representation) {
       LASMessage(
           LAS_SERIOUS_WARNING,
           "The WKT representation could not be generated and could not be written to the output file header! It is therefore not possible to "
           "determine the CRS of the file.");
     }
     set_proj_member(header_wkt_representation, wkt_representation);
+    set_proj_member(header_wkt2_representation, wkt2_representation);
     LASMessage(LAS_VERBOSE, "the WKT was successfully created via the PROJ library");
   }
 }
 
 /// returns the WKT representation of the PROJ crs
 /// IMPORTANT: the proj context and the PROJ crs object must have been created before calling the function
-const char* ProjParameters::get_wkt_representation(bool source /*=true*/) const {
+const char* ProjParameters::get_wkt_representation(LASheader& header, bool source /*=true*/) const {
   if (proj_ctx && ((proj_source_crs && source) || (proj_target_crs && !source))) {
+    PJ_WKT_TYPE wkt_type;
     // Retrieving and outputting the WKT representation
     const char* options[] = {"MULTILINE=NO", nullptr};
-    const char* wkt = proj_as_wkt_ptr(proj_ctx, source ? proj_source_crs : proj_target_crs, PJ_WKT1_GDAL, options);
+
+    // LAS 1.5 WKT2 (recommended)
+    if (header.version_major == 1 && header.version_minor >= 5) {
+      wkt_type = PJ_WKT2_2019;
+    } else {
+      wkt_type = PJ_WKT1_GDAL;
+    }
+    const char* wkt = proj_as_wkt_ptr(proj_ctx, source ? proj_source_crs : proj_target_crs, wkt_type, options);
+
     if (!wkt) {
       laserror("The WKT representation of the PROJ CRS could not be generated.");
     }
@@ -2370,14 +2386,29 @@ FILE* GeoProjectionConverter::open_geo_file(bool pcs, bool vertical) {
 bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, char* description) {
   WktParserSem wkt;
   wkt.SetWkt(ogc_wkt);
+
   LASMessage(LAS_VERBOSE, "reading wkt%c %s", wkt.isWkt1 ? '1' : '2', wkt.isCompound ? "[compound]" : "");
+
   vertical_geokey = wkt.Vert_Epsg();
   set_VerticalUnitsGeoKey(wkt.Vert_Unit_Epsg());
-  // check if we have a projection
-  if (set_epsg_code(wkt.Pcs_Epsg(), description)) {
-    LASMessage(LAS_VERBOSE, "source projection [%s] set", source_projection->info().c_str());
-    return true;
+
+  int gcs = wkt.Gcs_Epsg();
+  if (gcs > 0) {
+    if (set_epsg_code(gcs, description)) {
+      LASMessage(LAS_VERBOSE, "source CRS [%s] set (GCS)", source_projection->info().c_str());
+      // DO NOT return yet PCS may override it
+    }
   }
+
+  // check if we have a projection (PCS)
+  int pcs = wkt.Pcs_Epsg();
+  if (pcs > 0) {
+    if (set_epsg_code(pcs, description)) {
+      LASMessage(LAS_VERBOSE, "source CRS [%s] set (PCS)", source_projection->info().c_str());
+      return true;  // PCS wins
+    }
+  }
+
   // otherwise try to find the PROJECTION and all its parameters
   PROJECTION_METHOD projection;
   if (wkt.HasProjection(projection)) {
@@ -2442,9 +2473,10 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
       default:  // Unhandled values exist.
         break;
     }
-  } else {
-    // no projection found - optional: check if the string contains a wkt1-GEOCCS
   }
+  // if we set GCS earlier, return true now
+  if (gcs > 0) return true;
+
   return false;
 }
 
@@ -8001,29 +8033,23 @@ bool GeoProjectionConverter::has_target_precision() const {
 }
 
 double GeoProjectionConverter::get_target_precision(double header_precision) const {
-  if (target_precision) {
-    return target_precision;
-  } else if (target_projection && (target_projection->type == GEO_PROJECTION_LONG_LAT || target_projection->type == GEO_PROJECTION_LAT_LONG)) {
-    return 1e-7;
-  } else if (source_projection && (source_projection->type == GEO_PROJECTION_LONG_LAT || source_projection->type == GEO_PROJECTION_LAT_LONG)) {
-    return 0.01;
-  } else if (projParameters.proj_target_crs && projParameters.proj_ctx) {
-    PJ* target_coord_system = proj_crs_get_coordinate_system_ptr(projParameters.proj_ctx, projParameters.proj_target_crs);
+  if (target_precision > 0.0) return target_precision;
 
-    if (target_coord_system) {
-      PJ* source_coord_system = proj_crs_get_coordinate_system_ptr(projParameters.proj_ctx, projParameters.proj_source_crs);
-      PJ_COORDINATE_SYSTEM_TYPE target_cs_type = proj_cs_get_type_ptr(projParameters.proj_ctx, target_coord_system);
-      PJ_COORDINATE_SYSTEM_TYPE source_cs_type = proj_cs_get_type_ptr(projParameters.proj_ctx, source_coord_system);
+  if (header_precision > 0.0) return header_precision;
 
-      if (target_cs_type == PJ_CS_TYPE_ELLIPSOIDAL) {
-        return 1e-7;
-      } else if (source_coord_system && source_cs_type == PJ_CS_TYPE_ELLIPSOIDAL && target_cs_type != PJ_CS_TYPE_ELLIPSOIDAL) {
-        return 0.01;
-      }
+  if (projParameters.proj_target_crs && projParameters.proj_ctx) {
+    PJ* target_cs = proj_crs_get_coordinate_system_ptr(projParameters.proj_ctx, projParameters.proj_target_crs);
+
+    if (target_cs) {
+      PJ_COORDINATE_SYSTEM_TYPE type = proj_cs_get_type_ptr(projParameters.proj_ctx, target_cs);
+
+      if (type == PJ_CS_TYPE_ELLIPSOIDAL)
+        return 1e-7;  // lat/long
+      else
+        return 0.01;  // projected meters
     }
-  } else if (header_precision > 0.0) {
-    return header_precision;
   }
+
   return 0.01;
 }
 
@@ -8777,7 +8803,7 @@ void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int& epsg_code, boo
     LASMessage(LAS_VERY_VERBOSE, "the PROJ source object was successfully created");
   } else {
     projParameters.proj_target_crs = proj_crs;
-    projParameters.set_header_wkt_representation(projParameters.proj_target_crs);
+    projParameters.set_target_header_wkt_representation(projParameters.proj_target_crs);
     LASMessage(LAS_VERY_VERBOSE, "the PROJ target object was successfully created");
   }
 }
@@ -8818,7 +8844,7 @@ void GeoProjectionConverter::set_proj_crs_with_string(const char* proj_string, b
     LASMessage(LAS_VERY_VERBOSE, "the PROJ source object was successfully created");
   } else {
     projParameters.proj_target_crs = proj_crs;
-    projParameters.set_header_wkt_representation(projParameters.proj_target_crs);
+    projParameters.set_target_header_wkt_representation(projParameters.proj_target_crs);
     LASMessage(LAS_VERY_VERBOSE, "the PROJ target object was successfully created");
   }
 }
@@ -8893,7 +8919,7 @@ void GeoProjectionConverter::set_proj_crs_with_json(const char* json_filename, b
     LASMessage(LAS_VERY_VERBOSE, "the PROJ source object was successfully created");
   } else {
     projParameters.proj_target_crs = proj_crs;
-    projParameters.set_header_wkt_representation(projParameters.proj_target_crs);
+    projParameters.set_target_header_wkt_representation(projParameters.proj_target_crs);
     LASMessage(LAS_VERY_VERBOSE, "the PROJ target object was successfully created");
   }
 }
@@ -8967,7 +8993,7 @@ void GeoProjectionConverter::set_proj_crs_with_wkt(const char* wkt_filename, boo
     LASMessage(LAS_VERY_VERBOSE, "the PROJ source object was successfully created");
   } else {
     projParameters.proj_target_crs = proj_crs;
-    projParameters.set_header_wkt_representation(projParameters.proj_target_crs);
+    projParameters.set_target_header_wkt_representation(projParameters.proj_target_crs);
     LASMessage(LAS_VERY_VERBOSE, "the PROJ target object was successfully created");
   }
 #pragma warning(push)
@@ -9012,7 +9038,7 @@ void GeoProjectionConverter::set_proj_crs_with_file_header_wkt(const char* wktCo
     LASMessage(LAS_VERY_VERBOSE, "the PROJ source object was successfully created");
   } else {
     projParameters.proj_target_crs = proj_crs;
-    projParameters.set_header_wkt_representation(projParameters.proj_target_crs);
+    projParameters.set_target_header_wkt_representation(projParameters.proj_target_crs);
     LASMessage(LAS_VERY_VERBOSE, "the PROJ target object was successfully created");
   }
 }
@@ -9201,7 +9227,7 @@ void GeoProjectionConverter::set_proj_param_for_transformation_with_string(const
       if (projParameters.proj_target_crs) {
         LASMessage(LAS_VERBOSE, "using PROJ transformation (piped) string '%s'", proj_source_string);
         // Calling up and outputting the WKT display
-        projParameters.set_header_wkt_representation(projParameters.proj_target_crs);
+        projParameters.set_target_header_wkt_representation(projParameters.proj_target_crs);
       }
     } else {
       // If only one PROJ string was specified and describes a single CRS, it is set as the target.
@@ -9264,7 +9290,7 @@ bool GeoProjectionConverter::do_proj_crs_transformation(double& x, double& y, do
 void GeoProjectionConverter::get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjectionConverter& geoprojectionconverter, LASreader* lasreader) {
   if (lasreader) {
     // If there is a target wkt header, it is a CRS transformation
-    const char* wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation();
+    const char* wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation(lasreader->header);
 
     // If the WKT representation has not been created yet
     if (geoprojectionconverter.source_header_epsg == 0 && wkt_representation == nullptr) {
@@ -9299,13 +9325,13 @@ void GeoProjectionConverter::get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjection
           geoprojectionconverter.reset_projection();
         }
       }
-      wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation();
+      wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation(lasreader->header);
     }
     if (wkt_representation == nullptr) {
       // If no WKT representation is available, try to create it with EPSG
       if (geoprojectionconverter.source_header_epsg > 0) {
         geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, false);
-        wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation();
+        wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation(lasreader->header);
       }
     }
     if (wkt_representation) {
@@ -9316,6 +9342,8 @@ void GeoProjectionConverter::get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjection
         strcpy_las(ogc_wkt_out, buff_len, wkt_representation);
         ogc_wkt_out[buff_len - 1] = '\0';
       }
+    } else {
+      LASMessage(LAS_SERIOUS_WARNING, "The WKT representation could not be generated");
     }
   }
 }

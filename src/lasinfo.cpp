@@ -1717,6 +1717,12 @@ public:
       std::string printstring(4096, '\0');
       bool wkt_bit_set = false;  // false = GeoTiff, true = WKT
 
+      if ((lasheader->version_major == 1) && (lasheader->version_minor <= 4)) {
+        wkt_bit_set = (lasheader->global_encoding & (1 << 4)) != 0;
+      } else {
+        wkt_bit_set = true;
+      }
+
       if (file_out && !no_header) {
         JsonObject json_sub_main_header_entries;
 
@@ -1741,11 +1747,6 @@ public:
           }
         }
         //detailed information on set bits in global encoding
-        //GPS bits first (bit 6 and bit 0)
-        bool gpsOffs = (lasheader->global_encoding & 64) != 0;
-        bool gpsStd = (lasheader->global_encoding & 1) != 0;
-        int gps_mode = 0;  // 0 = week, 1 = std, 2 = std+offs
-
         std::string global_encoding_bits = VectorDelimited(lasheader->get_global_encoding_list(), ", ");
 
         if (json_out) {
@@ -3580,7 +3581,7 @@ public:
         }
         // Query the WKT representation of the CRS
         if (geoprojectionconverter.projParameters.proj_info_arg_contains("wkt")) {
-          proj_crs_infos = geoprojectionconverter.projParameters.get_wkt_representation(true);
+          proj_crs_infos = geoprojectionconverter.projParameters.get_wkt_representation(lasreader->header, true);
           info_content = indent_text(proj_crs_infos, "  ");
 
           if (info_content == nullptr || *info_content == '\0') {

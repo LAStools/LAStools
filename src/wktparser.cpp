@@ -306,7 +306,7 @@ std::string WktParser::ValueSubStr(const std::string& key, const std::string sub
   for (auto item = range.first; item != range.second; ++item) {
     std::string val = item->second;
     std::string out;
-    if (GetTokenNext(val, "|", out) && (BOOST_PRE to_lower_copy(out).compare(sub) == 0)) {
+    if (GetTokenNext(val, "|", out) && (BOOST_PRE to_lower_copy(out).compare(to_lower_copy(sub)) == 0)) {
       if (GetTokenNext(val, "|", out)) {
         return out;
       }
@@ -358,6 +358,7 @@ int WktParserSem::Vert_Epsg() {
   }
   return res;
 }
+
 int WktParserSem::Vert_Unit_Epsg() {
   int res = 0;
   if (isWkt1) {
@@ -391,7 +392,12 @@ bool WktParserSem::HasProjection(PROJECTION_METHOD& pm) {
     key = "PROJCRS.CONVERSION.METHOD";
   }
   projection = ValueStr(compoundPfx + key);
-  if (auto search = wkt1projection.find(to_lower_copy(projection)); search != wkt1projection.end()) {
+  // select the correct map
+  const auto& map = isWkt1 ? wkt1projection : wkt2projection;
+
+  if (!isWkt1) projection = to_lower_copy(projection);
+
+  if (auto search = map.find(projection); search != map.end()) {
     pm = search->second;
     return true;
   }

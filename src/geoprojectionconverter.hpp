@@ -305,9 +305,9 @@ class ProjParameters
   ProjParameters();
   ~ProjParameters();
 
-  void set_header_wkt_representation(PJ* proj_crs);
-  const char* get_target_header_wkt_representation();
-  const char* get_wkt_representation(bool source=true) const;  // cmd arg: 'wkt'
+  void set_target_header_wkt_representation(PJ* proj_crs);
+  const char* get_target_header_wkt_representation(LASheader& header);
+  const char* get_wkt_representation(LASheader& header, bool source = true) const;  // cmd arg: 'wkt'
   const char* get_json_representation(bool source = true) const;  // cmd arg: 'js'
   const char* get_projString_representation(bool source = true) const;  // cmd arg: 'str'
   const char* get_epsg_representation(bool source = true) const;        // cmd arg: 'epsg'
@@ -318,6 +318,7 @@ class ProjParameters
   
  private:
   char* header_wkt_representation;
+  char* header_wkt2_representation;
   char* proj_crs_infos;
 
   void set_proj_member(char*& member, const char* value);
