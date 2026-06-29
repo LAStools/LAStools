@@ -1169,6 +1169,28 @@ public:
     return buffer;
   }
 
+  /// Converts the year and day of year stored in the LAS header into a single number with format YYYYMMDD
+  U32 get_dayOfYear_to_date_number() {
+    if (this->file_creation_year == 0 || this->file_creation_day == 0) {
+      return 0;
+    }
+
+    std::tm date = {};
+    date.tm_year = this->file_creation_year - 1900;
+    date.tm_mday = this->file_creation_day;
+
+    if (std::mktime(&date) == -1) {
+      return 0;
+    }
+
+    // yyyymmdd
+    U32 y = date.tm_year + 1900;
+    U32 m = date.tm_mon + 1;
+    U32 d = date.tm_mday;
+
+    return y * 10000 + m * 100 + d;
+  }
+
   U64 get_number_of_point_records_uni() {
     if (this->extended_number_of_point_records != 0) {
       return this->extended_number_of_point_records;
