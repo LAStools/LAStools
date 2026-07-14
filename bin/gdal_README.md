@@ -18,7 +18,7 @@ The source code for the GDAL library is available at
   https://github.com/OSGeo/gdal.
 
 
-## Installing the GDAL Library
+## installing the GDAL Library
 
 To use the GDAL library in LAStools, it must be installed on your 
 system (possibly via QGIS or OSGeo4W or Conda).
@@ -26,7 +26,7 @@ Please note: This software requires GDAL version 3.0 or later.
 If the GDAL library is not already installed, here are several 
 methods to install it (We recommend using the default standard installation paths):
 
-### Package Managers
+### package Managers
 
 - **OSGeo4W**: Use this **Windows-specific** package manager to install GDAL.
  1. Download [OSGeo4W setup] - *https://trac.osgeo.org/osgeo4w/*
@@ -74,7 +74,7 @@ and configured.
   **Fedora:**:
     sudo dnf install qgis qgis-grass
 
-### Further installation options
+### further installation options
 - **Linux**:
   **Debian/Ubuntu**:
     sudo apt-get install gdal-bin
@@ -90,7 +90,7 @@ and configured.
   Or MacPorts:
     sudo port install gdal
 
-### Required Files for GDAL in LASTools
+### required Files for GDAL in LASTools
 
 To ensure that the GDAL library functions correctly with LASTools,
  you need to have the following library files available:
@@ -102,7 +102,7 @@ To ensure that the GDAL library functions correctly with LASTools,
 Additionally, ensure that the PROJ data files, including the 
 `proj.db`, are installed for full functionality.
 
-### File and Data Locations
+### file and Data Locations
 
 - **`file` and `data` standart Directories**: If LAStools uses the 
 GDAL library, the files and data of the library are automatically 
@@ -172,14 +172,14 @@ To use these custom directories,set the environment variables via command line (
 
 If you want to use the GDAL library later via QGIS, OSGeo4W or another installation, you must first delete the environment variables LASTOOLS_GDAL and GDAL_DATA if they have been set permanently.
 
-### Note
+### note
 
 For more information and detailed instructions about the 
 installation, refer to the official GDAL installation page
   https://gdal.org/en/stable/download.html
 
 
-## Licensing
+## licensing
 
 This library is free to use.
 GDAL is released under the X/MIT open source License.
@@ -187,7 +187,7 @@ For more information about the license and usage of the GDAL
 library, refer to the official GDAL repository or the official website 
   https://gdal.org/.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

@@ -32,6 +32,7 @@
     <ClCompile Include="src\fopen_compressed.cpp" />
     <ClCompile Include="src\lascopc.cpp" />
     <ClCompile Include="src\lasfilter.cpp" />
+    <ClCompile Include="src\lasformula_api_stub.cpp" />
     <ClCompile Include="src\lasignore.cpp" />
     <ClCompile Include="src\laskdtree.cpp" />
     <ClCompile Include="src\lasreader.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="..\src\proj_wrapper.h" />
     <ClInclude Include="inc\lasdefinitions.hpp" />
     <ClInclude Include="inc\lasfilter.hpp" />
+    <ClInclude Include="inc\lasformula_api.h" />
     <ClInclude Include="inc\lasignore.hpp" />
     <ClInclude Include="inc\laskdtree.hpp" />
     <ClInclude Include="inc\lasreader.hpp" />

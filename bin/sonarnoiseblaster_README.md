@@ -37,7 +37,7 @@ vertices but only 2 of the across-connected vertices are shown:
                  X
 
 
-## Examples
+## examples
 
     sonarnoiseblaster -i reef.laz -o reef_cleaned.laz
 
@@ -75,11 +75,11 @@ connected component reaches 5000 or higher.
 
 -week_to_adjusted [n] : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
-## Licensing
+## licensing
 
 This tool is free to use.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

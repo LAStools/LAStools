@@ -33,6 +33,7 @@
 #include "lasfilter.hpp"
 #include "lasmessage.hpp"
 #include "lasreader.hpp"
+#include "lasformula_api.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -11273,6 +11274,12 @@ void LAStransform::transform(LASpoint* point)
             return;
         }
     }
+    // Formula transformation
+    if (has_formula_transform) {
+      lasformula_bind_point(point);
+      lasformula_eval_transforms();
+    }
+
     for (i = 0; i < num_operations; i++) {
       operations[i]->transform(point);
     }
@@ -11296,6 +11303,7 @@ LAStransform::LAStransform()
     num_operations = 0;
     operations = 0;
     is_filtered = FALSE;
+    has_formula_transform = false;
     filter = 0;
 }
 

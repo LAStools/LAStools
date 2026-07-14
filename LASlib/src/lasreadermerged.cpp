@@ -674,6 +674,14 @@ BOOL LASreaderMerged::open()
         laserror("could not open lasreaderlas for file '%s'", file_names[i]);
         return FALSE;
       }
+      lasreaderlas->opener->file_formula(lasreaderlas);
+
+      // fileformula filtered
+      if (lasreaderlas->opener->is_file_formula_filtered()) {
+        filtered_file_number.insert(i);
+        LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_names[i]);
+        continue;
+      }
     }
     else if (lasreaderbin)
     {
@@ -1513,6 +1521,11 @@ BOOL LASreaderMerged::open_next_file()
 {
   while (file_name_current < file_name_number)
   {
+    if (filtered_file_number.count(file_name_current)) {
+      file_name_current++;
+      continue;
+    }
+
     if (inside)
     {
       // check if bounding box overlaps requested bounding box

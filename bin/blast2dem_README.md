@@ -37,7 +37,7 @@ value is always assumed to be meters and will be multipled with
 3.28 for LAS/LAZ files where x and y are known to be in feet.
 
 
-## Examples
+## examples
 
     blast2dem -i ..\data\TO_core_last_zoom.laz -o dem.asc -v
     blast2dem -i ..\data\TO_core_last_zoom.laz -o dem.bil -v -step 0.5
@@ -134,7 +134,7 @@ file that georeferences the PNG file in Google Earth
 -use_tile_bb               : raster tile without buffer added by lastile  
 -week_to_adjusted [n]      : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 
-### Basics
+### basics
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
@@ -152,9 +152,9 @@ file that georeferences the PNG file in Google Earth
 -version        : reports this tool's version number  
 
 
-## Module arguments
+## module arguments
 
-### General
+### general
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
@@ -164,7 +164,7 @@ file that georeferences the PNG file in Google Earth
 -no_world_file     : avoid world-file for PNG, JPG, TIF and BIL output  
 -stored            : use in memory reader  
 
-### Color
+### color
 -clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
 -copy_B_into_NIR                    : copy blue color value into NearInfraRed value  
 -copy_B_into_intensity              : copy blue color value to intensity  
@@ -223,7 +223,7 @@ file that georeferences the PNG file in Google Earth
 -switch_R_B                         : switch red and blue color value  
 -switch_R_G                         : switch red and green color value  
 
-### Coordinates
+### coordinates
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
 -auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly. Only applicable to LAS/LAZ input files  
@@ -302,7 +302,7 @@ file that georeferences the PNG file in Google Earth
 -translate_y [n]                    : translate y value by [n]  
 -translate_z [n]                    : translate z value by [n]  
 
-### Simple thinning
+### simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
 -keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
@@ -311,7 +311,7 @@ file that georeferences the PNG file in Google Earth
 -thin_with_grid [n]           : thin points by min grid size of [n]  
 -thin_with_time [n]           : thin pulses with time, [n] = timespacing  
 
-### Return number
+### return number
 -change_extended_number_of_returns_from_to [m] [n]: change extended number of returns from [m] to [n]  
 -change_extended_return_number_from_to [m] [n]: change extended return number from [m] to [n]  
 -change_number_of_returns_from_to [m] [n]: change number of returns from [m] to [n]  
@@ -352,7 +352,7 @@ file that georeferences the PNG file in Google Earth
 -set_number_of_returns [n]          : set number of returns to [n]  
 -set_return_number [n]              : set return number to [n]  
 
-### Scanline
+### scanline
 -drop_scan_direction [n]       : drop points with scan direction [n]  
 -faf                           : input files are flightlines. do ***NOT*** use this for tiled input  
 -faf_index [n]                 : set files are flightlines index [n]  
@@ -363,7 +363,7 @@ file that georeferences the PNG file in Google Earth
 -set_edge_of_flight_line [0/1] : set "Edge of Flight Line" flag to [0/1]  
 -set_scan_direction_flag [0/1] : set scan direction flag to [0/1]  
 
-### Scanner channel
+### scanner channel
 -copy_scanner_channel_into_point_source: copy scanner channel into point_source  
 -copy_scanner_channel_into_user_data: copy scanner channel into user data  
 -copy_user_data_into_scanner_channel: copy user data into scanner channel  
@@ -374,7 +374,7 @@ file that georeferences the PNG file in Google Earth
 -set_scanner_channel [n]            : set scanner channel to [n]  
 -split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
-### Source ID
+### source ID
 -apply_file_source_ID               : copy file source ID to target  
 -bin_Z_into_point_source [n]        : set point source to z/[n]  
 -bin_abs_scan_angle_into_point_source [n]: set point source to scan_angle/[n]  
@@ -397,7 +397,7 @@ file that georeferences the PNG file in Google Earth
 -set_point_source [n]               : set point source to [n]  
 -split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
-### User data
+### user data
 -add_scaled_attribute_to_user_data [m] [n]: scale attribute [m] value by [n] and add to user data  
 -change_user_data_from_to [m] [n]   : change user data from [m] to [n]  
 -copy_attribute_into_user_data [n]  : copy attribute [n] value into user data field  
@@ -422,7 +422,7 @@ file that georeferences the PNG file in Google Earth
 -scale_user_data [n]                : scale user data by [n]  
 -set_user_data [n]                  : sets all user_data fields to [n]  
 
-### Classification
+### classification
 -change_class_from_to [m] [n]       : change classification from [m] to [n]  
 -change_classification_from_to [m] [n]: change classification from [m] to [n]  
 -change_extended_class_from_to [m] [n]: change extended class from [m] to [n]  
@@ -456,7 +456,7 @@ file that georeferences the PNG file in Google Earth
 -set_classification [n]             : set classification to [n]  
 -set_extended_classification [n]    : set extended classification to [n]  
 
-### Extra byte
+### extra byte
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_user_data [m] [n]: scale attribute [m] value by [n] and add to user data  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
@@ -493,7 +493,7 @@ file that georeferences the PNG file in Google Earth
 -set_attribute [m] [n]              : set attribute [m] with value [n]  
 -translate_attribute [m] [n]        : translate attribute [n] by [n]  
 
-### Flags
+### flags
 -drop_keypoint                   : drop points flaged as keypoint  
 -drop_overlap                    : drop points flaged as overlap  
 -drop_scan_direction [n]         : drop points with scan direction [n]  
@@ -534,7 +534,7 @@ file that georeferences the PNG file in Google Earth
 -set_gps_time [n]                   : set gps time to [n]  
 -translate_gps_time [n]             : translate GPS time by [n]  
 
-### Intensity
+### intensity
 -bin_gps_time_into_intensity [n]    : set intensity time to gps/[n]  
 -clamp_intensity [min] [max]        : limit intensity values to [min] and [max]  
 -clamp_intensity_above [max]        : limit intensity values to maximal [max]  
@@ -571,7 +571,7 @@ file that georeferences the PNG file in Google Earth
 -translate_intensity [n]            : translate intensity by [n]  
 -translate_then_scale_intensity [m] [n]: translate intensity by [m] and scale by [n]  
 
-### Raw point values
+### raw point values
 -clamp_raw_z [min] [max]            : limit raw z values to [min] and [max]  
 -translate_raw_x [n]                : translate raw x value by [n]  
 -translate_raw_xy_at_random [x] [y] : translate raw xy values by random and max offset of [x] [y]  
@@ -579,7 +579,7 @@ file that georeferences the PNG file in Google Earth
 -translate_raw_y [n]                : translate raw y value by [n]  
 -translate_raw_z [n]                : translate raw z value by [n]  
 
-### Registers
+### registers
 -add_registers [m] [n] [o]          : add register [m] and [n] and store result in register [o]  
 -copy_B_into_register [n]           : copy blue color value into register [n]  
 -copy_G_into_register [n]           : copy green color value into register [n]  
@@ -608,7 +608,7 @@ file that georeferences the PNG file in Google Earth
 -subtract_registers [m] [n] [o]     : subtract register [m] by register [n] and store result in register [o]  
 -translate_register [m] [n]         : translate register index [m] value by [n]  
 
-### Scan angle
+### scan angle
 -bin_abs_scan_angle_into_point_source [n]: set point source to scan_angle/[n]  
 -drop_abs_scan_angle_above [max]    : drop points with absolute scan angle above [max]  
 -drop_abs_scan_angle_below [min]    : drop points with absolute scan angle below [min]  
@@ -624,12 +624,12 @@ file that georeferences the PNG file in Google Earth
 -translate_scan_angle [n]           : translate scan angle by [n]  
 -translate_then_scale_scan_angle [m] [n]: translate scan angle by [m] and scale by [n]  
 
-### Tiles
+### tiles
 -keep_tile [x] [y] [size] : keep tile at lower-left [x] [y] with size [s]  
 -tiles_ns [m] [n]         : create a tiling of DEMs with name [m] with tiles of size [n]  
 -tiling_ns crater 500     : create a tiling of DEMs named 'crater' with tiles of size 500  
 
-### Waveform packet
+### waveform packet
 -drop_wavepacket [n]     : drop points with wavepacket value of [n]  
 -flip_waveform_direction : flip the waveform direction in the waveform VLR  
 -keep_wavepacket [n]     : keep points with wavepacket value of [n]  
@@ -701,12 +701,19 @@ file that georeferences the PNG file in Google Earth
 -wgs72                              : use the WGS-72 ellipsoid  
 -wgs84                              : use the WGS-84 ellipsoid  
 
-### Logical
+### logical
 -filter_and         : boolean AND combination of last 2 filters  
 -filter_or          : boolean OR combination of last 2 filters  
 -filtered_transform : do the transformation only on points of the current filter  
 
-### Input
+### formula solver
+-formula [exp]       : Allows filtering or transforming point variables using formula expressions [exp]; LAS header variables may be used only for filtering  
+-fileformula [exp]   : Allows filtering input files or transforming LAS header variables using formula expressions [exp]; point variables are not allowed  
+
+For details about the formula features and how to write formula expressions, see the [formula solver documentation (formula_solver_README.md)]  
+The formula features require a full licensed build of LAStools and are not available in the open-source version.  
+ 
+### input
 -i [fnp]        : input file or input file mask [fnp] (e.g. *.laz;fo?.la?;esri.shp,...)  
 -io_ibuffer [n] : use read-input-buffer of size [n] bytes  
 -iparse [xyz]   : define fields [xyz] for text input parser  
@@ -722,7 +729,7 @@ file that georeferences the PNG file in Google Earth
 -buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
-### Output
+### output
 -compression_quality [n] : set compression quality to [n] for compressable image formats  
 -do_not_populate         : do not populate header on output  
 -nil                     : pipe output to NULL (suppress output)  
@@ -785,18 +792,18 @@ The other supported entries are:
   H : a hexadecimal string encoding the RGB color  
   J : a hexadecimal string encoding the intensity  
 
-## Licensing
+## licensing
 
 Info on licensing and pricing: https://rapidlasso.de/pricing/.
 If you have any questions or need assistance, email to info@rapidlasso.de.
 
-## Evaluation and demo mode
+## evaluation and demo mode
 
 Please use the "-demo" argument to run the tool in demo mode. For quality tests,
 use small files (< 1.5 million points). If you use larger files, the output will
 contain diagonal lines/output distortions due to the license protection.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

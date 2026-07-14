@@ -4,7 +4,7 @@ This tiny tool informs about all header fields in a GeoTIFF file.
 Other TIFF tools just report the well known TIFF tags. This tool
 also analyzes and reports the GeoKey directory entries.
   
-## Examples
+## examples
 
     geotiffinfo in.tif
 or
@@ -50,11 +50,11 @@ KeyID   Loc Cnt Value: KeyDesc = Value
 
 if only one argument is given this is assumed as input file or input wildcard
 
-## Licensing
+## licensing
 
 This tool is free to use.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

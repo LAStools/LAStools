@@ -22,7 +22,7 @@ The source code for the PROJ library is available at
   https://github.com/OSGeo/PROJ.
 
 
-## Installing the PROJ Library
+## installing the PROJ Library
 
 To use the PROJ library in LAStools, it must be installed on your 
 system (possibly via QGIS or OSGeo4W or Conda).
@@ -30,7 +30,7 @@ Please note: This software requires PROJ version 9.0.0 or later.
 If the PROJ library is not already installed, here are several 
 methods to install it (We recommend using the default standard installation paths):
 
-### Package Managers
+### package Managers
 
 - **OSGeo4W**: Use this **Windows-specific** package manager to install PROJ.
  1. Download [OSGeo4W setup] - *https://trac.osgeo.org/osgeo4w/*
@@ -83,7 +83,7 @@ and configured.
    **Fedora:**:
     sudo dnf install qgis qgis-grass
 
-### Further installation options
+### further installation options
 - **Linux**:
   **Debian/Ubuntu**:
 
@@ -108,7 +108,7 @@ and configured.
     sudo port install proj
 
 
-### Required Files for PROJ in LASTools
+### required Files for PROJ in LASTools
 
 To ensure that the PROJ library functions correctly with LASTools,
  you need to have the following library files available:
@@ -124,7 +124,7 @@ To ensure that the PROJ library functions correctly with LASTools,
 Additionally, ensure that the PROJ data files, including the 
 `proj.db`, are installed for full functionality.
 
-### File and Data Locations
+### file and Data Locations
 
 - **`file` and `data` standart Directories**: If LAStools uses the 
 PROJ library, the files and data of the library are automatically 
@@ -227,7 +227,7 @@ To use these custom directories, set the environment variables via command line 
 
 If you want to use the PROJ library later via QGIS, OSGeo4W or another installation, you must first delete the environment variables LASTOOLS_PROJ and PROJ_LIB if they have been set permanently.
 
-### Important Note
+### important Note
 
 Ensure that the version of the PROJ data matches the version of the 
 PROJ library to avoid compatibility issues.
@@ -236,7 +236,7 @@ installation, refer to the official PROJ installation page
   https://proj.org/install.html
 
 
-## Licensing
+## licensing
 
 This library is free to use.
 PROJ is released under the X/MIT open source License.
@@ -244,7 +244,7 @@ For more information about the license and usage of the PROJ
 library, refer to the official PROJ repository or the official website 
   https://proj.org.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

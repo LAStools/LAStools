@@ -709,7 +709,7 @@ std::string trim(const std::string& in) {
   size_t i = 0;
   while (i < in.length() && (in[i] == ' ' || in[i] == '\n' || in[i] == '\t' || in[i] == '\r' || in[i] == '\f' || in[i] == '\v')) i++;
   size_t j = in.length() - 1;
-  while (j > 0 && (in[j] == ' ' || in[j] == '\n' || in[j] == '\t' || in[i] == '\r' || in[i] == '\f' || in[i] == '\v')) j--;
+  while (j > 0 && (in[j] == ' ' || in[j] == '\n' || in[j] == '\t' || in[j] == '\r' || in[j] == '\f' || in[j] == '\v')) j--;
   if (j - i + 1 > 0) {
     return in.substr(i, j - i + 1);
   } else {

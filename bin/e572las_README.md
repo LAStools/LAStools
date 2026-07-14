@@ -36,7 +36,7 @@ Batch conversion can be done using a batch file like
 for %%f in (*.e57) do if not exist %%~nf.laz e572las -i %%f -olaz
 ```
   
-## Examples
+## examples
 
     e572las -i Tikal.e57 -o Tikal.laz
 convert from las e57 into LAZ. Result file is much smaller due compression:
@@ -230,7 +230,7 @@ written a total 1213990 points
 Any other argument is used as filename if "-i" is not set and the argument does not start with '-':
     e572las64 foo.e57
     
-### Basics
+### basics
 -h            : print help output  
 -help         : print help output  
 -v            : verbose output (print extra information)  
@@ -240,11 +240,11 @@ Any other argument is used as filename if "-i" is not set and the argument does 
 -version      : displays the version number of the tool  
 -license      : print license information  
 
-## Licensing
+## licensing
 
 This tool is free to use.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 
