@@ -360,6 +360,7 @@ class LASLIB_DLL LASpoint {
     this->point = new U8*[num_items];
 #pragma warning(push)
 #pragma warning(disable : 26819)
+    BOOL has_byte_item = false;
     for (i = 0; i < num_items; i++) {
       this->items[i] = items[i];
       total_point_size += items[i].size;
@@ -391,10 +392,14 @@ class LASLIB_DLL LASpoint {
           break;
         case LASitem::BYTE:
         case LASitem::BYTE14:
+          if (has_byte_item) {
+            return false;
+          }
           extra_bytes_number = items[i].size;
           extra_bytes = new U8[extra_bytes_number];
           memset(extra_bytes, 0, extra_bytes_number);
           this->point[i] = extra_bytes;
+          has_byte_item = true;
           break;
         default:
           return FALSE;
@@ -1106,6 +1111,7 @@ class LASLIB_DLL LASpoint {
   };
 
   // typed and offset functions for attributes in extra bytes (more efficient)
+  // memcpy to support target systems with strict memory alignment (ARM, ...)
 
   inline void get_attribute(I32 start, U8& data) const {
     data = extra_bytes[start];
@@ -1120,52 +1126,68 @@ class LASLIB_DLL LASpoint {
     extra_bytes[start] = data;
   };
   inline void get_attribute(I32 start, U16& data) const {
-    data = *((U16*)(extra_bytes + start));
+    //data = *((U16*)(extra_bytes + start));
+    memcpy(&data, extra_bytes + start, sizeof(U16));
   };
   inline void set_attribute(I32 start, U16 data) {
-    *((U16*)(extra_bytes + start)) = data;
+    //*((U16*)(extra_bytes + start)) = data;
+    memcpy(extra_bytes + start, &data, sizeof(U16));
   };
   inline void get_attribute(I32 start, I16& data) const {
-    data = *((I16*)(extra_bytes + start));
+    //data = *((I16*)(extra_bytes + start));
+    memcpy(&data, extra_bytes + start, sizeof(I16));
   };
   inline void set_attribute(I32 start, I16 data) {
-    *((I16*)(extra_bytes + start)) = data;
+    //*((I16*)(extra_bytes + start)) = data;
+    memcpy(extra_bytes + start, &data, sizeof(I16));
   };
   inline void get_attribute(I32 start, U32& data) const {
-    data = *((U32*)(extra_bytes + start));
+    //data = *((U32*)(extra_bytes + start));
+    memcpy(&data, extra_bytes + start, sizeof(U32));
   };
   inline void set_attribute(I32 start, U32 data) {
-    *((U32*)(extra_bytes + start)) = data;
+    //*((U32*)(extra_bytes + start)) = data;
+    memcpy(extra_bytes + start, &data, sizeof(U32));
   };
   inline void get_attribute(I32 start, I32& data) const {
-    data = *((I32*)(extra_bytes + start));
+    //data = *((I32*)(extra_bytes + start));
+    memcpy(&data, extra_bytes + start, sizeof(I32));
   };
   inline void set_attribute(I32 start, I32 data) {
-    *((I32*)(extra_bytes + start)) = data;
+    //*((I32*)(extra_bytes + start)) = data;
+    memcpy(extra_bytes + start, &data, sizeof(I32));
   };
   inline void get_attribute(I32 start, U64& data) const {
-    data = *((U64*)(extra_bytes + start));
+    //data = *((U64*)(extra_bytes + start));
+    memcpy(&data, extra_bytes + start, sizeof(U64));
   };
   inline void set_attribute(I32 start, U64 data) {
-    *((U64*)(extra_bytes + start)) = data;
+    //*((U64*)(extra_bytes + start)) = data;
+    memcpy(extra_bytes + start, &data, sizeof(U64));
   };
   inline void get_attribute(I32 start, I64& data) const {
-    data = *((I64*)(extra_bytes + start));
+    /// data = *((I64*)(extra_bytes + start));
+    memcpy(&data, extra_bytes + start, sizeof(I64));
   };
   inline void set_attribute(I32 start, I64 data) {
-    *((I64*)(extra_bytes + start)) = data;
+    //*((I64*)(extra_bytes + start)) = data;
+    memcpy(extra_bytes + start, &data, sizeof(I64));
   };
   inline void get_attribute(I32 start, F32& data) const {
-    data = *((F32*)(extra_bytes + start));
+    //data = *((F32*)(extra_bytes + start));
+    memcpy(&data, extra_bytes + start, sizeof(F32));
   };
   inline void set_attribute(I32 start, F32 data) {
-    *((F32*)(extra_bytes + start)) = data;
+    //*((F32*)(extra_bytes + start)) = data;
+    memcpy(extra_bytes + start, &data, sizeof(F32));
   };
   inline void get_attribute(I32 start, F64& data) const {
-    data = *((F64*)(extra_bytes + start));
+    //data = *((F64*)(extra_bytes + start));
+    memcpy(&data, extra_bytes + start, sizeof(F64));
   };
   inline void set_attribute(I32 start, F64 data) {
-    *((F64*)(extra_bytes + start)) = data;
+    //*((F64*)(extra_bytes + start)) = data;
+    memcpy(extra_bytes + start, &data, sizeof(F64));
   };
 
   ~LASpoint() {

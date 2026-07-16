@@ -97,7 +97,7 @@ public:
     }
     else
     {
-      if (number_of_point_records == std::numeric_limits<uint32_t>::max())
+      if (number_of_point_records >= std::numeric_limits<uint32_t>::max())
         throw "number_of_point_records integer overflow";
 
       number_of_points_by_return[point->return_number]++;
@@ -582,7 +582,7 @@ laszip_clean(
 
     // dealloc the inventory although close_writer() call should have done this already
 
-    if (laszip_dll->inventory == 0)
+    if (laszip_dll->inventory)
     {
       delete laszip_dll->inventory;
       laszip_dll->inventory = 0;
@@ -3031,7 +3031,6 @@ setup_laszip_items(
   }
 
   // create point items in the LASzip structure from point format and size
-
   if (!laszip->setup(point_type, point_size, LASZIP_COMPRESSOR_NONE))
   {
     snprintf(laszip_dll->error, sizeof(laszip_dll->error), "invalid combination of point_type %d and point_size %d", (I32)point_type, (I32)point_size);
@@ -3045,7 +3044,7 @@ setup_laszip_items(
     delete [] laszip_dll->point_items;
   }
 
-  laszip_dll->point_items = new U8*[laszip->num_items];
+  laszip_dll->point_items = new U8*[laszip->num_items]();
 
   if (laszip_dll->point_items == 0)
   {
@@ -3073,7 +3072,7 @@ setup_laszip_items(
     case LASitem::BYTE14:
       laszip_dll->point.num_extra_bytes = laszip->items[i].size;
       if (laszip_dll->point.extra_bytes) delete [] laszip_dll->point.extra_bytes;
-      laszip_dll->point.extra_bytes = new U8[laszip_dll->point.num_extra_bytes];
+      laszip_dll->point.extra_bytes = new U8[laszip_dll->point.num_extra_bytes]();
       laszip_dll->point_items[i] = laszip_dll->point.extra_bytes;
       break;
     case LASitem::WAVEPACKET13:
@@ -4288,7 +4287,7 @@ laszip_read_header(
     delete [] laszip_dll->point_items;
   }
 
-  laszip_dll->point_items = new U8*[laszip->num_items];
+  laszip_dll->point_items = new U8*[laszip->num_items]();
 
   if (laszip_dll->point_items == 0)
   {
@@ -4296,6 +4295,9 @@ laszip_read_header(
     delete laszip;
     return 1;
   }
+
+  // make sure it is really unique to prevent delete of buffer
+  bool has_BYTE_item = false; 
 
   for (i = 0; i < laszip->num_items; i++)
   {
@@ -4315,10 +4317,16 @@ laszip_read_header(
       break;
     case LASitem::BYTE:
     case LASitem::BYTE14:
+      if (has_BYTE_item) {
+        snprintf(laszip_dll->error, sizeof(laszip_dll->error), "duplicate BYTE/BYTE14 LAZ item");
+        delete laszip;
+        return 1;
+      }
       laszip_dll->point.num_extra_bytes = laszip->items[i].size;
       if (laszip_dll->point.extra_bytes) delete [] laszip_dll->point.extra_bytes;
-      laszip_dll->point.extra_bytes = new U8[laszip_dll->point.num_extra_bytes];
+      laszip_dll->point.extra_bytes = new U8[laszip_dll->point.num_extra_bytes]();
       laszip_dll->point_items[i] = laszip_dll->point.extra_bytes;
+      has_BYTE_item = true;
       break;
     case LASitem::WAVEPACKET13:
     case LASitem::WAVEPACKET14:

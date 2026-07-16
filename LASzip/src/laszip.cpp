@@ -39,8 +39,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 #endif
+#include <limits>
 
 LASzip::LASzip()
 {
@@ -98,33 +100,48 @@ bool LASzip::unpack(const U8* bytes, const I32 num)
   // do the unpacking
   U16 i;
   const U8* b = bytes;
-  compressor = *((const U16*)b);
+  // compressor = *((const U16*)b);  // no compatibility with e.g. ARM with strict alignment, change to memcpy
+  memcpy(&compressor, b, sizeof(U16));  
   b += 2;
-  coder = *((const U16*)b);
+  // coder = *((const U16*)b);
+  memcpy(&coder, b, sizeof(U16));  
   b += 2;
   version_major = *((const U8*)b);
   b += 1;
   version_minor = *((const U8*)b);
   b += 1;
-  version_revision = *((const U16*)b);
+  //version_revision = *((const U16*)b);
+  memcpy(&version_revision, b, sizeof(U16));
   b += 2;
-  options = *((const U32*)b);
+  // options = *((const U32*)b);
+  memcpy(&options, b, sizeof(U32));
   b += 4;
-  chunk_size = *((const U32*)b);
+  //chunk_size = *((const U32*)b);
+  memcpy(&chunk_size, b, sizeof(U32));
   b += 4;
-  number_of_special_evlrs = *((const I64*)b);
+  // number_of_special_evlrs = *((const I64*)b);
+  memcpy(&number_of_special_evlrs, b, sizeof(I64));
   b += 8;
-  offset_to_special_evlrs = *((const I64*)b);
+  // offset_to_special_evlrs = *((const I64*)b);
+  memcpy(&offset_to_special_evlrs, b, sizeof(I32));
   b += 8;
-  num_items = *((const U16*)b);
+  //num_items = *((const U16*)b);
+  memcpy(&num_items, b, sizeof(U16));
   b += 2;
   for (i = 0; i < num_items; i++)
   {
-    items[i].type = (LASitem::Type)*((const U16*)b);
+    U16 tmp;
+    //items[i].type = (LASitem::Type)*((const U16*)b);
+    memcpy(&tmp, b, sizeof(U16));
+    items[i].type = (LASitem::Type)tmp;
     b += 2;
-    items[i].size = *((const U16*)b);
+    //items[i].size = *((const U16*)b);
+    memcpy(&tmp, b, sizeof(U16));
+    items[i].size = tmp;
     b += 2;
-    items[i].version = *((const U16*)b);
+    //items[i].version = *((const U16*)b);
+    memcpy(&tmp, b, sizeof(U16));
+    items[i].version = tmp;
     b += 2;
   }
   assert((bytes + num) == b);
@@ -145,40 +162,66 @@ bool LASzip::pack(U8*& bytes, I32& num)
   if (!check()) return false;
 
   // prepare output
+  U64 num_bytesize = 34 + 6 * num_items;
   num = 34 + 6*num_items;
+  // wrap around (i.e. num > I32_MAX)
+  if (num_bytesize != num) {
+      return false;
+  }
   if (this->bytes) delete [] this->bytes;
+  // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
+  if (num > std::numeric_limits<size_t>::max()) {
+      return false;
+  }
+  bytes = new U8[static_cast<size_t>(num)];
+
   this->bytes = bytes = new U8[num];
 
   // pack
   U16 i;
   U8* b = bytes;
-  *((U16*)b) = compressor;
+  // *((U16*)b) = compressor;
+  memcpy(b, &compressor, sizeof(U16));
   b += 2;
-  *((U16*)b) = coder;
+  //*((U16*)b) = coder;
+  memcpy(b, &coder, sizeof(U16));
   b += 2;
   *((U8*)b) = version_major;
   b += 1;
   *((U8*)b) = version_minor;
   b += 1;
-  *((U16*)b) = version_revision;
+  //*((U16*)b) = version_revision;
+  memcpy(b, &version_revision, sizeof(U16));
   b += 2;
-  *((U32*)b) = options;
+  // *((U32*)b) = options;
+  memcpy(b, &options, sizeof(U32));
   b += 4;
-  *((U32*)b) = chunk_size;
+  //*((U32*)b) = chunk_size;
+  memcpy(b, &chunk_size, sizeof(U32));
   b += 4;
-  *((I64*)b) = number_of_special_evlrs;
+  //*((I64*)b) = number_of_special_evlrs;
+  memcpy(b, &number_of_special_evlrs, sizeof(I64));
   b += 8;
-  *((I64*)b) = offset_to_special_evlrs;
+  //*((I64*)b) = offset_to_special_evlrs;
+  memcpy(b, &offset_to_special_evlrs, sizeof(I64));
   b += 8;
-  *((U16*)b) = num_items;
+  //*((U16*)b) = num_items;
+  memcpy(b, &num_items, sizeof(U16));
   b += 2;
   for (i = 0; i < num_items; i++)
   {
-    *((U16*)b) = (U16)items[i].type;
+    U16 tmp;
+    //*((U16*)b) = (U16)items[i].type;
+    tmp = (U16)items[i].type;
+    memcpy(b, &tmp, sizeof(U16));
     b += 2;
-    *((U16*)b) = items[i].size;
+    //*((U16*)b) = items[i].size;
+    tmp = (U16)items[i].size;
+    memcpy(b, &tmp, sizeof(U16));
     b += 2;
-    *((U16*)b) = items[i].version;
+    //*((U16*)b) = items[i].version;
+    tmp = items[i].version;
+    memcpy(b, &tmp, sizeof(U16));
     b += 2;
   }
   assert((bytes + num) == b);
@@ -293,6 +336,57 @@ bool LASzip::check_items(const U16 num_items, const LASitem* items, const U16 po
     CHAR temp[66];
     snprintf(temp, sizeof(temp), "point has size of %d but items only add up to %d bytes", point_size, size);
     return return_error(temp);
+  }
+  
+  BOOL has_point = false;
+  BOOL has_items_14 = false;
+  BOOL has_items_pre14 = false;
+
+  // check if las 1.0 - 1.3 items are combined with 1.4+ items
+  for (i = 0; i < num_items; i++)
+  {
+      switch (items[i].type)
+      {
+      case LASitem::POINT10:
+          has_point = true;
+          has_items_pre14 = true;
+          break;
+      case LASitem::BYTE:
+      case LASitem::GPSTIME11:
+      case LASitem::RGB12:
+      case LASitem::WAVEPACKET13:
+          has_items_pre14 = true;
+          break;
+      case LASitem::POINT14:
+          has_point = true;
+          has_items_14 = true;
+          break;
+      case LASitem::BYTE14:
+      case LASitem::RGB14:
+      case LASitem::RGBNIR14:
+      case LASitem::WAVEPACKET14:
+          has_items_14 = true;
+          break;
+      }
+  }
+  if (has_items_14 && has_items_pre14) {
+      return return_error("invalid LAZ item definition: cannot combine las 1.4+ and older items");
+  }
+  //if (!has_point) {
+  //    return return_error("invalid LAZ item definition: does not contain POINT item");
+  //}
+
+  // check that all items are unique
+  for (i = 0; i < num_items; i++)
+  {
+      for (int j = i+1; j < num_items; j++)
+      {
+         if (items[i].type == items[j].type) {
+             CHAR temp[66];
+             snprintf(temp, sizeof(temp), "invalid LAZ item definition: duplicate item %d", items[j].type);
+             return return_error(temp);
+         }
+      }
   }
   return true;
 }
