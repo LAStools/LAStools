@@ -41,6 +41,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits>
+
 
 LASreadPoint::LASreadPoint(U32 decompress_selective)
 {
@@ -438,7 +440,7 @@ BOOL LASreadPoint::read(U8* const * point)
           if (current_chunk >= number_chunks)
           {
             number_chunks += 256;
-            chunk_starts = (I64*)realloc_las(chunk_starts, sizeof(I64)*(number_chunks+1));
+            chunk_starts = (I64*)realloc_las(chunk_starts, sizeof(I64)*((U64)number_chunks+1));
           }
           chunk_starts[tabled_chunks] = point_start; // needs fixing
           tabled_chunks++;
@@ -680,14 +682,17 @@ BOOL LASreadPoint::read_chunk_table()
     chunk_starts = 0;
     if (chunk_size == U32_MAX)
     {
-      chunk_totals = new U64[number_chunks+1];
+      if (number_chunks > std::numeric_limits<size_t>::max() - 1) {
+        throw 1;
+      }
+      chunk_totals = new U64[(U64)number_chunks+1];
       if (chunk_totals == 0)
       {
         throw 1;
       }
       chunk_totals[0] = 0;
     }
-    chunk_starts = (I64*)malloc_las(sizeof(I64) * (number_chunks + 1));
+    chunk_starts = (I64*)malloc_las(sizeof(I64) * ((U64)number_chunks + 1));
     if (chunk_starts == 0)
     {
       throw 1;
@@ -696,7 +701,7 @@ BOOL LASreadPoint::read_chunk_table()
     tabled_chunks = 1;
     if (number_chunks > 0)
     {
-      U32 i;
+      U64 i;
       dec->init(instream);
       IntegerCompressor ic(dec, 32, 2);
       ic.initDecompressor();
@@ -733,7 +738,7 @@ BOOL LASreadPoint::read_chunk_table()
     {
       // then compressor was interrupted before getting a chance to write the chunk table
       number_chunks = 256;
-      chunk_starts = (I64*)malloc_las(sizeof(I64) * (number_chunks + 1));
+      chunk_starts = (I64*)malloc_las(sizeof(I64) * ((U64)number_chunks + 1));
       if (chunk_starts == 0)
       {
         return FALSE;

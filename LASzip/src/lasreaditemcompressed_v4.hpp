@@ -111,7 +111,7 @@ private:
   BOOL requested_gps_time;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextPOINT14 contexts[4];
@@ -149,7 +149,7 @@ private:
   BOOL requested_RGB;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextRGB14 contexts[4];
@@ -191,7 +191,7 @@ private:
   BOOL requested_NIR;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextRGBNIR14 contexts[4];
@@ -228,7 +228,7 @@ private:
   BOOL requested_wavepacket;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextWAVEPACKET14 contexts[4];
@@ -265,7 +265,7 @@ private:
   BOOL* requested_Bytes;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextBYTE14 contexts[4];

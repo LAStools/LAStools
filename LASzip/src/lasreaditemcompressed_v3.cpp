@@ -32,6 +32,7 @@
 #include "lasreaditemcompressed_v3.hpp"
 #include "lasmessage.hpp"
 
+#include <limits>
 #include <cassert>
 #include <string.h>
 
@@ -458,7 +459,7 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item, U32& context)
 
   /* how many bytes do we need to read */
   
-  U32 num_bytes = num_bytes_channel_returns_XY;
+  U64 num_bytes = num_bytes_channel_returns_XY;
   if (requested_Z) num_bytes += num_bytes_Z; 
   if (requested_classification) num_bytes += num_bytes_classification; 
   if (requested_flags) num_bytes += num_bytes_flags; 
@@ -473,7 +474,12 @@ BOOL LASreadItemCompressed_POINT14_v3::init(const U8* item, U32& context)
   if (num_bytes > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
-    bytes = new U8[num_bytes];
+
+    // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
+    if (num_bytes > std::numeric_limits<size_t>::max()) {
+        return false;
+    }
+    bytes = new U8[static_cast<size_t>(num_bytes)];
     if (bytes == 0) return FALSE;
     num_bytes_allocated = num_bytes;
   }
@@ -1260,7 +1266,12 @@ BOOL LASreadItemCompressed_RGB14_v3::init(const U8* item, U32& context)
   if (num_bytes_RGB > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
-    bytes = new U8[num_bytes_RGB];
+  
+    // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
+    if (num_bytes_RGB > std::numeric_limits<size_t>::max()) {
+        return false;
+    }
+    bytes = new U8[static_cast<size_t>(num_bytes_RGB)];
     if (bytes == 0) return FALSE;
     num_bytes_allocated = num_bytes_RGB;
   }
@@ -1604,7 +1615,7 @@ BOOL LASreadItemCompressed_RGBNIR14_v3::init(const U8* item, U32& context)
   
   /* how many bytes do we need to read */
 
-  U32 num_bytes = 0;
+  U64 num_bytes = 0;
   if (requested_RGB) num_bytes += num_bytes_RGB;
   if (requested_NIR) num_bytes += num_bytes_NIR;
 
@@ -1613,7 +1624,12 @@ BOOL LASreadItemCompressed_RGBNIR14_v3::init(const U8* item, U32& context)
   if (num_bytes > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
-    bytes = new U8[num_bytes];
+
+    // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
+    if (num_bytes > std::numeric_limits<size_t>::max()) {
+        return false;
+    }
+    bytes = new U8[static_cast<size_t>(num_bytes)];
     if (bytes == 0) return FALSE;
     num_bytes_allocated = num_bytes;
   }
@@ -1992,7 +2008,12 @@ BOOL LASreadItemCompressed_WAVEPACKET14_v3::init(const U8* item, U32& context)
   if (num_bytes_wavepacket > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
-    bytes = new U8[num_bytes_wavepacket];
+
+    // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
+    if (num_bytes_wavepacket > std::numeric_limits<size_t>::max()) {
+        return false;
+    }
+    bytes = new U8[static_cast<size_t>(num_bytes_wavepacket)];
     if (bytes == 0) return FALSE;
     num_bytes_allocated = num_bytes_wavepacket;
   }
@@ -2315,7 +2336,7 @@ BOOL LASreadItemCompressed_BYTE14_v3::init(const U8* item, U32& context)
 
   /* how many bytes do we need to read */
 
-  U32 num_bytes = 0;
+  U64 num_bytes = 0;
 
   for (i = 0; i < number; i++)
   {
@@ -2327,7 +2348,12 @@ BOOL LASreadItemCompressed_BYTE14_v3::init(const U8* item, U32& context)
   if (num_bytes > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
-    bytes = new U8[num_bytes];
+
+    // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
+    if (num_bytes > std::numeric_limits<size_t>::max()) {
+        return false;
+    }
+    bytes = new U8[static_cast<size_t>(num_bytes)];
     if (bytes == 0) return FALSE;
     num_bytes_allocated = num_bytes;
   }

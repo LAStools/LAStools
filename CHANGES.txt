@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+20 July 2026 -- fix: laszip mem cleanup and fixes
 16 July 2026 -- NEW: beta: formula solver for file and point reader (https://downloads.rapidlasso.de/html/formula_solver_README.html)
 15 July 2026 -- fix: lasnoise with argument '-by_flightline'
 10 June 2026 -- fix: lasinfo: output classification histogram in JSON output
