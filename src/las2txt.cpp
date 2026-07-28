@@ -347,11 +347,7 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
         lidardouble2string(printstring, temp_d);
         fprintf(file, "%s", printstring);
       } else {
-#ifdef _WIN32
-        fprintf(file, "%I64u", value);
-#else
         fprintf(file, "%llu", value);
-#endif
       }
     }
   } else if (header->attributes[index].data_type == 8) {

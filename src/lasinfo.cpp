@@ -2547,11 +2547,7 @@ public:
               fprintf(file_out, "    root node halfsize: %.3lf\012", info->halfsize);
               fprintf(file_out, "    root node point spacing: %.3lf\012", info->spacing);
               fprintf(file_out, "    gpstime min/max: %.2lf/%.2lf\012", info->gpstime_minimum, info->gpstime_maximum);
-#ifdef _WIN32
-              fprintf(file_out, "    root hierarchy offset/size: %I64u/%I64u\012", info->root_hier_offset, info->root_hier_size);
-#else
               fprintf(file_out, "    root hierarchy offset/size: %llu/%llu\012", info->root_hier_offset, info->root_hier_size);
-#endif
             }
           }
           if (json_out) json_sub_main["las_variable_length_records"].push_back(json_vlr_record);
@@ -2635,11 +2631,7 @@ public:
                     json_copc["voxels"] = voxel_count[j];
                     json_evlr_record["copc"]["octree_levels"].push_back(json_copc);
                   } else if (!csv_out) {
-#ifdef _WIN32
-                    fprintf(file_out, "    Level %d : %I64u points in %u voxels\012", j, point_count[j], voxel_count[j]);
-#else
                     fprintf(file_out, "    Level %d : %llu points in %u voxels\012", j, point_count[j], voxel_count[j]);
-#endif
                   }
                 }
                 free(point_count);
