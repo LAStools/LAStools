@@ -39,7 +39,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef _WIN32
+#if !defined(NOMINMAX)
 #define NOMINMAX
+#endif
 #include <windows.h>
 #endif
 #include <limits>
@@ -165,12 +167,12 @@ bool LASzip::pack(U8*& bytes, I32& num)
   U64 num_bytesize = 34 + 6 * num_items;
   num = 34 + 6*num_items;
   // wrap around (i.e. num > I32_MAX)
-  if (num_bytesize != num) {
+  if (num_bytesize != (U64)num) {
       return false;
   }
   if (this->bytes) delete [] this->bytes;
   // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
-  if (num > std::numeric_limits<size_t>::max()) {
+  if ((U64)num > std::numeric_limits<size_t>::max()) {
       return false;
   }
   bytes = new U8[static_cast<size_t>(num)];
@@ -338,7 +340,7 @@ bool LASzip::check_items(const U16 num_items, const LASitem* items, const U16 po
     return return_error(temp);
   }
   
-  BOOL has_point = false;
+  // BOOL has_point = false;
   BOOL has_items_14 = false;
   BOOL has_items_pre14 = false;
 
@@ -348,7 +350,7 @@ bool LASzip::check_items(const U16 num_items, const LASitem* items, const U16 po
       switch (items[i].type)
       {
       case LASitem::POINT10:
-          has_point = true;
+//          has_point = true;
           has_items_pre14 = true;
           break;
       case LASitem::BYTE:
@@ -358,7 +360,7 @@ bool LASzip::check_items(const U16 num_items, const LASitem* items, const U16 po
           has_items_pre14 = true;
           break;
       case LASitem::POINT14:
-          has_point = true;
+//          has_point = true;
           has_items_14 = true;
           break;
       case LASitem::BYTE14:
@@ -366,6 +368,8 @@ bool LASzip::check_items(const U16 num_items, const LASitem* items, const U16 po
       case LASitem::RGBNIR14:
       case LASitem::WAVEPACKET14:
           has_items_14 = true;
+          break;
+      default: 
           break;
       }
   }

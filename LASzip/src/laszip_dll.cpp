@@ -2306,8 +2306,8 @@ laszip_prepare_point_for_write(
           // describe any undocumented "extra bytes" as "unknown" U8 attributes
           for (I32 i = (I32)(laszip_dll->attributer->get_attributes_size()); i < number_of_existing_extrabytes; i++)
           {
-            CHAR unknown_name[16];
-            memset(unknown_name, 0, 16);
+            CHAR unknown_name[20];
+            memset(unknown_name, 0, 20);
             snprintf(unknown_name, sizeof(unknown_name), "unknown %d", i);
             LASattribute lasattribute_unknown(LAS_ATTRIBUTE_U8, unknown_name, unknown_name);
             if (laszip_dll->attributer->add_attribute(lasattribute_unknown) == -1)

@@ -574,7 +574,7 @@ BOOL LASindex::seek_next(LASreadPoint* reader, I64 &p_count)
     reader->seek(p_count, start);
     p_count = start;
   }
-  if (p_count == end)
+  if ((U64)p_count == end)
   {
     have_interval = FALSE;
   }

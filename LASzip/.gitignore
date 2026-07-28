@@ -10,3 +10,8 @@ CPackSourceConfig.cmake
 _CPack_Packages/
 install_mainifest.txt
 docs/build
+dll/
+lib/
+laszip3.dir
+bin64
+/x64

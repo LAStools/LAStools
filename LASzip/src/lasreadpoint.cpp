@@ -344,12 +344,12 @@ BOOL LASreadPoint::seek(const U64 current, const U64 target)
       if (chunk_totals)
       {
         target_chunk = search_chunk_table(target, 0, number_chunks);
-        chunk_size = chunk_totals[target_chunk+1]-chunk_totals[target_chunk];
+        chunk_size = (U32)(chunk_totals[target_chunk+1]-chunk_totals[target_chunk]);
         delta = target - chunk_totals[target_chunk];
       }
       else
       {
-        target_chunk = target/chunk_size;
+        target_chunk = (U32)(target / chunk_size);
         delta = target%chunk_size;
       }
       if (target_chunk >= tabled_chunks)
@@ -447,7 +447,7 @@ BOOL LASreadPoint::read(U8* const * point)
         }
         else if (chunk_totals) // variable sized chunks?
         {
-          chunk_size = chunk_totals[current_chunk+1]-chunk_totals[current_chunk];
+          chunk_size = (U32)(chunk_totals[current_chunk + 1] - chunk_totals[current_chunk]);
         }
         chunk_count = 0;
       }
@@ -581,7 +581,7 @@ BOOL LASreadPoint::init_dec()
       return FALSE;
     }
     current_chunk = 0;
-    if (chunk_totals) chunk_size = chunk_totals[1];
+    if (chunk_totals) chunk_size = (U32)chunk_totals[1];
   }
 
   point_start = instream->tell();
@@ -707,7 +707,7 @@ BOOL LASreadPoint::read_chunk_table()
       ic.initDecompressor();
       for (i = 1; i <= number_chunks; i++)
       {
-        if (chunk_size == U32_MAX) chunk_totals[i] = ic.decompress((i>1 ? chunk_totals[i-1] : 0), 0);
+        if (chunk_size == U32_MAX) chunk_totals[i] = ic.decompress((i>1 ? (U32)chunk_totals[i-1] : 0), 0);
         chunk_starts[i] = ic.decompress((i>1 ? (U32)(chunk_starts[i-1]) : 0), 1);
         tabled_chunks++;
       }

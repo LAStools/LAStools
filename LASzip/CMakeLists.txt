@@ -5,19 +5,6 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 
 set(ROOT_DIR "${PROJECT_SOURCE_DIR}")
 
-if (NOT CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
-
-if (NOT CMAKE_C_STANDARD)
-    set(CMAKE_C_STANDARD 99)
-    set(CMAKE_C_STANDARD_REQUIRED ON)
-endif()
-
-if (MSVC)
-  add_compile_options("/std:c++17")
-endif()
 
 if(CMAKE_GNU_COMPILER_ID OR CMAKE_Clang_COMPILER_ID)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format-security -Wno-format-truncation")
@@ -135,4 +122,3 @@ add_subdirectory(dll)
 
 #
 add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
-
