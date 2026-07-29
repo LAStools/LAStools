@@ -83,7 +83,7 @@ and configured.
    **Fedora:**:
     sudo dnf install qgis qgis-grass
 
-### further installation options
+### manual installation options
 - **Linux**:
   **Debian/Ubuntu**:
 
@@ -110,8 +110,8 @@ and configured.
 
 ### required Files for PROJ in LASTools
 
-To ensure that the PROJ library functions correctly with LASTools,
- you need to have the following library files available:
+If you choose manual installation, you must ensure that all dependencies are correct.
+You need to have the following library files available:
 
 - `proj`  
 - `libcrypto`  
@@ -123,6 +123,7 @@ To ensure that the PROJ library functions correctly with LASTools,
 
 Additionally, ensure that the PROJ data files, including the 
 `proj.db`, are installed for full functionality.
+The default linux installation places the `proj.db` into `/usr/share/proj`.
 
 ### file and Data Locations
 
@@ -132,14 +133,17 @@ searched for in the default standard directories of the installation via
 QGIS or OSGeo4W or Conda.  
 
 - **Custom Directory**: Alternatively, you can place the library 
-files and PROJ data in custom directories of your choice via environment variables. We recommend only using this option if the PROJ lib is not found automatically via the QGIS or OSGeo4W or Conda installations.
+files and PROJ data in custom directories of your choice via environment variables.
+We recommend only using this option if the PROJ lib is not found automatically via the QGIS or OSGeo4W or Conda installations.
 
     LASTOOLS_PROJ
 
   for the PROJ library directory.
   If the PROJ library cannot find the PROJ data directory itself set
 
-    PROJ_LIB
+    PROJ_DATA
+    
+  (or PROJ_LIB [deprecated])
 
   Which is a PROJ-specific environment variable and specifies the directory to PROJ data.
 
@@ -152,7 +156,7 @@ To use these custom directories, set the environment variables via command line 
 
   and if required
 
-    set PROJ_LIB=C:\path\to\proj_data
+    set PROJ_DATA=C:\path\to\proj_data
 
 
   Set environment variable **permanently** (applies to new CMD windows, but not to the current session):
@@ -160,7 +164,7 @@ To use these custom directories, set the environment variables via command line 
     setx LASTOOLS_PROJ "C:\path\to\proj_lib"
   and if required
 
-    setx PROJ_LIB "C:\path\to\proj_data"
+    setx PROJ_DATA "C:\path\to\proj_data"
 
   Set environment variable **permanently and system-wide** for all users (need to run with admin rights):
 
@@ -168,7 +172,7 @@ To use these custom directories, set the environment variables via command line 
 
   and if required
 
-    setx PROJ_LIB "C:\path\to\proj_data" /M
+    setx PROJ_DATA "C:\path\to\proj_data" /M
 
 - **Linux**:
   **Temporary** for the current session:
@@ -177,7 +181,7 @@ To use these custom directories, set the environment variables via command line 
 
   and if required
 
-    export PROJ_LIB=/path/to/proj_data
+    export PROJ_DATA=/usr/share/proj
 
   Set environment variable **permanently** for this user:
   Open your Bash configuration file:
@@ -190,7 +194,7 @@ To use these custom directories, set the environment variables via command line 
 
   and if required
 
-    export PROJ_LIB=/path/to/proj_data
+    export PROJ_DATA=/usr/share/proj
 
   save and close the file and then execute the command
 
@@ -207,14 +211,31 @@ To use these custom directories, set the environment variables via command line 
 
   and if required
 
-    PROJ_LIB="/path/to/proj_data"
+    PROJ_LIB="/usr/share/proj"
 
   save and close the file and then execute the command or (best) reboot your system to ensure the changes are affecting  
 
     source /etc/environment
 
 
-**Check the environment variables**:
+## test
+### check the PROJ installation 
+run
+    proj
+to check your installation.
+This should output something like
+```
+Rel. 9.4.0, March 1st, 2024
+usage: proj [-bdeEfiIlmorsStTvVwW [args]] [+opt[=arg] ...] [file ...]
+```
+
+run
+    echo "10 20" | cs2cs +init=epsg:4326 +to +init=epsg:3857
+to see, if the PROJ conversion works. This should return:
+    1113194.91	2273030.93 0.00
+
+
+### check the environment variables
 - **cmd - windows**:
 
     echo %LASTOOLS_PROJ%
@@ -226,6 +247,7 @@ To use these custom directories, set the environment variables via command line 
     echo $PROJ_LIB
 
 If you want to use the PROJ library later via QGIS, OSGeo4W or another installation, you must first delete the environment variables LASTOOLS_PROJ and PROJ_LIB if they have been set permanently.
+
 
 ### important Note
 
