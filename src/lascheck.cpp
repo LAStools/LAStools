@@ -394,7 +394,7 @@ void LAScheck::check(ValidationResult& results, std::string& crsdescription, BOO
     // does the year fall into the expected range
 
     if ((lasheader->file_creation_year < 1990) || (lasheader->file_creation_year > today_year)) {
-      set_oss_content(note_oss, "should be between 1990-", today_year, " not ", lasheader->file_creation_year);
+      set_oss_content(note_oss, "must be between 1990-", today_year, " (current year), not ", lasheader->file_creation_year);
       results.add_fail("file creation year", note_oss.str());
     }
 
@@ -412,7 +412,7 @@ void LAScheck::check(ValidationResult& results, std::string& crsdescription, BOO
     }
 
     if (lasheader->file_creation_day > max_day_of_year) {
-      set_oss_content(note_oss, "should be between 1-", max_day_of_year, " not ", lasheader->file_creation_day);
+      set_oss_content(note_oss, "must be between 1-", max_day_of_year, " (today in current year), not ", lasheader->file_creation_day);
       results.add_fail("file creation day", note_oss.str());
     }
   }

@@ -31,6 +31,7 @@
 #include "lasfilter.hpp"
 #include "lasmessage.hpp"
 #include "lasreader.hpp"
+#include "lasformula_api.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -5452,6 +5453,15 @@ BOOL LASfilter::filter(const LASpoint* point)
 {
   U32 i;
 
+  // Formula filter first
+  if (has_formula_filter) {
+    lasformula_bind_point((LASpoint*)point);
+    
+    if (lasformula_eval_filters()) {
+      return TRUE;  // point was filtered
+    }
+  }
+
   for (i = 0; i < num_criteria; i++)
   {
     if (criteria[i]->filter(point))
@@ -5460,6 +5470,7 @@ BOOL LASfilter::filter(const LASpoint* point)
       return TRUE; // point was filtered
     }
   }
+
   return FALSE; // point survived
 }
 
@@ -5474,6 +5485,7 @@ void LASfilter::reset()
 
 LASfilter::LASfilter()
 {
+  has_formula_filter = false;
   alloc_criteria = 0;
   num_criteria = 0;
   criteria = 0;

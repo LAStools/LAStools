@@ -52,7 +52,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 260507
+#define LAS_TOOLS_VERSION 260729
 
 #include <stdio.h>
 #include <string.h>
@@ -1145,6 +1145,11 @@ public:
     return std::string(version_buffer);
   }
 
+  // LAS version as number: 1.3 equivalent to 13
+  U16 get_version_number() const {
+    return (version_major * 10) + version_minor;
+  }
+
   /// Converts the year and day of year stored in the LAS header into a YYYY-MM-DD date or 'unknown' if the values are invalid and retuns it
   std::string get_dayOfYear_to_date_string() {
     if (this->file_creation_year == 0 || this->file_creation_day == 0) {
@@ -1164,11 +1169,45 @@ public:
     return buffer;
   }
 
+  /// Converts the year and day of year stored in the LAS header into a single number with format YYYYMMDD
+  U32 get_dayOfYear_to_date_number() {
+    if (this->file_creation_year == 0 || this->file_creation_day == 0) {
+      return 0;
+    }
+
+    std::tm date = {};
+    date.tm_year = this->file_creation_year - 1900;
+    date.tm_mday = this->file_creation_day;
+
+    if (std::mktime(&date) == -1) {
+      return 0;
+    }
+
+    // yyyymmdd
+    U32 y = date.tm_year + 1900;
+    U32 m = date.tm_mon + 1;
+    U32 d = date.tm_mday;
+
+    return y * 10000 + m * 100 + d;
+  }
+
   U64 get_number_of_point_records_uni() {
     if (this->extended_number_of_point_records != 0) {
       return this->extended_number_of_point_records;
     }
     return this->number_of_point_records;
+  }
+
+  void set_number_of_point_records_uni(U64 value) {
+    if (this->version_major > 1 || (this->version_major == 1 && this->version_minor >= 4)) {
+      // LAS 1.4
+      this->extended_number_of_point_records = value;
+      this->number_of_point_records = 0;
+    } else {
+      // LAS 1.0-1.3
+      this->number_of_point_records = (U32)value;
+      this->extended_number_of_point_records = 0;
+    }
   }
 
   U64 get_number_of_points_by_return_uni(U8 idx) {

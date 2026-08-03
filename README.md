@@ -37,14 +37,14 @@ The documentation is located in
 * `lasindex` creates a spatial index LAX file for fast spatial queries
 * `lasmerge` merges several LAS or LAZ files into a single LAS or LAZ file
 * `lasinfo` prints out a quick overview of the contents of a LAS file
+* `lasvalidate` determine if LAS files are conform to the ASPRS LAS specifications
 * `lascopcindex` creates a COPC *.laz file for a given set of *.las or *.laz files
 * `lasdiff` compares LIDAR data and reports whether they are identical or different
 * `lasprecision` analyses the actual precision of the LIDAR points
+* `e572las` extracts the points from the E57 format and stores them as LAS/LAZ files
 
 ### Free tools:
-* `lasvalidate` determine if LAS files are conform to the ASPRS LAS specifications
 * `lasview` visualizes a LAS file with a simple OpenGL viewer
-* `e572las` extracts the points from the E57 format and stores them as LAS/LAZ files
 * `demzip` compresses and uncompresses raster data from ASC, BIL, TIF, IMG format to the compressed RasterLAZ format
 
 ### Closed source tools:

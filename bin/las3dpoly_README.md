@@ -15,7 +15,7 @@ overlaps and they must all form closed loops (e.g. the last
 and first point should be identical).
 
 
-## Examples
+## examples
 
     las3dpoly64 -i in.laz -poly line.shp -o out.laz -distance 10 -classify_as 13 -v
 
@@ -33,7 +33,7 @@ With the -gdal argument, input formats such as GPKG, GML, GeoJSON, KML, GPX, and
 Please note that GPKG, SHP, and GML are recommended for maximum precision, as KML, GPX, and GeoJSON require transformation to 
 geographic coordinates (EPSG:4326) during processing, which may introduce very minor positional differences along 
 polygon boundaries. Only single-layer poly input files are supported. For multi-layer inputs, only the first layer is processed. 
-For GPX files, only routes or tracks layers are supported.
+For GPX files, only routes or tracks layers are supported. See [gdal_README.md] for details.
 
 line.csv may look like
 
@@ -53,7 +53,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -poly [fns]          : input shape file [fns]  
 -sep                 : separator in a csv file to separate values. see table below. default [space]  
 -distance [d]        : radial distance [d] or horizontal [d1] and vertical [d2] distance. default [4]  
--gdal                : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON, GPX and KML as -poly input file. Can also be used for SHP  
+-gdal                : Uses the GDAL library to support additional vector formats such as GML, GPKG, GeoJSON, GPX and KML as -poly input file. Can also be used for SHP. See [gdal_README.md] for details.  
 -remove_points       : remove points within distance to polyline  
 -classify [n]        : classify points within distance to polyline as [n]  
 -classify_as [n]     : classify points within distance to polyline as [n]  
@@ -64,7 +64,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -match_all_below     : match all points below the given distance of the polyline  
 -remain_buffered     : write on-the-fly buffer to the output  
 
-### Basics
+### basics
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -license        : show license information  
 -demo           : use LAStools in demo mode (64bit only)  
@@ -82,16 +82,16 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -version        : reports this tool's version number  
 
 
-## Module arguments
+## module arguments
 
-### General
+### general
 -chunk_size [n]    : set chunk size [n] in number of bytes  
 -comma_not_point   : use comma instead of point as decimal separator  
 -neighbors [n]     : set neighbors filename or wildcard [n]  
 -neighbors_lof [n] : set neighbors list of files [fnf]  
 -stored            : use in memory reader  
 
-### Color
+### color
 -clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
 -copy_B_into_NIR                    : copy blue color value into NearInfraRed value  
 -copy_B_into_intensity              : copy blue color value to intensity  
@@ -151,7 +151,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -switch_R_B                         : switch red and blue color value  
 -switch_R_G                         : switch red and green color value  
 
-### Coordinates
+### coordinates
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
 -auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly. Only applicable to LAS/LAZ input files  
@@ -231,7 +231,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -translate_y [n]                    : translate y value by [n]  
 -translate_z [n]                    : translate z value by [n]  
 
-### Simple thinning
+### simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
 -keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
@@ -240,7 +240,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -thin_with_grid [n]           : thin points by min grid size of [n]  
 -thin_with_time [n]           : thin pulses with time, [n] = timespacing  
 
-### Return number
+### return number
 -change_extended_number_of_returns_from_to [m] [n]: change extended number of returns from [m] to [n]  
 -change_extended_return_number_from_to [m] [n]: change extended return number from [m] to [n]  
 -change_number_of_returns_from_to [m] [n]: change number of returns from [m] to [n]  
@@ -287,7 +287,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -set_number_of_returns [n]          : set number of returns to [n]  
 -set_return_number [n]              : set return number to [n]  
 
-### Scanline
+### scanline
 -drop_scan_direction [n]       : drop points with scan direction [n]  
 -faf                           : input files are flightlines. do ***NOT*** use this for tiled input  
 -faf_index [n]                 : set files are flightlines index [n]  
@@ -298,7 +298,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -set_edge_of_flight_line [0/1] : set "Edge of Flight Line" flag to [0/1]  
 -set_scan_direction_flag [0/1] : set scan direction flag to [0/1]  
 
-### Scanner channel
+### scanner channel
 -copy_scanner_channel_into_point_source: copy scanner channel into point_source  
 -copy_scanner_channel_into_user_data: copy scanner channel into user data  
 -copy_user_data_into_scanner_channel: copy user data into scanner channel  
@@ -309,7 +309,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -set_scanner_channel [n]            : set scanner channel to [n]  
 -split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
-### Source ID
+### source ID
 -apply_file_source_ID               : copy file source ID to target  
 -bin_Z_into_point_source [n]        : set point source to z/[n]  
 -bin_abs_scan_angle_into_point_source [n]: set point source to scan_angle/[n]  
@@ -332,7 +332,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -set_point_source [n]               : set point source to [n]  
 -split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
-### User data
+### user data
 -add_scaled_attribute_to_user_data [m] [n]: scale attribute [m] value by [n] and add to user data  
 -change_user_data_from_to [m] [n]   : change user data from [m] to [n]  
 -copy_attribute_into_user_data [n]  : copy attribute [n] value into user data field  
@@ -357,7 +357,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -scale_user_data [n]                : scale user data by [n]  
 -set_user_data [n]                  : sets all user_data fields to [n]  
 
-### Classification
+### classification
 -change_class_from_to [m] [n]       : change classification from [m] to [n]  
 -change_classification_from_to [m] [n]: change classification from [m] to [n]  
 -change_extended_class_from_to [m] [n]: change extended class from [m] to [n]  
@@ -393,7 +393,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -set_classification [n]             : set classification to [n]  
 -set_extended_classification [n]    : set extended classification to [n]  
 
-### Extra byte
+### extra byte
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_user_data [m] [n]: scale attribute [m] value by [n] and add to user data  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
@@ -430,7 +430,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -set_attribute [m] [n]              : set attribute [m] with value [n]  
 -translate_attribute [m] [n]        : translate attribute [n] by [n]  
 
-### Flags
+### flags
 -drop_keypoint                   : drop points flaged as keypoint  
 -drop_overlap                    : drop points flaged as overlap  
 -drop_scan_direction [n]         : drop points with scan direction [n]  
@@ -475,7 +475,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -set_gps_time [n]                   : set gps time to [n]  
 -translate_gps_time [n]             : translate GPS time by [n]  
 
-### Intensity
+### intensity
 -bin_gps_time_into_intensity [n]    : set intensity time to gps/[n]  
 -clamp_intensity [min] [max]        : limit intensity values to [min] and [max]  
 -clamp_intensity_above [max]        : limit intensity values to maximal [max]  
@@ -512,7 +512,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -translate_intensity [n]            : translate intensity by [n]  
 -translate_then_scale_intensity [m] [n]: translate intensity by [m] and scale by [n]  
 
-### Raw point values
+### raw point values
 -clamp_raw_z [min] [max]            : limit raw z values to [min] and [max]  
 -translate_raw_x [n]                : translate raw x value by [n]  
 -translate_raw_xy_at_random [x] [y] : translate raw xy values by random and max offset of [x] [y]  
@@ -520,7 +520,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -translate_raw_y [n]                : translate raw y value by [n]  
 -translate_raw_z [n]                : translate raw z value by [n]  
 
-### Registers
+### registers
 -add_registers [m] [n] [o]          : add register [m] and [n] and store result in register [o]  
 -copy_B_into_register [n]           : copy blue color value into register [n]  
 -copy_G_into_register [n]           : copy green color value into register [n]  
@@ -549,7 +549,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -subtract_registers [m] [n] [o]     : subtract register [m] by register [n] and store result in register [o]  
 -translate_register [m] [n]         : translate register index [m] value by [n]  
 
-### Scan angle
+### scan angle
 -bin_abs_scan_angle_into_point_source [n]: set point source to scan_angle/[n]  
 -drop_abs_scan_angle_above [max]    : drop points with absolute scan angle above [max]  
 -drop_abs_scan_angle_below [min]    : drop points with absolute scan angle below [min]  
@@ -565,10 +565,10 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -translate_scan_angle [n]           : translate scan angle by [n]  
 -translate_then_scale_scan_angle [m] [n]: translate scan angle by [m] and scale by [n]  
 
-### Tiles
+### tiles
 -keep_tile [x] [y] [size] : keep tile at lower-left [x] [y] with size [s]  
 
-### Waveform packet
+### waveform packet
 -drop_wavepacket [n]     : drop points with wavepacket value of [n]  
 -flip_waveform_direction : flip the waveform direction in the waveform VLR  
 -keep_wavepacket [n]     : keep points with wavepacket value of [n]  
@@ -642,12 +642,19 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -wgs72                              : use the WGS-72 ellipsoid  
 -wgs84                              : use the WGS-84 ellipsoid  
 
-### Logical
+### logical
 -filter_and         : boolean AND combination of last 2 filters  
 -filter_or          : boolean OR combination of last 2 filters  
 -filtered_transform : do the transformation only on points of the current filter  
 
-### Input
+### formula solver
+-formula [exp]       : Allows filtering or transforming point variables using formula expressions [exp]; LAS header variables may be used only for filtering  
+-fileformula [exp]   : Allows filtering input files or transforming LAS header variables using formula expressions [exp]; point variables are not allowed  
+
+For details about the formula features and how to write formula expressions, see the [formula solver documentation (formula_solver_README.md)]  
+The formula features require a full licensed build of LAStools and are not available in the open-source version.  
+ 
+### input
 -i [fnp]        : input file or input file mask [fnp] (e.g. *.laz;fo?.la?;esri.shp,...)  
 -io_ibuffer [n] : use read-input-buffer of size [n] bytes  
 -iparse [xyz]   : define fields [xyz] for text input parser  
@@ -663,7 +670,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
 -stdin          : pipe from stdin  
 
-### Output
+### output
 -compatible      : write LAS/LAZ output in compatibility mode  
 -do_not_populate : do not populate header on output  
 -io_obuffer [n]  : use write-out-buffer of size [n] bytes  
@@ -691,7 +698,7 @@ lasdistance - modify LAS/LAZ based on distance from polygonal segments. Distance
 -target_ecef     : output is geocentric (Earth-centered Earth-fixed)  
 -temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
-### Basics
+### basics
 -help : print help output  
 
 ### parse
@@ -742,18 +749,18 @@ Supported [sep] values:
   hyphen  
   space  
 
-## Licensing
+## licensing
 
 Info on licensing and pricing: https://rapidlasso.de/pricing/.
 If you have any questions or need assistance, email to info@rapidlasso.de.
 
-## Evaluation and demo mode
+## evaluation and demo mode
 
 Please use the "-demo" argument to run the tool in demo mode. For quality tests,
 use small files (< 1.5 million points). If you use larger files, the output will
 contain diagonal lines/output distortions due to the license protection.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

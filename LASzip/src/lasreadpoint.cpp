@@ -41,6 +41,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits>
+
 
 LASreadPoint::LASreadPoint(U32 decompress_selective)
 {
@@ -342,12 +344,12 @@ BOOL LASreadPoint::seek(const U64 current, const U64 target)
       if (chunk_totals)
       {
         target_chunk = search_chunk_table(target, 0, number_chunks);
-        chunk_size = chunk_totals[target_chunk+1]-chunk_totals[target_chunk];
+        chunk_size = (U32)(chunk_totals[target_chunk+1]-chunk_totals[target_chunk]);
         delta = target - chunk_totals[target_chunk];
       }
       else
       {
-        target_chunk = target/chunk_size;
+        target_chunk = (U32)(target / chunk_size);
         delta = target%chunk_size;
       }
       if (target_chunk >= tabled_chunks)
@@ -438,14 +440,14 @@ BOOL LASreadPoint::read(U8* const * point)
           if (current_chunk >= number_chunks)
           {
             number_chunks += 256;
-            chunk_starts = (I64*)realloc_las(chunk_starts, sizeof(I64)*(number_chunks+1));
+            chunk_starts = (I64*)realloc_las(chunk_starts, sizeof(I64)*((U64)number_chunks+1));
           }
           chunk_starts[tabled_chunks] = point_start; // needs fixing
           tabled_chunks++;
         }
         else if (chunk_totals) // variable sized chunks?
         {
-          chunk_size = chunk_totals[current_chunk+1]-chunk_totals[current_chunk];
+          chunk_size = (U32)(chunk_totals[current_chunk + 1] - chunk_totals[current_chunk]);
         }
         chunk_count = 0;
       }
@@ -579,7 +581,7 @@ BOOL LASreadPoint::init_dec()
       return FALSE;
     }
     current_chunk = 0;
-    if (chunk_totals) chunk_size = chunk_totals[1];
+    if (chunk_totals) chunk_size = (U32)chunk_totals[1];
   }
 
   point_start = instream->tell();
@@ -680,14 +682,17 @@ BOOL LASreadPoint::read_chunk_table()
     chunk_starts = 0;
     if (chunk_size == U32_MAX)
     {
-      chunk_totals = new U64[number_chunks+1];
+      if (number_chunks > std::numeric_limits<size_t>::max() - 1) {
+        throw 1;
+      }
+      chunk_totals = new U64[(U64)number_chunks+1];
       if (chunk_totals == 0)
       {
         throw 1;
       }
       chunk_totals[0] = 0;
     }
-    chunk_starts = (I64*)malloc_las(sizeof(I64) * (number_chunks + 1));
+    chunk_starts = (I64*)malloc_las(sizeof(I64) * ((U64)number_chunks + 1));
     if (chunk_starts == 0)
     {
       throw 1;
@@ -696,13 +701,13 @@ BOOL LASreadPoint::read_chunk_table()
     tabled_chunks = 1;
     if (number_chunks > 0)
     {
-      U32 i;
+      U64 i;
       dec->init(instream);
       IntegerCompressor ic(dec, 32, 2);
       ic.initDecompressor();
       for (i = 1; i <= number_chunks; i++)
       {
-        if (chunk_size == U32_MAX) chunk_totals[i] = ic.decompress((i>1 ? chunk_totals[i-1] : 0), 0);
+        if (chunk_size == U32_MAX) chunk_totals[i] = ic.decompress((i>1 ? (U32)chunk_totals[i-1] : 0), 0);
         chunk_starts[i] = ic.decompress((i>1 ? (U32)(chunk_starts[i-1]) : 0), 1);
         tabled_chunks++;
       }
@@ -733,7 +738,7 @@ BOOL LASreadPoint::read_chunk_table()
     {
       // then compressor was interrupted before getting a chance to write the chunk table
       number_chunks = 256;
-      chunk_starts = (I64*)malloc_las(sizeof(I64) * (number_chunks + 1));
+      chunk_starts = (I64*)malloc_las(sizeof(I64) * ((U64)number_chunks + 1));
       if (chunk_starts == 0)
       {
         return FALSE;

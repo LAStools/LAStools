@@ -1211,6 +1211,11 @@ public:
         I64 set_vlr_user_id_pos = -1;
         if (set_vlr_user_id_index != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+          // fileformula filtered
+          if (lasreadopener.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+            continue;
+          }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
@@ -1230,6 +1235,11 @@ public:
         I64 set_vlr_record_id_pos = -1;
         if (set_vlr_record_id_index != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+          // fileformula filtered
+          if (lasreadopener.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+            continue;
+          }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
@@ -1249,6 +1259,11 @@ public:
         I64 set_vlr_description_pos = -1;
         if (set_vlr_description_index != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+          // fileformula filtered
+          if (lasreadopener.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+            continue;
+          }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
@@ -1273,6 +1288,11 @@ public:
         U32 set_geotiff_vlr_geo_ascii_length = 0;
         if (set_geotiff_epsg != -1) {
           LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+          // fileformula filtered
+          if (lasreadopener.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+            continue;
+          }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
           }
@@ -1307,6 +1327,11 @@ public:
           // preread header actions
           if (header_preread) {
             LASreader* lasreader = lasreadopener.open(file_name, FALSE);
+            // fileformula filtered
+            if (lasreadopener.is_file_formula_filtered()) {
+              LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+              continue;
+            }
             if (lasreader == 0) {
               laserror("cannot open lasreader for '%s'", file_name);
             }
@@ -1579,6 +1604,11 @@ public:
 
       // open lasreader
       lasreader = lasreadopener.open();
+      // fileformula filtered
+      if (lasreadopener.is_file_formula_filtered()) {
+        LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+        continue;
+      }
       if (lasreader == 0) {
         laserror("cannot open lasreader");
         continue;
@@ -1715,7 +1745,13 @@ public:
 
       // print header info
       std::string printstring(4096, '\0');
-      bool wkt_bit_set = false;  // false = GeoTiff, true = WKT
+      bool wkt_bit_set = false; // false = GeoTiff, true = WKT
+
+      if ((lasheader->version_major == 1) && (lasheader->version_minor <= 4)) {
+        wkt_bit_set = (lasheader->global_encoding & (1 << 4)) != 0;
+      } else {
+        wkt_bit_set = true;
+      }
 
       if ((lasheader->version_major == 1) && (lasheader->version_minor <= 4)) {
         wkt_bit_set = (lasheader->global_encoding & (1 << 4)) != 0;
@@ -2517,11 +2553,7 @@ public:
               fprintf(file_out, "    root node halfsize: %.3lf\012", info->halfsize);
               fprintf(file_out, "    root node point spacing: %.3lf\012", info->spacing);
               fprintf(file_out, "    gpstime min/max: %.2lf/%.2lf\012", info->gpstime_minimum, info->gpstime_maximum);
-#ifdef _WIN32
-              fprintf(file_out, "    root hierarchy offset/size: %I64u/%I64u\012", info->root_hier_offset, info->root_hier_size);
-#else
               fprintf(file_out, "    root hierarchy offset/size: %llu/%llu\012", info->root_hier_offset, info->root_hier_size);
-#endif
             }
           }
           if (json_out) json_sub_main["las_variable_length_records"].push_back(json_vlr_record);
@@ -2605,11 +2637,7 @@ public:
                     json_copc["voxels"] = voxel_count[j];
                     json_evlr_record["copc"]["octree_levels"].push_back(json_copc);
                   } else if (!csv_out) {
-#ifdef _WIN32
-                    fprintf(file_out, "    Level %d : %I64u points in %u voxels\012", j, point_count[j], voxel_count[j]);
-#else
                     fprintf(file_out, "    Level %d : %llu points in %u voxels\012", j, point_count[j], voxel_count[j]);
-#endif
                   }
                 }
                 free(point_count);

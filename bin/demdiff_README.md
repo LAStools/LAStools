@@ -20,7 +20,7 @@ done with all files. total time for [r] files [s] sec.
 The text output can be parsed to get further information for automated processes.
 
 
-## Warnings and Errors
+## warnings and Errors
 If the input files or the arguments are not valid, an error output will be displayed:
 
     ERROR: cannot open raster1 with file name '...'.
@@ -58,7 +58,7 @@ Only files with 1 color band (layers) are supported.
 The number of columns, rows and color bands of all files to compare has to be identical.
 
 
-## Examples
+## examples
 
     demdiff -i lake1.tif lake2.tif
     demdiff -i lake1.tif -i lake2.tif
@@ -70,7 +70,7 @@ Both commands compare the raster difference between file 'lake1.tif' and 'lake2.
 -i         : one or many input files to proceed  
 -cores [n] : process multiple inputs on [n] cores in parallel  
 
-### Basics
+### basics
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
@@ -85,11 +85,11 @@ Both commands compare the raster difference between file 'lake1.tif' and 'lake2.
 -version        : reports this tool's version number  
 
 
-## Licensing
+## licensing
 
 This tool is free to use.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

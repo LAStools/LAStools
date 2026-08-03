@@ -24,7 +24,7 @@ If any of these functions is called the LASreader will only return the points
 that fall inside the specified region or depth and use - when available - the spatial
 indexing information in the COPC EVLR.
 
-## Examples
+## examples
 
     lascopcindex64 in.las
 
@@ -119,9 +119,9 @@ overview of all tool-specific switches:
 -ondisk             : stores processing data on disk to save memory.  
 -tmpdir             : if ondisk is set, an optionnal path to a directory where to store temporary files.  
 
-## Module arguments
+## module arguments
 
-### Color
+### color
 -clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
 -copy_B_into_NIR                    : copy blue color value into NearInfraRed value  
 -copy_B_into_intensity              : copy blue color value to intensity  
@@ -179,7 +179,7 @@ overview of all tool-specific switches:
 -switch_R_B                         : switch red and blue color value  
 -switch_R_G                         : switch red and green color value  
 
-### Coordinates
+### coordinates
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
 -auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly. Only applicable to LAS/LAZ input files  
@@ -259,7 +259,7 @@ overview of all tool-specific switches:
 -translate_y [n]                    : translate y value by [n]  
 -translate_z [n]                    : translate z value by [n]  
 
-### Simple thinning
+### simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
 -keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
@@ -268,7 +268,7 @@ overview of all tool-specific switches:
 -thin_with_grid [n]           : thin points by min grid size of [n]  
 -thin_with_time [n]           : thin pulses with time, [n] = timespacing  
 
-### Return number
+### return number
 -change_extended_number_of_returns_from_to [m] [n]: change extended number of returns from [m] to [n]  
 -change_extended_return_number_from_to [m] [n]: change extended return number from [m] to [n]  
 -change_number_of_returns_from_to [m] [n]: change number of returns from [m] to [n]  
@@ -309,7 +309,7 @@ overview of all tool-specific switches:
 -set_number_of_returns [n]          : set number of returns to [n]  
 -set_return_number [n]              : set return number to [n]  
 
-### Scanline
+### scanline
 -drop_scan_direction [n]       : drop points with scan direction [n]  
 -faf                           : input files are flightlines. do ***NOT*** use this for tiled input  
 -faf_index [n]                 : set files are flightlines index [n]  
@@ -320,7 +320,7 @@ overview of all tool-specific switches:
 -set_edge_of_flight_line [0/1] : set "Edge of Flight Line" flag to [0/1]  
 -set_scan_direction_flag [0/1] : set scan direction flag to [0/1]  
 
-### Scanner channel
+### scanner channel
 -copy_scanner_channel_into_point_source: copy scanner channel into point_source  
 -copy_scanner_channel_into_user_data: copy scanner channel into user data  
 -copy_user_data_into_scanner_channel: copy user data into scanner channel  
@@ -331,7 +331,7 @@ overview of all tool-specific switches:
 -set_scanner_channel [n]            : set scanner channel to [n]  
 -split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
-### Source ID
+### source ID
 -apply_file_source_ID               : copy file source ID to target  
 -bin_Z_into_point_source [n]        : set point source to z/[n]  
 -bin_abs_scan_angle_into_point_source [n]: set point source to scan_angle/[n]  
@@ -354,7 +354,7 @@ overview of all tool-specific switches:
 -set_point_source [n]               : set point source to [n]  
 -split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
-### User data
+### user data
 -add_scaled_attribute_to_user_data [m] [n]: scale attribute [m] value by [n] and add to user data  
 -change_user_data_from_to [m] [n]   : change user data from [m] to [n]  
 -copy_attribute_into_user_data [n]  : copy attribute [n] value into user data field  
@@ -379,7 +379,7 @@ overview of all tool-specific switches:
 -scale_user_data [n]                : scale user data by [n]  
 -set_user_data [n]                  : sets all user_data fields to [n]  
 
-### Classification
+### classification
 -change_class_from_to [m] [n]       : change classification from [m] to [n]  
 -change_classification_from_to [m] [n]: change classification from [m] to [n]  
 -change_extended_class_from_to [m] [n]: change extended class from [m] to [n]  
@@ -413,7 +413,7 @@ overview of all tool-specific switches:
 -set_classification [n]             : set classification to [n]  
 -set_extended_classification [n]    : set extended classification to [n]  
 
-### Extra byte
+### extra byte
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_user_data [m] [n]: scale attribute [m] value by [n] and add to user data  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
@@ -450,7 +450,7 @@ overview of all tool-specific switches:
 -set_attribute [m] [n]              : set attribute [m] with value [n]  
 -translate_attribute [m] [n]        : translate attribute [n] by [n]  
 
-### Flags
+### flags
 -drop_keypoint                   : drop points flaged as keypoint  
 -drop_overlap                    : drop points flaged as overlap  
 -drop_scan_direction [n]         : drop points with scan direction [n]  
@@ -476,11 +476,11 @@ overview of all tool-specific switches:
 -bin_gps_time_into_point_source [n] : set point source to gps/[n]  
 -drop_gps_time_above [n]            : drop points with GPS time above [n]  
 
-## Licensing
+## licensing
 
 This tool is free to use.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

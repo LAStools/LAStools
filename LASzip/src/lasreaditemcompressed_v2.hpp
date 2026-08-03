@@ -39,7 +39,7 @@
 
 #include "laszip_common_v2.hpp"
 
-class LASreadItemCompressed_POINT10_v2 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_POINT10_v2 : public LASreadItemCompressed
 {
 public:
 
@@ -70,7 +70,7 @@ private:
   IntegerCompressor* ic_z;
 };
 
-class LASreadItemCompressed_GPSTIME11_v2 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_GPSTIME11_v2 : public LASreadItemCompressed
 {
 public:
 
@@ -93,7 +93,7 @@ private:
   IntegerCompressor* ic_gpstime;
 };
 
-class LASreadItemCompressed_RGB12_v2 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_RGB12_v2 : public LASreadItemCompressed
 {
 public:
 
@@ -117,7 +117,7 @@ private:
   ArithmeticModel* m_rgb_diff_5;
 };
 
-class LASreadItemCompressed_BYTE_v2 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_BYTE_v2 : public LASreadItemCompressed
 {
 public:
 

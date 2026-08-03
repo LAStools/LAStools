@@ -58,16 +58,16 @@ protected:
     U16 global_encoding = 0;
 };
 
-class LASfilter
+class LASLIB_DLL LASfilter
 {
 public:
-
   void usage() const;
   void clean();
   BOOL parse(int argc, char* argv[]);
   BOOL parse(CHAR* string);
   I32 unparse(CHAR* string) const;
   inline BOOL active() const { return (num_criteria != 0); };
+
   U32 get_decompress_selective() const;
 
   void addClipCircle(F64 x, F64 y, F64 radius);
@@ -75,6 +75,8 @@ public:
   void addKeepScanDirectionChange();
 
   void addHeaderInfo(LASreader* lasreader);
+
+  inline void enable_formula_filter() { has_formula_filter = true; }
 
   BOOL filter(const LASpoint* point);
   void reset();
@@ -89,6 +91,7 @@ private:
   U32 alloc_criteria;
   LAScriterion** criteria;
   I32* counters;
+  bool has_formula_filter;
 };
 
 #endif

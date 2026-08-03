@@ -87,9 +87,9 @@ LASintervalStartCell::LASintervalStartCell(const U64 p_index) : LASintervalCell(
 
 BOOL LASintervalStartCell::add(const U64 p_index, const U32 threshold)
 {
-  U32 current_end = (last ? last->end : end);
+  U32 current_end = (U32)(last ? last->end : end);
   assert(p_index > current_end);
-  U32 diff = p_index - current_end;
+  U32 diff = (U32)(p_index - current_end);
   full++;
   if (diff > threshold)
   {
@@ -208,7 +208,7 @@ void LASinterval::merge_intervals(U32 maximum_intervals)
     cell = (*hash_element).second;
     while (cell->next)
     {
-      diff = cell->next->start - cell->end - 1;
+      diff = (U32)(cell->next->start - cell->end - 1);
       map.insert(my_cell_map::value_type(diff, cell));
       cell = cell->next;
     }

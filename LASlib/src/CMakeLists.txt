@@ -34,6 +34,7 @@ set(LAS_SRC
 	lastransform.cpp
 	laskdtree.cpp
 	lascopc.cpp
+        lasformula_api_stub.cpp
 	fopen_compressed.cpp
 )
 

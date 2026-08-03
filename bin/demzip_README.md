@@ -21,7 +21,7 @@ Advantages of storing elevation grids and rasters as RasterLAZ:
 A RasterLAZ file is a LAZ file with an extra VLR that stores the raster
 relevant extra information such as ncols, nrows, stepx resolution, stepy resolution, ...
 
-## Examples
+## examples
 
     demzip64 -i sample.tif -o sample.laz
 
@@ -43,7 +43,7 @@ convert the RasterLAZ file into a TIFF file.
 -scale [n]          : set vertical resolution to [n] (meter/feet)  
 -sigmaxy [n]        : horizontal accuracy expected at [n] meters (inactive)  
 
-### Basics
+### basics
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
@@ -57,11 +57,11 @@ convert the RasterLAZ file into a TIFF file.
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
-## Licensing
+## licensing
 
 This tool is free to use.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

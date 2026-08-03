@@ -2,7 +2,7 @@
 
 This tiny tool formats a WKT/WKT2 string.
   
-## Examples
+## examples
 
     wktformat64 -i wkt.txt
 
@@ -32,11 +32,11 @@ formats the input string as argument. Result is
 
 if only one argument is given this is assumed as input string or input file (ending .txt or .wkt)
 
-## Licensing
+## licensing
 
 This tool is free to use.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

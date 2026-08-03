@@ -36,7 +36,7 @@
 
 #include <stdio.h>
 
-class LASreaderPLY : public LASreader
+class LASLIB_DLL LASreaderPLY : public LASreader
 {
 public:
 
@@ -97,7 +97,7 @@ private:
   void clean();
 };
 
-class LASreaderPLYrescale : public virtual LASreaderPLY
+class LASLIB_DLL LASreaderPLYrescale : public virtual LASreaderPLY
 {
 public:
   virtual BOOL open(const CHAR* file_name, U8 point_type=0, BOOL populate_header=FALSE);
@@ -107,7 +107,7 @@ protected:
   F64 scale_factor[3];
 };
 
-class LASreaderPLYreoffset : public virtual LASreaderPLY
+class LASLIB_DLL LASreaderPLYreoffset : public virtual LASreaderPLY
 {
 public:
   virtual BOOL open(const CHAR* file_name, U8 point_type=0, BOOL populate_header=FALSE);
@@ -116,7 +116,7 @@ protected:
   F64 offset[3];
 };
 
-class LASreaderPLYrescalereoffset : public LASreaderPLYrescale, LASreaderPLYreoffset
+class LASLIB_DLL LASreaderPLYrescalereoffset : public LASreaderPLYrescale, LASreaderPLYreoffset
 {
 public:
   BOOL open(const CHAR* file_name, U8 point_type=0, BOOL populate_header=FALSE);

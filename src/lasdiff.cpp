@@ -973,17 +973,32 @@ int main(int argc, char *argv[])
 
     while (lasreadopener1.active())
     {
+      bool skip_pair = false;
+
       lasreader1 = lasreadopener1.open();
       file_name1 = LASCopyString(lasreadopener1.get_file_name());
+      // fileformula filtered
+      if (lasreadopener1.is_file_formula_filtered()) {
+        LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name1);
+        skip_pair = true;
+      } 
       if (lasreader1 == 0)
       {
         laserror("cannot open '%s'", file_name1);
       }
       lasreader2 = lasreadopener2.open();
       file_name2 = LASCopyString(lasreadopener2.get_file_name());
+      if (lasreadopener2.is_file_formula_filtered()) {
+        LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name2);
+        skip_pair = true;
+      }
       if (lasreader2 == 0)
       {
         laserror("cannot open '%s'", file_name2);
+      }
+      // skip if either one was filtered
+      if (skip_pair) {
+        continue;
       }
 
       LASMessage(LAS_INFO, "checking '%s' against '%s'", file_name1, file_name2);
@@ -1028,18 +1043,30 @@ int main(int argc, char *argv[])
 
     while (lasreadopener.active())
     {
+      bool skip_pair = false;
+
       start_time = taketime();
 
       if (lasreadopener.get_file_name_number() == 2)
       {
         lasreader1 = lasreadopener.open();
         file_name1 = LASCopyString(lasreadopener.get_file_name());
+        // fileformula filtered
+        if (lasreadopener.is_file_formula_filtered()) {
+          LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name1);
+          skip_pair = true;
+        } 
         if (lasreader1 == 0)
         {
           laserror("cannot open '%s'", file_name1);
         }
         lasreader2 = lasreadopener.open();
         file_name2 = LASCopyString(lasreadopener.get_file_name());
+        // fileformula filtered
+        if (lasreadopener.is_file_formula_filtered()) {
+          LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name2);
+          skip_pair = true;
+        }
         if (lasreader2 == 0)
         {
           laserror("cannot open '%s'", file_name2);
@@ -1049,6 +1076,11 @@ int main(int argc, char *argv[])
       {
         lasreader1 = lasreadopener.open();
         file_name1 = LASCopyString(lasreadopener.get_file_name());
+        // fileformula filtered
+        if (lasreadopener.is_file_formula_filtered()) {
+          LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name1);
+          skip_pair = true;
+        } 
         if (lasreader1 == 0)
         {
           laserror("cannot open '%s'", file_name1);
@@ -1078,10 +1110,20 @@ int main(int argc, char *argv[])
         LASreadOpener lasreadopener_other;
         lasreadopener_other.set_file_name(file_name2);
         lasreader2 = lasreadopener_other.open();
+        // fileformula filtered
+        if (lasreadopener_other.is_file_formula_filtered()) {
+          LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name2);
+          skip_pair = true;
+        }
         if (lasreader2 == 0)
         {
           laserror("cannot open '%s'", file_name2);
         }
+      }
+
+      // skip if either one was filtered
+      if (skip_pair) {
+        continue;
       }
 
       LASMessage(LAS_INFO, "checking '%s' against '%s'", file_name1, file_name2);

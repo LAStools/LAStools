@@ -80,7 +80,7 @@ lasinfo provides detail information about this VLR records:
     copc  
        1 copc information  
 
-## Examples
+## examples
 
     lasinfo64 lidar.laz
 
@@ -290,7 +290,6 @@ Further examples
 -cd                                 : compute rough approximation for covered area, density, and spacing  
 -compute_density                    : compute rough approximation for covered area, density, and spacing  
 -delete_empty                       : delete LAS files with zero points  
--full_csv                           : outputs all information.Use only in combination with csv format
 -gps_week                           : compute the GPS week (if data is Adjusted Standard GPS time)  
 -gw                                 : compute the GPS week (if data is Adjusted Standard GPS time)  
 -histo [m] [n]                      : histogram output about [m] with step width [n]  
@@ -309,12 +308,6 @@ Further examples
 -nr                                 : don't output return information  
 -nv                                 : don't output VLR information  
 -nw                                 : don't output warnings  
--otxt                               : output as textfile  
--ojs                                : output as json file  
--ocsv                               : reduced output as csv file. -nc is set by default use -full_csv for full output
--js                                 : output in json format  
--json                               : output in json format  
--csv                                : reduced output in csv format. -nc is set by default use -full_csv for full output
 -progress [n]                       : report progress every [n] points  
 -proj_info [wkt] [js] [str] [epsg] [el] [datum] [cs] : get CRS representations and information of the input file: [wkt] WKT, [js] PROJJSON, [str] PROJ string or [epsg] EPSG code representation and [el] ellipsoid, [datum] datum or [cs] coordinate system information  
 -rename [n]                         : renames input file 'fusa.laz' to '[n]_123_456.laz' where 123 and 456 is the x and y header minimum value  
@@ -323,7 +316,7 @@ Further examples
 -repair_counters                    : set (in place) the counters for point number and (extended) return histograms in header  
 -report_outside                     : report attributes of each point that falls outside of LAS header bounding box  
 -ro                                 : report attributes of each point that falls outside of LAS header bounding box  
--scale_header [x] [y] [z]           : scale whole file by scaling the header values with factor [x] [y] [z] or [xyz] (one for all) (64bit only)   
+-scale_header [x] [y] [z]           : scale whole file by scaling the header values with factor [x] [y] [z] or [xyz] (one for all) (64bit only)  
 -set_bb [x1] [y1] [z1] [x2] [y2] [z2]: set bounding box to [x1] [y1] [z1] [x2] [y2] [z2]  
 -set_bounding_box [x1] [y1] [z1] [x2] [y2] [z2]: set bounding box to [x1] [y1] [z1] [x2] [y2] [z2]  
 -set_creation_date [day] [year]     : set creation date to [day] [year]  
@@ -352,6 +345,15 @@ Further examples
 -week_to_adjusted [n]               : converts time stamps from GPS week [n] to Adjusted Standard GPS  
 -wkt_format                         : formats WKT output with line breaks and indent for better readability  
 
+## lasinfo output arguments
+-otxt                               : output as textfile (or '-o file.txt')  
+-ojs                                : output as json file (or '-o file.json')  
+-ocsv                               : output as csv file (table style; '-nc' is set by default; use '-full_csv' for all columns)  
+-js                                 : console output in json format  
+-json                               : console output in json format  
+-csv                                : console output in csv format (table style; '-nc' is set by default; use '-full_csv' for all columns)  
+-full_csv                           : outputs all information. Use only in combination with csv format  
+
 ## lasinfo patch arguments
 
 CAREFUL! this arguments patch LAS/LAZ files and they will become probably invalid
@@ -368,7 +370,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -set_version [n]                    : CAREFUL! sets the version field of the LAS header to [n]{e.g. 1.2}  without checking whether this will corrupt the file  
 -set_start_of_waveform_data_packet_record [n]: CAREFUL! sets the start of waveform data packet record field of the LAS header to [n] without checking whether this will corrupt the file  
 
-### Basics
+### basics
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
@@ -383,16 +385,16 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -version        : reports this tool's version number  
 
 
-## Module arguments
+## module arguments
 
-### General
+### general
 -chunk_size [n]        : set chunk size [n] in number of bytes  
 -comma_not_point       : use comma instead of point as decimal separator  
 -neighbors [n]         : set neighbors filename or wildcard [n]  
 -neighbors_lof [n]     : set neighbors list of files [fnf]  
 -stored                : use in memory reader  
 
-### Color
+### color
 -clamp_RGB_to_8bit                  : limit RGB values to 8 bit (otherwise: 16 bit)  
 -copy_B_into_NIR                    : copy blue color value into NearInfraRed value  
 -copy_B_into_intensity              : copy blue color value to intensity  
@@ -452,7 +454,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -switch_R_B                         : switch red and blue color value  
 -switch_R_G                         : switch red and green color value  
 
-### Coordinates
+### coordinates
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
 -auto_reoffset                      : puts a reasonable offset in the header and translates the points accordingly. Only applicable to LAS/LAZ input files  
@@ -532,7 +534,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -translate_y [n]                    : translate y value by [n]  
 -translate_z [n]                    : translate z value by [n]  
 
-### Simple thinning
+### simple thinning
 -drop_every_nth [n]           : drop every [n]th point  
 -keep_every_nth [n]           : keep every [n]th point  
 -keep_random_fraction [m] [n] : keep points by random fraction [m]{0-1}, optional seed [n]  
@@ -541,7 +543,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -thin_with_grid [n]           : thin points by min grid size of [n]  
 -thin_with_time [n]           : thin pulses with time, [n] = timespacing  
 
-### Return number
+### return number
 -change_extended_number_of_returns_from_to [m] [n]: change extended number of returns from [m] to [n]  
 -change_extended_return_number_from_to [m] [n]: change extended return number from [m] to [n]  
 -change_number_of_returns_from_to [m] [n]: change number of returns from [m] to [n]  
@@ -582,7 +584,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -set_number_of_returns [n]          : set number of returns to [n]  
 -set_return_number [n]              : set return number to [n]  
 
-### Scanline
+### scanline
 -drop_scan_direction [n]       : drop points with scan direction [n]  
 -faf                           : input files are flightlines. do ***NOT*** use this for tiled input  
 -faf_index [n]                 : set files are flightlines index [n]  
@@ -593,7 +595,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -set_edge_of_flight_line [0/1] : set "Edge of Flight Line" flag to [0/1]  
 -set_scan_direction_flag [0/1] : set scan direction flag to [0/1]  
 
-### Scanner channel
+### scanner channel
 -copy_scanner_channel_into_point_source: copy scanner channel into point_source  
 -copy_scanner_channel_into_user_data: copy scanner channel into user data  
 -copy_user_data_into_scanner_channel: copy user data into scanner channel  
@@ -604,7 +606,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -set_scanner_channel [n]            : set scanner channel to [n]  
 -split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
-### Source ID
+### source ID
 -apply_file_source_ID               : copy file source ID to target  
 -bin_Z_into_point_source [n]        : set point source to z/[n]  
 -bin_abs_scan_angle_into_point_source [n]: set point source to scan_angle/[n]  
@@ -627,7 +629,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -set_point_source [n]               : set point source to [n]  
 -split_scanner_channel_from_point_source: split scanner channel from point source and save as extended scanner channel  
 
-### User data
+### user data
 -add_scaled_attribute_to_user_data [m] [n]: scale attribute [m] value by [n] and add to user data  
 -change_user_data_from_to [m] [n]   : change user data from [m] to [n]  
 -copy_attribute_into_user_data [n]  : copy attribute [n] value into user data field  
@@ -652,7 +654,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -scale_user_data [n]                : scale user data by [n]  
 -set_user_data [n]                  : sets all user_data fields to [n]  
 
-### Classification
+### classification
 -change_class_from_to [m] [n]       : change classification from [m] to [n]  
 -change_classification_from_to [m] [n]: change classification from [m] to [n]  
 -change_extended_class_from_to [m] [n]: change extended class from [m] to [n]  
@@ -686,7 +688,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -set_classification [n]             : set classification to [n]  
 -set_extended_classification [n]    : set extended classification to [n]  
 
-### Extra byte
+### extra byte
 -add_attribute_to_z [n]             : add value of attribute [n] to z value  
 -add_scaled_attribute_to_user_data [m] [n]: scale attribute [m] value by [n] and add to user data  
 -add_scaled_attribute_to_z [m] [n]  : scale attribute [m] value by [n] and add to z value  
@@ -723,7 +725,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -set_attribute [m] [n]              : set attribute [m] with value [n]  
 -translate_attribute [m] [n]        : translate attribute [n] by [n]  
 
-### Flags
+### flags
 -drop_keypoint                   : drop points flaged as keypoint  
 -drop_overlap                    : drop points flaged as overlap  
 -drop_scan_direction [n]         : drop points with scan direction [n]  
@@ -764,7 +766,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -set_gps_time [n]                   : set gps time to [n]  
 -translate_gps_time [n]             : translate GPS time by [n]  
 
-### Intensity
+### intensity
 -bin_gps_time_into_intensity [n]    : set intensity time to gps/[n]  
 -clamp_intensity [min] [max]        : limit intensity values to [min] and [max]  
 -clamp_intensity_above [max]        : limit intensity values to maximal [max]  
@@ -801,7 +803,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -translate_intensity [n]            : translate intensity by [n]  
 -translate_then_scale_intensity [m] [n]: translate intensity by [m] and scale by [n]  
 
-### Raw point values
+### raw point values
 -clamp_raw_z [min] [max]            : limit raw z values to [min] and [max]  
 -translate_raw_x [n]                : translate raw x value by [n]  
 -translate_raw_xy_at_random [x] [y] : translate raw xy values by random and max offset of [x] [y]  
@@ -809,7 +811,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -translate_raw_y [n]                : translate raw y value by [n]  
 -translate_raw_z [n]                : translate raw z value by [n]  
 
-### Registers
+### registers
 -add_registers [m] [n] [o]          : add register [m] and [n] and store result in register [o]  
 -copy_B_into_register [n]           : copy blue color value into register [n]  
 -copy_G_into_register [n]           : copy green color value into register [n]  
@@ -838,7 +840,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -subtract_registers [m] [n] [o]     : subtract register [m] by register [n] and store result in register [o]  
 -translate_register [m] [n]         : translate register index [m] value by [n]  
 
-### Scan angle
+### scan angle
 -bin_abs_scan_angle_into_point_source [n]: set point source to scan_angle/[n]  
 -drop_abs_scan_angle_above [max]    : drop points with absolute scan angle above [max]  
 -drop_abs_scan_angle_below [min]    : drop points with absolute scan angle below [min]  
@@ -854,20 +856,27 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -translate_scan_angle [n]           : translate scan angle by [n]  
 -translate_then_scale_scan_angle [m] [n]: translate scan angle by [m] and scale by [n]  
 
-### Tiles
+### tiles
 -keep_tile [x] [y] [size] : keep tile at lower-left [x] [y] with size [s]  
 
-### Waveform packet
+### waveform packet
 -drop_wavepacket [n]     : drop points with wavepacket value of [n]  
 -flip_waveform_direction : flip the waveform direction in the waveform VLR  
 -keep_wavepacket [n]     : keep points with wavepacket value of [n]  
 
-### Logical
+### logical
 -filter_and         : boolean AND combination of last 2 filters  
 -filter_or          : boolean OR combination of last 2 filters  
 -filtered_transform : do the transformation only on points of the current filter  
 
-### Input
+### formula solver
+-formula [exp]       : Allows filtering or transforming point variables using formula expressions [exp]; LAS header variables may be used only for filtering  
+-fileformula [exp]   : Allows filtering input files or transforming LAS header variables using formula expressions [exp]; point variables are not allowed  
+
+For details about the formula features and how to write formula expressions, see the [formula solver documentation (formula_solver_README.md)]  
+The formula features require a full licensed build of LAStools and are not available in the open-source version.  
+ 
+### input
 -i [fnp]        : input file or input file mask [fnp] (e.g. *.laz;fo?.la?;esri.shp,...)  
 -io_ibuffer [n] : use read-input-buffer of size [n] bytes  
 -iparse [xyz]   : define fields [xyz] for text input parser  
@@ -882,7 +891,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -merged         : merge input files  
 -stdin          : pipe from stdin  
 
-### Output
+### output
 -compatible      : write LAS/LAZ output in compatibility mode  
 -do_not_populate : do not populate header on output  
 -io_obuffer [n]  : use write-out-buffer of size [n] bytes  
@@ -908,7 +917,7 @@ CAREFUL! this arguments patch LAS/LAZ files and they will become probably invali
 -stdout          : pipe to stdout  
 -temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
-### Basics
+### basics
 -help : print help output  
 
 ### parse
@@ -987,11 +996,11 @@ This parameters can be used in "-histo" and "-histo_avg" argument as first param
     wavepacket_size  
     wavepacket_location  
 
-## Licensing
+## licensing
 
 This tool is free to use.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

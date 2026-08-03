@@ -24,80 +24,48 @@ The validation includes the following:
 
 **Header validation:**
 1. The **Global Encoding** field is verified for correctly set bits according to the LAS version and point data format.
-
 2. The **LAS version number**, **System Identifier**, **Generating Software**, and **File Creation Date** are validated.
-
 3. The **header size** is checked against the minimum required size according to the LAS version specification, and the **offset to point data** is validated.
-
 4. The **point data format** is verified to ensure it is permitted for the specified LAS version.
-
 5. The **point data record length** is checked against the minimum required length for the given point data format.
-
 6. The **extra bytes** in the point data record are checked against an **Extra Bytes VLR or EVLR**.
-
 7. It is verified that **at least one point** record exists in the file.
-
 8. It is checked that the **number of points by return** is less than or equal to the total **number of point records**.
-
 9. For LAS 1.4 and higher, integrity between the **legacy number of point records** and the **extended number of point records** is verified.
-
 10. For LAS 1.4 and higher, integrity between the **legacy number of points by return** and the **extended number of points by return** is verified.
-
 11. If a tile size is specified, it is checked whether the **header bounding box** agrees with the given tile size.
-
 12. The **number of point records** stored in the header is compared against the counted inventory.
-
 13. The **extended number of points by return** stored in the header is compared against the counted inventory.
-
 14. The **scale factors (X, Y, Z)** and **offset values (X, Y, Z)** are validated.
-
 15. The **Global Encoding** field and **Waveform Data Packet** information are verified.
-
 16. Coordinates are checked for **excessive resolution** or **rounding artifacts** ("resolution fluff").
-
 17. The inventory is checked for **invalid return numbers**.
-
 18. The inventory is checked for **invalid numbers of returns per pulse**.
-
 19. The inventory is checked for **abnormal intensity values**.
-
 20. The inventory is checked for **abnormal scan angle values**.
-
 21. The inventory is checked for **zero Point Source IDs**.
-
 22. Consistency between the **File Source ID** and **Point Source IDs** is verified.
-
 23. For point data formats 1, 3, 4, and higher, it is checked whether **all GPS time stamps are identical**.
-
 24. For point data formats 2, 3, 7, 8, and 10, it is checked whether **all RGB values are identical**.
-
 25. **Wave packet indices** are validated.
-
 26. **GPS time** values are checked for validity.
-
 
 
 **Point validation:**
 1. **Point coordinates** are verified to ensure they lie within the **header-defined bounding box**.
-
 2. The **return number** and **number of returns**, as well as the **extended return number** and **extended number of returns**, are checked for consistency.
-
 3. The **scan direction** and **edge of flight line** are correctly set to 0 or 1
-
 4. check that the **point classification** value is valid according to LAS version 
-
 5. **GPS time values** are validated against the **header-defined time range**.
 
 
 **CRS-Validierung:**
 1. It is checked whether a **GeoTIFF CRS** or an **OGC WKT CRS** is present.
-
 2. The **CRS specification** (GeoTIFF or OGC WKT) is verified according to the LAS minor version.
-
 3. The **GeoTIFF CRS** or **OGC WKT CRS** definition is validated for correctness.
 
 
-## Examples
+## examples
 
     lasvalidate64 -i lidar.laz
 
@@ -147,20 +115,21 @@ Further examples
 
 ## lasvalidate specific arguments
 
--ocsv                               : Simplified output as csv file  
--oxml                               : output as xml file  
--otxt                               : output as text file  
--ojs                                : output as json file  
--csv                                : simplified output in csv format (otherwise default json)  
--txt                                : output in txt format (otherwise default json)  
--xml                                : output in xml format (otherwise default json)  
+-otxt                               : output as textfile (or '-o file.txt')  
+-ojs                                : output as json file (or '-o file.json')  
+-oxml                               : output as xml file  (or '-o file.xml')  
+-ocsv                               : output as csv file (table style)  
+-txt                                : console output in text format  
+-js                                 : console output in json format (default)  
+-json                               : console output in json format (default)  
+-csv                                : console output in csv format (table style)  
 -report_per_file                    : creates a separate validation report file for each input file  
 -tile_size [n]                      : checks if header bounding box exceeds the tile size [n]  
 -no_CRS_fail                        : all CRS (Coordinate Reference System) validation errors are issued as warnings  
 -halt_on_errors                     : halt on errors, even if more then 1 input files checked  
 
 
-### Basics
+### basics
 -cores [n]      : process multiple inputs on [n] cores in parallel  
 -h, -help       : print help output  
 -v, -verbose    : verbose output (print extra information)  
@@ -174,7 +143,17 @@ Further examples
 -gui            : start with files loaded into GUI  
 -version        : reports this tool's version number  
 
-### Input
+## module arguments
+
+### formula solver
+-formula [exp]       : Allows filtering or transforming point variables using formula expressions [exp]; LAS header variables may be used only for filtering  
+-fileformula [exp]   : Allows filtering input files or transforming LAS header variables using formula expressions [exp]; point variables are not allowed  
+
+For details about the formula features and how to write formula expressions, see the [formula solver documentation (formula_solver_README.md)]  
+The formula features require a full licensed build of LAStools and are not available in the open-source version.  
+
+
+### input
 -i [fnp]        : input file or input file mask [fnp] (e.g. *.laz;fo?.la?;esri.shp,...)  
 -io_ibuffer [n] : use read-input-buffer of size [n] bytes  
 -iparse [xyz]   : define fields [xyz] for text input parser  
@@ -187,7 +166,7 @@ Further examples
 -unique         : remove duplicate files in a -lof list  
 -stdin          : pipe from stdin  
 
-### Output
+### output
 -nil             : pipe output to NULL (suppress output)  
 -o [n]           : use [n] as output file  
 -ocut [n]        : cut the last [n] characters from name  
@@ -236,11 +215,11 @@ The other supported entries are:
   J : a hexadecimal string encoding the intensity  
 
 
-## Licensing
+## licensing
 
 This tool is free to use.
 
-## Support
+## support
 
 1. We invite you to join our LAStools Google Group (http://groups.google.com/group/lastools/).
    If you are looking for information about a specific tool, enter the tool name in the search 

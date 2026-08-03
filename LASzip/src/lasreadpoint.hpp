@@ -53,7 +53,7 @@
 class LASreadItem;
 class ArithmeticDecoder;
 
-class LASreadPoint
+class LASLIB_DLL LASreadPoint
 {
 public:
   LASreadPoint(U32 decompress_selective=LASZIP_DECOMPRESS_SELECTIVE_ALL);

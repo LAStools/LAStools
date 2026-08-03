@@ -347,11 +347,7 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
         lidardouble2string(printstring, temp_d);
         fprintf(file, "%s", printstring);
       } else {
-#ifdef _WIN32
-        fprintf(file, "%I64u", value);
-#else
         fprintf(file, "%llu", value);
-#endif
       }
     }
   } else if (header->attributes[index].data_type == 8) {
@@ -742,6 +738,13 @@ int main(int argc, char* argv[]) {
     // open lasreader
 
     LASreader* lasreader = lasreadopener.open();
+
+    // fileformula filtered
+    if (lasreadopener.is_file_formula_filtered()) {
+      LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+      continue;
+    }
+
     if (lasreader == 0) {
       laserror("could not open lasreader");
     }

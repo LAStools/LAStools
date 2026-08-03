@@ -65,7 +65,7 @@ struct LASTransformMatrix {
 	F64 tr3;
 };
 
-class LASoperation
+class LASLIB_DLL LASoperation
 {
 public:
 	virtual const CHAR * name() const = 0;
@@ -242,7 +242,7 @@ class LASoperationMultiplyScaledIntensityRangeIntoRGB : public LASoperation
 #define LASTRANSFORM_XY_COORDINATE (LASTRANSFORM_X_COORDINATE | LASTRANSFORM_Y_COORDINATE)
 #define LASTRANSFORM_XYZ_COORDINATE (LASTRANSFORM_XY_COORDINATE | LASTRANSFORM_Z_COORDINATE)
 
-class LAStransform
+class LASLIB_DLL LAStransform
 {
 public:
   bool needPreread;
@@ -286,6 +286,8 @@ public:
     return false;
   }
 
+  inline void enable_formula_transform() { has_formula_transform = true; }
+
 	LAStransform();
 	~LAStransform();
 
@@ -297,6 +299,7 @@ private:
 	LASoperation** operations;
 	BOOL is_filtered;
 	LASfilter* filter;
+  bool has_formula_transform;
 };
 
 #endif

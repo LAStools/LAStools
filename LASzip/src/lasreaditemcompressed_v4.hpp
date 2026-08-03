@@ -44,7 +44,7 @@
 #include "laszip_common_v3.hpp"
 #include "laszip_decompress_selective_v3.hpp"
 
-class LASreadItemCompressed_POINT14_v4 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_POINT14_v4 : public LASreadItemCompressed
 {
 public:
 
@@ -111,7 +111,7 @@ private:
   BOOL requested_gps_time;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextPOINT14 contexts[4];
@@ -120,7 +120,7 @@ private:
   void read_gps_time();
 };
 
-class LASreadItemCompressed_RGB14_v4 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_RGB14_v4 : public LASreadItemCompressed
 {
 public:
 
@@ -149,7 +149,7 @@ private:
   BOOL requested_RGB;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextRGB14 contexts[4];
@@ -157,7 +157,7 @@ private:
   BOOL createAndInitModelsAndDecompressors(U32 context, const U8* item);
 };
 
-class LASreadItemCompressed_RGBNIR14_v4 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_RGBNIR14_v4 : public LASreadItemCompressed
 {
 public:
 
@@ -191,7 +191,7 @@ private:
   BOOL requested_NIR;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextRGBNIR14 contexts[4];
@@ -199,7 +199,7 @@ private:
   BOOL createAndInitModelsAndDecompressors(U32 context, const U8* item);
 };
 
-class LASreadItemCompressed_WAVEPACKET14_v4 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_WAVEPACKET14_v4 : public LASreadItemCompressed
 {
 public:
 
@@ -228,7 +228,7 @@ private:
   BOOL requested_wavepacket;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextWAVEPACKET14 contexts[4];
@@ -236,7 +236,7 @@ private:
   BOOL createAndInitModelsAndDecompressors(U32 context, const U8* item);
 };
 
-class LASreadItemCompressed_BYTE14_v4 : public LASreadItemCompressed
+class LASLIB_DLL LASreadItemCompressed_BYTE14_v4 : public LASreadItemCompressed
 {
 public:
 
@@ -265,7 +265,7 @@ private:
   BOOL* requested_Bytes;
 
   U8* bytes;
-  U32 num_bytes_allocated;
+  U64 num_bytes_allocated;
 
   U32 current_context;
   LAScontextBYTE14 contexts[4];

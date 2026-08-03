@@ -44,7 +44,7 @@
 
 typedef std::set<U32> my_index_set;
 
-class LASkdtreeRectangle
+class LASLIB_DLL LASkdtreeRectangle
 {
 public:
   F64 min[2];
@@ -58,7 +58,7 @@ public:
   LASkdtreeRectangle(F64 min_x, F64 min_y, F64 max_x, F64 max_y, U32 index);
 };
 
-class LASkdtreePoint
+class LASLIB_DLL LASkdtreePoint
 {
 public:
   F64 pos[2];
@@ -71,7 +71,7 @@ public:
 
 typedef std::list<LASkdtreeRectangle> my_rectangle_list;
 
-class LASkdtreeRectanglesNode
+class LASLIB_DLL LASkdtreeRectanglesNode
 {
 public:
   F64 split;
@@ -83,7 +83,7 @@ public:
   ~LASkdtreeRectanglesNode();
 };
 
-class LASkdtreeRectangles
+class LASLIB_DLL LASkdtreeRectangles
 {
 public:
   BOOL init();
