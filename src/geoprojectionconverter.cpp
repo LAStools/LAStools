@@ -2592,14 +2592,12 @@ bool GeoProjectionConverter::get_ogc_wkt_from_projection(int& len, char** ogc_wk
     } else {
       // if not geographic we have a projection
       if ((projection->type != GEO_PROJECTION_LAT_LONG) && (projection->type != GEO_PROJECTION_LONG_LAT)) {
-        int len = (int)strlen(projection->name);
         char* epsg_name = 0;
-        if (len == 0) {
-          epsg_name = get_epsg_name_from_pcs_file(projection->geokey);
+
+        if (strlen(projection->name) > 0) {
+          epsg_name = strdup(projection->name);
         } else {
-          len += (int)strlen(gcs_name) + 16;
-          epsg_name = (char*)malloc_las(len);
-          snprintf(epsg_name, len, "%s / %s", gcs_name, projection->name);
+          epsg_name = get_epsg_name_from_pcs_file(projection->geokey);
         }
         // maybe output a compound CRS
         if ((vertical_geokey == GEO_VERTICAL_NAVD88) || (vertical_geokey == GEO_VERTICAL_NGVD29) || (vertical_geokey == GEO_VERTICAL_CGVD2013) ||

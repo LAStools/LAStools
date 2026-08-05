@@ -1102,8 +1102,8 @@ int main(int argc, char* argv[])
         }
       }
 
-      // convert CRS from GeoTIF to OGC WKT
-      if (lasreader->header.vlr_geo_keys)
+      // convert CRS from GeoTIFF to OGC WKT
+      if (lasreader->header.vlr_geo_keys && !lasreader->header.vlr_geo_ogc_wkt && lasreader->header.version_minor >= 4)
       {
         char* ogc_wkt = 0;
         I32 len = 0;
@@ -1115,6 +1115,7 @@ int main(int argc, char* argv[])
 
         if (ogc_wkt)
         {
+          LASMessage(LAS_VERBOSE, "CRS converted from GeoTIFF to OGC WKT");
           lasheader->set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
           lasheader->remove_vlr("LASF_Projection", 34735);
           lasheader->del_geo_ascii_params();
