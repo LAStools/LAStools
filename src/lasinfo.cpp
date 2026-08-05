@@ -710,11 +710,6 @@ public:
         if (subsequence_stop < 0) {
           laserror("'%s' needs 2 arguments: start stop but '%lld' is not a valid stop", argv[i], subsequence_stop);
         }
-        if (subsequence_start >= subsequence_stop) {
-          laserror(
-              "'%s' needs 2 arguments: start stop but '%lld' and '%lld' are no valid start and stop combination ", argv[i], subsequence_start,
-              subsequence_stop);
-        }
         i += 2;
       } else if (strcmp(argv[i], "-start_at_point") == 0) {
         if ((i + 1) >= argc) {

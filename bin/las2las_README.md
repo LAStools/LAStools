@@ -316,9 +316,9 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -set_version 1.2                    : set LAS version number to 1.2  
 -set_version_major 1                : set LAS major version number to 1  
 -set_version_minor 2                : set LAS minor version number to 2  
--start_at_point [n]                 : skips all points until point number [n]  
--stop_at_point [n]                  : omits all points after point number [n]  
--subseq [m] [n]                     : extract a subsequence, start from [m] using [n] points  
+-start_at_point [n]                 : start loading from point position [n]  
+-stop_at_point [n]                  : stop processing after [n] points  
+-subseq [m] [n]                     : extract a subsequence, start from point [m] using [n] points  
 -switch_G_B                         : switch green and blue value  
 -unset_attribute_offset [n]         : unsets the offset of attribute [n]{0=first} in the extra bytes  
 -unset_attribute_scale [n]          : unsets the scale of attribute [n]{0=first} in the extra bytes  
