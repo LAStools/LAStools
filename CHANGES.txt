@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+5 August 2026 -- fix: lasinfo: remove invalid check for "-subseq" and improve readme doc
 28 July 2026 -- fix: blast2iso -smooth,-clean,-simplyfy_... argument support
 20 July 2026 -- fix: laszip mem cleanup and fixes
 16 July 2026 -- NEW: beta: formula solver for file and point reader (https://downloads.rapidlasso.de/html/formula_solver_README.html)

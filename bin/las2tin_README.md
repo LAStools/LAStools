@@ -108,6 +108,9 @@ las2tin64 -i lidar.laz -last_only -histo_only min_edge_length 0.1
 
 ## las2tin specific arguments
 
+-odxf                               : output as CAD *.dxf file (Autodesk DXF format)  
+-oobj                               : output as OBJ file (Wavefront OBJ format)  
+-oshp                               : output as SHP *.shp file (ESRI SHP format)  
 -concavity [n]                      : remove triangles longer than [n]{meter/feet; Default=50}  
 -creeks [fns]                       : integrate hard breaklines listed in file [fns]{.shp or .txt}  
 -extra_pass                         : do extra read pass to count points (only makes sense when filtering)  
@@ -121,9 +124,6 @@ las2tin64 -i lidar.laz -last_only -histo_only min_edge_length 0.1
 -ilaydir [n]                        : look for corresponding *.lay file in directory [n]  
 -kill [n]                           : remove triangles with edges equal or above [n]  
 -lakes [fns]                        : respect lines in given shape or text file [fns]{closed polygons with elevations}  
--odxf                               : output as CAD *.dxf file  
--oobj                               : output as OBJ file  
--oshp                               : output as SHP *.shp file  
 -switch_G_B                         : switch green and blue value  
 -tin                                : write output.shp TIN  
 -use_orig_bb                        : raster tile without buffer added by on-the-fly buffering  
@@ -725,30 +725,17 @@ The formula features require a full licensed build of LAStools and are not avail
 -stdin          : pipe from stdin  
 
 ### output
--compatible      : write LAS/LAZ output in compatibility mode  
--do_not_populate : do not populate header on output  
--io_obuffer [n]  : use write-out-buffer of size [n] bytes  
--native          : write LAS/LAZ output in native/actual mode  
--nil             : pipe output to NULL (suppress output)  
 -o [n]           : use [n] as output file  
--obin            : output as BIN (terrasolid binary)  
--ocut [n]        : cut the last [n] characters from name  
+-io_obuffer [n]  : use write-out-buffer of size [n] bytes  
 -odir [n]        : set output directory to [n]  
 -odix [n]        : set output file name suffix to [n]  
+-ocut [n]        : cut the last [n] characters from name  
 -oforce          : force output creation also on errors or warnings  
--olas            : output as LAS file  
--olaz            : output as LAZ (compressed LAS)  
--oparse [xyz]    : parse on-the-fly to ASCII using fields [xyz]  
--opts            : output as PTS (plain text lidar data)  
--optx            : output as PTX (plain text with header)  
--oqi             : output in QFIT format (.qi)(ATM project, NASA)  
--oscale_rgb [n]  : scale output RGB by [n]  
--osep [sep]      : set text output separator as [sep](see table below)  
--otxt            : output as textfile  
--owrl            : output as VRLM (Virtual Reality Modeling Language) text  
--pipe_on         : write output to command pipe, see also -std_in  
+-do_not_populate : do not populate header on output  
 -populate        : populate header on output  
+-pipe_on         : write output to command pipe, see also -std_in  
 -stdout          : pipe to stdout  
+-nil             : pipe output to NULL (suppress output)  
 -target_ecef     : output is geocentric (Earth-centered Earth-fixed)  
 -temp_files [n]  : set base file name [n] for temp files (example: E:\tmp)  
 
