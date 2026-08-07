@@ -163,17 +163,17 @@ operators, functions and constants are listed.
   r    : Return number (rw)  
   l    : Scanner channel (rw)  
   u    : User data (rw)  
-  p    : Point source ID (rw)
-  
-  h    : Withheld flag (ro/rw)  
-  k    : Keypoint flag (ro/rw)  
-  g    : Synthetic flag (ro/rw)  
-  o    : Overlap flag (ro/rw)  
-  e    : Edge of flight line flag (ro/rw)  
-  d    : Direction of scan flag (ro/rw)  
+  p    : Point source ID (rw)  
+  h    : Withheld flag (rw)  
+  k    : Keypoint flag (rw)  
+  g    : Synthetic flag (rw)  
+  o    : Overlap flag (rw)  
+  e    : Edge of flight line flag (rw)  
+  d    : Direction of scan flag (rw)  
+  A0..A(n): Extra attribute values (rw)  
+
   m    : Point index (0-based) (ro)  
   M    : Point index (1-based) (ro)  
-  A0..A(n): Extra attribute values (ro)  
 
 ### header variables
   hdrScaleX   : X scale factor (rw)  
@@ -183,8 +183,7 @@ operators, functions and constants are listed.
   hdrOffsY    : Y offset (rw)  
   hdrOffsZ    : Z offset (rw)  
   hdrDtDay    : File creation day ("45" = 14 Feb.) (rw)  
-  hdrDtYear   : File creation year ("2025") (rw)
-  hdrDt       : File creation date ("20250214" = 14 Feb. 2025) (ro)  
+  hdrDtYear   : File creation year ("2025") (rw)  
   
   hdrXmin     : Minimum X bound (ro)  
   hdrYmin     : Minimum Y bound (ro)  
@@ -194,7 +193,7 @@ operators, functions and constants are listed.
   hdrZmax     : Maximum Z bound (ro)  
   hdrGpsMin   : Minimum GPS time (ro)  
   hdrGpsMax   : Maximum GPS time (ro)  
-  hdrPcnt     : Number of point records (ro) 
+  hdrPcnt     : Number of point records (ro)  
   hdrGeValue  : Global encoding ("17" = [WKT, GpsStd]) (ro)  
   hdrGeWkt    : WKT flag (ro)  
   hdrGeGpsStd : GPS standard flag (ro)  
@@ -203,6 +202,7 @@ operators, functions and constants are listed.
   hdrVlrCnt   : Number of VLRs (ro)  
   hdrPver     : Point data format (ro)  
   hdrGpsOffs  : Time offset ("604800" = +1 week offset) (ro)  
+  hdrDt       : File creation date ("20250214" = 14 Feb. 2025) (ro)  
 
 (rw) = read/write  
        The variable can be modified using formula expressions.  
