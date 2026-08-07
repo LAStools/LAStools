@@ -569,7 +569,6 @@ int main(int argc, char* argv[])
   int set_time_offset = -1;
   int set_lastiling_buffer_flag = -1;
   // variable header changes
-  bool ogc_wkt_in_header = false;
   bool set_ogc_wkt = false;
   bool set_ogc_wkt_in_evlr = false;
   CHAR* set_ogc_wkt_string = 0;
@@ -1962,7 +1961,6 @@ int main(int argc, char* argv[])
       // reproject or just set the projection?
       LASquantizer* reproject_quantizer = 0;
       bool set_projection_in_header = false;
-      bool set_wkt_global_encoding_bit = false;
 
       if (geoprojectionconverter.has_projection(false)) // reproject because a target projection was provided in the command line
       {
@@ -1996,30 +1994,38 @@ int main(int argc, char* argv[])
           point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
           point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
           geoprojectionconverter.to_target(point);
-          if (!geoprojectionconverter.has_target_precision() && lasreadopener.get_scale_factor() != nullptr &&
-              lasreadopener.get_scale_factor()[0] > 0.0) {
+
+          if (geoprojectionconverter.has_target_precision()) {
+            LASMessage(LAS_VERBOSE, "target precision is used for x scaling");
+            reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.x_scale_factor);
+          } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[0] > 0.0) {
             LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for x scaling", lasreadopener.get_scale_factor()[0]);
             reproject_quantizer->x_scale_factor = lasreadopener.get_scale_factor()[0];
           } else {
-            LASMessage(LAS_VERBOSE, "target precision is used for x scaling");
-            reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.x_scale_factor);
+            LASMessage(LAS_VERBOSE, "input header scale factor is used for x scaling");
+            reproject_quantizer->x_scale_factor = lasreader->header.x_scale_factor;
           }
-          if (!geoprojectionconverter.has_target_precision() && lasreadopener.get_scale_factor() != nullptr &&
-              lasreadopener.get_scale_factor()[1] > 0.0) {
+          if (geoprojectionconverter.has_target_precision()) {
+            LASMessage(LAS_VERBOSE, "target precision is used for y scaling");
+            reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.y_scale_factor);
+          } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[1] > 0.0) {
             LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for y scaling", lasreadopener.get_scale_factor()[1]);
             reproject_quantizer->y_scale_factor = lasreadopener.get_scale_factor()[1];
           } else {
-            LASMessage(LAS_VERBOSE, "target precision is used for y scaling");
-            reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.y_scale_factor);
+            LASMessage(LAS_VERBOSE, "input header scale factor is used for y scaling");
+            reproject_quantizer->y_scale_factor = lasreader->header.y_scale_factor;
           }
-          if (!geoprojectionconverter.has_target_elevation_precision() && lasreadopener.get_scale_factor() != nullptr &&
-              lasreadopener.get_scale_factor()[2] > 0.0) {
+          if (geoprojectionconverter.has_target_elevation_precision()) {
+            LASMessage(LAS_VERBOSE, "target elevation precision is used for z scaling");
+            reproject_quantizer->z_scale_factor = geoprojectionconverter.get_target_elevation_precision(lasreader->header.z_scale_factor);
+          } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[2] > 0.0) {
             LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for z scaling", lasreadopener.get_scale_factor()[2]);
             reproject_quantizer->z_scale_factor = lasreadopener.get_scale_factor()[2];
           } else {
-            LASMessage(LAS_VERBOSE, "target elevation precision is used for z scaling");
-            reproject_quantizer->z_scale_factor = geoprojectionconverter.get_target_elevation_precision(lasreader->header.z_scale_factor);
-          }      
+            LASMessage(LAS_VERBOSE, "input header scale factor is used for z scaling");
+            reproject_quantizer->z_scale_factor = lasreader->header.z_scale_factor;
+          }
+      
           reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
           reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
           reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
@@ -2085,172 +2091,119 @@ int main(int argc, char* argv[])
         point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
         point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
         geoprojectionconverter.to_target(point);
-        if (!geoprojectionconverter.has_target_precision() && lasreadopener.get_scale_factor() != nullptr &&
-            lasreadopener.get_scale_factor()[0] > 0.0) {
+        
+        if (geoprojectionconverter.has_target_precision()) {
+          LASMessage(LAS_VERBOSE, "target precision is used for x scaling");
+          reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.x_scale_factor);
+        } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[0] > 0.0) {
           LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for x scaling", lasreadopener.get_scale_factor()[0]);
           reproject_quantizer->x_scale_factor = lasreadopener.get_scale_factor()[0];
         } else {
-          LASMessage(LAS_VERBOSE, "target precision is used for x scaling");
-          reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.x_scale_factor);
+          LASMessage(LAS_VERBOSE, "input header scale factor is used for x scaling");
+          reproject_quantizer->x_scale_factor = lasreader->header.x_scale_factor;
         }
-        if (!geoprojectionconverter.has_target_precision() && lasreadopener.get_scale_factor() != nullptr &&
-            lasreadopener.get_scale_factor()[1] > 0.0) {
+        if (geoprojectionconverter.has_target_precision()) {
+          LASMessage(LAS_VERBOSE, "target precision is used for y scaling");
+          reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.y_scale_factor);
+        } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[1] > 0.0) {
           LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for y scaling", lasreadopener.get_scale_factor()[1]);
           reproject_quantizer->y_scale_factor = lasreadopener.get_scale_factor()[1];
         } else {
-          LASMessage(LAS_VERBOSE, "target precision is used for y scaling");
-          reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.y_scale_factor);
+          LASMessage(LAS_VERBOSE, "input header scale factor is used for y scaling");
+          reproject_quantizer->y_scale_factor = lasreader->header.y_scale_factor;
         }
-        if (!geoprojectionconverter.has_target_elevation_precision() && lasreadopener.get_scale_factor() != nullptr &&
-            lasreadopener.get_scale_factor()[2] > 0.0) {
+        if (geoprojectionconverter.has_target_elevation_precision()) {
+          LASMessage(LAS_VERBOSE, "target elevation precision is used for z scaling");
+          reproject_quantizer->z_scale_factor = geoprojectionconverter.get_target_elevation_precision(lasreader->header.z_scale_factor);
+        } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[2] > 0.0) {
           LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for z scaling", lasreadopener.get_scale_factor()[2]);
           reproject_quantizer->z_scale_factor = lasreadopener.get_scale_factor()[2];
         } else {
-          LASMessage(LAS_VERBOSE, "target elevation precision is used for z scaling");
-          reproject_quantizer->z_scale_factor = geoprojectionconverter.get_target_elevation_precision(lasreader->header.z_scale_factor);
+          LASMessage(LAS_VERBOSE, "input header scale factor is used for z scaling");
+          reproject_quantizer->z_scale_factor = lasreader->header.z_scale_factor;
         }
+
         reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
         reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
         reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
 
         set_projection_in_header = true;
-        ogc_wkt_in_header = true;
-        set_wkt_global_encoding_bit = true;
         lasreader->header.clean_vlrs();
         lasreader->header.clean_evlrs();
         LASMessage(LAS_VERY_VERBOSE, "the original vlr and evlr header information from the source file are not transferred to the target file");
       }
 
-      if (set_projection_in_header)
-      {
-        int number_of_keys;
-        GeoProjectionGeoKeys* geo_keys = 0;
-        int num_geo_double_params;
-        double* geo_double_params = 0;
+      if (set_projection_in_header || set_ogc_wkt_string || set_ogc_wkt) {
+        CHAR* ogc_wkt = set_ogc_wkt_string;
+        bool has_wkt = false;
 
-        if (geoprojectionconverter.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params, !geoprojectionconverter.has_projection(false)))
-        {
-          lasreader->header.set_geo_keys(number_of_keys, (LASvlr_key_entry*)geo_keys);
-          free(geo_keys);
-          if (geo_double_params)
-          {
-            lasreader->header.set_geo_double_params(num_geo_double_params, geo_double_params);
-            free(geo_double_params);
-          }
-          else
-          {
-            lasreader->header.del_geo_double_params();
-          }
-          lasreader->header.del_geo_ascii_params();
-          lasreader->header.del_geo_ogc_wkt();
-        }
-
-        if (set_ogc_wkt || ogc_wkt_in_header || (lasreader->header.point_data_format >= 6)) // maybe also set the OCG WKT
-        {
-          CHAR* ogc_wkt = set_ogc_wkt_string;
-          // The WKT should be generated via the PROJ lib if: it is a PROJ transformation, a soure EPSG in the arguments is specified or a WKT is specified in the file header. 
-          // For older file versions that only contain GeoKeys in file header, the WKT should still be generated via LAStool.
-          if (ogc_wkt == 0 && geoprojectionconverter.is_proj_request) { 
-            LASMessage(LAS_VERBOSE, "the WKT for the file header is created via the PROJ library");
+        // generate WKT (if desired or LAS 1.4)
+        if (lasreader->header.version_minor >= 4) {
+          // PROJ-WKT
+          if (!ogc_wkt && geoprojectionconverter.is_proj_request) {
+            LASMessage(LAS_VERBOSE, "use the WKT generated by PROJ");
             geoprojectionconverter.get_wkt_from_proj(ogc_wkt, geoprojectionconverter, lasreader);
           }
 
           I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
 
-          // If the WKT could not be created by the PROJ lib
-          if (ogc_wkt == 0)
-          {
-            if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false)))
-            {
-              LASMessage(LAS_WARNING, "cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'", lasreadopener.get_file_name());
-              if (ogc_wkt) free(ogc_wkt);
-              ogc_wkt = 0;
+          if (!ogc_wkt) {
+            if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false))) {
+              if (lasreader->header.vlr_geo_keys) {
+                geoprojectionconverter.set_projection_from_geo_keys(
+                    lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
+                    lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+                if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false))) {
+                  LASMessage(LAS_WARNING, "cannot produce WKT. ignoring '-set_ogc_wkt' for '%s'", lasreadopener.get_file_name());
+                  if (ogc_wkt) free(ogc_wkt);
+                  ogc_wkt = nullptr;
+                } else {
+                  LASMessage(LAS_VERBOSE, "CRS converted from GeoTIFF to OGC WKT");
+                }
+              }
+            } else {
+              len = (I32)strlen(ogc_wkt);
             }
           }
-          if (ogc_wkt)
-          {
-            if (set_ogc_wkt_in_evlr)
-            {
-              if (lasreader->header.version_minor >= 4)
-              {
-                lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, TRUE);
-              }
-              else
-              {
-                LASMessage(LAS_WARNING, "input file is LAS 1.%d. setting OGC WKT to VLR instead of EVLR ...", lasreader->header.version_minor);
-                lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, FALSE);
-              }
-            }
-            else
-            {
-              lasreader->header.set_geo_ogc_wkt(len, ogc_wkt);
-            }
-            if (!set_ogc_wkt_string) free(ogc_wkt);
-            if (((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6)) || set_wkt_global_encoding_bit)
-            {
-              lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
-            }
-          }
-        }
-      } 
-      else if (set_ogc_wkt) // maybe only set the OCG WKT
-      {
-        CHAR* ogc_wkt = set_ogc_wkt_string;
-        // The WKT should be generated via the PROJ lib if: it is a PROJ transformation, a soure EPSG in the arguments is specified or a WKT is specified in the file header. 
-        // For older file versions that only contain GeoKeys in file header, the WKT should still be generated via LAStool.
-        if (ogc_wkt == 0 && geoprojectionconverter.is_proj_request) {
-          LASMessage(LAS_VERBOSE, "the WKT for the file header is created via the PROJ library");
-          geoprojectionconverter.get_wkt_from_proj(ogc_wkt, geoprojectionconverter, lasreader);
-        }
 
-        I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
-        //If the WKT could not be created by the PROJ lib
-        if (ogc_wkt == 0) 
-        { 
-          if (lasreader->header.vlr_geo_keys) 
-          {
-            geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
-            if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt)) 
-            {
-              LASMessage(LAS_WARNING, "cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'", lasreadopener.get_file_name());
-              if (ogc_wkt) free(ogc_wkt);
-              ogc_wkt = 0;
-            }
-          } 
-          else 
-          {
-            LASMessage(LAS_WARNING, "no projection information. ignoring '-set_ogc_wkt' for '%s'", lasreadopener.get_file_name());
-          }  
-        }
+          // enter WKT (if available)
+          if (ogc_wkt) {
+            has_wkt = true;
 
-        if (ogc_wkt)
-        {
-          if (set_ogc_wkt_in_evlr)
-          {
-            if (lasreader->header.version_minor >= 4)
-            {
+            if (set_ogc_wkt_in_evlr && lasreader->header.version_minor >= 4)
               lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, TRUE);
-            }
             else
-            {
-              LASMessage(LAS_WARNING, "input file is LAS 1.%d. setting OGC WKT to VLR instead of EVLR ...", lasreader->header.version_minor);
               lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, FALSE);
+
+            if (!set_ogc_wkt_string) free(ogc_wkt);
+            if (lasreader->header.version_minor >= 4) lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+          }
+        }
+
+        // GeoKeys only if no WKT has been generated
+        if (!has_wkt) {
+          int number_of_keys;
+          GeoProjectionGeoKeys* geo_keys = 0;
+          int num_geo_double_params;
+          double* geo_double_params = 0;
+
+          if (geoprojectionconverter.get_geo_keys_from_projection(
+                  number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params, !geoprojectionconverter.has_projection(false))) {
+            lasreader->header.set_geo_keys(number_of_keys, (LASvlr_key_entry*)geo_keys);
+            free(geo_keys);
+
+            if (geo_double_params) {
+              lasreader->header.set_geo_double_params(num_geo_double_params, geo_double_params);
+              free(geo_double_params);
+            } else {
+              lasreader->header.del_geo_double_params();
             }
-          }
-          else
-          {
-            lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, FALSE);
-          }
 
-          if (!set_ogc_wkt_string) free(ogc_wkt);
-
-          if (((lasreader->header.version_minor >= 4) && (lasreader->header.point_data_format >= 6)) || set_wkt_global_encoding_bit)
-          {
-            lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+            lasreader->header.del_geo_ascii_params();
+            lasreader->header.del_geo_ogc_wkt();
           }
         }
       }
-      ogc_wkt_in_header = false;
 
       // maybe we should remove some stuff
 

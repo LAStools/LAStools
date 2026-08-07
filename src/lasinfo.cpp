@@ -1748,6 +1748,12 @@ public:
         wkt_bit_set = true;
       }
 
+      if ((lasheader->version_major == 1) && (lasheader->version_minor <= 4)) {
+        wkt_bit_set = (lasheader->global_encoding & (1 << 4)) != 0;
+      } else {
+        wkt_bit_set = true;
+      }
+
       if (file_out && !no_header) {
         JsonObject json_sub_main_header_entries;
 
@@ -3598,7 +3604,7 @@ public:
         }
         // Query the WKT representation of the CRS
         if (geoprojectionconverter.projParameters.proj_info_arg_contains("wkt")) {
-          proj_crs_infos = geoprojectionconverter.projParameters.get_wkt_representation(true);
+          proj_crs_infos = geoprojectionconverter.projParameters.get_wkt_representation(lasreader->header, true);
           info_content = indent_text(proj_crs_infos, "  ");
 
           if (info_content == nullptr || *info_content == '\0') {

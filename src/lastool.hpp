@@ -292,6 +292,7 @@ class LasTool
             return;
         if (lasmessage_cnt[LAS_SERIOUS_WARNING] > 0)
         {
+            LASMessage(LAS_INFO, "Aborting after previous SERIOUS WARNING(s). Use '-force' to continue anyway.");
             byebye();
         }
     }
