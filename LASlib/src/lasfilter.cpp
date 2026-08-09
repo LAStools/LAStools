@@ -1871,7 +1871,7 @@ public:
       U32 array_sizes_new = ((pos_x_pos / 256) + 1) * 256;
       if ((*array_sizes)[pos_y])
       {
-        (*array)[pos_y] = (U32*)realloc_las((*array)[pos_y], array_sizes_new * sizeof(U32));
+        if (array != nullptr && *array != nullptr) (*array)[pos_y] = (U32*)realloc_las((*array)[pos_y], array_sizes_new * sizeof(U32));
       }
       else
       {

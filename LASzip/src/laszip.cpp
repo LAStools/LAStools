@@ -125,7 +125,7 @@ bool LASzip::unpack(const U8* bytes, const I32 num)
   memcpy(&number_of_special_evlrs, b, sizeof(I64));
   b += 8;
   // offset_to_special_evlrs = *((const I64*)b);
-  memcpy(&offset_to_special_evlrs, b, sizeof(I32));
+  memcpy(&offset_to_special_evlrs, b, sizeof(I64));
   b += 8;
   //num_items = *((const U16*)b);
   memcpy(&num_items, b, sizeof(U16));
@@ -171,13 +171,12 @@ bool LASzip::pack(U8*& bytes, I32& num)
       return false;
   }
   if (this->bytes) delete [] this->bytes;
+  this->bytes = 0;
   // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
   if ((U64)num > std::numeric_limits<size_t>::max()) {
       return false;
   }
-  bytes = new U8[static_cast<size_t>(num)];
-
-  this->bytes = bytes = new U8[num];
+  this->bytes = bytes = new U8[static_cast<size_t>(num)];
 
   // pack
   U16 i;

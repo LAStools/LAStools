@@ -149,11 +149,11 @@ struct LASfinalizer
     zmax = header->max_z;
 
     F64 size = MAX3(xmax - xmin, ymax - ymin, zmax - zmin);
-    F64 grid_spacing = size / division;
+    F64 grid_spacing = (size > 0.0) ? (size / division) : 1.0;
 
-    ncols = I32_CEIL((xmax - xmin) / grid_spacing);
-    nrows = I32_CEIL((ymax - ymin) / grid_spacing);
-    nlays = I32_CEIL((zmax - zmin) / grid_spacing);
+    ncols = (xmax > xmin) ? MAX2(I32_CEIL((xmax - xmin) / grid_spacing), 1) : 1;
+    nrows = (ymax > ymin) ? MAX2(I32_CEIL((ymax - ymin) / grid_spacing), 1) : 1;
+    nlays = (zmax > zmin) ? MAX2(I32_CEIL((zmax - zmin) / grid_spacing), 1) : 1;
 
     xres = (xmax - xmin) / ncols;
     yres = (ymax - ymin) / nrows;
@@ -658,13 +658,17 @@ int main(int argc, char* argv[])
     fprintf(stderr, "%s is better run in the command line\n", argv[0]);
     char file_name[256];
     fprintf(stderr, "enter input file: ");
-    fgets(file_name, 256, stdin);
-    file_name[strlen(file_name) - 1] = '\0';
-    lasreadopener.set_file_name(file_name);
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name) - 1] = '\0';
+      lasreadopener.set_file_name(file_name);
+    }
     fprintf(stderr, "enter output file: ");
-    fgets(file_name, 256, stdin);
-    file_name[strlen(file_name) - 1] = '\0';
-    laswriteopener.set_file_name(file_name);
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name) - 1] = '\0';
+      laswriteopener.set_file_name(file_name);
+    }
     // #endif
   }
   else

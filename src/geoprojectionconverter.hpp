@@ -520,6 +520,7 @@ private:
   GeoProjectionGeoKeys* geo_keys;
   char* geo_ascii_params;
   double* geo_double_params;
+  double get_geo_double_param(int offset) const;
 
   // codes and names according to EPSG
   int gcs_code;

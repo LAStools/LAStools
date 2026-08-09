@@ -642,9 +642,11 @@ public:
       fprintf(stderr, "%s is better run in the command line\n", argv[0]);
       char file_name[256];
       fprintf(stderr, "enter input file: ");
-      fgets(file_name, 256, stdin);
-      file_name[strlen(file_name) - 1] = '\0';
-      lasreadopener.set_file_name(file_name);
+      if (fgets(file_name, 256, stdin) && strlen(file_name))
+      {
+        file_name[strlen(file_name) - 1] = '\0';
+        lasreadopener.set_file_name(file_name);
+      }
 #endif
     } else {
       for (i = 1; i < argc; i++) {
@@ -2603,9 +2605,11 @@ public:
           } else if (strcmp(lasheader->evlrs[i].user_id, "copc") == 0) {
             if (lasheader->evlrs[i].record_id == 1000) {  // COPC EPT hierachy
               if (lasheader->vlr_copc_entries) {
+                const I32 max_representable_depth = (I32)(8 * sizeof(lasheader->vlr_copc_entries[0].key.x)) - 1;
                 I32 max_octree_level = 0;
                 for (U32 j = 0; j < lasheader->number_of_copc_entries; j++) {
-                  if (lasheader->vlr_copc_entries[j].key.depth > max_octree_level) max_octree_level = lasheader->vlr_copc_entries[j].key.depth;
+                  I32 depth = lasheader->vlr_copc_entries[j].key.depth;
+                  if ((depth >= 0) && (depth <= max_representable_depth) && (depth > max_octree_level)) max_octree_level = depth;
                 }
                 max_octree_level++;
 
@@ -2618,20 +2622,26 @@ public:
                 U64* point_count = (U64*)calloc(max_octree_level, sizeof(U64));
                 U32* voxel_count = (U32*)calloc(max_octree_level, sizeof(U32));
 
-                for (U32 j = 0; j < lasheader->number_of_copc_entries; j++) {
-                  point_count[lasheader->vlr_copc_entries[j].key.depth] += lasheader->vlr_copc_entries[j].point_count;
-                  voxel_count[lasheader->vlr_copc_entries[j].key.depth]++;
+                if (point_count && voxel_count) {
+                  for (U32 j = 0; j < lasheader->number_of_copc_entries; j++) {
+                    I32 depth = lasheader->vlr_copc_entries[j].key.depth;
+                    if ((depth < 0) || (depth >= max_octree_level)) continue;
+                    point_count[depth] += lasheader->vlr_copc_entries[j].point_count;
+                    voxel_count[depth]++;
+                  }
                 }
 
-                for (I32 j = 0; j < max_octree_level; j++) {
-                  if (json_out) {
-                    JsonObject json_copc;
-                    json_copc["level"] = j;
-                    json_copc["points"] = point_count[j];
-                    json_copc["voxels"] = voxel_count[j];
-                    json_evlr_record["copc"]["octree_levels"].push_back(json_copc);
-                  } else if (!csv_out) {
-                    fprintf(file_out, "    Level %d : %llu points in %u voxels\012", j, point_count[j], voxel_count[j]);
+                if (point_count && voxel_count) {
+                  for (I32 j = 0; j < max_octree_level; j++) {
+                    if (json_out) {
+                      JsonObject json_copc;
+                      json_copc["level"] = j;
+                      json_copc["points"] = point_count[j];
+                      json_copc["voxels"] = voxel_count[j];
+                      json_evlr_record["copc"]["octree_levels"].push_back(json_copc);
+                    } else if (!csv_out) {
+                      fprintf(file_out, "    Level %d : %llu points in %u voxels\012", j, point_count[j], voxel_count[j]);
+                    }
                   }
                 }
                 free(point_count);

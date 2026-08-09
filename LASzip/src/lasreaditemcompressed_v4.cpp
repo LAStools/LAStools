@@ -474,6 +474,8 @@ BOOL LASreadItemCompressed_POINT14_v4::init(const U8* item, U32& context)
   if (num_bytes > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
+    bytes = 0;
+    num_bytes_allocated = 0;
 
     // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
     if (num_bytes > std::numeric_limits<size_t>::max()) {
@@ -1010,6 +1012,8 @@ inline void LASreadItemCompressed_POINT14_v4::read(U8* item, U32& context)
 void LASreadItemCompressed_POINT14_v4::read_gps_time()
 {
   I32 multi;
+  for (;;)
+  {
   if (contexts[current_context].last_gpstime_diff[contexts[current_context].last] == 0) // if the last integer difference was zero
   {
     multi = dec_gps_time->decodeSymbol(contexts[current_context].m_gpstime_0diff);
@@ -1032,7 +1036,7 @@ void LASreadItemCompressed_POINT14_v4::read_gps_time()
     else // we switch to another sequence
     {
       contexts[current_context].last = (contexts[current_context].last+multi-1)&3;
-      read_gps_time();
+      continue;
     }
   }
   else
@@ -1106,8 +1110,10 @@ void LASreadItemCompressed_POINT14_v4::read_gps_time()
     else if (multi >=  LASZIP_GPSTIME_MULTI_CODE_FULL)
     {
       contexts[current_context].last = (contexts[current_context].last+multi-LASZIP_GPSTIME_MULTI_CODE_FULL)&3;
-      read_gps_time();
+      continue;
     }
+  }
+  break;
   }
 }
 
@@ -1266,6 +1272,8 @@ BOOL LASreadItemCompressed_RGB14_v4::init(const U8* item, U32& context)
   if (num_bytes_RGB > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
+    bytes = 0;
+    num_bytes_allocated = 0;
 
     // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
     if (num_bytes_RGB > std::numeric_limits<size_t>::max()) {
@@ -1624,6 +1632,8 @@ BOOL LASreadItemCompressed_RGBNIR14_v4::init(const U8* item, U32& context)
   if (num_bytes > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
+    bytes = 0;
+    num_bytes_allocated = 0;
     // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
     if (num_bytes > std::numeric_limits<size_t>::max()) {
         return false;
@@ -2007,6 +2017,8 @@ BOOL LASreadItemCompressed_WAVEPACKET14_v4::init(const U8* item, U32& context)
   if (num_bytes_wavepacket > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
+    bytes = 0;
+    num_bytes_allocated = 0;
     // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
     if (num_bytes_wavepacket > std::numeric_limits<size_t>::max()) {
         return false;
@@ -2346,6 +2358,8 @@ BOOL LASreadItemCompressed_BYTE14_v4::init(const U8* item, U32& context)
   if (num_bytes > num_bytes_allocated)
   {
     if (bytes) delete [] bytes;
+    bytes = 0;
+    num_bytes_allocated = 0;
     // check if required memory would be larger than allowed memory allocation (e.g. > 4GB for 32 bit version)
     if (num_bytes > std::numeric_limits<size_t>::max()) {
         return false;

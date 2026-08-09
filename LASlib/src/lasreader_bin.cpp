@@ -207,6 +207,18 @@ BOOL LASreaderBIN::open(ByteStreamIn* stream)
     }
   }
 
+  if (tsheader.npoints < 0)
+  {
+    laserror("corrupt terrasolid header. npoints %d is negative.", tsheader.npoints);
+    return FALSE;
+  }
+
+  if (tsheader.units <= 0)
+  {
+    laserror("corrupt terrasolid header. units %d must be positive.", tsheader.units);
+    return FALSE;
+  }
+
   header.number_of_point_records = tsheader.npoints;
   npoints = tsheader.npoints;
 

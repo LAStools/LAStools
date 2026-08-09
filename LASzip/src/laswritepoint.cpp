@@ -100,7 +100,7 @@ BOOL LASwritePoint::setup(const U32 num_items, const LASitem* items, const LASzi
   chunk_size = U32_MAX;
 
   // always create the raw writers
-  writers_raw = new LASwriteItem*[num_writers];
+  writers_raw = new LASwriteItem*[num_writers]();
   memset(writers_raw, 0, num_writers*sizeof(LASwriteItem*));
   for (i = 0; i < num_writers; i++)
   {
@@ -156,7 +156,7 @@ BOOL LASwritePoint::setup(const U32 num_items, const LASitem* items, const LASzi
   // if needed create the compressed writers and set versions
   if (enc)
   {
-    writers_compressed = new LASwriteItem*[num_writers];
+    writers_compressed = new LASwriteItem*[num_writers]();
     memset(writers_compressed, 0, num_writers*sizeof(LASwriteItem*));
     for (i = 0; i < num_writers; i++)
     {

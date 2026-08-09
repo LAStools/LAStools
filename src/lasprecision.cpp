@@ -194,12 +194,18 @@ int main(int argc, char *argv[])
     wait_on_exit();
     fprintf(stderr,"%s is better run in the command line\n", argv[0]);
     char file_name[256];
-    fprintf(stderr,"enter input file: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name)-1] = '\0';
-    lasreadopener.set_file_name(file_name);
-    fprintf(stderr,"enter output file: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name)-1] = '\0';
-    laswriteopener.set_file_name(file_name);
+    fprintf(stderr,"enter input file: ");
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name)-1] = '\0';
+      lasreadopener.set_file_name(file_name);
+    }
+    fprintf(stderr,"enter output file: ");
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name)-1] = '\0';
+      laswriteopener.set_file_name(file_name);
+    }
 #endif
   }
   else
@@ -450,27 +456,27 @@ int main(int argc, char *argv[])
 
       // sort values
 
-      if (report_x)
+      if (report_x && array_max > 0)
       {
         quicksort_for_ints(array_x, 0, array_max-1);
       }
 
-      if (report_y)
+      if (report_y && array_max > 0)
       {
         quicksort_for_ints(array_y, 0, array_max-1);
       }
 
-      if (report_z)
+      if (report_z && array_max > 0)
       {
         quicksort_for_ints(array_z, 0, array_max-1);
       }
 
-      if (report_gps && lasreader->point.have_gps_time)
+      if (report_gps && lasreader->point.have_gps_time && array_max > 0)
       {
         quicksort_for_doubles(array_gps, 0, array_max-1);
       }
 
-      if (report_rgb && lasreader->point.have_rgb)
+      if (report_rgb && lasreader->point.have_rgb && array_max > 0)
       {
         quicksort_for_shorts(array_r, 0, array_max-1);
         quicksort_for_shorts(array_g, 0, array_max-1);
@@ -523,27 +529,27 @@ int main(int argc, char *argv[])
 
       // sort differences
 
-      if (report_x)
+      if (report_x && array_max > 1)
       {
         quicksort_for_ints(array_x, 0, array_max-2);
       }
 
-      if (report_y)
+      if (report_y && array_max > 1)
       {
         quicksort_for_ints(array_y, 0, array_max-2);
       }
 
-      if (report_z)
+      if (report_z && array_max > 1)
       {
         quicksort_for_ints(array_z, 0, array_max-2);
       }
 
-      if (report_gps && lasreader->point.have_gps_time)
+      if (report_gps && lasreader->point.have_gps_time && array_max > 1)
       {
         quicksort_for_doubles(array_gps, 0, array_max-2);
       }
 
-      if (report_rgb && lasreader->point.have_rgb)
+      if (report_rgb && lasreader->point.have_rgb && array_max > 1)
       {
         quicksort_for_shorts(array_r, 0, array_max-2);
         quicksort_for_shorts(array_g, 0, array_max-2);
@@ -569,7 +575,7 @@ int main(int argc, char *argv[])
             array_first++;
           }
         }
-        if (report_diff_diff)
+        if (report_diff_diff && array_first > 0)
         {
           fprintf(stdout, "X differences of differences\n");
           quicksort_for_ints(array_x, 0, array_first-1);
@@ -597,7 +603,7 @@ int main(int argc, char *argv[])
             array_first++;
           }
         }
-        if (report_diff_diff)
+        if (report_diff_diff && array_first > 0)
         {
           fprintf(stdout, "Y differences of differences\n");
           quicksort_for_ints(array_y, 0, array_first-1);
@@ -625,7 +631,7 @@ int main(int argc, char *argv[])
             array_first++;
           }
         }
-        if (report_diff_diff)
+        if (report_diff_diff && array_first > 0)
         {
           fprintf(stdout, "Z differences of differences\n");
           quicksort_for_ints(array_z, 0, array_first-1);
@@ -655,7 +661,7 @@ int main(int argc, char *argv[])
             array_first++;
           }
         }
-        if (report_diff_diff)
+        if (report_diff_diff && array_first > 0)
         {
           fprintf(stdout, "GPS time  differences of differences\n");
           quicksort_for_doubles(array_gps, 0, array_first-1);
@@ -685,7 +691,7 @@ int main(int argc, char *argv[])
             array_first++;
           }
         }
-        if (report_diff_diff)
+        if (report_diff_diff && array_first > 0)
         {
           fprintf(stdout, "R differences of differences\n");
           quicksort_for_shorts(array_r, 0, array_first-1);
@@ -710,7 +716,7 @@ int main(int argc, char *argv[])
             array_first++;
           }
         }
-        if (report_diff_diff)
+        if (report_diff_diff && array_first > 0)
         {
           fprintf(stdout, "G differences of differences\n");
           quicksort_for_shorts(array_g, 0, array_first-1);
@@ -735,7 +741,7 @@ int main(int argc, char *argv[])
             array_first++;
           }
         }
-        if (report_diff_diff)
+        if (report_diff_diff && array_first > 0)
         {
           fprintf(stdout, "B differences of differences\n");
           quicksort_for_shorts(array_b, 0, array_first-1);

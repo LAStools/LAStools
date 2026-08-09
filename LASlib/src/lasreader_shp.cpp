@@ -300,6 +300,7 @@ BOOL LASreaderSHP::read_point_default()
       if (fread(&double_input, sizeof(double), 1, file) != 1) { npoints = p_idx; return FALSE; }; // ymax (LITTLE)
       if (fread(&int_input, sizeof(int), 1, file) != 1) { npoints = p_idx; return FALSE; }; // number of points (LITTLE)
       from_little_endian(&int_input);
+      if ((int_input < 0) || (int_input > (I32_MAX / 3))) { npoints = p_idx; return FALSE; }
       number_of_points = int_input;
     }
     else // or regular point?

@@ -175,8 +175,13 @@ BOOL LASwriterBIN::open(ByteStreamOut* stream, const LASheader* header, const ch
   strncpy_las(tsheader.recog_str, TSHEADER_RECOG_STR_LEN, "CXYZ", 4);
   tsheader.npoints = (header->number_of_point_records ? header->number_of_point_records : (U32)header->extended_number_of_point_records);
   double scale = header->x_scale_factor;
-  if (header->y_scale_factor < scale) scale = header->y_scale_factor; 
-  if (header->z_scale_factor < scale) scale = header->z_scale_factor; 
+  if (header->y_scale_factor < scale) scale = header->y_scale_factor;
+  if (header->z_scale_factor < scale) scale = header->z_scale_factor;
+  if (scale <= 0.0)
+  {
+    laserror("cannot write terrasolid bin: scale factor %g from the input header must be positive", scale);
+    return FALSE;
+  }
   units = tsheader.units = (I32)(1.0 / scale);
   origin_x = tsheader.origin_x = -header->x_offset/scale;
   origin_y = tsheader.origin_y = -header->y_offset/scale;

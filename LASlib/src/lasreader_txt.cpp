@@ -727,7 +727,12 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
     memset(payload, 0, 32);
     ((F32*)payload)[0] = translate_intensity;
     ((F32*)payload)[1] = scale_intensity;
-    strcpy((char*)(payload + 16), (parse_string ? parse_string : "xyz"));
+    const CHAR* pts_parse_string = (parse_string ? parse_string : "xyz");
+    if (strlen(pts_parse_string) > 15)
+    {
+      LASMessage(LAS_WARNING, "parse string '%s' is too long for the PTS VLR and is stored truncated to 15 characters", pts_parse_string);
+    }
+    snprintf((char*)(payload + 16), 16, "%s", pts_parse_string);
     header.add_vlr("LAStools", 2000, 32, payload);
   }
   else if (iptx || iptx_transform)
@@ -904,7 +909,12 @@ BOOL LASreaderTXT::open(FILE* file, const CHAR* file_name, U8 point_type, const 
       memset(payload, 0, 32 + 240);
       ((F32*)payload)[0] = translate_intensity;
       ((F32*)payload)[1] = scale_intensity;
-      strcpy((char*)(payload + 16), (parse_string ? parse_string : "xyz"));
+      const CHAR* ptx_parse_string = (parse_string ? parse_string : "xyz");
+      if (strlen(ptx_parse_string) > 15)
+      {
+        LASMessage(LAS_WARNING, "parse string '%s' is too long for the PTX VLR and is stored truncated to 15 characters", ptx_parse_string);
+      }
+      snprintf((char*)(payload + 16), 16, "%s", ptx_parse_string);
       ((I64*)payload)[4] = (I64)ncols;
       ((I64*)payload)[5] = (I64)nrows;
       ((F64*)payload)[6] = ptx_scan_pos[0];
@@ -1115,6 +1125,11 @@ void LASreaderTXT::set_offset(const F64* offset)
 
 void LASreaderTXT::add_attribute(I32 data_type, const char* name, const char* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset, F64 no_data)
 {
+  if (number_attributes >= 32)
+  {
+    LASMessage(LAS_WARNING, "already have 32 attributes. ignoring attribute '%s'.", name);
+    return;
+  }
   attributes_data_types[number_attributes] = data_type;
   if (name)
   {

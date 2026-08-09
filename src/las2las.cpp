@@ -638,12 +638,18 @@ int main(int argc, char* argv[])
     wait_on_exit();
     fprintf(stderr, "%s is better run in the command line\n", argv[0]);
     char file_name[256];
-    fprintf(stderr, "enter input file: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name) - 1] = '\0';
-    lasreadopener.set_file_name(file_name);
-    fprintf(stderr, "enter output file: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name) - 1] = '\0';
-    laswriteopener.set_file_name(file_name);
+    fprintf(stderr, "enter input file: ");
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name) - 1] = '\0';
+      lasreadopener.set_file_name(file_name);
+    }
+    fprintf(stderr, "enter output file: ");
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name) - 1] = '\0';
+      laswriteopener.set_file_name(file_name);
+    }
 #endif
   }
   else
@@ -2210,7 +2216,7 @@ int main(int argc, char* argv[])
           if (lasreader->header.vlr_geo_keys) 
           {
             geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
-            if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt)) 
+            if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
             {
               LASMessage(LAS_WARNING, "cannot produce OCG WKT. ignoring '-set_ogc_wkt' for '%s'", lasreadopener.get_file_name());
               if (ogc_wkt) free(ogc_wkt);

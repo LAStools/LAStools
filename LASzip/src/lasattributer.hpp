@@ -606,18 +606,37 @@ class LASLIB_DLL LASattributer {
   BOOL init_attributes(U32 number_attributes, LASattribute* attributes) {
     U32 i;
     clean_attributes();
+    if (number_attributes == 0) {
+      this->number_attributes = 0;
+      this->attributes = 0;
+      attribute_starts = 0;
+      attribute_sizes = 0;
+      return TRUE;
+    }
     this->number_attributes = number_attributes;
     this->attributes = (LASattribute*)malloc_las(sizeof(LASattribute) * number_attributes);
     if (this->attributes == 0) {
+      this->number_attributes = 0;
+      attribute_starts = 0;
+      attribute_sizes = 0;
       return FALSE;
     }
     memcpy(this->attributes, attributes, sizeof(LASattribute) * number_attributes);
     attribute_starts = (I32*)malloc_las(sizeof(I32) * number_attributes);
     if (attribute_starts == 0) {
+      free(this->attributes);
+      this->attributes = 0;
+      this->number_attributes = 0;
+      attribute_sizes = 0;
       return FALSE;
     }
     attribute_sizes = (I32*)malloc_las(sizeof(I32) * number_attributes);
     if (attribute_sizes == 0) {
+      free(this->attributes);
+      this->attributes = 0;
+      free(attribute_starts);
+      attribute_starts = 0;
+      this->number_attributes = 0;
       return FALSE;
     }
     attribute_starts[0] = 0;
@@ -697,21 +716,21 @@ class LASLIB_DLL LASattributer {
   }
 
   I32 get_attribute_start(I32 index) const {
-    if (index < number_attributes) {
+    if (index >= 0 && index < number_attributes) {
       return attribute_starts[index];
     }
     return -1;
   }
 
   I32 get_attribute_size(I32 index) const {
-    if (index < number_attributes) {
+    if (index >= 0 && index < number_attributes) {
       return attribute_sizes[index];
     }
     return -1;
   }
 
   const CHAR* get_attribute_name(I32 index) const {
-    if (index < number_attributes) {
+    if (index >= 0 && index < number_attributes) {
       return attributes[index].name;
     }
     return 0;

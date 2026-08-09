@@ -1621,6 +1621,11 @@ BOOL LASreaderPLY::parse_header()
     }
     else if (strncmp(line, "property", 8) == 0)
     {
+      if (items >= 63)
+      {
+        laserrorm("too many properties (> 63) in PLY header");
+        return FALSE;
+      }
       if ((strncmp(&line[9], "float ", 6) == 0) || (strncmp(&line[9], "float32 ", 8) == 0))
       {
         if (strncmp(&line[9], "float32 ", 8) == 0)

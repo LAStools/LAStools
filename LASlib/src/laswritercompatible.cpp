@@ -376,10 +376,13 @@ BOOL LASwriterCompatibleDown::write_point(const LASpoint* point)
 
   // write distilled extended attributes into extra bytes 
 
-  pointCompatibleDown.set_attribute(start_scan_angle, ((I16)scan_angle_remainder));
-  pointCompatibleDown.set_attribute(start_extended_returns, (U8)((return_number_increment << 4) | number_of_returns_increment));
-  pointCompatibleDown.set_attribute(start_classification, (U8)(pointCompatibleDown.extended_classification));
-  pointCompatibleDown.set_attribute(start_flags_and_channel, (U8)((scanner_channel << 1) | overlap_bit));
+  if ((start_scan_angle != -1) && (start_extended_returns != -1) && (start_classification != -1) && (start_flags_and_channel != -1))
+  {
+    pointCompatibleDown.set_attribute(start_scan_angle, ((I16)scan_angle_remainder));
+    pointCompatibleDown.set_attribute(start_extended_returns, (U8)((return_number_increment << 4) | number_of_returns_increment));
+    pointCompatibleDown.set_attribute(start_classification, (U8)(pointCompatibleDown.extended_classification));
+    pointCompatibleDown.set_attribute(start_flags_and_channel, (U8)((scanner_channel << 1) | overlap_bit));
+  }
   if (start_NIR_band != -1)
   {
     pointCompatibleDown.set_attribute(start_NIR_band, pointCompatibleDown.rgb[3]);
@@ -483,12 +486,12 @@ BOOL LASwriterCompatibleUp::open(LASheader* header, LASwriteOpener* laswriteopen
   }
   start_classification = header->get_attribute_start(index_classification);
   I32 index_flags_and_channel = header->get_attribute_index("LAS 1.4 flags and channel");
-  if (index_scan_angle == -1)
+  if (index_flags_and_channel == -1)
   {
     laserror("attribute \"LAS 1.4 flags and channel\" is not in EXTRA_BYTES");
     return FALSE;
   }
-  start_flags_and_channel = header->get_attribute_start(index_flags_and_channel); 
+  start_flags_and_channel = header->get_attribute_start(index_flags_and_channel);
 
   this->header = header;
 
@@ -642,6 +645,11 @@ BOOL LASwriterCompatibleUp::write_point(const LASpoint* point)
   // copy point
   pointCompatibleUp = *point;
   // get extra_attributes
+  if ((start_scan_angle == -1) || (start_extended_returns == -1) || (start_classification == -1) || (start_flags_and_channel == -1))
+  {
+    laserror("compatibility attribute offsets are invalid");
+    return FALSE;
+  }
   point->get_attribute(start_scan_angle, scan_angle);
   point->get_attribute(start_extended_returns, extended_returns);
   point->get_attribute(start_classification, classification);

@@ -111,9 +111,16 @@ void LASoperation::set_origins(F64 orig_x_offset, F64 orig_y_offset, F64 orig_z_
 /// setting the new scaling factor
 void LASoperation::set_scale_factor(F64 scale_factor_x, F64 scale_factor_y, F64 scale_factor_z)
 {
-  this->scale_factor_x = (scale_factor_x != 0) ? scale_factor_x : orig_x_scale_factor;
-  this->scale_factor_y = (scale_factor_y != 0) ? scale_factor_y : orig_y_scale_factor;
-  this->scale_factor_z = (scale_factor_z != 0) ? scale_factor_z : orig_z_scale_factor;
+  F64 candidate_x = (scale_factor_x != 0) ? scale_factor_x : orig_x_scale_factor;
+  F64 candidate_y = (scale_factor_y != 0) ? scale_factor_y : orig_y_scale_factor;
+  F64 candidate_z = (scale_factor_z != 0) ? scale_factor_z : orig_z_scale_factor;
+
+  if (candidate_x != 0) this->scale_factor_x = candidate_x;
+  else LASMessage(LAS_WARNING, "ignoring zero x scale factor for transform, keeping %g", this->scale_factor_x);
+  if (candidate_y != 0) this->scale_factor_y = candidate_y;
+  else LASMessage(LAS_WARNING, "ignoring zero y scale factor for transform, keeping %g", this->scale_factor_y);
+  if (candidate_z != 0) this->scale_factor_z = candidate_z;
+  else LASMessage(LAS_WARNING, "ignoring zero z scale factor for transform, keeping %g", this->scale_factor_z);
 };
 
 /// setting the new offset factor
@@ -5940,34 +5947,35 @@ class LASoperationMapAttributeIntoRGB : public LASoperation
             Gs = new U8[size];
             Bs = new U8[size];
             file = LASfopen(file_name, "r");
-            while (fgets(line, 256, file))
+            if (file)
             {
-                if (sscanf(line, "%lf %u %u %u", &value, &R, &G, &B) == 4)
+                while ((count < size) && fgets(line, 256, file))
                 {
-                    if ((R <= 255) && (G <= 255) && (B <= 255))
+                    if (sscanf(line, "%lf %u %u %u", &value, &R, &G, &B) == 4)
                     {
-                        values[count] = value;
-                        Rs[count] = R;
-                        Gs[count] = G;
-                        Bs[count] = B;
-                        count++;
+                        if ((R <= 255) && (G <= 255) && (B <= 255))
+                        {
+                            values[count] = value;
+                            Rs[count] = R;
+                            Gs[count] = G;
+                            Bs[count] = B;
+                            count++;
+                        }
                     }
                 }
+                fclose(file);
             }
-            fclose(file);
+            size = count;
         }
         this->index = index;
         map_file_name = LASCopyString(file_name);
     };
     ~LASoperationMapAttributeIntoRGB()
     {
-        if (size)
-        {
-            delete[] values;
-            delete[] Rs;
-            delete[] Gs;
-            delete[] Bs;
-        }
+        delete[] values;
+        delete[] Rs;
+        delete[] Gs;
+        delete[] Bs;
         free(map_file_name);
     };
 
@@ -11371,17 +11379,20 @@ void LAStransform::adjust_offset(LASreader* lasreader, F64* scale_factor)
     //calculate the adjusted offset after the operation (transformation)
     if (transf_min != 0 && transf_max != 0)
     {
-      if (F64_IS_FINITE(transf_min[0]) && F64_IS_FINITE(transf_max[0]))
+      if (F64_IS_FINITE(transf_min[0]) && F64_IS_FINITE(transf_max[0]) &&
+          F64_IS_FINITE(lasreader->header.x_scale_factor) && (lasreader->header.x_scale_factor != 0.0))
         adj_offset_x = ((I64)((transf_min[0] + transf_max[0]) / lasreader->header.x_scale_factor / 20000000)) * 10000000 * lasreader->header.x_scale_factor;
       else
         adj_offset_x = 0.0;
 
-      if (F64_IS_FINITE(transf_min[1]) && F64_IS_FINITE(transf_max[1]))
+      if (F64_IS_FINITE(transf_min[1]) && F64_IS_FINITE(transf_max[1]) &&
+          F64_IS_FINITE(lasreader->header.y_scale_factor) && (lasreader->header.y_scale_factor != 0.0))
         adj_offset_y = ((I64)((transf_min[1] + transf_max[1]) / lasreader->header.y_scale_factor / 20000000)) * 10000000 * lasreader->header.y_scale_factor;
       else
         adj_offset_y = 0.0;
 
-      if (F64_IS_FINITE(transf_min[2]) && F64_IS_FINITE(transf_max[2]))
+      if (F64_IS_FINITE(transf_min[2]) && F64_IS_FINITE(transf_max[2]) &&
+          F64_IS_FINITE(lasreader->header.z_scale_factor) && (lasreader->header.z_scale_factor != 0.0))
         adj_offset_z = ((I64)((transf_min[2] + transf_max[2]) / lasreader->header.z_scale_factor / 20000000)) * 10000000 * lasreader->header.z_scale_factor;
       else
         adj_offset_z = 0.0;

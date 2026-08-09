@@ -138,39 +138,54 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
 
     if (strstr(line, "ncols") || strstr(line, "NCOLS"))
     {
-      sscanf_las(line, "%s %d", dummy, &ncols);
+      sscanf_las(line, "%31s %d", dummy, &ncols);
+      if (ncols <= 0)
+      {
+        laserror("ncols %d in ASC header must be positive", ncols);
+        return FALSE;
+      }
+      if ((I64)ncols > (((I64)I32_MAX - 1024) / 50))
+      {
+        laserror("ncols %d in ASC header is too large for the line buffer size computation", ncols);
+        return FALSE;
+      }
       free(line);
       line_size = 1024 + 50 * ncols;
       line = (CHAR*)malloc_las(sizeof(CHAR) * line_size);
+      if (line == 0)
+      {
+        laserror("allocating %d bytes for line buffer failed", line_size);
+        return FALSE;
+      }
     }
 #pragma warning(pop)
     else if (strstr(line, "nrows") || strstr(line, "NROWS"))
     {
-      sscanf_las(line, "%s %d", dummy, &nrows);
+      sscanf_las(line, "%31s %d", dummy, &nrows);
     }
     else if (strstr(line, "xllcorner") || strstr(line, "XLLCORNER"))
     {
-      sscanf_las(line, "%s %lf", dummy, &xllcorner);
+      sscanf_las(line, "%31s %lf", dummy, &xllcorner);
     }
     else if (strstr(line, "yllcorner") || strstr(line, "YLLCORNER"))
     {
-      sscanf_las(line, "%s %lf", dummy, &yllcorner);
+      sscanf_las(line, "%31s %lf", dummy, &yllcorner);
     }
     else if (strstr(line, "xllcenter") || strstr(line, "XLLCENTER"))
     {
-      sscanf_las(line, "%s %lf", dummy, &xllcenter);
+      sscanf_las(line, "%31s %lf", dummy, &xllcenter);
     }
     else if (strstr(line, "yllcenter") || strstr(line, "YLLCENTER"))
     {
-      sscanf_las(line, "%s %lf", dummy, &yllcenter);
+      sscanf_las(line, "%31s %lf", dummy, &yllcenter);
     }
     else if (strstr(line, "cellsize") || strstr(line, "CELLSIZE"))
     {
-      sscanf_las(line, "%s %f", dummy, &cellsize);
+      sscanf_las(line, "%31s %f", dummy, &cellsize);
     }
     else if (strstr(line, "nodata_value") || strstr(line, "NODATA_VALUE") || strstr(line, "nodata_VALUE") || strstr(line, "NODATA_value"))
     {
-      sscanf_las(line, "%s %f", dummy, &nodata);
+      sscanf_las(line, "%31s %f", dummy, &nodata);
     }
     else if ((ncols != 0) && (nrows != 0) && (((xllcorner != F64_MAX) && (yllcorner != F64_MAX)) || ((xllcenter != F64_MAX) && (yllcenter != F64_MAX))) && (cellsize > 0))
     {

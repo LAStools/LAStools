@@ -58,6 +58,7 @@ void WktParser::SetWkt(const std::string wktin) {
   std::vector<std::string> vval;
   bool inStr = false;
   bool inEscape = false;
+  bool unmatchedBracket = false;
 
   // add key to key vector
   auto vkeyAdd = [&]() {
@@ -146,7 +147,12 @@ void WktParser::SetWkt(const std::string wktin) {
         map.insert(std::pair<std::string, std::string>(VectorDelimited(vkey, "."), VectorDelimited(vval, "|")));
         vval.clear();
       }
-      vkey.pop_back();
+      if (!vkey.empty()) {
+        vkey.pop_back();
+      } else if (!unmatchedBracket) {
+        unmatchedBracket = true;
+        LASMessage(LAS_WARNING, "unmatched ] in WKT string");
+      }
       /* optional: handle first value as key
       if (push) {
         vkey.pop_back();

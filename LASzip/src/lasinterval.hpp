@@ -117,6 +117,7 @@ private:
   U32 threshold;
   U32 number_intervals;
   I32 last_index;
+  BOOL last_index_valid;
   LASintervalStartCell* last_cell;
   LASintervalCell* current_cell;
   LASintervalStartCell* merged_cells;
