@@ -134,6 +134,12 @@ BOOL LASwaveform13writer::open(const char* file_name, const LASvlr_wave_packet_d
   char* file_name_temp = LASCopyString(file_name);
 
   I32 len = (I32)strlen(file_name_temp);
+  if (len < 3)
+  {
+    laserror("file name '%s' is too short to derive a waveform file name", file_name);
+    free(file_name_temp);
+    return FALSE;
+  }
   if (file_name_temp[len-3] == 'L' || file_name_temp[len-3] == 'W')
   {
     file_name_temp[len-3] = 'W';
@@ -265,6 +271,12 @@ BOOL LASwaveform13writer::write_waveform(LASpoint* point, U8* samples)
   U32 index = point->wavepacket.getIndex();
   if (index == 0)
   {
+    return FALSE;
+  }
+
+  if (waveforms[index] == 0)
+  {
+    laserror("wavepacket is indexing non-existant descriptor %u", index);
     return FALSE;
   }
 

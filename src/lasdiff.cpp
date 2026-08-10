@@ -337,7 +337,11 @@ static int check_header(LASreader* lasreader1, LASreader* lasreader2)
         different_header++;
         fprintf(stderr, "variable length record %d description field is different: '%s' '%s'\n", i, lasreader1->header.vlrs[i].description, lasreader2->header.vlrs[i].description);
       }
-      if (memcmp(lasreader1->header.vlrs[i].data, lasreader2->header.vlrs[i].data, lasreader1->header.vlrs[i].record_length_after_header))
+      if (lasreader1->header.vlrs[i].record_length_after_header != lasreader2->header.vlrs[i].record_length_after_header)
+      {
+        fprintf(stderr, "skipping data comparison of variable length record %d due to different size (%d != %d)\n", i, lasreader1->header.vlrs[i].record_length_after_header, lasreader2->header.vlrs[i].record_length_after_header);
+      }
+      else if (memcmp(lasreader1->header.vlrs[i].data, lasreader2->header.vlrs[i].data, lasreader1->header.vlrs[i].record_length_after_header))
       {
         for (j = 0; j < lasreader1->header.vlrs[i].record_length_after_header; j++)
         {
@@ -876,12 +880,18 @@ int main(int argc, char *argv[])
     wait_on_exit();
     char file_name[256];
     fprintf(stderr,"%s is better run in the command line\n", argv[0]);
-    fprintf(stderr,"enter input file1: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name)-1] = '\0';
-    lasreadopener.set_file_name(file_name);
-    fprintf(stderr,"enter input file2: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name)-1] = '\0';
-    lasreadopener.set_file_name(file_name);
+    fprintf(stderr,"enter input file1: ");
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name)-1] = '\0';
+      lasreadopener.set_file_name(file_name);
+    }
+    fprintf(stderr,"enter input file2: ");
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name)-1] = '\0';
+      lasreadopener.set_file_name(file_name);
+    }
 #endif
   }
   else
@@ -1087,7 +1097,11 @@ int main(int argc, char *argv[])
         }
         file_name2 = LASCopyString(lasreadopener.get_file_name());
         I32 len = (I32)strlen(file_name1);
-        if (strncmp(&file_name1[len-4], ".las", 4) == 0)
+        if (len < 4)
+        {
+          laserror("file '%s' not ending in *.las or *.laz", file_name1);
+        }
+        else if (strncmp(&file_name1[len-4], ".las", 4) == 0)
         {
           file_name2[len-1] = 'z';
         }

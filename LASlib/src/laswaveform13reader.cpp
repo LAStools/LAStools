@@ -131,6 +131,12 @@ BOOL LASwaveform13reader::open(const char* file_name, I64 start_of_waveform_data
     {
       char* file_name_temp = LASCopyString(file_name);
       I32 len = (I32)strlen(file_name_temp);
+      if (len < 3)
+      {
+        laserror("file name '%s' is too short to derive a waveform file name", file_name);
+        free(file_name_temp);
+        return FALSE;
+      }
       if ((file_name_temp[len-3] == 'L') || (file_name_temp[len-3] == 'W'))
       {
         file_name_temp[len-3] = 'W';
@@ -311,13 +317,20 @@ BOOL LASwaveform13reader::read_waveform(const LASpoint* point)
 
   // alloc data
 
-  if (size < ((nbits/8) * nsamples))
+  U64 needed_size = (U64)(nbits/8) * (U64)nsamples;
+  if (needed_size > U32_MAX)
   {
-    if (samples) delete [] samples;
-    samples = new U8[((nbits/8) * nsamples)];
+    laserror("waveform with %u samples of %u bits requires too much memory", nsamples, nbits);
+    return FALSE;
   }
 
-  size = ((nbits/8) * nsamples);
+  if (size < (U32)needed_size)
+  {
+    if (samples) delete [] samples;
+    samples = new U8[(U32)needed_size];
+  }
+
+  size = (U32)needed_size;
 
   // read waveform
 

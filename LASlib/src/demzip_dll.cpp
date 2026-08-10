@@ -228,7 +228,7 @@ demzip_get_error(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_get_error");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_get_error");
     return 1;
   }
 
@@ -251,7 +251,7 @@ demzip_get_warning(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_get_warning");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_get_warning");
     return 1;
   }
 
@@ -305,13 +305,13 @@ demzip_clean(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot clean while reader is open.");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot clean while reader is open.");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot clean while writer is open.");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot clean while writer is open.");
       return 1;
     }
 
@@ -448,7 +448,7 @@ demzip_clean(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_clean");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_clean");
     return 1;
   }
 
@@ -493,7 +493,7 @@ demzip_get_header_pointer(
   {
     if (header_pointer == 0)
     {
-      sprintf(demzip_dll->error, "demzip_header_struct pointer 'header_pointer' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_header_struct pointer 'header_pointer' is zero");
       return 1;
     }
 
@@ -501,7 +501,7 @@ demzip_get_header_pointer(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_get_header_pointer");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_get_header_pointer");
     return 1;
   }
 
@@ -523,7 +523,7 @@ demzip_get_point_pointer(
   {
     if (point_pointer == 0)
     {
-      sprintf(demzip_dll->error, "demzip_point_struct pointer 'point_pointer' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_point_struct pointer 'point_pointer' is zero");
       return 1;
     }
 
@@ -531,7 +531,7 @@ demzip_get_point_pointer(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_get_point_pointer");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_get_point_pointer");
     return 1;
   }
 
@@ -553,13 +553,13 @@ demzip_get_point_count(
   {
     if (count == 0)
     {
-      sprintf(demzip_dll->error, "demzip_I64 pointer 'count' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_I64 pointer 'count' is zero");
       return 1;
     }
 
     if ((demzip_dll->reader == 0) && (demzip_dll->writer == 0))
     {
-      sprintf(demzip_dll->error, "getting count before reader or writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "getting count before reader or writer was opened");
       return 1;
     }
 
@@ -567,7 +567,7 @@ demzip_get_point_count(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_get_point_count");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_get_point_count");
     return 1;
   }
 
@@ -589,19 +589,19 @@ demzip_set_header(
   {
     if (header == 0)
     {
-      sprintf(demzip_dll->error, "demzip_header_struct pointer 'header' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_header_struct pointer 'header' is zero");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot set header after reader was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set header after reader was opened");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot set header after writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set header after writer was opened");
       return 1;
     }
 
@@ -672,7 +672,7 @@ demzip_set_header(
     {
       if (header->user_data_in_header == 0)
       {
-        sprintf(demzip_dll->error, "header->user_data_in_header_size is %d but header->user_data_in_header is NULL", header->user_data_in_header_size);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "header->user_data_in_header_size is %d but header->user_data_in_header is NULL", header->user_data_in_header_size);
         return 1;
       }
       demzip_dll->header.user_data_in_header = new U8[header->user_data_in_header_size];
@@ -693,7 +693,14 @@ demzip_set_header(
     }
     if (header->number_of_variable_length_records)
     {
-      demzip_dll->header.vlrs = (demzip_vlr*)malloc(sizeof(demzip_vlr)*header->number_of_variable_length_records);
+      demzip_dll->header.vlrs = (demzip_vlr*)calloc(header->number_of_variable_length_records, sizeof(demzip_vlr));
+
+      if (demzip_dll->header.vlrs == 0)
+      {
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "allocating %u VLRs", header->number_of_variable_length_records);
+        return 1;
+      }
+
       for (i = 0; i < header->number_of_variable_length_records; i++)
       {
         demzip_dll->header.vlrs[i].reserved = header->vlrs[i].reserved;
@@ -705,7 +712,7 @@ demzip_set_header(
         {
           if (header->vlrs[i].data == 0)
           {
-            sprintf(demzip_dll->error, "header->vlrs[%d].record_length_after_header is %d but header->vlrs[%d].data is NULL", i, header->vlrs[i].record_length_after_header, i);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "header->vlrs[%d].record_length_after_header is %d but header->vlrs[%d].data is NULL", i, header->vlrs[i].record_length_after_header, i);
             return 1;
           }
           demzip_dll->header.vlrs[i].data = new U8[header->vlrs[i].record_length_after_header];
@@ -725,7 +732,7 @@ demzip_set_header(
             demzip_dll->attributer = new LASattributer;
             if (demzip_dll->attributer == 0)
             {
-              sprintf(demzip_dll->error, "cannot allocate LASattributer");
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot allocate LASattributer");
               return 1;
             }
           }
@@ -744,7 +751,7 @@ demzip_set_header(
     {
       if (header->user_data_after_header == 0)
       {
-        sprintf(demzip_dll->error, "header->user_data_after_header_size is %d but header->user_data_after_header is NULL", header->user_data_after_header_size);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "header->user_data_after_header_size is %d but header->user_data_after_header is NULL", header->user_data_after_header_size);
         return 1;
       }
       demzip_dll->header.user_data_after_header = new U8[header->user_data_after_header_size];
@@ -753,7 +760,7 @@ demzip_set_header(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_set_header");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_set_header");
     return 1;
   }
 
@@ -776,13 +783,13 @@ demzip_set_point_type_and_size(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot set point format and point size after reader was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set point format and point size after reader was opened");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot set point format and point size after writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set point format and point size after writer was opened");
       return 1;
     }
 
@@ -790,7 +797,7 @@ demzip_set_point_type_and_size(
 
     if (!LASzip().setup(point_type, point_size, LASZIP_COMPRESSOR_NONE))
     {
-      sprintf(demzip_dll->error, "invalid combination of point_type %d and point_size %d", (I32)point_type, (I32)point_size);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "invalid combination of point_type %d and point_size %d", (I32)point_type, (I32)point_size);
       return 1;
     }
 
@@ -801,7 +808,7 @@ demzip_set_point_type_and_size(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_set_point_type_and_size");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_set_point_type_and_size");
     return 1;
   }
 
@@ -844,38 +851,38 @@ demzip_check_for_integer_overflow(
 
     if ((header->min_x > 0) != (dequant_min_x > 0))
     {
-      sprintf(demzip_dll->error, "quantization sign flip for min_x from %g to %g. set scale factor for x coarser than %g\n", header->min_x, dequant_min_x, header->x_scale_factor);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "quantization sign flip for min_x from %g to %g. set scale factor for x coarser than %g\n", header->min_x, dequant_min_x, header->x_scale_factor);
       return 1;
     }
     if ((header->max_x > 0) != (dequant_max_x > 0))
     {
-      sprintf(demzip_dll->error, "quantization sign flip for max_x from %g to %g. set scale factor for x coarser than %g\n", header->max_x, dequant_max_x, header->x_scale_factor);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "quantization sign flip for max_x from %g to %g. set scale factor for x coarser than %g\n", header->max_x, dequant_max_x, header->x_scale_factor);
       return 1;
     }
     if ((header->min_y > 0) != (dequant_min_y > 0))
     {
-      sprintf(demzip_dll->error, "quantization sign flip for min_y from %g to %g. set scale factor for y coarser than %g\n", header->min_y, dequant_min_y, header->y_scale_factor);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "quantization sign flip for min_y from %g to %g. set scale factor for y coarser than %g\n", header->min_y, dequant_min_y, header->y_scale_factor);
       return 1;
     }
     if ((header->max_y > 0) != (dequant_max_y > 0))
     {
-      sprintf(demzip_dll->error, "quantization sign flip for max_y from %g to %g. set scale factor for y coarser than %g\n", header->max_y, dequant_max_y, header->y_scale_factor);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "quantization sign flip for max_y from %g to %g. set scale factor for y coarser than %g\n", header->max_y, dequant_max_y, header->y_scale_factor);
       return 1;
     }
     if ((header->min_z > 0) != (dequant_min_z > 0))
     {
-      sprintf(demzip_dll->error, "quantization sign flip for min_z from %g to %g. set scale factor for z coarser than %g\n", header->min_z, dequant_min_z, header->z_scale_factor);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "quantization sign flip for min_z from %g to %g. set scale factor for z coarser than %g\n", header->min_z, dequant_min_z, header->z_scale_factor);
       return 1;
     }
     if ((header->max_z > 0) != (dequant_max_z > 0))
     {
-      sprintf(demzip_dll->error, "quantization sign flip for max_z from %g to %g. set scale factor for z coarser than %g\n", header->max_z, dequant_max_z, header->z_scale_factor);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "quantization sign flip for max_z from %g to %g. set scale factor for z coarser than %g\n", header->max_z, dequant_max_z, header->z_scale_factor);
       return 1;
     }
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_auto_offset");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_auto_offset");
     return 1;
   }
 
@@ -896,13 +903,13 @@ demzip_auto_offset(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot auto offset after reader was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot auto offset after reader was opened");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot auto offset after writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot auto offset after writer was opened");
       return 1;
     }
 
@@ -918,19 +925,19 @@ demzip_auto_offset(
 
     if ((x_scale_factor <= 0) || !F64_IS_FINITE(x_scale_factor))
     {
-      sprintf(demzip_dll->error, "invalid x scale_factor %g in header", header->x_scale_factor);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "invalid x scale_factor %g in header", header->x_scale_factor);
       return 1;
     }
 
     if ((y_scale_factor <= 0) || !F64_IS_FINITE(y_scale_factor))
     {
-      sprintf(demzip_dll->error, "invalid y scale_factor %g in header", header->y_scale_factor);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "invalid y scale_factor %g in header", header->y_scale_factor);
       return 1;
     }
 
     if ((z_scale_factor <= 0) || !F64_IS_FINITE(z_scale_factor))
     {
-      sprintf(demzip_dll->error, "invalid z scale_factor %g in header", header->z_scale_factor);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "invalid z scale_factor %g in header", header->z_scale_factor);
       return 1;
     }
 
@@ -940,19 +947,19 @@ demzip_auto_offset(
 
     if (!F64_IS_FINITE(center_bb_x))
     {
-      sprintf(demzip_dll->error, "invalid x coordinate at center of bounding box (min: %g max: %g)", header->min_x, header->max_x);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "invalid x coordinate at center of bounding box (min: %g max: %g)", header->min_x, header->max_x);
       return 1;
     }
 
     if (!F64_IS_FINITE(center_bb_y))
     {
-      sprintf(demzip_dll->error, "invalid y coordinate at center of  bounding box (min: %g max: %g)", header->min_y, header->max_y);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "invalid y coordinate at center of  bounding box (min: %g max: %g)", header->min_y, header->max_y);
       return 1;
     }
 
     if (!F64_IS_FINITE(center_bb_z))
     {
-      sprintf(demzip_dll->error, "invalid z coordinate at center of  bounding box (min: %g max: %g)", header->min_z, header->max_z);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "invalid z coordinate at center of  bounding box (min: %g max: %g)", header->min_z, header->max_z);
       return 1;
     }
 
@@ -974,7 +981,7 @@ demzip_auto_offset(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_auto_offset");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_auto_offset");
     return 1;
   }
 
@@ -996,13 +1003,13 @@ demzip_set_point(
   {
     if (point == 0)
     {
-      sprintf(demzip_dll->error, "demzip_point_struct pointer 'point' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_point_struct pointer 'point' is zero");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot set point for reader");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set point for reader");
       return 1;
     }
 
@@ -1018,13 +1025,13 @@ demzip_set_point(
         }
         else
         {
-          sprintf(demzip_dll->error, "target point has %d extra bytes but source point has %d", demzip_dll->point.num_extra_bytes, point->num_extra_bytes);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "target point has %d extra bytes but source point has %d", demzip_dll->point.num_extra_bytes, point->num_extra_bytes);
           return 1;
         }
       }
       else if (!demzip_dll->compatibility_mode)
       {
-        sprintf(demzip_dll->error, "target point has extra bytes but source point does not");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "target point has extra bytes but source point does not");
         return 1;
       }
     }
@@ -1033,7 +1040,7 @@ demzip_set_point(
     {
       if (point->extra_bytes)
       {
-        sprintf(demzip_dll->error, "source point has extra bytes but target point does not");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "source point has extra bytes but target point does not");
         return 1;
       }
     }
@@ -1041,7 +1048,7 @@ demzip_set_point(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_set_point");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_set_point");
     return 1;
   }
 
@@ -1063,13 +1070,13 @@ demzip_set_coordinates(
   {
     if (coordinates == 0)
     {
-      sprintf(demzip_dll->error, "demzip_F64 pointer 'coordinates' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_F64 pointer 'coordinates' is zero");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot set coordinates for reader");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set coordinates for reader");
       return 1;
     }
 
@@ -1089,7 +1096,7 @@ demzip_set_coordinates(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_set_coordinates");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_set_coordinates");
     return 1;
   }
 
@@ -1111,7 +1118,7 @@ demzip_get_coordinates(
   {
     if (coordinates == 0)
     {
-      sprintf(demzip_dll->error, "demzip_F64 pointer 'coordinates' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_F64 pointer 'coordinates' is zero");
       return 1;
     }
 
@@ -1131,7 +1138,7 @@ demzip_get_coordinates(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_get_coordinates");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_get_coordinates");
     return 1;
   }
 
@@ -1154,25 +1161,25 @@ demzip_set_geokeys(
   {
     if (number == 0)
     {
-      sprintf(demzip_dll->error, "number of key_entries is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "number of key_entries is zero");
       return 1;
     }
 
     if (key_entries == 0)
     {
-      sprintf(demzip_dll->error, "demzip_geokey_struct pointer 'key_entries' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_geokey_struct pointer 'key_entries' is zero");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot set geokeys after reader was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set geokeys after reader was opened");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot set geokeys after writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set geokeys after writer was opened");
       return 1;
     }
 
@@ -1181,7 +1188,7 @@ demzip_set_geokeys(
     demzip_geokey_struct* key_entries_plus_one = new demzip_geokey_struct[number+1];
     if (key_entries_plus_one == 0)
     {
-      sprintf(demzip_dll->error, "allocating demzip_geokey_struct[%u] array", number+1);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "allocating demzip_geokey_struct[%u] array", number+1);
       return 1;
     }
     key_entries_plus_one[0].key_id = 1;            // aka key_directory_version
@@ -1194,13 +1201,13 @@ demzip_set_geokeys(
 
     if (demzip_add_vlr(demzip_dll, "LASF_Projection", 34735, (demzip_U16)(8 + number*8), 0, (demzip_U8*)key_entries_plus_one))
     {
-      sprintf(demzip_dll->error, "setting %u geodouble_params", number);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "setting %u geodouble_params", number);
       return 1;
     }
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_set_geokey_entries");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_set_geokey_entries");
     return 1;
   }
 
@@ -1223,25 +1230,25 @@ demzip_set_geodouble_params(
   {
     if (number == 0)
     {
-      sprintf(demzip_dll->error, "number of geodouble_params is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "number of geodouble_params is zero");
       return 1;
     }
 
     if (geodouble_params == 0)
     {
-      sprintf(demzip_dll->error, "demzip_F64 pointer 'geodouble_params' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_F64 pointer 'geodouble_params' is zero");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot set geodouble_params after reader was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set geodouble_params after reader was opened");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot set geodouble_params after writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set geodouble_params after writer was opened");
       return 1;
     }
 
@@ -1249,13 +1256,13 @@ demzip_set_geodouble_params(
 
     if (demzip_add_vlr(demzip_dll, "LASF_Projection", 34736, (demzip_U16)(number*8), 0, (demzip_U8*)geodouble_params))
     {
-      sprintf(demzip_dll->error, "setting %u geodouble_params", number);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "setting %u geodouble_params", number);
       return 1;
     }
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_set_geodouble_params");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_set_geodouble_params");
     return 1;
   }
 
@@ -1278,25 +1285,25 @@ demzip_set_geoascii_params(
   {
     if (number == 0)
     {
-      sprintf(demzip_dll->error, "number of geoascii_params is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "number of geoascii_params is zero");
       return 1;
     }
 
     if (geoascii_params == 0)
     {
-      sprintf(demzip_dll->error, "demzip_CHAR pointer 'geoascii_params' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_CHAR pointer 'geoascii_params' is zero");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot set geoascii_params after reader was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set geoascii_params after reader was opened");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot set geoascii_params after writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot set geoascii_params after writer was opened");
       return 1;
     }
 
@@ -1304,13 +1311,13 @@ demzip_set_geoascii_params(
 
     if (demzip_add_vlr(demzip_dll, "LASF_Projection", 34737, (demzip_U16)(number), 0, (demzip_U8*)geoascii_params))
     {
-      sprintf(demzip_dll->error, "setting %u geoascii_params", number);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "setting %u geoascii_params", number);
       return 1;
     }
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_set_geoascii_params");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_set_geoascii_params");
     return 1;
   }
 
@@ -1336,25 +1343,25 @@ demzip_add_attribute(
   {
     if (type > LAS_ATTRIBUTE_F64)
     {
-      sprintf(demzip_dll->error, "demzip_U32 'type' is %u but needs to be between %d and %d", type, LAS_ATTRIBUTE_U8, LAS_ATTRIBUTE_F64);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_U32 'type' is %u but needs to be between %d and %d", type, LAS_ATTRIBUTE_U8, LAS_ATTRIBUTE_F64);
       return 1;
     }
 
     if (name == 0)
     {
-      sprintf(demzip_dll->error, "demzip_CHAR pointer 'name' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_CHAR pointer 'name' is zero");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot add attribute after reader was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot add attribute after reader was opened");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot add attribute after writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot add attribute after writer was opened");
       return 1;
     }
 
@@ -1367,26 +1374,26 @@ demzip_add_attribute(
       demzip_dll->attributer = new LASattributer;
       if (demzip_dll->attributer == 0)
       {
-        sprintf(demzip_dll->error, "cannot allocate LASattributer");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot allocate LASattributer");
         return 1;
       }
     }
 
     if (demzip_dll->attributer->add_attribute(lasattribute) == -1)
     {
-      sprintf(demzip_dll->error, "cannot add attribute '%s' to attributer", name);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot add attribute '%s' to attributer", name);
       return 1;
     }
 
     if (demzip_add_vlr(demzip_dll, "LASF_Spec\0\0\0\0\0\0", 4, (demzip_U16)(demzip_dll->attributer->number_attributes*sizeof(LASattribute)), 0, (demzip_U8*)demzip_dll->attributer->attributes))
     {
-      sprintf(demzip_dll->error, "adding the new extra bytes VLR with the additional attribute '%s'", name);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "adding the new extra bytes VLR with the additional attribute '%s'", name);
       return 1;
     }
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_add_attribute");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_add_attribute");
     return 1;
   }
 
@@ -1412,25 +1419,25 @@ demzip_add_vlr(
   {
     if (user_id == 0)
     {
-      sprintf(demzip_dll->error, "demzip_CHAR pointer 'user_id' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_CHAR pointer 'user_id' is zero");
       return 1;
     }
 
     if ((record_length_after_header > 0) && (data == 0))
     {
-      sprintf(demzip_dll->error, "record_length_after_header of VLR is %u but data pointer is zero", (U32)record_length_after_header);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "record_length_after_header of VLR is %u but data pointer is zero", (U32)record_length_after_header);
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot add vlr after reader was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot add vlr after reader was opened");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot add vlr after writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot add vlr after writer was opened");
       return 1;
     }
 
@@ -1464,7 +1471,7 @@ demzip_add_vlr(
         demzip_dll->header.vlrs = (demzip_vlr_struct*)realloc(demzip_dll->header.vlrs, sizeof(demzip_vlr_struct)*demzip_dll->header.number_of_variable_length_records);
         if (demzip_dll->header.vlrs == 0)
         {
-          sprintf(demzip_dll->error, "reallocating vlrs[%u] array", demzip_dll->header.number_of_variable_length_records);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reallocating vlrs[%u] array", demzip_dll->header.number_of_variable_length_records);
           return 1;
         }
       }
@@ -1476,7 +1483,7 @@ demzip_add_vlr(
       demzip_dll->header.vlrs = (demzip_vlr_struct*)malloc(sizeof(demzip_vlr_struct));
       if (demzip_dll->header.vlrs == 0)
       {
-        sprintf(demzip_dll->error, "allocating vlrs[1] array");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "allocating vlrs[1] array");
         return 1;
       }
     }
@@ -1508,7 +1515,7 @@ demzip_add_vlr(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_add_vlr");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_add_vlr");
     return 1;
   }
 
@@ -1531,19 +1538,19 @@ demzip_remove_vlr(
   {
     if (user_id == 0)
     {
-      sprintf(demzip_dll->error, "demzip_CHAR pointer 'user_id' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_CHAR pointer 'user_id' is zero");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "cannot remove vlr after reader was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot remove vlr after reader was opened");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "cannot remove vlr after writer was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot remove vlr after writer was opened");
       return 1;
     }
 
@@ -1571,7 +1578,7 @@ demzip_remove_vlr(
             demzip_dll->header.vlrs = (demzip_vlr_struct*)realloc(demzip_dll->header.vlrs, sizeof(demzip_vlr_struct)*demzip_dll->header.number_of_variable_length_records);
             if (demzip_dll->header.vlrs == 0)
             {
-              sprintf(demzip_dll->error, "reallocating vlrs[%u] array", demzip_dll->header.number_of_variable_length_records);
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reallocating vlrs[%u] array", demzip_dll->header.number_of_variable_length_records);
               return 1;
             }
           }
@@ -1586,19 +1593,19 @@ demzip_remove_vlr(
       }
       if (i != U32_MAX)
       {
-        sprintf(demzip_dll->error, "cannot find VLR with user_id '%s' and record_id %d among the %u VLRs in the header", user_id, (I32)record_id, demzip_dll->header.number_of_variable_length_records);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot find VLR with user_id '%s' and record_id %d among the %u VLRs in the header", user_id, (I32)record_id, demzip_dll->header.number_of_variable_length_records);
         return 1;
       }
     }
     else
     {
-      sprintf(demzip_dll->error, "cannot remove VLR with user_id '%s' and record_id %d because header has no VLRs", user_id, (I32)record_id);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot remove VLR with user_id '%s' and record_id %d because header has no VLRs", user_id, (I32)record_id);
       return 1;
     }
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_add_vlr");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_add_vlr");
     return 1;
   }
 
@@ -1620,13 +1627,13 @@ demzip_preserve_generating_software(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
@@ -1634,7 +1641,7 @@ demzip_preserve_generating_software(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_preserve_generating_software");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_preserve_generating_software");
     return 1;
   }
 
@@ -1657,13 +1664,13 @@ demzip_request_native_extension(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
@@ -1676,7 +1683,7 @@ demzip_request_native_extension(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_request_native_extension");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_request_native_extension");
     return 1;
   }
 
@@ -1698,13 +1705,13 @@ demzip_request_compatibility_mode(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
@@ -1717,7 +1724,7 @@ demzip_request_compatibility_mode(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_request_compatibility_mode");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_request_compatibility_mode");
     return 1;
   }
 
@@ -1739,13 +1746,13 @@ demzip_set_chunk_size(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
@@ -1753,7 +1760,7 @@ demzip_set_chunk_size(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_set_chunk_size");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_set_chunk_size");
     return 1;
   }
 
@@ -1776,19 +1783,19 @@ demzip_create_spatial_index(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
     if (append)
     {
-      sprintf(demzip_dll->error, "appending of spatial index not (yet) supported in this version");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "appending of spatial index not (yet) supported in this version");
       return 1;
     }
 
@@ -1797,7 +1804,7 @@ demzip_create_spatial_index(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_create_spatial_index");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_create_spatial_index");
     return 1;
   }
 
@@ -1813,7 +1820,7 @@ demzip_prepare_header_for_write(
 {
   if ((demzip_dll->header.version_major != 1) || (demzip_dll->header.version_minor > 4))
   {
-    sprintf(demzip_dll->error, "unknown LAS version %d.%d", (I32)demzip_dll->header.version_major, (I32)demzip_dll->header.version_minor);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "unknown LAS version %d.%d", (I32)demzip_dll->header.version_major, (I32)demzip_dll->header.version_minor);
     return 1;
   }
 
@@ -1838,7 +1845,7 @@ demzip_prepare_header_for_write(
     {
       if (demzip_dll->header.number_of_point_records != 0)
       {
-        sprintf(demzip_dll->error, "inconsistent number_of_point_records %u and extended_number_of_point_records %llu", demzip_dll->header.number_of_point_records, demzip_dll->header.extended_number_of_point_records);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "inconsistent number_of_point_records %u and extended_number_of_point_records %llu", demzip_dll->header.number_of_point_records, demzip_dll->header.extended_number_of_point_records);
         return 1;
       }
       else if (demzip_dll->header.extended_number_of_point_records <= U32_MAX)
@@ -1852,7 +1859,7 @@ demzip_prepare_header_for_write(
       {
         if (demzip_dll->header.number_of_points_by_return[i] != 0)
         {
-          sprintf(demzip_dll->error, "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %llu", i, demzip_dll->header.number_of_points_by_return[i], i, demzip_dll->header.extended_number_of_points_by_return[i]);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "inconsistent number_of_points_by_return[%u] %u and extended_number_of_points_by_return[%u] %llu", i, demzip_dll->header.number_of_points_by_return[i], i, demzip_dll->header.extended_number_of_points_by_return[i]);
           return 1;
         }
         else if (demzip_dll->header.extended_number_of_points_by_return[i] <= U32_MAX)
@@ -1898,7 +1905,7 @@ demzip_prepare_point_for_write(
 
       if (demzip_dll->header.extended_number_of_point_records > U32_MAX)
       {
-        sprintf(demzip_dll->error, "extended_number_of_point_records of %llu is too much for 32-bit counters of compatibility mode", demzip_dll->header.extended_number_of_point_records);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "extended_number_of_point_records of %llu is too much for 32-bit counters of compatibility mode", demzip_dll->header.extended_number_of_point_records);
         return 1;
       }
 
@@ -1932,13 +1939,13 @@ demzip_prepare_point_for_write(
         number_of_existing_extrabytes = demzip_dll->header.point_data_record_length - 67;
         break;
       default:
-        sprintf(demzip_dll->error, "unknown point_data_format %d", demzip_dll->header.point_data_format);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "unknown point_data_format %d", demzip_dll->header.point_data_format);
         return 1;
       }
 
       if (number_of_existing_extrabytes < 0)
       {
-        sprintf(demzip_dll->error, "bad point_data_format %d point_data_record_length %d combination", demzip_dll->header.point_data_format, demzip_dll->header.point_data_record_length);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "bad point_data_format %d point_data_record_length %d combination", demzip_dll->header.point_data_format, demzip_dll->header.point_data_record_length);
         return 1;
       }
 
@@ -2044,7 +2051,7 @@ demzip_prepare_point_for_write(
 
       if (demzip_add_vlr(demzip_dll, "lascompatible\0\0", 22204, (demzip_U16)(vlr_size), 0, (demzip_U8*)out->takeData()))
       {
-        sprintf(demzip_dll->error, "adding the compatibility VLR");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "adding the compatibility VLR");
         return 1;
       }
       delete out;
@@ -2056,7 +2063,7 @@ demzip_prepare_point_for_write(
         demzip_dll->attributer = new LASattributer;
         if (demzip_dll->attributer == 0)
         {
-          sprintf(demzip_dll->error, "cannot allocate LASattributer");
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot allocate LASattributer");
           return 1;
         }
       }
@@ -2069,7 +2076,7 @@ demzip_prepare_point_for_write(
 
         if (demzip_dll->attributer->get_attributes_size() > number_of_existing_extrabytes)
         {
-          sprintf(demzip_dll->error, "bad \"extra bytes\" VLR describes %d bytes more than points actually have", demzip_dll->attributer->get_attributes_size() - number_of_existing_extrabytes);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "bad \"extra bytes\" VLR describes %d bytes more than points actually have", demzip_dll->attributer->get_attributes_size() - number_of_existing_extrabytes);
           return 1;
         }
         else if (demzip_dll->attributer->get_attributes_size() < number_of_existing_extrabytes)
@@ -2095,7 +2102,7 @@ demzip_prepare_point_for_write(
             LASattribute lasattribute_unknown(LAS_ATTRIBUTE_U8, unknown_name, unknown_name);
             if (demzip_dll->attributer->add_attribute(lasattribute_unknown) == -1)
             {
-              sprintf(demzip_dll->error, "cannot add unknown U8 attribute '%s' of %d to attributer", unknown_name, number_of_existing_extrabytes);
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot add unknown U8 attribute '%s' of %d to attributer", unknown_name, number_of_existing_extrabytes);
               return 1;
             }
           }
@@ -2138,7 +2145,7 @@ demzip_prepare_point_for_write(
 
       if (demzip_add_vlr(demzip_dll, "LASF_Spec\0\0\0\0\0\0", 4, (demzip_U16)(demzip_dll->attributer->number_attributes*sizeof(LASattribute)), 0, (demzip_U8*)demzip_dll->attributer->attributes))
       {
-        sprintf(demzip_dll->error, "adding the extra bytes VLR with the additional attributes");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "adding the extra bytes VLR with the additional attributes");
         return 1;
       }
 
@@ -2162,7 +2169,7 @@ demzip_prepare_point_for_write(
     }
     else if (compress)
     {
-      sprintf(demzip_dll->error, "LASzip DLL %d.%d r%d (%d) cannot compress point data format %d without requesting 'compatibility mode'", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE, (I32)demzip_dll->header.point_data_format);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "LASzip DLL %d.%d r%d (%d) cannot compress point data format %d without requesting 'compatibility mode'", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE, (I32)demzip_dll->header.point_data_format);
       return 1;
     }
   }
@@ -2192,7 +2199,7 @@ demzip_prepare_vlrs_for_write(
   {
     if (demzip_dll->header.vlrs == 0)
     {
-      sprintf(demzip_dll->error, "number_of_variable_length_records is %u but vlrs pointer is zero", demzip_dll->header.number_of_variable_length_records);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "number_of_variable_length_records is %u but vlrs pointer is zero", demzip_dll->header.number_of_variable_length_records);
       return 1;
     }
 
@@ -2203,7 +2210,7 @@ demzip_prepare_vlrs_for_write(
       {
         if (demzip_dll->header.vlrs == 0)
         {
-          sprintf(demzip_dll->error, "vlrs[%u].record_length_after_header is %u but vlrs[%u].data pointer is zero", i, demzip_dll->header.vlrs[i].record_length_after_header, i);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "vlrs[%u].record_length_after_header is %u but vlrs[%u].data pointer is zero", i, demzip_dll->header.vlrs[i].record_length_after_header, i);
           return 1;
         }
         vlrs_size += demzip_dll->header.vlrs[i].record_length_after_header;
@@ -2213,7 +2220,7 @@ demzip_prepare_vlrs_for_write(
 
   if ((vlrs_size + demzip_dll->header.header_size + demzip_dll->header.user_data_after_header_size) != demzip_dll->header.offset_to_point_data)
   {
-    sprintf(demzip_dll->error,"header_size (%u) plus vlrs_size (%u) plus user_data_after_header_size (%u) does not equal offset_to_point_data (%u)", (U32)demzip_dll->header.header_size, vlrs_size, demzip_dll->header.user_data_after_header_size, demzip_dll->header.offset_to_point_data);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error),"header_size (%u) plus vlrs_size (%u) plus user_data_after_header_size (%u) does not equal offset_to_point_data (%u)", (U32)demzip_dll->header.header_size, vlrs_size, demzip_dll->header.user_data_after_header_size, demzip_dll->header.offset_to_point_data);
     return 1;
   }
 
@@ -2242,25 +2249,25 @@ write_demzip_vlr_header(
   U16 reserved = 0x0;
   try { out->put16bitsLE((U8*)&reserved); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing LASzip VLR header.reserved");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing LASzip VLR header.reserved");
     return 1;
   }
   U8 user_id[16] = "laszip encoded\0";
   try { out->putBytes((U8*)user_id, 16); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing LASzip VLR header.user_id");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing LASzip VLR header.user_id");
     return 1;
   }
   U16 record_id = 22204;
   try { out->put16bitsLE((U8*)&record_id); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing LASzip VLR header.record_id");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing LASzip VLR header.record_id");
     return 1;
   }
   U16 record_length_after_header = (U16)demzip_vrl_payload_size(laszip);
   try { out->put16bitsLE((U8*)&record_length_after_header); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing LASzip VLR header.record_length_after_header");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing LASzip VLR header.record_length_after_header");
     return 1;
   }
   CHAR description[32];
@@ -2268,7 +2275,7 @@ write_demzip_vlr_header(
   sprintf(description, "LASzip DLL %d.%d r%d (%d)", LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION, LASZIP_VERSION_BUILD_DATE);
   try { out->putBytes((U8*)description, 32); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing LASzip VLR header.description");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing LASzip VLR header.description");
     return 1;
   }
 
@@ -2302,52 +2309,52 @@ write_demzip_vlr_payload(
 
   try { out->put16bitsLE((const U8*)&(laszip->compressor)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing compressor %d", (I32)laszip->compressor);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing compressor %d", (I32)laszip->compressor);
     return 1;
   }
   try { out->put16bitsLE((const U8*)&(laszip->coder)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing coder %d", (I32)laszip->coder);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing coder %d", (I32)laszip->coder);
     return 1;
   }
   try { out->putBytes((const U8*)&(laszip->version_major), 1); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing version_major %d", (I32)laszip->version_major);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing version_major %d", (I32)laszip->version_major);
     return 1;
   }
   try { out->putBytes((const U8*)&(laszip->version_minor), 1); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing version_minor %d", (I32)laszip->version_minor);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing version_minor %d", (I32)laszip->version_minor);
     return 1;
   }
   try { out->put16bitsLE((const U8*)&(laszip->version_revision)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing version_revision %d", (I32)laszip->version_revision);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing version_revision %d", (I32)laszip->version_revision);
     return 1;
   }
   try { out->put32bitsLE((const U8*)&(laszip->options)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing options %u", laszip->options);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing options %u", laszip->options);
     return 1;
   }
   try { out->put32bitsLE((const U8*)&(laszip->chunk_size)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing chunk_size %u", laszip->chunk_size);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing chunk_size %u", laszip->chunk_size);
     return 1;
   }
   try { out->put64bitsLE((const U8*)&(laszip->number_of_special_evlrs)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing number_of_special_evlrs %d", (I32)laszip->number_of_special_evlrs);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing number_of_special_evlrs %d", (I32)laszip->number_of_special_evlrs);
     return 1;
   }
   try { out->put64bitsLE((const U8*)&(laszip->offset_to_special_evlrs)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing offset_to_special_evlrs %d", (I32)laszip->offset_to_special_evlrs);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing offset_to_special_evlrs %d", (I32)laszip->offset_to_special_evlrs);
     return 1;
   }
   try { out->put16bitsLE((const U8*)&(laszip->num_items)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing num_items %d", (I32)laszip->num_items);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing num_items %d", (I32)laszip->num_items);
     return 1;
   }
 
@@ -2357,17 +2364,17 @@ write_demzip_vlr_payload(
     U16 type = (U16)(laszip->items[j].type);
     try { out->put16bitsLE((const U8*)&type); } catch(...)
     {
-      sprintf(demzip_dll->error, "writing type %d of item %d", (I32)laszip->items[j].type, j);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing type %d of item %d", (I32)laszip->items[j].type, j);
       return 1;
     }
     try { out->put16bitsLE((const U8*)&(laszip->items[j].size)); } catch(...)
     {
-      sprintf(demzip_dll->error, "writing size %d of item %d", (I32)laszip->items[j].size, j);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing size %d of item %d", (I32)laszip->items[j].size, j);
       return 1;
     }
     try { out->put16bitsLE((const U8*)&(laszip->items[j].version)); } catch(...)
     {
-      sprintf(demzip_dll->error, "writing version %d of item %d", (I32)laszip->items[j].version, j);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing version %d of item %d", (I32)laszip->items[j].version, j);
       return 1;
     }
   }
@@ -2386,52 +2393,52 @@ demzip_write_header(
 
   try { demzip_dll->streamout->putBytes((const U8*)"LASF", 4); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.file_signature");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.file_signature");
     return 1;
   }
   try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.file_source_ID)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.file_source_ID");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.file_source_ID");
     return 1;
   }
   try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.global_encoding)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.global_encoding");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.global_encoding");
     return 1;
   }
   try { demzip_dll->streamout->put32bitsLE((const U8*)&(demzip_dll->header.project_ID_GUID_data_1)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.project_ID_GUID_data_1");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.project_ID_GUID_data_1");
     return 1;
   }
   try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.project_ID_GUID_data_2)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.project_ID_GUID_data_2");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.project_ID_GUID_data_2");
     return 1;
   }
   try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.project_ID_GUID_data_3)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.project_ID_GUID_data_3");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.project_ID_GUID_data_3");
     return 1;
   }
   try { demzip_dll->streamout->putBytes((const U8*)demzip_dll->header.project_ID_GUID_data_4, 8); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.project_ID_GUID_data_4");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.project_ID_GUID_data_4");
     return 1;
   }
   try { demzip_dll->streamout->putBytes((const U8*)&(demzip_dll->header.version_major), 1); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.version_major");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.version_major");
     return 1;
   }
   try { demzip_dll->streamout->putBytes((const U8*)&(demzip_dll->header.version_minor), 1); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.version_minor");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.version_minor");
     return 1;
   }
   try { demzip_dll->streamout->putBytes((const U8*)demzip_dll->header.system_identifier, 32); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.system_identifier");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.system_identifier");
     return 1;
   }
   if (!demzip_dll->preserve_generating_software)
@@ -2441,22 +2448,22 @@ demzip_write_header(
   }
   try { demzip_dll->streamout->putBytes((const U8*)demzip_dll->header.generating_software, 32); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.generating_software");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.generating_software");
     return 1;
   }
   try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.file_creation_day)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.file_creation_day");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.file_creation_day");
     return 1;
   }
   try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.file_creation_year)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.file_creation_year");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.file_creation_year");
     return 1;
   }
   try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.header_size)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.header_size");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.header_size");
     return 1;
   }
   if (compress)
@@ -2465,7 +2472,7 @@ demzip_write_header(
   }
   try { demzip_dll->streamout->put32bitsLE((const U8*)&(demzip_dll->header.offset_to_point_data)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.offset_to_point_data");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.offset_to_point_data");
     return 1;
   }
   if (compress)
@@ -2475,7 +2482,7 @@ demzip_write_header(
   }
   try { demzip_dll->streamout->put32bitsLE((const U8*)&(demzip_dll->header.number_of_variable_length_records)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.number_of_variable_length_records");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.number_of_variable_length_records");
     return 1;
   }
   if (compress)
@@ -2485,7 +2492,7 @@ demzip_write_header(
   }
   try { demzip_dll->streamout->putBytes((const U8*)&(demzip_dll->header.point_data_format), 1); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.point_data_format");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.point_data_format");
     return 1;
   }
   if (compress)
@@ -2494,80 +2501,80 @@ demzip_write_header(
   }
   try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.point_data_record_length)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.point_data_record_length");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.point_data_record_length");
     return 1;
   }
   try { demzip_dll->streamout->put32bitsLE((const U8*)&(demzip_dll->header.number_of_point_records)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.number_of_point_records");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.number_of_point_records");
     return 1;
   }
   for (i = 0; i < 5; i++)
   {
     try { demzip_dll->streamout->put32bitsLE((const U8*)&(demzip_dll->header.number_of_points_by_return[i])); } catch(...)
     {
-      sprintf(demzip_dll->error, "writing header.number_of_points_by_return %d", i);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.number_of_points_by_return %d", i);
       return 1;
     }
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.x_scale_factor)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.x_scale_factor");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.x_scale_factor");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.y_scale_factor)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.y_scale_factor");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.y_scale_factor");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.z_scale_factor)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.z_scale_factor");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.z_scale_factor");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.x_offset)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.x_offset");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.x_offset");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.y_offset)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.y_offset");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.y_offset");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.z_offset)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.z_offset");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.z_offset");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.max_x)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.max_x");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.max_x");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.min_x)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.min_x");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.min_x");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.max_y)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.max_y");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.max_y");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.min_y)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.min_y");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.min_y");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.max_z)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.max_z");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.max_z");
     return 1;
   }
   try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.min_z)); } catch(...)
   {
-    sprintf(demzip_dll->error, "writing header.min_z");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.min_z");
     return 1;
   }
 
@@ -2576,19 +2583,19 @@ demzip_write_header(
   {
     if (demzip_dll->header.header_size < 235)
     {
-      sprintf(demzip_dll->error, "for LAS 1.%d header_size should at least be 235 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "for LAS 1.%d header_size should at least be 235 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
       return 1;
     }
     else
     {
       if (demzip_dll->header.start_of_waveform_data_packet_record != 0)
       {
-        sprintf(demzip_dll->warning, "header.start_of_waveform_data_packet_record is %llu. writing 0 instead.", demzip_dll->header.start_of_waveform_data_packet_record);
+        snprintf(demzip_dll->warning, sizeof(demzip_dll->warning), "header.start_of_waveform_data_packet_record is %llu. writing 0 instead.", demzip_dll->header.start_of_waveform_data_packet_record);
         demzip_dll->header.start_of_waveform_data_packet_record = 0;
       }
       try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.start_of_waveform_data_packet_record)); } catch(...)
       {
-        sprintf(demzip_dll->error, "writing header.start_of_waveform_data_packet_record");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.start_of_waveform_data_packet_record");
         return 1;
       }
       demzip_dll->header.user_data_in_header_size = demzip_dll->header.header_size - 235;
@@ -2596,6 +2603,11 @@ demzip_write_header(
   }
   else
   {
+    if (demzip_dll->header.header_size < 227)
+    {
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "header_size should at least be 227 but it is only %d", demzip_dll->header.header_size);
+      return 1;
+    }
     demzip_dll->header.user_data_in_header_size = demzip_dll->header.header_size - 227;
   }
 
@@ -2604,31 +2616,31 @@ demzip_write_header(
   {
     if (demzip_dll->header.header_size < 375)
     {
-      sprintf(demzip_dll->error, "for LAS 1.%d header_size should at least be 375 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "for LAS 1.%d header_size should at least be 375 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
       return 1;
     }
     else
     {
       try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.start_of_first_extended_variable_length_record)); } catch(...)
       {
-        sprintf(demzip_dll->error, "writing header.start_of_first_extended_variable_length_record");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.start_of_first_extended_variable_length_record");
         return 1;
       }
       try { demzip_dll->streamout->put32bitsLE((const U8*)&(demzip_dll->header.number_of_extended_variable_length_records)); } catch(...)
       {
-        sprintf(demzip_dll->error, "writing header.number_of_extended_variable_length_records");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.number_of_extended_variable_length_records");
         return 1;
       }
       try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.extended_number_of_point_records)); } catch(...)
       {
-        sprintf(demzip_dll->error, "writing header.extended_number_of_point_records");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.extended_number_of_point_records");
         return 1;
       }
       for (i = 0; i < 15; i++)
       {
         try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.extended_number_of_points_by_return[i])); } catch(...)
         {
-          sprintf(demzip_dll->error, "writing header.extended_number_of_points_by_return[%d]", i);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.extended_number_of_points_by_return[%d]", i);
           return 1;
         }
       }
@@ -2640,24 +2652,24 @@ demzip_write_header(
   {
       if (demzip_dll->header.header_size < 393)
       {
-          sprintf(demzip_dll->error, "for LAS 1.%d header_size should at least be 393 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "for LAS 1.%d header_size should at least be 393 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
           return 1;
       }
       else
       {
           try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.max_gps_time)); } catch (...)
           {
-              sprintf(demzip_dll->error, "writing header.max_gps_time");
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.max_gps_time");
               return 1;
           }
           try { demzip_dll->streamout->put64bitsLE((const U8*)&(demzip_dll->header.min_gps_time)); } catch (...)
           {
-              sprintf(demzip_dll->error, "writing header.min_gps_time");
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.min_gps_time");
               return 1;
           }
           try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.time_offset)); } catch (...)
           {
-              sprintf(demzip_dll->error, "writing header.time_offset");
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.time_offset");
               return 1;
           }
           demzip_dll->header.user_data_in_header_size = demzip_dll->header.header_size - 393;
@@ -2669,7 +2681,7 @@ demzip_write_header(
   {
     try { demzip_dll->streamout->putBytes((const U8*)demzip_dll->header.user_data_in_header, demzip_dll->header.user_data_in_header_size); } catch(...)
     {
-      sprintf(demzip_dll->error, "writing %d bytes of data into header.user_data_in_header", demzip_dll->header.user_data_in_header_size);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing %d bytes of data into header.user_data_in_header", demzip_dll->header.user_data_in_header_size);
       return 1;
     }
   }
@@ -2686,28 +2698,28 @@ demzip_write_header(
 
       try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.vlrs[i].reserved)); } catch(...)
       {
-        sprintf(demzip_dll->error, "writing header.vlrs[%d].reserved", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.vlrs[%d].reserved", i);
         return 1;
       }
 
       try { demzip_dll->streamout->putBytes((const U8*)demzip_dll->header.vlrs[i].user_id, 16); } catch(...)
       {
-        sprintf(demzip_dll->error, "writing header.vlrs[%d].user_id", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.vlrs[%d].user_id", i);
         return 1;
       }
       try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.vlrs[i].record_id)); } catch(...)
       {
-        sprintf(demzip_dll->error, "writing header.vlrs[%d].record_id", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.vlrs[%d].record_id", i);
         return 1;
       }
       try { demzip_dll->streamout->put16bitsLE((const U8*)&(demzip_dll->header.vlrs[i].record_length_after_header)); } catch(...)
       {
-        sprintf(demzip_dll->error, "writing header.vlrs[%d].record_length_after_header", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.vlrs[%d].record_length_after_header", i);
         return 1;
       }
       try { demzip_dll->streamout->putBytes((const U8*)demzip_dll->header.vlrs[i].description, 32); } catch(...)
       {
-        sprintf(demzip_dll->error, "writing header.vlrs[%d].description", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing header.vlrs[%d].description", i);
         return 1;
       }
 
@@ -2717,7 +2729,7 @@ demzip_write_header(
       {
         try { demzip_dll->streamout->putBytes(demzip_dll->header.vlrs[i].data, demzip_dll->header.vlrs[i].record_length_after_header); } catch(...)
         {
-          sprintf(demzip_dll->error, "writing %d bytes of data into header.vlrs[%d].data", demzip_dll->header.vlrs[i].record_length_after_header, i);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing %d bytes of data into header.vlrs[%d].data", demzip_dll->header.vlrs[i].record_length_after_header, i);
           return 1;
         }
       }
@@ -2747,7 +2759,7 @@ demzip_write_header(
   {
     try { demzip_dll->streamout->putBytes((const U8*)demzip_dll->header.user_data_after_header, demzip_dll->header.user_data_after_header_size); } catch(...)
     {
-      sprintf(demzip_dll->error, "writing %u bytes of data into header.user_data_after_header", demzip_dll->header.user_data_after_header_size);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing %u bytes of data into header.user_data_after_header", demzip_dll->header.user_data_after_header_size);
       return 1;
     }
   }
@@ -2766,19 +2778,19 @@ demzip_I32 create_point_writer
   demzip_dll->writer = new LASwritePoint();
   if (demzip_dll->writer == 0)
   {
-    sprintf(demzip_dll->error, "could not alloc LASwritePoint");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc LASwritePoint");
     return 1;
   }
 
   if (!demzip_dll->writer->setup(laszip->num_items, laszip->items, laszip))
   {
-    sprintf(demzip_dll->error, "setup of LASwritePoint failed");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "setup of LASwritePoint failed");
     return 1;
   }
 
   if (!demzip_dll->writer->init(demzip_dll->streamout))
   {
-    sprintf(demzip_dll->error, "init of LASwritePoint failed");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "init of LASwritePoint failed");
     return 1;
   }
 
@@ -2800,7 +2812,7 @@ setup_demzip_items(
   {
     if (!laszip->request_compatibility_mode(1))
     {
-      sprintf(demzip_dll->error, "requesting 'compatibility mode' has failed");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "requesting 'compatibility mode' has failed");
       return 1;
     }
   }
@@ -2809,7 +2821,7 @@ setup_demzip_items(
 
   if (!laszip->setup(point_type, point_size, LASZIP_COMPRESSOR_NONE))
   {
-    sprintf(demzip_dll->error, "invalid combination of point_type %d and point_size %d", (I32)point_type, (I32)point_size);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "invalid combination of point_type %d and point_size %d", (I32)point_type, (I32)point_size);
     return 1;
   }
 
@@ -2820,11 +2832,11 @@ setup_demzip_items(
     delete [] demzip_dll->point_items;
   }
 
-  demzip_dll->point_items = new U8*[laszip->num_items];
+  demzip_dll->point_items = new U8*[laszip->num_items]();
 
   if (demzip_dll->point_items == 0)
   {
-    sprintf(demzip_dll->error, "could not alloc point_items");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc point_items");
     return 1;
   }
 
@@ -2856,7 +2868,7 @@ setup_demzip_items(
       demzip_dll->point_items[i] = (U8*)&(demzip_dll->point.wave_packet);
       break;
     default:
-      sprintf(demzip_dll->error, "unknown LASitem type %d", (I32)laszip->items[i].type);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "unknown LASitem type %d", (I32)laszip->items[i].type);
       return 1;
     }
   }
@@ -2867,7 +2879,7 @@ setup_demzip_items(
     {
       if (!laszip->setup(point_type, point_size, LASZIP_COMPRESSOR_LAYERED_CHUNKED))
       {
-        sprintf(demzip_dll->error, "cannot compress point_type %d with point_size %d using native", (I32)point_type, (I32)point_size);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot compress point_type %d with point_size %d using native", (I32)point_type, (I32)point_size);
         return 1;
       }
     }
@@ -2875,7 +2887,7 @@ setup_demzip_items(
     {
       if (!laszip->setup(point_type, point_size, LASZIP_COMPRESSOR_DEFAULT))
       {
-        sprintf(demzip_dll->error, "cannot compress point_type %d with point_size %d", (I32)point_type, (I32)point_size);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot compress point_type %d with point_size %d", (I32)point_type, (I32)point_size);
         return 1;
       }
     }
@@ -2892,7 +2904,7 @@ setup_demzip_items(
     {
       if (!laszip->set_chunk_size(demzip_dll->set_chunk_size))
       {
-        sprintf(demzip_dll->error, "setting chunk size %d has failed", demzip_dll->set_chunk_size);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "setting chunk size %d has failed", demzip_dll->set_chunk_size);
         return 1;
       }
     }
@@ -2919,19 +2931,19 @@ demzip_open_writer(
   {
     if (file_name == 0)
     {
-      sprintf(demzip_dll->error, "demzip_CHAR pointer 'file_name' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_CHAR pointer 'file_name' is zero");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
@@ -2941,13 +2953,13 @@ demzip_open_writer(
 
     if (demzip_dll->file == 0)
     {
-      sprintf(demzip_dll->error, "cannot open file '%s'", file_name);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot open file '%s'", file_name);
       return 1;
     }
 
     if (setvbuf(demzip_dll->file, NULL, _IOFBF, 262144) != 0)
     {
-      sprintf(demzip_dll->warning, "setvbuf() failed with buffer size 262144\n");
+      snprintf(demzip_dll->warning, sizeof(demzip_dll->warning), "setvbuf() failed with buffer size 262144\n");
     }
 
     // create the outstream
@@ -2959,7 +2971,7 @@ demzip_open_writer(
 
     if (demzip_dll->streamout == 0)
     {
-      sprintf(demzip_dll->error, "could not alloc ByteStreamOutFile");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc ByteStreamOutFile");
       return 1;
     }
 
@@ -3028,7 +3040,7 @@ demzip_open_writer(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_open_writer '%s'", file_name);
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_open_writer '%s'", file_name);
     return 1;
   }
 
@@ -3054,7 +3066,7 @@ demzip_write_point(
       // make sure legacy flags and extended flags are identical
       if ((demzip_dll->point.extended_classification_flags & 0x7) != ((((U8*)&(demzip_dll->point.intensity))[3]) >> 5))
       {
-        sprintf(demzip_dll->error, "legacy flags and extended flags are not identical");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "legacy flags and extended flags are not identical");
         return 1;
       }
 
@@ -3063,7 +3075,7 @@ demzip_write_point(
       {
         if (demzip_dll->point.classification != demzip_dll->point.extended_classification)
         {
-          sprintf(demzip_dll->error, "legacy classification %d and extended classification %d are not consistent", demzip_dll->point.classification, demzip_dll->point.extended_classification);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "legacy classification %d and extended classification %d are not consistent", demzip_dll->point.classification, demzip_dll->point.extended_classification);
           return 1;
         }
       }
@@ -3149,7 +3161,7 @@ demzip_write_point(
     // write the point
     if (!demzip_dll->writer->write(demzip_dll->point_items))
     {
-      sprintf(demzip_dll->error, "writing point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
       return 1;
     }
 
@@ -3157,7 +3169,7 @@ demzip_write_point(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_write_point");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_write_point");
     return 1;
   }
 
@@ -3179,7 +3191,7 @@ demzip_write_indexed_point(
     // write the point
     if (!demzip_dll->writer->write(demzip_dll->point_items))
     {
-      sprintf(demzip_dll->error, "writing point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
       return 1;
     }
     // index the point
@@ -3190,7 +3202,7 @@ demzip_write_indexed_point(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_write_indexed_point");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_write_indexed_point");
     return 1;
   }
 
@@ -3218,7 +3230,7 @@ demzip_update_inventory(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_update_inventory");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_update_inventory");
     return 1;
   }
 
@@ -3239,13 +3251,13 @@ demzip_close_writer(
   {
     if (demzip_dll->writer == 0)
     {
-      sprintf(demzip_dll->error, "closing writer before it was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "closing writer before it was opened");
       return 1;
     }
 
     if (!demzip_dll->writer->done())
     {
-      sprintf(demzip_dll->error, "done of LASwritePoint failed");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "done of LASwritePoint failed");
       return 1;
     }
 
@@ -3264,14 +3276,14 @@ demzip_close_writer(
         demzip_dll->streamout->seek(107);
         if (!demzip_dll->streamout->put32bitsLE((const U8*)&(demzip_dll->inventory->number_of_point_records)))
         {
-          sprintf(demzip_dll->error, "updating demzip_dll->inventory->number_of_point_records");
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->number_of_point_records");
           return 1;
         }
         for (I32 i = 0; i < 5; i++)
         {
           if (!demzip_dll->streamout->put32bitsLE((const U8*)&(demzip_dll->inventory->number_of_points_by_return[i+1])))
           {
-            sprintf(demzip_dll->error, "updating demzip_dll->inventory->number_of_points_by_return[%d]\n", i);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->number_of_points_by_return[%d]\n", i);
             return 1;
           }
         }
@@ -3281,37 +3293,37 @@ demzip_close_writer(
       value = demzip_dll->header.x_scale_factor*demzip_dll->inventory->max_X+demzip_dll->header.x_offset;
       if (!demzip_dll->streamout->put64bitsLE((const U8*)&value))
       {
-        sprintf(demzip_dll->error, "updating demzip_dll->inventory->max_X");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->max_X");
         return 1;
       }
       value = demzip_dll->header.x_scale_factor*demzip_dll->inventory->min_X+demzip_dll->header.x_offset;
       if (!demzip_dll->streamout->put64bitsLE((const U8*)&value))
       {
-        sprintf(demzip_dll->error, "updating demzip_dll->inventory->min_X");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->min_X");
         return 1;
       }
       value = demzip_dll->header.y_scale_factor*demzip_dll->inventory->max_Y+demzip_dll->header.y_offset;
       if (!demzip_dll->streamout->put64bitsLE((const U8*)&value))
       {
-        sprintf(demzip_dll->error, "updating demzip_dll->inventory->max_Y");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->max_Y");
         return 1;
       }
       value = demzip_dll->header.y_scale_factor*demzip_dll->inventory->min_Y+demzip_dll->header.y_offset;
       if (!demzip_dll->streamout->put64bitsLE((const U8*)&value))
       {
-        sprintf(demzip_dll->error, "updating demzip_dll->inventory->min_Y");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->min_Y");
         return 1;
       }
       value = demzip_dll->header.z_scale_factor*demzip_dll->inventory->max_Z+demzip_dll->header.z_offset;
       if (!demzip_dll->streamout->put64bitsLE((const U8*)&value))
       {
-        sprintf(demzip_dll->error, "updating demzip_dll->inventory->max_Z");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->max_Z");
         return 1;
       }
       value = demzip_dll->header.z_scale_factor*demzip_dll->inventory->min_Z+demzip_dll->header.z_offset;
       if (!demzip_dll->streamout->put64bitsLE((const U8*)&value))
       {
-        sprintf(demzip_dll->error, "updating demzip_dll->inventory->min_Z");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->min_Z");
         return 1;
       }
       if (demzip_dll->header.version_minor >= 4) // only update extended counters for LAS 1.4
@@ -3320,7 +3332,7 @@ demzip_close_writer(
         I64 number = demzip_dll->inventory->number_of_point_records;
         if (!demzip_dll->streamout->put64bitsLE((const U8*)&number))
         {
-          sprintf(demzip_dll->error, "updating demzip_dll->inventory->extended_number_of_point_records");
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->extended_number_of_point_records");
           return 1;
         }
         for (I32 i = 0; i < 15; i++)
@@ -3328,7 +3340,7 @@ demzip_close_writer(
           number = demzip_dll->inventory->number_of_points_by_return[i+1];
           if (!demzip_dll->streamout->put64bitsLE((const U8*)&number))
           {
-            sprintf(demzip_dll->error, "updating demzip_dll->inventory->extended_number_of_points_by_return[%d]\n", i);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "updating demzip_dll->inventory->extended_number_of_points_by_return[%d]\n", i);
             return 1;
           }
         }
@@ -3345,7 +3357,7 @@ demzip_close_writer(
 
       if (!demzip_dll->lax_index->write(demzip_dll->lax_file_name))
       {
-        sprintf(demzip_dll->error, "writing LAX file to '%s'", demzip_dll->lax_file_name);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writing LAX file to '%s'", demzip_dll->lax_file_name);
         return 1;
       }
 
@@ -3367,7 +3379,7 @@ demzip_close_writer(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_writer_close");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_writer_close");
     return 1;
   }
 
@@ -3389,13 +3401,13 @@ demzip_exploit_spatial_index(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
@@ -3403,7 +3415,7 @@ demzip_exploit_spatial_index(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_exploit_spatial_index");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_exploit_spatial_index");
     return 1;
   }
 
@@ -3425,13 +3437,13 @@ demzip_decompress_selective(
   {
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
@@ -3439,7 +3451,7 @@ demzip_decompress_selective(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_decompress_selective");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_decompress_selective");
     return 1;
   }
 
@@ -3461,170 +3473,170 @@ demzip_read_header(
   CHAR file_signature[5];
   try { demzip_dll->streamin->getBytes((U8*)file_signature, 4); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.file_signature");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.file_signature");
     return 1;
   }
   if (strncmp(file_signature, "LASF", 4) != 0)
   {
-    sprintf(demzip_dll->error, "wrong file_signature. not a LAS/LAZ file.");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "wrong file_signature. not a LAS/LAZ file.");
     return 1;
   }
   try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.file_source_ID)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.file_source_ID");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.file_source_ID");
     return 1;
   }
   try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.global_encoding)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.global_encoding");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.global_encoding");
     return 1;
   }
   try { demzip_dll->streamin->get32bitsLE((U8*)&(demzip_dll->header.project_ID_GUID_data_1)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.project_ID_GUID_data_1");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.project_ID_GUID_data_1");
     return 1;
   }
   try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.project_ID_GUID_data_2)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.project_ID_GUID_data_2");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.project_ID_GUID_data_2");
     return 1;
   }
   try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.project_ID_GUID_data_3)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.project_ID_GUID_data_3");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.project_ID_GUID_data_3");
     return 1;
   }
   try { demzip_dll->streamin->getBytes((U8*)demzip_dll->header.project_ID_GUID_data_4, 8); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.project_ID_GUID_data_4");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.project_ID_GUID_data_4");
     return 1;
   }
   try { demzip_dll->streamin->getBytes((U8*)&(demzip_dll->header.version_major), 1); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.version_major");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.version_major");
     return 1;
   }
   try { demzip_dll->streamin->getBytes((U8*)&(demzip_dll->header.version_minor), 1); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.version_minor");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.version_minor");
     return 1;
   }
   try { demzip_dll->streamin->getBytes((U8*)demzip_dll->header.system_identifier, 32); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.system_identifier");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.system_identifier");
     return 1;
   }
   try { demzip_dll->streamin->getBytes((U8*)demzip_dll->header.generating_software, 32); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.generating_software");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.generating_software");
     return 1;
   }
   try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.file_creation_day)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.file_creation_day");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.file_creation_day");
     return 1;
   }
   try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.file_creation_year)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.file_creation_year");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.file_creation_year");
     return 1;
   }
   try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.header_size)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.header_size");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.header_size");
     return 1;
   }
   try { demzip_dll->streamin->get32bitsLE((U8*)&(demzip_dll->header.offset_to_point_data)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.offset_to_point_data");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.offset_to_point_data");
     return 1;
   }
   try { demzip_dll->streamin->get32bitsLE((U8*)&(demzip_dll->header.number_of_variable_length_records)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.number_of_variable_length_records");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.number_of_variable_length_records");
     return 1;
   }
   try { demzip_dll->streamin->getBytes((U8*)&(demzip_dll->header.point_data_format), 1); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.point_data_format");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.point_data_format");
     return 1;
   }
   try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.point_data_record_length)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.point_data_record_length");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.point_data_record_length");
     return 1;
   }
   try { demzip_dll->streamin->get32bitsLE((U8*)&(demzip_dll->header.number_of_point_records)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.number_of_point_records");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.number_of_point_records");
     return 1;
   }
   for (i = 0; i < 5; i++)
   {
     try { demzip_dll->streamin->get32bitsLE((U8*)&(demzip_dll->header.number_of_points_by_return[i])); } catch(...)
     {
-      sprintf(demzip_dll->error, "reading header.number_of_points_by_return %d", i);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.number_of_points_by_return %d", i);
       return 1;
     }
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.x_scale_factor)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.x_scale_factor");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.x_scale_factor");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.y_scale_factor)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.y_scale_factor");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.y_scale_factor");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.z_scale_factor)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.z_scale_factor");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.z_scale_factor");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.x_offset)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.x_offset");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.x_offset");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.y_offset)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.y_offset");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.y_offset");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.z_offset)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.z_offset");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.z_offset");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.max_x)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.max_x");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.max_x");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.min_x)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.min_x");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.min_x");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.max_y)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.max_y");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.max_y");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.min_y)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.min_y");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.min_y");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.max_z)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.max_z");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.max_z");
     return 1;
   }
   try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.min_z)); } catch(...)
   {
-    sprintf(demzip_dll->error, "reading header.min_z");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.min_z");
     return 1;
   }
 
@@ -3633,14 +3645,14 @@ demzip_read_header(
   {
     if (demzip_dll->header.header_size < 235)
     {
-      sprintf(demzip_dll->error, "for LAS 1.%d header_size should at least be 235 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "for LAS 1.%d header_size should at least be 235 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
       return 1;
     }
     else
     {
       try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.start_of_waveform_data_packet_record)); } catch(...)
       {
-        sprintf(demzip_dll->error, "reading header.start_of_waveform_data_packet_record");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.start_of_waveform_data_packet_record");
         return 1;
       }
       demzip_dll->header.user_data_in_header_size = demzip_dll->header.header_size - 235;
@@ -3648,6 +3660,11 @@ demzip_read_header(
   }
   else
   {
+    if (demzip_dll->header.header_size < 227)
+    {
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "header_size should at least be 227 but it is only %d", demzip_dll->header.header_size);
+      return 1;
+    }
     demzip_dll->header.user_data_in_header_size = demzip_dll->header.header_size - 227;
   }
 
@@ -3656,31 +3673,31 @@ demzip_read_header(
   {
     if (demzip_dll->header.header_size < 375)
     {
-      sprintf(demzip_dll->error, "for LAS 1.%d header_size should at least be 375 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "for LAS 1.%d header_size should at least be 375 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
       return 1;
     }
     else
     {
       try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.start_of_first_extended_variable_length_record)); } catch(...)
       {
-        sprintf(demzip_dll->error, "reading header.start_of_first_extended_variable_length_record");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.start_of_first_extended_variable_length_record");
         return 1;
       }
       try { demzip_dll->streamin->get32bitsLE((U8*)&(demzip_dll->header.number_of_extended_variable_length_records)); } catch(...)
       {
-        sprintf(demzip_dll->error, "reading header.number_of_extended_variable_length_records");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.number_of_extended_variable_length_records");
         return 1;
       }
       try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.extended_number_of_point_records)); } catch(...)
       {
-        sprintf(demzip_dll->error, "reading header.extended_number_of_point_records");
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.extended_number_of_point_records");
         return 1;
       }
       for (i = 0; i < 15; i++)
       {
         try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.extended_number_of_points_by_return[i])); } catch(...)
         {
-          sprintf(demzip_dll->error, "reading header.extended_number_of_points_by_return[%d]", i);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.extended_number_of_points_by_return[%d]", i);
           return 1;
         }
       }
@@ -3692,7 +3709,7 @@ demzip_read_header(
   {
       if (demzip_dll->header.header_size < 393)
       {
-          sprintf(demzip_dll->error, "for LAS 1.%d header_size should at least be 393 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "for LAS 1.%d header_size should at least be 393 but it is only %d", demzip_dll->header.version_minor, demzip_dll->header.header_size);
           return 1;
       }
       else
@@ -3700,19 +3717,19 @@ demzip_read_header(
           try { demzip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.max_gps_time)); }
           catch (...)
           {
-              sprintf(demzip_dll->error, "reading header.max_gps_time");
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.max_gps_time");
               return 1;
           }
           try { laszip_dll->streamin->get64bitsLE((U8*)&(demzip_dll->header.min_gps_time)); }
           catch (...)
           {
-              sprintf(demzip_dll->error, "reading header.min_gps_time");
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.min_gps_time");
               return 1;
           }
           try { laszip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.time_offset)); }
           catch (...)
           {
-              sprintf(demzip_dll->error, "reading header.time_offset");
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.time_offset");
               return 1;
           }
           demzip_dll->header.user_data_in_header_size = demzip_dll->header.header_size - 393;
@@ -3730,7 +3747,7 @@ demzip_read_header(
 
     try { demzip_dll->streamin->getBytes((U8*)demzip_dll->header.user_data_in_header, demzip_dll->header.user_data_in_header_size); } catch(...)
     {
-      sprintf(demzip_dll->error, "reading %u bytes of data into header.user_data_in_header", demzip_dll->header.user_data_in_header_size);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading %u bytes of data into header.user_data_in_header", demzip_dll->header.user_data_in_header_size);
       return 1;
     }
   }
@@ -3744,11 +3761,11 @@ demzip_read_header(
   {
     U32 i;
 
-    demzip_dll->header.vlrs = (demzip_vlr*)malloc(sizeof(demzip_vlr)*demzip_dll->header.number_of_variable_length_records);
+    demzip_dll->header.vlrs = (demzip_vlr*)calloc(demzip_dll->header.number_of_variable_length_records, sizeof(demzip_vlr));
 
     if (demzip_dll->header.vlrs == 0)
     {
-      sprintf(demzip_dll->error, "allocating %u VLRs", demzip_dll->header.number_of_variable_length_records);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "allocating %u VLRs", demzip_dll->header.number_of_variable_length_records);
       return 1;
     }
 
@@ -3758,7 +3775,7 @@ demzip_read_header(
 
       if (((int)demzip_dll->header.offset_to_point_data - vlrs_size - demzip_dll->header.header_size) < 54)
       {
-        sprintf(demzip_dll->warning, "only %d bytes until point block after reading %d of %d vlrs. skipping remaining vlrs ...", (int)demzip_dll->header.offset_to_point_data - vlrs_size - demzip_dll->header.header_size, i, demzip_dll->header.number_of_variable_length_records);
+        snprintf(demzip_dll->warning, sizeof(demzip_dll->warning), "only %d bytes until point block after reading %d of %d vlrs. skipping remaining vlrs ...", (int)demzip_dll->header.offset_to_point_data - vlrs_size - demzip_dll->header.header_size, i, demzip_dll->header.number_of_variable_length_records);
         demzip_dll->header.number_of_variable_length_records = i;
         break;
       }
@@ -3767,28 +3784,28 @@ demzip_read_header(
 
       try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.vlrs[i].reserved)); } catch(...)
       {
-        sprintf(demzip_dll->error, "reading header.vlrs[%u].reserved", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.vlrs[%u].reserved", i);
         return 1;
       }
 
       try { demzip_dll->streamin->getBytes((U8*)demzip_dll->header.vlrs[i].user_id, 16); } catch(...)
       {
-        sprintf(demzip_dll->error, "reading header.vlrs[%u].user_id", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.vlrs[%u].user_id", i);
         return 1;
       }
       try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.vlrs[i].record_id)); } catch(...)
       {
-        sprintf(demzip_dll->error, "reading header.vlrs[%u].record_id", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.vlrs[%u].record_id", i);
         return 1;
       }
       try { demzip_dll->streamin->get16bitsLE((U8*)&(demzip_dll->header.vlrs[i].record_length_after_header)); } catch(...)
       {
-        sprintf(demzip_dll->error, "reading header.vlrs[%u].record_length_after_header", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.vlrs[%u].record_length_after_header", i);
         return 1;
       }
       try { demzip_dll->streamin->getBytes((U8*)demzip_dll->header.vlrs[i].description, 32); } catch(...)
       {
-        sprintf(demzip_dll->error, "reading header.vlrs[%u].description", i);
+        snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading header.vlrs[%u].description", i);
         return 1;
       }
 
@@ -3800,14 +3817,14 @@ demzip_read_header(
 
       if ((demzip_dll->header.vlrs[i].reserved != 0xAABB) && (demzip_dll->header.vlrs[i].reserved != 0x0))
       {
-        sprintf(demzip_dll->warning,"wrong header.vlrs[%d].reserved: %d != 0xAABB and %d != 0x0", i, demzip_dll->header.vlrs[i].reserved, demzip_dll->header.vlrs[i].reserved);
+        snprintf(demzip_dll->warning, sizeof(demzip_dll->warning),"wrong header.vlrs[%d].reserved: %d != 0xAABB and %d != 0x0", i, demzip_dll->header.vlrs[i].reserved, demzip_dll->header.vlrs[i].reserved);
       }
 
       // make sure there are enough bytes left to read the data of the variable length record before the point block starts
 
       if (((int)demzip_dll->header.offset_to_point_data - vlrs_size - demzip_dll->header.header_size) < demzip_dll->header.vlrs[i].record_length_after_header)
       {
-        sprintf(demzip_dll->warning, "only %d bytes until point block when trying to read %d bytes into header.vlrs[%d].data", (int)demzip_dll->header.offset_to_point_data - vlrs_size - demzip_dll->header.header_size, demzip_dll->header.vlrs[i].record_length_after_header, i);
+        snprintf(demzip_dll->warning, sizeof(demzip_dll->warning), "only %d bytes until point block when trying to read %d bytes into header.vlrs[%d].data", (int)demzip_dll->header.offset_to_point_data - vlrs_size - demzip_dll->header.header_size, demzip_dll->header.vlrs[i].record_length_after_header, i);
         demzip_dll->header.vlrs[i].record_length_after_header = (int)demzip_dll->header.offset_to_point_data - vlrs_size - demzip_dll->header.header_size;
       }
 
@@ -3826,7 +3843,7 @@ demzip_read_header(
 
           if (laszip == 0)
           {
-            sprintf(demzip_dll->error, "could not alloc LASzip");
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc LASzip");
             return 1;
           }
 
@@ -3849,52 +3866,52 @@ demzip_read_header(
 
           try { demzip_dll->streamin->get16bitsLE((U8*)&(laszip->compressor)); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading compressor %d", (I32)laszip->compressor);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading compressor %d", (I32)laszip->compressor);
             return 1;
           }
           try { demzip_dll->streamin->get16bitsLE((U8*)&(laszip->coder)); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading coder %d", (I32)laszip->coder);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading coder %d", (I32)laszip->coder);
             return 1;
           }
           try { demzip_dll->streamin->getBytes((U8*)&(laszip->version_major), 1); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading version_major %d", (I32)laszip->version_major);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading version_major %d", (I32)laszip->version_major);
             return 1;
           }
           try { demzip_dll->streamin->getBytes((U8*)&(laszip->version_minor), 1); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading version_minor %d", (I32)laszip->version_minor);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading version_minor %d", (I32)laszip->version_minor);
             return 1;
           }
           try { demzip_dll->streamin->get16bitsLE((U8*)&(laszip->version_revision)); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading version_revision %d", (I32)laszip->version_revision);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading version_revision %d", (I32)laszip->version_revision);
             return 1;
           }
           try { demzip_dll->streamin->get32bitsLE((U8*)&(laszip->options)); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading options %u", laszip->options);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading options %u", laszip->options);
             return 1;
           }
           try { demzip_dll->streamin->get32bitsLE((U8*)&(laszip->chunk_size)); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading chunk_size %u", laszip->chunk_size);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading chunk_size %u", laszip->chunk_size);
             return 1;
           }
           try { demzip_dll->streamin->get64bitsLE((U8*)&(laszip->number_of_special_evlrs)); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading number_of_special_evlrs %d", (I32)laszip->number_of_special_evlrs);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading number_of_special_evlrs %d", (I32)laszip->number_of_special_evlrs);
             return 1;
           }
           try { demzip_dll->streamin->get64bitsLE((U8*)&(laszip->offset_to_special_evlrs)); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading offset_to_special_evlrs %d", (I32)laszip->offset_to_special_evlrs);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading offset_to_special_evlrs %d", (I32)laszip->offset_to_special_evlrs);
             return 1;
           }
           try { demzip_dll->streamin->get16bitsLE((U8*)&(laszip->num_items)); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading num_items %d", (I32)laszip->num_items);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading num_items %d", (I32)laszip->num_items);
             return 1;
           }
           laszip->items = new LASitem[laszip->num_items];
@@ -3904,18 +3921,18 @@ demzip_read_header(
             U16 type;
             try { demzip_dll->streamin->get16bitsLE((U8*)&type); } catch(...)
             {
-              sprintf(demzip_dll->error, "reading type of item %u", j);
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading type of item %u", j);
               return 1;
             }
             laszip->items[j].type = (LASitem::Type)type;
             try { demzip_dll->streamin->get16bitsLE((U8*)&(laszip->items[j].size)); } catch(...)
             {
-              sprintf(demzip_dll->error, "reading size of item %u", j);
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading size of item %u", j);
               return 1;
             }
             try { demzip_dll->streamin->get16bitsLE((U8*)&(laszip->items[j].version)); } catch(...)
             {
-              sprintf(demzip_dll->error, "reading version of item %u", j);
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading version of item %u", j);
               return 1;
             }
           }
@@ -3926,7 +3943,7 @@ demzip_read_header(
 
           try { demzip_dll->streamin->getBytes(demzip_dll->header.vlrs[i].data, demzip_dll->header.vlrs[i].record_length_after_header); } catch(...)
           {
-            sprintf(demzip_dll->error, "reading %d bytes of data into header.vlrs[%u].data", (I32)demzip_dll->header.vlrs[i].record_length_after_header, i);
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading %d bytes of data into header.vlrs[%u].data", (I32)demzip_dll->header.vlrs[i].record_length_after_header, i);
             return 1;
           }
         }
@@ -3965,6 +3982,11 @@ demzip_read_header(
 
   // load any number of user-defined bytes that might have been added after the header
 
+  if (demzip_dll->header.offset_to_point_data < ((I64)vlrs_size + demzip_dll->header.header_size))
+  {
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "offset_to_point_data (%u) is smaller than header_size (%u) plus vlrs_size (%u)", demzip_dll->header.offset_to_point_data, (U32)demzip_dll->header.header_size, vlrs_size);
+    return 1;
+  }
   demzip_dll->header.user_data_after_header_size = (I32)demzip_dll->header.offset_to_point_data - vlrs_size - demzip_dll->header.header_size;
   if (demzip_dll->header.user_data_after_header_size)
   {
@@ -3976,7 +3998,7 @@ demzip_read_header(
 
     try { demzip_dll->streamin->getBytes((U8*)demzip_dll->header.user_data_after_header, demzip_dll->header.user_data_after_header_size); } catch(...)
     {
-      sprintf(demzip_dll->error, "reading %u bytes of data into header.user_data_after_header", demzip_dll->header.user_data_after_header_size);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading %u bytes of data into header.user_data_after_header", demzip_dll->header.user_data_after_header_size);
       return 1;
     }
   }
@@ -3987,7 +4009,7 @@ demzip_read_header(
   {
     if (!laszip)
     {
-      sprintf(demzip_dll->error, "this file was compressed with an experimental version of LASzip. contact 'info@rapidlasso.de' for assistance");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "this file was compressed with an experimental version of LASzip. contact 'info@rapidlasso.de' for assistance");
       return 1;
     }
     demzip_dll->header.point_data_format &= 127;
@@ -4001,7 +4023,7 @@ demzip_read_header(
     *is_compressed = 1;
     if (!laszip->check(demzip_dll->header.point_data_record_length))
     {
-      sprintf(demzip_dll->error, "%s upgrade to the latest release of LASzip or contact 'info@rapidlasso.de' for assistance", laszip->get_error());
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "%s upgrade to the latest release of LASzip or contact 'info@rapidlasso.de' for assistance", laszip->get_error());
       return 1;
     }
   }
@@ -4012,12 +4034,12 @@ demzip_read_header(
     laszip = new LASzip;
     if (laszip == 0)
     {
-      sprintf(demzip_dll->error, "could not alloc LASzip");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc LASzip");
       return 1;
     }
     if (!laszip->setup(demzip_dll->header.point_data_format, demzip_dll->header.point_data_record_length, LASZIP_COMPRESSOR_NONE))
     {
-      sprintf(demzip_dll->error, "invalid combination of point_data_format %d and point_data_record_length %d", (I32)demzip_dll->header.point_data_format, (I32)demzip_dll->header.point_data_record_length);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "invalid combination of point_data_format %d and point_data_record_length %d", (I32)demzip_dll->header.point_data_format, (I32)demzip_dll->header.point_data_record_length);
       return 1;
     }
   }
@@ -4029,11 +4051,11 @@ demzip_read_header(
     delete [] demzip_dll->point_items;
   }
 
-  demzip_dll->point_items = new U8*[laszip->num_items];
+  demzip_dll->point_items = new U8*[laszip->num_items]();
 
   if (demzip_dll->point_items == 0)
   {
-    sprintf(demzip_dll->error, "could not alloc point_items");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc point_items");
     return 1;
   }
 
@@ -4065,7 +4087,7 @@ demzip_read_header(
       demzip_dll->point_items[i] = (U8*)&(demzip_dll->point.wave_packet);
       break;
     default:
-      sprintf(demzip_dll->error, "unknown LASitem type %d", (I32)laszip->items[i].type);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "unknown LASitem type %d", (I32)laszip->items[i].type);
       return 1;
     }
   }
@@ -4191,7 +4213,7 @@ demzip_read_header(
 
           if (demzip_remove_vlr(demzip_dll, "lascompatible\0\0", 22204))
           {
-            sprintf(demzip_dll->error, "removing the compatibility VLR");
+            snprintf(demzip_dll->error, sizeof(demzip_dll->error), "removing the compatibility VLR");
             return 1;
           }
 
@@ -4209,7 +4231,7 @@ demzip_read_header(
           {
             if (demzip_add_vlr(demzip_dll, "LASF_Spec\0\0\0\0\0\0", 4, (demzip_U16)(attributer.number_attributes*sizeof(LASattribute)), 0, (demzip_U8*)attributer.attributes))
             {
-              sprintf(demzip_dll->error, "rewriting the extra bytes VLR without 'LAS 1.4 compatibility mode' attributes");
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "rewriting the extra bytes VLR without 'LAS 1.4 compatibility mode' attributes");
               return 1;
             }
           }
@@ -4217,7 +4239,7 @@ demzip_read_header(
           {
             if (demzip_remove_vlr(demzip_dll, "LASF_Spec\0\0\0\0\0\0", 4))
             {
-              sprintf(demzip_dll->error, "removing the LAS 1.4 attribute VLR");
+              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "removing the LAS 1.4 attribute VLR");
               return 1;
             }
           }
@@ -4308,19 +4330,19 @@ demzip_read_header(
   demzip_dll->reader = new LASreadPoint(demzip_dll->las14_decompress_selective);
   if (demzip_dll->reader == 0)
   {
-    sprintf(demzip_dll->error, "could not alloc LASreadPoint");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc LASreadPoint");
     return 1;
   }
 
   if (!demzip_dll->reader->setup(laszip->num_items, laszip->items, laszip))
   {
-    sprintf(demzip_dll->error, "setup of LASreadPoint failed");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "setup of LASreadPoint failed");
     return 1;
   }
 
   if (!demzip_dll->reader->init(demzip_dll->streamin))
   {
-    sprintf(demzip_dll->error, "init of LASreadPoint failed");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "init of LASreadPoint failed");
     return 1;
   }
 
@@ -4350,25 +4372,25 @@ demzip_open_reader(
   {
     if (file_name == 0)
     {
-      sprintf(demzip_dll->error, "demzip_CHAR pointer 'file_name' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_CHAR pointer 'file_name' is zero");
       return 1;
     }
 
     if (is_compressed == 0)
     {
-      sprintf(demzip_dll->error, "demzip_BOOL pointer 'is_compressed' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_BOOL pointer 'is_compressed' is zero");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
@@ -4378,13 +4400,13 @@ demzip_open_reader(
 
     if (demzip_dll->file == 0)
     {
-      sprintf(demzip_dll->error, "cannot open file '%s'", file_name);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "cannot open file '%s'", file_name);
       return 1;
     }
 
     if (setvbuf(demzip_dll->file, NULL, _IOFBF, 262144) != 0)
     {
-      sprintf(demzip_dll->warning, "setvbuf() failed with buffer size 262144\n");
+      snprintf(demzip_dll->warning, sizeof(demzip_dll->warning), "setvbuf() failed with buffer size 262144\n");
     }
 
     if (IS_LITTLE_ENDIAN())
@@ -4394,7 +4416,7 @@ demzip_open_reader(
 
     if (demzip_dll->streamin == 0)
     {
-      sprintf(demzip_dll->error, "could not alloc ByteStreamInFile");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc ByteStreamInFile");
       return 1;
     }
 
@@ -4420,7 +4442,7 @@ demzip_open_reader(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_open_reader");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_open_reader");
     return 1;
   }
 
@@ -4443,25 +4465,25 @@ demzip_has_spatial_index(
   {
     if (is_indexed == 0)
     {
-      sprintf(demzip_dll->error, "demzip_BOOL pointer 'is_indexed' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_BOOL pointer 'is_indexed' is zero");
       return 1;
     }
 
     if (demzip_dll->reader == 0)
     {
-      sprintf(demzip_dll->error, "reader is not open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is not open");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
     if (demzip_dll->lax_exploit == 0)
     {
-      sprintf(demzip_dll->error, "exploiting of spatial indexing not enabled before opening reader");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "exploiting of spatial indexing not enabled before opening reader");
       return 1;
     }
 
@@ -4486,7 +4508,7 @@ demzip_has_spatial_index(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_have_spatial_index");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_have_spatial_index");
     return 1;
   }
 
@@ -4512,19 +4534,19 @@ demzip_inside_rectangle(
   {
     if (demzip_dll->reader == 0)
     {
-      sprintf(demzip_dll->error, "reader is not open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is not open");
       return 1;
     }
 
     if (is_empty == 0)
     {
-      sprintf(demzip_dll->error, "demzip_BOOL pointer 'is_empty' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_BOOL pointer 'is_empty' is zero");
       return 1;
     }
 
     if (demzip_dll->lax_exploit == FALSE)
     {
-      sprintf(demzip_dll->error, "exploiting of spatial indexing not enabled before opening reader");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "exploiting of spatial indexing not enabled before opening reader");
       return 1;
     }
 
@@ -4560,7 +4582,7 @@ demzip_inside_rectangle(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_inside_rectangle");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_inside_rectangle");
     return 1;
   }
 
@@ -4583,14 +4605,14 @@ demzip_seek_point(
     // seek to the point
     if (!demzip_dll->reader->seek((U32)demzip_dll->p_count, (U32)index))
     {
-      sprintf(demzip_dll->error, "seeking from index %lld to index %lld for file with %lld points", demzip_dll->p_count, index, demzip_dll->npoints);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "seeking from index %lld to index %lld for file with %lld points", demzip_dll->p_count, index, demzip_dll->npoints);
       return 1;
     }
     demzip_dll->p_count = index;
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_seek_point");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_seek_point");
     return 1;
   }
 
@@ -4612,7 +4634,7 @@ demzip_read_point(
     // read the point
     if (!demzip_dll->reader->read(demzip_dll->point_items))
     {
-      sprintf(demzip_dll->error, "reading point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
       return 1;
     }
 
@@ -4661,7 +4683,7 @@ demzip_read_point(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_read_point");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_read_point");
     return 1;
   }
 
@@ -4718,7 +4740,7 @@ demzip_read_inside_point(
       {
         if (demzip_dll->p_count < demzip_dll->npoints)
         {
-          sprintf(demzip_dll->error, "reading point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reading point %lld of %lld total points", demzip_dll->p_count, demzip_dll->npoints);
           return 1;
         }
       }
@@ -4726,7 +4748,7 @@ demzip_read_inside_point(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_read_inside_point");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_read_inside_point");
     return 1;
   }
 
@@ -4746,13 +4768,13 @@ demzip_close_reader(
   {
     if (demzip_dll->reader == 0)
     {
-      sprintf(demzip_dll->error, "closing reader before it was opened");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "closing reader before it was opened");
       return 1;
     }
 
     if (!demzip_dll->reader->done())
     {
-      sprintf(demzip_dll->error, "done of LASreadPoint failed");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "done of LASreadPoint failed");
       return 1;
     }
 
@@ -4779,7 +4801,7 @@ demzip_close_reader(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_close_reader");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_close_reader");
     return 1;
   }
 
@@ -4804,19 +4826,19 @@ demzip_open_reader_stream(
   {
     if (is_compressed == 0)
     {
-      sprintf(demzip_dll->error, "demzip_BOOL pointer 'is_compressed' is zero");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "demzip_BOOL pointer 'is_compressed' is zero");
       return 1;
     }
 
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
@@ -4829,7 +4851,7 @@ demzip_open_reader_stream(
 
     if (demzip_dll->streamin == 0)
     {
-      sprintf(demzip_dll->error, "could not alloc ByteStreamInIstream");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc ByteStreamInIstream");
       return 1;
     }
 
@@ -4837,7 +4859,7 @@ demzip_open_reader_stream(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_open_reader");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_open_reader");
     return 1;
   }
 }
@@ -4862,13 +4884,13 @@ demzip_open_writer_stream(
   {
     if (demzip_dll->writer)
     {
-      sprintf(demzip_dll->error, "writer is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "writer is already open");
       return 1;
     }
 
     if (demzip_dll->reader)
     {
-      sprintf(demzip_dll->error, "reader is already open");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reader is already open");
       return 1;
     }
 
@@ -4881,7 +4903,7 @@ demzip_open_writer_stream(
 
     if (demzip_dll->streamout == 0)
     {
-      sprintf(demzip_dll->error, "could not alloc ByteStreamOutOstream");
+      snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc ByteStreamOutOstream");
       return 1;
     }
 
@@ -4940,7 +4962,7 @@ demzip_open_writer_stream(
   }
   catch (...)
   {
-    sprintf(demzip_dll->error, "internal error in demzip_open_writer_stream.");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "internal error in demzip_open_writer_stream.");
     return 1;
   }
   demzip_dll->error[0] = '\0';
@@ -4975,7 +4997,7 @@ demzip_create_demzip_vlr(
 
   if (out == 0)
   {
-    sprintf(demzip_dll->error, "could not alloc ByteStreamOutArray");
+    snprintf(demzip_dll->error, sizeof(demzip_dll->error), "could not alloc ByteStreamOutArray");
     return 1;
   }
 

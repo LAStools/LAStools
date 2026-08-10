@@ -567,6 +567,11 @@ BOOL LASreaderBuffered::copy_point_from_buffer()
     U32 buffer_count = (point_count / points_per_buffer);
     current_buffer = buffers[buffer_count];
   }
+  if (current_buffer == 0)
+  {
+    laserror("buffered point %u was never stored (out of memory?)", point_count);
+    return FALSE;
+  }
   point.copy_from(&(current_buffer[point_count_in_buffer*point.total_point_size]));
   point_count++;
   return TRUE;

@@ -336,7 +336,7 @@ FILE* fopen_compressed(const char* filename, const char* mode, bool* piped)
   FILE* file;
   len = (int)strlen(filename);
 
-  if (strcmp(filename+len-3, ".gz") == 0)
+  if ((len >= 3) && (strcmp(filename+len-3, ".gz") == 0))
   {
 #ifdef _WIN32
     file = fopenGzipped(filename, mode);
@@ -346,7 +346,7 @@ FILE* fopen_compressed(const char* filename, const char* mode, bool* piped)
     return 0;
 #endif
   }
-  else if (strcmp(filename+len-4, ".zip") == 0)
+  else if ((len >= 4) && (strcmp(filename+len-4, ".zip") == 0))
   {
 #ifdef _WIN32
     file = fopenZIPped(filename, mode);
@@ -356,7 +356,7 @@ FILE* fopen_compressed(const char* filename, const char* mode, bool* piped)
     return 0;
 #endif
   }
-  else if (strcmp(filename+len-3, ".7z") == 0)
+  else if ((len >= 3) && (strcmp(filename+len-3, ".7z") == 0))
   {
 #ifdef _WIN32
     file = fopen7zipped(filename, mode);
@@ -366,7 +366,7 @@ FILE* fopen_compressed(const char* filename, const char* mode, bool* piped)
     return 0;
 #endif
   }
-  else if (strcmp(filename+len-4, ".rar") == 0)
+  else if ((len >= 4) && (strcmp(filename+len-4, ".rar") == 0))
   {
 #ifdef _WIN32
     file = fopenRARed(filename, mode);

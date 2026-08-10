@@ -300,28 +300,38 @@ void LASinterval::merge_intervals(U32 maximum_intervals)
 void LASinterval::get_cells()
 {
   last_index = I32_MIN;
+  last_index_valid = FALSE;
   current_cell = 0;
 }
 
 BOOL LASinterval::has_cells()
 {
   my_cell_hash::iterator hash_element;
-  if (last_index == I32_MIN)
+  if (!last_index_valid)
   {
     hash_element = ((my_cell_hash*)cells)->begin();
   }
   else
   {
     hash_element = ((my_cell_hash*)cells)->find(last_index);
+    if (hash_element == ((my_cell_hash*)cells)->end())
+    {
+      last_index = I32_MIN;
+      last_index_valid = FALSE;
+      current_cell = 0;
+      return FALSE;
+    }
     hash_element++;
   }
   if (hash_element == ((my_cell_hash*)cells)->end())
   {
     last_index = I32_MIN;
+    last_index_valid = FALSE;
     current_cell = 0;
     return FALSE;
   }
   last_index = (*hash_element).first;
+  last_index_valid = TRUE;
   index = (*hash_element).first;
   full = (*hash_element).second->full;
   total = (*hash_element).second->total;
@@ -508,6 +518,7 @@ LASinterval::LASinterval(const U32 threshold)
   this->threshold = threshold;
   number_intervals = 0;
   last_index = I32_MIN;
+  last_index_valid = FALSE;
   last_cell = 0;
   current_cell = 0;
   merged_cells = 0;
@@ -617,7 +628,15 @@ BOOL LASinterval::read(ByteStreamIn* stream)
     }
     // create cell and insert into hash
     LASintervalStartCell* start_cell = new LASintervalStartCell();
-    ((my_cell_hash*)cells)->insert(my_cell_hash::value_type(cell_index, start_cell));
+    std::pair<my_cell_hash::iterator, bool> insert_result =
+        ((my_cell_hash*)cells)->insert(my_cell_hash::value_type(cell_index, start_cell));
+    const BOOL cell_is_duplicate = (insert_result.second == false);
+
+    if (cell_is_duplicate)
+    {
+      LASMessage(LAS_WARNING, "(LASinterval): cell index %d appears more than once, ignoring the repeated entry", cell_index);
+    }
+
     LASintervalCell* cell = start_cell;
     // read number of intervals in cell
     U32 number_intervals;
@@ -655,9 +674,14 @@ BOOL LASinterval::read(ByteStreamIn* stream)
           laserror("(LASinterval): reading end %llu of interval", cell->end);
           return FALSE;
         }
+        if (cell->end < cell->start)
+        {
+          laserror("(LASinterval): interval end %llu before start %llu", cell->end, cell->start);
+          return FALSE;
+        }
         start_cell->total += (cell->end - cell->start + 1);
         number_intervals--;
-        if (number_intervals) {
+        if (number_intervals && !cell_is_duplicate) {
           cell->next = new LASintervalCell();
           cell = cell->next;
         }
@@ -694,14 +718,24 @@ BOOL LASinterval::read(ByteStreamIn* stream)
         }
         cell->end = end32;
 
+        if (cell->end < cell->start)
+        {
+          laserror("(LASinterval): interval end %llu before start %llu", cell->end, cell->start);
+          return FALSE;
+        }
         start_cell->total += (cell->end - cell->start + 1);
         number_intervals--;
-        if (number_intervals) {
+        if (number_intervals && !cell_is_duplicate) {
           cell->next = new LASintervalCell();
           cell = cell->next;
         }
       }
     }
+    if (cell_is_duplicate)
+    {
+      delete start_cell;
+    }
+
     number_cells--;
   }
 

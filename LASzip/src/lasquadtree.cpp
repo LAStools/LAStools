@@ -449,8 +449,8 @@ U32 LASquadtree::get_level_index(U32 cell_index) const
 // returns the level the cell index
 U32 LASquadtree::get_level(U32 cell_index) const
 {
-  int level = 0;
-  while (cell_index >= level_offset[level+1]) level++;
+  U32 level = 0;
+  while ((level < 15) && (cell_index >= level_offset[level+1])) level++;
   return level;
 }
 
@@ -504,7 +504,7 @@ void LASquadtree::raster_occupancy(BOOL(*does_cell_exist)(I32), U32* data, U32 m
   U32 adaptive_pos = cell_index/32;
   U32 adaptive_bit = ((U32)1) << (cell_index%32);
   // have we reached a leaf
-  if (adaptive[adaptive_pos] & adaptive_bit) // interior node
+  if ((adaptive_pos < adaptive_alloc) && (adaptive[adaptive_pos] & adaptive_bit)) // interior node
   {
     if (level < stop_level) // do we need to continue
     {
@@ -619,6 +619,11 @@ BOOL LASquadtree::read(ByteStreamIn* stream)
 //    laserror("(LASquadtree): wrong signature %4s instead of 'LASV'", signature);
 //    return FALSE;
     levels = ((U32*)signature)[0];
+    if (levels > 15)
+    {
+      laserror("(LASquadtree): levels %u out of range (max 15)", levels);
+      return FALSE;
+    }
   }
   else
   {
@@ -631,6 +636,11 @@ BOOL LASquadtree::read(ByteStreamIn* stream)
     try { stream->get32bitsLE((U8*)&levels); } catch(...)
     {
       laserror("(LASquadtree): reading levels");
+      return FALSE;
+    }
+    if (levels > 15)
+    {
+      laserror("(LASquadtree): levels %u out of range (max 15)", levels);
       return FALSE;
     }
   }
@@ -750,6 +760,12 @@ BOOL LASquadtree::write(ByteStreamOut* stream) const
 // create or finalize the cell (in the spatial hierarchy) 
 BOOL LASquadtree::manage_cell(const U32 cell_index, const BOOL finalize)
 {
+  U32 max_cell_index = (sub_level ? level_offset[16] - 1 : get_max_cell_index());
+  if (cell_index > max_cell_index)
+  {
+    laserror("(LASquadtree): cell index %u out of range (max %u)", cell_index, max_cell_index);
+    return FALSE;
+  }
   U32 adaptive_pos = cell_index/32;
   U32 adaptive_bit = ((U32)1) << (cell_index%32);
   if (adaptive_pos >= adaptive_alloc)
@@ -757,18 +773,26 @@ BOOL LASquadtree::manage_cell(const U32 cell_index, const BOOL finalize)
     if (adaptive)
     {
       size_t n_pos = (size_t)adaptive_pos * 2;
-      adaptive = (U32*)realloc_las(adaptive, n_pos * sizeof(U32));
+      U32* new_adaptive = (U32*)realloc_las(adaptive, n_pos * sizeof(U32));
+      if (new_adaptive == 0)
+      {
+        laserror("(LASquadtree): cannot reallocate %u adaptive entries", (U32)n_pos);
+        return FALSE;
+      }
+      adaptive = new_adaptive;
       for (size_t i = adaptive_alloc; i < n_pos; i++) adaptive[i] = 0;
       adaptive_alloc = n_pos;
     }
     else
     {
-#pragma warning(push)
-#pragma warning(disable : 6011)
       adaptive = (U32*)malloc_las(((size_t)adaptive_pos + 1) * sizeof(U32));
+      if (adaptive == 0)
+      {
+        laserror("(LASquadtree): cannot allocate %u adaptive entries", adaptive_pos + 1);
+        return FALSE;
+      }
       for (size_t i = adaptive_alloc; i <= adaptive_pos; i++) adaptive[i] = 0;
       adaptive_alloc = (size_t)adaptive_pos + 1;
-#pragma warning(pop)
     }
   }
   adaptive[adaptive_pos] &= ~adaptive_bit;
@@ -782,6 +806,7 @@ BOOL LASquadtree::manage_cell(const U32 cell_index, const BOOL finalize)
     index = get_cell_index(level_index, level);
     adaptive_pos = index/32;
     adaptive_bit = ((U32)1) << (index%32);
+    if (adaptive_pos >= adaptive_alloc) break;
     if (adaptive[adaptive_pos] & adaptive_bit) break;
     adaptive[adaptive_pos] |= adaptive_bit;
   }
@@ -991,7 +1016,7 @@ void LASquadtree::intersect_rectangle_with_cells_adaptive(const F64 r_min_x, con
   U32 cell_index = get_cell_index(level_index, level);
   U32 adaptive_pos = cell_index/32;
   U32 adaptive_bit = ((U32)1) << (cell_index%32);
-  if ((level < levels) && (adaptive[adaptive_pos] & adaptive_bit))
+  if ((level < levels) && (adaptive_pos < adaptive_alloc) && (adaptive[adaptive_pos] & adaptive_bit))
   {
     level++;
     level_index <<= 2;
@@ -1160,7 +1185,7 @@ void LASquadtree::intersect_tile_with_cells_adaptive(const F32 ll_x, const F32 l
   U32 cell_index = get_cell_index(level_index, level);
   U32 adaptive_pos = cell_index/32;
   U32 adaptive_bit = ((U32)1) << (cell_index%32);
-  if ((level < levels) && (adaptive[adaptive_pos] & adaptive_bit))
+  if ((level < levels) && (adaptive_pos < adaptive_alloc) && (adaptive[adaptive_pos] & adaptive_bit))
   {
     level++;
     level_index <<= 2;
@@ -1332,7 +1357,7 @@ void LASquadtree::intersect_circle_with_cells_adaptive(const F64 center_x, const
   U32 cell_index = get_cell_index(level_index, level);
   U32 adaptive_pos = cell_index/32;
   U32 adaptive_bit = ((U32)1) << (cell_index%32);
-  if ((level < levels) && (adaptive[adaptive_pos] & adaptive_bit))
+  if ((level < levels) && (adaptive_pos < adaptive_alloc) && (adaptive[adaptive_pos] & adaptive_bit))
   {
     level++;
     level_index <<= 2;
@@ -1517,6 +1542,12 @@ BOOL LASquadtree::has_more_cells()
 
 BOOL LASquadtree::setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, F32 cell_size)
 {
+  if (cell_size <= 0.0f)
+  {
+    laserror("cell size %g must be positive", cell_size);
+    return FALSE;
+  }
+
   this->cell_size = cell_size;
   this->sub_level = 0;
   this->sub_level_index = 0;
@@ -1568,6 +1599,12 @@ BOOL LASquadtree::setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, 
 
 BOOL LASquadtree::setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, F32 cell_size, F32 offset_x, F32 offset_y)
 {
+  if (cell_size <= 0.0f)
+  {
+    laserror("cell size %g must be positive", cell_size);
+    return FALSE;
+  }
+
   this->cell_size = cell_size;
   this->sub_level = 0;
   this->sub_level_index = 0;
@@ -1619,6 +1656,11 @@ BOOL LASquadtree::setup(F64 bb_min_x, F64 bb_max_x, F64 bb_min_y, F64 bb_max_y, 
 
 BOOL LASquadtree::tiling_setup(F32 min_x, F32 max_x, F32 min_y, F32 max_y, U32 levels)
 {
+  if (levels > 15)
+  {
+    laserror("(LASquadtree): levels %u out of range (max 15)", levels);
+    return FALSE;
+  }
   this->min_x = min_x;
   this->max_x = max_x;
   this->min_y = min_y;
@@ -1631,6 +1673,11 @@ BOOL LASquadtree::tiling_setup(F32 min_x, F32 max_x, F32 min_y, F32 max_y, U32 l
 
 BOOL LASquadtree::subtiling_setup(F32 min_x, F32 max_x, F32 min_y, F32 max_y, U32 sub_level, U32 sub_level_index, U32 levels)
 {
+  if ((levels > 15) || (sub_level > 15) || ((sub_level + levels) > 15))
+  {
+    laserror("(LASquadtree): sub_level %u plus levels %u out of range (max 15)", sub_level, levels);
+    return FALSE;
+  }
   this->min_x = min_x;
   this->max_x = max_x;
   this->min_y = min_y;

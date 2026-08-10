@@ -339,6 +339,7 @@ class LASLIB_DLL LASpoint {
           this->point[i] = extra_bytes;
           break;
         default:
+          clean();
           return FALSE;
       }
     }
@@ -1066,10 +1067,8 @@ class LASLIB_DLL LASpoint {
   // generic functions for attributes in extra bytes
 
   inline BOOL has_attribute(U32 index) const {
-    if (attributer) {
-      if (((I32)index) < attributer->number_attributes) {
-        return TRUE;
-      }
+    if (attributer && (attributer->number_attributes > 0) && (index < (U32)attributer->number_attributes)) {
+      return TRUE;
     }
     return FALSE;
   };

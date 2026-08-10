@@ -128,44 +128,49 @@ BOOL LASwriterWRL::open(FILE* file, const LASheader* header, const CHAR* parse_s
   return TRUE;
 }
 
-static void lidardouble2string(CHAR* string, double value)
+static void lidardouble2string(CHAR* string, size_t stringsz, double value)
 {
-  int len;
-  len = sprintf(string, "%.15f", value) - 1;
-  while (string[len] == '0') len--;
+  int n = snprintf(string, stringsz, "%.15f", value);
+  if (n <= 0 || (size_t)n >= stringsz)
+  {
+    string[stringsz - 1] = '\0';
+    return;
+  }
+  int len = n - 1;
+  while (len > 0 && string[len] == '0') len--;
   if (string[len] != '.') len++;
   string[len] = '\0';
 }
 
-static void lidardouble2string(CHAR* string, double value, double precision)
+static void lidardouble2string(CHAR* string, size_t stringsz, double value, double precision)
 {
   if (precision == 0.1)
-    sprintf(string, "%.1f", value);
+    snprintf(string, stringsz, "%.1f", value);
   else if (precision == 0.01)
-    sprintf(string, "%.2f", value);
+    snprintf(string, stringsz, "%.2f", value);
   else if (precision == 0.001)
-    sprintf(string, "%.3f", value);
+    snprintf(string, stringsz, "%.3f", value);
   else if (precision == 0.0001)
-    sprintf(string, "%.4f", value);
+    snprintf(string, stringsz, "%.4f", value);
   else if (precision == 0.00001)
-    sprintf(string, "%.5f", value);
+    snprintf(string, stringsz, "%.5f", value);
   else if (precision == 0.000001)
-    sprintf(string, "%.6f", value);
+    snprintf(string, stringsz, "%.6f", value);
   else if (precision == 0.0000001)
-    sprintf(string, "%.7f", value);
+    snprintf(string, stringsz, "%.7f", value);
   else if (precision == 0.00000001)
-    sprintf(string, "%.8f", value);
+    snprintf(string, stringsz, "%.8f", value);
   else if (precision == 0.000000001)
-    sprintf(string, "%.9f", value);
+    snprintf(string, stringsz, "%.9f", value);
   else
-    lidardouble2string(string, value);
+    lidardouble2string(string, stringsz, value);
 }
 
 BOOL LASwriterWRL::write_point(const LASpoint* point)
 {
-  lidardouble2string(printstring, header->get_x(point->get_X()), header->x_scale_factor); fprintf(file, "%s ", printstring);
-  lidardouble2string(printstring, header->get_y(point->get_Y()), header->y_scale_factor); fprintf(file, "%s ", printstring);
-  lidardouble2string(printstring, header->get_z(point->get_Z()), header->z_scale_factor); fprintf(file, "%s\012", printstring);
+  lidardouble2string(printstring, sizeof(printstring), header->get_x(point->get_X()), header->x_scale_factor); fprintf(file, "%s ", printstring);
+  lidardouble2string(printstring, sizeof(printstring), header->get_y(point->get_Y()), header->y_scale_factor); fprintf(file, "%s ", printstring);
+  lidardouble2string(printstring, sizeof(printstring), header->get_z(point->get_Z()), header->z_scale_factor); fprintf(file, "%s\012", printstring);
   if (rgb)
   {
     if (p_count == rgb_alloc)

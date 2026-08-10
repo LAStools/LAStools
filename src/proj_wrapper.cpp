@@ -61,12 +61,12 @@ PJ_CONTEXT* my_proj_context_create() {
 
 /// Wrapper for proj_context_destroy
 void my_proj_context_destroy(PJ_CONTEXT* ctx) {
-  proj_context_destroy_ptr(ctx);
+  if (proj_context_destroy_ptr) proj_context_destroy_ptr(ctx);
 }
 
 /// Wrapper for proj_context_destroy
 void my_proj_destroy(PJ* crs) {
-  proj_destroy_ptr(crs);
+  if (proj_destroy_ptr) proj_destroy_ptr(crs);
 }
 
 /// Wrapper for proj_create
@@ -76,12 +76,12 @@ PJ* my_proj_create(PJ_CONTEXT* ctx, const char* crs) {
 
 /// Wrapper for proj_context_errno
 int my_proj_context_errno(PJ_CONTEXT* ctx) {
-  return proj_context_errno_ptr(ctx);
+  return proj_context_errno_ptr ? proj_context_errno_ptr(ctx) : 0;
 }
 
 /// Wrapper for proj_context_errno_string
 const char* my_proj_context_errno_string(PJ_CONTEXT* ctx, int err_no) {
-  return proj_context_errno_string_ptr(ctx, err_no);
+  return proj_context_errno_string_ptr ? proj_context_errno_string_ptr(ctx, err_no) : nullptr;
 }
 
 /// Wrapper for proj_get_type

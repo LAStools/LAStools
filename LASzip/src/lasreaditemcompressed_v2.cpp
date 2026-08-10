@@ -298,6 +298,8 @@ BOOL LASreadItemCompressed_GPSTIME11_v2::init(const U8* item, U32& context)
 inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item, U32& context)
 {
   I32 multi;
+  for (;;)
+  {
   if (last_gpstime_diff[last] == 0) // if the last integer difference was zero
   {
     multi = dec->decodeSymbol(m_gpstime_0diff);
@@ -305,7 +307,7 @@ inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item, U32& context)
     {
       last_gpstime_diff[last] = ic_gpstime->decompress(0, 0);
       last_gpstime[last].i64 += last_gpstime_diff[last];
-      multi_extreme_counter[last] = 0; 
+      multi_extreme_counter[last] = 0;
     }
     else if (multi == 2) // the difference is huge
     {
@@ -315,12 +317,12 @@ inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item, U32& context)
       last_gpstime[next].u64 |= dec->readInt();
       last = next;
       last_gpstime_diff[last] = 0;
-      multi_extreme_counter[last] = 0; 
+      multi_extreme_counter[last] = 0;
     }
     else if (multi > 2) // we switch to another sequence
     {
       last = (last+multi-2)&3;
-      read(item, context);
+      continue;
     }
   }
   else
@@ -394,8 +396,10 @@ inline void LASreadItemCompressed_GPSTIME11_v2::read(U8* item, U32& context)
     else if (multi >=  LASZIP_GPSTIME_MULTI_CODE_FULL)
     {
       last = (last+multi-LASZIP_GPSTIME_MULTI_CODE_FULL)&3;
-      read(item, context);
+      continue;
     }
+  }
+  break;
   }
   *((I64*)item) = last_gpstime[last].i64;
 }

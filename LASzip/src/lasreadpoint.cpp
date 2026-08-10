@@ -32,6 +32,7 @@
 #include "lasreadpoint.hpp"
 
 #include "arithmeticdecoder.hpp"
+#include "lasmessage.hpp"
 #include "lasreaditemraw.hpp"
 #include "lasreaditemcompressed_v1.hpp"
 #include "lasreaditemcompressed_v2.hpp"
@@ -42,6 +43,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits>
+#include <exception>
 
 
 LASreadPoint::LASreadPoint(U32 decompress_selective)
@@ -108,6 +110,10 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
     }
     // maybe layered compression for LAS 1.4 
     layered_las14_compression = (laszip->compressor == LASZIP_COMPRESSOR_LAYERED_CHUNKED);
+    if (layered_las14_compression && ((num_items == 0) || (items[0].type != LASitem::POINT14)))
+    {
+      return FALSE;
+    }
   }
  
   // initizalize the readers
@@ -118,7 +124,7 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
   chunk_size = U32_MAX;
 
   // always create the raw readers
-  readers_raw = new LASreadItem*[num_readers];
+  readers_raw = new LASreadItem*[num_readers]();
   for (i = 0; i < num_readers; i++)
   {
     switch (items[i].type)
@@ -168,20 +174,35 @@ BOOL LASreadPoint::setup(U32 num_items, const LASitem* items, const LASzip* lasz
     default:
       return FALSE;
     }
+    if (items[i].size > (U32_MAX - point_size))
+    {
+      return FALSE;
+    }
     point_size += items[i].size;
   }
 
   if (dec)
   {
-    readers_compressed = new LASreadItem*[num_readers];
+    readers_compressed = new LASreadItem*[num_readers]();
     // seeks with compressed data need a seek point
     if (seek_point)
     {
       delete [] seek_point[0];
       delete [] seek_point;
+      seek_point = 0;
     }
-    seek_point = new U8*[num_items];
-    if (!seek_point) return FALSE;
+    if (layered_las14_compression)
+    {
+      if (point_size > (U32_MAX/2))
+      {
+        return FALSE;
+      }
+      if ((point_size*2) <= 22)
+      {
+        return FALSE;
+      }
+    }
+    seek_point = new U8*[num_items]();
     if (layered_las14_compression)
     {
       // because combo LAS 1.0 - 1.4 point struct has padding
@@ -343,6 +364,10 @@ BOOL LASreadPoint::seek(const U64 current, const U64 target)
       U32 target_chunk;
       if (chunk_totals)
       {
+        if (number_chunks == 0)
+        {
+          return FALSE;
+        }
         target_chunk = search_chunk_table(target, 0, number_chunks);
         chunk_size = (U32)(chunk_totals[target_chunk+1]-chunk_totals[target_chunk]);
         delta = target - chunk_totals[target_chunk];
@@ -447,7 +472,14 @@ BOOL LASreadPoint::read(U8* const * point)
         }
         else if (chunk_totals) // variable sized chunks?
         {
-          chunk_size = (U32)(chunk_totals[current_chunk + 1] - chunk_totals[current_chunk]);
+          if (((U64)current_chunk + 1) <= (U64)number_chunks)
+          {
+            chunk_size = (U32)(chunk_totals[current_chunk+1]-chunk_totals[current_chunk]);
+          }
+          else
+          {
+            chunk_size = 0;
+          }
         }
         chunk_count = 0;
       }
@@ -535,6 +567,12 @@ BOOL LASreadPoint::read(U8* const * point)
     }
     return FALSE;
   }
+  catch (const std::exception& e)
+  {
+    if (last_error == 0) last_error = new CHAR[128];
+    snprintf(last_error, 128, "chunk with index %u is corrupt or requests excessive memory: %s", current_chunk, e.what());
+    return FALSE;
+  }
   return TRUE;
 }
 
@@ -581,7 +619,10 @@ BOOL LASreadPoint::init_dec()
       return FALSE;
     }
     current_chunk = 0;
-    if (chunk_totals) chunk_size = (U32)chunk_totals[1];
+    if (chunk_totals)
+    {
+      chunk_size = (number_chunks > 0) ? (U32)chunk_totals[1] : 0;
+    }
   }
 
   point_start = instream->tell();
@@ -680,11 +721,16 @@ BOOL LASreadPoint::read_chunk_table()
     chunk_totals = 0;
     if (chunk_starts) free(chunk_starts);
     chunk_starts = 0;
+    if (((U64)number_chunks + 1) > (U64)(std::numeric_limits<size_t>::max() / sizeof(I64)))
+    {
+      throw 1;
+    }
+    if (number_chunks > 100000000)
+    {
+      LASMessage(LAS_WARNING, "chunk table declares %u chunks, which is implausibly many", number_chunks);
+    }
     if (chunk_size == U32_MAX)
     {
-      if (number_chunks > std::numeric_limits<size_t>::max() - 1) {
-        throw 1;
-      }
       chunk_totals = new U64[(U64)number_chunks+1];
       if (chunk_totals == 0)
       {

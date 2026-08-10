@@ -447,6 +447,11 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
   if (header.number_of_variable_length_records)
   {
     header.vlrs = (LASvlr*)calloc(header.number_of_variable_length_records, sizeof(LASvlr));
+    if (header.vlrs == 0)
+    {
+      laserror("allocating %u vlrs failed", header.number_of_variable_length_records);
+      return FALSE;
+    }
     std::map<std::string, WaveInfo> wave_aggregated;
 
     for (i = 0; i < header.number_of_variable_length_records; i++)
@@ -760,23 +765,36 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             {
               LASMessage(LAS_WARNING, "variable length records contain more than one GeoKeyDirectoryTag");
             }
-            header.vlr_geo_keys = (LASvlr_geo_keys*)header.vlrs[i].data;
+            if (header.vlrs[i].record_length_after_header < sizeof(LASvlr_geo_keys))
+            {
+              LASMessage(LAS_WARNING, "variable length record payload for GeoKeyDirectoryTag is %d instead of at least %u bytes", (I32)header.vlrs[i].record_length_after_header, (U32)sizeof(LASvlr_geo_keys));
+            }
+            else
+            {
+              header.vlr_geo_keys = (LASvlr_geo_keys*)header.vlrs[i].data;
 
-            // check variable header geo keys contents
+              // check variable header geo keys contents
 
-            if (header.vlr_geo_keys->key_directory_version != 1)
-            {
-              LASMessage(LAS_WARNING, "wrong vlr_geo_keys->key_directory_version: %d != 1",header.vlr_geo_keys->key_directory_version);
+              if (header.vlr_geo_keys->key_directory_version != 1)
+              {
+                LASMessage(LAS_WARNING, "wrong vlr_geo_keys->key_directory_version: %d != 1",header.vlr_geo_keys->key_directory_version);
+              }
+              if (header.vlr_geo_keys->key_revision != 1)
+              {
+                LASMessage(LAS_WARNING, "wrong vlr_geo_keys->key_revision: %d != 1",header.vlr_geo_keys->key_revision);
+              }
+              if (header.vlr_geo_keys->minor_revision != 0)
+              {
+                LASMessage(LAS_WARNING, "wrong vlr_geo_keys->minor_revision: %d != 0",header.vlr_geo_keys->minor_revision);
+              }
+              U32 max_keys = (U32)((header.vlrs[i].record_length_after_header - sizeof(LASvlr_geo_keys)) / sizeof(LASvlr_key_entry));
+              if (header.vlr_geo_keys->number_of_keys > max_keys)
+              {
+                LASMessage(LAS_WARNING, "GeoKeyDirectoryTag claims %u keys but payload only has room for %u; truncating", header.vlr_geo_keys->number_of_keys, max_keys);
+                header.vlr_geo_keys->number_of_keys = (U16)max_keys;
+              }
+              header.vlr_geo_key_entries = (LASvlr_key_entry*)&header.vlr_geo_keys[1];
             }
-            if (header.vlr_geo_keys->key_revision != 1)
-            {
-              LASMessage(LAS_WARNING, "wrong vlr_geo_keys->key_revision: %d != 1",header.vlr_geo_keys->key_revision);
-            }
-            if (header.vlr_geo_keys->minor_revision != 0)
-            {
-              LASMessage(LAS_WARNING, "wrong vlr_geo_keys->minor_revision: %d != 0",header.vlr_geo_keys->minor_revision);
-            }
-            header.vlr_geo_key_entries = (LASvlr_key_entry*)&header.vlr_geo_keys[1];
           }
           else if (header.vlrs[i].record_id == 34736) // GeoDoubleParamsTag
           {
@@ -866,13 +884,16 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             {
               LASMessage(LAS_WARNING, "variable length record payload for wave packet descr %d is %d instead of 26 bytes", idx, (I32)header.vlrs[i].record_length_after_header);
             }
-            header.vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)header.vlrs[i].data;
-            if (opener && opener->is_validation() == FALSE) {
-              header.vlr_wave_packet_descr[idx]->check_wave_packet_descriptor([&](const std::string& msg, LAS_MESSAGE_TYPE type) { 
-                WaveInfo& info = wave_aggregated[msg];
-                info.type = type;
-                info.indices.insert(i);
-              });
+            if (header.vlrs[i].record_length_after_header >= 26)
+            {
+              header.vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)header.vlrs[i].data;
+              if (opener && opener->is_validation() == FALSE) {
+                header.vlr_wave_packet_descr[idx]->check_wave_packet_descriptor([&](const std::string& msg, LAS_MESSAGE_TYPE type) {
+                  WaveInfo& info = wave_aggregated[msg];
+                  info.type = type;
+                  info.indices.insert(i);
+                });
+              }
             }
 
 /*
@@ -915,11 +936,18 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             {
               if (!header.vlr_copc_info)
               {
-                // Unlike e.g. vlr_geo_ogc_wkt or vlr_classification, vlr_copc_info is not a pointer to the VLR payload (LASvlr_copc_info*)header.vlrs[i].data
-                // Instead we use a copy. This allows to remove the COPC VLR later and maintain the COPC index information for a COPC aware reader but writers
-                // will never receive any COPC data
-                header.vlr_copc_info = new LASvlr_copc_info;
-                memcpy(header.vlr_copc_info, header.vlrs[i].data, sizeof(LASvlr_copc_info));
+                if (header.vlrs[i].record_length_after_header < sizeof(LASvlr_copc_info))
+                {
+                  LASMessage(LAS_WARNING, "variable length record payload for copc info is %d instead of %u bytes", (I32)header.vlrs[i].record_length_after_header, (U32)sizeof(LASvlr_copc_info));
+                }
+                else
+                {
+                  // Unlike e.g. vlr_geo_ogc_wkt or vlr_classification, vlr_copc_info is not a pointer to the VLR payload (LASvlr_copc_info*)header.vlrs[i].data
+                  // Instead we use a copy. This allows to remove the COPC VLR later and maintain the COPC index information for a COPC aware reader but writers
+                  // will never receive any COPC data
+                  header.vlr_copc_info = new LASvlr_copc_info;
+                  memcpy(header.vlr_copc_info, header.vlrs[i].data, sizeof(LASvlr_copc_info));
+                }
               }
               else
               {
@@ -981,6 +1009,11 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
         stream->seek(header.start_of_first_extended_variable_length_record);
 
         header.evlrs = (LASevlr*)calloc(header.number_of_extended_variable_length_records, sizeof(LASevlr));
+        if (header.evlrs == 0)
+        {
+          laserror("allocating %u evlrs failed", header.number_of_extended_variable_length_records);
+          return FALSE;
+        }
         // read the extended variable length records into the header
         for (i = 0; i < header.number_of_extended_variable_length_records; i++)
         {
@@ -1178,8 +1211,9 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
             {
               try
               {
-                if (header.evlrs[i].record_length_after_header > UINT32_MAX) {
-                  laserror("evlr size of %llu bytes in header.evlrs[%d] not supported", header.evlrs[i].record_length_after_header, i);
+                if (header.evlrs[i].record_length_after_header < 0 || header.evlrs[i].record_length_after_header > UINT32_MAX) {
+                  laserror("evlr size of %lld bytes in header.evlrs[%d] not supported", header.evlrs[i].record_length_after_header, i);
+                  return FALSE;
                 }
                 header.evlrs[i].data = new U8[header.evlrs[i].record_length_after_header + 1];
                 if (header.evlrs[i].record_length_after_header) {
@@ -1293,7 +1327,14 @@ BOOL LASreaderLAS::open(ByteStreamIn* stream, BOOL peek_only, U32 decompress_sel
               {
                 LASMessage(LAS_WARNING, "extended variable length records defines wave packet descr %d more than once", idx);
               }
-              header.vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)header.evlrs[i].data;
+              if (header.evlrs[i].record_length_after_header != 26)
+              {
+                LASMessage(LAS_WARNING, "extended variable length record payload for wave packet descr %d is %lld instead of 26 bytes", idx, header.evlrs[i].record_length_after_header);
+              }
+              if (header.evlrs[i].record_length_after_header >= 26)
+              {
+                header.vlr_wave_packet_descr[idx] = (LASvlr_wave_packet_descr*)header.evlrs[i].data;
+              }
             }
           }
           else if (strcmp(header.evlrs[i].user_id, "laszip encoded") == 0 || strcmp(header.evlrs[i].user_id, "LAStools") == 0)

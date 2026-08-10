@@ -880,7 +880,14 @@ laszip_set_header(
     }
     if (header->number_of_variable_length_records)
     {
-      laszip_dll->header.vlrs = (laszip_vlr*)malloc_las(sizeof(laszip_vlr) * header->number_of_variable_length_records);
+      laszip_dll->header.vlrs = (laszip_vlr*)calloc(header->number_of_variable_length_records, sizeof(laszip_vlr));
+
+      if (laszip_dll->header.vlrs == 0)
+      {
+        snprintf(laszip_dll->error, sizeof(laszip_dll->error), "allocating %u VLRs", header->number_of_variable_length_records);
+        return 1;
+      }
+
       for (i = 0; i < header->number_of_variable_length_records; i++)
       {
         laszip_dll->header.vlrs[i].reserved = header->vlrs[i].reserved;
@@ -2820,6 +2827,11 @@ laszip_write_header(
   }
   else
   {
+    if (laszip_dll->header.header_size < 227)
+    {
+      snprintf(laszip_dll->error, sizeof(laszip_dll->error), "header_size should at least be 227 but it is only %d", laszip_dll->header.header_size);
+      return 1;
+    }
     laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 227;
   }
 
@@ -3883,6 +3895,11 @@ laszip_read_header(
   }
   else
   {
+    if (laszip_dll->header.header_size < 227)
+    {
+      snprintf(laszip_dll->error, sizeof(laszip_dll->error), "header_size should at least be 227 but it is only %d", laszip_dll->header.header_size);
+      return 1;
+    }
     laszip_dll->header.user_data_in_header_size = laszip_dll->header.header_size - 227;
   }
 
@@ -3980,7 +3997,7 @@ laszip_read_header(
   {
     U32 i;
 
-    laszip_dll->header.vlrs = (laszip_vlr*)malloc_las(sizeof(laszip_vlr) * laszip_dll->header.number_of_variable_length_records);
+    laszip_dll->header.vlrs = (laszip_vlr*)calloc(laszip_dll->header.number_of_variable_length_records, sizeof(laszip_vlr));
 
     if (laszip_dll->header.vlrs == 0)
     {
@@ -4220,6 +4237,11 @@ laszip_read_header(
 
   // load any number of user-defined bytes that might have been added after the header
 
+  if (laszip_dll->header.offset_to_point_data < ((I64)vlrs_size + laszip_dll->header.header_size))
+  {
+    snprintf(laszip_dll->error, sizeof(laszip_dll->error), "offset_to_point_data (%u) is smaller than header_size (%u) plus vlrs_size (%u)", laszip_dll->header.offset_to_point_data, (U32)laszip_dll->header.header_size, vlrs_size);
+    return 1;
+  }
   laszip_dll->header.user_data_after_header_size = (I32)laszip_dll->header.offset_to_point_data - vlrs_size - laszip_dll->header.header_size;
   if (laszip_dll->header.user_data_after_header_size)
   {

@@ -118,7 +118,7 @@ const char* LASunzipper::get_error() const
 bool LASunzipper::return_error(const char* error)
 {
   char err[256];
-  sprintf(err, "%s (LASzip v%d.%dr%d)", error, LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION);
+  snprintf(err, sizeof(err), "%s (LASzip v%d.%dr%d)", error, LASZIP_VERSION_MAJOR, LASZIP_VERSION_MINOR, LASZIP_VERSION_REVISION);
   if (error_string) free(error_string);
   error_string = LASCopyString(err);
   return false;

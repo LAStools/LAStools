@@ -116,59 +116,63 @@ static double taketime() {
   return (double)(clock()) / CLOCKS_PER_SEC;
 }
 
-static void lidardouble2string(CHAR* string, double value) {
-  int len;
-  len = sprintf(string, "%.15f", value) - 1;
-  while (string[len] == '0') len--;
+static void lidardouble2string(CHAR* string, size_t stringsz, double value) {
+  int n = snprintf(string, stringsz, "%.15f", value);
+  if (n <= 0 || (size_t)n >= stringsz) {
+    string[stringsz - 1] = '\0';
+    return;
+  }
+  int len = n - 1;
+  while (len > 0 && string[len] == '0') len--;
   if (string[len] != '.') len++;
   string[len] = '\0';
 }
 
-static void lidardouble2string(CHAR* string, double value, double precision) {
+static void lidardouble2string(CHAR* string, size_t stringsz, double value, double precision) {
   if (precision == 0.01)
-    sprintf(string, "%.2f", value);
+    snprintf(string, stringsz, "%.2f", value);
   else if (precision == 0.001)
-    sprintf(string, "%.3f", value);
+    snprintf(string, stringsz, "%.3f", value);
   else if (precision == 0.0001)
-    sprintf(string, "%.4f", value);
+    snprintf(string, stringsz, "%.4f", value);
   else if (precision == 0.1)
-    sprintf(string, "%.1f", value);
+    snprintf(string, stringsz, "%.1f", value);
   else if (precision == 0.00001)
-    sprintf(string, "%.5f", value);
+    snprintf(string, stringsz, "%.5f", value);
   else if (precision == 0.000001)
-    sprintf(string, "%.6f", value);
+    snprintf(string, stringsz, "%.6f", value);
   else if (precision == 0.0000001)
-    sprintf(string, "%.7f", value);
+    snprintf(string, stringsz, "%.7f", value);
   else if (precision == 0.00000001)
-    sprintf(string, "%.8f", value);
+    snprintf(string, stringsz, "%.8f", value);
   else if (precision == 0.000000001)
-    sprintf(string, "%.9f", value);
+    snprintf(string, stringsz, "%.9f", value);
   else if (precision == 0.0025)
-    sprintf(string, "%.4f", value);
+    snprintf(string, stringsz, "%.4f", value);
   else if (precision == 0.00025)
-    sprintf(string, "%.5f", value);
+    snprintf(string, stringsz, "%.5f", value);
   else if (precision == 0.000025)
-    sprintf(string, "%.6f", value);
+    snprintf(string, stringsz, "%.6f", value);
   else if (precision == 0.005)
-    sprintf(string, "%.3f", value);
+    snprintf(string, stringsz, "%.3f", value);
   else if (precision == 0.0005)
-    sprintf(string, "%.4f", value);
+    snprintf(string, stringsz, "%.4f", value);
   else if (precision == 0.00005)
-    sprintf(string, "%.5f", value);
+    snprintf(string, stringsz, "%.5f", value);
   else if (precision == 0.0000000001)
-    sprintf(string, "%.10f", value);
+    snprintf(string, stringsz, "%.10f", value);
   else if (precision == 0.00000000001)
-    sprintf(string, "%.11f", value);
+    snprintf(string, stringsz, "%.11f", value);
   else if (precision == 0.000000000001)
-    sprintf(string, "%.12f", value);
+    snprintf(string, stringsz, "%.12f", value);
   else if (precision == 0.0000000000001)
-    sprintf(string, "%.13f", value);
+    snprintf(string, stringsz, "%.13f", value);
   else if (precision == 0.00000000000001)
-    sprintf(string, "%.14f", value);
+    snprintf(string, stringsz, "%.14f", value);
   else if (precision == 0.000000000000001)
-    sprintf(string, "%.15f", value);
+    snprintf(string, stringsz, "%.15f", value);
   else
-    lidardouble2string(string, value);
+    lidardouble2string(string, stringsz, value);
 }
 
 static void output_waveform(FILE* file_out, CHAR separator_sign, LASwaveform13reader* laswaveform13reader) {
@@ -192,8 +196,8 @@ static void output_waveform(FILE* file_out, CHAR separator_sign, LASwaveform13re
 
 static I32 attribute_starts[32];
 
-static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint* point, I32 index, CHAR* printstring) {
-  if (index >= header->number_attributes) {
+static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint* point, I32 index, CHAR* printstring, size_t printstringsz) {
+  if (index < 0 || index >= header->number_attributes || index >= 32) {
     return FALSE;
   }
   if (header->attributes[index].data_type == 1) {
@@ -202,17 +206,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * value;
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + value;
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%d", (I32)value);
@@ -224,17 +228,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * value;
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + value;
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%d", (I32)value);
@@ -246,17 +250,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * value;
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + value;
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%d", (I32)value);
@@ -268,17 +272,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * value;
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + value;
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%d", (I32)value);
@@ -290,17 +294,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * value;
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + value;
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%u", value);
@@ -312,17 +316,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * value;
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + value;
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%d", value);
@@ -334,17 +338,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * ((I64)value) + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * ((I64)value);
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + ((I64)value);
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%llu", value);
@@ -356,17 +360,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * value;
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + value;
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%lld", value);
@@ -378,17 +382,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * value;
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + value;
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%g", value);
@@ -400,17 +404,17 @@ static BOOL print_attribute(FILE* file, const LASheader* header, const LASpoint*
     if (header->attributes[index].has_scale()) {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].scale[0] * value + header->attributes[index].offset[0];
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       } else {
         F64 temp_d = header->attributes[index].scale[0] * value;
-        lidardouble2string(printstring, temp_d, header->attributes[index].scale[0]);
+        lidardouble2string(printstring, printstringsz, temp_d, header->attributes[index].scale[0]);
         fprintf(file, "%s", printstring);
       }
     } else {
       if (header->attributes[index].has_offset()) {
         F64 temp_d = header->attributes[index].offset[0] + value;
-        lidardouble2string(printstring, temp_d);
+        lidardouble2string(printstring, printstringsz, temp_d);
         fprintf(file, "%s", printstring);
       } else {
         fprintf(file, "%g", value);
@@ -482,13 +486,17 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "%s is better run in the command line\n", argv[0]);
     CHAR file_name[256];
     fprintf(stderr, "enter input file: ");
-    fgets(file_name, 256, stdin);
-    file_name[strlen(file_name) - 1] = '\0';
-    lasreadopener.set_file_name(file_name);
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name) - 1] = '\0';
+      lasreadopener.set_file_name(file_name);
+    }
     fprintf(stderr, "enter output file: ");
-    fgets(file_name, 256, stdin);
-    file_name[strlen(file_name) - 1] = '\0';
-    laswriteopener.set_file_name(file_name);
+    if (fgets(file_name, 256, stdin) && strlen(file_name))
+    {
+      file_name[strlen(file_name) - 1] = '\0';
+      laswriteopener.set_file_name(file_name);
+    }
 #endif
   } else {
     for (i = 1; i < argc; i++) {
@@ -794,10 +802,15 @@ int main(int argc, char* argv[]) {
       if ((ptsVLR = header->get_vlr("LAStools", 2000)) || (ptxVLR = header->get_vlr("LAStools", 2001))) {
         if ((parse_string == 0) || (strcmp(parse_string, "original") == 0)) {
           if (parse_string) free(parse_string);
+          CHAR parse_field[17];
           if (ptsVLR && (ptsVLR->record_length_after_header >= 32)) {
-            parse_string = LASCopyString((CHAR*)(ptsVLR->data + 16));
+            memcpy(parse_field, ptsVLR->data + 16, 16);
+            parse_field[16] = '\0';
+            parse_string = LASCopyString(parse_field);
           } else if (ptxVLR && (ptxVLR->record_length_after_header >= 32)) {
-            parse_string = LASCopyString((CHAR*)(ptxVLR->data + 16));
+            memcpy(parse_field, ptxVLR->data + 16, 16);
+            parse_field[16] = '\0';
+            parse_string = LASCopyString(parse_field);
           } else if (ptsVLR) {
             LASMessage(LAS_WARNING, "found VLR for PTS with wrong payload size of %d.", ptsVLR->record_length_after_header);
           } else if (ptxVLR) {
@@ -826,7 +839,10 @@ int main(int argc, char* argv[]) {
         U8* payload = ptxVLR->data;
         if ((parse_string == 0) || (strcmp(parse_string, "original") == 0)) {
           if (parse_string) free(parse_string);
-          parse_string = LASCopyString((CHAR*)(payload + 16));
+          CHAR parse_field[17];
+          memcpy(parse_field, payload + 16, 16);
+          parse_field[16] = '\0';
+          parse_string = LASCopyString(parse_field);
         }
         fprintf(file_out, "%u     \012", (U32)((I64*)payload)[4]);                                         // ncols
         fprintf(file_out, "%u     \012", (U32)((I64*)payload)[5]);                                         // nrows
@@ -886,25 +902,25 @@ int main(int argc, char* argv[]) {
           file_out, "%c scale factor x y z         %g %g %g\012", header_comment_sign, header->x_scale_factor, header->y_scale_factor,
           header->z_scale_factor);
       fprintf(file_out, "%c offset x y z               ", header_comment_sign);
-      lidardouble2string(printstring, header->x_offset);
+      lidardouble2string(printstring, sizeof(printstring), header->x_offset);
       fprintf(file_out, "%s ", printstring);
-      lidardouble2string(printstring, header->y_offset);
+      lidardouble2string(printstring, sizeof(printstring), header->y_offset);
       fprintf(file_out, "%s ", printstring);
-      lidardouble2string(printstring, header->z_offset);
+      lidardouble2string(printstring, sizeof(printstring), header->z_offset);
       fprintf(file_out, "%s\012", printstring);
       fprintf(file_out, "%c min x y z                  ", header_comment_sign);
-      lidardouble2string(printstring, header->min_x, header->x_scale_factor);
+      lidardouble2string(printstring, sizeof(printstring), header->min_x, header->x_scale_factor);
       fprintf(file_out, "%s ", printstring);
-      lidardouble2string(printstring, header->min_y, header->y_scale_factor);
+      lidardouble2string(printstring, sizeof(printstring), header->min_y, header->y_scale_factor);
       fprintf(file_out, "%s ", printstring);
-      lidardouble2string(printstring, header->min_z, header->z_scale_factor);
+      lidardouble2string(printstring, sizeof(printstring), header->min_z, header->z_scale_factor);
       fprintf(file_out, "%s\012", printstring);
       fprintf(file_out, "%c max x y z                  ", header_comment_sign);
-      lidardouble2string(printstring, header->max_x, header->x_scale_factor);
+      lidardouble2string(printstring, sizeof(printstring), header->max_x, header->x_scale_factor);
       fprintf(file_out, "%s ", printstring);
-      lidardouble2string(printstring, header->max_y, header->y_scale_factor);
+      lidardouble2string(printstring, sizeof(printstring), header->max_y, header->y_scale_factor);
       fprintf(file_out, "%s ", printstring);
-      lidardouble2string(printstring, header->max_z, header->z_scale_factor);
+      lidardouble2string(printstring, sizeof(printstring), header->max_z, header->z_scale_factor);
       fprintf(file_out, "%s\012", printstring);
       // if LAS 1.4
       if (header->version_minor >= 4) {
@@ -1031,7 +1047,7 @@ int main(int argc, char* argv[]) {
             index = 10 * index + (parse_string[i] - '0');
             i++;
           }
-          if (index >= lasreader->header.number_attributes) {
+          if (index >= lasreader->header.number_attributes || index >= 32) {
             laserror("attribute '%d' does not exist. skipping ...", index);
           } else {
             attribute_starts[index] = lasreader->header.get_attribute_start(index);
@@ -1203,15 +1219,15 @@ int main(int argc, char* argv[]) {
       while (true) {
         switch (parse_string[i]) {
           case 'x':  // the x coordinate
-            lidardouble2string(printstring, lasreader->point.get_x(), lasreader->header.x_scale_factor);
+            lidardouble2string(printstring, sizeof(printstring), lasreader->point.get_x(), lasreader->header.x_scale_factor);
             fprintf(file_out, "%s", printstring);
             break;
           case 'y':  // the y coordinate
-            lidardouble2string(printstring, lasreader->point.get_y(), lasreader->header.y_scale_factor);
+            lidardouble2string(printstring, sizeof(printstring), lasreader->point.get_y(), lasreader->header.y_scale_factor);
             fprintf(file_out, "%s", printstring);
             break;
           case 'z':  // the z coordinate
-            lidardouble2string(printstring, lasreader->point.get_z(), lasreader->header.z_scale_factor);
+            lidardouble2string(printstring, sizeof(printstring), lasreader->point.get_z(), lasreader->header.z_scale_factor);
             fprintf(file_out, "%s", printstring);
             break;
           case 'X':  // the unscaled raw integer X coordinate
@@ -1314,7 +1330,7 @@ int main(int argc, char* argv[]) {
             fprintf(file_out, "%d", lasreader->point.get_Z() - last_XYZ[2]);
             break;
           case '#':  // the gps-time difference to the last point
-            lidardouble2string(printstring, lasreader->point.gps_time - last_GPSTIME);
+            lidardouble2string(printstring, sizeof(printstring), lasreader->point.gps_time - last_GPSTIME);
             fprintf(file_out, "%s", printstring);
             break;
           case '$':  // the R difference to the last point
@@ -1395,7 +1411,7 @@ int main(int argc, char* argv[]) {
           case '7':  // the extra attributes
           case '8':  // the extra attributes
           case '9':  // the extra attributes
-            print_attribute(file_out, &lasreader->header, &lasreader->point, (I32)(parse_string[i] - '0'), printstring);
+            print_attribute(file_out, &lasreader->header, &lasreader->point, (I32)(parse_string[i] - '0'), printstring, sizeof(printstring));
             break;
           default:
             index = 0;
@@ -1404,7 +1420,7 @@ int main(int argc, char* argv[]) {
               index = 10 * index + (parse_string[i] - '0');
               i++;
             }
-            print_attribute(file_out, &lasreader->header, &lasreader->point, index, printstring);
+            print_attribute(file_out, &lasreader->header, &lasreader->point, index, printstring, sizeof(printstring));
         }
         i++;
         if (parse_string[i]) {

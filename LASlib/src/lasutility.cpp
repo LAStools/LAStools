@@ -777,37 +777,42 @@ void LASbin::add(F64 item, F64 value)
 #pragma warning(pop)
 }
 
-static void lidardouble2string(CHAR* string, F64 value)
+static void lidardouble2string(CHAR* string, size_t stringsz, F64 value)
 {
-  int len;
-  len = sprintf(string, "%.15f", value) - 1;
-  while (string[len] == '0') len--;
+  int n = snprintf(string, stringsz, "%.15f", value);
+  if (n <= 0 || (size_t)n >= stringsz)
+  {
+    string[stringsz - 1] = '\0';
+    return;
+  }
+  int len = n - 1;
+  while (len > 0 && string[len] == '0') len--;
   if (string[len] != '.') len++;
   string[len] = '\0';
 }
 
-static void lidardouble2string(CHAR* string, F64 value, F64 precision)
+static void lidardouble2string(CHAR* string, size_t stringsz, F64 value, F64 precision)
 {
   if (precision == 0.1 || precision == 0.2 || precision == 0.3 || precision == 0.4 || precision == 0.5)
-    sprintf(string, "%.1f", value);
+    snprintf(string, stringsz, "%.1f", value);
   else if (precision == 0.01 || precision == 0.02 || precision == 0.03 || precision == 0.04 || precision == 0.05 || precision == 0.25)
-    sprintf(string, "%.2f", value);
+    snprintf(string, stringsz, "%.2f", value);
   else if (precision == 0.001 || precision == 0.002 || precision == 0.003 || precision == 0.004 || precision == 0.005 || precision == 0.025 || precision == 0.125)
-    sprintf(string, "%.3f", value);
+    snprintf(string, stringsz, "%.3f", value);
   else if (precision == 0.0001 || precision == 0.0002 || precision == 0.0005 || precision == 0.0025 || precision == 0.0125)
-    sprintf(string, "%.4f", value);
+    snprintf(string, stringsz, "%.4f", value);
   else if (precision == 0.00001 || precision == 0.00002 || precision == 0.00005 || precision == 0.00025 || precision == 0.00125)
-    sprintf(string, "%.5f", value);
+    snprintf(string, stringsz, "%.5f", value);
   else if (precision == 0.000001 || precision == 0.000002 || precision == 0.000005 || precision == 0.000025 || precision == 0.000125)
-    sprintf(string, "%.6f", value);
+    snprintf(string, stringsz, "%.6f", value);
   else if (precision == 0.0000001)
-    sprintf(string, "%.7f", value);
+    snprintf(string, stringsz, "%.7f", value);
   else if (precision == 0.00000001)
-    sprintf(string, "%.8f", value);
+    snprintf(string, stringsz, "%.8f", value);
   else if (precision == 0.000000001)
-    sprintf(string, "%.9f", value);
+    snprintf(string, stringsz, "%.9f", value);
   else
-    lidardouble2string(string, value);
+    lidardouble2string(string, stringsz, value);
 }
 
 void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
@@ -843,8 +848,8 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
         }
         else
         {
-          lidardouble2string(temp1, ((F64)bin)*step, step);
-          lidardouble2string(temp2, ((F64)bin+1)*step, step);
+          lidardouble2string(temp1, sizeof(temp1), ((F64)bin)*step, step);
+          lidardouble2string(temp2, sizeof(temp2), ((F64)bin+1)*step, step);
           if (values_neg)
             fprintf(file, "  bin [%s,%s] has average %g (of %d)\012", temp1, temp2, values_neg[i]/bins_neg[i], bins_neg[i]);
           else
@@ -869,8 +874,8 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
         }
         else
         {
-          lidardouble2string(temp1, ((F64)bin)*step, step);
-          lidardouble2string(temp2, ((F64)bin+1)*step, step);
+          lidardouble2string(temp1, sizeof(temp1), ((F64)bin)*step, step);
+          lidardouble2string(temp2, sizeof(temp2), ((F64)bin+1)*step, step);
           if (values_pos)
             fprintf(file, "  bin [%s,%s] average has %g (of %d)\012", temp1, temp2, values_pos[i]/bins_pos[i], bins_pos[i]);
           else
@@ -881,7 +886,7 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
   }
   if (count)
   {
-    lidardouble2string(temp1, total/count, step);
+    lidardouble2string(temp1, sizeof(temp1), total/count, step);
     if (name)
       fprintf(file, "  average %s %s for %lld element(s)\012", name, temp1, count);
     else
@@ -1096,6 +1101,11 @@ I32 LAShistogram::unparse(CHAR* string) const
 
 BOOL LAShistogram::histo(const CHAR* name, F64 step)
 {
+  if (step <= 0.0)
+  {
+    laserror("histogram step must be positive, but is %g", step);
+    return FALSE;
+  }
   if (strcmp(name, "x") == 0)
     x_bin = new LASbin(step);
   else if (strcmp(name, "y") == 0)
@@ -1175,6 +1185,11 @@ BOOL LAShistogram::histo(const CHAR* name, F64 step)
 
 BOOL LAShistogram::histo_avg(const CHAR* name, F64 step, const CHAR* name_avg)
 {
+  if (step <= 0.0)
+  {
+    laserror("histogram step must be positive, but is %g", step);
+    return FALSE;
+  }
   if (strcmp(name, "classification") == 0)
   {
     if (strcmp(name_avg, "intensity") == 0)
@@ -1503,6 +1518,11 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
       *array = (U32**)malloc_las(array_size_new * sizeof(U32*));
       *array_sizes = (U16*)malloc_las(array_size_new * sizeof(U16));
     }
+    if ((*array == 0) || (*array_sizes == 0) || ((array == &minus_plus || array == &plus_plus) && (*ankers == 0)))
+    {
+      laserror("(re)allocating occupancy grid band of %u entries failed", array_size_new);
+      return FALSE;
+    }
     for (U32 i = *array_size; i < array_size_new; i++)
     {
       (*array)[i] = 0;
@@ -1528,6 +1548,11 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
     else
     {
       (*array)[pos_y] = (U32*)malloc_las(array_sizes_new * sizeof(U32));
+    }
+    if ((*array)[pos_y] == 0)
+    {
+      laserror("(re)allocating occupancy grid row of %u entries failed", array_sizes_new);
+      return FALSE;
     }
     for (U16 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
     {

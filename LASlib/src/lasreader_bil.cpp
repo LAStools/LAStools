@@ -373,9 +373,10 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
 
   while ((len > 0) && (file_name_hdr[len] != '.')) len--;
 
-  if ((len == 0) && (file_name_hdr[len] != '.'))
+  if ((len < 0) || (file_name_hdr[len] != '.'))
   {
     laserror("file name '%s' is not a valid BIL file", file_name);
+    free(file_name_hdr);
     return FALSE;
   }
 
@@ -397,6 +398,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     {
       file_name_hdr[len] = '\0';
       laserror("cannot open files '%s.hdr' or '%s.HDR'", file_name_hdr, file_name_hdr);
+      free(file_name_hdr);
       return FALSE;
     }
     free(file_name_hdr);
@@ -429,24 +431,24 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "ncols") || strstr(line, "NCOLS"))
     {
-      sscanf_las(line, "%s %d", dummy, &ncols);
+      sscanf_las(line, "%31s %d", dummy, &ncols);
     }
     else if (strstr(line, "nrows") || strstr(line, "NROWS"))
     {
-      sscanf_las(line, "%s %d", dummy, &nrows);
+      sscanf_las(line, "%31s %d", dummy, &nrows);
     }
     else if (strstr(line, "nbands") || strstr(line, "NBANDS"))
     {
-      sscanf_las(line, "%s %d", dummy, &nbands);
+      sscanf_las(line, "%31s %d", dummy, &nbands);
     }
     else if (strstr(line, "nbits") || strstr(line, "NBITS"))
     {
-      sscanf_las(line, "%s %d", dummy, &nbits);
+      sscanf_las(line, "%31s %d", dummy, &nbits);
     }
     else if (strstr(line, "layout") || strstr(line, "LAYOUT"))
     {
       CHAR layout[32] = {0};
-      if (sscanf(line, "%s %s", dummy, layout) == 2)
+      if (sscanf(line, "%31s %31s", dummy, layout) == 2)
       {
         if (strcmp(layout, "bil") && strcmp(layout, "BIL"))
         {
@@ -461,7 +463,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     else if (strstr(line, "pixeltype") || strstr(line, "PIXELTYPE"))
     {
       CHAR pixeltype[32] = {0};
-      sscanf_las(line, "%s %s", dummy, pixeltype);
+      sscanf_las(line, "%31s %31s", dummy, pixeltype);
       if ((strcmp(pixeltype, "float") == 0) || (strcmp(pixeltype, "FLOAT") == 0))
       {
         floatpixels = TRUE;
@@ -477,12 +479,12 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "nodata") || strstr(line, "NODATA"))
     {
-      sscanf_las(line, "%s %f", dummy, &nodata);
+      sscanf_las(line, "%31s %f", dummy, &nodata);
     }
     else if (strstr(line, "byteorder") || strstr(line, "BYTEORDER")) // if little or big endian machine (i == intel, m == motorola)
     {
       CHAR byteorder[32] = {0};
-      sscanf_las(line, "%s %s", dummy, byteorder);
+      sscanf_las(line, "%31s %31s", dummy, byteorder);
       if (strcmp(byteorder, "i") && strcmp(byteorder, "I"))
       {
         LASMessage(LAS_WARNING, "byteorder '%s' not recognized by LASreader_bil", byteorder);
@@ -490,19 +492,19 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     }
     else if (strstr(line, "ulxmap") || strstr(line, "ULXMAP"))
     {
-      sscanf_las(line, "%s %lf", dummy, &ulxmap);
+      sscanf_las(line, "%31s %lf", dummy, &ulxmap);
     }
     else if (strstr(line, "ulymap") || strstr(line, "ULYMAP"))
     {
-      sscanf_las(line, "%s %lf", dummy, &ulymap);
+      sscanf_las(line, "%31s %lf", dummy, &ulymap);
     }
     else if (strstr(line, "xdim") || strstr(line, "XDIM"))
     {
-      sscanf_las(line, "%s %f", dummy, &xdim);
+      sscanf_las(line, "%31s %f", dummy, &xdim);
     }
     else if (strstr(line, "ydim") || strstr(line, "YDIM"))
     {
-      sscanf_las(line, "%s %f", dummy, &ydim);
+      sscanf_las(line, "%31s %f", dummy, &ydim);
     }
   }
 
@@ -529,6 +531,12 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
     return FALSE;
   }
 
+  if ((nbits != 32) && (nbits != 16) && (nbands > 4))
+  {
+    LASMessage(LAS_WARNING, "nbands = %d in HDR file is not supported for %d bit pixels (maximum 4)", nbands, nbits);
+    return FALSE;
+  }
+
   return TRUE;
 }
 
@@ -547,9 +555,10 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
 
   while ((len > 0) && (file_name_bwl[len] != '.')) len--;
 
-  if ((len == 0) && (file_name_bwl[len] != '.'))
+  if ((len < 0) || (file_name_bwl[len] != '.'))
   {
     laserror("file name '%s' is not a valid BIL file", file_name);
+    free(file_name_bwl);
     return FALSE;
   }
 

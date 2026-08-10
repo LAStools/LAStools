@@ -637,12 +637,16 @@ int main(int argc, char* argv[])
     wait_on_exit();
     fprintf(stderr, "%s is better run in the command line\n", argv[0]);
     char file_name[256];
-    fprintf(stderr, "enter input file: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name) - 1] = '\0';
-    lasreadopener.set_file_name(file_name);
-    fprintf(stderr, "enter output file: "); fgets(file_name, 256, stdin);
-    file_name[strlen(file_name) - 1] = '\0';
-    laswriteopener.set_file_name(file_name);
+    fprintf(stderr, "enter input file: ");
+    if (fgets(file_name, 256, stdin) && strlen(file_name)) {
+      file_name[strlen(file_name) - 1] = '\0';
+      lasreadopener.set_file_name(file_name);
+    }
+    fprintf(stderr, "enter output file: ");
+    if (fgets(file_name, 256, stdin) && strlen(file_name)) {
+      file_name[strlen(file_name) - 1] = '\0';
+      laswriteopener.set_file_name(file_name);
+    }
 #endif
   }
   else

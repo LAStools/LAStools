@@ -2821,9 +2821,10 @@ BOOL LASreadOpener::add_file_name_single(const CHAR* file_name, BOOL unique)
     }
     if (file_names == 0) {
       laserror("alloc for file_names pointer array failed at %d", file_name_allocated);
+      return FALSE;
     }
   }
-  if (file_names != nullptr) file_names[file_name_number] = LASCopyString(file_name);
+  file_names[file_name_number] = LASCopyString(file_name);
   file_name_number++;
   return TRUE;
 }
@@ -3139,9 +3140,9 @@ void LASreadOpener::delete_file_name(U32 file_name_id) {
     for (i = file_name_id + 1; i < file_name_number; i++) {
       file_names[i - 1] = file_names[i];
     }
+    file_names[file_name_number - 1] = NULL;
+    file_name_number--;
   }
-  file_names[file_name_number - 1] = NULL;
-  file_name_number--;
 }
 
 BOOL LASreadOpener::set_file_name_current(U32 file_name_id) {
@@ -3208,9 +3209,10 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
     }
     if (neighbor_file_names == 0) {
       laserror("alloc for neighbor_file_names pointer array failed at %d", neighbor_file_name_allocated);
+      return FALSE;
     }
   }
-  if (neighbor_file_names != nullptr) neighbor_file_names[neighbor_file_name_number] = LASCopyString(neighbor_file_name);
+  neighbor_file_names[neighbor_file_name_number] = LASCopyString(neighbor_file_name);
   neighbor_file_name_number++;
   return TRUE;
 }
@@ -3280,6 +3282,10 @@ void LASreadOpener::add_attribute(
     I32 data_type, const CHAR* name, const CHAR* description, F64 scale, F64 offset, F64 pre_scale, F64 pre_offset, F64 no_data) {
   if ((data_type < 1) || (data_type > 10)) {
     LASMessage(LAS_WARNING, "attribute data type %d not supported. ignoring attribute '%s'.", data_type, name);
+    return;
+  }
+  if (number_attributes >= 32) {
+    LASMessage(LAS_WARNING, "already have 32 attributes. ignoring attribute '%s'.", name);
     return;
   }
   attribute_data_types[number_attributes] = data_type;

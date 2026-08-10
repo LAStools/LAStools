@@ -643,8 +643,8 @@ void strncpy_las(char* dest, size_t destsz, const char* src, size_t count /*=0*/
     } 
     return;
   }
-  // target NULL -> nothing to do
-  if (dest == nullptr) {
+  // target NULL or zero-sized -> nothing to do
+  if (dest == nullptr || destsz == 0) {
     return;
   }
   // calculate src len if not given; crop len if src is shorter than defined len

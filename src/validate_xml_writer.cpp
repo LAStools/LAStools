@@ -118,8 +118,10 @@ BOOL ValidateXmlWriter::write(const std::string& variable, const std::string& ke
   stream << "<" << key << ">\n";
   indent++;
 
+  std::string escaped_variable = escape_xml_value(variable);
+
   printIndent(stream);
-  stream << "<variable>" << variable << "</variable>\n";
+  stream << "<variable>" << escaped_variable << "</variable>\n";
 
   if (!note.empty()) {
     std::string escaped_note = escape_xml_value(note);

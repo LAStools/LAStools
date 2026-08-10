@@ -332,13 +332,25 @@ BOOL LASindex::append(const char* file_name) const
 
   LASreader* lasreader = lasreadopener.open(file_name);
   if (lasreader == 0) return FALSE;
-  if (lasreader->header.laszip == 0) return FALSE;
+  if (lasreader->header.laszip == 0)
+  {
+    lasreader->close();
+    delete lasreader;
+    return FALSE;
+  }
 
   // close reader
 
   lasreader->close();
 
   FILE* file = LASfopen(file_name, "rb");
+
+  if (file == 0)
+  {
+    laserror("(LASindex): cannot open file '%s' for read", file_name);
+    delete lasreader;
+    return FALSE;
+  }
 
   ByteStreamIn* bytestreamin = 0;
   if (Endian::IS_LITTLE_ENDIAN)
@@ -374,6 +386,9 @@ BOOL LASindex::append(const char* file_name) const
       try { bytestreamin->getBytes((U8*)user_id, 16); } catch(...)
       {
         laserror("reading header.vlrs[%d].user_id", u);
+        delete bytestreamin;
+        fclose(file);
+        delete lasreader;
         return FALSE;
       }
       if (strcmp(user_id, "laszip encoded") == 0)
@@ -385,12 +400,18 @@ BOOL LASindex::append(const char* file_name) const
       try { bytestreamin->get16bitsLE((U8*)&record_id); } catch(...)
       {
         laserror("reading header.vlrs[%d].record_id", u);
+        delete bytestreamin;
+        fclose(file);
+        delete lasreader;
         return FALSE;
       }
       U16 record_length_after_header;
       try { bytestreamin->get16bitsLE((U8*)&record_length_after_header); } catch(...)
       {
         laserror("reading header.vlrs[%d].record_length_after_header", u);
+        delete bytestreamin;
+        fclose(file);
+        delete lasreader;
         return FALSE;
       }
       total_tmp += (54 + record_length_after_header);
@@ -404,6 +425,13 @@ BOOL LASindex::append(const char* file_name) const
 
   ByteStreamOut* bytestreamout;
   file = LASfopen(file_name, "rb+");
+
+  if (file == 0)
+  {
+    laserror("(LASindex): cannot open file '%s' for append", file_name);
+    delete lasreader;
+    return FALSE;
+  }
 
   if (Endian::IS_LITTLE_ENDIAN)
     bytestreamout = new ByteStreamOutFileLE(file);
@@ -530,7 +558,11 @@ BOOL LASindex::read(ByteStreamIn* stream)
   interval->get_cells();
   while (interval->has_cells())
   {
-    spatial->manage_cell(interval->index);
+    if (!spatial->manage_cell((U32)interval->index))
+    {
+      laserror("(LASindex): cannot manage cell %d", interval->index);
+      return FALSE;
+    }
   }
   return TRUE;
 }

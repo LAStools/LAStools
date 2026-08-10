@@ -1173,6 +1173,13 @@ bool ProjParameters::proj_info_arg_contains(const char* arg) const {
   return false;
 }
 
+double GeoProjectionConverter::get_geo_double_param(int offset) const {
+  if (geo_double_params) {
+    return geo_double_params[offset];
+  }
+  return 0.0;
+}
+
 bool GeoProjectionConverter::set_projection_from_geo_keys(
     int num_geo_keys, const GeoProjectionGeoKeys* geo_keys, char* geo_ascii_params, double* geo_double_params, char* description, bool source) {
   int user_defined_projection = 0;
@@ -1590,11 +1597,11 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
     if (user_defined_projection == 1) {
       if ((offsetProjFalseEastingGeoKey >= 0) && (offsetProjFalseNorthingGeoKey >= 0) && (offsetProjNatOriginLatGeoKey >= 0) &&
           (offsetProjCenterLongGeoKey >= 0) && (offsetProjScaleAtNatOriginGeoKey >= 0)) {
-        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
-        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
-        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
-        double longMeridianDeg = geo_double_params[offsetProjCenterLongGeoKey];
-        double scaleFactor = geo_double_params[offsetProjScaleAtNatOriginGeoKey];
+        double falseEastingMeter = get_geo_double_param(offsetProjFalseEastingGeoKey) * coordinates2meter;
+        double falseNorthingMeter = get_geo_double_param(offsetProjFalseNorthingGeoKey) * coordinates2meter;
+        double latOriginDeg = get_geo_double_param(offsetProjNatOriginLatGeoKey);
+        double longMeridianDeg = get_geo_double_param(offsetProjCenterLongGeoKey);
+        double scaleFactor = get_geo_double_param(offsetProjScaleAtNatOriginGeoKey);
         set_transverse_mercator_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longMeridianDeg, scaleFactor, 0, source);
         if (description) {
           sprintf(description, "generic transverse mercator");
@@ -1608,21 +1615,21 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
           ((offsetProjCenterLongGeoKey >= 0) || (offsetProjNatOriginLongGeoKey >= 0) || (offsetProjFalseOriginLongGeoKey >= 0)) &&
           (offsetProjStdParallel1GeoKey >= 0) && (offsetProjStdParallel2GeoKey >= 0)) {
         double falseEastingMeter =
-            ((offsetProjFalseEastingGeoKey >= 0) ? geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter
-                                                 : geo_double_params[offsetProjFalseOriginEastingGeoKey] * coordinates2meter);
+            ((offsetProjFalseEastingGeoKey >= 0) ? get_geo_double_param(offsetProjFalseEastingGeoKey) * coordinates2meter
+                                                 : get_geo_double_param(offsetProjFalseOriginEastingGeoKey) * coordinates2meter);
         double falseNorthingMeter =
-            ((offsetProjFalseNorthingGeoKey >= 0) ? geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter
-                                                  : geo_double_params[offsetProjFalseOriginNorthingGeoKey] * coordinates2meter);
+            ((offsetProjFalseNorthingGeoKey >= 0) ? get_geo_double_param(offsetProjFalseNorthingGeoKey) * coordinates2meter
+                                                  : get_geo_double_param(offsetProjFalseOriginNorthingGeoKey) * coordinates2meter);
         double latOriginDeg =
-            ((offsetProjNatOriginLatGeoKey >= 0) ? geo_double_params[offsetProjNatOriginLatGeoKey]
-                                                 : geo_double_params[offsetProjFalseOriginLatGeoKey]);
+            ((offsetProjNatOriginLatGeoKey >= 0) ? get_geo_double_param(offsetProjNatOriginLatGeoKey)
+                                                 : get_geo_double_param(offsetProjFalseOriginLatGeoKey));
         double longOriginDeg =
-            ((offsetProjCenterLongGeoKey >= 0) ? geo_double_params[offsetProjCenterLongGeoKey]
-                                               : ((offsetProjNatOriginLongGeoKey >= 0) ? geo_double_params[offsetProjNatOriginLongGeoKey]
-                                                                                       : geo_double_params[offsetProjFalseOriginLongGeoKey]));
-        if ((longOriginDeg == 0.0) && (offsetProjNatOriginLongGeoKey >= 0)) longOriginDeg = geo_double_params[offsetProjNatOriginLongGeoKey];
-        double firstStdParallelDeg = geo_double_params[offsetProjStdParallel1GeoKey];
-        double secondStdParallelDeg = geo_double_params[offsetProjStdParallel2GeoKey];
+            ((offsetProjCenterLongGeoKey >= 0) ? get_geo_double_param(offsetProjCenterLongGeoKey)
+                                               : ((offsetProjNatOriginLongGeoKey >= 0) ? get_geo_double_param(offsetProjNatOriginLongGeoKey)
+                                                                                       : get_geo_double_param(offsetProjFalseOriginLongGeoKey)));
+        if ((longOriginDeg == 0.0) && (offsetProjNatOriginLongGeoKey >= 0)) longOriginDeg = get_geo_double_param(offsetProjNatOriginLongGeoKey);
+        double firstStdParallelDeg = get_geo_double_param(offsetProjStdParallel1GeoKey);
+        double secondStdParallelDeg = get_geo_double_param(offsetProjStdParallel2GeoKey);
         set_lambert_conformal_conic_projection(
             falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg, 0, source);
         if (description) {
@@ -1634,14 +1641,14 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
       if ((offsetProjFalseEastingGeoKey >= 0) && (offsetProjFalseNorthingGeoKey >= 0) && (offsetProjNatOriginLatGeoKey >= 0) &&
           ((offsetProjCenterLongGeoKey >= 0) || (offsetProjNatOriginLongGeoKey >= 0)) && (offsetProjStdParallel1GeoKey >= 0) &&
           (offsetProjStdParallel2GeoKey >= 0)) {
-        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
-        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
-        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
+        double falseEastingMeter = get_geo_double_param(offsetProjFalseEastingGeoKey) * coordinates2meter;
+        double falseNorthingMeter = get_geo_double_param(offsetProjFalseNorthingGeoKey) * coordinates2meter;
+        double latOriginDeg = get_geo_double_param(offsetProjNatOriginLatGeoKey);
         double longOriginDeg =
-            ((offsetProjCenterLongGeoKey >= 0) ? geo_double_params[offsetProjCenterLongGeoKey] : geo_double_params[offsetProjNatOriginLongGeoKey]);
-        if ((longOriginDeg == 0.0) && (offsetProjNatOriginLongGeoKey >= 0)) longOriginDeg = geo_double_params[offsetProjNatOriginLongGeoKey];
-        double firstStdParallelDeg = geo_double_params[offsetProjStdParallel1GeoKey];
-        double secondStdParallelDeg = geo_double_params[offsetProjStdParallel2GeoKey];
+            ((offsetProjCenterLongGeoKey >= 0) ? get_geo_double_param(offsetProjCenterLongGeoKey) : get_geo_double_param(offsetProjNatOriginLongGeoKey));
+        if ((longOriginDeg == 0.0) && (offsetProjNatOriginLongGeoKey >= 0)) longOriginDeg = get_geo_double_param(offsetProjNatOriginLongGeoKey);
+        double firstStdParallelDeg = get_geo_double_param(offsetProjStdParallel1GeoKey);
+        double secondStdParallelDeg = get_geo_double_param(offsetProjStdParallel2GeoKey);
         set_albers_equal_area_conic_projection(
             falseEastingMeter, falseNorthingMeter, latOriginDeg, longOriginDeg, firstStdParallelDeg, secondStdParallelDeg, 0, source);
         if (description) {
@@ -1652,12 +1659,12 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
     } else if (user_defined_projection == 16) {
       if ((offsetProjFalseEastingGeoKey >= 0) && (offsetProjFalseNorthingGeoKey >= 0) && (offsetProjNatOriginLatGeoKey >= 0) &&
           ((offsetProjCenterLongGeoKey >= 0) || (offsetProjNatOriginLongGeoKey >= 0)) && (offsetProjScaleAtNatOriginGeoKey >= 0)) {
-        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
-        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
-        double latOriginDeg = geo_double_params[offsetProjNatOriginLatGeoKey];
+        double falseEastingMeter = get_geo_double_param(offsetProjFalseEastingGeoKey) * coordinates2meter;
+        double falseNorthingMeter = get_geo_double_param(offsetProjFalseNorthingGeoKey) * coordinates2meter;
+        double latOriginDeg = get_geo_double_param(offsetProjNatOriginLatGeoKey);
         double longMeridianDeg =
-            ((offsetProjCenterLongGeoKey >= 0) ? geo_double_params[offsetProjCenterLongGeoKey] : geo_double_params[offsetProjNatOriginLongGeoKey]);
-        double scaleFactor = geo_double_params[offsetProjScaleAtNatOriginGeoKey];
+            ((offsetProjCenterLongGeoKey >= 0) ? get_geo_double_param(offsetProjCenterLongGeoKey) : get_geo_double_param(offsetProjNatOriginLongGeoKey));
+        double scaleFactor = get_geo_double_param(offsetProjScaleAtNatOriginGeoKey);
         set_oblique_stereographic_projection(falseEastingMeter, falseNorthingMeter, latOriginDeg, longMeridianDeg, scaleFactor, 0, source);
         if (description) {
           sprintf(description, "generic oblique stereographic");
@@ -1667,13 +1674,13 @@ bool GeoProjectionConverter::set_projection_from_geo_keys(
     } else if (user_defined_projection == 3) {
       if ((offsetProjFalseEastingGeoKey >= 0) && (offsetProjFalseNorthingGeoKey >= 0) && (offsetProjCenterLatGeoKey >= 0) &&
           (offsetProjCenterLongGeoKey >= 0) && (offsetProjAzimuthAngleGeoKey >= 0) && (offsetProjScaleAtCenterGeoKey >= 0)) {
-        double falseEastingMeter = geo_double_params[offsetProjFalseEastingGeoKey] * coordinates2meter;
-        double falseNorthingMeter = geo_double_params[offsetProjFalseNorthingGeoKey] * coordinates2meter;
-        double latCenterDeg = geo_double_params[offsetProjCenterLatGeoKey];
-        double longCenterDeg = geo_double_params[offsetProjCenterLongGeoKey];
-        double azimuthDeg = geo_double_params[offsetProjAzimuthAngleGeoKey];
-        double rectifiedGridAngleDeg = (offsetProjRectifiedGridAngleGeoKey >= 0 ? geo_double_params[offsetProjRectifiedGridAngleGeoKey] : azimuthDeg);
-        double scaleFactor = geo_double_params[offsetProjScaleAtCenterGeoKey];
+        double falseEastingMeter = get_geo_double_param(offsetProjFalseEastingGeoKey) * coordinates2meter;
+        double falseNorthingMeter = get_geo_double_param(offsetProjFalseNorthingGeoKey) * coordinates2meter;
+        double latCenterDeg = get_geo_double_param(offsetProjCenterLatGeoKey);
+        double longCenterDeg = get_geo_double_param(offsetProjCenterLongGeoKey);
+        double azimuthDeg = get_geo_double_param(offsetProjAzimuthAngleGeoKey);
+        double rectifiedGridAngleDeg = (offsetProjRectifiedGridAngleGeoKey >= 0 ? get_geo_double_param(offsetProjRectifiedGridAngleGeoKey) : azimuthDeg);
+        double scaleFactor = get_geo_double_param(offsetProjScaleAtCenterGeoKey);
         set_hotine_oblique_mercator_projection(
             falseEastingMeter, falseNorthingMeter, latCenterDeg, longCenterDeg, azimuthDeg, rectifiedGridAngleDeg, scaleFactor, 0, source);
         if (description) {
@@ -1708,9 +1715,10 @@ bool GeoProjectionConverter::GeoTiffInfo(
     };
 
     auto geoDoubleGet = [&](const int offs = 0, const int decimals = 10) -> std::string {
+      int idx = geokeye->value_offset + offs;
       if (doubleparams) {
         try {
-          return DoubleToString(doubleparams[geokeye->value_offset + offs], decimals, true);
+          return DoubleToString(doubleparams[idx], decimals, true);
         } catch (...) {
           return "?";
         }
@@ -1727,8 +1735,12 @@ bool GeoProjectionConverter::GeoTiffInfo(
       geoValueDouble(10);
     } else if (std::find(geoKeyAscii.begin(), geoKeyAscii.end(), geokeye->key_id) != geoKeyAscii.end()) {
       // - handle string values
-      value = asciip.substr(geokeye->value_offset, geokeye->count);
-      if (value.back() == '|') {
+      try {
+        value = asciip.substr(geokeye->value_offset, geokeye->count);
+      } catch (...) {
+        value = "";
+      }
+      if (!value.empty() && value.back() == '|') {
         value.pop_back();
       }
     } else {
@@ -3527,7 +3539,7 @@ double GeoProjectionConverter::get_GeogLinearUnitSizeGeoKey() const {
   if (num_geo_keys && geo_double_params) {
     for (int i = 0; i < num_geo_keys; i++) {
       if (geo_keys[i].key_id == 2053) {
-        return geo_double_params[geo_keys[i].value_offset];
+        return get_geo_double_param(geo_keys[i].value_offset);
       }
     }
   }
@@ -3549,7 +3561,7 @@ double GeoProjectionConverter::get_GeogAngularUnitSizeGeoKey() const {
   if (num_geo_keys && geo_double_params) {
     for (int i = 0; i < num_geo_keys; i++) {
       if (geo_keys[i].key_id == 2055) {
-        return geo_double_params[geo_keys[i].value_offset];
+        return get_geo_double_param(geo_keys[i].value_offset);
       }
     }
   }
@@ -3560,7 +3572,7 @@ double GeoProjectionConverter::get_GeogSemiMajorAxisGeoKey() const {
   if (num_geo_keys && geo_double_params) {
     for (int i = 0; i < num_geo_keys; i++) {
       if (geo_keys[i].key_id == 2057) {
-        return geo_double_params[geo_keys[i].value_offset];
+        return get_geo_double_param(geo_keys[i].value_offset);
       }
     }
   }
@@ -3571,7 +3583,7 @@ double GeoProjectionConverter::get_GeogSemiMinorAxisGeoKey() const {
   if (num_geo_keys && geo_double_params) {
     for (int i = 0; i < num_geo_keys; i++) {
       if (geo_keys[i].key_id == 2058) {
-        return geo_double_params[geo_keys[i].value_offset];
+        return get_geo_double_param(geo_keys[i].value_offset);
       }
     }
   }
@@ -3582,7 +3594,7 @@ double GeoProjectionConverter::get_GeogInvFlatteningGeoKey() const {
   if (num_geo_keys && geo_double_params) {
     for (int i = 0; i < num_geo_keys; i++) {
       if (geo_keys[i].key_id == 2059) {
-        return geo_double_params[geo_keys[i].value_offset];
+        return get_geo_double_param(geo_keys[i].value_offset);
       }
     }
   }
@@ -3604,7 +3616,7 @@ double GeoProjectionConverter::get_GeogPrimeMeridianLongGeoKey() const {
   if (num_geo_keys && geo_double_params) {
     for (int i = 0; i < num_geo_keys; i++) {
       if (geo_keys[i].key_id == 2061) {
-        return geo_double_params[geo_keys[i].value_offset];
+        return get_geo_double_param(geo_keys[i].value_offset);
       }
     }
   }

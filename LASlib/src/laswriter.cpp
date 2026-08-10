@@ -566,13 +566,15 @@ void LASwriteOpener::set_file_name(const CHAR* file_name)
     else
     {
       CHAR* temp_file_name = (CHAR*)malloc_las(len + (format == LAS_TOOLS_FORMAT_QFIT ? 4 : (format == LAS_TOOLS_FORMAT_JSON ? 6 : 5)));
-      if (temp_file_name) 
+      if (temp_file_name == 0)
       {
-        strcpy(temp_file_name, this->file_name);
-        free(this->file_name);
-        this->file_name = temp_file_name;
-        this->file_name[len] = '.';
+        laserror("allocating file name of length %d failed", len);
+        return;
       }
+      strcpy(temp_file_name, this->file_name);
+      free(this->file_name);
+      this->file_name = temp_file_name;
+      this->file_name[len] = '.';
       if (format == LAS_TOOLS_FORMAT_LAZ)
       {
         len++;
@@ -906,6 +908,11 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
       if (this->file_name) free(this->file_name);
       len = (I32)strlen(file_name);
       this->file_name = (CHAR*)malloc_las(len + 10);
+      if (this->file_name == 0)
+      {
+        laserror("allocating file name of length %d failed", len);
+        return;
+      }
       strcpy(this->file_name, file_name);
       if (cut)
       {
