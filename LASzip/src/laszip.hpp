@@ -74,10 +74,11 @@ typedef long long SIGNED_INT64;
 #define LASCopyString strdup
 #endif
 
+// sync changes with LASZIP_API_VERSION_STRING in LASzip\CMakeLists.txt
 #define LASZIP_VERSION_MAJOR                3
 #define LASZIP_VERSION_MINOR                5
 #define LASZIP_VERSION_REVISION             1
-#define LASZIP_VERSION_BUILD_DATE      260717
+#define LASZIP_VERSION_BUILD_DATE      260810
 
 #define LASZIP_COMPRESSOR_NONE              0
 #define LASZIP_COMPRESSOR_POINTWISE         1

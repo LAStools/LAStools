@@ -11,8 +11,7 @@ if(CMAKE_GNU_COMPILER_ID OR CMAKE_Clang_COMPILER_ID)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-format-security -Wno-format-truncation")
 endif()
 
-# the next line is the ONLY place in the entire laszip system where
-# the version info is hard-coded
+# sync changes with LASZIP_VERSION_MAJOR in LASzip\src\laszip.hpp
 set(LASZIP_API_VERSION_STRING "3.5.1" CACHE STRING "LASzip version" FORCE)
 
 include (CheckIncludeFileCXX)
