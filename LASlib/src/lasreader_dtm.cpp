@@ -954,7 +954,7 @@ BOOL LASreaderDTM::open(const CHAR* file_name)
     geo_keys[num_geo_keys].count = 1;
     if (vertical_datum == 2)
     {
-      geo_keys[num_geo_keys].value_offset = 5103;// GEO_VERTICAL_NAVD88;
+      geo_keys[num_geo_keys].value_offset = 5103;// GEO_VERTICAL_NAVD88_DATUM;
     }
     else if (vertical_datum == 3)
     {
