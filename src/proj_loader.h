@@ -90,6 +90,12 @@ using proj_get_type_t = int (*)(PJ*);
 using proj_is_crs_t = int (*)(const PJ*);
 using proj_log_func_t = void (*)(PJ_CONTEXT*, void*, void(*)(void*, int, const char*));
 
+using proj_coordoperation_is_instantiable_t = int (*)(PJ_CONTEXT*, const PJ*);
+using proj_coordoperation_has_ballpark_transformation_t = int (*)(PJ_CONTEXT*, const PJ*);
+using proj_coordoperation_get_accuracy_t = double (*)(PJ_CONTEXT*, const PJ*);
+using proj_coordoperation_get_grid_used_count_t = int (*)(PJ_CONTEXT*, const PJ*);
+using proj_coordoperation_get_grid_used_t =  int (*)(PJ_CONTEXT*, const PJ*, int, const char**, const char**, const char**, const char**, int*, int*, int*);
+
 // MyPJ_INFO - own compatible type
 using proj_info_t = MyPJ_INFO (*)(void);
 
@@ -130,6 +136,11 @@ extern proj_trans_t proj_trans_ptr;
 extern proj_get_type_t proj_get_type_ptr;
 extern proj_info_t proj_info_ptr;
 extern proj_log_func_t proj_log_func_ptr;
+extern proj_coordoperation_is_instantiable_t proj_coordoperation_is_instantiable_ptr;
+extern proj_coordoperation_has_ballpark_transformation_t proj_coordoperation_has_ballpark_transformation_ptr;
+extern proj_coordoperation_get_accuracy_t proj_coordoperation_get_accuracy_ptr;
+extern proj_coordoperation_get_grid_used_count_t proj_coordoperation_get_grid_used_count_ptr;
+extern proj_coordoperation_get_grid_used_t proj_coordoperation_get_grid_used_ptr;
 
 // ------------------------
 // Library loader

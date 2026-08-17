@@ -423,7 +423,7 @@ public:
   bool set_state_plane_nad83_tm(const char* zone, char* description=0, bool source=true, const char* name=0);
   void print_all_state_plane_nad83_tm() const;
 
-  bool set_epsg_code(short code, char* description=0, bool source=true);
+  bool set_epsg_code(short code, char* description = 0, short vertical_value = 0, bool source = true);
 
   void reset_projection(bool source=true);
   bool has_projection(bool source=true) const;
@@ -508,13 +508,14 @@ public:
   void load_proj();
   void set_proj_crs_transform();
   BOOL is_proj_epsg_valid(unsigned int epsg_code);
-  void set_proj_crs_with_epsg(unsigned int& epsg_code, bool source = true);
+  void set_proj_crs_with_epsg(unsigned int horizontal_epsg, unsigned int vertical_epsg, bool source = true);
   void set_proj_crs_with_string(const char* proj_string, bool source = true);
   void set_proj_crs_with_json(const char* json_filename, bool source = true);
   void set_proj_crs_with_wkt(const char* wkt_filename, bool source = true);
   void set_proj_crs_with_file_header_wkt(const char* wktContent, bool source = true);
   bool is_proj_wkt_valid(const char* wktContent);
   std::string get_proj_crs_name_from_wkt(const char* wktContent);
+  void check_proj_coordinate_operation();
   void get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjectionConverter& geoprojectionconverter, LASreader* lasreader);
    
   // helps us to find the 'pcs.csv' file
@@ -526,6 +527,7 @@ public:
   bool disable_messages;
   bool check_header_for_crs;
   unsigned int source_header_epsg;
+  unsigned int source_header_vertical_epsg;
 
 private:
   // parameters for gtiff
@@ -543,8 +545,10 @@ private:
   int spheroid_code;
 
   //PROJ options 
-  unsigned int source_code;
-  unsigned int target_code;
+  unsigned int proj_source_horizontal_epsg;
+  unsigned int proj_target_horizontal_epsg;
+  unsigned int proj_source_vertical_epsg;
+  unsigned int proj_target_vertical_epsg;
   char* proj_source_string;
   char* proj_target_string;
   char* proj_source_json;
@@ -579,6 +583,7 @@ private:
   void set_projection(GeoProjectionParameters* projection, bool source);
   void set_geokey(short geokey, bool source);
   void check_geokey(short geokey, bool source);
+  void parse_proj_epsg(const char* arg, unsigned int& horizontal_epsg, unsigned int& vertical_epsg, const char* type);
   GeoProjectionParameters* get_projection(bool source) const;
   void compute_lcc_parameters(bool source);
   void compute_tm_parameters(bool source);
@@ -587,7 +592,7 @@ private:
   void compute_os_parameters(bool source);
 
   // using PROJ lib 
-  void set_proj_param_for_transformation_with_epsg(unsigned int& source_code, unsigned int& target_code);
+  void set_proj_param_for_transformation_with_epsg(unsigned int source_horizontal_epsg, unsigned int source_vertical_epsg, unsigned int target_horizontal_epsg, unsigned int target_vertical_epsg);
   void set_proj_param_for_transformation_with_string(const char* proj_sourge_string, const char* proj_target_string);
   void set_proj_param_for_transformation_with_json(const char* source_filename, const char* target_filename);
   void set_proj_param_for_transformation_with_wkt(const char* source_filename, const char* target_filename);

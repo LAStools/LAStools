@@ -346,7 +346,7 @@ double WktParser::ValueSubDouble(const std::string& key, const std::string sub, 
 // WktParserSem::WktParserSem(const std::string wktin) : WktParser(wktin) {}
 
 int WktParserSem::Pcs_Epsg() {
-  int res;
+  int res = 0;
   if (isWkt1) {
     res = ValueInt(compoundPfx + "PROJCS.AUTHORITY");
   } else {
@@ -356,7 +356,7 @@ int WktParserSem::Pcs_Epsg() {
 }
 
 int WktParserSem::Vert_Epsg() {
-  int res;
+  int res = 0;
   if (isWkt1) {
     res = ValueInt(compoundPfx + "VERT_CS.AUTHORITY");
   } else {
@@ -380,7 +380,7 @@ int WktParserSem::Vert_Unit_Epsg() {
 }
 
 int WktParserSem::Gcs_Epsg() {
-  int res;
+  int res = 0;
   if (isWkt1) {
     res = ValueInt(compoundPfx + "GEOGCS.AUTHORITY");
   } else {
@@ -411,7 +411,7 @@ bool WktParserSem::HasProjection(PROJECTION_METHOD& pm) {
 }
 
 double WktParserSem::ProjectionFalseEasting() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "false_easting");
   } else {
@@ -420,7 +420,7 @@ double WktParserSem::ProjectionFalseEasting() {
   return res;
 }
 double WktParserSem::ProjectionFalseNorthing() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "false_northing");
   } else {
@@ -430,7 +430,7 @@ double WktParserSem::ProjectionFalseNorthing() {
 }
 
 double WktParserSem::ProjectionLatitudeOfOrigin() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "latitude_of_origin");
   } else {
@@ -439,7 +439,7 @@ double WktParserSem::ProjectionLatitudeOfOrigin() {
   return res;
 }
 double WktParserSem::ProjectionLatitudeOfCenter() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "latitude_of_center");
   } else {
@@ -448,7 +448,7 @@ double WktParserSem::ProjectionLatitudeOfCenter() {
   return res;
 }
 double WktParserSem::ProjectionLongitudeOfCenter() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "longitude_of_center");
   } else {
@@ -458,7 +458,7 @@ double WktParserSem::ProjectionLongitudeOfCenter() {
 }
 
 double WktParserSem::ProjectionCentralMeridian() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "central_meridian");
   } else {
@@ -467,7 +467,7 @@ double WktParserSem::ProjectionCentralMeridian() {
   return res;
 }
 double WktParserSem::ProjectionCentralStandardParallel1() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "standard_parallel_1");
   } else {
@@ -476,7 +476,7 @@ double WktParserSem::ProjectionCentralStandardParallel1() {
   return res;
 }
 double WktParserSem::ProjectionCentralStandardParallel2() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "standard_parallel_2");
   } else {
@@ -486,7 +486,7 @@ double WktParserSem::ProjectionCentralStandardParallel2() {
 }
 
 double WktParserSem::ProjectionScaleFactor() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueSubDouble(compoundPfx + "PROJCS.PARAMETER", "scale_factor", 1);
   } else {
@@ -496,7 +496,7 @@ double WktParserSem::ProjectionScaleFactor() {
 }
 
 double WktParserSem::Pcs_Unit() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueDouble(compoundPfx + "PROJCS.UNIT", 1);
   } else {
@@ -506,7 +506,7 @@ double WktParserSem::Pcs_Unit() {
 }
 
 double WktParserSem::Vert_Unit() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueDouble(compoundPfx + "VERT_CS.UNIT", 1);
   } else {
@@ -516,7 +516,7 @@ double WktParserSem::Vert_Unit() {
 }
 
 double WktParserSem::Gcs_Unit() {
-  double res;
+  double res = 0.0;
   if (isWkt1) {
     res = ValueDouble(compoundPfx + "GEOCCS.UNIT", 1);
   } else {

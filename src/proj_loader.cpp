@@ -84,6 +84,11 @@ proj_is_crs_t proj_is_crs_ptr = nullptr;
 proj_cs_get_type_t proj_cs_get_type_ptr = nullptr;
 proj_info_t proj_info_ptr = nullptr;
 proj_log_func_t proj_log_func_ptr = nullptr;
+proj_coordoperation_is_instantiable_t proj_coordoperation_is_instantiable_ptr = nullptr;
+proj_coordoperation_has_ballpark_transformation_t proj_coordoperation_has_ballpark_transformation_ptr = nullptr;
+proj_coordoperation_get_accuracy_t proj_coordoperation_get_accuracy_ptr = nullptr;
+proj_coordoperation_get_grid_used_count_t proj_coordoperation_get_grid_used_count_ptr = nullptr;
+proj_coordoperation_get_grid_used_t proj_coordoperation_get_grid_used_ptr = nullptr;
 
 /// Function for parsing the version number from the directory name
 static std::vector<int> parseVersion(std::string versionStr) {
@@ -844,6 +849,11 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
   proj_is_crs_ptr = (proj_is_crs_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_is_crs");
   proj_info_ptr = (proj_info_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_info");
   proj_log_func_ptr = (proj_log_func_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_log_func");
+  proj_coordoperation_is_instantiable_ptr = (proj_coordoperation_is_instantiable_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_coordoperation_is_instantiable");
+  proj_coordoperation_has_ballpark_transformation_ptr = (proj_coordoperation_has_ballpark_transformation_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_coordoperation_has_ballpark_transformation");
+  proj_coordoperation_get_accuracy_ptr = (proj_coordoperation_get_accuracy_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_coordoperation_get_accuracy");
+  proj_coordoperation_get_grid_used_count_ptr = (proj_coordoperation_get_grid_used_count_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_coordoperation_get_grid_used_count");
+  proj_coordoperation_get_grid_used_ptr = (proj_coordoperation_get_grid_used_t)GET_PROC_ADDRESS(proj_lib_handle, "proj_coordoperation_get_grid_used");
 
   if (!proj_as_wkt_ptr || !proj_as_proj_string_ptr || !proj_as_projjson_ptr || !proj_get_source_crs_ptr || !proj_get_target_crs_ptr ||
       !proj_destroy_ptr || !proj_context_create_ptr || !proj_context_destroy_ptr || !proj_get_id_code_ptr || !proj_get_ellipsoid_ptr ||
@@ -852,7 +862,9 @@ bool load_proj_library(const char* path, bool isNecessary/*=true*/) {
       !proj_crs_get_coordinate_system_ptr || !proj_cs_get_type_ptr || !proj_cs_get_axis_count_ptr || !proj_cs_get_axis_info_ptr || !proj_create_ptr ||
       !proj_create_argv_ptr || !proj_create_crs_to_crs_ptr || !proj_create_crs_to_crs_from_pj_ptr || !proj_create_from_wkt_ptr ||
       !proj_context_errno_ptr || !proj_context_errno_string_ptr || !proj_coord_ptr || !proj_trans_ptr || !proj_get_type_ptr || !proj_is_crs_ptr ||
-      !proj_info_ptr || !proj_log_func_ptr)
+      !proj_info_ptr || !proj_log_func_ptr || !proj_coordoperation_is_instantiable_ptr ||
+      !proj_coordoperation_has_ballpark_transformation_ptr || !proj_coordoperation_get_accuracy_ptr || !proj_coordoperation_get_grid_used_count_ptr || 
+      !proj_coordoperation_get_grid_used_ptr)
   {
     std::string version = "Unknown";
     if (proj_info_ptr) {
@@ -915,6 +927,11 @@ void unload_proj_library() {
   proj_is_crs_ptr = nullptr;
   proj_info_ptr = nullptr;
   proj_log_func_ptr = nullptr;
+  proj_coordoperation_is_instantiable_ptr = nullptr;
+  proj_coordoperation_has_ballpark_transformation_ptr = nullptr;
+  proj_coordoperation_get_accuracy_ptr = nullptr;
+  proj_coordoperation_get_grid_used_count_ptr = nullptr;
+  proj_coordoperation_get_grid_used_ptr = nullptr;
 }
 
 /// User-specific error handler for PROJ errors and warnings

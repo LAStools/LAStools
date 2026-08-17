@@ -849,22 +849,21 @@ int main(int argc, char* argv[])
       }
       else if (strncmp(argv[i], "-set_ogc_wkt", 12) == 0)
       {
-        if (!geoprojectionconverter.is_proj_request) {         
-          if (strcmp(argv[i], "-set_ogc_wkt") == 0)
-          {
-            set_ogc_wkt = true;
-            set_ogc_wkt_in_evlr = false;
-          }
-          else if (strcmp(argv[i], "-set_ogc_wkt_in_evlr") == 0)
-          {
-            set_ogc_wkt = true;
-            set_ogc_wkt_in_evlr = true;
-          }
-          else
-          {
-            lastool.parse_arg_invalid_n(i);
-          }
+        if (strcmp(argv[i], "-set_ogc_wkt") == 0)
+        {
+          set_ogc_wkt = true;
+          set_ogc_wkt_in_evlr = false;
         }
+        else if (strcmp(argv[i], "-set_ogc_wkt_in_evlr") == 0)
+        {
+          set_ogc_wkt = true;
+          set_ogc_wkt_in_evlr = true;
+        }
+        else
+        {
+          lastool.parse_arg_invalid_n(i);
+        }
+
         if ((i + 1) < argc)
         {
           if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0'))
@@ -874,22 +873,29 @@ int main(int argc, char* argv[])
           }
         }
       } else if (strncmp(argv[i], "-set_proj_wkt", 13) == 0) {
-        if (!geoprojectionconverter.is_proj_request) {
-          // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
+        // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
+        if (!geoprojectionconverter.is_proj_request) 
+        {
           geoprojectionconverter.is_proj_request = load_proj_library(nullptr, false);
 
-          if (strcmp(argv[i], "-set_proj_wkt") == 0) {
+          if (strcmp(argv[i], "-set_proj_wkt") == 0) 
+          {
             set_ogc_wkt = true;
             set_ogc_wkt_in_evlr = false;
-          } else if (strcmp(argv[i], "-set_proj_wkt_in_evlr") == 0) {
+          } 
+          else if (strcmp(argv[i], "-set_proj_wkt_in_evlr") == 0) {
             set_ogc_wkt = true;
             set_ogc_wkt_in_evlr = true;
-          } else {
+          } 
+          else 
+          {
             lastool.parse_arg_invalid_n(i);
           }
         }
-        if ((i + 1) < argc) {
-          if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0')) {
+        if ((i + 1) < argc) 
+        {
+          if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0')) 
+          {
             set_ogc_wkt_string = argv[i + 1];
             i++;
           }
@@ -1130,7 +1136,7 @@ int main(int argc, char* argv[])
           {
             c = fgetc(file);
 
-            if (k == buff_size)
+            if (k + 1 >= buff_size)
               set_ogc_wkt_string = (CHAR*)realloc_las(set_ogc_wkt_string, (buff_size *= 2) * sizeof(CHAR));
 
             if (c == EOF || c == '\n')
@@ -2042,7 +2048,7 @@ int main(int argc, char* argv[])
         set_projection_in_header = true;
       }
       // PROJ transformation
-      if (geoprojectionconverter.is_proj_request && !set_ogc_wkt) 
+      if (geoprojectionconverter.is_proj_request) 
       {
         LASMessage(LAS_VERY_VERBOSE, "the PROJ transformation is prepared within las2las");
         // 1. If the source CRS is not specified as an argument (cmd line), try to generate it from the input file
@@ -2064,17 +2070,16 @@ int main(int argc, char* argv[])
 
             CHAR* ogc_wkt = nullptr;
             I32 len = 0;
-            // 3. if no WKT exist in file header try to generate WKT from GeoTiff and lastool
-            if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt))
+            // 3. prefer WKT when no vertical CRS is present; compound WKT generation supports only a limited set of vertical EPSGs
+            if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt) && geoprojectionconverter.source_header_vertical_epsg == 0)
             {
               geoprojectionconverter.set_proj_crs_with_file_header_wkt(ogc_wkt, true);
             }
-            // 4. if no WKT can be generated from GeoTiff try to get die EPSG from GeoTiff
+            // 4. if WKT is unavailable or a vertical CRS is present, use the GeoTIFF EPSG codes (limited compound WKT support)
             else if (geoprojectionconverter.source_header_epsg)
             {
-              LASMessage(LAS_WARNING, "No valid WKT could be generated from the GeoTiff of the source file. The EPSG code from the GeoTiff is used for the transformation, "
-                             "this can lead to loss of GeoTiff arguments, which can lead to inaccuracies or data loss during the transformation.");
-              geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, true);
+              LASMessage(LAS_VERY_VERBOSE, "using GeoTIFF EPSG codes to create the PROJ source CRS");
+              geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, geoprojectionconverter.source_header_vertical_epsg, true);
             }
             else 
             {
@@ -2132,9 +2137,6 @@ int main(int argc, char* argv[])
         reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
 
         set_projection_in_header = true;
-        lasreader->header.clean_vlrs();
-        lasreader->header.clean_evlrs();
-        LASMessage(LAS_VERY_VERBOSE, "the original vlr and evlr header information from the source file are not transferred to the target file");
       }
 
       if (set_projection_in_header || set_ogc_wkt_string || set_ogc_wkt) {
@@ -2142,7 +2144,8 @@ int main(int argc, char* argv[])
         bool has_wkt = false;
 
         // generate WKT (if desired or LAS 1.4)
-        if (lasreader->header.version_minor >= 4) {
+        if ((lasreader->header.version_minor == 4 && (set_ogc_wkt || set_ogc_wkt_string || 
+            geoprojectionconverter.is_proj_request)) || lasreader->header.version_minor >= 5) {
           // PROJ-WKT
           if (!ogc_wkt && geoprojectionconverter.is_proj_request) {
             LASMessage(LAS_VERBOSE, "use the WKT generated by PROJ");
@@ -2173,6 +2176,12 @@ int main(int argc, char* argv[])
           // enter WKT (if available)
           if (ogc_wkt) {
             has_wkt = true;
+            lasreader->header.remove_vlr("LASF_Projection", 34735);
+            lasreader->header.del_geo_ogc_wkt();
+            lasreader->header.del_geo_wkt_ogc_math();
+            lasreader->header.del_geo_ascii_params();
+            lasreader->header.del_geo_double_params();
+            LASMessage(LAS_VERY_VERBOSE, "the CRS related VLR and EVLR information is rebuilt for the target header");
 
             if (set_ogc_wkt_in_evlr && lasreader->header.version_minor >= 4)
               lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, TRUE);
@@ -2180,20 +2189,20 @@ int main(int argc, char* argv[])
               lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, FALSE);
 
             if (!set_ogc_wkt_string) free(ogc_wkt);
-            if (lasreader->header.version_minor >= 4) lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+            lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
           }
         }
 
-        // GeoKeys only if no WKT has been generated
-        if (!has_wkt) {
+        // GeoKeys only if no WKT has been generated an minor version < 5
+        if (!has_wkt && lasreader->header.version_minor < 5) {
           int number_of_keys;
           GeoProjectionGeoKeys* geo_keys = 0;
           int num_geo_double_params;
           double* geo_double_params = 0;
 
-          if (geoprojectionconverter.get_geo_keys_from_projection(
-                  number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params, !geoprojectionconverter.has_projection(false))) {
+          if (geoprojectionconverter.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params, !geoprojectionconverter.has_projection(false))) {
             lasreader->header.set_geo_keys(number_of_keys, (LASvlr_key_entry*)geo_keys);
+            lasreader->header.unset_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
             free(geo_keys);
 
             if (geo_double_params) {

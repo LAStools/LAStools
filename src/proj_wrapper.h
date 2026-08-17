@@ -71,6 +71,20 @@ MyPJ_TYPE my_proj_get_type(PJ* P);
 /// Read PROJ information 
 MyPJ_INFO my_proj_info(void);
 
+/// Get PROJ object name
+const char* my_proj_get_name(const PJ* obj);
+
+int my_proj_coordoperation_is_instantiable(PJ_CONTEXT* ctx, const PJ* operation);
+
+int my_proj_coordoperation_has_ballpark_transformation(PJ_CONTEXT* ctx, const PJ* operation);
+
+double my_proj_coordoperation_get_accuracy(PJ_CONTEXT* ctx, const PJ* operation);
+
+int my_proj_coordoperation_get_grid_used_count(PJ_CONTEXT* ctx, const PJ* operation);
+
+int my_proj_coordoperation_get_grid_used( PJ_CONTEXT* ctx, const PJ* operation, int index, const char** short_name, const char** full_name, const char** package_name, const char** url,
+    int* direct_download, int* open_license, int* available);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

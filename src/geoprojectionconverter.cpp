@@ -863,11 +863,12 @@ ProjParameters::~ProjParameters() {
 void ProjParameters::set_proj_member(char*& member, const char* value) {
   // Release previous memory to avoid memory leak
   delete[] member;
+  member = nullptr;
+
   if (value) {
-    member = new char[strlen(value) + 1];
-    strcpy_las(member, strlen(value) + 1, value);
-  } else {
-    member = nullptr;
+    const size_t len = strlen(value);
+    member = new char[len + 1];
+    strcpy_las(member, len + 1, value);
   }
 }
 
@@ -888,7 +889,10 @@ void ProjParameters::set_target_header_wkt_representation(PJ* proj_crs) {
   if (proj_ctx && proj_crs) {
     const char* options[] = {"MULTILINE=NO", nullptr};
     const char* wkt_representation = proj_as_wkt_ptr(proj_ctx, proj_crs, PJ_WKT1_GDAL, options);
+    set_proj_member(header_wkt_representation, wkt_representation);
+
     const char* wkt2_representation = proj_as_wkt_ptr(proj_ctx, proj_crs, PJ_WKT2_2019, options);
+    set_proj_member(header_wkt2_representation, wkt2_representation);
 
     if (!wkt_representation && !wkt2_representation) {
       LASMessage(
@@ -896,8 +900,7 @@ void ProjParameters::set_target_header_wkt_representation(PJ* proj_crs) {
           "The WKT representation could not be generated and could not be written to the output file header! It is therefore not possible to "
           "determine the CRS of the file.");
     }
-    set_proj_member(header_wkt_representation, wkt_representation);
-    set_proj_member(header_wkt2_representation, wkt2_representation);
+
     LASMessage(LAS_VERBOSE, "the WKT was successfully created via the PROJ library");
   }
 }
@@ -2406,7 +2409,7 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
 
   int gcs = wkt.Gcs_Epsg();
   if (gcs > 0) {
-    if (set_epsg_code(gcs, description)) {
+    if (set_epsg_code(gcs, description, vertical_geokey)) {
       LASMessage(LAS_VERBOSE, "source CRS [%s] set (GCS)", source_projection->info().c_str());
       // DO NOT return yet PCS may override it
     }
@@ -2415,7 +2418,7 @@ bool GeoProjectionConverter::set_projection_from_ogc_wkt(const char* ogc_wkt, ch
   // check if we have a projection (PCS)
   int pcs = wkt.Pcs_Epsg();
   if (pcs > 0) {
-    if (set_epsg_code(pcs, description)) {
+    if (set_epsg_code(pcs, description, vertical_geokey)) {
       LASMessage(LAS_VERBOSE, "source CRS [%s] set (PCS)", source_projection->info().c_str());
       return true;  // PCS wins
     }
@@ -4114,6 +4117,8 @@ short GeoProjectionConverter::get_VerticalUnitsGeoKey(bool source) const {
 }
 
 bool GeoProjectionConverter::set_VerticalCSTypeGeoKey(short value, char* description, size_t descs) {
+  if (is_proj_request) source_header_vertical_epsg = value;
+
   if (value == GEO_VERTICAL_WGS84) {
     vertical_geokey = GEO_VERTICAL_WGS84;
     if (description) sprintf(description, "WGS 84 Ellipsoid");
@@ -4941,7 +4946,7 @@ static double unit2meter(double length, int unit, bool disable_messages) {
   return 0.0;
 }
 
-bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool source) {
+bool GeoProjectionConverter::set_epsg_code(short value, char* description, short vertical_value, bool source) {
   if (value == 0) return false;
   int ellipsoid = -1;
   int gcs = -1;
@@ -4951,7 +4956,10 @@ bool GeoProjectionConverter::set_epsg_code(short value, char* description, bool 
   bool longlat = false;
   bool ecef = false;
 
-  if (source) source_header_epsg = value;
+  if (source) {
+    source_header_epsg = value;
+    if (vertical_value != 0) source_header_vertical_epsg = vertical_value;
+  }
 
   if ((value >= 32601) && (value <= 32660))  // PCS_WGS84_UTM_zone_1N - PCS_WGS84_UTM_zone_60N
   {
@@ -5379,7 +5387,7 @@ bool GeoProjectionConverter::set_state_plane_nad27_lcc(const char* zone, char* d
   int i = 0;
   while (state_plane_lcc_nad27_list[i].zone) {
     if (strcmp(zone, state_plane_lcc_nad27_list[i].zone) == 0) {
-      return set_epsg_code(state_plane_lcc_nad27_list[i].geokey, description, source);
+      return set_epsg_code(state_plane_lcc_nad27_list[i].geokey, description, source, vertical_geokey);
     }
     i++;
   }
@@ -5409,7 +5417,7 @@ bool GeoProjectionConverter::set_state_plane_nad83_lcc(const char* zone, char* d
   int i = 0;
   while (state_plane_lcc_nad83_list[i].zone) {
     if (strcmp(zone, state_plane_lcc_nad83_list[i].zone) == 0) {
-      return set_epsg_code(state_plane_lcc_nad83_list[i].geokey, description, source);
+      return set_epsg_code(state_plane_lcc_nad83_list[i].geokey, description, source, vertical_geokey);
     }
     i++;
   }
@@ -5439,7 +5447,7 @@ bool GeoProjectionConverter::set_state_plane_nad27_tm(const char* zone, char* de
   int i = 0;
   while (state_plane_tm_nad27_list[i].zone) {
     if (strcmp(zone, state_plane_tm_nad27_list[i].zone) == 0) {
-      return set_epsg_code(state_plane_tm_nad27_list[i].geokey, description, source);
+      return set_epsg_code(state_plane_tm_nad27_list[i].geokey, description, source, vertical_geokey);
     }
     i++;
   }
@@ -5468,7 +5476,7 @@ bool GeoProjectionConverter::set_state_plane_nad83_tm(const char* zone, char* de
   int i = 0;
   while (state_plane_tm_nad83_list[i].zone) {
     if (strcmp(zone, state_plane_tm_nad83_list[i].zone) == 0) {
-      return set_epsg_code(state_plane_tm_nad83_list[i].geokey, description, source);
+      return set_epsg_code(state_plane_tm_nad83_list[i].geokey, description, source, vertical_geokey);
     }
     i++;
   }
@@ -6944,9 +6952,12 @@ GeoProjectionConverter::GeoProjectionConverter() {
   is_proj_request = false;
   disable_messages = false;
   source_header_epsg = 0;
+  source_header_vertical_epsg = 0;
 
-  source_code = 0;
-  target_code = 0;
+  proj_source_horizontal_epsg = 0;
+  proj_target_horizontal_epsg = 0;
+  proj_source_vertical_epsg = 0;
+  proj_target_vertical_epsg = 0;
   proj_source_string = nullptr;
   proj_target_string = nullptr;
   proj_source_json = nullptr;
@@ -7183,20 +7194,19 @@ void GeoProjectionConverter::parse(int argc, char* argv[]) {
     else if (strcmp(argv[i], "-proj_epsg") == 0) {
       if (argv[i + 1] != nullptr && argv[i + 1][0] != '\0' && argv[i + 1][0] != '-' && argv[i + 2] != nullptr && argv[i + 2][0] != '\0' &&
           argv[i + 2][0] != '-') {
-        if (sscanf_las(argv[i + 1], "%u", &source_code) != 1) {
-          laserror("EPSG code from source '%s' not valid", argv[i + 1]);
-        }
-        if (sscanf_las(argv[i + 2], "%u", &target_code) != 1) {
-          laserror("EPSG code for the target '%s' not valid", argv[i + 2]);
-        }
+        // Source EPSG: horizontal[+vertical]
+        parse_proj_epsg(argv[i + 1], proj_source_horizontal_epsg, proj_source_vertical_epsg, "source");
+        // Target EPSG: horizontal[+vertical]
+        parse_proj_epsg(argv[i + 2], proj_target_horizontal_epsg, proj_target_vertical_epsg, "target");
+
         *argv[i] = '\0';
         *argv[i + 1] = '\0';
         *argv[i + 2] = '\0';
         i += 2;
       } else if (argv[i + 1] != nullptr && argv[i + 1][0] != '\0' && argv[i + 1][0] != '-') {
-        if (sscanf_las(argv[i + 1], "%u", &target_code) != 1) {
-          laserror("EPSG code from source '%s' not valid", argv[i + 1]);
-        }
+        // Target EPSG: horizontal[+vertical]
+        parse_proj_epsg(argv[i + 1], proj_target_horizontal_epsg, proj_target_vertical_epsg, "target");
+
         check_header_for_crs = true;
         *argv[i] = '\0';
         *argv[i + 1] = '\0';
@@ -7750,11 +7760,11 @@ int GeoProjectionConverter::unparse(char* string) const {
     n += sprintf(&string[n], "-target_elevation_precision %lf ", target_elevation_precision);
   }
   if (is_proj_request == true) {
-    if (target_code > 0) {
-      if (source_code > 0) {
-        n += sprintf(&string[n], "-proj_epsg %u %u ", source_code, target_code);
+    if (proj_target_horizontal_epsg > 0) {
+      if (proj_source_horizontal_epsg > 0) {
+        n += sprintf(&string[n], "-proj_epsg %u %u ", proj_source_horizontal_epsg, proj_target_horizontal_epsg);
       } else {
-        n += sprintf(&string[n], "-proj_epsg %u ", target_code);
+        n += sprintf(&string[n], "-proj_epsg %u ", proj_target_horizontal_epsg);
       }
     }
     if (proj_source_string != nullptr) {
@@ -7781,6 +7791,34 @@ int GeoProjectionConverter::unparse(char* string) const {
   }
 
   return n;
+}
+
+// Parses a horizontal EPSG code, optionally accompanied by a vertical EPSG code, in the format horizontal[+vertical]
+void GeoProjectionConverter::parse_proj_epsg(const char* arg, unsigned int& horizontal_epsg, unsigned int& vertical_epsg, const char* type) {
+  horizontal_epsg = 0;
+  vertical_epsg = 0;
+
+  const char* separator = strchr(arg, '+');
+  char extra;
+
+  if (separator) {
+    // horizontal EPSG
+    std::string horizontal(arg, separator - arg);
+    const char* vertical = separator + 1;
+
+    if (horizontal.empty() || sscanf_las(horizontal.c_str(), "%u%c", &horizontal_epsg, &extra) != 1) {
+      laserror("Horizontal %s EPSG code '%s' not valid", type, arg);
+    }
+    // vertical EPSG
+    if (*vertical == '\0' || sscanf_las(vertical, "%u%c", &vertical_epsg, &extra) != 1) {
+      laserror("Vertical %s EPSG code '%s' not valid", type, vertical);
+    }
+  } else {
+    // horizontal EPSG only
+    if (sscanf_las(arg, "%u%c", &horizontal_epsg, &extra) != 1) {
+      laserror("%s EPSG code '%s' not valid", type, arg);
+    }
+  }
 }
 
 void GeoProjectionConverter::set_coordinates_in_survey_feet(bool source) {
@@ -8852,10 +8890,11 @@ BOOL GeoProjectionConverter::is_proj_epsg_valid(unsigned int epsg_code) {
 /// IMPORTANT: The Proj lib must be installed and loaded to use this functionality.
 /// create PROJ object using the epsg code (for source=true or target=false)
 /// Parse and validate the input epsg and set the ProjParameter crs
-void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int& epsg_code, bool source /*=true*/) {
+void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int horizontal_epsg, unsigned int vertical_epsg, bool source /*=true*/) {
   int err_no = 0;
 
-  if (epsg_code == 0 || epsg_code > 999999) laserror("Invalid epsg code: %u", epsg_code);
+  if (horizontal_epsg == 0 || horizontal_epsg > 999999) laserror("Invalid horizontal EPSG code: %u", horizontal_epsg);
+  if (vertical_epsg > 999999) laserror("Invalid vertical EPSG code: %u", vertical_epsg);
 
   projParameters.proj_ctx = my_proj_context_create();
   // Register log handler
@@ -8863,8 +8902,13 @@ void GeoProjectionConverter::set_proj_crs_with_epsg(unsigned int& epsg_code, boo
 
   if (!projParameters.proj_ctx) laserror("Failed to create PROJ context");
 
-  char crs_epsg[20];
-  snprintf(crs_epsg, sizeof(crs_epsg), "EPSG:%u", epsg_code);
+  char crs_epsg[40];
+
+  if (vertical_epsg != 0) {
+    snprintf(crs_epsg, sizeof(crs_epsg), "EPSG:%u+%u", horizontal_epsg, vertical_epsg);
+  } else {
+    snprintf(crs_epsg, sizeof(crs_epsg), "EPSG:%u", horizontal_epsg);
+  }
 
   PJ* proj_crs = my_proj_create(projParameters.proj_ctx, crs_epsg);
 
@@ -9176,11 +9220,11 @@ void GeoProjectionConverter::load_proj() {
     load_proj_library(nullptr);
 
     // Set the correct source and target arguments
-    if (target_code > 0) {
-      if (source_code > 0) {
-        set_proj_param_for_transformation_with_epsg(source_code, target_code);
+    if (proj_target_horizontal_epsg > 0) {
+      if (proj_source_horizontal_epsg > 0) {
+        set_proj_param_for_transformation_with_epsg(proj_source_horizontal_epsg, proj_source_vertical_epsg, proj_target_horizontal_epsg, proj_target_vertical_epsg);
       } else {
-        set_proj_crs_with_epsg(target_code, false);
+        set_proj_crs_with_epsg(proj_target_horizontal_epsg, proj_target_vertical_epsg, false);
       }
     } else if (proj_source_string != nullptr) {
       if (proj_target_string != nullptr) {
@@ -9246,19 +9290,31 @@ void GeoProjectionConverter::set_proj_crs_transform() {
       }
     }
     LASMessage(LAS_VERY_VERBOSE, "the PROJ transformations object was successfully created");
+
+    check_proj_coordinate_operation();
   }
 }
 
 /// IMPORTANT: The Proj lib must be installed and loaded to use this functionality.
 /// PROJ transformation using the source and target epsg code
 /// Parse and validate the input values and set the ProjParameter
-void GeoProjectionConverter::set_proj_param_for_transformation_with_epsg(unsigned int& source_code, unsigned int& target_code) {
-  if (source_code == 0 || source_code > 999999 || target_code == 0 || target_code > 999999) laserror("Invalid source or target epsg code");
+void GeoProjectionConverter::set_proj_param_for_transformation_with_epsg(unsigned int source_horizontal_epsg, unsigned int source_vertical_epsg, unsigned int target_horizontal_epsg, unsigned int target_vertical_epsg) {
+  if (source_horizontal_epsg == 0 || source_horizontal_epsg > 999999 || target_horizontal_epsg == 0 || target_horizontal_epsg > 999999) {
+    laserror("Invalid source or target horizontal EPSG code");
+  }
+  if (source_vertical_epsg > 999999 || target_vertical_epsg > 999999) {
+    laserror("Invalid source or target vertical EPSG code");
+  }
 
-  // Create the proj crs object
-  set_proj_crs_with_epsg(source_code, true);
-  set_proj_crs_with_epsg(target_code, false);
-  LASMessage(LAS_VERBOSE, "using PROJ source epsg code '%d' and target epsg code '%d'", source_code, target_code);
+  // Create source and target CRS objects
+  set_proj_crs_with_epsg(source_horizontal_epsg, source_vertical_epsg, true);
+  set_proj_crs_with_epsg(target_horizontal_epsg, target_vertical_epsg, false);
+
+  std::string source_vertical = source_vertical_epsg ? ", vertical EPSG '" + std::to_string(source_vertical_epsg) + "'" : "";
+  std::string target_vertical = target_vertical_epsg ? ", vertical EPSG '" + std::to_string(target_vertical_epsg) + "'" : "";
+
+  LASMessage(LAS_VERBOSE, "using PROJ source horizontal EPSG '%u'%s and target horizontal EPSG '%u'%s", source_horizontal_epsg, source_vertical.c_str(),
+      target_horizontal_epsg, target_vertical.c_str());
 
   // Create the transformation PROJ object
   set_proj_crs_transform();
@@ -9368,6 +9424,117 @@ bool GeoProjectionConverter::do_proj_crs_transformation(double& x, double& y, do
   return true;
 }
 
+/// Checks the PROJ transformation object and reports information about the selected coordinate operation, including ballpark status, accuracy, and grid usage.
+void GeoProjectionConverter::check_proj_coordinate_operation() {
+  PJ* operation = projParameters.proj_transform_crs;
+
+  if (!operation) {
+    laserror("PROJ coordinate operation is null.");
+  }
+
+  // Check whether the coordinate operation is instantiable
+
+  const int instantiable = my_proj_coordoperation_is_instantiable(projParameters.proj_ctx, operation);
+
+  if (instantiable == 0) {
+    laserror("The PROJ coordinate operation cannot be instantiated.");
+  }
+
+  if (instantiable < 0) {
+    LASMessage(LAS_WARNING, "PROJ could not determine whether the coordinate operation is instantiable.");
+  }
+
+  // Check whether the operation uses a ballpark transformation
+
+  const int ballpark = my_proj_coordoperation_has_ballpark_transformation(projParameters.proj_ctx, operation);
+
+  if (ballpark > 0) {
+    const char* source_name = my_proj_get_name(projParameters.proj_source_crs);
+    const char* target_name = my_proj_get_name(projParameters.proj_target_crs);
+
+    if (source_name && source_name[0] != '\0' && target_name && target_name[0] != '\0') {
+      LASMessage(LAS_WARNING, "PROJ selected a ballpark transformation from '%s' to '%s'.", source_name, target_name);
+    } else {
+      LASMessage(LAS_WARNING, "PROJ selected a ballpark transformation.");
+    }
+
+    // technical operation detail
+    const char* operation_name = my_proj_get_name(operation);
+
+    if (operation_name && operation_name[0] != '\0') {
+      LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation: '%s'", operation_name);
+    }
+  } else if (ballpark < 0) {
+    LASMessage(LAS_WARNING, "PROJ could not determine whether the coordinate operation uses a ballpark transformation.");
+  }
+
+  // Check operation accuracy
+
+  const double accuracy = my_proj_coordoperation_get_accuracy(projParameters.proj_ctx, operation);
+
+  if (accuracy >= 0.0) {
+    LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation accuracy: %.3f m", accuracy);
+  } else {
+    LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation accuracy is unknown.");
+  }
+
+  // Check every grid used by the operation
+
+  const int grid_count = my_proj_coordoperation_get_grid_used_count(projParameters.proj_ctx, operation);
+
+  if (grid_count < 0) {
+    LASMessage(LAS_WARNING, "Could not determine grids used by the PROJ coordinate operation.");
+  } else if (grid_count == 0) {
+    LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation uses no grids.");
+  } else {
+    std::vector<std::string> missing_grids;
+    bool grid_information_incomplete = false;
+
+    for (int i = 0; i < grid_count; ++i) {
+      const char* short_name = nullptr;
+      const char* full_name = nullptr;
+      const char* package_name = nullptr;
+      const char* url = nullptr;
+
+      int direct_download = 0;
+      int open_license = 0;
+      int available = 0;
+
+      const int result = my_proj_coordoperation_get_grid_used(projParameters.proj_ctx, operation, i, &short_name, &full_name, &package_name, &url, &direct_download, &open_license, &available);
+
+      if (!result) {
+        grid_information_incomplete = true;
+        continue;
+      }
+
+      if (!available) {
+        missing_grids.emplace_back(short_name ? short_name : "(unknown)");
+      }
+    }
+
+    if (grid_information_incomplete) {
+      LASMessage(LAS_WARNING, "Could not retrieve information for one or more PROJ grids used by the coordinate operation.");
+    }
+
+    if (missing_grids.empty()) {
+      if (!grid_information_incomplete) {
+        LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation uses '%d' grid(s); all are available.",  grid_count);
+      }
+    } else {
+      std::string missing;
+
+      for (size_t i = 0; i < missing_grids.size(); ++i) {
+        if (i > 0) missing += ", ";
+
+        missing += missing_grids[i];
+      }
+
+      LASMessage(LAS_WARNING, "PROJ coordinate operation uses '%d' grid(s), but '%d' grid(s) are missing.", grid_count, static_cast<int>(missing_grids.size()));
+      LASMessage(LAS_WARNING, "Missing PROJ grid(s): %s", missing.c_str());
+    }
+  }
+}
+
 /// IMPORTANT: The Proj lib must be installed and loaded to use this functionality.
 /// Attempts to create the WKT representation of the CRS via the PROJ lib.
 /// If it is a Proj transformation, the wkt has already been created.
@@ -9401,7 +9568,7 @@ void GeoProjectionConverter::get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjection
                 LAS_WARNING,
                 "No valid WKT could be generated from the GeoTiff of the source file. The EPSG code from the GeoTiff is used for generating the WKT, "
                 "this can lead to loss of GeoTiff arguments, which can lead to inaccuracies or data loss in the WKT.");
-            geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, true);
+            geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, geoprojectionconverter.source_header_vertical_epsg, true);
           } else {
             laserror(
                 "No WKT could be generated from the header information of the source file. Please specify the coordinate system (CRS) directly when "
@@ -9415,7 +9582,8 @@ void GeoProjectionConverter::get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjection
     if (wkt_representation == nullptr) {
       // If no WKT representation is available, try to create it with EPSG
       if (geoprojectionconverter.source_header_epsg > 0) {
-        geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, false);
+        geoprojectionconverter.set_proj_crs_with_epsg(
+            geoprojectionconverter.source_header_epsg, geoprojectionconverter.source_header_vertical_epsg, false);
         wkt_representation = geoprojectionconverter.projParameters.get_target_header_wkt_representation(lasreader->header);
       }
     }
