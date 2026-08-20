@@ -618,6 +618,9 @@ BOOL file_exists(const std::string& path);
 /// Get the digits 
 I32 get_digits(F64 scale_factor); 
 
+/// Normalises line endings to LF
+std::string normalizeLineEndings(const char* data, int length);
+
 /// Correctly encapsulates CSV special characters and doubles quotation marks for valid CSV
 std::string escape_csv_value(const std::string& value);
 /// Converts all XML reserved characters in the string to their safe entity codes for valid XML

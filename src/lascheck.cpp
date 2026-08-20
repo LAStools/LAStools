@@ -320,10 +320,7 @@ void LAScheck::check(ValidationResult& results, std::string& crsdescription, BOO
       break;
     }
   }
-  if (i == 32) {
-    set_oss_content(note_oss, "should be terminated by '\\0'");
-    results.add_fail("system identifier", note_oss.str());
-  } else if (i == 0) {
+  if (i == 0) {
     set_oss_content(note_oss, "empty string. begins with '\\0'");
     results.add_warning("system identifier", note_oss.str());
   }
@@ -346,10 +343,7 @@ void LAScheck::check(ValidationResult& results, std::string& crsdescription, BOO
       break;
     }
   }
-  if (i == 32) {
-    set_oss_content(note_oss, "should be terminated by '\\0'");
-    results.add_fail("generating software", note_oss.str());
-  } else if (i == 0) {
+  if (i == 0) {
     set_oss_content(note_oss, "empty string. begins with '\\0'");
     results.add_warning("generating software", note_oss.str());
   }

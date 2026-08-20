@@ -879,6 +879,28 @@ I32 get_digits(F64 scale_factor) {
   return -1;
 }
 
+/// Standardises various line endings (CR, LF, CRLF) to a uniform LF and removes null terminators (\0)
+std::string normalizeLineEndings(const char* data, int length) {
+  std::string text;
+  text.reserve(length);
+
+  for (int j = 0; j < length; ++j) {
+    char c = data[j];
+
+    if (c == '\r') {
+      text += '\n';
+
+      if (j + 1 < length && data[j + 1] == '\n') {
+        ++j;
+      }
+    } else if (c == '\n') {
+      text += '\n';
+    } else if (c != '\0') {
+      text += c;
+    }
+  }
+  return text;
+}
 
 /// Correctly encapsulates CSV special characters and doubles quotation marks for valid CSV
 std::string escape_csv_value(const std::string& value) {
