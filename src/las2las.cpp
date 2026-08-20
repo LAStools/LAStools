@@ -531,6 +531,41 @@ static void parse_save_load_vlr_args(int& i, int argc, char* argv[], bool& save_
   }
 }
 
+/// Loads a WKT file and removes CR/LF line endings and following indentation
+static std::string parse_wkt_file_flat(const char* filename) {
+  FILE* file = LASfopen(filename, "rb");
+
+  if (!file) return std::string();
+
+  std::string wkt;
+  I32 c;
+
+  // read complete file
+  while ((c = fgetc(file)) != EOF) {
+    wkt += (CHAR)c;
+  }
+  fclose(file);
+
+  // remove line endings and indentation
+  std::string flat_wkt;
+  flat_wkt.reserve(wkt.size());
+
+  bool skip_indentation = false;
+
+  for (char c : wkt) {
+    if (c == '\r' || c == '\n') {
+      skip_indentation = true;
+      continue;
+    }
+    if (skip_indentation) {
+      if (c == ' ' || c == '\t') continue;
+      skip_indentation = false;
+    }
+    flat_wkt += c;
+  }
+  return flat_wkt;
+}
+
 // for point type conversions
 const U8 convert_point_type_from_to[11][11] =
 {
@@ -1117,44 +1152,24 @@ int main(int argc, char* argv[])
     {
       load_vlr = true;
       parse_save_load_vlr_args(i, argc, argv, save_vlr, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
-    }
-    else if (strcmp(argv[i], "-load_ogc_wkt") == 0)
-    {
+    } 
+    else if (strcmp(argv[i], "-load_ogc_wkt") == 0) {
       lastool.parse_arg_cnt_check(i, 1, "file name");
-      if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0'))
-      {
-        FILE* file = LASfopen(argv[i + 1], "r");
 
-        if (file)
-        {
-          set_ogc_wkt = true;
-          set_ogc_wkt_in_evlr = false;
-          U32 buff_size = 5; I32 c = 0; U32 k = 0;
-          set_ogc_wkt_string = (CHAR*)calloc(buff_size, sizeof(CHAR));
+      if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0')) {
+        set_ogc_wkt = true;
+        set_ogc_wkt_in_evlr = false;
 
-          while (c != EOF && c != '\n' && set_ogc_wkt_string != nullptr)
-          {
-            c = fgetc(file);
+        std::string flat_wkt = parse_wkt_file_flat(argv[i + 1]);
 
-            if (k + 1 >= buff_size)
-              set_ogc_wkt_string = (CHAR*)realloc_las(set_ogc_wkt_string, (buff_size *= 2) * sizeof(CHAR));
+        set_ogc_wkt_string = (CHAR*)calloc(flat_wkt.size() + 1, sizeof(CHAR));
 
-            if (c == EOF || c == '\n')
-              set_ogc_wkt_string[k] = '\0';
-            else
-              set_ogc_wkt_string[k++] = (CHAR)c;
-          }
-
-          fclose(file);
-          i++;
+        if (set_ogc_wkt_string != nullptr) {
+          memcpy(set_ogc_wkt_string, flat_wkt.c_str(), flat_wkt.size());
+          set_ogc_wkt_string[flat_wkt.size()] = '\0';
         }
-        else
-        {
-          laserror("cannot open file '%s' for read", argv[i + 1]);
-        }
-      }
-      else
-      {
+        i++;
+      } else {
         lastool.parse_arg_cnt_check(i, 1, "file name");
       }
     }

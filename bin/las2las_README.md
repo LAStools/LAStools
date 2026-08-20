@@ -286,7 +286,7 @@ point.Z<1000 or point.Z>4000 and stores all surviving points to out.laz
 -force                              : force a GPS conversion even if conversion is suspect  
 -load_vlrs                          : loads all VLRs from a file called vlrs.vlr and adds them to each processed file  
 -load_vlr [i] [u] [r] [f]           : loads a single VLR specified by index [i] (default = 0) or user ID [u] and record ID [r] from the file [f] (default: save.vlr) and adds it to each processed file header  
--load_ogc_wkt [f]                   : loads the first single-string from file [f] and puts it into the place of the OGC WKT  
+-load_ogc_wkt [f]                   : loads the WKT from file [f] and puts it into the OGC WKT VLR 
 -move_evlrs_to_vlrs                 : move all EVLRs with small enough payload to VLR section  
 -offset_to_adjusted                 : converts time stamps from Offset GPS to Adjusted Standard GPS  
 -offset_to_offset [n]               : converts time stamps from Offset GPS to Offset GPS [n]  
