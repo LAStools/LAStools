@@ -502,32 +502,186 @@ static bool load_single_vlr_from_file(LASheader* header, const int& vlr_index, c
   return true;
 }
 
-/// Parse and handle arguments for -save_vlr or -load_vlr, based on specified vlr index or user ID and record ID and optional output filename
-static void parse_save_load_vlr_args(int& i, int argc, char* argv[], bool& save_vlr, int& vlr_index, char*& vlr_user_id, int& vlr_record_id, char*& vlr_filename) {
-  if (i + 1 >= argc) {
-    vlr_index = 0; // Default value if no arguments are provided
+/// Loads the contents of a txt/bin file into an existing VLR in the LAS header, selected by index or user ID and record ID
+static bool load_file_to_vlr(LASheader* header, const int& vlr_index, const CHAR* vlr_user_id, const int& vlr_record_id, const CHAR* input_filename) {
+  U32 target_index = 0;
+  bool existing_vlr = false;
+
+  // find target VLR
+  if (vlr_index >= 0) {
+    if (static_cast<U32>(vlr_index) >= header->number_of_variable_length_records) {
+      laserror("specified vlr index '%d' is out of range", vlr_index);
+      return false;
+    }
+
+    target_index = static_cast<U32>(vlr_index);
+    existing_vlr = true;
+  } else if (vlr_user_id != nullptr && vlr_record_id >= 0) {
+    // search for an existing VLR with the specified user ID and record ID
+    for (U32 i = 0; i < header->number_of_variable_length_records; i++) {
+      if (strcmp(header->vlrs[i].user_id, vlr_user_id) == 0 && header->vlrs[i].record_id == vlr_record_id) {
+        target_index = i;
+        existing_vlr = true;
+        break;
+      }
+    }
+    // if it was not found, it will be created
+  } else {
+    laserror("no valid VLR selector specified");
+    return false;
   }
-  // Check for user ID and record ID
-  else if (i + 2 < argc && argv[i + 1][0] != '-' && isalnum(argv[i + 1][0]) && argv[i + 2][0] != '-' && isdigit(argv[i + 2][0])) {
-    vlr_user_id = argv[++i];
-    vlr_record_id = atoi(argv[++i]);
-    // Optional output filename
-    if (i + 1 < argc && argv[i + 1][0] != '-') {
-      vlr_filename = argv[++i];
+
+  FILE* file = LASfopen(input_filename, "rb");
+
+  if (file == nullptr) {
+    laserror("file '%s' could not be found", input_filename);
+    return false;
+  }
+  if (fseek(file, 0, SEEK_END) != 0) {
+    fclose(file);
+    laserror("could not seek in file '%s'", input_filename);
+    return false;
+  }
+
+  long file_size = ftell_las(file);
+
+  if (file_size < 0) {
+    fclose(file);
+    laserror("could not determine size of file '%s'", input_filename);
+    return false;
+  }
+
+  rewind(file);
+
+  // VLR record length is limited to U16
+  if (file_size > 65535) {
+    fclose(file);
+    laserror("file '%s' is too large for a VLR (%ld bytes, maximum is 65535 bytes)", input_filename, file_size);
+    return false;
+  }
+
+  U8* data = nullptr;
+
+  if (file_size > 0) {
+    data = new U8[file_size];
+
+    if (fread(data, 1, file_size, file) != static_cast<size_t>(file_size)) {
+      delete[] data;
+      fclose(file);
+      laserror("could not read file '%s'", input_filename);
+      return false;
     }
   }
-  // Check for numeric index
-  else if (i + 1 < argc && argv[i + 1][0] != '-' && isdigit(argv[i + 1][0])) {
-    vlr_index = atoi(argv[++i]);
-    // Optional output filename
-    if (i + 1 < argc && argv[i + 1][0] != '-') {
-      vlr_filename = argv[++i];
+  fclose(file);
+
+  // flatten WKT data only when the target VLR is LASF_Projection/2112
+  bool is_wkt_vlr = false;
+
+  if (existing_vlr) {
+    is_wkt_vlr = strcmp(header->vlrs[target_index].user_id, "LASF_Projection") == 0 && header->vlrs[target_index].record_id == 2112;
+  } else {
+    is_wkt_vlr = vlr_user_id != nullptr && strcmp(vlr_user_id, "LASF_Projection") == 0 && vlr_record_id == 2112;
+  }
+
+  if (is_wkt_vlr) {
+    std::string flat_wkt = flatten_text_data(data, static_cast<size_t>(file_size));
+
+    delete[] data;
+
+    file_size = static_cast<long>(flat_wkt.size());
+    data = nullptr;
+
+    if (file_size > 0) {
+      data = new U8[file_size];
+      memcpy(data, flat_wkt.data(), static_cast<size_t>(file_size));
     }
   }
-  //Only filename arguments is provided
-  else if (i + 1 < argc && argv[i + 1][0] != '-') {
-    vlr_index = 0; // Default value if just filename arguments is provided
-    vlr_filename = argv[++i];
+
+  if (existing_vlr) {
+    // replace only the data of the existing VLR
+    U16 old_record_length = header->vlrs[target_index].record_length_after_header;
+
+    if (old_record_length) {
+      header->offset_to_point_data -= old_record_length;
+      delete[] header->vlrs[target_index].data;
+    }
+
+    header->vlrs[target_index].data = data;
+    header->vlrs[target_index].record_length_after_header = static_cast<U16>(file_size);
+
+    header->offset_to_point_data += static_cast<U16>(file_size);
+
+    if (vlr_index >= 0) {
+      LASMessage(LAS_VERBOSE, "loaded %ld bytes from '%s' into VLR with index '%d'", file_size, input_filename, vlr_index);
+    } else {
+      LASMessage(
+          LAS_VERBOSE, "loaded %ld bytes from '%s' into existing VLR with user ID '%s' and record ID '%d'", file_size, input_filename, vlr_user_id,
+          vlr_record_id);
+    }
+  } else {
+    // VLR does not exist yet
+    header->add_vlr(vlr_user_id, static_cast<U16>(vlr_record_id), static_cast<U16>(file_size), data, FALSE, nullptr, FALSE);
+
+    LASMessage(
+        LAS_VERBOSE, "loaded %ld bytes from '%s' into new VLR with user ID '%s' and record ID '%d'", file_size, input_filename, vlr_user_id,
+        vlr_record_id);
+  }
+  return true;
+}
+
+/// Parse and handle arguments for -save_vlr or -load_vlr, based on specified VLR index or user ID and record ID and optional filename
+static void parse_vlr_args(int& i, int argc, char* argv[], int& vlr_index, char*& vlr_user_id, int& vlr_record_id, char*& input_filename, bool require_filename) {
+  // No arguments provided
+  if (i + 1 >= argc || argv[i + 1][0] == '-') {
+    vlr_index = 0;
+  } else {
+    // first check whether the next argument is numeric
+    char* end = nullptr;
+    long first_value = strtol(argv[i + 1], &end, 10);
+
+    bool first_is_numeric = (*argv[i + 1] != '\0' && *end == '\0');
+
+    if (first_is_numeric) {
+      // numeric VLR index
+      vlr_index = static_cast<int>(first_value);
+      ++i;
+
+      // optional filename
+      if (i + 1 < argc && argv[i + 1][0] != '-') {
+        input_filename = argv[++i];
+      }
+    }
+    // check for user ID and record ID
+    else if (i + 2 < argc && argv[i + 2][0] != '-') {
+      char* record_end = nullptr;
+      long record_value = strtol(argv[i + 2], &record_end, 10);
+
+      bool record_is_numeric = (*argv[i + 2] != '\0' && *record_end == '\0');
+
+      if (record_is_numeric) {
+        // User ID
+        vlr_user_id = argv[++i];
+        // Record ID
+        ++i;
+        vlr_record_id = static_cast<int>(record_value);
+        // Optional filename
+        if (i + 1 < argc && argv[i + 1][0] != '-') {
+          input_filename = argv[++i];
+        }
+      } else {
+        // input filename only
+        vlr_index = 0;
+        input_filename = argv[++i];
+      }
+    } else {
+      // input filename only
+      vlr_index = 0;
+      input_filename = argv[++i];
+    }
+  }
+  // input filename required?
+  if (require_filename && input_filename == nullptr) {
+    laserror("missing input file for VLR data");
   }
 }
 
@@ -628,6 +782,16 @@ int main(int argc, char* argv[])
   int vlr_record_id = -1;
   CHAR* vlr_user_id = nullptr;
   CHAR* vlr_filename = nullptr;
+  bool load_txt_to_vlr = false;
+  bool load_bin_to_vlr = false;
+  int load_txt_vlr_index = -1;
+  int load_txt_vlr_record_id = -1;
+  CHAR* load_txt_vlr_user_id = nullptr;
+  CHAR* load_txt_vlr_filename = nullptr;
+  int load_bin_vlr_index = -1;
+  int load_bin_vlr_record_id = -1;
+  CHAR* load_bin_vlr_user_id = nullptr;
+  CHAR* load_bin_vlr_filename = nullptr;
   int set_attribute_scales = 0;
   int set_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
   double set_attribute_scale_scale[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
@@ -1146,13 +1310,21 @@ int main(int argc, char* argv[])
     else if (strcmp(argv[i], "-save_vlr") == 0)
     {
       save_vlr = true;
-      parse_save_load_vlr_args(i, argc, argv, save_vlr, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
+      parse_vlr_args(i, argc, argv, vlr_index, vlr_user_id, vlr_record_id, vlr_filename, false);
     }
     else if (strcmp(argv[i], "-load_vlr") == 0)
     {
       load_vlr = true;
-      parse_save_load_vlr_args(i, argc, argv, save_vlr, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
+      parse_vlr_args(i, argc, argv, vlr_index, vlr_user_id, vlr_record_id, vlr_filename, false);
     } 
+    else if (strcmp(argv[i], "-load_txt_to_vlr") == 0) {
+      load_txt_to_vlr = true;
+      parse_vlr_args(i, argc, argv, load_txt_vlr_index, load_txt_vlr_user_id, load_txt_vlr_record_id, load_txt_vlr_filename, true);
+    } 
+    else if (strcmp(argv[i], "-load_bin_to_vlr") == 0) {
+      load_bin_to_vlr = true;
+      parse_vlr_args(i, argc, argv, load_bin_vlr_index, load_bin_vlr_user_id, load_bin_vlr_record_id, load_bin_vlr_filename, true);
+    }
     else if (strcmp(argv[i], "-load_ogc_wkt") == 0) {
       lastool.parse_arg_cnt_check(i, 1, "file name");
 
@@ -2326,6 +2498,16 @@ int main(int argc, char* argv[])
       {
         load_single_vlr_from_file(&lasreader->header, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
         load_vlr = false;
+      }
+
+      if (load_txt_to_vlr) {
+        load_file_to_vlr(&lasreader->header, load_txt_vlr_index, load_txt_vlr_user_id, load_txt_vlr_record_id, load_txt_vlr_filename);
+        load_txt_to_vlr = false;
+      }
+
+      if (load_bin_to_vlr) {
+        load_file_to_vlr(&lasreader->header, load_bin_vlr_index, load_bin_vlr_user_id, load_bin_vlr_record_id, load_bin_vlr_filename);
+        load_bin_to_vlr = false;
       }
 
       if (add_empty_vlr_user_ID != 0)

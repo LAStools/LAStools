@@ -902,6 +902,29 @@ std::string normalizeLineEndings(const char* data, int length) {
   return text;
 }
 
+/// Removes line endings and following indentation
+std::string flatten_text_data(const U8* data, size_t size) {
+  std::string flat_wkt;
+  flat_wkt.reserve(size);
+
+  bool skip_indentation = false;
+
+  for (size_t i = 0; i < size; i++) {
+    char c = static_cast<char>(data[i]);
+
+    if (c == '\r' || c == '\n') {
+      skip_indentation = true;
+      continue;
+    }
+    if (skip_indentation) {
+      if (c == ' ' || c == '\t') continue;
+      skip_indentation = false;
+    }
+    flat_wkt += c;
+  }
+  return flat_wkt;
+}
+
 /// Correctly encapsulates CSV special characters and doubles quotation marks for valid CSV
 std::string escape_csv_value(const std::string& value) {
   // only escape if special " characters present
