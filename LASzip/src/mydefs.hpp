@@ -495,7 +495,7 @@ inline int stat_las(const char* path, las_stat_t* buf) {
 #if defined(_WIN32) && !defined(__MINGW32__)
   return _stati64(path, buf);
 #elif defined(__MINGW32__)
-  return stat64(path, buf);
+  return _stat64(path, buf);
 #else
   return stat(path, buf);
 #endif
