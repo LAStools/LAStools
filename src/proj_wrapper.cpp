@@ -122,3 +122,38 @@ MyPJ_INFO my_proj_info(void) {
   }
   return proj_info_ptr();
 }
+
+/// Wrapper for proj_get_name
+const char* my_proj_get_name(const PJ* obj) {
+  return proj_get_name_ptr ? proj_get_name_ptr(obj) : nullptr;
+}
+
+/// Wrapper for proj_coordoperation_is_instantiable
+int my_proj_coordoperation_is_instantiable(PJ_CONTEXT* ctx, const PJ* operation) {
+  return proj_coordoperation_is_instantiable_ptr ? proj_coordoperation_is_instantiable_ptr(ctx, operation) : -1;
+}
+
+/// Wrapper for proj_coordoperation_has_ballpark_transformation
+int my_proj_coordoperation_has_ballpark_transformation(PJ_CONTEXT* ctx, const PJ* operation) {
+  return proj_coordoperation_has_ballpark_transformation_ptr ? proj_coordoperation_has_ballpark_transformation_ptr(ctx, operation) : -1;
+}
+
+/// Wrapper for proj_coordoperation_get_accuracy
+double my_proj_coordoperation_get_accuracy(PJ_CONTEXT* ctx, const PJ* operation) {
+  return proj_coordoperation_get_accuracy_ptr ? proj_coordoperation_get_accuracy_ptr(ctx, operation) : -1.0;
+}
+
+/// Wrapper for proj_coordoperation_get_grid_used_count
+int my_proj_coordoperation_get_grid_used_count(PJ_CONTEXT* ctx, const PJ* operation) {
+  return proj_coordoperation_get_grid_used_count_ptr ? proj_coordoperation_get_grid_used_count_ptr(ctx, operation) : -1;
+}
+
+/// Wrapper for proj_coordoperation_get_grid_used
+int my_proj_coordoperation_get_grid_used(
+    PJ_CONTEXT* ctx, const PJ* operation, int index, const char** short_name, const char** full_name, const char** package_name, const char** url,
+    int* direct_download, int* open_license, int* available) {
+  return proj_coordoperation_get_grid_used_ptr
+             ? proj_coordoperation_get_grid_used_ptr(
+                   ctx, operation, index, short_name, full_name, package_name, url, direct_download, open_license, available)
+             : 0;
+}

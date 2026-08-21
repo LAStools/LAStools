@@ -2265,33 +2265,71 @@ public:
             }
 
             if (lasheader->vlrs[i].record_id == 2111) {  // WKT OGC MATH TRANSFORM
+              std::string wkt(reinterpret_cast<const char*>(lasreader->header.vlrs[i].data), lasheader->vlrs[i].record_length_after_header);
+
+              // normalize WKT line endings
+              wkt = normalizeLineEndings(wkt.data(), static_cast<int>(wkt.size()));
+
               if (json_out || (csv_out && wkt_bit_set)) {
-                std::string wkt((char*)lasreader->header.vlrs[i].data);
                 add_field("wkt_ogc_math_transform", wkt, json_out, csv_out, json_vlr_record, file_csv);
               } else {
                 fprintf(file_out, "    WKT OGC MATH TRANSFORM:\012");
-                fprintf(file_out, "    %s\012", lasreader->header.vlrs[i].data);
+                fprintf(file_out, "    ");
+
+                for (char c : wkt) {
+                  if (c == '\n') {
+#ifdef _WIN32
+                    fprintf(file_out, "\r\n");
+#else
+                    fprintf(file_out, "\n");
+#endif
+                    fprintf(file_out, "    ");
+                  } else {
+                    fprintf(file_out, "%c", c);
+                  }
+                }
+                fprintf(file_out, "\012");
               }
-            };
-            if (lasheader->vlrs[i].record_id == 2112) {  // WKT OGC COORDINATE SYSTEM
-              std::string wkt((char*)lasreader->header.vlrs[i].data);
+            }
+            if (lasheader->vlrs[i].record_id == 2112) {
+              std::string wkt(reinterpret_cast<const char*>(lasreader->header.vlrs[i].data), lasheader->vlrs[i].record_length_after_header);
+
               if (json_out) {
+                // normalize line endings
+                wkt = normalizeLineEndings(wkt.data(), static_cast<int>(wkt.size()));
                 json_vlr_record["wkt_ogc_coordinate_system"] = wkt;
               } else if (csv_out && wkt_bit_set) {
+                // normalize line endings
+                wkt = normalizeLineEndings(wkt.data(), static_cast<int>(wkt.size()));
                 add_csv_field(file_csv, "wkt", wkt);
               } else {
                 fprintf(file_out, "    WKT OGC COORDINATE SYSTEM:\012");
+
                 if (wkt_format) {
                   WktParser wkp;
                   wkp.silent = true;
                   wkp.SetWkt(wkt);
-                  wkt = wkp.WktFormat(false,2,6);
-                  fprintf(file_out, "%s\012", wkt.c_str());
-                } else {
-                  fprintf(file_out, "    %s\012", wkt.c_str());
+                  wkt = wkp.WktFormat(false, 2, 6);
                 }
+                // normalize line endings
+                wkt = normalizeLineEndings(wkt.data(), static_cast<int>(wkt.size()));
+                fprintf(file_out, "    ");
+
+                for (char c : wkt) {
+                  if (c == '\n') {
+#ifdef _WIN32
+                    fprintf(file_out, "\r\n");
+#else
+                    fprintf(file_out, "\n");
+#endif
+                    fprintf(file_out, "    ");
+                  } else {
+                    fprintf(file_out, "%c", c);
+                  }
+                }
+                fprintf(file_out, "\012");
               }
-            };
+            }
           } else if ((strcmp(lasheader->vlrs[i].user_id, "LASF_Spec") == 0) && (lasheader->vlrs[i].data != 0)) {
             if (lasheader->vlrs[i].record_id == 0) {  // ClassificationLookup
               LASvlr_classification* vlr_classification = (LASvlr_classification*)lasheader->vlrs[i].data;
@@ -2311,23 +2349,33 @@ public:
               if (num && !json_out && !csv_out) fprintf(file_out, "\012");
             } else if (lasheader->vlrs[i].record_id == 2) {  // Histogram
             } else if (lasheader->vlrs[i].record_id == 3) {  // TextAreaDescription
+              const char* data = reinterpret_cast<const char*>(lasheader->vlrs[i].data);
+              const int length = lasheader->vlrs[i].record_length_after_header;
+
+              // normalise VLR text
+              std::string text = normalizeLineEndings(data, length);
+
               if (json_out) {
-                json_vlr_record["text_area_description"];
+                json_vlr_record["text_area_description"] = text;
               } else if (!csv_out) {
+                // first line indentation
                 fprintf(file_out, "    ");
-              }
-              for (int j = 0; j < lasheader->vlrs[i].record_length_after_header; j++) {
-                if (lasheader->vlrs[i].data[j] != '\0') {
-                  if (json_out) {
-                    json_vlr_record["text_area_description"].push_back(reinterpret_cast<char*>(lasreader->header.vlrs[i].data));
-                  } else if (!csv_out) {
-                    fprintf(file_out, "%c", lasheader->vlrs[i].data[j]);
+
+                for (char c : text) {
+                  if (c == '\n') {
+#ifdef _WIN32
+                    fprintf(file_out, "\r\n");
+#else
+                    fprintf(file_out, "\n");
+#endif
+                    // indent every new line
+                    fprintf(file_out, "    ");
+                  } else {
+                    fprintf(file_out, "%c", c);
                   }
-                } else if (!json_out && !csv_out) {
-                  fprintf(file_out, " ");
                 }
+                fprintf(file_out, "\012");
               }
-              if (!json_out && !csv_out) fprintf(file_out, "\012");
             } else if (lasheader->vlrs[i].record_id == 4) {  // ExtraBytes
               const char* name_table[10] = {"unsigned char",      "char",      "unsigned short", "short", "unsigned long", "long",
                                             "unsigned long long", "long long", "float",          "double"};

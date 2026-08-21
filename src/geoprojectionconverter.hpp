@@ -128,28 +128,40 @@ struct GeoProjectionGeoKeys {
 #define GEO_SPHEROID_GRS67         7036
 #define GEO_SPHEROID_WGS72         7043
 
-#define GEO_VERTICAL_WGS84         5030
-#define GEO_VERTICAL_NGVD29        5102
-#define GEO_VERTICAL_NAVD88        5103
-#define GEO_VERTICAL_CGVD28        5114
-#define GEO_VERTICAL_DVR90         5206
-#define GEO_VERTICAL_EVRF2007      5215
-#define GEO_VERTICAL_NN54          5776
-#define GEO_VERTICAL_DHHN92        5783
-#define GEO_VERTICAL_NN2000        5941
-#define GEO_VERTICAL_CGVD2013      6647 
-#define GEO_VERTICAL_DHHN2016      7837
-#define GEO_VERTICAL_NZVD2016      7839 
+// vertical datum 
+#define GEO_VERTICAL_NGVD29_DATUM 5102
+#define GEO_VERTICAL_NAVD88_DATUM 5103
+#define GEO_VERTICAL_CGVD28_DATUM 5114
+#define GEO_VERTICAL_EVRF2007_DATUM 5215
 
-#define GEO_VERTICAL_NAVD88_GEOID96   965103
-#define GEO_VERTICAL_NAVD88_GEOID99   995103
-#define GEO_VERTICAL_NAVD88_GEOID03  1035103
-#define GEO_VERTICAL_NAVD88_GEOID06  1065103
-#define GEO_VERTICAL_NAVD88_GEOID09  1095103
-#define GEO_VERTICAL_NAVD88_GEOID12  1125103
-#define GEO_VERTICAL_NAVD88_GEOID12A 1135103
-#define GEO_VERTICAL_NAVD88_GEOID12B 1145103
-#define GEO_VERTICAL_NAVD88_GEOID18  1185103
+// vertical crs
+#define GEO_VERTICAL_WGS84 5030
+#define GEO_VERTICAL_EVRF2007 5621
+#define GEO_VERTICAL_NGVD29 5702
+#define GEO_VERTICAL_NAVD88 5703
+#define GEO_VERTICAL_CGVD28 5713
+#define GEO_VERTICAL_NN54 5776
+#define GEO_VERTICAL_DHHN92 5783
+#define GEO_VERTICAL_DVR90_HEIGHT 5799
+#define GEO_VERTICAL_NN2000 5941
+#define GEO_VERTICAL_NAVD88_FT 6360
+#define GEO_VERTICAL_CGVD2013 6647
+#define GEO_VERTICAL_DHHN2016 7837
+#define GEO_VERTICAL_NZVD2016 7839
+
+// vertical coordinate operation / transformation
+#define GEO_VERTICAL_DVR90 5206
+
+// NAVD88 geoid realizations
+#define GEO_VERTICAL_NAVD88_DATUM_GEOID96 965103
+#define GEO_VERTICAL_NAVD88_DATUM_GEOID99 995103
+#define GEO_VERTICAL_NAVD88_DATUM_GEOID03 1035103
+#define GEO_VERTICAL_NAVD88_DATUM_GEOID06 1065103
+#define GEO_VERTICAL_NAVD88_DATUM_GEOID09 1095103
+#define GEO_VERTICAL_NAVD88_DATUM_GEOID12 1125103
+#define GEO_VERTICAL_NAVD88_DATUM_GEOID12A 1135103
+#define GEO_VERTICAL_NAVD88_DATUM_GEOID12B 1145103
+#define GEO_VERTICAL_NAVD88_DATUM_GEOID18 1185103
 
 #pragma warning(push)
 #pragma warning(disable : 26495)
@@ -411,7 +423,7 @@ public:
   bool set_state_plane_nad83_tm(const char* zone, char* description=0, bool source=true, const char* name=0);
   void print_all_state_plane_nad83_tm() const;
 
-  bool set_epsg_code(short code, char* description=0, bool source=true);
+  bool set_epsg_code(short code, char* description = 0, short vertical_value = 0, bool source = true);
 
   void reset_projection(bool source=true);
   bool has_projection(bool source=true) const;
@@ -496,13 +508,14 @@ public:
   void load_proj();
   void set_proj_crs_transform();
   BOOL is_proj_epsg_valid(unsigned int epsg_code);
-  void set_proj_crs_with_epsg(unsigned int& epsg_code, bool source = true);
+  void set_proj_crs_with_epsg(unsigned int horizontal_epsg, unsigned int vertical_epsg, bool source = true);
   void set_proj_crs_with_string(const char* proj_string, bool source = true);
   void set_proj_crs_with_json(const char* json_filename, bool source = true);
   void set_proj_crs_with_wkt(const char* wkt_filename, bool source = true);
   void set_proj_crs_with_file_header_wkt(const char* wktContent, bool source = true);
   bool is_proj_wkt_valid(const char* wktContent);
   std::string get_proj_crs_name_from_wkt(const char* wktContent);
+  void check_proj_coordinate_operation();
   void get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjectionConverter& geoprojectionconverter, LASreader* lasreader);
    
   // helps us to find the 'pcs.csv' file
@@ -514,6 +527,7 @@ public:
   bool disable_messages;
   bool check_header_for_crs;
   unsigned int source_header_epsg;
+  unsigned int source_header_vertical_epsg;
 
 private:
   // parameters for gtiff
@@ -531,8 +545,10 @@ private:
   int spheroid_code;
 
   //PROJ options 
-  unsigned int source_code;
-  unsigned int target_code;
+  unsigned int proj_source_horizontal_epsg;
+  unsigned int proj_target_horizontal_epsg;
+  unsigned int proj_source_vertical_epsg;
+  unsigned int proj_target_vertical_epsg;
   char* proj_source_string;
   char* proj_target_string;
   char* proj_source_json;
@@ -567,6 +583,7 @@ private:
   void set_projection(GeoProjectionParameters* projection, bool source);
   void set_geokey(short geokey, bool source);
   void check_geokey(short geokey, bool source);
+  void parse_proj_epsg(const char* arg, unsigned int& horizontal_epsg, unsigned int& vertical_epsg, const char* type);
   GeoProjectionParameters* get_projection(bool source) const;
   void compute_lcc_parameters(bool source);
   void compute_tm_parameters(bool source);
@@ -575,7 +592,7 @@ private:
   void compute_os_parameters(bool source);
 
   // using PROJ lib 
-  void set_proj_param_for_transformation_with_epsg(unsigned int& source_code, unsigned int& target_code);
+  void set_proj_param_for_transformation_with_epsg(unsigned int source_horizontal_epsg, unsigned int source_vertical_epsg, unsigned int target_horizontal_epsg, unsigned int target_vertical_epsg);
   void set_proj_param_for_transformation_with_string(const char* proj_sourge_string, const char* proj_target_string);
   void set_proj_param_for_transformation_with_json(const char* source_filename, const char* target_filename);
   void set_proj_param_for_transformation_with_wkt(const char* source_filename, const char* target_filename);

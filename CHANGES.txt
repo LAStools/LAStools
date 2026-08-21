@@ -1,5 +1,12 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+21 August 2026 -- fix: lasinfo: unify VLR line endings; support multiline texts in VLR output
+21 August 2026 -- fix: lasvalidate: 32 byte field termination validation
+21 August 2026 -- fix: laszip: stat_las() not compiling with MinGW
+21 August 2026 -- NEW: support multiline WKT input in -load_ogc_wkt
+17 August 2026 -- NEW: Extend PROJ integration with Compound CRS support
+13 August 2026 -- NEW: add EPSG 5621, 5702, 5703, 5713, 5799 and 6360 for compound WKT generation
+13 August 2026 -- NEW: add compound WKT generation support for EVRF2007,NGVD29,NAVD88,NAVD88(ftUS),CGVD28 and DVR90
 10 August 2026 -- NEW: improve WKT2 support and GeoTIFF-WKT conversion
 10 August 2026 -- NEW: improve formula solver: writeable flags and attributes
 7 August 2026 -- fix: mem cleanup; additional buffer and overflow checks
