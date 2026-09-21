@@ -2278,11 +2278,7 @@ public:
 
                 for (char c : wkt) {
                   if (c == '\n') {
-#ifdef _WIN32
-                    fprintf(file_out, "\r\n");
-#else
                     fprintf(file_out, "\n");
-#endif
                     fprintf(file_out, "    ");
                   } else {
                     fprintf(file_out, "%c", c);
@@ -2317,11 +2313,7 @@ public:
 
                 for (char c : wkt) {
                   if (c == '\n') {
-#ifdef _WIN32
-                    fprintf(file_out, "\r\n");
-#else
                     fprintf(file_out, "\n");
-#endif
                     fprintf(file_out, "    ");
                   } else {
                     fprintf(file_out, "%c", c);
@@ -2363,12 +2355,7 @@ public:
 
                 for (char c : text) {
                   if (c == '\n') {
-#ifdef _WIN32
-                    fprintf(file_out, "\r\n");
-#else
                     fprintf(file_out, "\n");
-#endif
-                    // indent every new line
                     fprintf(file_out, "    ");
                   } else {
                     fprintf(file_out, "%c", c);
