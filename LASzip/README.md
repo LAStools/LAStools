@@ -20,9 +20,11 @@ Binary downloads for Windows and Linux are available at
 
 # Compilation
 
-Just go to the root directory and run  
-    cmake -DCMAKE_BUILD_TYPE=Release CMakeLists.txt  
-    cmake --build .  
+Just go to the root directory and run:
+```
+cmake -DCMAKE_BUILD_TYPE=Release CMakeLists.txt  
+cmake --build .  
+```
 
 # Links
 
