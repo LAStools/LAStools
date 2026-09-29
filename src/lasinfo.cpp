@@ -615,6 +615,7 @@ public:
     I32 set_geotiff_epsg = -1;
     bool auto_date_creation = false;
     bool full_csv_report = false;
+    bool full_csv_class = false;
     FILE* file_out = stderr;
     // extract a subsequence
     I64 subsequence_start = 0;
@@ -750,6 +751,8 @@ public:
         auto_date_creation = true;
       } else if (strcmp(argv[i], "-full_csv") == 0) {
         full_csv_report = true;
+      } else if (strcmp(argv[i], "-full_class") == 0) {
+        full_csv_class = true;
       } else if (strncmp(argv[i], "-set_", 5) == 0) {
         if (strcmp(argv[i], "-set_file_source_ID") == 0) {
           if ((i + 1) >= argc) {
@@ -4436,8 +4439,13 @@ public:
                     json_synthetic_classification["index"] = i;
                     json_histogram_classification["flagged_as_synthetic"]["classification"].push_back(json_synthetic_classification);
                   } else if (csv_out) {
-                    // Any additional classes are not listed explicitly
-                    class_count += lassummary.flagged_synthetic_classification[i];
+                    if (full_csv_class) {
+                      csv_key = "point_count_synthetic_class_" + std::to_string(i);
+                      add_csv_field(file_csv, csv_key, lassummary.flagged_synthetic_classification[i]);
+                    } else {
+                      // Any additional classes are not listed explicitly
+                      class_count += lassummary.flagged_synthetic_classification[i];
+                    }
                   } else {
                     fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_synthetic_classification[i], i);
                   }
@@ -4485,8 +4493,13 @@ public:
                     json_keypoint_classification["index"] = i;
                     json_histogram_classification["flagged_as_keypoints"]["classification"].push_back(json_keypoint_classification);
                   } else if (csv_out) {
-                    // Any additional classes are not listed explicitly
-                    class_count += lassummary.flagged_keypoint_classification[i];
+                    if (full_csv_class) {
+                      csv_key = "point_count_keypoint_class_" + std::to_string(i);
+                      add_csv_field(file_csv, csv_key, lassummary.flagged_keypoint_classification[i]);
+                    } else {
+                      // Any additional classes are not listed explicitly
+                      class_count += lassummary.flagged_keypoint_classification[i];
+                    }
                   } else {
                     fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_keypoint_classification[i], i);
                   }
@@ -4534,8 +4547,13 @@ public:
                     json_withheld_classification["index"] = i;
                     json_histogram_classification["flagged_as_withheld"]["classification"].push_back(json_withheld_classification);
                   } else if (csv_out) {
-                    // Any additional classes are not listed explicitly
-                    class_count += lassummary.flagged_withheld_classification[i];
+                    if (full_csv_class) {
+                      csv_key = "point_count_withheld_class_" + std::to_string(i);
+                      add_csv_field(file_csv, csv_key, lassummary.flagged_withheld_classification[i]);
+                    } else {
+                      // Any additional classes are not listed explicitly
+                      class_count += lassummary.flagged_withheld_classification[i];
+                    }
                   } else {
                     fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_withheld_classification[i], i);
                   }
@@ -4589,8 +4607,13 @@ public:
                     json_histogram_extended_classification["flagged_as_extended_overlap"]["classification"].push_back(
                         json_extended_overlap_classification);
                   } else if (csv_out) {
-                    // Any additional classes are not listed explicitly
-                    class_count += lassummary.flagged_extended_overlap_classification[i];
+                    if (full_csv_class) {
+                      csv_key = "point_count_overlap_class_" + std::to_string(i);
+                      add_csv_field(file_csv, csv_key, lassummary.flagged_extended_overlap_classification[i]);
+                    } else {
+                      // Any additional classes are not listed explicitly
+                      class_count += lassummary.flagged_extended_overlap_classification[i];
+                    }
                   } else {
                     fprintf(file_out, "  +---> %15lld  of those are classification (%u)\n", lassummary.flagged_extended_overlap_classification[i], i);
                   }
@@ -4619,8 +4642,13 @@ public:
                     json_extended_classification["index"] = i;
                     json_histogram_extended_classification["extended_classification"].push_back(json_extended_classification);
                   } else if (csv_out) {
-                    // Any additional classes are not listed explicitly
-                    class_count += lassummary.extended_classification[i];
+                    if (full_csv_class) {
+                      csv_key = "point_count_class_" + std::to_string(i);
+                      add_csv_field(file_csv, csv_key, lassummary.extended_classification[i]);
+                    } else {
+                      // Any additional classes are not listed explicitly
+                      class_count += lassummary.extended_classification[i];
+                    }
                   } else {
                     fprintf(file_out, " %15lld  extended classification (%u)\n", lassummary.extended_classification[i], i);
                   }
