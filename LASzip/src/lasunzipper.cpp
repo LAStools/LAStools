@@ -88,8 +88,9 @@ unsigned int LASunzipper::tell() const
 
 bool LASunzipper::read(unsigned char * const * point)
 {
+  if (reader->read(point) != TRUE) return false;
   count++;
-  return (reader->read(point) == TRUE);
+  return true;
 }
 
 bool LASunzipper::close()
