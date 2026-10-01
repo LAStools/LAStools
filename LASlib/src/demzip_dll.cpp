@@ -4603,7 +4603,7 @@ demzip_seek_point(
   try
   {
     // seek to the point
-    if (!demzip_dll->reader->seek((U32)demzip_dll->p_count, (U32)index))
+    if (index < 0 || !demzip_dll->reader->seek((U32)demzip_dll->p_count, (U32)index))
     {
       snprintf(demzip_dll->error, sizeof(demzip_dll->error), "seeking from index %lld to index %lld for file with %lld points", demzip_dll->p_count, index, demzip_dll->npoints);
       return 1;

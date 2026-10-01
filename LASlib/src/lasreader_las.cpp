@@ -1528,7 +1528,7 @@ BOOL LASreaderLAS::seek(const I64 p_index)
 {
   if (reader)
   {
-    if (p_index < npoints)
+    if (p_index >= 0 && p_index < npoints)
     {
       if (reader->seek(p_idx, p_index))
       {
