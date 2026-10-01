@@ -4881,7 +4881,7 @@ laszip_seek_point(
 #pragma GCC diagnostic ignored "-Wformat"
 #endif
     // seek to the point
-    if (!laszip_dll->reader->seek(laszip_dll->p_count, index))
+    if (index < 0 || !laszip_dll->reader->seek(laszip_dll->p_count, index))
     {
       snprintf(laszip_dll->error, sizeof(laszip_dll->error), "seeking from index %lld to index %lld for file with %lld points", laszip_dll->p_count, index, laszip_dll->npoints);
       return 1;
