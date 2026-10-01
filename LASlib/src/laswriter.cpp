@@ -1064,7 +1064,7 @@ void LASwriteOpener::make_file_name(const CHAR* file_name, I32 file_number)
       {
         this->file_name = LASCopyString("temp.json");
       } 
-      else if (format == LAS_TOOLS_FORMAT_JSON) 
+      else if (format == LAS_TOOLS_FORMAT_XML) 
       {
         this->file_name = LASCopyString("temp.xml");
       }
