@@ -2960,7 +2960,7 @@ BOOL LASreadOpener::add_list_of_files(const CHAR* list_of_files, BOOL unique) {
     // find end of line
     I32 len = (I32)strlen(line) - 1;
     // remove extra white spaces and line return at the end
-    while ((len > 0) && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012'))) {
+    while ((len > 0) && ((line[len] == '\n') || (line[len] == '\r') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012'))) {
       line[len] = '\0';
       len--;
     }
@@ -3094,7 +3094,7 @@ BOOL LASreadOpener::add_neighbor_list_of_files(const CHAR* neighbor_list_of_file
     // find end of line
     I32 len = (I32)strlen(line) - 1;
     // remove extra white spaces and line return at the end
-    while ((len > 0) && ((line[len] == '\n') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012'))) {
+    while ((len > 0) && ((line[len] == '\n') || (line[len] == '\r') || (line[len] == ' ') || (line[len] == '\t') || (line[len] == '\012'))) {
       line[len] = '\0';
       len--;
     }
