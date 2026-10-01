@@ -175,7 +175,7 @@ BOOL LASreaderPipeOn::read_point_default()
       point = lasreader->point;
       if (laswriter)
       {
-        laswriter->write_point(&point);
+        if (!laswriter->write_point(&point)) return FALSE;
       }
       p_idx++;
       p_cnt++;
