@@ -590,6 +590,7 @@ void LASreaderPLY::add_attribute(I32 attribute_type, const char* name, const cha
 
 BOOL LASreaderPLY::seek(const I64 p_index)
 {
+  if (p_index < 0) return FALSE;
   U32 delta = 0;
   if (p_index > p_idx)
   {

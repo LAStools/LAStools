@@ -295,7 +295,7 @@ BOOL LASreaderQFIT::open(ByteStreamIn* stream)
 
 BOOL LASreaderQFIT::seek(const I64 p_index)
 {
-  if (p_index < npoints)
+  if (p_index >= 0 && p_index < npoints)
   {
     p_idx = p_index;
     return stream->seek(p_index*version+offset);

@@ -1159,6 +1159,7 @@ void LASreaderTXT::add_attribute(I32 data_type, const char* name, const char* de
 
 BOOL LASreaderTXT::seek(const I64 p_index)
 {
+  if (p_index < 0) return FALSE;
   U32 delta = 0;
   if (p_index > p_idx)
   {

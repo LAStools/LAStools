@@ -265,7 +265,7 @@ BOOL LASreaderBIN::open(ByteStreamIn* stream)
 
 BOOL LASreaderBIN::seek(const I64 p_index)
 {
-  if (p_index < npoints)
+  if (p_index >= 0 && p_index < npoints)
   {
     long pos = sizeof(TSheader);
     if (version == 20020715)
