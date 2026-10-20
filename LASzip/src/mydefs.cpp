@@ -119,6 +119,41 @@ extern void LASLIB_DLL byebye() {
   exit(code);
 }
 
+// Returns a reference to the currently active file error context for this thread
+FileErrorContext*& FileErrorContext::current_context() {
+  static thread_local FileErrorContext* context = nullptr;
+  return context;
+}
+
+// Activates a new file error context and preserves the previously active context
+FileErrorContext::FileErrorContext(const char* file_name, bool skip_file_on_error)
+    : file_name(file_name ? file_name : ""), skip_file_on_error(skip_file_on_error), previous_context(current_context()) {
+  current_context() = this;
+}
+
+// Restores the previously active file error context when leaving the current scope
+FileErrorContext::~FileErrorContext() {
+  current_context() = previous_context;
+}
+
+// Returns whether errors in the current file should skip only that file
+bool FileErrorContext::should_skip_file_on_error() {
+  FileErrorContext* context = current_context();
+
+  return context && context->skip_file_on_error;
+}
+
+// Returns the name of the file in the currently active error context
+const char* FileErrorContext::get_file_name() {
+  FileErrorContext* context = current_context();
+
+  if (!context) {
+    return nullptr;
+  }
+
+  return context->file_name.c_str();
+}
+
 /// Validates whether a given string is UTF-8 encoded.
 bool validate_utf8(const char* str, bool restrict_to_two_bytes) noexcept {
   if (!str) {

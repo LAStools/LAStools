@@ -50,25 +50,6 @@
 #include <string.h>
 #include "lastool.hpp"
 
-class LasTool_lasdiff : public LasTool
-{
-private:
-public:
-  void usage() override
-  {
-    fprintf(stderr, "usage:\n");
-    fprintf(stderr, "lasdiff lidar1.las lidar1.laz\n");
-    fprintf(stderr, "lasdiff *.las\n");
-    fprintf(stderr, "lasdiff lidar1.las lidar2.las -shutup 20\n");
-    fprintf(stderr, "lasdiff lidar1.txt lidar2.txt -iparse xyzti\n");
-    fprintf(stderr, "lasdiff lidar1.las lidar1.laz\n");
-    fprintf(stderr, "lasdiff lidar1.las lidar1.laz -random_seeks\n");
-    fprintf(stderr, "lasdiff -i lidar1.las -i lidar2.las -o diff.las\n");
-    fprintf(stderr, "lasdiff -wildcards folder1 folder2\n");
-    fprintf(stderr, "lasdiff -h\n");
-  };
-};
-
 static int lidardouble2string(char* string, double value0, double value1)
 {
   int len;
@@ -859,341 +840,380 @@ static int check_points(const CHAR* file_name1, LASreader* lasreader1, const CHA
 extern int lasdiff_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 #endif
 
-int main(int argc, char *argv[])
-{
-  LasTool_lasdiff lastool;
-  lastool.init(argc, argv, "lasdiff");
-  int i;
-  int random_seeks = 0;
-  const CHAR* wildcard1 = 0;
-  const CHAR* wildcard2 = 0;
-  double start_time = 0.0;
+class LasTool_lasdiff : public LasTool {
+ private:
+ public:
+  void usage() override {
+    fprintf(stderr, "usage:\n");
+    fprintf(stderr, "lasdiff lidar1.las lidar1.laz\n");
+    fprintf(stderr, "lasdiff *.las\n");
+    fprintf(stderr, "lasdiff lidar1.las lidar2.las -shutup 20\n");
+    fprintf(stderr, "lasdiff lidar1.txt lidar2.txt -iparse xyzti\n");
+    fprintf(stderr, "lasdiff lidar1.las lidar1.laz\n");
+    fprintf(stderr, "lasdiff lidar1.las lidar1.laz -random_seeks\n");
+    fprintf(stderr, "lasdiff -i lidar1.las -i lidar2.las -o diff.las\n");
+    fprintf(stderr, "lasdiff -wildcards folder1 folder2\n");
+    fprintf(stderr, "lasdiff -h\n");
+  };
 
-  LASreadOpener lasreadopener;
-  LASwriteOpener laswriteopener;
-
-  if (argc == 1)
-  {
-#ifdef COMPILE_WITH_GUI
-    return lasdiff_gui(argc, argv, 0);
-#else
-    wait_on_exit();
-    char file_name[256];
-    fprintf(stderr,"%s is better run in the command line\n", argv[0]);
-    fprintf(stderr,"enter input file1: ");
-    if (fgets(file_name, 256, stdin) && strlen(file_name))
+  int run() override {
+    int i;
+    int random_seeks = 0;
+    const CHAR* wildcard1 = 0;
+    const CHAR* wildcard2 = 0;
+    double start_time = 0.0;
+  
+    LASreadOpener lasreadopener;
+    LASwriteOpener laswriteopener;
+  
+    if (argc == 1)
     {
-      file_name[strlen(file_name)-1] = '\0';
-      lasreadopener.set_file_name(file_name);
-    }
-    fprintf(stderr,"enter input file2: ");
-    if (fgets(file_name, 256, stdin) && strlen(file_name))
-    {
-      file_name[strlen(file_name)-1] = '\0';
-      lasreadopener.set_file_name(file_name);
-    }
-#endif
-  }
-  else
-  {
-    for (i = 1; i < argc; i++)
-    {
-      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
-    }
-    lasreadopener.parse(argc, argv);
-    laswriteopener.parse(argc, argv);
-  }
-
-  auto arg_local = [&](int& i) -> bool {
-    if (strcmp(argv[i],"-random_seeks") == 0)
-    {
-      random_seeks = 10;
-    }
-    else if (strcmp(argv[i],"-wildcards") == 0)
-    {
-      if ((i+2) >= argc)
+  #ifdef COMPILE_WITH_GUI
+      return lasdiff_gui(argc, argv, 0);
+  #else
+      wait_on_exit();
+      char file_name[256];
+      fprintf(stderr,"%s is better run in the command line\n", argv[0]);
+      fprintf(stderr,"enter input file1: ");
+      if (fgets(file_name, 256, stdin) && strlen(file_name))
       {
-        laserror("'%s' needs 2 arguments: wildcard1 wildcard2", argv[i]);
+        file_name[strlen(file_name)-1] = '\0';
+        lasreadopener.set_file_name(file_name);
       }
-      wildcard1 = argv[i+1];
-      wildcard2 = argv[i+2];
-      i+=2;
-    }
-    else if (strcmp(argv[i],"-shutup") == 0)
-    {
-      i++;
-      shutup = atoi(argv[i]);;
-    }
-    else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))
-    {
-      lasreadopener.add_file_name(argv[i]);
-      argv[i][0] = '\0';
+      fprintf(stderr,"enter input file2: ");
+      if (fgets(file_name, 256, stdin) && strlen(file_name))
+      {
+        file_name[strlen(file_name)-1] = '\0';
+        lasreadopener.set_file_name(file_name);
+      }
+  #endif
     }
     else
     {
-      return false;
-    }
-    return true;
-  };
-
-  lastool.parse(arg_local);
-
-#ifdef COMPILE_WITH_GUI
-  if (lastool.gui)
-  {
-    return lasdiff_gui(argc, argv, &lasreadopener);
-  }
-#endif
-
-  char* file_name1;
-  char* file_name2;
-
-  LASreader* lasreader1;
-  LASreader* lasreader2;
-  LASwriter* laswriter = 0;
-
-  int different_header;
-
-  // possibly loop over two wild cards
-
-  if (wildcard1 && wildcard2)
-  {
-    LASreadOpener lasreadopener1;
-    LASreadOpener lasreadopener2;
-
-    lasreadopener1.add_file_name(wildcard1);
-    lasreadopener2.add_file_name(wildcard2);
-
-    if (!lasreadopener1.active())
-    {
-      laserror("wildcard1 specifies no input");
-    }
-
-    if (!lasreadopener2.active())
-    {
-      laserror("wildcard2 specifies no input");
-    }
-
-    if (lasreadopener1.get_file_name_number() != lasreadopener2.get_file_name_number())
-    {
-      laserror("wildcard1 (%u) and wildcard2 (%u) specify different number of files", lasreadopener1.get_file_name_number(), lasreadopener2.get_file_name_number());
-    }
-
-    // possibly multiple input files
-
-    while (lasreadopener1.active())
-    {
-      bool skip_pair = false;
-
-      lasreader1 = lasreadopener1.open();
-      file_name1 = LASCopyString(lasreadopener1.get_file_name());
-      // fileformula filtered
-      if (lasreadopener1.is_file_formula_filtered()) {
-        LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name1);
-        skip_pair = true;
-      } 
-      if (lasreader1 == 0)
+      for (i = 1; i < argc; i++)
       {
-        laserror("cannot open '%s'", file_name1);
+        if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
       }
-      lasreader2 = lasreadopener2.open();
-      file_name2 = LASCopyString(lasreadopener2.get_file_name());
-      if (lasreadopener2.is_file_formula_filtered()) {
-        LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name2);
-        skip_pair = true;
-      }
-      if (lasreader2 == 0)
+      lasreadopener.parse(argc, argv);
+      laswriteopener.parse(argc, argv);
+    }
+  
+    auto arg_local = [&](int& i) -> bool {
+      if (strcmp(argv[i],"-random_seeks") == 0)
       {
-        laserror("cannot open '%s'", file_name2);
+        random_seeks = 10;
       }
-      // skip if either one was filtered
-      if (skip_pair) {
-        continue;
-      }
-
-      LASMessage(LAS_INFO, "checking '%s' against '%s'", file_name1, file_name2);
-
-      // check header
-
-      different_header = check_header(lasreader1, lasreader2);
-
-      // check points
-
-      int different_points = check_points(file_name1, lasreader1, file_name2, lasreader2, laswriter, random_seeks);
-
-      // output final verdicts
-
-      if (!different_header && !different_points && !different_scaled_offset_coordinates) fprintf(stderr, "files are identical. ");
-
-      if (lasreader1->p_cnt == lasreader2->p_cnt)
+      else if (strcmp(argv[i],"-wildcards") == 0)
       {
-        LASMessage(LAS_INFO, "both have %lld points. took %g secs.", lasreader1->p_cnt, taketime()-start_time);
+        if ((i+2) >= argc)
+        {
+          laserror("'%s' needs 2 arguments: wildcard1 wildcard2", argv[i]);
+        }
+        wildcard1 = argv[i+1];
+        wildcard2 = argv[i+2];
+        i+=2;
+      }
+      else if (strcmp(argv[i],"-shutup") == 0)
+      {
+        i++;
+        shutup = atoi(argv[i]);;
+      }
+      else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))
+      {
+        lasreadopener.add_file_name(argv[i]);
+        argv[i][0] = '\0';
       }
       else
       {
-        LASMessage(LAS_INFO, "one has %lld the other %lld points. took %g secs.", lasreader1->p_cnt, lasreader2->p_cnt, taketime()-start_time);
+        return false;
       }
-      lasreader1->close();
-      delete lasreader1;
-      free(file_name1);
-
-      lasreader2->close();
-      delete lasreader2;
-      free(file_name2);
-    }
-  }
-  else
-  {
-    if (!lasreadopener.active())
+      return true;
+    };
+  
+    parse(arg_local);
+  
+  #ifdef COMPILE_WITH_GUI
+    if (gui)
     {
-      laserror("no input specified");
+      return lasdiff_gui(argc, argv, &lasreadopener);
     }
-
-    // possibly multiple input files
-
-    while (lasreadopener.active())
+  #endif
+  
+    char* file_name1;
+    char* file_name2;
+  
+    LASreader* lasreader1;
+    LASreader* lasreader2;
+    LASwriter* laswriter = 0;
+  
+    int different_header;
+  
+    // possibly loop over two wild cards
+  
+    if (wildcard1 && wildcard2)
     {
-      bool skip_pair = false;
-
-      start_time = taketime();
-
-      if (lasreadopener.get_file_name_number() == 2)
+      LASreadOpener lasreadopener1;
+      LASreadOpener lasreadopener2;
+  
+      lasreadopener1.add_file_name(wildcard1);
+      lasreadopener2.add_file_name(wildcard2);
+  
+      if (!lasreadopener1.active())
       {
-        lasreader1 = lasreadopener.open();
-        file_name1 = LASCopyString(lasreadopener.get_file_name());
-        // fileformula filtered
-        if (lasreadopener.is_file_formula_filtered()) {
-          LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name1);
-          skip_pair = true;
-        } 
-        if (lasreader1 == 0)
-        {
-          laserror("cannot open '%s'", file_name1);
-        }
-        lasreader2 = lasreadopener.open();
-        file_name2 = LASCopyString(lasreadopener.get_file_name());
-        // fileformula filtered
-        if (lasreadopener.is_file_formula_filtered()) {
-          LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name2);
-          skip_pair = true;
-        }
-        if (lasreader2 == 0)
-        {
-          laserror("cannot open '%s'", file_name2);
-        }
+        laserror("wildcard1 specifies no input");
       }
-      else
+  
+      if (!lasreadopener2.active())
       {
-        lasreader1 = lasreadopener.open();
-        file_name1 = LASCopyString(lasreadopener.get_file_name());
-        // fileformula filtered
-        if (lasreadopener.is_file_formula_filtered()) {
-          LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name1);
-          skip_pair = true;
-        } 
-        if (lasreader1 == 0)
-        {
-          laserror("cannot open '%s'", file_name1);
-        }
-        file_name2 = LASCopyString(lasreadopener.get_file_name());
-        I32 len = (I32)strlen(file_name1);
-        if (len < 4)
-        {
-          laserror("file '%s' not ending in *.las or *.laz", file_name1);
-        }
-        else if (strncmp(&file_name1[len-4], ".las", 4) == 0)
-        {
-          file_name2[len-1] = 'z';
-        }
-        else if (strncmp(&file_name1[len-4], ".laz", 4) == 0)
-        {
-          file_name2[len-1] = 's';
-        }
-        else if (strncmp(&file_name1[len-4], ".LAS", 4) == 0)
-        {
-          file_name2[len-1] = 'Z';
-        }
-        else if (strncmp(&file_name1[len-4], ".LAZ", 4) == 0)
-        {
-          file_name2[len-1] = 'S';
-        }
-        else
-        {
-          laserror("file '%s' not ending in *.las or *.laz", file_name1);
-        }
-        LASreadOpener lasreadopener_other;
-        lasreadopener_other.set_file_name(file_name2);
-        lasreader2 = lasreadopener_other.open();
-        // fileformula filtered
-        if (lasreadopener_other.is_file_formula_filtered()) {
-          LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name2);
-          skip_pair = true;
-        }
-        if (lasreader2 == 0)
-        {
-          laserror("cannot open '%s'", file_name2);
-        }
+        laserror("wildcard2 specifies no input");
       }
-
-      // skip if either one was filtered
-      if (skip_pair) {
-        continue;
-      }
-
-      LASMessage(LAS_INFO, "checking '%s' against '%s'", file_name1, file_name2);
-
-      // check header
-
-      different_header = check_header(lasreader1, lasreader2);
-
-      // maybe we should create a difference file
-
-      if (laswriteopener.active() || laswriteopener.get_directory() || laswriteopener.get_appendix())
+  
+      if (lasreadopener1.get_file_name_number() != lasreadopener2.get_file_name_number())
       {
-        if (!laswriteopener.active())
-        {
-          laswriteopener.make_file_name(lasreadopener.get_file_name());
+        laserror("wildcard1 (%u) and wildcard2 (%u) specify different number of files", lasreadopener1.get_file_name_number(), lasreadopener2.get_file_name_number());
+      }
+  
+      // possibly multiple input files
+  
+      run_file_loop(lasreadopener1, [&]() {
+        bool skip_pair = false;
+        const U32 index1_before = lasreadopener1.get_file_name_current();
+        const U32 index2_before = lasreadopener2.get_file_name_current();
+
+        try {
+          lasreader1 = lasreadopener1.open();
+          file_name1 = LASCopyString(lasreadopener1.get_file_name());
+          // fileformula filtered
+          if (lasreadopener1.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name1);
+            skip_pair = true;
+          } 
+          if (lasreader1 == 0)
+          {
+            laserror("cannot open '%s'", file_name1);
+          }
+
+          lasreader2 = lasreadopener2.open();
+          file_name2 = LASCopyString(lasreadopener2.get_file_name());
+          if (lasreadopener2.is_file_formula_filtered()) {
+            LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name2);
+            skip_pair = true;
+          }
+          if (lasreader2 == 0)
+          {
+            laserror("cannot open '%s'", file_name2);
+          }
+          // skip if either one was filtered
+          if (skip_pair) {
+            return;
+          }
+          
+          LASMessage(LAS_INFO, "checking '%s' against '%s'", file_name1, file_name2);
+          
+          // check header
+          
+          different_header = check_header(lasreader1, lasreader2);
+          
+          // check points
+          
+          int different_points = check_points(file_name1, lasreader1, file_name2, lasreader2, laswriter, random_seeks);
+          
+          // output final verdicts
+          
+          if (!different_header && !different_points && !different_scaled_offset_coordinates) fprintf(stderr, "files are identical. ");
+          
+          if (lasreader1->p_cnt == lasreader2->p_cnt)
+          {
+            LASMessage(LAS_INFO, "both have %lld points. took %g secs.", lasreader1->p_cnt, taketime()-start_time);
+          }
+          else
+          {
+            LASMessage(LAS_INFO, "one has %lld the other %lld points. took %g secs.", lasreader1->p_cnt, lasreader2->p_cnt, taketime()-start_time);
+          }
+          lasreader1->close();
+          delete lasreader1;
+          free(file_name1);
+          
+          lasreader2->close();
+          delete lasreader2;
+          free(file_name2);
+        } catch (...) {
+          const U32 index1_after = lasreadopener1.get_file_name_current();
+          const U32 index2_after = lasreadopener2.get_file_name_current();
+
+          if (index1_after == index1_before) lasreadopener1.set_file_name_current(index1_before + 1);
+          if (index2_after == index2_before) lasreadopener2.set_file_name_current(index2_before + 1);
+
+          throw;
         }
-        // prepare the header
-        memset(lasreader1->header.system_identifier, 0, LAS_HEADER_CHAR_LEN);
-        memset(lasreader1->header.generating_software, 0, LAS_HEADER_CHAR_LEN);
-        snprintf(lasreader1->header.system_identifier, sizeof(lasreader1->header.system_identifier), LAS_TOOLS_COPYRIGHT);
-        snprintf(lasreader1->header.generating_software, sizeof(lasreader1->header.generating_software), "lasdiff%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
-        laswriter = laswriteopener.open(&lasreader1->header);
-        if (laswriter == 0)
-        {
-          laserror("cannot open '%s'", laswriteopener.get_file_name());
-        }
-        laswriteopener.set_file_name(0);
-      }
-
-      // check points
-
-      int different_points = check_points(file_name1, lasreader1, file_name2, lasreader2, laswriter, random_seeks);
-
-      // output final verdicts
-
-      if (!different_header && !different_points && !different_scaled_offset_coordinates) fprintf(stderr, "files are identical. ");
-
-      if (lasreader1->p_cnt == lasreader2->p_cnt)
-      {
-        LASMessage(LAS_INFO, "both have %lld points. took %g secs.", lasreader1->p_cnt, taketime()-start_time);
-      }
-      else
-      {
-        LASMessage(LAS_INFO, "one has %lld the other %lld points. took %g secs.", lasreader1->p_cnt, lasreader2->p_cnt, taketime()-start_time);
-      }
-      lasreader1->close();
-      delete lasreader1;
-      free(file_name1);
-      //
-      lasreader2->close();
-      delete lasreader2;
-      free(file_name2);
+      });
     }
+    else
+    {
+      if (!lasreadopener.active())
+      {
+        laserror("no input specified");
+      }
+  
+      // possibly multiple input files
+  
+      run_file_loop(lasreadopener, [&]() {
+        bool skip_pair = false;
+        const U32 index_before = lasreadopener.get_file_name_current();
+
+        try {
+          start_time = taketime();
+          
+          if (lasreadopener.get_file_name_number() == 2)
+          {
+            lasreader1 = lasreadopener.open();
+            file_name1 = LASCopyString(lasreadopener.get_file_name());
+            // fileformula filtered
+            if (lasreadopener.is_file_formula_filtered()) {
+              LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name1);
+              skip_pair = true;
+            } 
+            if (lasreader1 == 0)
+            {
+              laserror("cannot open '%s'", file_name1);
+            }
+
+            lasreader2 = lasreadopener.open();
+            file_name2 = LASCopyString(lasreadopener.get_file_name());
+            // fileformula filtered
+            if (lasreadopener.is_file_formula_filtered()) {
+              LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name2);
+              skip_pair = true;
+            }
+            if (lasreader2 == 0)
+            {
+              laserror("cannot open '%s'", file_name2);
+            }
+          }
+          else
+          {
+            lasreader1 = lasreadopener.open();
+            file_name1 = LASCopyString(lasreadopener.get_file_name());
+            // fileformula filtered
+            if (lasreadopener.is_file_formula_filtered()) {
+              LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name1);
+              skip_pair = true;
+            } 
+            if (lasreader1 == 0)
+            {
+              laserror("cannot open '%s'", file_name1);
+            }
+            file_name2 = LASCopyString(lasreadopener.get_file_name());
+            I32 len = (I32)strlen(file_name1);
+            if (len < 4)
+            {
+              laserror("file '%s' not ending in *.las or *.laz", file_name1);
+            }
+            else if (strncmp(&file_name1[len-4], ".las", 4) == 0)
+            {
+              file_name2[len-1] = 'z';
+            }
+            else if (strncmp(&file_name1[len-4], ".laz", 4) == 0)
+            {
+              file_name2[len-1] = 's';
+            }
+            else if (strncmp(&file_name1[len-4], ".LAS", 4) == 0)
+            {
+              file_name2[len-1] = 'Z';
+            }
+            else if (strncmp(&file_name1[len-4], ".LAZ", 4) == 0)
+            {
+              file_name2[len-1] = 'S';
+            }
+            else
+            {
+              laserror("file '%s' not ending in *.las or *.laz", file_name1);
+            }
+            LASreadOpener lasreadopener_other;
+            lasreadopener_other.set_file_name(file_name2);
+            lasreader2 = lasreadopener_other.open();
+            // fileformula filtered
+            if (lasreadopener_other.is_file_formula_filtered()) {
+              LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", file_name2);
+              skip_pair = true;
+            }
+            if (lasreader2 == 0)
+            {
+              laserror("cannot open '%s'", file_name2);
+            }
+          }
+          
+          // skip if either one was filtered
+          if (skip_pair) {
+            return;
+          }
+          
+          LASMessage(LAS_INFO, "checking '%s' against '%s'", file_name1, file_name2);
+          
+          // check header
+          
+          different_header = check_header(lasreader1, lasreader2);
+          
+          // maybe we should create a difference file
+          
+          if (laswriteopener.active() || laswriteopener.get_directory() || laswriteopener.get_appendix())
+          {
+            if (!laswriteopener.active())
+            {
+              laswriteopener.make_file_name(lasreadopener.get_file_name());
+            }
+            // prepare the header
+            memset(lasreader1->header.system_identifier, 0, LAS_HEADER_CHAR_LEN);
+            memset(lasreader1->header.generating_software, 0, LAS_HEADER_CHAR_LEN);
+            snprintf(lasreader1->header.system_identifier, sizeof(lasreader1->header.system_identifier), LAS_TOOLS_COPYRIGHT);
+            snprintf(lasreader1->header.generating_software, sizeof(lasreader1->header.generating_software), "lasdiff%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
+            laswriter = laswriteopener.open(&lasreader1->header);
+            if (laswriter == 0)
+            {
+              laserror("cannot open '%s'", laswriteopener.get_file_name());
+            }
+            laswriteopener.set_file_name(0);
+          }
+          
+          // check points
+          
+          int different_points = check_points(file_name1, lasreader1, file_name2, lasreader2, laswriter, random_seeks);
+          
+          // output final verdicts
+          
+          if (!different_header && !different_points && !different_scaled_offset_coordinates) fprintf(stderr, "files are identical. ");
+          
+          if (lasreader1->p_cnt == lasreader2->p_cnt)
+          {
+            LASMessage(LAS_INFO, "both have %lld points. took %g secs.", lasreader1->p_cnt, taketime()-start_time);
+          }
+          else
+          {
+            LASMessage(LAS_INFO, "one has %lld the other %lld points. took %g secs.", lasreader1->p_cnt, lasreader2->p_cnt, taketime()-start_time);
+          }
+          lasreader1->close();
+          delete lasreader1;
+          free(file_name1);
+          //
+          lasreader2->close();
+          delete lasreader2;
+          free(file_name2);
+        } catch (...) {
+          const U32 index_after = lasreadopener.get_file_name_current();
+          const U32 expected_next_index = index_before + 2;
+
+          if (index_after < expected_next_index) lasreadopener.set_file_name_current(expected_next_index);
+
+          throw;
+        }
+      });
+    }
+    byebye();
+    return 0;
   }
+};
 
-  byebye();
-
-  return 0;
+int main(int argc, char* argv[]) {
+  LasTool_lasdiff lastool;
+  return lastool.execute(argc, argv, "lasdiff");
 }
