@@ -595,6 +595,10 @@ BOOL LASindex::write(ByteStreamOut* stream) const
   return TRUE;
 }
 
+BOOL LASindex::uses_64bit_intervals() const {
+  return interval && interval->get_version() >= 1;
+}
+
 // seek to next interval point
 
 #ifdef LASZIPDLL_EXPORTS

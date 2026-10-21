@@ -162,6 +162,13 @@ BOOL LASreader::inside_none() {
   return TRUE;
 }
 
+/// Warns if a 32 bit LAX index may exceed its limits due to a large point count
+static void warn_if_lax_exceeds_32bit_limit(const LASindex* index, const I64 point_count) {
+  if (index && !index->uses_64bit_intervals() && point_count > (I64)U32_MAX + 1) {
+    LASMessage(LAS_WARNING, "LAX index may exceed 32 bit limits. Regenerate index file");
+  }
+}
+
 BOOL LASreader::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size) {
   inside = 1;
   t_ll_x = ll_x;
@@ -179,7 +186,14 @@ BOOL LASreader::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size) {
   header.max_y = static_cast<F64>(ll_y) + static_cast<F64>(size);
   header.max_x -= header.x_scale_factor;
   header.max_y -= header.y_scale_factor;
-  if (((orig_min_x > header.max_x) || (orig_min_y > header.max_y) || (orig_max_x < header.min_x) || (orig_max_y < header.min_y))) {
+
+  const BOOL outside = (orig_min_x > header.max_x) || (orig_min_y > header.max_y) || (orig_max_x < header.min_x) || (orig_max_y < header.min_y);
+
+  if (!outside && index) {
+    warn_if_lax_exceeds_32bit_limit(index, npoints);
+  }
+
+  if (outside) {
     if (filter || transform) {
       read_complex = &LASreader::read_point_none;
     } else {
@@ -217,7 +231,14 @@ BOOL LASreader::inside_circle(const F64 center_x, const F64 center_y, const F64 
   header.min_y = center_y - radius;
   header.max_x = center_x + radius;
   header.max_y = center_y + radius;
-  if (((orig_min_x > header.max_x) || (orig_min_y > header.max_y) || (orig_max_x < header.min_x) || (orig_max_y < header.min_y))) {
+
+  const BOOL outside = (orig_min_x > header.max_x) || (orig_min_y > header.max_y) || (orig_max_x < header.min_x) || (orig_max_y < header.min_y);
+
+  if (!outside && index) {
+    warn_if_lax_exceeds_32bit_limit(index, npoints);
+  }
+
+  if (outside) {
     if (filter || transform) {
       read_complex = &LASreader::read_point_none;
     } else {
@@ -261,7 +282,14 @@ BOOL LASreader::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max
   header.min_y = min_y;
   header.max_x = max_x;
   header.max_y = max_y;
-  if (((orig_min_x > max_x) || (orig_min_y > max_y) || (orig_max_x < min_x) || (orig_max_y < min_y))) {
+
+  const BOOL outside = (orig_min_x > max_x) || (orig_min_y > max_y) || (orig_max_x < min_x) || (orig_max_y < min_y);
+
+  if (!outside && index) {
+    warn_if_lax_exceeds_32bit_limit(index, npoints);
+  }
+
+  if (outside) {
     if (filter || transform) {
       read_complex = &LASreader::read_point_none;
     } else {

@@ -75,6 +75,8 @@ public:
   // get total number of intervals
   U32 get_number_intervals() const;
 
+  U32 get_version() const { return version; }
+
   // merge cells (and their intervals) into one cell
   BOOL merge_cells(const U32 num_indices, const I32* indices, const I32 new_index);
 
@@ -116,6 +118,7 @@ private:
   void* cells_to_merge;
   U32 threshold;
   U32 number_intervals;
+  U32 version;
   I32 last_index;
   BOOL last_index_valid;
   LASintervalStartCell* last_cell;
