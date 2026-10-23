@@ -52,7 +52,7 @@
 #ifndef LAS_DEFINITIONS_HPP
 #define LAS_DEFINITIONS_HPP
 
-#define LAS_TOOLS_VERSION 260914
+#define LAS_TOOLS_VERSION 261023
 
 #include <stdio.h>
 #include <string.h>
@@ -404,6 +404,8 @@ public:
     time_offset = 0;
     min_gps_time = 0;
     max_gps_time = 0;
+    // LASattributer
+    attributes_linked = TRUE;
   };
 
   void clean_user_data_in_header()
@@ -660,16 +662,25 @@ public:
       }
       if (i == number_of_variable_length_records)
       {
-        number_of_variable_length_records++;
+        U32 new_number_of_variable_length_records = number_of_variable_length_records + 1;
+        if (!try_realloc_las(vlrs, sizeof(LASvlr)*new_number_of_variable_length_records))
+        {
+          return FALSE;
+        }
+        number_of_variable_length_records = new_number_of_variable_length_records;
         offset_to_point_data += 54;
-        vlrs = (LASvlr*)realloc_las(vlrs, sizeof(LASvlr)*number_of_variable_length_records);
       }
     }
     else
     {
+      LASvlr* new_vlrs = (LASvlr*)malloc_las(sizeof(LASvlr));
+      if (new_vlrs == 0)
+      {
+        return FALSE;
+      }
+      vlrs = new_vlrs;
       number_of_variable_length_records = 1;
       offset_to_point_data += 54;
-      vlrs = (LASvlr*)malloc_las(sizeof(LASvlr));
     }
     if (vlrs != nullptr) {
       memset((void*)&(vlrs[i]), 0, sizeof(LASvlr));
@@ -735,7 +746,7 @@ public:
         if (number_of_variable_length_records)
         {
           vlrs[i] = vlrs[number_of_variable_length_records];
-          vlrs = (LASvlr*)realloc_las(vlrs, sizeof(LASvlr)*number_of_variable_length_records);
+          (void)try_realloc_las(vlrs, sizeof(LASvlr)*number_of_variable_length_records);
         }
         else
         {
@@ -792,14 +803,23 @@ public:
       }
       if (i == number_of_extended_variable_length_records)
       {
-        number_of_extended_variable_length_records++;
-        evlrs = (LASevlr*)realloc_las(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
+        U32 new_number_of_evlrs = number_of_extended_variable_length_records + 1;
+        if (!try_realloc_las(evlrs, sizeof(LASevlr)*new_number_of_evlrs))
+        {
+          return;
+        }
+        number_of_extended_variable_length_records = new_number_of_evlrs;
       }
     }
     else
     {
+      LASevlr* new_evlrs = (LASevlr*)malloc_las(sizeof(LASevlr));
+      if (new_evlrs == 0)
+      {
+        return;
+      }
+      evlrs = new_evlrs;
       number_of_extended_variable_length_records = 1;
-      evlrs = (LASevlr*)malloc_las(sizeof(LASevlr) * number_of_extended_variable_length_records);
     }
     if (evlrs != nullptr) {
       memset((void*)&(evlrs[i]), 0, sizeof(LASevlr));
@@ -848,7 +868,7 @@ public:
         if (number_of_extended_variable_length_records)
         {
           evlrs[i] = evlrs[number_of_extended_variable_length_records];
-          evlrs = (LASevlr*)realloc_las(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
+          (void)try_realloc_las(evlrs, sizeof(LASevlr)*number_of_extended_variable_length_records);
         }
         else
         {

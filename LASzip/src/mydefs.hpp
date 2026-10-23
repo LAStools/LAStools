@@ -402,7 +402,7 @@ wchar_t* ANSItoUTF16(const char* ansi);
 /// </summary>
 class exception_file_loop : public std::runtime_error {
  public:
-  explicit exception_file_loop(char const* const _Message) noexcept : std::runtime_error(_Message){};
+  explicit exception_file_loop(char const* const _Message) : std::runtime_error(_Message){};
 };
 
 /// <summary>
@@ -411,6 +411,24 @@ class exception_file_loop : public std::runtime_error {
 class pnt_cnt_error : public exception_file_loop {
  public:
   explicit pnt_cnt_error() noexcept : exception_file_loop("too less points"){};
+};
+
+/// Manages the error handling context for the currently processed input file and restores the previous context on scope exit
+class LASLIB_DLL FileErrorContext {
+ public:
+  FileErrorContext(const char* file_name, bool skip_file_on_error);
+  ~FileErrorContext();
+
+  static bool should_skip_file_on_error();
+  static const char* get_file_name();
+
+ private:
+  std::string file_name;
+  bool skip_file_on_error;
+
+  FileErrorContext* previous_context;
+
+  static FileErrorContext*& current_context();
 };
 
 extern void LASLIB_DLL wait_on_exit(bool woe = true);
@@ -440,7 +458,7 @@ const char* indent_text(const char* text, const char* indent);
 template <typename... Args>
 void laserror(LAS_FORMAT_STRING(const char*) fmt, Args... args) {
   LASMessage(LAS_ERROR, fmt, args...);
-  if (do_halt_on_error()) {
+  if (do_halt_on_error() && !FileErrorContext::should_skip_file_on_error()) {
     byebye();
   }
   return;
@@ -451,7 +469,7 @@ template <typename... Args>
 void laserrorm(LAS_FORMAT_STRING(const char*) fmt, Args... args) {
   LASMessage(LAS_ERROR, fmt, args...);
   LASMessage(LAS_INFO, "\tcontact info@rapidlasso.de for support\n");
-  if (do_halt_on_error()) {
+  if (do_halt_on_error() && !FileErrorContext::should_skip_file_on_error()) {
     byebye();
   }
   return;
@@ -556,6 +574,24 @@ bool IsLasLazFile(std::string fn);
 /// returns TRUE if 'val' is found in 'vec'
 bool StringInVector(const std::string& value, const std::vector<std::string>& array, bool casesense);
 
+/// Reallocates *ptr to size bytes, returns true on success and the new pointer is written
+/// to *ptr. Returns false on failure, and *ptr is left unchanged (so the caller still owns 
+/// the original block and may keep using it/free it). Prefer the try_realloc_las() wrapper.
+LASLIB_DLL BOOL try_realloc_las_raw(void** ptr, size_t size);
+
+/// Type safe wrapper around try_realloc_las_raw() 
+template <typename T>
+inline BOOL try_realloc_las(T*& ptr, size_t size)
+{
+  void* p = ptr;
+  if (!try_realloc_las_raw(&p, size)) {
+    return FALSE;
+  }
+  ptr = (T*)p;
+  return TRUE;
+}
+
+// [[deprecated("use try_realloc_las(): realloc_las() cannot report a failed reallocation")]]
 LASLIB_DLL void* realloc_las(void* ptr, size_t size);
 LASLIB_DLL void* malloc_las(size_t size);
 void bytes_to_readable(size_t bytes, double* value_out, const char** unit_out);

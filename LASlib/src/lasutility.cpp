@@ -503,12 +503,12 @@ void LASbin::add_to_bin(I32 bin)
   bin = bin - anker;
   if (bin >= 0)
   {
-    if (bin >= size_pos)
+    if ((U32)bin >= size_pos)
     {
-      I32 i;
+      U32 i;
       if (size_pos == 0)
       {
-        size_pos = bin + 1024;
+        size_pos = (U32)bin + 1024;
         bins_pos = (U32*)malloc_las(sizeof(U32) * size_pos);
         if (bins_pos == 0)
         {
@@ -519,9 +519,8 @@ void LASbin::add_to_bin(I32 bin)
       }
       else
       {
-        I32 new_size = bin + 1024;
-        bins_pos = (U32*)realloc_las(bins_pos, sizeof(U32)*new_size);
-        if (bins_pos == 0)
+        U32 new_size = (U32)bin + 1024;
+        if (!try_realloc_las(bins_pos, sizeof(U32)*new_size))
         {
           laserror("reallocating %u pos bins", new_size);
           byebye();
@@ -535,12 +534,12 @@ void LASbin::add_to_bin(I32 bin)
   else
   {
     bin = -(bin+1);
-    if (bin >= size_neg)
+    if ((U32)bin >= size_neg)
     {
-      I32 i;
+      U32 i;
       if (size_neg == 0)
       {
-        size_neg = bin + 1024;
+        size_neg = (U32)bin + 1024;
         bins_neg = (U32*)malloc_las(sizeof(U32) * size_neg);
         if (bins_neg == 0)
         {
@@ -551,9 +550,8 @@ void LASbin::add_to_bin(I32 bin)
       }
       else
       {
-        I32 new_size = bin + 1024;
-        bins_neg = (U32*)realloc_las(bins_neg, sizeof(U32)*new_size);
-        if (bins_neg == 0)
+        U32 new_size = (U32)bin + 1024;
+        if (!try_realloc_las(bins_neg, sizeof(U32)*new_size))
         {
           laserror("reallocating %u neg bins", new_size);
           byebye();
@@ -582,12 +580,12 @@ void LASbin::add(I32 item, I32 value)
   bin = bin - anker;
   if (bin >= 0)
   {
-    if (bin >= size_pos)
+    if ((U32)bin >= size_pos)
     {
-      I32 i;
+      U32 i;
       if (size_pos == 0)
       {
-        size_pos = 1024;
+        size_pos = (U32)bin + 1024;
         bins_pos = (U32*)malloc_las(sizeof(U32) * size_pos);
         values_pos = (F64*)malloc_las(sizeof(F64) * size_pos);
         if (bins_pos == 0)
@@ -604,15 +602,13 @@ void LASbin::add(I32 item, I32 value)
       }
       else
       {
-        I32 new_size = bin + 1024;
-        bins_pos = (U32*)realloc_las(bins_pos, sizeof(U32)*new_size);
-        values_pos = (F64*)realloc_las(values_pos, sizeof(F64)*new_size);
-        if (bins_pos == 0)
+        U32 new_size = (U32)bin + 1024;
+        if (!try_realloc_las(bins_pos, sizeof(U32)*new_size))
         {
           laserror("reallocating %u pos bins", new_size);
           byebye();
         }
-        if (values_pos == 0)
+        if (!try_realloc_las(values_pos, sizeof(F64)*new_size))
         {
           laserror("reallocating %u pos values", new_size);
           byebye();
@@ -627,12 +623,12 @@ void LASbin::add(I32 item, I32 value)
   else
   {
     bin = -(bin+1);
-    if (bin >= size_neg)
+    if ((U32)bin >= size_neg)
     {
-      I32 i;
+      U32 i;
       if (size_neg == 0)
       {
-        size_neg = 1024;
+        size_neg = (U32)bin + 1024;
         bins_neg = (U32*)malloc_las(sizeof(U32) * size_neg);
         values_neg = (F64*)malloc_las(sizeof(F64) * size_neg);
         if (bins_neg == 0)
@@ -649,15 +645,13 @@ void LASbin::add(I32 item, I32 value)
       }
       else
       {
-        I32 new_size = bin + 1024;
-        bins_neg = (U32*)realloc_las(bins_neg, sizeof(U32)*new_size);
-        values_neg = (F64*)realloc_las(values_neg, sizeof(F64)*new_size);
-        if (bins_neg == 0)
+        U32 new_size = (U32)bin + 1024;
+        if (!try_realloc_las(bins_neg, sizeof(U32)*new_size))
         {
           laserror("reallocating %u neg bins", new_size);
           byebye();
         }
-        if (values_neg == 0)
+        if (!try_realloc_las(values_neg, sizeof(F64)*new_size))
         {
           laserror("reallocating %u neg values", new_size);
           byebye();
@@ -687,12 +681,12 @@ void LASbin::add(F64 item, F64 value)
   bin = bin - anker;
   if (bin >= 0)
   {
-    if (bin >= size_pos)
+    if ((U32)bin >= size_pos)
     {
-      I32 i;
+      U32 i;
       if (size_pos == 0)
       {
-        size_pos = 1024;
+        size_pos = (U32)bin + 1024;
         bins_pos = (U32*)malloc_las(sizeof(U32) * size_pos);
         values_pos = (F64*)malloc_las(sizeof(F64) * size_pos);
         if (bins_pos == 0)
@@ -709,15 +703,13 @@ void LASbin::add(F64 item, F64 value)
       }
       else
       {
-        I32 new_size = bin + 1024;
-        bins_pos = (U32*)realloc_las(bins_pos, sizeof(U32)*new_size);
-        values_pos = (F64*)realloc_las(values_pos, sizeof(F64)*new_size);
-        if (bins_pos == 0)
+        U32 new_size = (U32)bin + 1024;
+        if (!try_realloc_las(bins_pos, sizeof(U32)*new_size))
         {
           laserror("reallocating %u pos bins", new_size);
           byebye();
         }
-        if (values_pos == 0)
+        if (!try_realloc_las(values_pos, sizeof(F64)*new_size))
         {
           laserror("reallocating %u pos values", new_size);
           byebye();
@@ -732,12 +724,12 @@ void LASbin::add(F64 item, F64 value)
   else
   {
     bin = -(bin+1);
-    if (bin >= size_neg)
+    if ((U32)bin >= size_neg)
     {
-      I32 i;
+      U32 i;
       if (size_neg == 0)
       {
-        size_neg = 1024;
+        size_neg = (U32)bin + 1024;
         bins_neg = (U32*)malloc_las(sizeof(U32) * size_neg);
         values_neg = (F64*)malloc_las(sizeof(F64) * size_neg);
         if (bins_neg == 0)
@@ -754,15 +746,13 @@ void LASbin::add(F64 item, F64 value)
       }
       else
       {
-        I32 new_size = bin + 1024;
-        bins_neg = (U32*)realloc_las(bins_neg, sizeof(U32)*new_size);
-        values_neg = (F64*)realloc_las(values_neg, sizeof(F64)*new_size);
-        if (bins_neg == 0)
+        U32 new_size = (U32)bin + 1024;
+        if (!try_realloc_las(bins_neg, sizeof(U32)*new_size))
         {
           laserror("reallocating %u neg bins", new_size);
           byebye();
         }
-        if (values_neg == 0)
+        if (!try_realloc_las(values_neg, sizeof(F64)*new_size))
         {
           laserror("reallocating %u neg values", new_size);
           byebye();
@@ -817,7 +807,7 @@ static void lidardouble2string(CHAR* string, size_t stringsz, F64 value, F64 pre
 
 void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
 {
-  I32 i, bin;
+  I64 i, bin;
   if (name)
   {
     if (values_pos)
@@ -834,7 +824,7 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
   CHAR temp2[64];
   if (size_neg)
   {
-    for (i = size_neg-1; i >= 0; i--)
+    for (i = (I64)size_neg-1; i >= 0; i--)
     {
       if (bins_neg[i])
       {
@@ -842,9 +832,9 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
         if (step == 1)
         {
           if (values_neg)
-            fprintf(file, "  bin %d has average %g (of %d)\012", bin, values_neg[i]/bins_neg[i], bins_neg[i]);
+            fprintf(file, "  bin %lld has average %g (of %d)\012", bin, values_neg[i]/bins_neg[i], bins_neg[i]);
           else
-            fprintf(file, "  bin %d has %d\012", bin, bins_neg[i]);
+            fprintf(file, "  bin %lld has %d\012", bin, bins_neg[i]);
         }
         else
         {
@@ -860,7 +850,7 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
   }
   if (size_pos)
   {
-    for (i = 0; i < size_pos; i++)
+    for (i = 0; i < (I64)size_pos; i++)
     {
       if (bins_pos[i])
       {
@@ -868,9 +858,9 @@ void LASbin::report(FILE* file, const CHAR* name, const CHAR* name_avg) const
         if (step == 1)
         {
           if (values_pos)
-            fprintf(file, "  bin %d has average %g (of %d)\012", bin, values_pos[i]/bins_pos[i], bins_pos[i]);
+            fprintf(file, "  bin %lld has average %g (of %d)\012", bin, values_pos[i]/bins_pos[i], bins_pos[i]);
           else
-            fprintf(file, "  bin %d has %d\012", bin, bins_pos[i]);
+            fprintf(file, "  bin %lld has %d\012", bin, bins_pos[i]);
         }
         else
         {
@@ -1508,9 +1498,13 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
     U32 array_size_new = ((pos_y/1024)+1)*1024;
     if (*array_size)
     {
-      if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)realloc_las(*ankers, array_size_new*sizeof(I32));
-      *array = (U32**)realloc_las(*array, array_size_new*sizeof(U32*));
-      *array_sizes = (U16*)realloc_las(*array_sizes, array_size_new*sizeof(U16));
+      if (((array == &minus_plus || array == &plus_plus) && !try_realloc_las(*ankers, array_size_new*sizeof(I32))) ||
+          !try_realloc_las(*array, array_size_new*sizeof(U32*)) ||
+          !try_realloc_las(*array_sizes, array_size_new*sizeof(U16)))
+      {
+        laserror("(re)allocating occupancy grid band of %u entries failed", array_size_new);
+        return FALSE;
+      }
     }
     else
     {
@@ -1543,7 +1537,11 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
     U32 array_sizes_new = ((pos_x_pos/256)+1)*256;
     if ((*array_sizes)[pos_y])
     {
-      (*array)[pos_y] = (U32*)realloc_las((*array)[pos_y], array_sizes_new*sizeof(U32));
+      if (!try_realloc_las((*array)[pos_y], array_sizes_new*sizeof(U32)))
+      {
+        laserror("(re)allocating occupancy grid row of %u entries failed", array_sizes_new);
+        return FALSE;
+      }
     }
     else
     {
@@ -1554,7 +1552,7 @@ BOOL LASoccupancyGrid::add_internal(I32 pos_x, I32 pos_y)
       laserror("(re)allocating occupancy grid row of %u entries failed", array_sizes_new);
       return FALSE;
     }
-    for (U16 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
+    for (U32 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
     {
       (*array)[pos_y][i] = 0;
     }

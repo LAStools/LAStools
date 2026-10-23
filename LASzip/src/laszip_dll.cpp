@@ -1664,26 +1664,27 @@ laszip_add_vlr(
 
       if (i == laszip_dll->header.number_of_variable_length_records)
       {
-        laszip_dll->header.number_of_variable_length_records++;
-        laszip_dll->header.offset_to_point_data += 54;
-        laszip_dll->header.vlrs = (laszip_vlr_struct*)realloc_las(laszip_dll->header.vlrs, sizeof(laszip_vlr_struct)*laszip_dll->header.number_of_variable_length_records);
-        if (laszip_dll->header.vlrs == 0)
+        laszip_U32 new_number_of_vlrs = laszip_dll->header.number_of_variable_length_records + 1;
+        if (!try_realloc_las(laszip_dll->header.vlrs, sizeof(laszip_vlr_struct)*new_number_of_vlrs))
         {
-          snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reallocating vlrs[%u] array", laszip_dll->header.number_of_variable_length_records);
+          snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reallocating vlrs[%u] array", new_number_of_vlrs);
           return 1;
         }
+        laszip_dll->header.number_of_variable_length_records = new_number_of_vlrs;
+        laszip_dll->header.offset_to_point_data += 54;
       }
     }
     else
     {
-      laszip_dll->header.number_of_variable_length_records = 1;
-      laszip_dll->header.offset_to_point_data += 54;
-      laszip_dll->header.vlrs = (laszip_vlr_struct*)malloc_las(sizeof(laszip_vlr_struct));
-      if (laszip_dll->header.vlrs == 0)
+      laszip_vlr_struct* new_vlrs = (laszip_vlr_struct*)malloc_las(sizeof(laszip_vlr_struct));
+      if (new_vlrs == 0)
       {
         snprintf(laszip_dll->error, sizeof(laszip_dll->error), "allocating vlrs[1] array");
         return 1;
       }
+      laszip_dll->header.vlrs = new_vlrs;
+      laszip_dll->header.number_of_variable_length_records = 1;
+      laszip_dll->header.offset_to_point_data += 54;
     }
 
     // zero the VLR
@@ -1773,12 +1774,7 @@ laszip_remove_vlr(
           }
           if (laszip_dll->header.number_of_variable_length_records)
           {
-            laszip_dll->header.vlrs = (laszip_vlr_struct*)realloc_las(laszip_dll->header.vlrs, sizeof(laszip_vlr_struct)*laszip_dll->header.number_of_variable_length_records);
-            if (laszip_dll->header.vlrs == 0)
-            {
-              snprintf(laszip_dll->error, sizeof(laszip_dll->error), "reallocating vlrs[%u] array", laszip_dll->header.number_of_variable_length_records);
-              return 1;
-            }
+            (void)try_realloc_las(laszip_dll->header.vlrs, sizeof(laszip_vlr_struct)*laszip_dll->header.number_of_variable_length_records);
           }
           else
           {
@@ -4229,7 +4225,7 @@ laszip_read_header(
         }
         else
         {
-          laszip_dll->header.vlrs = (laszip_vlr*)realloc_las(laszip_dll->header.vlrs, sizeof(laszip_vlr)*laszip_dll->header.number_of_variable_length_records);
+          (void)try_realloc_las(laszip_dll->header.vlrs, sizeof(laszip_vlr)*laszip_dll->header.number_of_variable_length_records);
         }
       }
     }

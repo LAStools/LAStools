@@ -206,6 +206,7 @@ which points are selected as keypoints.
 -quiet          : no output at all  
 -force          : continue, even if serious warnings occur  
 -errors_ignore  : continue, even if errors occur (if possible). Use with caution!  
+-skip_file_on_error: skips the current input file when an unhandled processing error occurs and continues with the next file  
 -print_log_stats: print additional log statistics  
 -cpu64          : force 32bit version to start 64 bit in multi core (obsolete)  
 -gui            : start with files loaded into GUI  

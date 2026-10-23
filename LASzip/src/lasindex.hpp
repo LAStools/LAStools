@@ -82,6 +82,8 @@ public:
   BOOL get_intervals();
   BOOL has_intervals();
 
+  BOOL uses_64bit_intervals() const;
+
   U64 start;
   U64 end;
   U64 full;

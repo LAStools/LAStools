@@ -1841,9 +1841,12 @@ public:
       U32 array_size_new = ((pos_y / 1024) + 1) * 1024;
       if (*array_size)
       {
-        if (array == &minus_plus || array == &plus_plus) *ankers = (I32*)realloc_las(*ankers, array_size_new * sizeof(I32));
-        *array = (U32**)realloc_las(*array, array_size_new * sizeof(U32*));
-        *array_sizes = (U16*)realloc_las(*array_sizes, array_size_new * sizeof(U16));
+        if (((array == &minus_plus || array == &plus_plus) && !try_realloc_las(*ankers, array_size_new * sizeof(I32))) ||
+            !try_realloc_las(*array, array_size_new * sizeof(U32*)) ||
+            !try_realloc_las(*array_sizes, array_size_new * sizeof(U16)))
+        {
+          return FALSE;
+        }
       }
       else
       {
@@ -1871,13 +1874,16 @@ public:
       U32 array_sizes_new = ((pos_x_pos / 256) + 1) * 256;
       if ((*array_sizes)[pos_y])
       {
-        if (array != nullptr && *array != nullptr) (*array)[pos_y] = (U32*)realloc_las((*array)[pos_y], array_sizes_new * sizeof(U32));
+        if (array != nullptr && *array != nullptr && !try_realloc_las((*array)[pos_y], array_sizes_new * sizeof(U32)))
+        {
+          return FALSE;
+        }
       }
       else
       {
         if (array != nullptr && *array != nullptr) (*array)[pos_y] = (U32*)malloc_las(array_sizes_new * sizeof(U32));
       }
-      for (U16 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
+      for (U32 i = (*array_sizes)[pos_y]; i < array_sizes_new; i++)
       {
         if (array != nullptr && *array != nullptr && (*array)[pos_y] != nullptr) (*array)[pos_y][i] = 0;
       }

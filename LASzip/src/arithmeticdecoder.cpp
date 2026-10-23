@@ -190,6 +190,11 @@ U32 ArithmeticDecoder::decodeSymbol(ArithmeticModel* m)
     unsigned dv = value / (length >>= DM__LengthShift);
     unsigned t = dv >> m->table_shift;
 
+    if (t > m->table_size)
+    {
+      throw 4711;
+    }
+
     sym = m->decoder_table[t];      // initial decision based on table look-up
     n = m->decoder_table[t+1] + 1;
 

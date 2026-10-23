@@ -1,6 +1,14 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
-14 September 2026-- fix: line endings in -wkt_format output
+21 October 2026 -- NEW: add warning for potential 32 bit LAX index limitations during spatial queries
+20 October 2026 -- NEW: centralize exception handling across tools and file loop processing
+19 October 2026 -- fix: code cleanup; mem allocation fixes
+13 October 2026 -- fix: float_precision for .ASC, .SCV, .XYZ output
+13 October 2026 -- fix: blast2dem "missing pixel" problem
+29 September 2026 -- fix: LASzip point format POINT14 WAVEPACKET14
+29 September 2026 -- NEW: lasinfo -full_class option as -full_csv extension
+28 September 2026 -- fix: improve formula handler (class-mapping, extended 1.4 fields, attributes, RGB)
+14 September 2026 -- fix: line endings in -wkt_format output
 3 September 2026 -- NEW: Extend -remove_vlr to remove VLRs by multiple indices or by user ID and record ID
 3 September 2026 -- fix: EPSG source/target argument handling after vertical CRS support changes
 21 August 2026 -- NEW: las2las: arguments '-load_txt_to_vlr' and '-load_bin_to_vlr' to modify VLR data

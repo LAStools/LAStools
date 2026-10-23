@@ -35,6 +35,7 @@
 #include <cstring>
 #include <string>
 #include <filesystem>
+#include <exception>
 
 class LasTool
 {
@@ -47,6 +48,7 @@ class LasTool
     char** argv = 0;
     bool force = false;  // force continuation on serious_warnings
     bool blast = false;
+    bool skip_file_on_error = false;
 #ifdef COMPILE_WITH_GUI
     bool gui = false;
 #endif
@@ -80,6 +82,97 @@ class LasTool
             LASMessage(type, "LAStools%s %s (by info@rapidlasso.de) version %d%s\n", sBlast().c_str(), name.c_str(), LAS_TOOLS_VERSION, info.c_str());
             header_printed_once = type >= get_message_log_level();
         }
+    }
+
+    virtual int run() {
+      laserror("run() not implemented for '%s'", name.c_str());
+      return 1;
+    }
+
+    /// Initializes and runs the tool while handling any unhandled exceptions
+    int execute(int argc, char** argv, const char* tool_name) {
+      try {
+        init(argc, argv, tool_name);
+        return run();
+      } catch (const std::exception& e) {
+        LASMessage(LAS_FATAL_ERROR, "unhandled exception in %s: %s", tool_name, e.what());
+        return 1;
+      } catch (...) {
+        LASMessage(LAS_FATAL_ERROR, "unhandled unknown exception in %s", tool_name);
+        return 1;
+      }
+    }
+
+    /// Executes processing for each active input file and handles file scoped errors without aborting the entire tool when configured
+    template <typename TOpener, typename TProcessFile>
+    void run_file_loop(TOpener& opener, TProcessFile&& process_file) {
+      while (opener.active()) {
+        const U32 file_index = opener.get_file_name_current();
+        const char* file_name = opener.get_use_stdin() ? "<stdin>" : opener.get_file_name(file_index);
+
+        FileErrorContext file_context(file_name, skip_file_on_error);
+
+        try {
+          process_file();
+        } catch (const std::exception& e) {
+          const char* current_file = FileErrorContext::get_file_name();
+
+          std::string message = e.what();
+          message += " [file: ";
+          message += current_file ? current_file : "<unknown>";
+          message += "]";
+
+          if (!skip_file_on_error) {
+            throw exception_file_loop(message.c_str());
+          }
+          LASMessage(LAS_ERROR, "%s - file skipped", message.c_str());
+          continue;
+        } catch (...) {
+          const char* current_file = FileErrorContext::get_file_name();
+
+          std::string message = "unknown exception [file: ";
+          message += current_file ? current_file : "<unknown>";
+          message += "]";
+
+          if (!skip_file_on_error) {
+            throw exception_file_loop(message.c_str());
+          }
+          LASMessage(LAS_ERROR, "%s - file skipped", message.c_str());
+          continue;
+        }
+      }
+    }
+
+    /// Executes processing for each input file by index and handles file-scoped exceptions according to the configured skip behavior
+    template <typename TOpener, typename TProcessFile>
+    void run_file_index_loop(TOpener& opener, TProcessFile&& process_file) {
+      for (U32 u = 0; u < opener.get_file_name_number(); u++) {
+        const char* file_name = opener.get_file_name(u);
+        FileErrorContext file_context(file_name, skip_file_on_error);
+
+        try {
+          process_file(u);
+        } catch (const std::exception& e) {
+          std::string message = e.what();
+          message += " [file: ";
+          message += file_name ? file_name : "<unknown>";
+          message += "]";
+
+          if (!skip_file_on_error) throw exception_file_loop(message.c_str());
+
+          LASMessage(LAS_ERROR, "%s - file skipped", message.c_str());
+          continue;
+        } catch (...) {
+          std::string message = "unknown exception [file: ";
+          message += file_name ? file_name : "<unknown>";
+          message += "]";
+
+          if (!skip_file_on_error) throw exception_file_loop(message.c_str());
+
+          LASMessage(LAS_ERROR, "%s - file skipped", message.c_str());
+          continue;
+        }
+      }
     }
 
     virtual std::string laslicinfo()
@@ -187,6 +280,11 @@ class LasTool
 #else
             LASMessage(LAS_WARNING, "not compiled with GUI support. ignoring '-gui' ...");
 #endif
+        } 
+        else if (strcmp(argv[i], "-skip_file_on_error") == 0) 
+        {
+          skip_file_on_error = true;
+          argv[i][0] = '\0';
         }
         else if (strcmp(argv[i], "-cores") == 0)
         {

@@ -87,9 +87,9 @@ LASintervalStartCell::LASintervalStartCell(const U64 p_index) : LASintervalCell(
 
 BOOL LASintervalStartCell::add(const U64 p_index, const U32 threshold)
 {
-  U32 current_end = (U32)(last ? last->end : end);
+  U64 current_end = last ? last->end : end;
   assert(p_index > current_end);
-  U32 diff = (U32)(p_index - current_end);
+  U64 diff = p_index - current_end;
   full++;
   if (diff > threshold)
   {
@@ -523,6 +523,7 @@ LASinterval::LASinterval(const U32 threshold)
   current_cell = 0;
   merged_cells = 0;
   merged_cells_temporary = FALSE;
+  version = 0;
   end = 0;
   full = 0;
   index = 0;
@@ -601,13 +602,13 @@ BOOL LASinterval::read(ByteStreamIn* stream)
     laserror("(LASinterval): wrong signature %4s instead of 'LASV'", signature);
     return FALSE;
   }
-  U32 version;
+
   try { stream->get32bitsLE((U8*)&version); } catch (...)
   {
     laserror("(LASinterval): reading version");
     return FALSE;
   }
-  BOOL requires64bits = (version == 1);
+  BOOL requires64bits = (version >= 1);
 
   // read number of cells
   U32 number_cells;

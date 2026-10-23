@@ -652,36 +652,37 @@ class LASLIB_DLL LASattributer {
   I32 add_attribute(const LASattribute attribute) {
     if (attribute.get_size()) {
       if (attributes) {
-        number_attributes++;
-        attributes = (LASattribute*)realloc_las(attributes, sizeof(LASattribute) * number_attributes);
-        if (attributes == 0) {
+        if (number_attributes == I32_MAX) {
           return -1;
         }
-        attribute_starts = (I32*)realloc_las(attribute_starts, sizeof(I32) * number_attributes);
-        if (attribute_starts == 0) {
+        I32 new_number_attributes = number_attributes + 1;
+        if (!try_realloc_las(attributes, sizeof(LASattribute) * new_number_attributes)) {
           return -1;
         }
-        attribute_sizes = (I32*)realloc_las(attribute_sizes, sizeof(I32) * number_attributes);
-        if (attribute_sizes == 0) {
+        if (!try_realloc_las(attribute_starts, sizeof(I32) * new_number_attributes)) {
           return -1;
         }
+        if (!try_realloc_las(attribute_sizes, sizeof(I32) * new_number_attributes)) {
+          return -1;
+        }
+        number_attributes = new_number_attributes;
         attributes[number_attributes - 1] = attribute;
         attribute_starts[number_attributes - 1] = attribute_starts[number_attributes - 2] + attribute_sizes[number_attributes - 2];
         attribute_sizes[number_attributes - 1] = attributes[number_attributes - 1].get_size();
       } else {
+        LASattribute* new_attributes = (LASattribute*)malloc_las(sizeof(LASattribute));
+        I32* new_attribute_starts = (I32*)malloc_las(sizeof(I32));
+        I32* new_attribute_sizes = (I32*)malloc_las(sizeof(I32));
+        if ((new_attributes == 0) || (new_attribute_starts == 0) || (new_attribute_sizes == 0)) {
+          free(new_attributes);
+          free(new_attribute_starts);
+          free(new_attribute_sizes);
+          return -1;
+        }
         number_attributes = 1;
-        attributes = (LASattribute*)malloc_las(sizeof(LASattribute));
-        if (attributes == 0) {
-          return -1;
-        }
-        attribute_starts = (I32*)malloc_las(sizeof(I32));
-        if (attribute_starts == 0) {
-          return -1;
-        }
-        attribute_sizes = (I32*)malloc_las(sizeof(I32));
-        if (attribute_sizes == 0) {
-          return -1;
-        }
+        attributes = new_attributes;
+        attribute_starts = new_attribute_starts;
+        attribute_sizes = new_attribute_sizes;
         attributes[0] = attribute;
         attribute_starts[0] = 0;
         attribute_sizes[0] = attributes[0].get_size();
@@ -751,9 +752,9 @@ class LASLIB_DLL LASattributer {
     }
     number_attributes--;
     if (number_attributes) {
-      attributes = (LASattribute*)realloc_las(attributes, sizeof(LASattribute) * number_attributes);
-      attribute_starts = (I32*)realloc_las(attribute_starts, sizeof(I32) * number_attributes);
-      attribute_sizes = (I32*)realloc_las(attribute_sizes, sizeof(I32) * number_attributes);
+      (void)try_realloc_las(attributes, sizeof(LASattribute) * number_attributes);
+      (void)try_realloc_las(attribute_starts, sizeof(I32) * number_attributes);
+      (void)try_realloc_las(attribute_sizes, sizeof(I32) * number_attributes);
     } else {
       free(attributes);
       attributes = 0;

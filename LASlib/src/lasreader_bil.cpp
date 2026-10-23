@@ -368,12 +368,13 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
 
   // create *.hdr file name
 
-  I32 len = (I32)strlen(file_name) - 3;
+  I32 name_len = (I32)strlen(file_name);
+  I32 len = name_len - 3;
   CHAR* file_name_hdr = LASCopyString(file_name);
 
   while ((len > 0) && (file_name_hdr[len] != '.')) len--;
 
-  if ((len < 0) || (file_name_hdr[len] != '.'))
+  if ((len < 0) || (file_name_hdr[len] != '.') || ((len + 4) > name_len))
   {
     laserror("file name '%s' is not a valid BIL file", file_name);
     free(file_name_hdr);
@@ -383,6 +384,7 @@ BOOL LASreaderBIL::read_hdr_file(const CHAR* file_name)
   file_name_hdr[len+1] = 'h';
   file_name_hdr[len+2] = 'd';
   file_name_hdr[len+3] = 'r';
+  file_name_hdr[len+4] = '\0';
 
   FILE* file = LASfopen(file_name_hdr, "r");
 
@@ -550,12 +552,13 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
 
   // create *.blw file name
 
-  I32 len = (I32)strlen(file_name) - 3;
+  I32 name_len = (I32)strlen(file_name);
+  I32 len = name_len - 3;
   CHAR* file_name_bwl = LASCopyString(file_name);
 
   while ((len > 0) && (file_name_bwl[len] != '.')) len--;
 
-  if ((len < 0) || (file_name_bwl[len] != '.'))
+  if ((len < 0) || (file_name_bwl[len] != '.') || ((len + 4) > name_len))
   {
     laserror("file name '%s' is not a valid BIL file", file_name);
     free(file_name_bwl);
@@ -565,6 +568,7 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
   file_name_bwl[len+1] = 'b';
   file_name_bwl[len+2] = 'l';
   file_name_bwl[len+3] = 'w';
+  file_name_bwl[len+4] = '\0';
 
   FILE* file = LASfopen(file_name_bwl, "r");
 

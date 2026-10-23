@@ -119,6 +119,41 @@ extern void LASLIB_DLL byebye() {
   exit(code);
 }
 
+// Returns a reference to the currently active file error context for this thread
+FileErrorContext*& FileErrorContext::current_context() {
+  static thread_local FileErrorContext* context = nullptr;
+  return context;
+}
+
+// Activates a new file error context and preserves the previously active context
+FileErrorContext::FileErrorContext(const char* file_name, bool skip_file_on_error)
+    : file_name(file_name ? file_name : ""), skip_file_on_error(skip_file_on_error), previous_context(current_context()) {
+  current_context() = this;
+}
+
+// Restores the previously active file error context when leaving the current scope
+FileErrorContext::~FileErrorContext() {
+  current_context() = previous_context;
+}
+
+// Returns whether errors in the current file should skip only that file
+bool FileErrorContext::should_skip_file_on_error() {
+  FileErrorContext* context = current_context();
+
+  return context && context->skip_file_on_error;
+}
+
+// Returns the name of the file in the currently active error context
+const char* FileErrorContext::get_file_name() {
+  FileErrorContext* context = current_context();
+
+  if (!context) {
+    return nullptr;
+  }
+
+  return context->file_name.c_str();
+}
+
 /// Validates whether a given string is UTF-8 encoded.
 bool validate_utf8(const char* str, bool restrict_to_two_bytes) noexcept {
   if (!str) {
@@ -333,6 +368,9 @@ const char* indent_text(const char* text, const char* indent) {
 /// <param name="path_len">current len of path</param>
 /// <param name="path">pointer to path char</param>
 void ExeNameToPathWithoutTrailingDelimiter(int& path_len, char* path) {
+  if (!path || (path_len < 0)) {
+    return;
+  }
   while ((path_len > 0) && (path[path_len] != DIRECTORY_SLASH) && (path[path_len] != ':')) path_len--;
   path[path_len] = 0;
 }
@@ -342,15 +380,24 @@ std::string exe_path() {
   size_t len = 0;
 #ifdef _WIN32
   TCHAR path[MAX_PATH_LAS];
-  GetModuleFileName(NULL, path, MAX_PATH_LAS);
-#ifdef UNICODE
-  len = wcslen(path);
-#else
-  len = strlen(path);
-#endif
+  // GetModuleFileName() returns 0 on failure
+  DWORD win_len = GetModuleFileName(NULL, path, MAX_PATH_LAS);
+  if ((win_len == 0) || (win_len >= MAX_PATH_LAS)) {
+    return std::string();
+  }
+  len = (size_t)win_len;
 #else
   char path[MAX_PATH_LAS];
-  len = readlink("/proc/self/exe", path, MAX_PATH_LAS);
+  // readlink() returns ssize_t and -1 on failure
+  ssize_t link_len = readlink("/proc/self/exe", path, MAX_PATH_LAS);
+  if (link_len < 0) {
+    return std::string();
+  }
+  len = (size_t)link_len;
+  if (len >= MAX_PATH_LAS) {
+    len = MAX_PATH_LAS - 1;
+  }
+  path[len] = '\0';
 #endif
   while (len && (path[len] != '\\') && (path[len] != '/')) len--;
   path[len] = '\0';
@@ -587,6 +634,27 @@ bool check_available_RAM(size_t size) {
     }
   }
   return false;
+}
+
+/// extension of the realloc function to check memory allocation errors
+BOOL try_realloc_las_raw(void** ptr, size_t size) {
+  // a size of 0 is deliberately not passed on: realloc(p, 0) is allowed to free the block and
+  // return 0, which would leave the caller with FALSE and a dangling pointer
+  if ((ptr == 0) || (size == 0)) {
+    return FALSE;
+  }
+
+  bool warned = check_available_RAM(size);
+
+  void* temp = realloc(*ptr, size);
+  if (temp == 0) {
+    if (!warned) {
+      LASMessage(LAS_WARNING, "memory reallocation failed");
+    }
+    return FALSE;
+  }
+  *ptr = temp;
+  return TRUE;
 }
 
 /// extension of the realloc function to check memory allocation errors

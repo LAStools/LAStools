@@ -50,26 +50,21 @@ BOOL LASreaderPipeOn::open(LASreader* lasreader)
   }
 
   // store a reference to the actual lasreader
-
   this->lasreader = lasreader;
 
   // populate our header from the actual header
   header = lasreader->header;
 
   // zero the pointers of the other header so they don't get deallocated twice
-  lasreader->header.user_data_in_header = 0;
-  lasreader->header.vlrs = 0;
-  lasreader->header.laszip = 0;
-  lasreader->header.vlr_lastiling = 0;
-  lasreader->header.vlr_lasoriginal = 0;
-  lasreader->header.user_data_after_header = 0;
+  lasreader->header.unlink();
 
+  // not needed: header = lasreader->header already copies the pointer, dont copy again
   // special check for attributes in extra bytes
-  if (header.number_attributes)
-  {
-    header.number_attributes = 0;
-    header.init_attributes(lasreader->header.number_attributes, lasreader->header.attributes);
-  }
+  //if (header.number_attributes)
+  //{
+  //  header.number_attributes = 0;
+  //  header.init_attributes(lasreader->header.number_attributes, lasreader->header.attributes);
+  //}
 
   // initialize the point with the header info
 

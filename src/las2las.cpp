@@ -76,32 +76,6 @@
 #include "bytestreamout_file.hpp"
 #include "bytestreamin_file.hpp"
 
-class LasTool_las2las : public LasTool
-{
-private:
-public:
-  void usage() override
-  {
-    fprintf(stderr, "usage:\n");
-    fprintf(stderr, "las2las -i *.las -utm 13N\n");
-    fprintf(stderr, "las2las -i *.laz -first_only -olaz\n");
-    fprintf(stderr, "las2las -i *.las -drop_return 4 5 -olaz\n");
-    fprintf(stderr, "las2las -latlong -target_utm 12T -i in.las -o out.las\n");
-    fprintf(stderr, "las2las -i in.laz -target_epsg 2972 -o out.laz\n");
-    fprintf(stderr, "las2las -set_point_type 0 -lof file_list.txt -merged -o out.las\n");
-    fprintf(stderr, "las2las -remove_vlr 2 -scale_rgb_up -i in.las -o out.las\n");
-    fprintf(stderr, "las2las -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las\n");
-    fprintf(stderr, "las2las -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt\n");
-    fprintf(stderr, "las2las -i in.las -remove_padding -keep_scan_angle -15 15 -o out.las\n");
-    fprintf(stderr, "las2las -i in.las -rescale 0.01 0.01 0.01 -reoffset 0 300000 0 -o out.las\n");
-    fprintf(stderr, "las2las -i in.las -set_version 1.2 -keep_gpstime 46.5 47.5 -o out.las\n");
-    fprintf(stderr, "las2las -i in.las -drop_intensity_below 10 -olaz -stdout > out.laz\n");
-    fprintf(stderr, "las2las -i in.las -last_only -drop_gpstime_below 46.75 -otxt -oparse xyzt -stdout > out.txt\n");
-    fprintf(stderr, "las2las -i in.las -remove_all_vlrs -keep_class 2 3 4 -olas -stdout > out.las\n");
-    fprintf(stderr, "las2las -h\n");
-  };
-};
-
 static double taketime()
 {
   return (double)(clock()) / CLOCKS_PER_SEC;
@@ -744,1147 +718,1434 @@ extern int las2las_gui(int argc, char* argv[], LASreadOpener* lasreadopener);
 extern void las2las_multi_core(int argc, char* argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, int cores, BOOL cpu64);
 #endif
 
-int main(int argc, char* argv[])
-{
-  LasTool_las2las lastool;
-  lastool.init(argc, argv, "las2las");
-  int i;
-  // fixed header changes
-  int set_version_major = -1;
-  int set_version_minor = -1;
-  int set_point_data_format = -1;
-  int set_point_data_record_length = -1;
-  int set_global_encoding_gps_bit = -1;
-  int set_time_offset = -1;
-  int set_lastiling_buffer_flag = -1;
-  // variable header changes
-  bool set_ogc_wkt = false;
-  bool set_ogc_wkt_in_evlr = false;
-  CHAR* set_ogc_wkt_string = 0;
-  bool remove_header_padding = false;
-  bool remove_all_variable_length_records = false;
-  int remove_variable_length_record_from = -1;
-  int remove_variable_length_record_to = -1;
-  bool remove_all_extended_variable_length_records = false;
-  int remove_extended_variable_length_record = -1;
-  int remove_extended_variable_length_record_from = -1;
-  int remove_extended_variable_length_record_to = -1;
-  CHAR* add_empty_vlr_user_ID = 0;
-  int add_empty_vlr_record_ID = -1;
-  CHAR* add_empty_vlr_description = 0;
-  bool move_evlrs_to_vlrs = false;
-  bool save_vlrs = false;
-  bool load_vlrs = false;
-  bool save_vlr = false;
-  bool load_vlr = false;
-  int vlr_index = -1;
-  int vlr_record_id = -1;
-  std::vector<int> remove_vlr_indices;
-  CHAR* remove_vlr_user_id = nullptr;
-  int remove_vlr_record_id = -1;
-  CHAR* vlr_user_id = nullptr;
-  CHAR* vlr_filename = nullptr;
-  bool load_txt_to_vlr = false;
-  bool load_bin_to_vlr = false;
-  int load_txt_vlr_index = -1;
-  int load_txt_vlr_record_id = -1;
-  CHAR* load_txt_vlr_user_id = nullptr;
-  CHAR* load_txt_vlr_filename = nullptr;
-  int load_bin_vlr_index = -1;
-  int load_bin_vlr_record_id = -1;
-  CHAR* load_bin_vlr_user_id = nullptr;
-  CHAR* load_bin_vlr_filename = nullptr;
-  int set_attribute_scales = 0;
-  int set_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
-  double set_attribute_scale_scale[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
-  int set_attribute_offsets = 0;
-  int set_attribute_offset_index[5] = { -1, -1, -1, -1, -1 };
-  double set_attribute_offset_offset[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
-  int unset_attribute_scales = 0;
-  int unset_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
-  int unset_attribute_offsets = 0;
-  int unset_attribute_offset_index[5] = { -1, -1, -1, -1, -1 };
-  bool remove_tiling_vlr = false;
-  bool remove_original_vlr = false;
-  bool remove_empty_files = true;
-  // extract a subsequence
-  I64 subsequence_start = 0;
-  I64 subsequence_stop = I64_MAX;
-  // fix files with corrupt points
-  bool clip_to_bounding_box = false;
-  double start_time = 0;
-  
-  LASreadOpener lasreadopener;
-  GeoProjectionConverter geoprojectionconverter;
-  LASwriteOpener laswriteopener;
-
-  enum class gps_time_type
-  {
-      NONE,
-      GPS_WEEK_TIME,
-      ADJUSTED_GPS_TIME,
-      OFFSET_GPS_TIME,
-      ADJUSTED_OR_OFFSET_GPS_TIME
+class LasTool_las2las : public LasTool {
+ public:
+  void usage() override {
+    fprintf(stderr, "usage:\n");
+    fprintf(stderr, "las2las -i *.las -utm 13N\n");
+    fprintf(stderr, "las2las -i *.laz -first_only -olaz\n");
+    fprintf(stderr, "las2las -i *.las -drop_return 4 5 -olaz\n");
+    fprintf(stderr, "las2las -latlong -target_utm 12T -i in.las -o out.las\n");
+    fprintf(stderr, "las2las -i in.laz -target_epsg 2972 -o out.laz\n");
+    fprintf(stderr, "las2las -set_point_type 0 -lof file_list.txt -merged -o out.las\n");
+    fprintf(stderr, "las2las -remove_vlr 2 -scale_rgb_up -i in.las -o out.las\n");
+    fprintf(stderr, "las2las -i in.las -keep_xy 630000 4834500 630500 4835000 -keep_z 10 100 -o out.las\n");
+    fprintf(stderr, "las2las -i in.txt -iparse xyzit -keep_circle 630200 4834750 100 -oparse xyzit -o out.txt\n");
+    fprintf(stderr, "las2las -i in.las -remove_padding -keep_scan_angle -15 15 -o out.las\n");
+    fprintf(stderr, "las2las -i in.las -rescale 0.01 0.01 0.01 -reoffset 0 300000 0 -o out.las\n");
+    fprintf(stderr, "las2las -i in.las -set_version 1.2 -keep_gpstime 46.5 47.5 -o out.las\n");
+    fprintf(stderr, "las2las -i in.las -drop_intensity_below 10 -olaz -stdout > out.laz\n");
+    fprintf(stderr, "las2las -i in.las -last_only -drop_gpstime_below 46.75 -otxt -oparse xyzt -stdout > out.txt\n");
+    fprintf(stderr, "las2las -i in.las -remove_all_vlrs -keep_class 2 3 4 -olas -stdout > out.las\n");
+    fprintf(stderr, "las2las -h\n");
   };
 
-  gps_time_type verify_current_gps_time_type = gps_time_type::NONE;
-
-
-  if (argc == 1)
-  {
-#ifdef COMPILE_WITH_GUI
-    return las2las_gui(argc, argv, 0);
-#else
-    wait_on_exit();
-    fprintf(stderr, "%s is better run in the command line\n", argv[0]);
-    char file_name[256];
-    fprintf(stderr, "enter input file: ");
-    if (fgets(file_name, 256, stdin) && strlen(file_name)) {
-      file_name[strlen(file_name) - 1] = '\0';
-      lasreadopener.set_file_name(file_name);
-    }
-    fprintf(stderr, "enter output file: ");
-    if (fgets(file_name, 256, stdin) && strlen(file_name)) {
-      file_name[strlen(file_name) - 1] = '\0';
-      laswriteopener.set_file_name(file_name);
-    }
-#endif
-  }
-  else
-  {
-      for (i = 1; i < argc; i++)
-      {
-          if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
-          if (strcmp(argv[i], "-week_to_adjusted") == 0)
-          {
-              set_global_encoding_gps_bit = 1;
-              verify_current_gps_time_type = gps_time_type::GPS_WEEK_TIME;
-          }
-          else if (strcmp(argv[i], "-offset_to_adjusted") == 0) {
-              set_global_encoding_gps_bit = 1;
-              verify_current_gps_time_type = gps_time_type::OFFSET_GPS_TIME;
-          }
-          else if (strcmp(argv[i], "-adjusted_or_offset_to_adjusted") == 0) {
-              set_global_encoding_gps_bit = 1;
-              verify_current_gps_time_type = gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME;
-          }
-          else if (strcmp(argv[i], "-adjusted_to_week") == 0)
-          {
-              set_global_encoding_gps_bit = 0;
-              verify_current_gps_time_type = gps_time_type::ADJUSTED_GPS_TIME;
-          }
-          else if (strcmp(argv[i], "-adjusted_or_offset_to_week") == 0)
-          {
-              set_global_encoding_gps_bit = 0;
-              verify_current_gps_time_type = gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME;
-          }
-          else if (strcmp(argv[i], "-offset_to_week") == 0)
-          {
-              set_global_encoding_gps_bit = 0;
-              verify_current_gps_time_type = gps_time_type::OFFSET_GPS_TIME;
-          }
-          else if (strcmp(argv[i], "-adjusted_to_offset") == 0)
-          {
-              lastool.parse_arg_cnt_check(i, 1, "time_offset");
-              if (sscanf_las(argv[i + 1], "%u", &set_time_offset) != 1)
-              {
-                  lastool.error_parse_arg_n_invalid(i, 1);
-              }
-              if (set_time_offset < 0) {
-                  set_time_offset = 0;
-              }
-              verify_current_gps_time_type = gps_time_type::ADJUSTED_GPS_TIME;
-          }
-          else if (strcmp(argv[i], "-adjusted_or_offset_to_offset") == 0)
-          {
-              lastool.parse_arg_cnt_check(i, 1, "time_offset");
-              if (sscanf_las(argv[i + 1], "%u", &set_time_offset) != 1)
-              {
-                  lastool.error_parse_arg_n_invalid(i, 1);
-              }
-              if (set_time_offset < 0) {
-                  set_time_offset = 0;
-              }
-              verify_current_gps_time_type = gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME;
-          }
-          else if (strcmp(argv[i], "-week_to_offset") == 0)
-          {
-              lastool.parse_arg_cnt_check(i, 2, "week time_offset");
-              // week only used in lastransform, so we can skip it here
-              if (sscanf_las(argv[i + 2], "%u", &set_time_offset) != 1)
-              {
-                  lastool.error_parse_arg_n_invalid(i, 2);
-              }
-              if (set_time_offset < 0) {  
-                  set_time_offset = 0;
-              }
-              verify_current_gps_time_type = gps_time_type::GPS_WEEK_TIME;
-          }
-          else if (strcmp(argv[i], "-offset_to_offset") == 0)
-          {
-              lastool.parse_arg_cnt_check(i, 1, "time_offset");
-              if (sscanf_las(argv[i + 1], "%u", &set_time_offset) != 1)
-              {
-                  lastool.error_parse_arg_n_invalid(i, 1);
-              }
-              if (set_time_offset < 0) {
-                  set_time_offset = 0;
-              }
-              verify_current_gps_time_type = gps_time_type::OFFSET_GPS_TIME;
-          }
-      }
-      geoprojectionconverter.parse(argc, argv);
-      lasreadopener.parse(argc, argv);
-      laswriteopener.parse(argc, argv);
-  }
-
-  auto arg_local = [&](int& i) -> bool {
-    if (strcmp(argv[i], "-subseq") == 0)
+  int run() override{
+    int i;
+    // fixed header changes
+    int set_version_major = -1;
+    int set_version_minor = -1;
+    int set_point_data_format = -1;
+    int set_point_data_record_length = -1;
+    int set_global_encoding_gps_bit = -1;
+    int set_time_offset = -1;
+    int set_lastiling_buffer_flag = -1;
+    // variable header changes
+    bool set_ogc_wkt = false;
+    bool set_ogc_wkt_in_evlr = false;
+    CHAR* set_ogc_wkt_string = 0;
+    bool remove_header_padding = false;
+    bool remove_all_variable_length_records = false;
+    int remove_variable_length_record_from = -1;
+    int remove_variable_length_record_to = -1;
+    bool remove_all_extended_variable_length_records = false;
+    int remove_extended_variable_length_record = -1;
+    int remove_extended_variable_length_record_from = -1;
+    int remove_extended_variable_length_record_to = -1;
+    CHAR* add_empty_vlr_user_ID = 0;
+    int add_empty_vlr_record_ID = -1;
+    CHAR* add_empty_vlr_description = 0;
+    bool move_evlrs_to_vlrs = false;
+    bool save_vlrs = false;
+    bool load_vlrs = false;
+    bool save_vlr = false;
+    bool load_vlr = false;
+    int vlr_index = -1;
+    int vlr_record_id = -1;
+    std::vector<int> remove_vlr_indices;
+    CHAR* remove_vlr_user_id = nullptr;
+    int remove_vlr_record_id = -1;
+    CHAR* vlr_user_id = nullptr;
+    CHAR* vlr_filename = nullptr;
+    bool load_txt_to_vlr = false;
+    bool load_bin_to_vlr = false;
+    int load_txt_vlr_index = -1;
+    int load_txt_vlr_record_id = -1;
+    CHAR* load_txt_vlr_user_id = nullptr;
+    CHAR* load_txt_vlr_filename = nullptr;
+    int load_bin_vlr_index = -1;
+    int load_bin_vlr_record_id = -1;
+    CHAR* load_bin_vlr_user_id = nullptr;
+    CHAR* load_bin_vlr_filename = nullptr;
+    int set_attribute_scales = 0;
+    int set_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
+    double set_attribute_scale_scale[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
+    int set_attribute_offsets = 0;
+    int set_attribute_offset_index[5] = { -1, -1, -1, -1, -1 };
+    double set_attribute_offset_offset[5] = { 0.0, 0.0, 0.0, 0.0, 0.0 };
+    int unset_attribute_scales = 0;
+    int unset_attribute_scale_index[5] = { -1, -1, -1, -1, -1 };
+    int unset_attribute_offsets = 0;
+    int unset_attribute_offset_index[5] = { -1, -1, -1, -1, -1 };
+    bool remove_tiling_vlr = false;
+    bool remove_original_vlr = false;
+    bool remove_empty_files = true;
+    // extract a subsequence
+    I64 subsequence_start = 0;
+    I64 subsequence_stop = I64_MAX;
+    // fix files with corrupt points
+    bool clip_to_bounding_box = false;
+    double start_time = 0;
+    
+    LASreadOpener lasreadopener;
+    GeoProjectionConverter geoprojectionconverter;
+    LASwriteOpener laswriteopener;
+  
+    enum class gps_time_type
     {
-      lastool.parse_arg_cnt_check(i, 2, "start stop");
-      if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1)
-      {
-        lastool.error_parse_arg_n_invalid(i, 1);
-      }
-      if (sscanf_las(argv[i + 2], "%lld", &subsequence_stop) != 1)
-      {
-        lastool.error_parse_arg_n_invalid(i, 2);
-      }
-      i += 2;
-    }
-    else if (strcmp(argv[i], "-start_at_point") == 0)
+        NONE,
+        GPS_WEEK_TIME,
+        ADJUSTED_GPS_TIME,
+        OFFSET_GPS_TIME,
+        ADJUSTED_OR_OFFSET_GPS_TIME
+    };
+  
+    gps_time_type verify_current_gps_time_type = gps_time_type::NONE;
+  
+  
+    if (argc == 1)
     {
-      lastool.parse_arg_cnt_check(i, 1, "index of start point");
-      if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1)
-      {
-        lastool.error_parse_arg_n_invalid(i, 1);
+  #ifdef COMPILE_WITH_GUI
+      return las2las_gui(argc, argv, 0);
+  #else
+      wait_on_exit();
+      fprintf(stderr, "%s is better run in the command line\n", argv[0]);
+      char file_name[256];
+      fprintf(stderr, "enter input file: ");
+      if (fgets(file_name, 256, stdin) && strlen(file_name)) {
+        file_name[strlen(file_name) - 1] = '\0';
+        lasreadopener.set_file_name(file_name);
       }
-      i += 1;
-    }
-    else if (strcmp(argv[i], "-stop_at_point") == 0)
-    {
-      lastool.parse_arg_cnt_check(i, 1, "index of stop point");
-      if (sscanf_las(argv[i + 1], "%lld", &subsequence_stop) != 1)
-      {
-        lastool.error_parse_arg_n_invalid(i, 1);
+      fprintf(stderr, "enter output file: ");
+      if (fgets(file_name, 256, stdin) && strlen(file_name)) {
+        file_name[strlen(file_name) - 1] = '\0';
+        laswriteopener.set_file_name(file_name);
       }
-      i += 1;
+  #endif
     }
-    else if (strncmp(argv[i], "-set_", 5) == 0)
+    else
     {
-      if (strncmp(argv[i], "-set_point_", 11) == 0)
-      {
-        if (strcmp(argv[i], "-set_point_type") == 0 || strcmp(argv[i], "-set_point_data_format") == 0)
+        for (i = 1; i < argc; i++)
         {
-          lastool.parse_arg_cnt_check(i, 1, "type");
-          if (sscanf_las(argv[i + 1], "%u", &set_point_data_format) != 1) {
-            lastool.error_parse_arg_n_invalid(i, 1);
-          } else {
-            // preset point type 
-            lasreadopener.set_point_type(set_point_data_format);
-          }
-          i++;
+            if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
+            if (strcmp(argv[i], "-week_to_adjusted") == 0)
+            {
+                set_global_encoding_gps_bit = 1;
+                verify_current_gps_time_type = gps_time_type::GPS_WEEK_TIME;
+            }
+            else if (strcmp(argv[i], "-offset_to_adjusted") == 0) {
+                set_global_encoding_gps_bit = 1;
+                verify_current_gps_time_type = gps_time_type::OFFSET_GPS_TIME;
+            }
+            else if (strcmp(argv[i], "-adjusted_or_offset_to_adjusted") == 0) {
+                set_global_encoding_gps_bit = 1;
+                verify_current_gps_time_type = gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME;
+            }
+            else if (strcmp(argv[i], "-adjusted_to_week") == 0)
+            {
+                set_global_encoding_gps_bit = 0;
+                verify_current_gps_time_type = gps_time_type::ADJUSTED_GPS_TIME;
+            }
+            else if (strcmp(argv[i], "-adjusted_or_offset_to_week") == 0)
+            {
+                set_global_encoding_gps_bit = 0;
+                verify_current_gps_time_type = gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME;
+            }
+            else if (strcmp(argv[i], "-offset_to_week") == 0)
+            {
+                set_global_encoding_gps_bit = 0;
+                verify_current_gps_time_type = gps_time_type::OFFSET_GPS_TIME;
+            }
+            else if (strcmp(argv[i], "-adjusted_to_offset") == 0)
+            {
+                parse_arg_cnt_check(i, 1, "time_offset");
+                if (sscanf_las(argv[i + 1], "%u", &set_time_offset) != 1)
+                {
+                    error_parse_arg_n_invalid(i, 1);
+                }
+                if (set_time_offset < 0) {
+                    set_time_offset = 0;
+                }
+                verify_current_gps_time_type = gps_time_type::ADJUSTED_GPS_TIME;
+            }
+            else if (strcmp(argv[i], "-adjusted_or_offset_to_offset") == 0)
+            {
+                parse_arg_cnt_check(i, 1, "time_offset");
+                if (sscanf_las(argv[i + 1], "%u", &set_time_offset) != 1)
+                {
+                    error_parse_arg_n_invalid(i, 1);
+                }
+                if (set_time_offset < 0) {
+                    set_time_offset = 0;
+                }
+                verify_current_gps_time_type = gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME;
+            }
+            else if (strcmp(argv[i], "-week_to_offset") == 0)
+            {
+                parse_arg_cnt_check(i, 2, "week time_offset");
+                // week only used in lastransform, so we can skip it here
+                if (sscanf_las(argv[i + 2], "%u", &set_time_offset) != 1)
+                {
+                    error_parse_arg_n_invalid(i, 2);
+                }
+                if (set_time_offset < 0) {  
+                    set_time_offset = 0;
+                }
+                verify_current_gps_time_type = gps_time_type::GPS_WEEK_TIME;
+            }
+            else if (strcmp(argv[i], "-offset_to_offset") == 0)
+            {
+                parse_arg_cnt_check(i, 1, "time_offset");
+                if (sscanf_las(argv[i + 1], "%u", &set_time_offset) != 1)
+                {
+                    error_parse_arg_n_invalid(i, 1);
+                }
+                if (set_time_offset < 0) {
+                    set_time_offset = 0;
+                }
+                verify_current_gps_time_type = gps_time_type::OFFSET_GPS_TIME;
+            }
         }
-        else if (strcmp(argv[i], "-set_point_data_record_length") == 0 || strcmp(argv[i], "-set_point_size") == 0)
+        geoprojectionconverter.parse(argc, argv);
+        lasreadopener.parse(argc, argv);
+        laswriteopener.parse(argc, argv);
+    }
+  
+    auto arg_local = [&](int& i) -> bool {
+      if (strcmp(argv[i], "-subseq") == 0)
+      {
+        parse_arg_cnt_check(i, 2, "start stop");
+        if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1)
         {
-          lastool.parse_arg_cnt_check(i, 1, "size");
-          if (sscanf_las(argv[i + 1], "%u", &set_point_data_record_length) != 1)
+          error_parse_arg_n_invalid(i, 1);
+        }
+        if (sscanf_las(argv[i + 2], "%lld", &subsequence_stop) != 1)
+        {
+          error_parse_arg_n_invalid(i, 2);
+        }
+        i += 2;
+      }
+      else if (strcmp(argv[i], "-start_at_point") == 0)
+      {
+        parse_arg_cnt_check(i, 1, "index of start point");
+        if (sscanf_las(argv[i + 1], "%lld", &subsequence_start) != 1)
+        {
+          error_parse_arg_n_invalid(i, 1);
+        }
+        i += 1;
+      }
+      else if (strcmp(argv[i], "-stop_at_point") == 0)
+      {
+        parse_arg_cnt_check(i, 1, "index of stop point");
+        if (sscanf_las(argv[i + 1], "%lld", &subsequence_stop) != 1)
+        {
+          error_parse_arg_n_invalid(i, 1);
+        }
+        i += 1;
+      }
+      else if (strncmp(argv[i], "-set_", 5) == 0)
+      {
+        if (strncmp(argv[i], "-set_point_", 11) == 0)
+        {
+          if (strcmp(argv[i], "-set_point_type") == 0 || strcmp(argv[i], "-set_point_data_format") == 0)
           {
-            lastool.error_parse_arg_n_invalid(i, 1);
-          }
-          i++;
-        }
-        else
-        {
-          lastool.parse_arg_invalid_n(i);
-        }
-      }
-      else if (strcmp(argv[i], "-set_global_encoding_gps_bit") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 1, "0 or 1");
-        if (sscanf_las(argv[i + 1], "%u", &set_global_encoding_gps_bit) != 1)
-        {
-          lastool.error_parse_arg_n_invalid(i, 1);
-        }
-        i += 1;
-      }
-      else if (strcmp(argv[i], "-set_version") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 1, "major.minor");
-        if (sscanf_las(argv[i + 1], "%u.%u", &set_version_major, &set_version_minor) != 2)
-        {
-          lastool.error_parse_arg_n_invalid(i, 1);
-        }
-        i += 1;
-      }
-      else if (strcmp(argv[i], "-set_version_major") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 1, "major");
-        if (sscanf_las(argv[i + 1], "%u", &set_version_major) != 1)
-        {
-          lastool.error_parse_arg_n_invalid(i, 1);
-        }
-        i += 1;
-      }
-      else if (strcmp(argv[i], "-set_version_minor") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 1, "minor");
-        if (sscanf_las(argv[i + 1], "%u", &set_version_minor) != 1)
-        {
-          lastool.error_parse_arg_n_invalid(i, 1);
-        }
-        i += 1;
-      }
-      else if (strcmp(argv[i], "-set_lastiling_buffer_flag") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 1, "0 or 1");
-        if (sscanf_las(argv[i + 1], "%u", &set_lastiling_buffer_flag) != 1)
-        {
-          lastool.error_parse_arg_n_invalid(i, 1);
-        }
-        if (set_lastiling_buffer_flag > 1)
-        {
-          lastool.parse_arg_cnt_check(i, 1, "0 or 1");
-        }
-        i += 1;
-      }
-      else if (strncmp(argv[i], "-set_ogc_wkt", 12) == 0)
-      {
-        if (strcmp(argv[i], "-set_ogc_wkt") == 0)
-        {
-          set_ogc_wkt = true;
-          set_ogc_wkt_in_evlr = false;
-        }
-        else if (strcmp(argv[i], "-set_ogc_wkt_in_evlr") == 0)
-        {
-          set_ogc_wkt = true;
-          set_ogc_wkt_in_evlr = true;
-        }
-        else
-        {
-          lastool.parse_arg_invalid_n(i);
-        }
-
-        if ((i + 1) < argc)
-        {
-          if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0'))
-          {
-            set_ogc_wkt_string = argv[i + 1];
+            parse_arg_cnt_check(i, 1, "type");
+            if (sscanf_las(argv[i + 1], "%u", &set_point_data_format) != 1) {
+              error_parse_arg_n_invalid(i, 1);
+            } else {
+              // preset point type 
+              lasreadopener.set_point_type(set_point_data_format);
+            }
             i++;
           }
+          else if (strcmp(argv[i], "-set_point_data_record_length") == 0 || strcmp(argv[i], "-set_point_size") == 0)
+          {
+            parse_arg_cnt_check(i, 1, "size");
+            if (sscanf_las(argv[i + 1], "%u", &set_point_data_record_length) != 1)
+            {
+              error_parse_arg_n_invalid(i, 1);
+            }
+            i++;
+          }
+          else
+          {
+            parse_arg_invalid_n(i);
+          }
         }
-      } else if (strncmp(argv[i], "-set_proj_wkt", 13) == 0) {
-        // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
-        if (!geoprojectionconverter.is_proj_request) 
+        else if (strcmp(argv[i], "-set_global_encoding_gps_bit") == 0)
         {
-          geoprojectionconverter.is_proj_request = load_proj_library(nullptr, false);
-
-          if (strcmp(argv[i], "-set_proj_wkt") == 0) 
+          parse_arg_cnt_check(i, 1, "0 or 1");
+          if (sscanf_las(argv[i + 1], "%u", &set_global_encoding_gps_bit) != 1)
+          {
+            error_parse_arg_n_invalid(i, 1);
+          }
+          i += 1;
+        }
+        else if (strcmp(argv[i], "-set_version") == 0)
+        {
+          parse_arg_cnt_check(i, 1, "major.minor");
+          if (sscanf_las(argv[i + 1], "%u.%u", &set_version_major, &set_version_minor) != 2)
+          {
+            error_parse_arg_n_invalid(i, 1);
+          }
+          i += 1;
+        }
+        else if (strcmp(argv[i], "-set_version_major") == 0)
+        {
+          parse_arg_cnt_check(i, 1, "major");
+          if (sscanf_las(argv[i + 1], "%u", &set_version_major) != 1)
+          {
+            error_parse_arg_n_invalid(i, 1);
+          }
+          i += 1;
+        }
+        else if (strcmp(argv[i], "-set_version_minor") == 0)
+        {
+          parse_arg_cnt_check(i, 1, "minor");
+          if (sscanf_las(argv[i + 1], "%u", &set_version_minor) != 1)
+          {
+            error_parse_arg_n_invalid(i, 1);
+          }
+          i += 1;
+        }
+        else if (strcmp(argv[i], "-set_lastiling_buffer_flag") == 0)
+        {
+          parse_arg_cnt_check(i, 1, "0 or 1");
+          if (sscanf_las(argv[i + 1], "%u", &set_lastiling_buffer_flag) != 1)
+          {
+            error_parse_arg_n_invalid(i, 1);
+          }
+          if (set_lastiling_buffer_flag > 1)
+          {
+            parse_arg_cnt_check(i, 1, "0 or 1");
+          }
+          i += 1;
+        }
+        else if (strncmp(argv[i], "-set_ogc_wkt", 12) == 0)
+        {
+          if (strcmp(argv[i], "-set_ogc_wkt") == 0)
           {
             set_ogc_wkt = true;
             set_ogc_wkt_in_evlr = false;
-          } 
-          else if (strcmp(argv[i], "-set_proj_wkt_in_evlr") == 0) {
+          }
+          else if (strcmp(argv[i], "-set_ogc_wkt_in_evlr") == 0)
+          {
             set_ogc_wkt = true;
             set_ogc_wkt_in_evlr = true;
-          } 
-          else 
+          }
+          else
           {
-            lastool.parse_arg_invalid_n(i);
+            parse_arg_invalid_n(i);
           }
-        }
-        if ((i + 1) < argc) 
-        {
-          if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0')) 
+  
+          if ((i + 1) < argc)
           {
-            set_ogc_wkt_string = argv[i + 1];
-            i++;
-          }
-        }
-      }
-      else if (strcmp(argv[i], "-set_attribute_scale") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 2, "index scale");
-        if (set_attribute_scales < 5)
-        {
-          if (sscanf_las(argv[i + 1], "%u", &(set_attribute_scale_index[set_attribute_scales])) != 1)
-          {
-            lastool.error_parse_arg_n_invalid(i, 1);
-          }
-          if (sscanf_las(argv[i + 2], "%lf", &(set_attribute_scale_scale[set_attribute_scales])) != 1)
-          {
-            lastool.error_parse_arg_n_invalid(i, 2);
-          }
-          set_attribute_scales++;
-        }
-        else
-        {
-          laserror("cannot '%s' more than 5 times", argv[i]);
-        }
-        i += 2;
-      }
-      else if (strcmp(argv[i], "-set_attribute_offset") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 2, "index offset");
-        if (set_attribute_offsets < 5)
-        {
-          if (sscanf_las(argv[i + 1], "%u", &(set_attribute_offset_index[set_attribute_offsets])) != 1)
-          {
-            lastool.error_parse_arg_n_invalid(i, 1);
-          }
-          if (sscanf_las(argv[i + 2], "%lf", &(set_attribute_offset_offset[set_attribute_offsets])) != 1)
-          {
-            lastool.error_parse_arg_n_invalid(i, 2);
-          }
-        }
-        else
-        {
-          laserror("cannot '%s' more than 5 times", argv[i]);
-        }
-        i += 2;
-      }
-      else
-      {
-        lastool.parse_arg_invalid_n(i);
-      }
-    }
-    else if (strncmp(argv[i], "-remove_", 8) == 0)
-    {
-      if (strcmp(argv[i], "-remove_padding") == 0)
-      {
-        remove_header_padding = true;
-      }
-      else if (strcmp(argv[i], "-remove_all_vlrs") == 0)
-      {
-        remove_all_variable_length_records = true;
-      } else if (strcmp(argv[i], "-remove_vlr") == 0) {
-        remove_vlr_user_id = nullptr;
-        remove_vlr_record_id = -1;
-        remove_vlr_indices.clear();
-
-        if (i + 1 >= argc || argv[i + 1][0] == '-') {
-          laserror("missing argument for -remove_vlr");
-        }
-
-        // User ID and record ID
-        else if (!isdigit(static_cast<unsigned char>(argv[i + 1][0]))) {
-          if (i + 2 >= argc || argv[i + 2][0] == '-') {
-            laserror("-remove_vlr requires user ID and record ID");
-          }
-          remove_vlr_user_id = argv[++i];
-          remove_vlr_record_id = atoi(argv[++i]);
-        }
-        // one or more VLR indices
-        else {
-          while (i + 1 < argc && argv[i + 1][0] != '-') {
-            char* end = nullptr;
-            long value = strtol(argv[i + 1], &end, 10);
-
-            if (*argv[i + 1] == '\0' || *end != '\0') {
-              laserror("invalid VLR index '%s'", argv[i + 1]);
-            }
-            remove_vlr_indices.push_back(static_cast<int>(value));
-            ++i;
-          }
-          std::sort(remove_vlr_indices.rbegin(), remove_vlr_indices.rend());
-        }
-        remove_variable_length_record_from = -1;
-        remove_variable_length_record_to = -1;
-      }
-      else if (strcmp(argv[i], "-remove_vlrs_from_to") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 1, "start end");
-        remove_variable_length_record_from = atoi(argv[i + 1]);
-        remove_variable_length_record_to = atoi(argv[i + 2]);
-        remove_vlr_user_id = nullptr;
-        remove_vlr_record_id = -1;
-        remove_vlr_indices.clear();
-        i += 2;
-      }
-      else if (strcmp(argv[i], "-remove_all_evlrs") == 0)
-      {
-        remove_all_extended_variable_length_records = true;
-      }
-      else if (strcmp(argv[i], "-remove_evlr") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 1, "number");
-        remove_extended_variable_length_record = atoi(argv[i + 1]);
-        remove_extended_variable_length_record_from = -1;
-        remove_extended_variable_length_record_to = -1;
-        i++;
-      }
-      else if (strcmp(argv[i], "-remove_evlrs_from_to") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 2, "start end");
-        remove_extended_variable_length_record = -1;
-        remove_extended_variable_length_record_from = atoi(argv[i + 1]);
-        remove_extended_variable_length_record_to = atoi(argv[i + 2]);
-        i += 2;
-      }
-      else if (strcmp(argv[i], "-remove_tiling_vlr") == 0)
-      {
-        remove_tiling_vlr = true;
-      }
-      else if (strcmp(argv[i], "-remove_original_vlr") == 0)
-      {
-        remove_original_vlr = true;
-      }
-      else
-      {
-        lastool.parse_arg_invalid_n(i);
-      }
-    }
-    else if (strncmp(argv[i], "-add_", 5) == 0)
-    {
-      if (strcmp(argv[i], "-add_attribute") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 1, "data_type name description ...");
-        if (((i + 4) < argc) && (atof(argv[i + 4]) != 0.0))
-        {
-          if (((i + 5) < argc) && ((atof(argv[i + 5]) != 0.0) || (strcmp(argv[i + 5], "0") == 0) || (strcmp(argv[i + 5], "0.0") == 0)))
-          {
-            if (((i + 6) < argc) && ((atof(argv[i + 6]) != 0.0) || (strcmp(argv[i + 6], "0") == 0) || (strcmp(argv[i + 6], "0.0") == 0)))
+            if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0'))
             {
-              lasreadopener.add_attribute(atoi(argv[i + 1]), argv[i + 2], argv[i + 3], atof(argv[i + 4]), atof(argv[i + 5]), 1.0, 0.0, atof(argv[i + 6]));
-              i += 6;
+              set_ogc_wkt_string = argv[i + 1];
+              i++;
             }
-            else
+          }
+        } else if (strncmp(argv[i], "-set_proj_wkt", 13) == 0) {
+          // When using the PROJ functionalities, the PROJ lib must be loaded dynamically
+          if (!geoprojectionconverter.is_proj_request) 
+          {
+            geoprojectionconverter.is_proj_request = load_proj_library(nullptr, false);
+  
+            if (strcmp(argv[i], "-set_proj_wkt") == 0) 
             {
-              lasreadopener.add_attribute(atoi(argv[i + 1]), argv[i + 2], argv[i + 3], atof(argv[i + 4]), atof(argv[i + 5]));
-              i += 5;
+              set_ogc_wkt = true;
+              set_ogc_wkt_in_evlr = false;
+            } 
+            else if (strcmp(argv[i], "-set_proj_wkt_in_evlr") == 0) {
+              set_ogc_wkt = true;
+              set_ogc_wkt_in_evlr = true;
+            } 
+            else 
+            {
+              parse_arg_invalid_n(i);
+            }
+          }
+          if ((i + 1) < argc) 
+          {
+            if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0')) 
+            {
+              set_ogc_wkt_string = argv[i + 1];
+              i++;
+            }
+          }
+        }
+        else if (strcmp(argv[i], "-set_attribute_scale") == 0)
+        {
+          parse_arg_cnt_check(i, 2, "index scale");
+          if (set_attribute_scales < 5)
+          {
+            if (sscanf_las(argv[i + 1], "%u", &(set_attribute_scale_index[set_attribute_scales])) != 1)
+            {
+              error_parse_arg_n_invalid(i, 1);
+            }
+            if (sscanf_las(argv[i + 2], "%lf", &(set_attribute_scale_scale[set_attribute_scales])) != 1)
+            {
+              error_parse_arg_n_invalid(i, 2);
+            }
+            set_attribute_scales++;
+          }
+          else
+          {
+            laserror("cannot '%s' more than 5 times", argv[i]);
+          }
+          i += 2;
+        }
+        else if (strcmp(argv[i], "-set_attribute_offset") == 0)
+        {
+          parse_arg_cnt_check(i, 2, "index offset");
+          if (set_attribute_offsets < 5)
+          {
+            if (sscanf_las(argv[i + 1], "%u", &(set_attribute_offset_index[set_attribute_offsets])) != 1)
+            {
+              error_parse_arg_n_invalid(i, 1);
+            }
+            if (sscanf_las(argv[i + 2], "%lf", &(set_attribute_offset_offset[set_attribute_offsets])) != 1)
+            {
+              error_parse_arg_n_invalid(i, 2);
             }
           }
           else
           {
-            lasreadopener.add_attribute(atoi(argv[i + 1]), argv[i + 2], argv[i + 3], atof(argv[i + 4]));
-            i += 4;
+            laserror("cannot '%s' more than 5 times", argv[i]);
+          }
+          i += 2;
+        }
+        else
+        {
+          parse_arg_invalid_n(i);
+        }
+      }
+      else if (strncmp(argv[i], "-remove_", 8) == 0)
+      {
+        if (strcmp(argv[i], "-remove_padding") == 0)
+        {
+          remove_header_padding = true;
+        }
+        else if (strcmp(argv[i], "-remove_all_vlrs") == 0)
+        {
+          remove_all_variable_length_records = true;
+        } else if (strcmp(argv[i], "-remove_vlr") == 0) {
+          remove_vlr_user_id = nullptr;
+          remove_vlr_record_id = -1;
+          remove_vlr_indices.clear();
+  
+          if (i + 1 >= argc || argv[i + 1][0] == '-') {
+            laserror("missing argument for -remove_vlr");
+          }
+  
+          // User ID and record ID
+          else if (!isdigit(static_cast<unsigned char>(argv[i + 1][0]))) {
+            if (i + 2 >= argc || argv[i + 2][0] == '-') {
+              laserror("-remove_vlr requires user ID and record ID");
+            }
+            remove_vlr_user_id = argv[++i];
+            remove_vlr_record_id = atoi(argv[++i]);
+          }
+          // one or more VLR indices
+          else {
+            while (i + 1 < argc && argv[i + 1][0] != '-') {
+              char* end = nullptr;
+              long value = strtol(argv[i + 1], &end, 10);
+  
+              if (*argv[i + 1] == '\0' || *end != '\0') {
+                laserror("invalid VLR index '%s'", argv[i + 1]);
+              }
+              remove_vlr_indices.push_back(static_cast<int>(value));
+              ++i;
+            }
+            std::sort(remove_vlr_indices.rbegin(), remove_vlr_indices.rend());
+          }
+          remove_variable_length_record_from = -1;
+          remove_variable_length_record_to = -1;
+        }
+        else if (strcmp(argv[i], "-remove_vlrs_from_to") == 0)
+        {
+          parse_arg_cnt_check(i, 1, "start end");
+          remove_variable_length_record_from = atoi(argv[i + 1]);
+          remove_variable_length_record_to = atoi(argv[i + 2]);
+          remove_vlr_user_id = nullptr;
+          remove_vlr_record_id = -1;
+          remove_vlr_indices.clear();
+          i += 2;
+        }
+        else if (strcmp(argv[i], "-remove_all_evlrs") == 0)
+        {
+          remove_all_extended_variable_length_records = true;
+        }
+        else if (strcmp(argv[i], "-remove_evlr") == 0)
+        {
+          parse_arg_cnt_check(i, 1, "number");
+          remove_extended_variable_length_record = atoi(argv[i + 1]);
+          remove_extended_variable_length_record_from = -1;
+          remove_extended_variable_length_record_to = -1;
+          i++;
+        }
+        else if (strcmp(argv[i], "-remove_evlrs_from_to") == 0)
+        {
+          parse_arg_cnt_check(i, 2, "start end");
+          remove_extended_variable_length_record = -1;
+          remove_extended_variable_length_record_from = atoi(argv[i + 1]);
+          remove_extended_variable_length_record_to = atoi(argv[i + 2]);
+          i += 2;
+        }
+        else if (strcmp(argv[i], "-remove_tiling_vlr") == 0)
+        {
+          remove_tiling_vlr = true;
+        }
+        else if (strcmp(argv[i], "-remove_original_vlr") == 0)
+        {
+          remove_original_vlr = true;
+        }
+        else
+        {
+          parse_arg_invalid_n(i);
+        }
+      }
+      else if (strncmp(argv[i], "-add_", 5) == 0)
+      {
+        if (strcmp(argv[i], "-add_attribute") == 0)
+        {
+          parse_arg_cnt_check(i, 1, "data_type name description ...");
+          if (((i + 4) < argc) && (atof(argv[i + 4]) != 0.0))
+          {
+            if (((i + 5) < argc) && ((atof(argv[i + 5]) != 0.0) || (strcmp(argv[i + 5], "0") == 0) || (strcmp(argv[i + 5], "0.0") == 0)))
+            {
+              if (((i + 6) < argc) && ((atof(argv[i + 6]) != 0.0) || (strcmp(argv[i + 6], "0") == 0) || (strcmp(argv[i + 6], "0.0") == 0)))
+              {
+                lasreadopener.add_attribute(atoi(argv[i + 1]), argv[i + 2], argv[i + 3], atof(argv[i + 4]), atof(argv[i + 5]), 1.0, 0.0, atof(argv[i + 6]));
+                i += 6;
+              }
+              else
+              {
+                lasreadopener.add_attribute(atoi(argv[i + 1]), argv[i + 2], argv[i + 3], atof(argv[i + 4]), atof(argv[i + 5]));
+                i += 5;
+              }
+            }
+            else
+            {
+              lasreadopener.add_attribute(atoi(argv[i + 1]), argv[i + 2], argv[i + 3], atof(argv[i + 4]));
+              i += 4;
+            }
+          }
+          else
+          {
+            lasreadopener.add_attribute(atoi(argv[i + 1]), argv[i + 2], argv[i + 3]);
+            i += 3;
+          }
+        }
+        else if (strcmp(argv[i], "-add_empty_vlr") == 0)
+        {
+          parse_arg_cnt_check(i, 1, "user_ID record_ID ...");
+          add_empty_vlr_user_ID = argv[i + 1];
+          add_empty_vlr_record_ID = atoi(argv[i + 2]);
+          i += 2;
+          if (((i + 1) < argc) && (argv[i + 1][0] != '-'))
+          {
+            add_empty_vlr_description = argv[i + 1];
+            i += 1;
           }
         }
         else
         {
-          lasreadopener.add_attribute(atoi(argv[i + 1]), argv[i + 2], argv[i + 3]);
-          i += 3;
+          parse_arg_invalid_n(i);
         }
       }
-      else if (strcmp(argv[i], "-add_empty_vlr") == 0)
+      else if (strncmp(argv[i], "-unset_", 7) == 0)
       {
-        lastool.parse_arg_cnt_check(i, 1, "user_ID record_ID ...");
-        add_empty_vlr_user_ID = argv[i + 1];
-        add_empty_vlr_record_ID = atoi(argv[i + 2]);
-        i += 2;
-        if (((i + 1) < argc) && (argv[i + 1][0] != '-'))
+        if (strcmp(argv[i], "-unset_attribute_scale") == 0)
         {
-          add_empty_vlr_description = argv[i + 1];
+          parse_arg_cnt_check(i, 1, "index");
+          if (unset_attribute_scales < 5)
+          {
+            if (sscanf_las(argv[i + 1], "%u", &(unset_attribute_scale_index[unset_attribute_scales])) != 1)
+            {
+              error_parse_arg_n_invalid(i, 1);
+            }
+            unset_attribute_scales++;
+          }
+          else
+          {
+            laserror("cannot '%s' more than 5 times", argv[i]);
+          }
           i += 1;
         }
-      }
-      else
-      {
-        lastool.parse_arg_invalid_n(i);
-      }
-    }
-    else if (strncmp(argv[i], "-unset_", 7) == 0)
-    {
-      if (strcmp(argv[i], "-unset_attribute_scale") == 0)
-      {
-        lastool.parse_arg_cnt_check(i, 1, "index");
-        if (unset_attribute_scales < 5)
+        else if (strcmp(argv[i], "-unset_attribute_offset") == 0)
         {
-          if (sscanf_las(argv[i + 1], "%u", &(unset_attribute_scale_index[unset_attribute_scales])) != 1)
+          parse_arg_cnt_check(i, 1, "index");
+          if (unset_attribute_offsets < 5)
           {
-            lastool.error_parse_arg_n_invalid(i, 1);
+            if (sscanf_las(argv[i + 1], "%u", &(unset_attribute_offset_index[unset_attribute_offsets])) != 1)
+            {
+              error_parse_arg_n_invalid(i, 1);
+            }
+            unset_attribute_offsets++;
           }
-          unset_attribute_scales++;
+          else
+          {
+            laserror("cannot '%s' more than 5 times", argv[i]);
+          }
+          i += 1;
         }
         else
         {
-          laserror("cannot '%s' more than 5 times", argv[i]);
+          parse_arg_invalid_n(i);
         }
-        i += 1;
       }
-      else if (strcmp(argv[i], "-unset_attribute_offset") == 0)
+      else if (strcmp(argv[i], "-move_evlrs_to_vlrs") == 0)
       {
-        lastool.parse_arg_cnt_check(i, 1, "index");
-        if (unset_attribute_offsets < 5)
-        {
-          if (sscanf_las(argv[i + 1], "%u", &(unset_attribute_offset_index[unset_attribute_offsets])) != 1)
-          {
-            lastool.error_parse_arg_n_invalid(i, 1);
+        move_evlrs_to_vlrs = true;
+      }
+      else if (strcmp(argv[i], "-save_vlrs") == 0)
+      {
+        save_vlrs = true;
+      }
+      else if (strcmp(argv[i], "-load_vlrs") == 0)
+      {
+        load_vlrs = true;
+      }
+      else if (strcmp(argv[i], "-save_vlr") == 0)
+      {
+        save_vlr = true;
+        parse_vlr_args(i, argc, argv, vlr_index, vlr_user_id, vlr_record_id, vlr_filename, false);
+      }
+      else if (strcmp(argv[i], "-load_vlr") == 0)
+      {
+        load_vlr = true;
+        parse_vlr_args(i, argc, argv, vlr_index, vlr_user_id, vlr_record_id, vlr_filename, false);
+      } 
+      else if (strcmp(argv[i], "-load_txt_to_vlr") == 0) {
+        load_txt_to_vlr = true;
+        parse_vlr_args(i, argc, argv, load_txt_vlr_index, load_txt_vlr_user_id, load_txt_vlr_record_id, load_txt_vlr_filename, true);
+      } 
+      else if (strcmp(argv[i], "-load_bin_to_vlr") == 0) {
+        load_bin_to_vlr = true;
+        parse_vlr_args(i, argc, argv, load_bin_vlr_index, load_bin_vlr_user_id, load_bin_vlr_record_id, load_bin_vlr_filename, true);
+      }
+      else if (strcmp(argv[i], "-load_ogc_wkt") == 0) {
+        parse_arg_cnt_check(i, 1, "file name");
+  
+        if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0')) {
+          set_ogc_wkt = true;
+          set_ogc_wkt_in_evlr = false;
+  
+          std::string flat_wkt = parse_wkt_file_flat(argv[i + 1]);
+  
+          set_ogc_wkt_string = (CHAR*)calloc(flat_wkt.size() + 1, sizeof(CHAR));
+  
+          if (set_ogc_wkt_string != nullptr) {
+            memcpy(set_ogc_wkt_string, flat_wkt.c_str(), flat_wkt.size());
+            set_ogc_wkt_string[flat_wkt.size()] = '\0';
           }
-          unset_attribute_offsets++;
+          i++;
+        } else {
+          parse_arg_cnt_check(i, 1, "file name");
         }
-        else
-        {
-          laserror("cannot '%s' more than 5 times", argv[i]);
-        }
-        i += 1;
+      }
+      else if (strcmp(argv[i], "-dont_remove_empty_files") == 0)
+      {
+        remove_empty_files = false;
+      }
+      // lasfilter abort on -clip_... due obsolete in general. we change -clip_ to -crop
+      else if (strcmp(argv[i], "-crop_to_bounding_box") == 0 || strcmp(argv[i], "-crop_to_bb") == 0)
+      {
+        clip_to_bounding_box = true;
+      }
+      else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))
+      {
+        lasreadopener.add_file_name(argv[i]);
+        argv[i][0] = '\0';
       }
       else
       {
-        lastool.parse_arg_invalid_n(i);
+        return false;
       }
-    }
-    else if (strcmp(argv[i], "-move_evlrs_to_vlrs") == 0)
+      return true;
+    };
+  
+    parse(arg_local);
+  
+  #ifdef COMPILE_WITH_GUI
+    if (gui)
     {
-      move_evlrs_to_vlrs = true;
+      return las2las_gui(argc, argv, &lasreadopener);
     }
-    else if (strcmp(argv[i], "-save_vlrs") == 0)
+  #endif
+  
+  #ifdef COMPILE_WITH_MULTI_CORE
+    if (cores > 1)
     {
-      save_vlrs = true;
-    }
-    else if (strcmp(argv[i], "-load_vlrs") == 0)
-    {
-      load_vlrs = true;
-    }
-    else if (strcmp(argv[i], "-save_vlr") == 0)
-    {
-      save_vlr = true;
-      parse_vlr_args(i, argc, argv, vlr_index, vlr_user_id, vlr_record_id, vlr_filename, false);
-    }
-    else if (strcmp(argv[i], "-load_vlr") == 0)
-    {
-      load_vlr = true;
-      parse_vlr_args(i, argc, argv, vlr_index, vlr_user_id, vlr_record_id, vlr_filename, false);
-    } 
-    else if (strcmp(argv[i], "-load_txt_to_vlr") == 0) {
-      load_txt_to_vlr = true;
-      parse_vlr_args(i, argc, argv, load_txt_vlr_index, load_txt_vlr_user_id, load_txt_vlr_record_id, load_txt_vlr_filename, true);
-    } 
-    else if (strcmp(argv[i], "-load_bin_to_vlr") == 0) {
-      load_bin_to_vlr = true;
-      parse_vlr_args(i, argc, argv, load_bin_vlr_index, load_bin_vlr_user_id, load_bin_vlr_record_id, load_bin_vlr_filename, true);
-    }
-    else if (strcmp(argv[i], "-load_ogc_wkt") == 0) {
-      lastool.parse_arg_cnt_check(i, 1, "file name");
-
-      if ((argv[i + 1][0] != '-') && (argv[i + 1][0] != '\0')) {
-        set_ogc_wkt = true;
-        set_ogc_wkt_in_evlr = false;
-
-        std::string flat_wkt = parse_wkt_file_flat(argv[i + 1]);
-
-        set_ogc_wkt_string = (CHAR*)calloc(flat_wkt.size() + 1, sizeof(CHAR));
-
-        if (set_ogc_wkt_string != nullptr) {
-          memcpy(set_ogc_wkt_string, flat_wkt.c_str(), flat_wkt.size());
-          set_ogc_wkt_string[flat_wkt.size()] = '\0';
-        }
-        i++;
-      } else {
-        lastool.parse_arg_cnt_check(i, 1, "file name");
-      }
-    }
-    else if (strcmp(argv[i], "-dont_remove_empty_files") == 0)
-    {
-      remove_empty_files = false;
-    }
-    // lasfilter abort on -clip_... due obsolete in general. we change -clip_ to -crop
-    else if (strcmp(argv[i], "-crop_to_bounding_box") == 0 || strcmp(argv[i], "-crop_to_bb") == 0)
-    {
-      clip_to_bounding_box = true;
-    }
-    else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))
-    {
-      lasreadopener.add_file_name(argv[i]);
-      argv[i][0] = '\0';
-    }
-    else
-    {
-      return false;
-    }
-    return true;
-  };
-
-  lastool.parse(arg_local);
-
-#ifdef COMPILE_WITH_GUI
-  if (lastool.gui)
-  {
-    return las2las_gui(argc, argv, &lasreadopener);
-  }
-#endif
-
-#ifdef COMPILE_WITH_MULTI_CORE
-  if (lastool.cores > 1)
-  {
-    if (lasreadopener.get_use_stdin())
-    {
-      LASMessage(LAS_WARNING, "using stdin. ignoring '-cores %d' ...", lastool.cores);
-    }
-    else if (lasreadopener.get_file_name_number() < 2)
-    {
-      LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), lastool.cores);
-    }
-    else if (lasreadopener.is_merged())
-    {
-      LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", lastool.cores);
-    }
-    else
-    {
-      las2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, lastool.cores, lastool.cpu64);
-    }
-  }
-  if (lastool.cpu64)
-  {
-    las2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, 1, TRUE);
-  }
-#endif
-
-  // check input
-
-  if (!lasreadopener.active())
-  {
-    laserror("no input specified");
-  }
-
-  // check proj options
-
-  if (geoprojectionconverter.is_proj_request == true) {
-    geoprojectionconverter.load_proj();
-  }
-
-  BOOL extra_pass = laswriteopener.is_piped();
-
-  // we only really need an extra pass if the coordinates are altered or if points are filtered
-
-  if (extra_pass)
-  {
-    if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
-    {
-      extra_pass = FALSE;
-    }
-  }
-
-  // for piped output we need an extra pass
-
-  if (extra_pass)
-  {
-    if (lasreadopener.is_piped())
-    {
-      laserror("input and output cannot both be piped");
-    }
-  }
-    // only save or load
-    if (save_vlrs && load_vlrs)
-  {
-    laserror("cannot save and load VLRs at the same time");
-  }
-  if (save_vlr && load_vlr)
-  {
-    laserror("cannot save and load VLR at the same time");
-  }
-
-  // only save/load a single vlr or multible vlrs
-    if (save_vlrs && save_vlr)
-  {
-    laserror("cannot save a single VLR and multiple VLRs at the same time");
-  }
-  if (load_vlrs && load_vlr)
-  {
-    laserror("cannot load a single VLR and multiple VLRs at the same time");
-  }
-
-  // possibly loop over multiple input files
-  while (lasreadopener.active())
-  {
-    try
-    {
-      start_time = taketime();
-
-      // open lasreader
-
-      LASreader* lasreader = lasreadopener.open();
-
-      // fileformula filtered
-      if (lasreadopener.is_file_formula_filtered()) {
-        LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
-        continue;
-      }
-    
-      if (lasreader == 0)
+      if (lasreadopener.get_use_stdin())
       {
-        laserror("could not open lasreader");
+        LASMessage(LAS_WARNING, "using stdin. ignoring '-cores %d' ...", cores);
       }
-
-      // store the inventory for the header
-
-      LASinventory lasinventory;
-
-      // the point we write sometimes needs to be copied
-
-      LASpoint* point = 0;
-
-      // prepare the header for output
+      else if (lasreadopener.get_file_name_number() < 2)
+      {
+        LASMessage(LAS_WARNING, "only %u input files. ignoring '-cores %d' ...", lasreadopener.get_file_name_number(), cores);
+      }
+      else if (lasreadopener.is_merged())
+      {
+        LASMessage(LAS_WARNING, "input files merged on-the-fly. ignoring '-cores %d' ...", cores);
+      }
+      else
+      {
+        las2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, cores, cpu64);
+      }
+    }
+    if (cpu64)
+    {
+      las2las_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, 1, TRUE);
+    }
+  #endif
+  
+    // check input
+  
+    if (!lasreadopener.active())
+    {
+      laserror("no input specified");
+    }
+  
+    // check proj options
+  
+    if (geoprojectionconverter.is_proj_request == true) {
+      geoprojectionconverter.load_proj();
+    }
+  
+    BOOL extra_pass = laswriteopener.is_piped();
+  
+    // we only really need an extra pass if the coordinates are altered or if points are filtered
+  
+    if (extra_pass)
+    {
+      if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
+      {
+        extra_pass = FALSE;
+      }
+    }
+  
+    // for piped output we need an extra pass
+  
+    if (extra_pass)
+    {
+      if (lasreadopener.is_piped())
+      {
+        laserror("input and output cannot both be piped");
+      }
+    }
+      // only save or load
+      if (save_vlrs && load_vlrs)
+    {
+      laserror("cannot save and load VLRs at the same time");
+    }
+    if (save_vlr && load_vlr)
+    {
+      laserror("cannot save and load VLR at the same time");
+    }
+  
+    // only save/load a single vlr or multible vlrs
+      if (save_vlrs && save_vlr)
+    {
+      laserror("cannot save a single VLR and multiple VLRs at the same time");
+    }
+    if (load_vlrs && load_vlr)
+    {
+      laserror("cannot load a single VLR and multiple VLRs at the same time");
+    }
+  
+    // possibly loop over multiple input files
+    run_file_loop(lasreadopener, [&]()
+    {
+      try
+      {
+        start_time = taketime();
+  
+        // open lasreader
+  
+        LASreader* lasreader = lasreadopener.open();
+  
+        // fileformula filtered
+        if (lasreadopener.is_file_formula_filtered()) {
+          LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
+          return;
+        }
       
-      /*
-      if (set_global_encoding_gps_bit != -1)
-      {
-        if (set_global_encoding_gps_bit == 0)
+        if (lasreader == 0)
         {
-          if ((lasreader->header.global_encoding & 1) == 0)
+          laserror("could not open lasreader");
+        }
+  
+        // store the inventory for the header
+  
+        LASinventory lasinventory;
+  
+        // the point we write sometimes needs to be copied
+  
+        LASpoint* point = 0;
+  
+        // prepare the header for output
+        
+        /*
+        if (set_global_encoding_gps_bit != -1)
+        {
+          if (set_global_encoding_gps_bit == 0)
           {
-            lastool.laswarnforce("global encoding indicates file already in GPS week time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
+            if ((lasreader->header.global_encoding & 1) == 0)
+            {
+              laswarnforce("global encoding indicates file already in GPS week time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
+            }
+            else
+            {
+              lasreader->header.global_encoding &= ~1;
+            }
+          }
+          else if (set_global_encoding_gps_bit == 1)
+          {
+            if ((lasreader->header.global_encoding & 1) == 1)
+            {
+              laswarnforce("global encoding indicates file already in Adjusted Standard GPS time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
+            }
+            else
+            {
+              lasreader->header.global_encoding |= 1;
+            }
           }
           else
           {
-            lasreader->header.global_encoding &= ~1;
+            LASMessage(LAS_WARNING, "ignoring invalid option '-set_global_encoding_gps_bit %d'", set_global_encoding_gps_bit);
           }
         }
-        else if (set_global_encoding_gps_bit == 1)
-        {
-          if ((lasreader->header.global_encoding & 1) == 1)
-          {
-            lastool.laswarnforce("global encoding indicates file already in Adjusted Standard GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
-          }
-          else
-          {
-            lasreader->header.global_encoding |= 1;
-          }
-        }
-        else
-        {
-          LASMessage(LAS_WARNING, "ignoring invalid option '-set_global_encoding_gps_bit %d'", set_global_encoding_gps_bit);
-        }
-      }
-      */
-
-      // verify gps time type matches specified source type
-      if (verify_current_gps_time_type != gps_time_type::NONE) {
-          if (verify_current_gps_time_type == gps_time_type::GPS_WEEK_TIME) {
-              if ((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) != 0)
-              {
-                  lastool.laswarnforce("global encoding indicates file is not in GPS week time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
-              }
-          }
-          else if (verify_current_gps_time_type == gps_time_type::ADJUSTED_GPS_TIME) {
-              if (((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0) || ((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0))
-              {
-                  lastool.laswarnforce("global encoding indicates file is not in Adjusted Standard GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
-              }
-          }
-          else if (verify_current_gps_time_type == gps_time_type::OFFSET_GPS_TIME) {
-              if (((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0) || ((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) == 0))
-              {
-                  lastool.laswarnforce("global encoding indicates file is not in Offset GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
-              }
-          }
-          else if (verify_current_gps_time_type == gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME) {
-              if (((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0))
-              {
-                  lastool.laswarnforce("global encoding indicates file is neither in Adjusted Standard GPS nor in Offset GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
-              }
-          }
-      }
-      else {
-          // if we do not convert and still set options, we keep the old checks for consistency 
-          if (set_global_encoding_gps_bit != -1)
-          {
-              if (set_global_encoding_gps_bit == 0)
-              {
-                  if ((lasreader->header.global_encoding & 1) == 0)
-                  {
-                      lastool.laswarnforce("global encoding indicates file already in GPS week time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
-                  }
-              }
-              else if (set_global_encoding_gps_bit == 1)
-              {
-                  if ((lasreader->header.global_encoding & 1) == 1)
-                  {
-                      lastool.laswarnforce("global encoding indicates file already in Adjusted Standard GPS time. %s", (lastool.force ? "Forced conversion" : "Use '-force' to force conversion"));
-                  }
-              }
-          }
-      }
-
-      // offset gps time?
-      if (set_time_offset > -1) {
-          if ((lasreader->header.version_minor >= 5) || (set_version_minor >= 5))
-          {
-              if (set_global_encoding_gps_bit > -1) {
-                  laserror("cannot set global encoding gps bit and set Offset GPS Time at the same time.");
-              }
-              lasreader->header.global_encoding |= ((1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE) | (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG));
-              lasreader->header.time_offset = set_time_offset;
-          }
-          else {
-              laserror("LAS %d.%d does not support Offset GPS Time, require at least LAS 1.5.", lasreader->header.version_major, (set_version_minor >= 0 ? set_version_minor : lasreader->header.version_minor));
-          }
-      }
-      else if (set_global_encoding_gps_bit != -1) {
-          if (set_global_encoding_gps_bit == 0) {
-              lasreader->header.global_encoding &= ~((1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE) | (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG));
-              lasreader->header.time_offset = 0;
-          }
-          else if (set_global_encoding_gps_bit == 1) {
-              lasreader->header.global_encoding |= (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE);
-              lasreader->header.global_encoding &= ~(1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG);
-              lasreader->header.time_offset = 0;
-          }
-          else
-          {
-              LASMessage(LAS_WARNING, "ignoring invalid option '-set_global_encoding_gps_bit %d'", set_global_encoding_gps_bit);
-          }
-      }
-
-      if (set_attribute_scales)
-      {
-        for (i = 0; i < set_attribute_scales; i++)
-        {
-          if (set_attribute_scale_index[i] != -1)
-          {
-            if (set_attribute_scale_index[i] < lasreader->header.number_attributes)
-            {
-              lasreader->header.attributes[set_attribute_scale_index[i]].set_scale(set_attribute_scale_scale[i]);
-            }
-            else
-            {
-              laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", set_attribute_scale_index[i], lasreader->header.number_attributes);
-            }
-          }
-        }
-      }
-
-      if (set_attribute_offsets)
-      {
-        for (i = 0; i < set_attribute_offsets; i++)
-        {
-          if (set_attribute_offset_index[i] != -1)
-          {
-            if (set_attribute_offset_index[i] < lasreader->header.number_attributes)
-            {
-              lasreader->header.attributes[set_attribute_offset_index[i]].set_offset(set_attribute_offset_offset[i]);
-            }
-            else
-            {
-              laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", set_attribute_offset_index[i], lasreader->header.number_attributes);
-            }
-          }
-        }
-      }
-
-      if (unset_attribute_scales)
-      {
-        for (i = 0; i < unset_attribute_scales; i++)
-        {
-          if (unset_attribute_scale_index[i] != -1)
-          {
-            if (unset_attribute_scale_index[i] < lasreader->header.number_attributes)
-            {
-              lasreader->header.attributes[unset_attribute_scale_index[i]].unset_scale();
-            }
-            else
-            {
-              laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", unset_attribute_scale_index[i], lasreader->header.number_attributes);
-            }
-          }
-        }
-      }
-
-      if (unset_attribute_offsets)
-      {
-        for (i = 0; i < unset_attribute_offsets; i++)
-        {
-          if (unset_attribute_offset_index[i] != -1)
-          {
-            if (unset_attribute_offset_index[i] < lasreader->header.number_attributes)
-            {
-              lasreader->header.attributes[unset_attribute_offset_index[i]].unset_offset();
-            }
-            else
-            {
-              laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", unset_attribute_offset_index[i], lasreader->header.number_attributes);
-            }
-          }
-        }
-      }
-
-      if (set_attribute_scales || set_attribute_offsets || unset_attribute_scales || unset_attribute_offsets)
-      {
-        lasreader->header.update_extra_bytes_vlr();
-      }
-
-      if (set_point_data_format > 5)
-      {
-        if (set_version_minor == -1) 
-        {
-            if (lasreader->header.version_minor < 4) {
-                set_version_minor = 4;
-            }
-        }
-      }
-
-      if (set_version_major != -1)
-      {
-        if (set_version_major != 1)
-        {
-          laserror("unknown version_major %d", set_version_major);
-        }
-        lasreader->header.version_major = (U8)set_version_major;
-      }
-
-      if (set_version_minor >= 0)
-      {
-        if (set_version_minor > 5)
-        {
-          laserror("unknown version_minor %d", set_version_minor);
-        }
-        if (set_version_minor < 3)
-        {
-          if (lasreader->header.version_minor == 3)
-          {
-            lasreader->header.header_size -= 8;
-            lasreader->header.offset_to_point_data -= 8;
-          }
-          else if (lasreader->header.version_minor == 4)
-          {
-            lasreader->header.header_size -= (8 + 140);
-            lasreader->header.offset_to_point_data -= (8 + 140);
-          }
-          else if (lasreader->header.version_minor >= 5)
-          {
-              lasreader->header.header_size -= (8 + 140 + 18);
-              lasreader->header.offset_to_point_data -= (8 + 140 + 18);
-          }
-        }
-        else if (set_version_minor == 3)
-        {
-          if (lasreader->header.version_minor < 3)
-          {
-            lasreader->header.header_size += 8;
-            lasreader->header.offset_to_point_data += 8;
-            lasreader->header.start_of_waveform_data_packet_record = 0;
-          }
-          else if (lasreader->header.version_minor == 4)
-          {
-            lasreader->header.header_size -= 140;
-            lasreader->header.offset_to_point_data -= 140;
-          }
-          else if (lasreader->header.version_minor >= 5)
-          {
-              lasreader->header.header_size -= (140 + 18);
-              lasreader->header.offset_to_point_data -= (140 + 18);
-          }
-        }
-        else if (set_version_minor == 4)
-        {
-          if (lasreader->header.version_minor < 3)
-          {
-            lasreader->header.header_size += (8 + 140);
-            lasreader->header.offset_to_point_data += (8 + 140);
-            lasreader->header.start_of_waveform_data_packet_record = 0;
-          }
-          else if (lasreader->header.version_minor == 3)
-          {
-            lasreader->header.header_size += 140;
-            lasreader->header.offset_to_point_data += 140;
-          }
-          else if (lasreader->header.version_minor >= 5)
-          {
-              lasreader->header.header_size -= 18;
-              lasreader->header.offset_to_point_data -= 18;
-          }
-
-          if (lasreader->header.version_minor < 4)
-          {
-            if (set_point_data_format > 5)
-            {
-              lasreader->header.extended_number_of_point_records = lasreader->header.number_of_point_records;
-              lasreader->header.number_of_point_records = 0;
-              for (i = 0; i < 5; i++)
-              {
-                lasreader->header.extended_number_of_points_by_return[i] = lasreader->header.number_of_points_by_return[i];
-                lasreader->header.number_of_points_by_return[i] = 0;
-              }
-            }
-          }
-        }
-        else if (set_version_minor == 5)
-        {
-            if (lasreader->header.version_minor < 3)
-            {
-                lasreader->header.header_size += (8 + 140 + 18);
-                lasreader->header.offset_to_point_data += (8 + 140 + 18);
-                lasreader->header.start_of_waveform_data_packet_record = 0;
-            }
-            else if (lasreader->header.version_minor == 3)
-            {
-                lasreader->header.header_size += (140 + 18);
-                lasreader->header.offset_to_point_data += (140 + 18);
-            }
-            else if (lasreader->header.version_minor == 4)
-            {
-                lasreader->header.header_size += 18;
-                lasreader->header.offset_to_point_data += 18;
-            }
-
-            if (lasreader->header.version_minor < 4)
-            {
-                if (set_point_data_format > 5)
+        */
+  
+        // verify gps time type matches specified source type
+        if (verify_current_gps_time_type != gps_time_type::NONE) {
+            if (verify_current_gps_time_type == gps_time_type::GPS_WEEK_TIME) {
+                if ((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) != 0)
                 {
-                    lasreader->header.extended_number_of_point_records = lasreader->header.number_of_point_records;
-                    lasreader->header.number_of_point_records = 0;
-                    for (i = 0; i < 5; i++)
+                    laswarnforce("global encoding indicates file is not in GPS week time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
+                }
+            }
+            else if (verify_current_gps_time_type == gps_time_type::ADJUSTED_GPS_TIME) {
+                if (((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0) || ((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) != 0))
+                {
+                    laswarnforce("global encoding indicates file is not in Adjusted Standard GPS time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
+                }
+            }
+            else if (verify_current_gps_time_type == gps_time_type::OFFSET_GPS_TIME) {
+                if (((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0) || ((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG)) == 0))
+                {
+                    laswarnforce("global encoding indicates file is not in Offset GPS time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
+                }
+            }
+            else if (verify_current_gps_time_type == gps_time_type::ADJUSTED_OR_OFFSET_GPS_TIME) {
+                if (((lasreader->header.global_encoding & (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE)) == 0))
+                {
+                    laswarnforce("global encoding indicates file is neither in Adjusted Standard GPS nor in Offset GPS time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
+                }
+            }
+        }
+        else {
+            // if we do not convert and still set options, we keep the old checks for consistency 
+            if (set_global_encoding_gps_bit != -1)
+            {
+                if (set_global_encoding_gps_bit == 0)
+                {
+                    if ((lasreader->header.global_encoding & 1) == 0)
                     {
-                        lasreader->header.extended_number_of_points_by_return[i] = lasreader->header.number_of_points_by_return[i];
-                        lasreader->header.number_of_points_by_return[i] = 0;
+                        laswarnforce("global encoding indicates file already in GPS week time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
+                    }
+                }
+                else if (set_global_encoding_gps_bit == 1)
+                {
+                    if ((lasreader->header.global_encoding & 1) == 1)
+                    {
+                        laswarnforce("global encoding indicates file already in Adjusted Standard GPS time. %s", (force ? "Forced conversion" : "Use '-force' to force conversion"));
                     }
                 }
             }
         }
-
-        if ((set_version_minor <= 3) && (lasreader->header.version_minor >= 4))
-        {
-          if (lasreader->header.point_data_format > 5)
-          {
-            switch (lasreader->header.point_data_format)
+  
+        // offset gps time?
+        if (set_time_offset > -1) {
+            if ((lasreader->header.version_minor >= 5) || (set_version_minor >= 5))
             {
-            case 6:
-              LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 1 and point_data_record_length from %d to %d",
-                lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 2);
-              lasreader->header.point_data_format = 1;
-              lasreader->header.point_data_record_length -= 2;
-              break;
-            case 7:
-              LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 3 and point_data_record_length from %d to %d",
-                lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 2);
-              lasreader->header.point_data_format = 3;
-              lasreader->header.point_data_record_length -= 2;
-              break;
-            case 8:
-              LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 3 and point_data_record_length from %d to %d",
-                lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 4);
-              lasreader->header.point_data_format = 3;
-              lasreader->header.point_data_record_length -= 4;
-              break;
-            case 9:
-              LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 4 and point_data_record_length from %d to %d",
-                lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 2);
-              lasreader->header.point_data_format = 4;
-              lasreader->header.point_data_record_length -= 2;
-              break;
-            case 10:
-              LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 5 and point_data_record_length from %d to %d",
-                lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 4);
-              lasreader->header.point_data_format = 5;
-              lasreader->header.point_data_record_length -= 4;
-              break;
-            default:
-              laserror("unknown point_data_format %d", lasreader->header.point_data_format);
+                if (set_global_encoding_gps_bit > -1) {
+                    laserror("cannot set global encoding gps bit and set Offset GPS Time at the same time.");
+                }
+                lasreader->header.global_encoding |= ((1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE) | (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG));
+                lasreader->header.time_offset = set_time_offset;
             }
-            point = new LASpoint;
-            lasreader->header.clean_laszip();
-          }
-          if (lasreader->header.get_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS))
+            else {
+                laserror("LAS %d.%d does not support Offset GPS Time, require at least LAS 1.5.", lasreader->header.version_major, (set_version_minor >= 0 ? set_version_minor : lasreader->header.version_minor));
+            }
+        }
+        else if (set_global_encoding_gps_bit != -1) {
+            if (set_global_encoding_gps_bit == 0) {
+                lasreader->header.global_encoding &= ~((1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE) | (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG));
+                lasreader->header.time_offset = 0;
+            }
+            else if (set_global_encoding_gps_bit == 1) {
+                lasreader->header.global_encoding |= (1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_GPS_TIME_TYPE);
+                lasreader->header.global_encoding &= ~(1 << LAS_TOOLS_GLOBAL_ENCODING_BIT_TIME_OFFSET_FLAG);
+                lasreader->header.time_offset = 0;
+            }
+            else
+            {
+                LASMessage(LAS_WARNING, "ignoring invalid option '-set_global_encoding_gps_bit %d'", set_global_encoding_gps_bit);
+            }
+        }
+  
+        if (set_attribute_scales)
+        {
+          for (i = 0; i < set_attribute_scales; i++)
           {
-            LASMessage(LAS_WARNING, "unsetting global encoding bit %d when downgrading from version 1.%d to version 1.%d",
-              LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS, lasreader->header.version_minor, set_version_minor);
-            lasreader->header.unset_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+            if (set_attribute_scale_index[i] != -1)
+            {
+              if (set_attribute_scale_index[i] < lasreader->header.number_attributes)
+              {
+                lasreader->header.attributes[set_attribute_scale_index[i]].set_scale(set_attribute_scale_scale[i]);
+              }
+              else
+              {
+                laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", set_attribute_scale_index[i], lasreader->header.number_attributes);
+              }
+            }
           }
-          if (lasreader->header.number_of_extended_variable_length_records)
+        }
+  
+        if (set_attribute_offsets)
+        {
+          for (i = 0; i < set_attribute_offsets; i++)
           {
-            LASMessage(LAS_WARNING, "loosing %d EVLR%s when downgrading from version 1.%d to version 1.%d. attempting to move %s to the VLR section ...",
-              lasreader->header.number_of_extended_variable_length_records, (lasreader->header.number_of_extended_variable_length_records > 1 ? "s" : ""),
-              lasreader->header.version_minor, set_version_minor, (lasreader->header.number_of_extended_variable_length_records > 1 ? "them" : "it"));
+            if (set_attribute_offset_index[i] != -1)
+            {
+              if (set_attribute_offset_index[i] < lasreader->header.number_attributes)
+              {
+                lasreader->header.attributes[set_attribute_offset_index[i]].set_offset(set_attribute_offset_offset[i]);
+              }
+              else
+              {
+                laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", set_attribute_offset_index[i], lasreader->header.number_attributes);
+              }
+            }
+          }
+        }
+  
+        if (unset_attribute_scales)
+        {
+          for (i = 0; i < unset_attribute_scales; i++)
+          {
+            if (unset_attribute_scale_index[i] != -1)
+            {
+              if (unset_attribute_scale_index[i] < lasreader->header.number_attributes)
+              {
+                lasreader->header.attributes[unset_attribute_scale_index[i]].unset_scale();
+              }
+              else
+              {
+                laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", unset_attribute_scale_index[i], lasreader->header.number_attributes);
+              }
+            }
+          }
+        }
+  
+        if (unset_attribute_offsets)
+        {
+          for (i = 0; i < unset_attribute_offsets; i++)
+          {
+            if (unset_attribute_offset_index[i] != -1)
+            {
+              if (unset_attribute_offset_index[i] < lasreader->header.number_attributes)
+              {
+                lasreader->header.attributes[unset_attribute_offset_index[i]].unset_offset();
+              }
+              else
+              {
+                laserror("attribute index %d out-of-range. only %d attributes in file. ignoring ... ", unset_attribute_offset_index[i], lasreader->header.number_attributes);
+              }
+            }
+          }
+        }
+  
+        if (set_attribute_scales || set_attribute_offsets || unset_attribute_scales || unset_attribute_offsets)
+        {
+          lasreader->header.update_extra_bytes_vlr();
+        }
+  
+        if (set_point_data_format > 5)
+        {
+          if (set_version_minor == -1) 
+          {
+              if (lasreader->header.version_minor < 4) {
+                  set_version_minor = 4;
+              }
+          }
+        }
+  
+        if (set_version_major != -1)
+        {
+          if (set_version_major != 1)
+          {
+            laserror("unknown version_major %d", set_version_major);
+          }
+          lasreader->header.version_major = (U8)set_version_major;
+        }
+  
+        if (set_version_minor >= 0)
+        {
+          if (set_version_minor > 5)
+          {
+            laserror("unknown version_minor %d", set_version_minor);
+          }
+          if (set_version_minor < 3)
+          {
+            if (lasreader->header.version_minor == 3)
+            {
+              lasreader->header.header_size -= 8;
+              lasreader->header.offset_to_point_data -= 8;
+            }
+            else if (lasreader->header.version_minor == 4)
+            {
+              lasreader->header.header_size -= (8 + 140);
+              lasreader->header.offset_to_point_data -= (8 + 140);
+            }
+            else if (lasreader->header.version_minor >= 5)
+            {
+                lasreader->header.header_size -= (8 + 140 + 18);
+                lasreader->header.offset_to_point_data -= (8 + 140 + 18);
+            }
+          }
+          else if (set_version_minor == 3)
+          {
+            if (lasreader->header.version_minor < 3)
+            {
+              lasreader->header.header_size += 8;
+              lasreader->header.offset_to_point_data += 8;
+              lasreader->header.start_of_waveform_data_packet_record = 0;
+            }
+            else if (lasreader->header.version_minor == 4)
+            {
+              lasreader->header.header_size -= 140;
+              lasreader->header.offset_to_point_data -= 140;
+            }
+            else if (lasreader->header.version_minor >= 5)
+            {
+                lasreader->header.header_size -= (140 + 18);
+                lasreader->header.offset_to_point_data -= (140 + 18);
+            }
+          }
+          else if (set_version_minor == 4)
+          {
+            if (lasreader->header.version_minor < 3)
+            {
+              lasreader->header.header_size += (8 + 140);
+              lasreader->header.offset_to_point_data += (8 + 140);
+              lasreader->header.start_of_waveform_data_packet_record = 0;
+            }
+            else if (lasreader->header.version_minor == 3)
+            {
+              lasreader->header.header_size += 140;
+              lasreader->header.offset_to_point_data += 140;
+            }
+            else if (lasreader->header.version_minor >= 5)
+            {
+                lasreader->header.header_size -= 18;
+                lasreader->header.offset_to_point_data -= 18;
+            }
+  
+            if (lasreader->header.version_minor < 4)
+            {
+              if (set_point_data_format > 5)
+              {
+                lasreader->header.extended_number_of_point_records = lasreader->header.number_of_point_records;
+                lasreader->header.number_of_point_records = 0;
+                for (i = 0; i < 5; i++)
+                {
+                  lasreader->header.extended_number_of_points_by_return[i] = lasreader->header.number_of_points_by_return[i];
+                  lasreader->header.number_of_points_by_return[i] = 0;
+                }
+              }
+            }
+          }
+          else if (set_version_minor == 5)
+          {
+              if (lasreader->header.version_minor < 3)
+              {
+                  lasreader->header.header_size += (8 + 140 + 18);
+                  lasreader->header.offset_to_point_data += (8 + 140 + 18);
+                  lasreader->header.start_of_waveform_data_packet_record = 0;
+              }
+              else if (lasreader->header.version_minor == 3)
+              {
+                  lasreader->header.header_size += (140 + 18);
+                  lasreader->header.offset_to_point_data += (140 + 18);
+              }
+              else if (lasreader->header.version_minor == 4)
+              {
+                  lasreader->header.header_size += 18;
+                  lasreader->header.offset_to_point_data += 18;
+              }
+  
+              if (lasreader->header.version_minor < 4)
+              {
+                  if (set_point_data_format > 5)
+                  {
+                      lasreader->header.extended_number_of_point_records = lasreader->header.number_of_point_records;
+                      lasreader->header.number_of_point_records = 0;
+                      for (i = 0; i < 5; i++)
+                      {
+                          lasreader->header.extended_number_of_points_by_return[i] = lasreader->header.number_of_points_by_return[i];
+                          lasreader->header.number_of_points_by_return[i] = 0;
+                      }
+                  }
+              }
+          }
+  
+          if ((set_version_minor <= 3) && (lasreader->header.version_minor >= 4))
+          {
+            if (lasreader->header.point_data_format > 5)
+            {
+              switch (lasreader->header.point_data_format)
+              {
+              case 6:
+                LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 1 and point_data_record_length from %d to %d",
+                  lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 2);
+                lasreader->header.point_data_format = 1;
+                lasreader->header.point_data_record_length -= 2;
+                break;
+              case 7:
+                LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 3 and point_data_record_length from %d to %d",
+                  lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 2);
+                lasreader->header.point_data_format = 3;
+                lasreader->header.point_data_record_length -= 2;
+                break;
+              case 8:
+                LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 3 and point_data_record_length from %d to %d",
+                  lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 4);
+                lasreader->header.point_data_format = 3;
+                lasreader->header.point_data_record_length -= 4;
+                break;
+              case 9:
+                LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 4 and point_data_record_length from %d to %d",
+                  lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 2);
+                lasreader->header.point_data_format = 4;
+                lasreader->header.point_data_record_length -= 2;
+                break;
+              case 10:
+                LASMessage(LAS_WARNING, "downgrading point_data_format from %d to 5 and point_data_record_length from %d to %d",
+                  lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length - 4);
+                lasreader->header.point_data_format = 5;
+                lasreader->header.point_data_record_length -= 4;
+                break;
+              default:
+                laserror("unknown point_data_format %d", lasreader->header.point_data_format);
+              }
+              point = new LASpoint;
+              lasreader->header.clean_laszip();
+            }
+            if (lasreader->header.get_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS))
+            {
+              LASMessage(LAS_WARNING, "unsetting global encoding bit %d when downgrading from version 1.%d to version 1.%d",
+                LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS, lasreader->header.version_minor, set_version_minor);
+              lasreader->header.unset_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+            }
+            if (lasreader->header.number_of_extended_variable_length_records)
+            {
+              LASMessage(LAS_WARNING, "loosing %d EVLR%s when downgrading from version 1.%d to version 1.%d. attempting to move %s to the VLR section ...",
+                lasreader->header.number_of_extended_variable_length_records, (lasreader->header.number_of_extended_variable_length_records > 1 ? "s" : ""),
+                lasreader->header.version_minor, set_version_minor, (lasreader->header.number_of_extended_variable_length_records > 1 ? "them" : "it"));
+              U32 u;
+              for (u = 0; u < lasreader->header.number_of_extended_variable_length_records; u++)
+              {
+                if (lasreader->header.evlrs[u].record_length_after_header <= U16_MAX)
+                {
+                  lasreader->header.add_vlr(lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_id, (U16)lasreader->header.evlrs[u].record_length_after_header, lasreader->header.evlrs[u].data);
+                  lasreader->header.evlrs[u].data = 0;
+                  LASMessage(LAS_INFO, "         moved EVLR %d with user ID '%s' and %lld bytes of payload", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+                }
+                else
+                {
+                  LASMessage(LAS_INFO, "         lost EVLR %d with user ID '%s' and %lld bytes of payload", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+                }
+              }
+            }
+          }
+         else if ((set_version_minor >= 5) && (lasreader->header.point_data_format <= 5)) {
+              // LAS 1.5 does not support point data formats 0 - 5 anymore, upgrade them
+              if (set_point_data_format == -1) // we accept unsupported point format if user requests it
+              {
+                  switch (lasreader->header.point_data_format)
+                  {
+                  case 0:
+                      LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 6 and point_data_record_length from %d to %d",
+                          lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 10);
+                      lasreader->header.point_data_format = 6;
+                      lasreader->header.point_data_record_length += 10;
+                      break;
+                  case 1:
+                      LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 6 and point_data_record_length from %d to %d",
+                          lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 2);
+                      lasreader->header.point_data_format = 6;
+                      lasreader->header.point_data_record_length += 2;
+                      break;
+                  case 2:
+                      LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 7 and point_data_record_length from %d to %d",
+                          lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 10);
+                      lasreader->header.point_data_format = 7;
+                      lasreader->header.point_data_record_length += 10;
+                      break;
+                  case 3:
+                      LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 7 and point_data_record_length from %d to %d",
+                          lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 2);
+                      lasreader->header.point_data_format = 7;
+                      lasreader->header.point_data_record_length += 2;
+                      break;
+                  case 4:
+                      LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 9 and point_data_record_length from %d to %d",
+                          lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 2);
+                      lasreader->header.point_data_format = 9;
+                      lasreader->header.point_data_record_length += 2;
+                      break;
+                  case 5:
+                      LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 10 and point_data_record_length from %d to %d",
+                          lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 4);
+                      lasreader->header.point_data_format = 10;
+                      lasreader->header.point_data_record_length += 4;
+                      break;
+                  default:
+                      laserror("unknown point_data_format %d", lasreader->header.point_data_format);
+                  }
+                  point = new LASpoint;
+                  lasreader->header.clean_laszip();
+              }
+          }
+  
+          lasreader->header.version_minor = (U8)set_version_minor;
+        }
+  
+        // are we supposed to change the point data format
+  
+        if (set_point_data_format != -1)
+        {
+          if (set_point_data_format < 0 || set_point_data_format > 10)
+          {
+            laserror("unknown point_data_format %d", set_point_data_format);
+          }
+          // depending on the conversion we may need to copy the point
+          if (convert_point_type_from_to[lasreader->header.point_data_format][set_point_data_format])
+          {
+            if (point == 0) point = new LASpoint;
+          }
+          // were there extra bytes before
+          I32 num_extra_bytes = 0;
+          switch (lasreader->header.point_data_format)
+          {
+          case 0:
+            num_extra_bytes = lasreader->header.point_data_record_length - 20;
+            break;
+          case 1:
+            num_extra_bytes = lasreader->header.point_data_record_length - 28;
+            break;
+          case 2:
+            num_extra_bytes = lasreader->header.point_data_record_length - 26;
+            break;
+          case 3:
+            num_extra_bytes = lasreader->header.point_data_record_length - 34;
+            break;
+          case 4:
+            num_extra_bytes = lasreader->header.point_data_record_length - 57;
+            break;
+          case 5:
+            num_extra_bytes = lasreader->header.point_data_record_length - 63;
+            break;
+          case 6:
+            num_extra_bytes = lasreader->header.point_data_record_length - 30;
+            break;
+          case 7:
+            num_extra_bytes = lasreader->header.point_data_record_length - 36;
+            break;
+          case 8:
+            num_extra_bytes = lasreader->header.point_data_record_length - 38;
+            break;
+          case 9:
+            num_extra_bytes = lasreader->header.point_data_record_length - 59;
+            break;
+          case 10:
+            num_extra_bytes = lasreader->header.point_data_record_length - 67;
+            break;
+          }
+          if (num_extra_bytes < 0)
+          {
+            laserror("point record length has %d fewer bytes than needed", -num_extra_bytes);
+          }
+          lasreader->header.point_data_format = (U8)set_point_data_format;
+          lasreader->header.clean_laszip();
+          switch (lasreader->header.point_data_format)
+          {
+          case 0:
+            lasreader->header.point_data_record_length = 20 + num_extra_bytes;
+            break;
+          case 1:
+            lasreader->header.point_data_record_length = 28 + num_extra_bytes;
+            break;
+          case 2:
+            lasreader->header.point_data_record_length = 26 + num_extra_bytes;
+            break;
+          case 3:
+            lasreader->header.point_data_record_length = 34 + num_extra_bytes;
+            break;
+          case 4:
+            lasreader->header.point_data_record_length = 57 + num_extra_bytes;
+            break;
+          case 5:
+            lasreader->header.point_data_record_length = 63 + num_extra_bytes;
+            break;
+          case 6:
+            lasreader->header.point_data_record_length = 30 + num_extra_bytes;
+            break;
+          case 7:
+            lasreader->header.point_data_record_length = 36 + num_extra_bytes;
+            break;
+          case 8:
+            lasreader->header.point_data_record_length = 38 + num_extra_bytes;
+            break;
+          case 9:
+            lasreader->header.point_data_record_length = 59 + num_extra_bytes;
+            break;
+          case 10:
+            lasreader->header.point_data_record_length = 67 + num_extra_bytes;
+            break;
+          }
+        }
+  
+        // are we supposed to change the point data record length
+  
+        if (set_point_data_record_length != -1)
+        {
+          I32 num_extra_bytes = 0;
+          switch (lasreader->header.point_data_format)
+          {
+          case 0:
+            num_extra_bytes = set_point_data_record_length - 20;
+            break;
+          case 1:
+            num_extra_bytes = set_point_data_record_length - 28;
+            break;
+          case 2:
+            num_extra_bytes = set_point_data_record_length - 26;
+            break;
+          case 3:
+            num_extra_bytes = set_point_data_record_length - 34;
+            break;
+          case 4:
+            num_extra_bytes = set_point_data_record_length - 57;
+            break;
+          case 5:
+            num_extra_bytes = set_point_data_record_length - 63;
+            break;
+          case 6:
+            num_extra_bytes = set_point_data_record_length - 30;
+            break;
+          case 7:
+            num_extra_bytes = set_point_data_record_length - 36;
+            break;
+          case 8:
+            num_extra_bytes = set_point_data_record_length - 38;
+            break;
+          case 9:
+            num_extra_bytes = set_point_data_record_length - 59;
+            break;
+          case 10:
+            num_extra_bytes = set_point_data_record_length - 67;
+            break;
+          }
+          if (num_extra_bytes < 0)
+          {
+            laserror("point_data_format %d needs record length of at least %d", lasreader->header.point_data_format, set_point_data_record_length - num_extra_bytes);
+          }
+          if (lasreader->header.point_data_record_length < set_point_data_record_length)
+          {
+            if (!point) point = new LASpoint;
+          }
+          lasreader->header.point_data_record_length = (U16)set_point_data_record_length;
+          lasreader->header.clean_laszip();
+        }
+  
+        // are we supposed to add attributes
+  
+        if (lasreadopener.get_number_attributes())
+        {
+          I32 attibutes_before_size = lasreader->header.get_attributes_size();
+          for (i = 0; i < lasreadopener.get_number_attributes(); i++)
+          {
+            I32 type = (lasreadopener.get_attribute_data_type(i) - 1) % 10;
+            try {
+              LASattribute attribute(type, lasreadopener.get_attribute_name(i), lasreadopener.get_attribute_description(i));
+              if (lasreadopener.get_attribute_scale(i) != 1.0 || lasreadopener.get_attribute_offset(i) != 0.0)
+              {
+                attribute.set_scale(lasreadopener.get_attribute_scale(i));
+              }
+              if (lasreadopener.get_attribute_offset(i) != 0.0)
+              {
+                attribute.set_offset(lasreadopener.get_attribute_offset(i));
+              }
+              if (lasreadopener.get_attribute_no_data(i) != F64_MAX)
+              {
+                attribute.set_no_data(lasreadopener.get_attribute_no_data(i));
+              }
+              lasreader->header.add_attribute(attribute);
+            }
+            catch (...) {
+              laserror("initializing attribute %s", lasreadopener.get_attribute_name(i));
+            }
+          }
+          I32 attibutes_after_size = lasreader->header.get_attributes_size();
+          if (!point) point = new LASpoint;
+          lasreader->header.update_extra_bytes_vlr();
+          lasreader->header.point_data_record_length += (attibutes_after_size - attibutes_before_size);
+          lasreader->header.clean_laszip();
+        }
+  
+        if (set_lastiling_buffer_flag != -1)
+        {
+          if (lasreader->header.vlr_lastiling)
+          {
+            lasreader->header.vlr_lastiling->buffer = set_lastiling_buffer_flag;
+          }
+          else
+          {
+            LASMessage(LAS_WARNING, "file '%s' has no LAStiling VLR. cannot set buffer flag.", lasreadopener.get_file_name());
+          }
+        }
+  
+        if (move_evlrs_to_vlrs)
+        {
+          if (lasreader->header.number_of_extended_variable_length_records > 0)
+          {
             U32 u;
             for (u = 0; u < lasreader->header.number_of_extended_variable_length_records; u++)
             {
@@ -1892,335 +2153,163 @@ int main(int argc, char* argv[])
               {
                 lasreader->header.add_vlr(lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_id, (U16)lasreader->header.evlrs[u].record_length_after_header, lasreader->header.evlrs[u].data);
                 lasreader->header.evlrs[u].data = 0;
-                LASMessage(LAS_INFO, "         moved EVLR %d with user ID '%s' and %lld bytes of payload", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+                LASMessage(LAS_VERY_VERBOSE, "moved EVLR %d with user ID '%s' and %lld bytes of payload", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
               }
-              else
+            }
+            U32 remaining = 0;
+            for (u = 0; u < lasreader->header.number_of_extended_variable_length_records; u++)
+            {
+              if (lasreader->header.evlrs[u].record_length_after_header > U16_MAX)
               {
-                LASMessage(LAS_INFO, "         lost EVLR %d with user ID '%s' and %lld bytes of payload", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
+                lasreader->header.evlrs[remaining] = lasreader->header.evlrs[u];
+                remaining++;
+              }
+            }
+            LASMessage(LAS_VERBOSE, "moved %u EVLRs to VLRs. %u EVLRs with large payload remain.", u - remaining, remaining);
+            lasreader->header.number_of_extended_variable_length_records = remaining;
+          }
+        }
+  
+        // if the point needs to be copied set up the data fields
+  
+        if (point)
+        {
+          point->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
+        }
+        
+        // reproject or just set the projection?
+        LASquantizer* reproject_quantizer = 0;
+        bool set_projection_in_header = false;
+  
+        if (geoprojectionconverter.has_projection(false)) // reproject because a target projection was provided in the command line
+        {
+          if (!geoprojectionconverter.has_projection(true))      // if no source projection was provided in the command line ...
+          {
+            if (lasreader->header.vlr_geo_ogc_wkt)               // ... try to get it from the OGC WKT string ...
+            {
+              geoprojectionconverter.set_projection_from_ogc_wkt(lasreader->header.vlr_geo_ogc_wkt);
+            }
+            if (!geoprojectionconverter.has_projection(true))    // ... nothing ... ? ...
+            {
+              if (lasreader->header.vlr_geo_keys)                // ... try to get it from the geo keys.
+              {
+                geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
               }
             }
           }
-        }
-       else if ((set_version_minor >= 5) && (lasreader->header.point_data_format <= 5)) {
-            // LAS 1.5 does not support point data formats 0 - 5 anymore, upgrade them
-            if (set_point_data_format == -1) // we accept unsupported point format if user requests it
-            {
-                switch (lasreader->header.point_data_format)
-                {
-                case 0:
-                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 6 and point_data_record_length from %d to %d",
-                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 10);
-                    lasreader->header.point_data_format = 6;
-                    lasreader->header.point_data_record_length += 10;
-                    break;
-                case 1:
-                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 6 and point_data_record_length from %d to %d",
-                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 2);
-                    lasreader->header.point_data_format = 6;
-                    lasreader->header.point_data_record_length += 2;
-                    break;
-                case 2:
-                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 7 and point_data_record_length from %d to %d",
-                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 10);
-                    lasreader->header.point_data_format = 7;
-                    lasreader->header.point_data_record_length += 10;
-                    break;
-                case 3:
-                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 7 and point_data_record_length from %d to %d",
-                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 2);
-                    lasreader->header.point_data_format = 7;
-                    lasreader->header.point_data_record_length += 2;
-                    break;
-                case 4:
-                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 9 and point_data_record_length from %d to %d",
-                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 2);
-                    lasreader->header.point_data_format = 9;
-                    lasreader->header.point_data_record_length += 2;
-                    break;
-                case 5:
-                    LASMessage(LAS_WARNING, "upgrading point_data_format from %d to 10 and point_data_record_length from %d to %d",
-                        lasreader->header.point_data_format, lasreader->header.point_data_record_length, lasreader->header.point_data_record_length + 4);
-                    lasreader->header.point_data_format = 10;
-                    lasreader->header.point_data_record_length += 4;
-                    break;
-                default:
-                    laserror("unknown point_data_format %d", lasreader->header.point_data_format);
-                }
-                point = new LASpoint;
-                lasreader->header.clean_laszip();
-            }
-        }
-
-        lasreader->header.version_minor = (U8)set_version_minor;
-      }
-
-      // are we supposed to change the point data format
-
-      if (set_point_data_format != -1)
-      {
-        if (set_point_data_format < 0 || set_point_data_format > 10)
-        {
-          laserror("unknown point_data_format %d", set_point_data_format);
-        }
-        // depending on the conversion we may need to copy the point
-        if (convert_point_type_from_to[lasreader->header.point_data_format][set_point_data_format])
-        {
-          if (point == 0) point = new LASpoint;
-        }
-        // were there extra bytes before
-        I32 num_extra_bytes = 0;
-        switch (lasreader->header.point_data_format)
-        {
-        case 0:
-          num_extra_bytes = lasreader->header.point_data_record_length - 20;
-          break;
-        case 1:
-          num_extra_bytes = lasreader->header.point_data_record_length - 28;
-          break;
-        case 2:
-          num_extra_bytes = lasreader->header.point_data_record_length - 26;
-          break;
-        case 3:
-          num_extra_bytes = lasreader->header.point_data_record_length - 34;
-          break;
-        case 4:
-          num_extra_bytes = lasreader->header.point_data_record_length - 57;
-          break;
-        case 5:
-          num_extra_bytes = lasreader->header.point_data_record_length - 63;
-          break;
-        case 6:
-          num_extra_bytes = lasreader->header.point_data_record_length - 30;
-          break;
-        case 7:
-          num_extra_bytes = lasreader->header.point_data_record_length - 36;
-          break;
-        case 8:
-          num_extra_bytes = lasreader->header.point_data_record_length - 38;
-          break;
-        case 9:
-          num_extra_bytes = lasreader->header.point_data_record_length - 59;
-          break;
-        case 10:
-          num_extra_bytes = lasreader->header.point_data_record_length - 67;
-          break;
-        }
-        if (num_extra_bytes < 0)
-        {
-          laserror("point record length has %d fewer bytes than needed", -num_extra_bytes);
-        }
-        lasreader->header.point_data_format = (U8)set_point_data_format;
-        lasreader->header.clean_laszip();
-        switch (lasreader->header.point_data_format)
-        {
-        case 0:
-          lasreader->header.point_data_record_length = 20 + num_extra_bytes;
-          break;
-        case 1:
-          lasreader->header.point_data_record_length = 28 + num_extra_bytes;
-          break;
-        case 2:
-          lasreader->header.point_data_record_length = 26 + num_extra_bytes;
-          break;
-        case 3:
-          lasreader->header.point_data_record_length = 34 + num_extra_bytes;
-          break;
-        case 4:
-          lasreader->header.point_data_record_length = 57 + num_extra_bytes;
-          break;
-        case 5:
-          lasreader->header.point_data_record_length = 63 + num_extra_bytes;
-          break;
-        case 6:
-          lasreader->header.point_data_record_length = 30 + num_extra_bytes;
-          break;
-        case 7:
-          lasreader->header.point_data_record_length = 36 + num_extra_bytes;
-          break;
-        case 8:
-          lasreader->header.point_data_record_length = 38 + num_extra_bytes;
-          break;
-        case 9:
-          lasreader->header.point_data_record_length = 59 + num_extra_bytes;
-          break;
-        case 10:
-          lasreader->header.point_data_record_length = 67 + num_extra_bytes;
-          break;
-        }
-      }
-
-      // are we supposed to change the point data record length
-
-      if (set_point_data_record_length != -1)
-      {
-        I32 num_extra_bytes = 0;
-        switch (lasreader->header.point_data_format)
-        {
-        case 0:
-          num_extra_bytes = set_point_data_record_length - 20;
-          break;
-        case 1:
-          num_extra_bytes = set_point_data_record_length - 28;
-          break;
-        case 2:
-          num_extra_bytes = set_point_data_record_length - 26;
-          break;
-        case 3:
-          num_extra_bytes = set_point_data_record_length - 34;
-          break;
-        case 4:
-          num_extra_bytes = set_point_data_record_length - 57;
-          break;
-        case 5:
-          num_extra_bytes = set_point_data_record_length - 63;
-          break;
-        case 6:
-          num_extra_bytes = set_point_data_record_length - 30;
-          break;
-        case 7:
-          num_extra_bytes = set_point_data_record_length - 36;
-          break;
-        case 8:
-          num_extra_bytes = set_point_data_record_length - 38;
-          break;
-        case 9:
-          num_extra_bytes = set_point_data_record_length - 59;
-          break;
-        case 10:
-          num_extra_bytes = set_point_data_record_length - 67;
-          break;
-        }
-        if (num_extra_bytes < 0)
-        {
-          laserror("point_data_format %d needs record length of at least %d", lasreader->header.point_data_format, set_point_data_record_length - num_extra_bytes);
-        }
-        if (lasreader->header.point_data_record_length < set_point_data_record_length)
-        {
-          if (!point) point = new LASpoint;
-        }
-        lasreader->header.point_data_record_length = (U16)set_point_data_record_length;
-        lasreader->header.clean_laszip();
-      }
-
-      // are we supposed to add attributes
-
-      if (lasreadopener.get_number_attributes())
-      {
-        I32 attibutes_before_size = lasreader->header.get_attributes_size();
-        for (i = 0; i < lasreadopener.get_number_attributes(); i++)
-        {
-          I32 type = (lasreadopener.get_attribute_data_type(i) - 1) % 10;
-          try {
-            LASattribute attribute(type, lasreadopener.get_attribute_name(i), lasreadopener.get_attribute_description(i));
-            if (lasreadopener.get_attribute_scale(i) != 1.0 || lasreadopener.get_attribute_offset(i) != 0.0)
-            {
-              attribute.set_scale(lasreadopener.get_attribute_scale(i));
-            }
-            if (lasreadopener.get_attribute_offset(i) != 0.0)
-            {
-              attribute.set_offset(lasreadopener.get_attribute_offset(i));
-            }
-            if (lasreadopener.get_attribute_no_data(i) != F64_MAX)
-            {
-              attribute.set_no_data(lasreadopener.get_attribute_no_data(i));
-            }
-            lasreader->header.add_attribute(attribute);
-          }
-          catch (...) {
-            laserror("initializing attribute %s", lasreadopener.get_attribute_name(i));
-          }
-        }
-        I32 attibutes_after_size = lasreader->header.get_attributes_size();
-        if (!point) point = new LASpoint;
-        lasreader->header.update_extra_bytes_vlr();
-        lasreader->header.point_data_record_length += (attibutes_after_size - attibutes_before_size);
-        lasreader->header.clean_laszip();
-      }
-
-      if (set_lastiling_buffer_flag != -1)
-      {
-        if (lasreader->header.vlr_lastiling)
-        {
-          lasreader->header.vlr_lastiling->buffer = set_lastiling_buffer_flag;
-        }
-        else
-        {
-          LASMessage(LAS_WARNING, "file '%s' has no LAStiling VLR. cannot set buffer flag.", lasreadopener.get_file_name());
-        }
-      }
-
-      if (move_evlrs_to_vlrs)
-      {
-        if (lasreader->header.number_of_extended_variable_length_records > 0)
-        {
-          U32 u;
-          for (u = 0; u < lasreader->header.number_of_extended_variable_length_records; u++)
+          if (!geoprojectionconverter.has_projection(true))
           {
-            if (lasreader->header.evlrs[u].record_length_after_header <= U16_MAX)
-            {
-              lasreader->header.add_vlr(lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_id, (U16)lasreader->header.evlrs[u].record_length_after_header, lasreader->header.evlrs[u].data);
-              lasreader->header.evlrs[u].data = 0;
-              LASMessage(LAS_VERY_VERBOSE, "moved EVLR %d with user ID '%s' and %lld bytes of payload", u, lasreader->header.evlrs[u].user_id, lasreader->header.evlrs[u].record_length_after_header);
-            }
+            LASMessage(LAS_WARNING, "cannot determine source projection of '%s'. not reprojecting ... ", lasreadopener.get_file_name());
+  
+            set_projection_in_header = false;
           }
-          U32 remaining = 0;
-          for (u = 0; u < lasreader->header.number_of_extended_variable_length_records; u++)
+          else
           {
-            if (lasreader->header.evlrs[u].record_length_after_header > U16_MAX)
-            {
-              lasreader->header.evlrs[remaining] = lasreader->header.evlrs[u];
-              remaining++;
+            geoprojectionconverter.check_horizontal_datum_before_reprojection();
+  
+            reproject_quantizer = new LASquantizer();
+            double point[3];
+            point[0] = (lasreader->header.min_x + lasreader->header.max_x) / 2;
+            point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
+            point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
+            geoprojectionconverter.to_target(point);
+  
+            if (geoprojectionconverter.has_target_precision()) {
+              LASMessage(LAS_VERBOSE, "target precision is used for x scaling");
+              reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.x_scale_factor);
+            } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[0] > 0.0) {
+              LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for x scaling", lasreadopener.get_scale_factor()[0]);
+              reproject_quantizer->x_scale_factor = lasreadopener.get_scale_factor()[0];
+            } else {
+              LASMessage(LAS_VERBOSE, "input header scale factor is used for x scaling");
+              reproject_quantizer->x_scale_factor = lasreader->header.x_scale_factor;
             }
-          }
-          LASMessage(LAS_VERBOSE, "moved %u EVLRs to VLRs. %u EVLRs with large payload remain.", u - remaining, remaining);
-          lasreader->header.number_of_extended_variable_length_records = remaining;
-        }
-      }
-
-      // if the point needs to be copied set up the data fields
-
-      if (point)
-      {
-        point->init(&lasreader->header, lasreader->header.point_data_format, lasreader->header.point_data_record_length);
-      }
-      
-      // reproject or just set the projection?
-      LASquantizer* reproject_quantizer = 0;
-      bool set_projection_in_header = false;
-
-      if (geoprojectionconverter.has_projection(false)) // reproject because a target projection was provided in the command line
-      {
-        if (!geoprojectionconverter.has_projection(true))      // if no source projection was provided in the command line ...
-        {
-          if (lasreader->header.vlr_geo_ogc_wkt)               // ... try to get it from the OGC WKT string ...
-          {
-            geoprojectionconverter.set_projection_from_ogc_wkt(lasreader->header.vlr_geo_ogc_wkt);
-          }
-          if (!geoprojectionconverter.has_projection(true))    // ... nothing ... ? ...
-          {
-            if (lasreader->header.vlr_geo_keys)                // ... try to get it from the geo keys.
-            {
-              geoprojectionconverter.set_projection_from_geo_keys(lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries, lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+            if (geoprojectionconverter.has_target_precision()) {
+              LASMessage(LAS_VERBOSE, "target precision is used for y scaling");
+              reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.y_scale_factor);
+            } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[1] > 0.0) {
+              LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for y scaling", lasreadopener.get_scale_factor()[1]);
+              reproject_quantizer->y_scale_factor = lasreadopener.get_scale_factor()[1];
+            } else {
+              LASMessage(LAS_VERBOSE, "input header scale factor is used for y scaling");
+              reproject_quantizer->y_scale_factor = lasreader->header.y_scale_factor;
             }
+            if (geoprojectionconverter.has_target_elevation_precision()) {
+              LASMessage(LAS_VERBOSE, "target elevation precision is used for z scaling");
+              reproject_quantizer->z_scale_factor = geoprojectionconverter.get_target_elevation_precision(lasreader->header.z_scale_factor);
+            } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[2] > 0.0) {
+              LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for z scaling", lasreadopener.get_scale_factor()[2]);
+              reproject_quantizer->z_scale_factor = lasreadopener.get_scale_factor()[2];
+            } else {
+              LASMessage(LAS_VERBOSE, "input header scale factor is used for z scaling");
+              reproject_quantizer->z_scale_factor = lasreader->header.z_scale_factor;
+            }
+        
+            reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
+            reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
+            reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
+  
+            set_projection_in_header = true;
           }
         }
-        if (!geoprojectionconverter.has_projection(true))
+        else if (geoprojectionconverter.has_projection(true)) // set because only a source projection was provided in the command line
         {
-          LASMessage(LAS_WARNING, "cannot determine source projection of '%s'. not reprojecting ... ", lasreadopener.get_file_name());
-
-          set_projection_in_header = false;
+          set_projection_in_header = true;
         }
-        else
+        // PROJ transformation
+        if (geoprojectionconverter.is_proj_request) 
         {
-          geoprojectionconverter.check_horizontal_datum_before_reprojection();
-
+          LASMessage(LAS_VERY_VERBOSE, "the PROJ transformation is prepared within las2las");
+          // 1. If the source CRS is not specified as an argument (cmd line), try to generate it from the input file
+          if (geoprojectionconverter.check_header_for_crs) 
+          {      
+            LASMessage(LAS_VERY_VERBOSE, "the header of the input file is checked for its CRS");
+            // 2. try to get it the source CRS from the OGC header WKT string
+            if (lasreader->header.vlr_geo_ogc_wkt) 
+            {
+              geoprojectionconverter.set_proj_crs_with_file_header_wkt(lasreader->header.vlr_geo_ogc_wkt, true);
+            } 
+            else if (lasreader->header.vlr_geo_keys) 
+            {
+              geoprojectionconverter.disable_messages = true;
+  
+              geoprojectionconverter.set_projection_from_geo_keys(
+                  lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
+                  lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+  
+              CHAR* ogc_wkt = nullptr;
+              I32 len = 0;
+              // 3. prefer WKT when no vertical CRS is present; compound WKT generation supports only a limited set of vertical EPSGs
+              if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt) && geoprojectionconverter.source_header_vertical_epsg == 0)
+              {
+                geoprojectionconverter.set_proj_crs_with_file_header_wkt(ogc_wkt, true);
+              }
+              // 4. if WKT is unavailable or a vertical CRS is present, use the GeoTIFF EPSG codes (limited compound WKT support)
+              else if (geoprojectionconverter.source_header_epsg)
+              {
+                LASMessage(LAS_VERY_VERBOSE, "using GeoTIFF EPSG codes to create the PROJ source CRS");
+                geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, geoprojectionconverter.source_header_vertical_epsg, true);
+              }
+              else 
+              {
+                laserror("No valid CRS could be extracted from the header information of the source file. Please specify the coordinate system (CRS) directly when calling the transformation tool.");
+              }
+              geoprojectionconverter.reset_projection();
+            } 
+            else 
+            {
+              laserror("No file header information could be found to identify the CRS.");
+            }
+            // Create the transformation PROJ object
+            geoprojectionconverter.set_proj_crs_transform();
+          }
           reproject_quantizer = new LASquantizer();
           double point[3];
           point[0] = (lasreader->header.min_x + lasreader->header.max_x) / 2;
           point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
           point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
           geoprojectionconverter.to_target(point);
-
+          
           if (geoprojectionconverter.has_target_precision()) {
             LASMessage(LAS_VERBOSE, "target precision is used for x scaling");
             reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.x_scale_factor);
@@ -2251,538 +2340,448 @@ int main(int argc, char* argv[])
             LASMessage(LAS_VERBOSE, "input header scale factor is used for z scaling");
             reproject_quantizer->z_scale_factor = lasreader->header.z_scale_factor;
           }
-      
+  
           reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
           reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
           reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
-
+  
           set_projection_in_header = true;
         }
-      }
-      else if (geoprojectionconverter.has_projection(true)) // set because only a source projection was provided in the command line
-      {
-        set_projection_in_header = true;
-      }
-      // PROJ transformation
-      if (geoprojectionconverter.is_proj_request) 
-      {
-        LASMessage(LAS_VERY_VERBOSE, "the PROJ transformation is prepared within las2las");
-        // 1. If the source CRS is not specified as an argument (cmd line), try to generate it from the input file
-        if (geoprojectionconverter.check_header_for_crs) 
-        {      
-          LASMessage(LAS_VERY_VERBOSE, "the header of the input file is checked for its CRS");
-          // 2. try to get it the source CRS from the OGC header WKT string
-          if (lasreader->header.vlr_geo_ogc_wkt) 
-          {
-            geoprojectionconverter.set_proj_crs_with_file_header_wkt(lasreader->header.vlr_geo_ogc_wkt, true);
-          } 
-          else if (lasreader->header.vlr_geo_keys) 
-          {
-            geoprojectionconverter.disable_messages = true;
-
-            geoprojectionconverter.set_projection_from_geo_keys(
-                lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
-                lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
-
-            CHAR* ogc_wkt = nullptr;
-            I32 len = 0;
-            // 3. prefer WKT when no vertical CRS is present; compound WKT generation supports only a limited set of vertical EPSGs
-            if (geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt) && geoprojectionconverter.source_header_vertical_epsg == 0)
-            {
-              geoprojectionconverter.set_proj_crs_with_file_header_wkt(ogc_wkt, true);
+  
+        if (set_projection_in_header || set_ogc_wkt_string || set_ogc_wkt) {
+          CHAR* ogc_wkt = set_ogc_wkt_string;
+          bool has_wkt = false;
+  
+          // generate WKT (if desired or LAS 1.4)
+          if ((lasreader->header.version_minor == 4 && (set_ogc_wkt || set_ogc_wkt_string || 
+              geoprojectionconverter.is_proj_request)) || lasreader->header.version_minor >= 5) {
+            // PROJ-WKT
+            if (!ogc_wkt && geoprojectionconverter.is_proj_request) {
+              LASMessage(LAS_VERBOSE, "use the WKT generated by PROJ");
+              geoprojectionconverter.get_wkt_from_proj(ogc_wkt, geoprojectionconverter, lasreader);
             }
-            // 4. if WKT is unavailable or a vertical CRS is present, use the GeoTIFF EPSG codes (limited compound WKT support)
-            else if (geoprojectionconverter.source_header_epsg)
-            {
-              LASMessage(LAS_VERY_VERBOSE, "using GeoTIFF EPSG codes to create the PROJ source CRS");
-              geoprojectionconverter.set_proj_crs_with_epsg(geoprojectionconverter.source_header_epsg, geoprojectionconverter.source_header_vertical_epsg, true);
+  
+            I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
+  
+            if (!ogc_wkt) {
+              if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false))) {
+                if (lasreader->header.vlr_geo_keys) {
+                  geoprojectionconverter.set_projection_from_geo_keys(
+                      lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
+                      lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
+                  if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false))) {
+                    LASMessage(LAS_WARNING, "cannot produce WKT. ignoring '-set_ogc_wkt' for '%s'", lasreadopener.get_file_name());
+                    if (ogc_wkt) free(ogc_wkt);
+                    ogc_wkt = nullptr;
+                  } else {
+                    LASMessage(LAS_VERBOSE, "CRS converted from GeoTIFF to OGC WKT");
+                  }
+                }
+              } else {
+                len = (I32)strlen(ogc_wkt);
+              }
             }
-            else 
-            {
-              laserror("No valid CRS could be extracted from the header information of the source file. Please specify the coordinate system (CRS) directly when calling the transformation tool.");
+  
+            // enter WKT (if available)
+            if (ogc_wkt) {
+              has_wkt = true;
+              lasreader->header.remove_vlr("LASF_Projection", 34735);
+              lasreader->header.del_geo_ogc_wkt();
+              lasreader->header.del_geo_wkt_ogc_math();
+              lasreader->header.del_geo_ascii_params();
+              lasreader->header.del_geo_double_params();
+              LASMessage(LAS_VERY_VERBOSE, "the CRS related VLR and EVLR information is rebuilt for the target header");
+  
+              if (set_ogc_wkt_in_evlr && lasreader->header.version_minor >= 4)
+                lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, TRUE);
+              else
+                lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, FALSE);
+  
+              if (!set_ogc_wkt_string) free(ogc_wkt);
+              lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
             }
-            geoprojectionconverter.reset_projection();
-          } 
-          else 
-          {
-            laserror("No file header information could be found to identify the CRS.");
           }
-          // Create the transformation PROJ object
-          geoprojectionconverter.set_proj_crs_transform();
-        }
-        reproject_quantizer = new LASquantizer();
-        double point[3];
-        point[0] = (lasreader->header.min_x + lasreader->header.max_x) / 2;
-        point[1] = (lasreader->header.min_y + lasreader->header.max_y) / 2;
-        point[2] = (lasreader->header.min_z + lasreader->header.max_z) / 2;
-        geoprojectionconverter.to_target(point);
-        
-        if (geoprojectionconverter.has_target_precision()) {
-          LASMessage(LAS_VERBOSE, "target precision is used for x scaling");
-          reproject_quantizer->x_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.x_scale_factor);
-        } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[0] > 0.0) {
-          LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for x scaling", lasreadopener.get_scale_factor()[0]);
-          reproject_quantizer->x_scale_factor = lasreadopener.get_scale_factor()[0];
-        } else {
-          LASMessage(LAS_VERBOSE, "input header scale factor is used for x scaling");
-          reproject_quantizer->x_scale_factor = lasreader->header.x_scale_factor;
-        }
-        if (geoprojectionconverter.has_target_precision()) {
-          LASMessage(LAS_VERBOSE, "target precision is used for y scaling");
-          reproject_quantizer->y_scale_factor = geoprojectionconverter.get_target_precision(lasreader->header.y_scale_factor);
-        } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[1] > 0.0) {
-          LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for y scaling", lasreadopener.get_scale_factor()[1]);
-          reproject_quantizer->y_scale_factor = lasreadopener.get_scale_factor()[1];
-        } else {
-          LASMessage(LAS_VERBOSE, "input header scale factor is used for y scaling");
-          reproject_quantizer->y_scale_factor = lasreader->header.y_scale_factor;
-        }
-        if (geoprojectionconverter.has_target_elevation_precision()) {
-          LASMessage(LAS_VERBOSE, "target elevation precision is used for z scaling");
-          reproject_quantizer->z_scale_factor = geoprojectionconverter.get_target_elevation_precision(lasreader->header.z_scale_factor);
-        } else if (lasreadopener.get_scale_factor() != nullptr && lasreadopener.get_scale_factor()[2] > 0.0) {
-          LASMessage(LAS_VERBOSE, "the scale factor '%g' from rescale argument is used for z scaling", lasreadopener.get_scale_factor()[2]);
-          reproject_quantizer->z_scale_factor = lasreadopener.get_scale_factor()[2];
-        } else {
-          LASMessage(LAS_VERBOSE, "input header scale factor is used for z scaling");
-          reproject_quantizer->z_scale_factor = lasreader->header.z_scale_factor;
-        }
-
-        reproject_quantizer->x_offset = ((I64)((point[0] / reproject_quantizer->x_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->x_scale_factor;
-        reproject_quantizer->y_offset = ((I64)((point[1] / reproject_quantizer->y_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->y_scale_factor;
-        reproject_quantizer->z_offset = ((I64)((point[2] / reproject_quantizer->z_scale_factor) / 10000000)) * 10000000 * reproject_quantizer->z_scale_factor;
-
-        set_projection_in_header = true;
-      }
-
-      if (set_projection_in_header || set_ogc_wkt_string || set_ogc_wkt) {
-        CHAR* ogc_wkt = set_ogc_wkt_string;
-        bool has_wkt = false;
-
-        // generate WKT (if desired or LAS 1.4)
-        if ((lasreader->header.version_minor == 4 && (set_ogc_wkt || set_ogc_wkt_string || 
-            geoprojectionconverter.is_proj_request)) || lasreader->header.version_minor >= 5) {
-          // PROJ-WKT
-          if (!ogc_wkt && geoprojectionconverter.is_proj_request) {
-            LASMessage(LAS_VERBOSE, "use the WKT generated by PROJ");
-            geoprojectionconverter.get_wkt_from_proj(ogc_wkt, geoprojectionconverter, lasreader);
+  
+          // GeoKeys only if no WKT has been generated an minor version < 5
+          if (!has_wkt && lasreader->header.version_minor < 5) {
+            int number_of_keys;
+            GeoProjectionGeoKeys* geo_keys = 0;
+            int num_geo_double_params;
+            double* geo_double_params = 0;
+  
+            if (geoprojectionconverter.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params, !geoprojectionconverter.has_projection(false))) {
+              lasreader->header.set_geo_keys(number_of_keys, (LASvlr_key_entry*)geo_keys);
+              lasreader->header.unset_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
+              free(geo_keys);
+  
+              if (geo_double_params) {
+                lasreader->header.set_geo_double_params(num_geo_double_params, geo_double_params);
+                free(geo_double_params);
+              } else {
+                lasreader->header.del_geo_double_params();
+              }
+  
+              lasreader->header.del_geo_ascii_params();
+              lasreader->header.del_geo_ogc_wkt();
+            }
           }
-
-          I32 len = (ogc_wkt ? (I32)strlen(ogc_wkt) : 0);
-
-          if (!ogc_wkt) {
-            if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false))) {
-              if (lasreader->header.vlr_geo_keys) {
-                geoprojectionconverter.set_projection_from_geo_keys(
-                    lasreader->header.vlr_geo_keys[0].number_of_keys, (GeoProjectionGeoKeys*)lasreader->header.vlr_geo_key_entries,
-                    lasreader->header.vlr_geo_ascii_params, lasreader->header.vlr_geo_double_params);
-                if (!geoprojectionconverter.get_ogc_wkt_from_projection(len, &ogc_wkt, !geoprojectionconverter.has_projection(false))) {
-                  LASMessage(LAS_WARNING, "cannot produce WKT. ignoring '-set_ogc_wkt' for '%s'", lasreadopener.get_file_name());
-                  if (ogc_wkt) free(ogc_wkt);
-                  ogc_wkt = nullptr;
-                } else {
-                  LASMessage(LAS_VERBOSE, "CRS converted from GeoTIFF to OGC WKT");
+        }
+  
+        // maybe we should remove some stuff
+  
+        if (remove_header_padding)
+        {
+          lasreader->header.clean_user_data_in_header();
+          lasreader->header.clean_user_data_after_header();
+        }
+  
+        if (remove_all_variable_length_records)
+        {
+          lasreader->header.clean_vlrs();
+        }
+        else
+        {
+          if (!remove_vlr_indices.empty()) {
+            std::vector<int> failed_remove_vlr_indices;
+  
+            for (int index : remove_vlr_indices) {
+              if (!lasreader->header.remove_vlr(index)) failed_remove_vlr_indices.push_back(index);
+            }
+            if (!failed_remove_vlr_indices.empty()) {
+              std::string failed_indices;
+  
+              for (size_t j = 0; j < failed_remove_vlr_indices.size(); j++) {
+                if (j > 0) failed_indices += ", ";
+                failed_indices += std::to_string(failed_remove_vlr_indices[j]);
+              }
+  
+              LASMessage(LAS_WARNING, "could not remove VLRs with indices [%s] from input file '%s'", failed_indices.c_str(), lasreadopener.get_file_name());
+            }
+          }
+  
+          if (remove_vlr_user_id != nullptr && remove_vlr_record_id >= 0) {
+            if (!lasreader->header.remove_vlr(remove_vlr_user_id, remove_vlr_record_id)) {
+              LASMessage(LAS_WARNING, "could not remove VLR with user ID '%s' and record ID '%d' from input file '%s'", remove_vlr_user_id, remove_vlr_record_id, lasreadopener.get_file_name());
+            }
+          }
+  
+          if (remove_variable_length_record_from != -1)
+          {
+            for (i = remove_variable_length_record_to; i >= remove_variable_length_record_from; i--)
+            {
+              lasreader->header.remove_vlr(i);
+            }
+          }
+        }
+  
+        if (remove_all_extended_variable_length_records)
+        {
+          lasreader->header.clean_evlrs();
+        }
+        else
+        {
+          if (remove_extended_variable_length_record != -1)
+          {
+            lasreader->header.remove_evlr(remove_extended_variable_length_record);
+          }
+  
+          if (remove_extended_variable_length_record_from != -1)
+          {
+            for (i = remove_extended_variable_length_record_to; i >= remove_extended_variable_length_record_from; i--)
+            {
+              lasreader->header.remove_evlr(i);
+            }
+          }
+        }
+  
+        if (remove_tiling_vlr)
+        {
+          lasreader->header.clean_lastiling();
+        }
+  
+        if (remove_original_vlr)
+        {
+          lasreader->header.clean_lasoriginal();
+        }
+  
+        if (lasreader->header.vlr_lastiling || lasreader->header.vlr_lasoriginal)
+        {
+          if (lasreader->get_transform())
+          {
+            if (lasreader->get_transform()->transformed_fields & (LASTRANSFORM_X_COORDINATE | LASTRANSFORM_Y_COORDINATE))
+            {
+              LASMessage(LAS_WARNING, "transforming x or y coordinates of file with %s VLR invalidates this VLR", (lasreader->header.vlr_lastiling ? "lastiling" : "lasoriginal"));
+            }
+          }
+          if (reproject_quantizer)
+          {
+            LASMessage(LAS_WARNING, "reprojecting file with %s VLR invalidates this VLR", (lasreader->header.vlr_lastiling ? "lastiling" : "lasoriginal"));
+          }
+        }
+  
+        if (save_vlrs)
+        {
+          save_vlrs_to_file(&lasreader->header);
+          save_vlrs = false;
+        }
+  
+        if (load_vlrs)
+        {
+          load_vlrs_from_file(&lasreader->header);
+        }
+  
+        if (save_vlr)
+        {
+          save_single_vlr_to_file(&lasreader->header, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
+        }
+  
+        if (load_vlr)
+        {
+          load_single_vlr_from_file(&lasreader->header, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
+          load_vlr = false;
+        }
+  
+        if (load_txt_to_vlr) {
+          load_file_to_vlr(&lasreader->header, load_txt_vlr_index, load_txt_vlr_user_id, load_txt_vlr_record_id, load_txt_vlr_filename);
+          load_txt_to_vlr = false;
+        }
+  
+        if (load_bin_to_vlr) {
+          load_file_to_vlr(&lasreader->header, load_bin_vlr_index, load_bin_vlr_user_id, load_bin_vlr_record_id, load_bin_vlr_filename);
+          load_bin_to_vlr = false;
+        }
+  
+        if (add_empty_vlr_user_ID != 0)
+        {
+          lasreader->header.add_vlr(add_empty_vlr_user_ID, add_empty_vlr_record_ID, 0, 0, (add_empty_vlr_description ? FALSE : TRUE), add_empty_vlr_description);
+        }
+  
+        if (save_vlr == false)
+        {
+          // do we need an extra pass
+          BOOL extra_pass = laswriteopener.is_piped();
+          
+          // we only really need an extra pass if the coordinates are altered or if points are filtered
+          if (extra_pass)
+          {
+            if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
+            {
+              extra_pass = FALSE;
+            }
+          }
+  
+          bool doIntensityRangeGet = false;
+          U16 intensityMin = UINT16_MAX;
+          U16 intensityMax = 0;
+          LASoperationMultiplyScaledIntensityRangeIntoRGB* op = nullptr;
+          if ((lasreadopener.get_transform() != nullptr) && (lasreadopener.get_transform()->find_operation(op)))
+          {
+            doIntensityRangeGet = true;
+            extra_pass = true;
+          }
+  
+          LASheader* header_writer = new LASheader();
+          *header_writer = lasreader->header;
+  
+          // for piped output we need an extra pass
+          if (extra_pass)
+          {
+            if (lasreadopener.is_piped())
+            {
+              laserror("input and output cannot both be piped");
+            }
+            LASMessage(LAS_VERBOSE, "extra pass required: reading %lld points ...", lasreader->npoints);
+            // maybe seek to start position
+            if (subsequence_start) lasreader->seek(subsequence_start);
+            while (lasreader->read_point())
+            {
+              if (lasreader->p_cnt > subsequence_stop) break;
+          
+              if (clip_to_bounding_box)
+              {
+                if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+                {
+                  continue;
                 }
               }
-            } else {
-              len = (I32)strlen(ogc_wkt);
-            }
-          }
-
-          // enter WKT (if available)
-          if (ogc_wkt) {
-            has_wkt = true;
-            lasreader->header.remove_vlr("LASF_Projection", 34735);
-            lasreader->header.del_geo_ogc_wkt();
-            lasreader->header.del_geo_wkt_ogc_math();
-            lasreader->header.del_geo_ascii_params();
-            lasreader->header.del_geo_double_params();
-            LASMessage(LAS_VERY_VERBOSE, "the CRS related VLR and EVLR information is rebuilt for the target header");
-
-            if (set_ogc_wkt_in_evlr && lasreader->header.version_minor >= 4)
-              lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, TRUE);
-            else
-              lasreader->header.set_geo_ogc_wkt(len, ogc_wkt, FALSE);
-
-            if (!set_ogc_wkt_string) free(ogc_wkt);
-            lasreader->header.set_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
-          }
-        }
-
-        // GeoKeys only if no WKT has been generated an minor version < 5
-        if (!has_wkt && lasreader->header.version_minor < 5) {
-          int number_of_keys;
-          GeoProjectionGeoKeys* geo_keys = 0;
-          int num_geo_double_params;
-          double* geo_double_params = 0;
-
-          if (geoprojectionconverter.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params, !geoprojectionconverter.has_projection(false))) {
-            lasreader->header.set_geo_keys(number_of_keys, (LASvlr_key_entry*)geo_keys);
-            lasreader->header.unset_global_encoding_bit(LAS_TOOLS_GLOBAL_ENCODING_BIT_OGC_WKT_CRS);
-            free(geo_keys);
-
-            if (geo_double_params) {
-              lasreader->header.set_geo_double_params(num_geo_double_params, geo_double_params);
-              free(geo_double_params);
-            } else {
-              lasreader->header.del_geo_double_params();
-            }
-
-            lasreader->header.del_geo_ascii_params();
-            lasreader->header.del_geo_ogc_wkt();
-          }
-        }
-      }
-
-      // maybe we should remove some stuff
-
-      if (remove_header_padding)
-      {
-        lasreader->header.clean_user_data_in_header();
-        lasreader->header.clean_user_data_after_header();
-      }
-
-      if (remove_all_variable_length_records)
-      {
-        lasreader->header.clean_vlrs();
-      }
-      else
-      {
-        if (!remove_vlr_indices.empty()) {
-          std::vector<int> failed_remove_vlr_indices;
-
-          for (int index : remove_vlr_indices) {
-            if (!lasreader->header.remove_vlr(index)) failed_remove_vlr_indices.push_back(index);
-          }
-          if (!failed_remove_vlr_indices.empty()) {
-            std::string failed_indices;
-
-            for (size_t j = 0; j < failed_remove_vlr_indices.size(); j++) {
-              if (j > 0) failed_indices += ", ";
-              failed_indices += std::to_string(failed_remove_vlr_indices[j]);
-            }
-
-            LASMessage(LAS_WARNING, "could not remove VLRs with indices [%s] from input file '%s'", failed_indices.c_str(), lasreadopener.get_file_name());
-          }
-        }
-
-        if (remove_vlr_user_id != nullptr && remove_vlr_record_id >= 0) {
-          if (!lasreader->header.remove_vlr(remove_vlr_user_id, remove_vlr_record_id)) {
-            LASMessage(LAS_WARNING, "could not remove VLR with user ID '%s' and record ID '%d' from input file '%s'", remove_vlr_user_id, remove_vlr_record_id, lasreadopener.get_file_name());
-          }
-        }
-
-        if (remove_variable_length_record_from != -1)
-        {
-          for (i = remove_variable_length_record_to; i >= remove_variable_length_record_from; i--)
-          {
-            lasreader->header.remove_vlr(i);
-          }
-        }
-      }
-
-      if (remove_all_extended_variable_length_records)
-      {
-        lasreader->header.clean_evlrs();
-      }
-      else
-      {
-        if (remove_extended_variable_length_record != -1)
-        {
-          lasreader->header.remove_evlr(remove_extended_variable_length_record);
-        }
-
-        if (remove_extended_variable_length_record_from != -1)
-        {
-          for (i = remove_extended_variable_length_record_to; i >= remove_extended_variable_length_record_from; i--)
-          {
-            lasreader->header.remove_evlr(i);
-          }
-        }
-      }
-
-      if (remove_tiling_vlr)
-      {
-        lasreader->header.clean_lastiling();
-      }
-
-      if (remove_original_vlr)
-      {
-        lasreader->header.clean_lasoriginal();
-      }
-
-      if (lasreader->header.vlr_lastiling || lasreader->header.vlr_lasoriginal)
-      {
-        if (lasreader->get_transform())
-        {
-          if (lasreader->get_transform()->transformed_fields & (LASTRANSFORM_X_COORDINATE | LASTRANSFORM_Y_COORDINATE))
-          {
-            LASMessage(LAS_WARNING, "transforming x or y coordinates of file with %s VLR invalidates this VLR", (lasreader->header.vlr_lastiling ? "lastiling" : "lasoriginal"));
-          }
-        }
-        if (reproject_quantizer)
-        {
-          LASMessage(LAS_WARNING, "reprojecting file with %s VLR invalidates this VLR", (lasreader->header.vlr_lastiling ? "lastiling" : "lasoriginal"));
-        }
-      }
-
-      if (save_vlrs)
-      {
-        save_vlrs_to_file(&lasreader->header);
-        save_vlrs = false;
-      }
-
-      if (load_vlrs)
-      {
-        load_vlrs_from_file(&lasreader->header);
-      }
-
-      if (save_vlr)
-      {
-        save_single_vlr_to_file(&lasreader->header, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
-      }
-
-      if (load_vlr)
-      {
-        load_single_vlr_from_file(&lasreader->header, vlr_index, vlr_user_id, vlr_record_id, vlr_filename);
-        load_vlr = false;
-      }
-
-      if (load_txt_to_vlr) {
-        load_file_to_vlr(&lasreader->header, load_txt_vlr_index, load_txt_vlr_user_id, load_txt_vlr_record_id, load_txt_vlr_filename);
-        load_txt_to_vlr = false;
-      }
-
-      if (load_bin_to_vlr) {
-        load_file_to_vlr(&lasreader->header, load_bin_vlr_index, load_bin_vlr_user_id, load_bin_vlr_record_id, load_bin_vlr_filename);
-        load_bin_to_vlr = false;
-      }
-
-      if (add_empty_vlr_user_ID != 0)
-      {
-        lasreader->header.add_vlr(add_empty_vlr_user_ID, add_empty_vlr_record_ID, 0, 0, (add_empty_vlr_description ? FALSE : TRUE), add_empty_vlr_description);
-      }
-
-      if (save_vlr == false)
-      {
-        // do we need an extra pass
-        BOOL extra_pass = laswriteopener.is_piped();
-        
-        // we only really need an extra pass if the coordinates are altered or if points are filtered
-        if (extra_pass)
-        {
-          if ((subsequence_start == 0) && (subsequence_stop == I64_MAX) && (clip_to_bounding_box == false) && (reproject_quantizer == 0) && (lasreadopener.get_filter() == 0) && ((lasreadopener.get_transform() == 0) || ((lasreadopener.get_transform()->transformed_fields & LASTRANSFORM_XYZ_COORDINATE) == 0)) && lasreadopener.get_filter() == 0)
-          {
-            extra_pass = FALSE;
-          }
-        }
-
-        bool doIntensityRangeGet = false;
-        U16 intensityMin = UINT16_MAX;
-        U16 intensityMax = 0;
-        LASoperationMultiplyScaledIntensityRangeIntoRGB* op = nullptr;
-        if ((lasreadopener.get_transform() != nullptr) && (lasreadopener.get_transform()->find_operation(op)))
-        {
-          doIntensityRangeGet = true;
-          extra_pass = true;
-        }
-
-        LASheader* header_writer = new LASheader();
-        *header_writer = lasreader->header;
-
-        // for piped output we need an extra pass
-        if (extra_pass)
-        {
-          if (lasreadopener.is_piped())
-          {
-            laserror("input and output cannot both be piped");
-          }
-          LASMessage(LAS_VERBOSE, "extra pass required: reading %lld points ...", lasreader->npoints);
-          // maybe seek to start position
-          if (subsequence_start) lasreader->seek(subsequence_start);
-          while (lasreader->read_point())
-          {
-            if (lasreader->p_cnt > subsequence_stop) break;
-        
-            if (clip_to_bounding_box)
-            {
-              if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+  
+              if (reproject_quantizer)
               {
-                continue;
+                  lasreader->point.compute_coordinates();
+                  geoprojectionconverter.to_target(lasreader->point.coordinates);
+                  lasreader->point.compute_XYZ(reproject_quantizer);
+              }
+              lasinventory.add(&lasreader->point);
+  
+              if (doIntensityRangeGet)
+              {
+                U16 ints = lasreader->point.get_intensity();
+                intensityMin = MIN2(ints, intensityMin);
+                intensityMax = MAX2(ints, intensityMax);
               }
             }
-
-            if (reproject_quantizer)
+            lasreader->close();
+  
+            if (doIntensityRangeGet)
             {
+              op->intensityMin = intensityMin;
+              op->intensityRange = intensityMax - intensityMin;
+              if (op->intensityRange == 0)
+              {
+                LASMessage(LAS_WARNING, "range of intensity values is zero. no intensity calculations will be done.");
+              }
+            }
+  
+            lasinventory.update_header(header_writer);
+         
+            LASMessage(LAS_VERBOSE, "extra pass took %g sec.", taketime() - start_time);
+            start_time = taketime();
+            LASMessage(LAS_VERBOSE, "piped output: reading %lld and writing %lld points ...", lasreader->npoints, lasinventory.extended_number_of_point_records);
+          }
+          else
+          {
+            LASMessage(LAS_VERBOSE, "reading %lld and writing all surviving points ...", lasreader->npoints);
+          }
+  
+          // check output
+          if (!laswriteopener.active())
+          {
+            // create name from input name
+            laswriteopener.make_file_name(lasreadopener.get_file_name());
+          }
+          else
+          {
+            // make sure we do not corrupt the input file
+            if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
+            {
+              laserror("input and output file name are identical: '%s'", lasreadopener.get_file_name());
+            }
+          }
+  
+          // prepare the header for the surviving points
+          strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
+          char temp[64];
+          snprintf(temp, sizeof(temp), "las2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
+          memset(lasreader->header.generating_software, 0, LAS_HEADER_CHAR_LEN);
+          strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp);
+          
+          // open laswriter
+          if (reproject_quantizer) {
+            *header_writer = *reproject_quantizer;
+          }
+          LASwriter* laswriter = laswriteopener.open(header_writer);
+          if (laswriter == 0)
+          {
+            laserror("could not open laswriter");
+          }
+  
+          // for piped output we need to re-open the input file
+          if (extra_pass)
+          {
+            if (!lasreadopener.reopen(lasreader))
+            {
+              laserror("could not re-open lasreader");
+            }
+          }
+  
+          // maybe seek to start position
+          if (subsequence_start) lasreader->seek(subsequence_start);
+  
+          // loop over points
+          if (point) // full rewrite: point copy
+          {
+            while (lasreader->read_point())
+            {
+              if (lasreader->p_cnt > subsequence_stop) break;
+  
+              if (clip_to_bounding_box)
+              {
+                if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+                {
+                  continue;
+                }
+              }
+  
+              if (reproject_quantizer)
+              {
                 lasreader->point.compute_coordinates();
                 geoprojectionconverter.to_target(lasreader->point.coordinates);
                 lasreader->point.compute_XYZ(reproject_quantizer);
-            }
-            lasinventory.add(&lasreader->point);
-
-            if (doIntensityRangeGet)
-            {
-              U16 ints = lasreader->point.get_intensity();
-              intensityMin = MIN2(ints, intensityMin);
-              intensityMax = MAX2(ints, intensityMax);
-            }
-          }
-          lasreader->close();
-
-          if (doIntensityRangeGet)
-          {
-            op->intensityMin = intensityMin;
-            op->intensityRange = intensityMax - intensityMin;
-            if (op->intensityRange == 0)
-            {
-              LASMessage(LAS_WARNING, "range of intensity values is zero. no intensity calculations will be done.");
-            }
-          }
-
-          lasinventory.update_header(header_writer);
-       
-          LASMessage(LAS_VERBOSE, "extra pass took %g sec.", taketime() - start_time);
-          start_time = taketime();
-          LASMessage(LAS_VERBOSE, "piped output: reading %lld and writing %lld points ...", lasreader->npoints, lasinventory.extended_number_of_point_records);
-        }
-        else
-        {
-          LASMessage(LAS_VERBOSE, "reading %lld and writing all surviving points ...", lasreader->npoints);
-        }
-
-        // check output
-        if (!laswriteopener.active())
-        {
-          // create name from input name
-          laswriteopener.make_file_name(lasreadopener.get_file_name());
-        }
-        else
-        {
-          // make sure we do not corrupt the input file
-          if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
-          {
-            laserror("input and output file name are identical: '%s'", lasreadopener.get_file_name());
-          }
-        }
-
-        // prepare the header for the surviving points
-        strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
-        char temp[64];
-        snprintf(temp, sizeof(temp), "las2las%s (version %d)", (IS64 ? "64" : ""), LAS_TOOLS_VERSION);
-        memset(lasreader->header.generating_software, 0, LAS_HEADER_CHAR_LEN);
-        strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp);
-        
-        // open laswriter
-        if (reproject_quantizer) {
-          *header_writer = *reproject_quantizer;
-        }
-        LASwriter* laswriter = laswriteopener.open(header_writer);
-        if (laswriter == 0)
-        {
-          laserror("could not open laswriter");
-        }
-
-        // for piped output we need to re-open the input file
-        if (extra_pass)
-        {
-          if (!lasreadopener.reopen(lasreader))
-          {
-            laserror("could not re-open lasreader");
-          }
-        }
-
-        // maybe seek to start position
-        if (subsequence_start) lasreader->seek(subsequence_start);
-
-        // loop over points
-        if (point) // full rewrite: point copy
-        {
-          while (lasreader->read_point())
-          {
-            if (lasreader->p_cnt > subsequence_stop) break;
-
-            if (clip_to_bounding_box)
-            {
-              if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
-              {
-                continue;
               }
+              *point = lasreader->point;
+              laswriter->write_point(point);
+              // without extra pass we need inventory of surviving points
+              if (!extra_pass) laswriter->update_inventory(point);
             }
-
-            if (reproject_quantizer)
-            {
-              lasreader->point.compute_coordinates();
-              geoprojectionconverter.to_target(lasreader->point.coordinates);
-              lasreader->point.compute_XYZ(reproject_quantizer);
-            }
-            *point = lasreader->point;
-            laswriter->write_point(point);
-            // without extra pass we need inventory of surviving points
-            if (!extra_pass) laswriter->update_inventory(point);
+            delete point;
+            point = 0;
           }
-          delete point;
-          point = 0;
-        }
-        else // direct copy from source point to target point
-        {
-          while (lasreader->read_point())
+          else // direct copy from source point to target point
           {
-            if (lasreader->p_cnt > subsequence_stop) break;
-
-            if (clip_to_bounding_box)
+            while (lasreader->read_point())
             {
-              if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+              if (lasreader->p_cnt > subsequence_stop) break;
+  
+              if (clip_to_bounding_box)
               {
-                continue;
+                if (!lasreader->point.inside_box(lasreader->header.min_x, lasreader->header.min_y, lasreader->header.min_z, lasreader->header.max_x, lasreader->header.max_y, lasreader->header.max_z))
+                {
+                  continue;
+                }
               }
+  
+              if (reproject_quantizer)
+              {
+                lasreader->point.compute_coordinates();
+                geoprojectionconverter.to_target(lasreader->point.coordinates);
+                lasreader->point.compute_XYZ(reproject_quantizer);
+              }
+              laswriter->write_point(&lasreader->point);
+              // without extra pass we need inventory of surviving points
+              if (!extra_pass) laswriter->update_inventory(&lasreader->point);
             }
-
-            if (reproject_quantizer)
-            {
-              lasreader->point.compute_coordinates();
-              geoprojectionconverter.to_target(lasreader->point.coordinates);
-              lasreader->point.compute_XYZ(reproject_quantizer);
-            }
-            laswriter->write_point(&lasreader->point);
-            // without extra pass we need inventory of surviving points
-            if (!extra_pass) laswriter->update_inventory(&lasreader->point);
           }
+  
+          // without the extra pass we need to fix the header now
+          if (!extra_pass)
+          {
+            laswriter->update_header(&lasreader->header, TRUE);
+            LASMessage(LAS_VERBOSE, "total time: %g sec. written %u surviving points to '%s'.", taketime() - start_time, (U32)laswriter->p_count, laswriteopener.get_file_name());
+          }
+          else
+          {
+            LASMessage(LAS_VERBOSE, "main pass took %g sec.", taketime() - start_time);
+          }
+  
+          laswriter->close();
+          // delete empty output files
+          if (remove_empty_files && (laswriter->npoints == 0) && laswriteopener.get_file_name())
+          {
+            remove(laswriteopener.get_file_name());
+            LASMessage(LAS_VERBOSE, "removing empty output file '%s'", laswriteopener.get_file_name());
+          }
+          delete laswriter;
         }
-
-        // without the extra pass we need to fix the header now
-        if (!extra_pass)
-        {
-          laswriter->update_header(&lasreader->header, TRUE);
-          LASMessage(LAS_VERBOSE, "total time: %g sec. written %u surviving points to '%s'.", taketime() - start_time, (U32)laswriter->p_count, laswriteopener.get_file_name());
-        }
-        else
-        {
-          LASMessage(LAS_VERBOSE, "main pass took %g sec.", taketime() - start_time);
-        }
-
-        laswriter->close();
-        // delete empty output files
-        if (remove_empty_files && (laswriter->npoints == 0) && laswriteopener.get_file_name())
-        {
-          remove(laswriteopener.get_file_name());
-          LASMessage(LAS_VERBOSE, "removing empty output file '%s'", laswriteopener.get_file_name());
-        }
-        delete laswriter;
+  
+        lasreader->close();
+        delete lasreader;
+  
+        if (reproject_quantizer) delete reproject_quantizer;
+  
+        laswriteopener.set_file_name(0);
       }
+      catch (...)
+      {
+        laswriteopener.set_file_name(0);
+        throw;
+      }
+    });
+    byebye();
+    return 0;
+  };
+};
 
-      lasreader->close();
-      delete lasreader;
-
-      if (reproject_quantizer) delete reproject_quantizer;
-
-      laswriteopener.set_file_name(0);
-    }
-    catch (...)
-    {
-      laswriteopener.set_file_name(0);
-      laserror("processing file '%s'. maybe file is corrupt?", lasreadopener.get_file_name());
-    }
-  }
-  byebye();
+int main(int argc, char* argv[]) {
+  LasTool_las2las lastool;
+  return lastool.execute(argc, argv, "las2las");
 }
-

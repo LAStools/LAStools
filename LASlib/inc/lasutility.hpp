@@ -122,8 +122,8 @@ private:
   F64 one_over_step;
   BOOL first;
   I32 anker;
-  I32 size_pos;
-  I32 size_neg;
+  U32 size_pos;
+  U32 size_neg;
   U32* bins_pos;
   U32* bins_neg;
   F64* values_pos;

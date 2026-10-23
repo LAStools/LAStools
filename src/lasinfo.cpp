@@ -556,7 +556,7 @@ class LasTool_lasinfo : public LasTool {
 #pragma warning(push)
 #pragma warning(disable : 6262)
 public:
-  void run() {
+  int run() override {
     int i;
     bool no_header = false;
     bool no_variable_header = false;
@@ -1173,7 +1173,7 @@ public:
     lasreadopener.set_decompress_selective(decompress_selective);
 
     // possibly loop over multiple input files
-    while (lasreadopener.active()) {
+    run_file_loop(lasreadopener, [&]() {
       LASreader* lasreader = nullptr;
       LASheader* lasheader = nullptr;
       FileMap file_csv;
@@ -1214,7 +1214,7 @@ public:
           // fileformula filtered
           if (lasreadopener.is_file_formula_filtered()) {
             LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
-            continue;
+            return;
           }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
@@ -1238,7 +1238,7 @@ public:
           // fileformula filtered
           if (lasreadopener.is_file_formula_filtered()) {
             LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
-            continue;
+            return;
           }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
@@ -1262,7 +1262,7 @@ public:
           // fileformula filtered
           if (lasreadopener.is_file_formula_filtered()) {
             LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
-            continue;
+            return;
           }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
@@ -1291,7 +1291,7 @@ public:
           // fileformula filtered
           if (lasreadopener.is_file_formula_filtered()) {
             LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
-            continue;
+            return;
           }
           if (lasreader == 0) {
             laserror("cannot open lasreader for '%s'", file_name);
@@ -1330,7 +1330,7 @@ public:
             // fileformula filtered
             if (lasreadopener.is_file_formula_filtered()) {
               LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
-              continue;
+              return;
             }
             if (lasreader == 0) {
               laserror("cannot open lasreader for '%s'", file_name);
@@ -1607,11 +1607,11 @@ public:
       // fileformula filtered
       if (lasreadopener.is_file_formula_filtered()) {
         LASMessage(LAS_VERBOSE, "file '%s' filtered by fileformula", lasreadopener.get_file_name());
-        continue;
+        return;
       }
       if (lasreader == 0) {
         laserror("cannot open lasreader");
-        continue;
+        return;
       }
 
       if (delete_empty && lasreadopener.get_file_name()) {
@@ -1623,7 +1623,7 @@ public:
           lasreader->close();
         }
         delete lasreader;
-        continue;
+        return;
       }
 
       lasheader = &lasreader->header;
@@ -1651,7 +1651,7 @@ public:
         } catch (const std::filesystem::filesystem_error& e) {
           laserror("rename failed: %s", e.what());
         }
-        continue;
+        return;
       }
 
       LASMessage(
@@ -4837,7 +4837,7 @@ public:
 
       delete lasreader;
       if (file) fclose(file);
-    }
+    });
 
     // write the csv output
     if (csv_out) write_full_csv(file_out, all_files);
@@ -4858,6 +4858,7 @@ public:
     if (set_scale) delete[] set_scale;
 
     byebye();
+    return 0;
   };
 #pragma warning(pop)
 
@@ -4880,6 +4881,5 @@ public:
 
 int main(int argc, char* argv[]) {
   LasTool_lasinfo lastool;
-  lastool.init(argc, argv, "lasinfo");
-  lastool.run();
+  return lastool.execute(argc, argv, "lasinfo");
 }

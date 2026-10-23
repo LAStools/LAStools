@@ -356,7 +356,15 @@ BOOL LASreadPoint::seek(const U64 current, const U64 target)
   {
     if (point_start == 0)
     {
-      init_dec();
+      if (!init_dec())
+      {
+        if (last_error == 0)
+        {
+          last_error = new CHAR[128];
+          snprintf(last_error, 128, "cannot read chunk table of LAZ file while seeking");
+        }
+        return FALSE;
+      }
       chunk_count = 0;
     }
     if (chunk_starts)
@@ -384,7 +392,10 @@ BOOL LASreadPoint::seek(const U64 current, const U64 target)
           dec->done();
           current_chunk = (tabled_chunks-1);
           instream->seek(chunk_starts[current_chunk]);
-          init_dec();
+          if (!init_dec())
+          {
+            return FALSE;
+          }
           chunk_count = 0;
         }
         delta += (chunk_size*(target_chunk-current_chunk) - chunk_count);
@@ -394,7 +405,10 @@ BOOL LASreadPoint::seek(const U64 current, const U64 target)
         dec->done();
         current_chunk = target_chunk;
         instream->seek(chunk_starts[current_chunk]);
-        init_dec();
+        if (!init_dec())
+        {
+          return FALSE;
+        }
         chunk_count = 0;
       }
       else
@@ -406,7 +420,15 @@ BOOL LASreadPoint::seek(const U64 current, const U64 target)
     {
       dec->done();
       instream->seek(point_start);
-      init_dec();
+      if (!init_dec())
+      {
+        if (last_error == 0)
+        {
+          last_error = new CHAR[128];
+          snprintf(last_error, 128, "cannot read chunk table of LAZ file while seeking");
+        }
+        return FALSE;
+      }
       delta = target;
     }
     else if (current < target)
@@ -459,15 +481,49 @@ BOOL LASreadPoint::read(U8* const * point)
             }
           }
         }
-        init_dec();
+        if (!init_dec())
+        {
+          if (last_error == 0)
+          {
+            last_error = new CHAR[128];
+            snprintf(last_error, 128, "cannot read chunk table of LAZ file");
+          }
+          return FALSE;
+        }
         if (current_chunk == tabled_chunks) // no or incomplete chunk table?
         {
           if (current_chunk >= number_chunks)
           {
-            number_chunks += 256;
-            chunk_starts = (I64*)realloc_las(chunk_starts, sizeof(I64)*((U64)number_chunks+1));
+            U64 new_number_chunks_64 = (U64)number_chunks + 256;
+            if (new_number_chunks_64 > U32_MAX)
+            {
+              new_number_chunks_64 = U32_MAX;
+            }
+            U32 new_number_chunks = (U32)new_number_chunks_64;
+
+            if ((new_number_chunks == number_chunks) ||
+                (((U64)new_number_chunks + 1) > (U64)(std::numeric_limits<size_t>::max() / sizeof(I64))))
+            {
+              if (last_error == 0)
+              {
+                last_error = new CHAR[128];
+              }
+              snprintf(last_error, 128, "cannot grow chunk start table beyond %u entries", number_chunks);
+              return FALSE;
+            }
+
+            if (!try_realloc_las(chunk_starts, sizeof(I64)*((U64)new_number_chunks+1)))
+            {
+              if (last_error == 0)
+              {
+                last_error = new CHAR[128];
+              }
+              snprintf(last_error, 128, "cannot grow chunk start table to %u entries", new_number_chunks);
+              return FALSE;
+            }
+            number_chunks = new_number_chunks;
           }
-          chunk_starts[tabled_chunks] = point_start; // needs fixing
+          chunk_starts[tabled_chunks] = point_start;
           tabled_chunks++;
         }
         else if (chunk_totals) // variable sized chunks?
@@ -660,6 +716,7 @@ BOOL LASreadPoint::read_chunk_table()
     chunk_starts = (I64*)malloc_las(sizeof(I64) * (number_chunks + 1));
     if (chunk_starts == 0)
     {
+      number_chunks = U32_MAX;
       return FALSE;
     }
     chunk_starts[0] = chunks_start;
@@ -787,6 +844,7 @@ BOOL LASreadPoint::read_chunk_table()
       chunk_starts = (I64*)malloc_las(sizeof(I64) * ((U64)number_chunks + 1));
       if (chunk_starts == 0)
       {
+        number_chunks = U32_MAX;
         return FALSE;
       }
       chunk_starts[0] = chunks_start;

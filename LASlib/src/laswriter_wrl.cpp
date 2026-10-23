@@ -78,6 +78,10 @@ BOOL LASwriterWRL::open(FILE* file, const LASheader* header, const CHAR* parse_s
         {
           rgb_alloc = 1024;
           rgb = (U8*)malloc_las(3 * sizeof(U8) * rgb_alloc);
+          if (rgb == 0) {
+            LASMessage(LAS_WARNING, "failed to allocate memory for RGB colors");
+            rgb_alloc = 0;
+          }
         }
       }
       else
@@ -100,6 +104,11 @@ BOOL LASwriterWRL::open(FILE* file, const LASheader* header, const CHAR* parse_s
       {
         rgb_alloc = 1024;
         rgb = (U8*)malloc_las(3 * sizeof(U8) * rgb_alloc);
+        if (rgb == 0) {
+          LASMessage(LAS_WARNING, "failed to allocate memory for RGB colors");
+          rgb_alloc = 0;
+        }
+
       }
     }
     else
@@ -173,10 +182,17 @@ BOOL LASwriterWRL::write_point(const LASpoint* point)
   lidardouble2string(printstring, sizeof(printstring), header->get_z(point->get_Z()), header->z_scale_factor); fprintf(file, "%s\012", printstring);
   if (rgb)
   {
-    if (p_count == rgb_alloc)
+    if (p_count >= rgb_alloc)
     {
-      rgb_alloc *= 2;
-      rgb = (U8*)realloc_las(rgb, 3*sizeof(U8)*rgb_alloc);
+      I64 new_rgb_alloc = (I64)rgb_alloc * 2;
+      U64 new_bytes = (U64)new_rgb_alloc * 3;
+      if ((new_rgb_alloc > I32_MAX) || ((U64)(size_t)new_bytes != new_bytes) ||
+          !try_realloc_las(rgb, (size_t)new_bytes))
+      {
+        laserror("cannot grow the rgb buffer to %lld entries", new_rgb_alloc);
+        return FALSE;
+      }
+      rgb_alloc = (I32)new_rgb_alloc;
     }
     if (point->rgb[0] > 255)
       rgb[3*p_count+0] = U8_CLAMP(point->rgb[0]/256);

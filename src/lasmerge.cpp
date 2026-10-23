@@ -47,23 +47,6 @@
 #include "geoprojectionconverter.hpp"
 #include "lastool.hpp"
 
-class LasTool_lasmerge : public LasTool
-{
-private:
-public:
-  void usage() override
-  {
-    fprintf(stderr, "usage:\n");
-    fprintf(stderr, "lasmerge -i *.las -o out.las\n");
-    fprintf(stderr, "lasmerge -lof lasfiles.txt -o out.las\n");
-    fprintf(stderr, "lasmerge -i *.las -o out0000.laz -split 1000000000\n");
-    fprintf(stderr, "lasmerge -i file1.las file2.las file3.las -o out.las\n");
-    fprintf(stderr, "lasmerge -i file1.las file2.las -reoffset 600000 4000000 0 -olas > out.las\n");
-    fprintf(stderr, "lasmerge -lof lasfiles.txt -rescale 0.01 0.01 0.01 -verbose -o out.las\n");
-    fprintf(stderr, "lasmerge -h\n");
-  };
-};
-
 static double taketime()
 {
   return (double)(clock())/CLOCKS_PER_SEC;
@@ -77,254 +60,273 @@ extern int lasmerge_gui(int argc, char *argv[], LASreadOpener* lasreadopener);
 extern void lasmerge_multi_core(int argc, char *argv[], GeoProjectionConverter* geoprojectionconverter, LASreadOpener* lasreadopener, LASwriteOpener* laswriteopener, BOOL cpu64);
 #endif
 
-int main(int argc, char *argv[])
-{
-  LasTool_lasmerge lastool;
-  lastool.init(argc, argv, "lasmerge");
-  int i;
-  bool keep_lastiling = false;
-  U32 chopchop = 0;
-  bool projection_was_set = false;
-  double start_time = 0;
-
-  LASreadOpener lasreadopener;
-  GeoProjectionConverter geoprojectionconverter;
-  LASwriteOpener laswriteopener;
-
-  if (argc == 1)
-  {
-#ifdef COMPILE_WITH_GUI
-    return lasmerge_gui(argc, argv, 0);
-#else
-    wait_on_exit();
-    fprintf(stderr,"%s is better run in the command line\n", argv[0]);
-    char file_name[256];
-    fprintf(stderr,"enter input file 1: ");
-    if (fgets(file_name, 256, stdin) && strlen(file_name))
-    {
-      file_name[strlen(file_name)-1] = '\0';
-      lasreadopener.add_file_name(file_name);
-    }
-    fprintf(stderr,"enter input file 2: ");
-    if (fgets(file_name, 256, stdin) && strlen(file_name))
-    {
-      file_name[strlen(file_name)-1] = '\0';
-      lasreadopener.add_file_name(file_name);
-    }
-    fprintf(stderr,"enter output file: ");
-    if (fgets(file_name, 256, stdin) && strlen(file_name))
-    {
-      file_name[strlen(file_name)-1] = '\0';
-      laswriteopener.set_file_name(file_name);
-    }
-#endif
-  }
-  else
-  {
-    for (i = 1; i < argc; i++)
-    {
-      if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
-    }
-    geoprojectionconverter.parse(argc, argv);
-    lasreadopener.parse(argc, argv);
-    laswriteopener.parse(argc, argv);
-  }
-
-  auto arg_local = [&](int& i) -> bool {
-    if (strcmp(argv[i],"-split") == 0)
-    {
-      if ((i+1) >= argc)
-      {
-        laserror("'%s' needs 1 argument: size", argv[i]);
-      }
-      i++;
-      chopchop = atoi(argv[i]);
-    }
-    else if (strcmp(argv[i],"-keep_lastiling") == 0)
-    {
-      keep_lastiling = true;
-    }
-    else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))
-    {
-      lasreadopener.add_file_name(argv[i]);
-      argv[i][0] = '\0';
-    }
-    else
-    {
-      return false;
-    }
-    return true;
+class LasTool_lasmerge : public LasTool {
+ private:
+ public:
+  void usage() override {
+    fprintf(stderr, "usage:\n");
+    fprintf(stderr, "lasmerge -i *.las -o out.las\n");
+    fprintf(stderr, "lasmerge -lof lasfiles.txt -o out.las\n");
+    fprintf(stderr, "lasmerge -i *.las -o out0000.laz -split 1000000000\n");
+    fprintf(stderr, "lasmerge -i file1.las file2.las file3.las -o out.las\n");
+    fprintf(stderr, "lasmerge -i file1.las file2.las -reoffset 600000 4000000 0 -olas > out.las\n");
+    fprintf(stderr, "lasmerge -lof lasfiles.txt -rescale 0.01 0.01 0.01 -verbose -o out.las\n");
+    fprintf(stderr, "lasmerge -h\n");
   };
 
-  lastool.parse(arg_local);
-
-#ifdef COMPILE_WITH_GUI
-  if (lastool.gui)
-  {
-    return lasmerge_gui(argc, argv, &lasreadopener);
-  }
-#endif
-
-  // read all the input files merged
-  lasreadopener.set_merged(TRUE);
-
-#ifdef COMPILE_WITH_MULTI_CORE
-  if (lastool.cpu64)
-  {
-    lasmerge_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, TRUE);
-  }
-#endif
-
-  // maybe we want to keep the lastiling
-
-  if (keep_lastiling)
-  {
-    lasreadopener.set_keep_lastiling(TRUE);
-  }
-
-  // we need to precompute the bounding box
-
-  lasreadopener.set_populate_header(TRUE);
-
-  // check input and output
-
-  if (!lasreadopener.active())
-  {
-    laserror("no input specified");
-  }
-
-  if (!laswriteopener.active())
-  {
-    laserror("no output specified");
-  }
-
-  // make sure we do not corrupt the input file
-
-  if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
-  {
-    laserror("input and output file name are identical");
-  }
-
-  // check if projection info was set in the command line
-
-  int number_of_keys;
-  GeoProjectionGeoKeys* geo_keys = 0;
-  int num_geo_double_params;
-  double* geo_double_params = 0;
-
-  if (geoprojectionconverter.has_projection())
-  {
-    projection_was_set = geoprojectionconverter.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params);
-  }
-
-  start_time = taketime();
-
-  LASreader* lasreader = lasreadopener.open();
-  if (lasreader == nullptr)
-  {
-    laserror("could not open lasreader");
-  }
-#pragma warning(push)
-#pragma warning(disable : 6011)
-  LASMessage(LAS_VERBOSE, "merging headers took %g sec. there are %lld points in total.", taketime()-start_time, lasreader->npoints);
-#pragma warning(push)
-  start_time = taketime();
-
-  // prepare the header for the surviving points
-
-  strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
-  char temp[64];
-  snprintf(temp, sizeof(temp), "lasmerge%s (version %d)", (IS64?"64":""), LAS_TOOLS_VERSION);
-  memset(lasreader->header.generating_software, 0, LAS_HEADER_CHAR_LEN);
-  strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp);
+  int run() override {
+    LasTool_lasmerge lastool;
+    lastool.init(argc, argv, "lasmerge");
+    int i;
+    bool keep_lastiling = false;
+    U32 chopchop = 0;
+    bool projection_was_set = false;
+    double start_time = 0;
   
-  if (projection_was_set)
-  {
-    lasreader->header.set_geo_keys(number_of_keys, (LASvlr_key_entry*)geo_keys);
-    free(geo_keys);
-    if (geo_double_params)
+    LASreadOpener lasreadopener;
+    GeoProjectionConverter geoprojectionconverter;
+    LASwriteOpener laswriteopener;
+  
+    if (argc == 1)
     {
-      lasreader->header.set_geo_double_params(num_geo_double_params, geo_double_params);
-      free(geo_double_params);
+  #ifdef COMPILE_WITH_GUI
+      return lasmerge_gui(argc, argv, 0);
+  #else
+      wait_on_exit();
+      fprintf(stderr,"%s is better run in the command line\n", argv[0]);
+      char file_name[256];
+      fprintf(stderr,"enter input file 1: ");
+      if (fgets(file_name, 256, stdin) && strlen(file_name))
+      {
+        file_name[strlen(file_name)-1] = '\0';
+        lasreadopener.add_file_name(file_name);
+      }
+      fprintf(stderr,"enter input file 2: ");
+      if (fgets(file_name, 256, stdin) && strlen(file_name))
+      {
+        file_name[strlen(file_name)-1] = '\0';
+        lasreadopener.add_file_name(file_name);
+      }
+      fprintf(stderr,"enter output file: ");
+      if (fgets(file_name, 256, stdin) && strlen(file_name))
+      {
+        file_name[strlen(file_name)-1] = '\0';
+        laswriteopener.set_file_name(file_name);
+      }
+  #endif
     }
     else
     {
-      lasreader->header.del_geo_double_params();
-    }
-    lasreader->header.del_geo_ascii_params();
-  }
-
-  if (chopchop)
-  {
-    I32 file_number = 0;
-    LASwriter* laswriter = 0;
-    // loop over the points
-    while (lasreader->read_point())
-    {
-      if (laswriter == 0)
+      for (i = 1; i < argc; i++)
       {
-        // open the next writer
-        laswriteopener.make_file_name(0, file_number);
-        file_number++;
-        laswriter = laswriteopener.open(&lasreader->header);
+        if ((unsigned char)argv[i][0] == 0x96) argv[i][0] = '-';
+      }
+      geoprojectionconverter.parse(argc, argv);
+      lasreadopener.parse(argc, argv);
+      laswriteopener.parse(argc, argv);
+    }
+  
+    auto arg_local = [&](int& i) -> bool {
+      if (strcmp(argv[i],"-split") == 0)
+      {
+        if ((i+1) >= argc)
+        {
+          laserror("'%s' needs 1 argument: size", argv[i]);
+        }
+        i++;
+        chopchop = atoi(argv[i]);
+      }
+      else if (strcmp(argv[i],"-keep_lastiling") == 0)
+      {
+        keep_lastiling = true;
+      }
+      else if ((argv[i][0] != '-') && (lasreadopener.get_file_name_number() == 0))
+      {
+        lasreadopener.add_file_name(argv[i]);
+        argv[i][0] = '\0';
+      }
+      else
+      {
+        return false;
+      }
+      return true;
+    };
+  
+    lastool.parse(arg_local);
+  
+  #ifdef COMPILE_WITH_GUI
+    if (lastool.gui)
+    {
+      return lasmerge_gui(argc, argv, &lasreadopener);
+    }
+  #endif
+  
+    // read all the input files merged
+    lasreadopener.set_merged(TRUE);
+  
+  #ifdef COMPILE_WITH_MULTI_CORE
+    if (lastool.cpu64)
+    {
+      lasmerge_multi_core(argc, argv, &geoprojectionconverter, &lasreadopener, &laswriteopener, TRUE);
+    }
+  #endif
+  
+    // maybe we want to keep the lastiling
+  
+    if (keep_lastiling)
+    {
+      lasreadopener.set_keep_lastiling(TRUE);
+    }
+  
+    // we need to precompute the bounding box
+  
+    lasreadopener.set_populate_header(TRUE);
+  
+    // check input and output
+  
+    if (!lasreadopener.active())
+    {
+      laserror("no input specified");
+    }
+  
+    if (!laswriteopener.active())
+    {
+      laserror("no output specified");
+    }
+  
+    // make sure we do not corrupt the input file
+  
+    if (lasreadopener.get_file_name() && laswriteopener.get_file_name() && (strcmp(lasreadopener.get_file_name(), laswriteopener.get_file_name()) == 0))
+    {
+      laserror("input and output file name are identical");
+    }
+  
+    // check if projection info was set in the command line
+  
+    int number_of_keys;
+    GeoProjectionGeoKeys* geo_keys = 0;
+    int num_geo_double_params;
+    double* geo_double_params = 0;
+  
+    if (geoprojectionconverter.has_projection())
+    {
+      projection_was_set = geoprojectionconverter.get_geo_keys_from_projection(number_of_keys, &geo_keys, num_geo_double_params, &geo_double_params);
+    }
+  
+    start_time = taketime();
+  
+    LASreader* lasreader = lasreadopener.open();
+    if (lasreader == nullptr)
+    {
+      laserror("could not open lasreader");
+    }
+  #pragma warning(push)
+  #pragma warning(disable : 6011)
+    LASMessage(LAS_VERBOSE, "merging headers took %g sec. there are %lld points in total.", taketime()-start_time, lasreader->npoints);
+  #pragma warning(push)
+    start_time = taketime();
+  
+    // prepare the header for the surviving points
+  
+    strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);
+    char temp[64];
+    snprintf(temp, sizeof(temp), "lasmerge%s (version %d)", (IS64?"64":""), LAS_TOOLS_VERSION);
+    memset(lasreader->header.generating_software, 0, LAS_HEADER_CHAR_LEN);
+    strncpy_las(lasreader->header.generating_software, LAS_HEADER_CHAR_LEN, temp);
+    
+    if (projection_was_set)
+    {
+      lasreader->header.set_geo_keys(number_of_keys, (LASvlr_key_entry*)geo_keys);
+      free(geo_keys);
+      if (geo_double_params)
+      {
+        lasreader->header.set_geo_double_params(num_geo_double_params, geo_double_params);
+        free(geo_double_params);
+      }
+      else
+      {
+        lasreader->header.del_geo_double_params();
+      }
+      lasreader->header.del_geo_ascii_params();
+    }
+  
+    if (chopchop)
+    {
+      I32 file_number = 0;
+      LASwriter* laswriter = 0;
+      // loop over the points
+      while (lasreader->read_point())
+      {
         if (laswriter == 0)
         {
-          laserror("could not open laswriter");
+          // open the next writer
+          laswriteopener.make_file_name(0, file_number);
+          file_number++;
+          laswriter = laswriteopener.open(&lasreader->header);
+          if (laswriter == 0)
+          {
+            laserror("could not open laswriter");
+          }
+        }
+        laswriter->write_point(&lasreader->point);
+        laswriter->update_inventory(&lasreader->point);
+        if (laswriter->p_count == chopchop)
+        {
+          // close the current writer
+          laswriter->update_header(&lasreader->header, TRUE);
+          laswriter->close();
+          LASMessage(LAS_VERBOSE, "splitting file '%s' took %g sec.",       laswriteopener.get_file_name(), taketime()-start_time);
+          start_time = taketime();
+          delete laswriter;
+          laswriter = 0;
         }
       }
-      laswriter->write_point(&lasreader->point);
-      laswriter->update_inventory(&lasreader->point);
-      if (laswriter->p_count == chopchop)
+      if (laswriter && laswriter->p_count)
       {
         // close the current writer
         laswriter->update_header(&lasreader->header, TRUE);
         laswriter->close();
-        LASMessage(LAS_VERBOSE, "splitting file '%s' took %g sec.",       laswriteopener.get_file_name(), taketime()-start_time);
-        start_time = taketime();
+        LASMessage(LAS_VERBOSE, "splitting file '%s' took %g sec.", laswriteopener.get_file_name(), taketime()-start_time);
+        start_time = taketime(); 
         delete laswriter;
         laswriter = 0;
       }
     }
-    if (laswriter && laswriter->p_count)
+    else
     {
-      // close the current writer
+      if (lasreader->npoints > U32_MAX)
+      {
+        if (lasreader->header.version_minor < 4)
+        {
+          laserror("cannot merge %lld points into single LAS 1.%d file. maximum is %u", lasreader->npoints, lasreader->header.version_minor, U32_MAX);
+        }
+      }
+      // open the writer
+      LASwriter* laswriter = laswriteopener.open(&lasreader->header);
+      if (laswriter == 0)
+      {
+        laserror("could not open laswriter");
+      }
+      // loop over the points
+      while (lasreader->read_point())
+      {
+        laswriter->write_point(&lasreader->point);
+        laswriter->update_inventory(&lasreader->point);
+      }
+      // close the writer
       laswriter->update_header(&lasreader->header, TRUE);
       laswriter->close();
-      LASMessage(LAS_VERBOSE, "splitting file '%s' took %g sec.", laswriteopener.get_file_name(), taketime()-start_time);
-      start_time = taketime(); 
+      LASMessage(LAS_VERBOSE, "merging files took %g sec.", taketime()-start_time); 
       delete laswriter;
-      laswriter = 0;
     }
+    lasreader->close();
+    delete lasreader;
+    byebye();
+    return 0;
   }
-  else
-  {
-    if (lasreader->npoints > U32_MAX)
-    {
-      if (lasreader->header.version_minor < 4)
-      {
-        laserror("cannot merge %lld points into single LAS 1.%d file. maximum is %u", lasreader->npoints, lasreader->header.version_minor, U32_MAX);
-      }
-    }
-    // open the writer
-    LASwriter* laswriter = laswriteopener.open(&lasreader->header);
-    if (laswriter == 0)
-    {
-      laserror("could not open laswriter");
-    }
-    // loop over the points
-    while (lasreader->read_point())
-    {
-      laswriter->write_point(&lasreader->point);
-      laswriter->update_inventory(&lasreader->point);
-    }
-    // close the writer
-    laswriter->update_header(&lasreader->header, TRUE);
-    laswriter->close();
-    LASMessage(LAS_VERBOSE, "merging files took %g sec.", taketime()-start_time); 
-    delete laswriter;
-  }
-  lasreader->close();
-  delete lasreader;
-  byebye();
-  return 0;
+};
+
+int main(int argc, char* argv[]) {
+  LasTool_lasmerge lastool;
+  return lastool.execute(argc, argv, "lasmerge");
 }

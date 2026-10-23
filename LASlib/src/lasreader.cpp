@@ -162,6 +162,13 @@ BOOL LASreader::inside_none() {
   return TRUE;
 }
 
+/// Warns if a 32 bit LAX index may exceed its limits due to a large point count
+static void warn_if_lax_exceeds_32bit_limit(const LASindex* index, const I64 point_count) {
+  if (index && !index->uses_64bit_intervals() && point_count > (I64)U32_MAX + 1) {
+    LASMessage(LAS_WARNING, "LAX index may exceed 32 bit limits. Regenerate index file");
+  }
+}
+
 BOOL LASreader::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size) {
   inside = 1;
   t_ll_x = ll_x;
@@ -179,7 +186,14 @@ BOOL LASreader::inside_tile(const F32 ll_x, const F32 ll_y, const F32 size) {
   header.max_y = static_cast<F64>(ll_y) + static_cast<F64>(size);
   header.max_x -= header.x_scale_factor;
   header.max_y -= header.y_scale_factor;
-  if (((orig_min_x > header.max_x) || (orig_min_y > header.max_y) || (orig_max_x < header.min_x) || (orig_max_y < header.min_y))) {
+
+  const BOOL outside = (orig_min_x > header.max_x) || (orig_min_y > header.max_y) || (orig_max_x < header.min_x) || (orig_max_y < header.min_y);
+
+  if (!outside && index) {
+    warn_if_lax_exceeds_32bit_limit(index, npoints);
+  }
+
+  if (outside) {
     if (filter || transform) {
       read_complex = &LASreader::read_point_none;
     } else {
@@ -217,7 +231,14 @@ BOOL LASreader::inside_circle(const F64 center_x, const F64 center_y, const F64 
   header.min_y = center_y - radius;
   header.max_x = center_x + radius;
   header.max_y = center_y + radius;
-  if (((orig_min_x > header.max_x) || (orig_min_y > header.max_y) || (orig_max_x < header.min_x) || (orig_max_y < header.min_y))) {
+
+  const BOOL outside = (orig_min_x > header.max_x) || (orig_min_y > header.max_y) || (orig_max_x < header.min_x) || (orig_max_y < header.min_y);
+
+  if (!outside && index) {
+    warn_if_lax_exceeds_32bit_limit(index, npoints);
+  }
+
+  if (outside) {
     if (filter || transform) {
       read_complex = &LASreader::read_point_none;
     } else {
@@ -261,7 +282,14 @@ BOOL LASreader::inside_rectangle(const F64 min_x, const F64 min_y, const F64 max
   header.min_y = min_y;
   header.max_x = max_x;
   header.max_y = max_y;
-  if (((orig_min_x > max_x) || (orig_min_y > max_y) || (orig_max_x < min_x) || (orig_max_y < min_y))) {
+
+  const BOOL outside = (orig_min_x > max_x) || (orig_min_y > max_y) || (orig_max_x < min_x) || (orig_max_y < min_y);
+
+  if (!outside && index) {
+    warn_if_lax_exceeds_32bit_limit(index, npoints);
+  }
+
+  if (outside) {
     if (filter || transform) {
       read_complex = &LASreader::read_point_none;
     } else {
@@ -2813,8 +2841,12 @@ BOOL LASreadOpener::add_file_name_single(const CHAR* file_name, BOOL unique)
   }
   if (file_name_number == file_name_allocated) {
     if (file_names) {
-      file_name_allocated *= 2;
-      file_names = (CHAR**)realloc_las(file_names, sizeof(CHAR*) * file_name_allocated);
+      U32 new_file_name_allocated = file_name_allocated * 2;
+      if (!try_realloc_las(file_names, sizeof(CHAR*) * new_file_name_allocated)) {
+        laserror("realloc for file_names arrays failed at %u", new_file_name_allocated);
+        return FALSE;
+      }
+      file_name_allocated = new_file_name_allocated;
     } else {
       file_name_allocated = 16;
       file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
@@ -2840,9 +2872,13 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, BOOL unique) {
   }
   if (file_name_number == file_name_allocated) {
     if (file_names) {
-      file_name_allocated *= 2;
-      file_names = (CHAR**)realloc_las(file_names, sizeof(CHAR*) * file_name_allocated);
-      file_names_ID = (U32*)realloc_las(file_names_ID, sizeof(U32) * file_name_allocated);
+      U32 new_file_name_allocated = file_name_allocated * 2;
+      if (!try_realloc_las(file_names, sizeof(CHAR*) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_ID, sizeof(U32) * new_file_name_allocated)) {
+        laserror("realloc for file_names arrays failed at %u", new_file_name_allocated);
+        return FALSE;
+      }
+      file_name_allocated = new_file_name_allocated;
     } else {
       file_name_allocated = 16;
       file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
@@ -2874,14 +2910,18 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, I64 npoints, F6
   }
   if (file_name_number == file_name_allocated) {
     if (file_names) {
-      file_name_allocated *= 2;
-      file_names = (CHAR**)realloc_las(file_names, sizeof(CHAR*) * file_name_allocated);
-      file_names_ID = (U32*)realloc_las(file_names_ID, sizeof(U32) * file_name_allocated);
-      file_names_npoints = (I64*)realloc_las(file_names_npoints, sizeof(I64) * file_name_allocated);
-      file_names_min_x = (F64*)realloc_las(file_names_min_x, sizeof(F64) * file_name_allocated);
-      file_names_min_y = (F64*)realloc_las(file_names_min_y, sizeof(F64) * file_name_allocated);
-      file_names_max_x = (F64*)realloc_las(file_names_max_x, sizeof(F64) * file_name_allocated);
-      file_names_max_y = (F64*)realloc_las(file_names_max_y, sizeof(F64) * file_name_allocated);
+      U32 new_file_name_allocated = file_name_allocated * 2;
+      if (!try_realloc_las(file_names, sizeof(CHAR*) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_ID, sizeof(U32) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_npoints, sizeof(I64) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_min_x, sizeof(F64) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_min_y, sizeof(F64) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_max_x, sizeof(F64) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_max_y, sizeof(F64) * new_file_name_allocated)) {
+        laserror("realloc for file_names arrays failed at %u", new_file_name_allocated);
+        return FALSE;
+      }
+      file_name_allocated = new_file_name_allocated;
     } else {
       file_name_allocated = 16;
       file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
@@ -3016,13 +3056,17 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, I64 n
   }
   if (neighbor_file_name_number == neighbor_file_name_allocated) {
     if (neighbor_file_names) {
-      neighbor_file_name_allocated *= 2;
-      neighbor_file_names = (CHAR**)realloc_las(neighbor_file_names, sizeof(CHAR*) * neighbor_file_name_allocated);
-      neighbor_file_names_npoints = (I64*)realloc_las(neighbor_file_names_npoints, sizeof(I64) * neighbor_file_name_allocated);
-      neighbor_file_names_min_x = (F64*)realloc_las(neighbor_file_names_min_x, sizeof(F64) * neighbor_file_name_allocated);
-      neighbor_file_names_min_y = (F64*)realloc_las(neighbor_file_names_min_y, sizeof(F64) * neighbor_file_name_allocated);
-      neighbor_file_names_max_x = (F64*)realloc_las(neighbor_file_names_max_x, sizeof(F64) * neighbor_file_name_allocated);
-      neighbor_file_names_max_y = (F64*)realloc_las(neighbor_file_names_max_y, sizeof(F64) * neighbor_file_name_allocated);
+      U32 new_neighbor_file_name_allocated = neighbor_file_name_allocated * 2;
+      if (!try_realloc_las(neighbor_file_names, sizeof(CHAR*) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_npoints, sizeof(I64) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_min_x, sizeof(F64) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_min_y, sizeof(F64) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_max_x, sizeof(F64) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_max_y, sizeof(F64) * new_neighbor_file_name_allocated)) {
+        laserror("realloc for neighbor_file_names arrays failed at %u", new_neighbor_file_name_allocated);
+        return FALSE;
+      }
+      neighbor_file_name_allocated = new_neighbor_file_name_allocated;
     } else {
       neighbor_file_name_allocated = 16;
       neighbor_file_names = (CHAR**)malloc_las(sizeof(CHAR*) * neighbor_file_name_allocated);
@@ -3201,8 +3245,12 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
   }
   if (neighbor_file_name_number == neighbor_file_name_allocated) {
     if (neighbor_file_names) {
-      neighbor_file_name_allocated *= 2;
-      neighbor_file_names = (CHAR**)realloc_las(neighbor_file_names, sizeof(CHAR*) * neighbor_file_name_allocated);
+      U32 new_neighbor_file_name_allocated = neighbor_file_name_allocated * 2;
+      if (!try_realloc_las(neighbor_file_names, sizeof(CHAR*) * new_neighbor_file_name_allocated)) {
+        laserror("realloc for neighbor_file_names arrays failed at %u", new_neighbor_file_name_allocated);
+        return FALSE;
+      }
+      neighbor_file_name_allocated = new_neighbor_file_name_allocated;
     } else {
       neighbor_file_name_allocated = 16;
       neighbor_file_names = (CHAR**)malloc_las(sizeof(CHAR*) * neighbor_file_name_allocated);
