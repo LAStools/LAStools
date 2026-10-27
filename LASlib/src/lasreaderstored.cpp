@@ -59,12 +59,13 @@ BOOL LASreaderStored::open(LASreader* lasreader)
   // zero the pointers of the other header so they don't get deallocated twice
   lasreader->header.unlink();
 
+  // not needed: header = lasreader->header already copies the pointer, dont copy again
   // special check for attributes in extra bytes
-  if (header.number_attributes)
-  {
-    header.number_attributes = 0;
-    header.init_attributes(lasreader->header.number_attributes, lasreader->header.attributes);
-  }
+  //if (header.number_attributes)
+  //{
+  //  header.number_attributes = 0;
+  //  header.init_attributes(lasreader->header.number_attributes, lasreader->header.attributes);
+  //}
 
   // initialize the point with the header info
 
@@ -106,7 +107,18 @@ BOOL LASreaderStored::open(LASreader* lasreader)
     return FALSE;
   }
 
-  if (!laswriterlas->open(streamoutarray, &header, LASZIP_COMPRESSOR_DEFAULT))
+  // for LAS 1.4 points 6 and up, the compressor needs to be LASZIP_COMPRESSOR_LAYERED_CHUNKED
+  U8 stored_point_type = header.point_data_format;
+  if (header.laszip)
+  {
+    U8 laszip_point_type = 0;
+    U16 laszip_record_length = 0;
+    header.laszip->is_standard(&laszip_point_type, &laszip_record_length);
+    stored_point_type = laszip_point_type;
+  }
+  U32 compressor = (stored_point_type > 5) ? LASZIP_COMPRESSOR_LAYERED_CHUNKED : LASZIP_COMPRESSOR_DEFAULT;
+
+  if (!laswriterlas->open(streamoutarray, &header, compressor))
   {
     delete laswriterlas;
     laswriterlas = 0;

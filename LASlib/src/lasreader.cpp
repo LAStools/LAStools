@@ -2841,8 +2841,12 @@ BOOL LASreadOpener::add_file_name_single(const CHAR* file_name, BOOL unique)
   }
   if (file_name_number == file_name_allocated) {
     if (file_names) {
-      file_name_allocated *= 2;
-      file_names = (CHAR**)realloc_las(file_names, sizeof(CHAR*) * file_name_allocated);
+      U32 new_file_name_allocated = file_name_allocated * 2;
+      if (!try_realloc_las(file_names, sizeof(CHAR*) * new_file_name_allocated)) {
+        laserror("realloc for file_names arrays failed at %u", new_file_name_allocated);
+        return FALSE;
+      }
+      file_name_allocated = new_file_name_allocated;
     } else {
       file_name_allocated = 16;
       file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
@@ -2868,9 +2872,13 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, BOOL unique) {
   }
   if (file_name_number == file_name_allocated) {
     if (file_names) {
-      file_name_allocated *= 2;
-      file_names = (CHAR**)realloc_las(file_names, sizeof(CHAR*) * file_name_allocated);
-      file_names_ID = (U32*)realloc_las(file_names_ID, sizeof(U32) * file_name_allocated);
+      U32 new_file_name_allocated = file_name_allocated * 2;
+      if (!try_realloc_las(file_names, sizeof(CHAR*) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_ID, sizeof(U32) * new_file_name_allocated)) {
+        laserror("realloc for file_names arrays failed at %u", new_file_name_allocated);
+        return FALSE;
+      }
+      file_name_allocated = new_file_name_allocated;
     } else {
       file_name_allocated = 16;
       file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
@@ -2902,14 +2910,18 @@ BOOL LASreadOpener::add_file_name(const CHAR* file_name, U32 ID, I64 npoints, F6
   }
   if (file_name_number == file_name_allocated) {
     if (file_names) {
-      file_name_allocated *= 2;
-      file_names = (CHAR**)realloc_las(file_names, sizeof(CHAR*) * file_name_allocated);
-      file_names_ID = (U32*)realloc_las(file_names_ID, sizeof(U32) * file_name_allocated);
-      file_names_npoints = (I64*)realloc_las(file_names_npoints, sizeof(I64) * file_name_allocated);
-      file_names_min_x = (F64*)realloc_las(file_names_min_x, sizeof(F64) * file_name_allocated);
-      file_names_min_y = (F64*)realloc_las(file_names_min_y, sizeof(F64) * file_name_allocated);
-      file_names_max_x = (F64*)realloc_las(file_names_max_x, sizeof(F64) * file_name_allocated);
-      file_names_max_y = (F64*)realloc_las(file_names_max_y, sizeof(F64) * file_name_allocated);
+      U32 new_file_name_allocated = file_name_allocated * 2;
+      if (!try_realloc_las(file_names, sizeof(CHAR*) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_ID, sizeof(U32) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_npoints, sizeof(I64) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_min_x, sizeof(F64) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_min_y, sizeof(F64) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_max_x, sizeof(F64) * new_file_name_allocated) ||
+          !try_realloc_las(file_names_max_y, sizeof(F64) * new_file_name_allocated)) {
+        laserror("realloc for file_names arrays failed at %u", new_file_name_allocated);
+        return FALSE;
+      }
+      file_name_allocated = new_file_name_allocated;
     } else {
       file_name_allocated = 16;
       file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
@@ -3044,13 +3056,17 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, I64 n
   }
   if (neighbor_file_name_number == neighbor_file_name_allocated) {
     if (neighbor_file_names) {
-      neighbor_file_name_allocated *= 2;
-      neighbor_file_names = (CHAR**)realloc_las(neighbor_file_names, sizeof(CHAR*) * neighbor_file_name_allocated);
-      neighbor_file_names_npoints = (I64*)realloc_las(neighbor_file_names_npoints, sizeof(I64) * neighbor_file_name_allocated);
-      neighbor_file_names_min_x = (F64*)realloc_las(neighbor_file_names_min_x, sizeof(F64) * neighbor_file_name_allocated);
-      neighbor_file_names_min_y = (F64*)realloc_las(neighbor_file_names_min_y, sizeof(F64) * neighbor_file_name_allocated);
-      neighbor_file_names_max_x = (F64*)realloc_las(neighbor_file_names_max_x, sizeof(F64) * neighbor_file_name_allocated);
-      neighbor_file_names_max_y = (F64*)realloc_las(neighbor_file_names_max_y, sizeof(F64) * neighbor_file_name_allocated);
+      U32 new_neighbor_file_name_allocated = neighbor_file_name_allocated * 2;
+      if (!try_realloc_las(neighbor_file_names, sizeof(CHAR*) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_npoints, sizeof(I64) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_min_x, sizeof(F64) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_min_y, sizeof(F64) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_max_x, sizeof(F64) * new_neighbor_file_name_allocated) ||
+          !try_realloc_las(neighbor_file_names_max_y, sizeof(F64) * new_neighbor_file_name_allocated)) {
+        laserror("realloc for neighbor_file_names arrays failed at %u", new_neighbor_file_name_allocated);
+        return FALSE;
+      }
+      neighbor_file_name_allocated = new_neighbor_file_name_allocated;
     } else {
       neighbor_file_name_allocated = 16;
       neighbor_file_names = (CHAR**)malloc_las(sizeof(CHAR*) * neighbor_file_name_allocated);
@@ -3229,8 +3245,12 @@ BOOL LASreadOpener::add_neighbor_file_name(const CHAR* neighbor_file_name, BOOL 
   }
   if (neighbor_file_name_number == neighbor_file_name_allocated) {
     if (neighbor_file_names) {
-      neighbor_file_name_allocated *= 2;
-      neighbor_file_names = (CHAR**)realloc_las(neighbor_file_names, sizeof(CHAR*) * neighbor_file_name_allocated);
+      U32 new_neighbor_file_name_allocated = neighbor_file_name_allocated * 2;
+      if (!try_realloc_las(neighbor_file_names, sizeof(CHAR*) * new_neighbor_file_name_allocated)) {
+        laserror("realloc for neighbor_file_names arrays failed at %u", new_neighbor_file_name_allocated);
+        return FALSE;
+      }
+      neighbor_file_name_allocated = new_neighbor_file_name_allocated;
     } else {
       neighbor_file_name_allocated = 16;
       neighbor_file_names = (CHAR**)malloc_las(sizeof(CHAR*) * neighbor_file_name_allocated);

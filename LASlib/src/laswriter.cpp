@@ -862,14 +862,18 @@ void LASwriteOpener::make_numbered_file_name(const CHAR* file_name, I32 digits)
   {
     if (this->file_name != 0) free(this->file_name);
     len = (I32)strlen(file_name);
-    this->file_name = (CHAR*)malloc_las(static_cast<size_t>(len) + digits + 2);
+    this->file_name = (CHAR*)malloc_las(static_cast<size_t>(len) + digits + 6);
     if (this->file_name) strcpy(this->file_name, file_name);
   }
   else
   {
     if (this->file_name == 0) this->file_name = LASCopyString("output.xxx");
     len = (I32)strlen(this->file_name);
-    this->file_name = (CHAR*)realloc_las(this->file_name, static_cast<size_t>(len) + digits + 2);
+    if (!try_realloc_las(this->file_name, static_cast<size_t>(len) + digits + 6))
+    {
+      laserror("cannot grow the output file name to %d characters", len + digits + 6);
+      return;
+    }
   }
   if (this->file_name != nullptr) 
   {

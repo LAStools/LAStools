@@ -11381,21 +11381,57 @@ void LAStransform::adjust_offset(LASreader* lasreader, F64* scale_factor)
     {
       if (F64_IS_FINITE(transf_min[0]) && F64_IS_FINITE(transf_max[0]) &&
           F64_IS_FINITE(lasreader->header.x_scale_factor) && (lasreader->header.x_scale_factor != 0.0))
-        adj_offset_x = ((I64)((transf_min[0] + transf_max[0]) / lasreader->header.x_scale_factor / 20000000)) * 10000000 * lasreader->header.x_scale_factor;
+      {
+        const F64 mid_x = (transf_min[0] + transf_max[0]) / lasreader->header.x_scale_factor / 20000000;
+        if (F64_IS_FINITE(mid_x) && (mid_x >= (F64)I64_MIN) && (mid_x < (F64)I64_MAX))
+        {
+          adj_offset_x = ((I64)mid_x) * 10000000 * lasreader->header.x_scale_factor;
+        }
+        else
+        {
+          adj_offset_x = 0.0;
+        }
+      }
       else
+      {
         adj_offset_x = 0.0;
+      }
 
       if (F64_IS_FINITE(transf_min[1]) && F64_IS_FINITE(transf_max[1]) &&
           F64_IS_FINITE(lasreader->header.y_scale_factor) && (lasreader->header.y_scale_factor != 0.0))
-        adj_offset_y = ((I64)((transf_min[1] + transf_max[1]) / lasreader->header.y_scale_factor / 20000000)) * 10000000 * lasreader->header.y_scale_factor;
+      {
+        const F64 mid_y = (transf_min[1] + transf_max[1]) / lasreader->header.y_scale_factor / 20000000;
+        if (F64_IS_FINITE(mid_y) && (mid_y >= (F64)I64_MIN) && (mid_y < (F64)I64_MAX))
+        {
+          adj_offset_y = ((I64)mid_y) * 10000000 * lasreader->header.y_scale_factor;
+        }
+        else
+        {
+          adj_offset_y = 0.0;
+        }
+      }
       else
+      {
         adj_offset_y = 0.0;
+      }
 
       if (F64_IS_FINITE(transf_min[2]) && F64_IS_FINITE(transf_max[2]) &&
           F64_IS_FINITE(lasreader->header.z_scale_factor) && (lasreader->header.z_scale_factor != 0.0))
-        adj_offset_z = ((I64)((transf_min[2] + transf_max[2]) / lasreader->header.z_scale_factor / 20000000)) * 10000000 * lasreader->header.z_scale_factor;
+      {
+        const F64 mid_z = (transf_min[2] + transf_max[2]) / lasreader->header.z_scale_factor / 20000000;
+        if (F64_IS_FINITE(mid_z) && (mid_z >= (F64)I64_MIN) && (mid_z < (F64)I64_MAX))
+        {
+          adj_offset_z = ((I64)mid_z) * 10000000 * lasreader->header.z_scale_factor;
+        }
+        else
+        {
+          adj_offset_z = 0.0;
+        }
+      }
       else
+      {
         adj_offset_z = 0.0;
+      }
       //is required when several operations are performed
       transf_x_min = transf_min[0];
       transf_y_min = transf_min[1];

@@ -486,29 +486,27 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name)
   // add the file
   if (file_name_number == file_name_allocated)
   {
-    file_name_allocated += 1024;
+    U32 new_file_name_allocated = file_name_allocated + 1024;
     if (file_names)
     {
-      file_names = (CHAR**)realloc_las(file_names, sizeof(CHAR*) * file_name_allocated);
-      if (file_names_ID)
+      if (!try_realloc_las(file_names, sizeof(CHAR*) * (size_t)new_file_name_allocated) ||
+          (file_names_ID && !try_realloc_las(file_names_ID, sizeof(U32) * (size_t)new_file_name_allocated)))
       {
-        file_names_ID = (U32*)realloc_las(file_names_ID, sizeof(U32) * file_name_allocated);
-        if (file_names_ID == 0)
-        {
-          laserror("alloc for file_names_ID array failed at %d", file_name_allocated);
-          return FALSE;
-        }
+        laserror("realloc for file_names arrays failed at %u", new_file_name_allocated);
+        return FALSE;
       }
     }
     else
     {
-      file_names = (CHAR**)malloc_las(sizeof(CHAR*) * file_name_allocated);
+      CHAR** new_file_names = (CHAR**)malloc_las(sizeof(CHAR*) * (size_t)new_file_name_allocated);
+      if (new_file_names == 0)
+      {
+        laserror("alloc for file_names pointer array failed at %u", new_file_name_allocated);
+        return FALSE;
+      }
+      file_names = new_file_names;
     }
-    if (file_names == 0)
-    {
-      laserror("alloc for file_names pointer array failed at %d", file_name_allocated);
-      return FALSE;
-    }
+    file_name_allocated = new_file_name_allocated;
   }
   file_names[file_name_number] = LASCopyString(file_name);
   file_name_number++;
@@ -524,7 +522,7 @@ BOOL LASreaderMerged::add_file_name(const CHAR* file_name, U32 ID)
       file_names_ID = (U32*)malloc_las(sizeof(U32) * file_name_allocated);
       if (file_names_ID == 0)
       {
-        laserror("alloc for file_names_ID array failed at %d", file_name_allocated);
+        laserror("alloc for file_names_ID array failed at %u", file_name_allocated);
         return FALSE;
       }
     }

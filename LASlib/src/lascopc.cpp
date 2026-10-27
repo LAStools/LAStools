@@ -183,16 +183,61 @@ BOOL EPToctree::set_vlr_entries(const U8* data, const U64 offset_to_first_copc_e
 {
   if (!data) return FALSE;
 
+  BOOL evlr_found = FALSE;
+  I64 payload_length = 0;
+  if (header.evlrs)
+  {
+    for (U32 k = 0; k < header.number_of_extended_variable_length_records; k++)
+    {
+      if (header.evlrs[k].data == data)
+      {
+        evlr_found = TRUE;
+        payload_length = header.evlrs[k].record_length_after_header;
+        break;
+      }
+    }
+  }
+  if (!evlr_found)
+  {
+    LASMessage(LAS_WARNING, "COPC EPT hierarchy payload does not belong to this header, its size cannot be determined.");
+    return FALSE;
+  }
+  if (payload_length <= 0)
+  {
+    LASMessage(LAS_WARNING, "COPC EPT hierarchy EVLR payload length is %lld (not specification-conform).", payload_length);
+    return FALSE;
+  }
+  const U64 data_size = (U64)payload_length;
+
   std::vector<LASvlr_copc_entry> page;
   std::vector<LASvlr_copc_entry> entries;
   std::deque<LASvlr_copc_entry> child_entries;
   const LASvlr_copc_entry* payload = (const LASvlr_copc_entry*)data;
+  const U64 entry_size = sizeof(LASvlr_copc_entry);
+  const U64 max_entries = data_size/entry_size;
+
+  auto read_page = [&](U64 abs_offset, U64 n_entry, std::vector<LASvlr_copc_entry>& out) -> bool
+  {
+    if (abs_offset < offset_to_first_copc_entry)
+    {
+      return false;
+    }
+    U64 n_entries_before = (abs_offset - offset_to_first_copc_entry)/entry_size;
+    if ((n_entries_before > max_entries) || (n_entry > (max_entries - n_entries_before)))
+    {
+      return false;
+    }
+    out = std::vector<LASvlr_copc_entry>(payload + n_entries_before, payload + n_entries_before + n_entry);
+    return true;
+  };
 
   // Read the root page
-  U64 n_root_entries = header.vlr_copc_info->root_hier_size/sizeof(LASvlr_copc_entry);
-  U64 root_offset = header.vlr_copc_info->root_hier_offset - offset_to_first_copc_entry;
-  U64 n_entries_before_root = root_offset/sizeof(LASvlr_copc_entry);
-  page = std::vector<LASvlr_copc_entry>(payload + n_entries_before_root, payload + n_entries_before_root + n_root_entries);
+  U64 n_root_entries = header.vlr_copc_info->root_hier_size/entry_size;
+  if (!read_page(header.vlr_copc_info->root_hier_offset, n_root_entries, page))
+  {
+    LASMessage(LAS_WARNING, "COPC EPT hierarchy root page is out of bounds of the EVLR payload (not specification-conform).");
+    return FALSE;
+  }
 
   for (size_t j = 0; j < page.size(); j++)
   {
@@ -200,17 +245,27 @@ BOOL EPToctree::set_vlr_entries(const U8* data, const U64 offset_to_first_copc_e
     else if (page[j].point_count == -1) child_entries.push_back(page[j]);
   }
 
+  U64 total_entries_read = page.size();
+
   // Recurse the tree of entries
   while (child_entries.size())
   {
     LASvlr_copc_entry e = child_entries.front();
     child_entries.pop_front();
 
-    U64 page_size = e.byte_size;
-    U64 n_entry = page_size/sizeof(LASvlr_copc_entry);
-    U64 page_offset = e.offset - offset_to_first_copc_entry;
-    U64 n_entries_before_page = page_offset/sizeof(LASvlr_copc_entry);
-    page = std::vector<LASvlr_copc_entry>(payload + n_entries_before_page, payload + n_entries_before_page + n_entry);
+    U64 n_entry = e.byte_size/entry_size;
+    if (!read_page(e.offset, n_entry, page))
+    {
+      LASMessage(LAS_WARNING, "COPC EPT hierarchy child page is out of bounds of the EVLR payload (not specification-conform).");
+      return FALSE;
+    }
+
+    total_entries_read += page.size();
+    if (total_entries_read > max_entries)
+    {
+      LASMessage(LAS_WARNING, "COPC EPT hierarchy has more entries than fit into the EVLR payload (not specification-conform).");
+      return FALSE;
+    }
 
     for (size_t j = 0; j < page.size(); j++)
     {

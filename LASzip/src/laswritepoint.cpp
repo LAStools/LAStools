@@ -41,6 +41,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits>
 
 LASwritePoint::LASwritePoint()
 {
@@ -320,7 +321,10 @@ BOOL LASwritePoint::write(const U8 * const * point)
       {
         enc->done();
       }
-      add_chunk_to_table();
+      if (!add_chunk_to_table())
+      {
+        return FALSE;
+      }
       init(outstream);
     }
     else
@@ -383,7 +387,10 @@ BOOL LASwritePoint::chunk()
   {
     enc->done();
   }
-  add_chunk_to_table();
+  if (!add_chunk_to_table())
+  {
+    return FALSE;
+  }
   init(outstream);
   chunk_count = 0;
   return TRUE;
@@ -414,7 +421,10 @@ BOOL LASwritePoint::done()
     }
     if (chunk_start_position)
     {
-      if (chunk_count) add_chunk_to_table();
+      if (chunk_count && !add_chunk_to_table())
+      {
+        return FALSE;
+      }
       return write_chunk_table();
     }
   }
@@ -435,18 +445,44 @@ BOOL LASwritePoint::add_chunk_to_table()
   {
     if (chunk_bytes == 0)
     {
-      alloced_chunks = 1024;
-      if (chunk_size == U32_MAX) chunk_sizes = (U32*)malloc_las(sizeof(U32) * alloced_chunks); 
-      chunk_bytes = (U32*)malloc_las(sizeof(U32) * alloced_chunks); 
+      U32 new_alloced_chunks = 1024;
+      if (chunk_size == U32_MAX)
+      {
+        chunk_sizes = (U32*)malloc_las(sizeof(U32) * new_alloced_chunks);
+        if (chunk_sizes == 0)
+        {
+          return FALSE;
+        }
+      }
+      chunk_bytes = (U32*)malloc_las(sizeof(U32) * new_alloced_chunks);
+      if (chunk_bytes == 0)
+      {
+        return FALSE;
+      }
+      alloced_chunks = new_alloced_chunks;
     }
     else
     {
-      alloced_chunks *= 2;
-      if (chunk_size == U32_MAX) chunk_sizes = (U32*)realloc_las(chunk_sizes, sizeof(U32)*alloced_chunks); 
-      chunk_bytes = (U32*)realloc_las(chunk_bytes, sizeof(U32)*alloced_chunks); 
+      U64 new_alloced_chunks_64 = (U64)alloced_chunks * 2;
+      if (new_alloced_chunks_64 > U32_MAX)
+      {
+        new_alloced_chunks_64 = U32_MAX;
+      }
+      U32 new_alloced_chunks = (U32)new_alloced_chunks_64;
+
+      if ((new_alloced_chunks == alloced_chunks) ||
+          ((U64)new_alloced_chunks > (U64)(std::numeric_limits<size_t>::max() / sizeof(U32))))
+      {
+        return FALSE;
+      }
+
+      if (((chunk_size == U32_MAX) && !try_realloc_las(chunk_sizes, sizeof(U32)*(U64)new_alloced_chunks)) ||
+          !try_realloc_las(chunk_bytes, sizeof(U32)*(U64)new_alloced_chunks))
+      {
+        return FALSE;
+      }
+      alloced_chunks = new_alloced_chunks;
     }
-    if (chunk_size == U32_MAX && chunk_sizes == 0) return FALSE;
-    if (chunk_bytes == 0) return FALSE;
   }
   I64 position = outstream->tell();
   if (chunk_size == U32_MAX) chunk_sizes[number_chunks] = chunk_count;

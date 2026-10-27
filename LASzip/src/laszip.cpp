@@ -985,7 +985,7 @@ bool LASzip::is_standard(const U16 num_items, const LASitem* items, U8* point_ty
         }
         else
         {
-          if (items[2].is_type(LASitem::WAVEPACKET13) || items[1].is_type(LASitem::WAVEPACKET14))
+          if (items[2].is_type(LASitem::WAVEPACKET13) || items[2].is_type(LASitem::WAVEPACKET14))
           {
             if (num_items == 3)
             {

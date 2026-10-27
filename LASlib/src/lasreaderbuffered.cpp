@@ -162,12 +162,13 @@ BOOL LASreaderBuffered::open()
   // unlink pointers in other header so their data does not get deallocated twice
   lasreader->header.unlink();
 
+  // not needed: header = lasreader->header already copies the pointer, dont copy again
   // special check for attributes in extra bytes
-  if (header.number_attributes)
-  {
-    header.number_attributes = 0;
-    header.init_attributes(lasreader->header.number_attributes, lasreader->header.attributes);
-  }
+  // if (header.number_attributes)
+  // {
+  //   header.number_attributes = 0;
+  //   header.init_attributes(lasreader->header.number_attributes, lasreader->header.attributes);
+  // }
 
   // initialize the point with the header info
 
@@ -227,7 +228,10 @@ BOOL LASreaderBuffered::open()
       // copy
       point = lasreader_neighbor->point;
       // copy_point_to_buffer
-      copy_point_to_buffer();
+      if (!copy_point_to_buffer())
+      {
+        return FALSE;
+      }
       // increment number of points by return
       if (point.return_number == 1)
       {
@@ -475,7 +479,11 @@ BOOL LASreaderBuffered::read_point_default()
     }
     else if (point_count < buffered_points)
     {
-      copy_point_from_buffer();
+      if (!copy_point_from_buffer())
+      {
+        point.zero();
+        return FALSE;
+      }
       p_idx++;
       p_cnt++;
       return TRUE;
@@ -534,19 +542,34 @@ BOOL LASreaderBuffered::copy_point_to_buffer()
   {
     if (buffers == 0)
     {
-      size_of_buffers_array = 1024;
-      buffers = (U8**)malloc_las(sizeof(U8*) * size_of_buffers_array);
+      U32 new_size_of_buffers_array = 1024;
+      buffers = (U8**)malloc_las(sizeof(U8*) * new_size_of_buffers_array);
+      if (buffers == 0)
+      {
+        laserror("cannot allocate the buffer pointer array with %u entries", new_size_of_buffers_array);
+        return FALSE;
+      }
+      size_of_buffers_array = new_size_of_buffers_array;
       number_of_buffers = 0;
     }
     else if (number_of_buffers == size_of_buffers_array)
     {
-      size_of_buffers_array *= 2;
-      buffers = (U8**)realloc_las(buffers, sizeof(U8*)*size_of_buffers_array);
+      U64 new_size_of_buffers_array = (U64)size_of_buffers_array * 2;
+      U64 new_bytes = new_size_of_buffers_array * sizeof(U8*);
+      if ((new_size_of_buffers_array > U32_MAX) || ((U64)(size_t)new_bytes != new_bytes) ||
+          !try_realloc_las(buffers, (size_t)new_bytes))
+      {
+        laserror("cannot grow the buffer pointer array to %llu entries", new_size_of_buffers_array);
+        return FALSE;
+      }
+      size_of_buffers_array = (U32)new_size_of_buffers_array;
     }
-    if (buffers != nullptr)
+    buffers[number_of_buffers] = (U8*)malloc_las((size_t)point.total_point_size * (size_t)points_per_buffer);
+    current_buffer = buffers[number_of_buffers];
+    if (current_buffer == 0)
     {
-      buffers[number_of_buffers] = (U8*)malloc_las((size_t)point.total_point_size * (size_t)points_per_buffer);
-      current_buffer = buffers[number_of_buffers];
+      laserror("cannot allocate buffer %u for %u points of %u bytes", number_of_buffers, points_per_buffer, point.total_point_size);
+      return FALSE;
     }
     number_of_buffers++;
   }
@@ -565,6 +588,11 @@ BOOL LASreaderBuffered::copy_point_from_buffer()
   if (point_count_in_buffer == 0)
   {
     U32 buffer_count = (point_count / points_per_buffer);
+    if ((buffers == 0) || (buffer_count >= number_of_buffers))
+    {
+      laserror("buffer %u of %u for buffered point %u is not available", buffer_count, number_of_buffers, point_count);
+      return FALSE;
+    }
     current_buffer = buffers[buffer_count];
   }
   if (current_buffer == 0)

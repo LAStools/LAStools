@@ -281,8 +281,13 @@ struct OctantInMemory : public Octant
   {
     if (point_count == point_capacity)
     {
-      point_capacity *= 2;
-      point_buffer = (U8*)realloc_las(point_buffer, (size_t)point_capacity * (size_t)point_size);
+      I64 new_point_capacity = point_capacity * 2;
+      if (!try_realloc_las(point_buffer, (size_t)new_point_capacity * (size_t)point_size))
+      {
+        laserror("cannot grow the point buffer to %lld points", new_point_capacity);
+        return;
+      }
+      point_capacity = new_point_capacity;
     }
 
     memcpy(point_buffer + (size_t)point_count * (size_t)point_size, buffer, point_size);
@@ -297,8 +302,13 @@ struct OctantInMemory : public Octant
   {
     if (point_count == point_capacity)
     {
-      point_capacity *= 2;
-      point_buffer = (U8*)realloc_las(point_buffer, (size_t)point_capacity * (size_t)point_size);
+      I64 new_point_capacity = point_capacity * 2;
+      if (!try_realloc_las(point_buffer, (size_t)new_point_capacity * (size_t)point_size))
+      {
+        laserror("cannot grow the point buffer to %lld points", new_point_capacity);
+        return;
+      }
+      point_capacity = new_point_capacity;
     }
 
     laspoint->copy_to(point_buffer + (size_t)point_count * (size_t)point_size);
@@ -1146,18 +1156,24 @@ class LasTool_lascopcindex : public LasTool {
         }
         else
         {
-          lasreader->header.number_of_variable_length_records++;
-          lasreader->header.offset_to_point_data += 54;
-          lasreader->header.vlrs = (LASvlr*)realloc_las(lasreader->header.vlrs, lasreader->header.number_of_variable_length_records * sizeof(LASvlr));
-          for (U32 i = lasreader->header.number_of_variable_length_records - 1; i > 0; i--) lasreader->header.vlrs[i] = lasreader->header.vlrs[i - 1];
-          memset((void*)&(lasreader->header.vlrs[0]), 0, sizeof(LASvlr));
-          lasreader->header.vlrs[0].reserved = 0;
-          strncpy_las(lasreader->header.vlrs[0].user_id, sizeof(lasreader->header.vlrs[0].user_id), "copc");
-          lasreader->header.vlrs[0].record_id = 1;
-          lasreader->header.vlrs[0].record_length_after_header = sizeof(LASvlr_copc_info);
-          lasreader->header.offset_to_point_data += lasreader->header.vlrs[0].record_length_after_header;
-          snprintf(lasreader->header.vlrs[0].description, sizeof(lasreader->header.vlrs[0].description), "%.31s", "copc info");
-          lasreader->header.vlrs[0].data = (U8*)info;
+          U32 new_number_of_vlrs = lasreader->header.number_of_variable_length_records + 1;
+          if (!try_realloc_las(lasreader->header.vlrs, (size_t)new_number_of_vlrs * sizeof(LASvlr))) {
+            delete[] info;
+            laserror("cannot grow the VLR array to %u entries for the copc info VLR", new_number_of_vlrs);
+          } else {
+            lasreader->header.number_of_variable_length_records = new_number_of_vlrs;
+            lasreader->header.offset_to_point_data += 54;
+            for (U32 i = lasreader->header.number_of_variable_length_records - 1; i > 0; i--)
+              lasreader->header.vlrs[i] = lasreader->header.vlrs[i - 1];
+            memset((void*)&(lasreader->header.vlrs[0]), 0, sizeof(LASvlr));
+            lasreader->header.vlrs[0].reserved = 0;
+            strncpy_las(lasreader->header.vlrs[0].user_id, sizeof(lasreader->header.vlrs[0].user_id), "copc");
+            lasreader->header.vlrs[0].record_id = 1;
+            lasreader->header.vlrs[0].record_length_after_header = sizeof(LASvlr_copc_info);
+            lasreader->header.offset_to_point_data += lasreader->header.vlrs[0].record_length_after_header;
+            snprintf(lasreader->header.vlrs[0].description, sizeof(lasreader->header.vlrs[0].description), "%.31s", "copc info");
+            lasreader->header.vlrs[0].data = (U8*)info;
+          }
         }
   
         strncpy_las(lasreader->header.system_identifier, LAS_HEADER_CHAR_LEN, LAS_TOOLS_COPYRIGHT);

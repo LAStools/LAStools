@@ -773,13 +773,11 @@ BOOL LASquadtree::manage_cell(const U32 cell_index, const BOOL finalize)
     if (adaptive)
     {
       size_t n_pos = (size_t)adaptive_pos * 2;
-      U32* new_adaptive = (U32*)realloc_las(adaptive, n_pos * sizeof(U32));
-      if (new_adaptive == 0)
+      if (!try_realloc_las(adaptive, n_pos * sizeof(U32)))
       {
         laserror("(LASquadtree): cannot reallocate %u adaptive entries", (U32)n_pos);
         return FALSE;
       }
-      adaptive = new_adaptive;
       for (size_t i = adaptive_alloc; i < n_pos; i++) adaptive[i] = 0;
       adaptive_alloc = n_pos;
     }

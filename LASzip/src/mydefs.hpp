@@ -574,6 +574,24 @@ bool IsLasLazFile(std::string fn);
 /// returns TRUE if 'val' is found in 'vec'
 bool StringInVector(const std::string& value, const std::vector<std::string>& array, bool casesense);
 
+/// Reallocates *ptr to size bytes, returns true on success and the new pointer is written
+/// to *ptr. Returns false on failure, and *ptr is left unchanged (so the caller still owns 
+/// the original block and may keep using it/free it). Prefer the try_realloc_las() wrapper.
+LASLIB_DLL BOOL try_realloc_las_raw(void** ptr, size_t size);
+
+/// Type safe wrapper around try_realloc_las_raw() 
+template <typename T>
+inline BOOL try_realloc_las(T*& ptr, size_t size)
+{
+  void* p = ptr;
+  if (!try_realloc_las_raw(&p, size)) {
+    return FALSE;
+  }
+  ptr = (T*)p;
+  return TRUE;
+}
+
+// [[deprecated("use try_realloc_las(): realloc_las() cannot report a failed reallocation")]]
 LASLIB_DLL void* realloc_las(void* ptr, size_t size);
 LASLIB_DLL void* malloc_las(size_t size);
 void bytes_to_readable(size_t bytes, double* value_out, const char** unit_out);

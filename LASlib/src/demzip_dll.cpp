@@ -1466,26 +1466,29 @@ demzip_add_vlr(
 
       if (i == demzip_dll->header.number_of_variable_length_records)
       {
-        demzip_dll->header.number_of_variable_length_records++;
-        demzip_dll->header.offset_to_point_data += 54;
-        demzip_dll->header.vlrs = (demzip_vlr_struct*)realloc(demzip_dll->header.vlrs, sizeof(demzip_vlr_struct)*demzip_dll->header.number_of_variable_length_records);
-        if (demzip_dll->header.vlrs == 0)
+        demzip_U32 new_number_of_vlrs = demzip_dll->header.number_of_variable_length_records + 1;
+        demzip_vlr_struct* new_vlrs = (demzip_vlr_struct*)realloc(demzip_dll->header.vlrs, sizeof(demzip_vlr_struct)*new_number_of_vlrs);
+        if (new_vlrs == 0)
         {
-          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reallocating vlrs[%u] array", demzip_dll->header.number_of_variable_length_records);
+          snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reallocating vlrs[%u] array", new_number_of_vlrs);
           return 1;
         }
+        demzip_dll->header.vlrs = new_vlrs;
+        demzip_dll->header.number_of_variable_length_records = new_number_of_vlrs;
+        demzip_dll->header.offset_to_point_data += 54;
       }
     }
     else
     {
-      demzip_dll->header.number_of_variable_length_records = 1;
-      demzip_dll->header.offset_to_point_data += 54;
-      demzip_dll->header.vlrs = (demzip_vlr_struct*)malloc(sizeof(demzip_vlr_struct));
-      if (demzip_dll->header.vlrs == 0)
+      demzip_vlr_struct* new_vlrs = (demzip_vlr_struct*)malloc(sizeof(demzip_vlr_struct));
+      if (new_vlrs == 0)
       {
         snprintf(demzip_dll->error, sizeof(demzip_dll->error), "allocating vlrs[1] array");
         return 1;
       }
+      demzip_dll->header.vlrs = new_vlrs;
+      demzip_dll->header.number_of_variable_length_records = 1;
+      demzip_dll->header.offset_to_point_data += 54;
     }
 
     // zero the VLR
@@ -1575,11 +1578,10 @@ demzip_remove_vlr(
           }
           if (demzip_dll->header.number_of_variable_length_records)
           {
-            demzip_dll->header.vlrs = (demzip_vlr_struct*)realloc(demzip_dll->header.vlrs, sizeof(demzip_vlr_struct)*demzip_dll->header.number_of_variable_length_records);
-            if (demzip_dll->header.vlrs == 0)
+            demzip_vlr_struct* new_vlrs = (demzip_vlr_struct*)realloc(demzip_dll->header.vlrs, sizeof(demzip_vlr_struct)*demzip_dll->header.number_of_variable_length_records);
+            if (new_vlrs != 0)
             {
-              snprintf(demzip_dll->error, sizeof(demzip_dll->error), "reallocating vlrs[%u] array", demzip_dll->header.number_of_variable_length_records);
-              return 1;
+              demzip_dll->header.vlrs = new_vlrs;
             }
           }
           else
@@ -3974,7 +3976,11 @@ demzip_read_header(
         }
         else
         {
-          demzip_dll->header.vlrs = (demzip_vlr*)realloc(demzip_dll->header.vlrs, sizeof(demzip_vlr)*demzip_dll->header.number_of_variable_length_records);
+          demzip_vlr* new_vlrs = (demzip_vlr*)realloc(demzip_dll->header.vlrs, sizeof(demzip_vlr)*demzip_dll->header.number_of_variable_length_records);
+          if (new_vlrs != 0)
+          {
+            demzip_dll->header.vlrs = new_vlrs;
+          }
         }
       }
     }

@@ -114,18 +114,26 @@ inline ByteStreamOutArray::ByteStreamOutArray(I64 alloc)
   this->alloc = alloc;
   this->size = 0;
   this->curr = 0;
+  if (this->data == 0)
+  {
+    this->alloc = 0;
+  }
 }
 
 inline BOOL ByteStreamOutArray::putByte(U8 byte)
 {
   if (curr == alloc)
   {
-    alloc += 4096;
-    data = (U8*)realloc_las(data, (U32)alloc);
-    if (data == 0)
+    I64 new_alloc = alloc + 4096;
+    if ((new_alloc < 0) || ((I64)(size_t)new_alloc != new_alloc))
     {
       return FALSE;
     }
+    if (!try_realloc_las(data, (size_t)new_alloc))
+    {
+      return FALSE;
+    }
+    alloc = new_alloc;
   }
   data[curr] = byte;
   if (curr == size) size++;
@@ -137,12 +145,16 @@ inline BOOL ByteStreamOutArray::putBytes(const U8* bytes, U32 num_bytes)
 {
   if ((curr+num_bytes) > alloc)
   {
-    alloc += (4096+static_cast<I64>(num_bytes));
-    data = (U8*)realloc_las(data, (U32)alloc);
-    if (data == 0)
+    I64 new_alloc = alloc + 4096 + (I64)num_bytes;
+    if ((new_alloc < 0) || ((I64)(size_t)new_alloc != new_alloc))
     {
       return FALSE;
     }
+    if (!try_realloc_las(data, (size_t)new_alloc))
+    {
+      return FALSE;
+    }
+    alloc = new_alloc;
   }
   memcpy((void*)(data+curr), bytes, num_bytes);
   curr += num_bytes;
