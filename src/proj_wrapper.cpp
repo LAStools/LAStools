@@ -54,6 +54,13 @@ MyPJ_COORD transform_point(PJ* P, PJ_DIRECTION direction, double x, double y, do
   return result;
 }
 
+/// Returns the coordinate operation used during the last transformation
+PJ* my_proj_trans_get_last_used_operation(PJ* transform) {
+  if (!transform || !proj_trans_get_last_used_operation_ptr) return nullptr;
+
+  return proj_trans_get_last_used_operation_ptr(transform);
+}
+
 /// Wrapper for proj_context_create
 PJ_CONTEXT* my_proj_context_create() {
   return proj_context_create_ptr ? proj_context_create_ptr() : nullptr;
@@ -156,4 +163,70 @@ int my_proj_coordoperation_get_grid_used(
              ? proj_coordoperation_get_grid_used_ptr(
                    ctx, operation, index, short_name, full_name, package_name, url, direct_download, open_license, available)
              : 0;
+}
+
+
+/// Wrapper for proj_create_operation_factory_context_ptr
+/// Creates a PROJ operation factory context used to discover candidate coordinate operations
+PJ_OPERATION_FACTORY_CONTEXT* my_proj_create_operation_factory_context(PJ_CONTEXT* ctx, const char* authority) {
+  if (!proj_create_operation_factory_context_ptr) {
+    return nullptr;
+  }
+
+  return proj_create_operation_factory_context_ptr(ctx, authority);
+}
+
+/// Wrapper for proj_operation_factory_context_destroy_ptr
+/// Destroys a PROJ operation factory context created with my_proj_create_operation_factory_context()
+void my_proj_operation_factory_context_destroy(PJ_OPERATION_FACTORY_CONTEXT* ctx) {
+  if (proj_operation_factory_context_destroy_ptr) {
+    proj_operation_factory_context_destroy_ptr(ctx);
+  }
+}
+
+/// Wrapper for proj_operation_factory_context_set_grid_availability_use_ptr
+/// Configures how PROJ should handle grid availability when discovering candidate coordinate operations
+void my_proj_operation_factory_context_set_grid_availability_use(
+    PJ_CONTEXT* ctx, PJ_OPERATION_FACTORY_CONTEXT* factory_ctx, PROJ_GRID_AVAILABILITY_USE use) {
+  if (proj_operation_factory_context_set_grid_availability_use_ptr) {
+    proj_operation_factory_context_set_grid_availability_use_ptr(ctx, factory_ctx, use);
+  }
+}
+
+/// Wrapper for proj_create_operations_ptr
+/// Creates a list of candidate coordinate operations between the given source and target CRS or CoordinateMetadata objects
+PJ_OBJ_LIST* my_proj_create_operations(PJ_CONTEXT* ctx, const PJ* source, const PJ* target, const PJ_OPERATION_FACTORY_CONTEXT* operation_context) {
+  if (!proj_create_operations_ptr) {
+    return nullptr;
+  }
+
+  return proj_create_operations_ptr(ctx, source, target, operation_context);
+}
+
+/// Wrapper for proj_list_get_count_ptr
+/// Returns the number of coordinate operations contained in a PROJ object list
+int my_proj_list_get_count(const PJ_OBJ_LIST* list) {
+  if (!proj_list_get_count_ptr) {
+    return -1;
+  }
+
+  return proj_list_get_count_ptr(list);
+}
+
+/// Wrapper for proj_list_get_ptr
+/// Returns the coordinate operation at the given index from a PROJ object list
+PJ* my_proj_list_get(PJ_CONTEXT* ctx, const PJ_OBJ_LIST* list, int index) {
+  if (!proj_list_get_ptr) {
+    return nullptr;
+  }
+
+  return proj_list_get_ptr(ctx, list, index);
+}
+
+/// Wrapper for proj_list_destroy_ptr
+/// Creates a PROJ operation factory context used to discover candidate coordinate operations
+void my_proj_list_destroy(PJ_OBJ_LIST* list) {
+  if (proj_list_destroy_ptr) {
+    proj_list_destroy_ptr(list);
+  }
 }

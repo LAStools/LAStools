@@ -6964,6 +6964,7 @@ GeoProjectionConverter::GeoProjectionConverter() {
   proj_target_json = nullptr;
   proj_source_wkt = nullptr;
   proj_target_wkt = nullptr;
+  proj_operation_checked = false;
 }
 
 GeoProjectionConverter::~GeoProjectionConverter() {
@@ -9262,6 +9263,8 @@ void GeoProjectionConverter::set_proj_crs_transform() {
     projParameters.proj_transform_crs =
         proj_create_crs_to_crs_from_pj_ptr(projParameters.proj_ctx, projParameters.proj_source_crs, projParameters.proj_target_crs, nullptr, nullptr);
 
+    proj_operation_checked = false;
+
     if (!projParameters.proj_transform_crs) {
       err_no = my_proj_context_errno(projParameters.proj_ctx);
 
@@ -9289,9 +9292,9 @@ void GeoProjectionConverter::set_proj_crs_transform() {
         laserror("Failed to create PROJ object for the transformation: %s", errstr.c_str());
       }
     }
-    LASMessage(LAS_VERY_VERBOSE, "the PROJ transformations object was successfully created");
+    validate_proj_transform_setup();
 
-    check_proj_coordinate_operation();
+    LASMessage(LAS_VERY_VERBOSE, "the PROJ transformations object was successfully created");
   }
 }
 
@@ -9416,6 +9419,12 @@ bool GeoProjectionConverter::do_proj_crs_transformation(double& x, double& y, do
 
   MyPJ_COORD result = transform_point(projParameters.proj_transform_crs, PJ_FWD, x, y, elevation, 0);
 
+    // Check the actual operation only once
+  if (!proj_operation_checked) {
+    check_last_used_proj_operation();
+    proj_operation_checked = true;
+  }
+
   // Assign transformed coordinates
   x = result.x;
   y = result.y;
@@ -9424,71 +9433,63 @@ bool GeoProjectionConverter::do_proj_crs_transformation(double& x, double& y, do
   return true;
 }
 
-/// Checks the PROJ transformation object and reports information about the selected coordinate operation, including ballpark status, accuracy, and grid usage.
-void GeoProjectionConverter::check_proj_coordinate_operation() {
+/// Validates the PROJ transformation object before execution
+void GeoProjectionConverter::validate_proj_transform_setup() const {
   PJ* operation = projParameters.proj_transform_crs;
 
   if (!operation) {
-    laserror("PROJ coordinate operation is null.");
+    laserror("PROJ coordinate operation is null");
+  }
+}
+
+void GeoProjectionConverter::check_last_used_proj_operation() const {
+  // Optional API, available since PROJ 9.1
+  if (!proj_trans_get_last_used_operation_ptr) {
+    LASMessage(LAS_VERY_VERBOSE, "PROJ last used operation API is unavailable");
+    return;
   }
 
-  // Check whether the coordinate operation is instantiable
+  PJ* used = my_proj_trans_get_last_used_operation(projParameters.proj_transform_crs);
 
-  const int instantiable = my_proj_coordoperation_is_instantiable(projParameters.proj_ctx, operation);
-
-  if (instantiable == 0) {
-    laserror("The PROJ coordinate operation cannot be instantiated.");
+  if (!used) {
+    LASMessage(LAS_WARNING, "PROJ did not report a last used coordinate operation");
+    return;
   }
 
-  if (instantiable < 0) {
-    LASMessage(LAS_WARNING, "PROJ could not determine whether the coordinate operation is instantiable.");
+  // Actual coordinate operation
+  const char* name = my_proj_get_name(used);
+
+  if (name && name[0] != '\0') {
+    LASMessage(LAS_VERY_VERBOSE, "PROJ used coordinate operation: '%s'", name);
   }
 
-  // Check whether the operation uses a ballpark transformation
-
-  const int ballpark = my_proj_coordoperation_has_ballpark_transformation(projParameters.proj_ctx, operation);
+  // Ballpark transformation
+  const int ballpark = my_proj_coordoperation_has_ballpark_transformation(projParameters.proj_ctx, used);
 
   if (ballpark > 0) {
-    const char* source_name = my_proj_get_name(projParameters.proj_source_crs);
-    const char* target_name = my_proj_get_name(projParameters.proj_target_crs);
-
-    if (source_name && source_name[0] != '\0' && target_name && target_name[0] != '\0') {
-      LASMessage(LAS_WARNING, "PROJ selected a ballpark transformation from '%s' to '%s'.", source_name, target_name);
-    } else {
-      LASMessage(LAS_WARNING, "PROJ selected a ballpark transformation.");
-    }
-
-    // technical operation detail
-    const char* operation_name = my_proj_get_name(operation);
-
-    if (operation_name && operation_name[0] != '\0') {
-      LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation: '%s'", operation_name);
-    }
+    LASMessage(LAS_WARNING, "PROJ is using a ballpark coordinate transformation");
   } else if (ballpark < 0) {
-    LASMessage(LAS_WARNING, "PROJ could not determine whether the coordinate operation uses a ballpark transformation.");
+    LASMessage(LAS_VERY_VERBOSE, "PROJ could not determine whether the used operation is ballpark");
   }
 
-  // Check operation accuracy
-
-  const double accuracy = my_proj_coordoperation_get_accuracy(projParameters.proj_ctx, operation);
+  // Operation accuracy
+  const double accuracy = my_proj_coordoperation_get_accuracy(projParameters.proj_ctx, used);
 
   if (accuracy >= 0.0) {
-    LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation accuracy: %.3f m", accuracy);
+    LASMessage(LAS_VERY_VERBOSE, "PROJ used coordinate operation accuracy: %.3f m", accuracy);
   } else {
-    LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation accuracy is unknown.");
+    LASMessage(LAS_VERY_VERBOSE, "PROJ used coordinate operation accuracy is unknown");
   }
 
-  // Check every grid used by the operation
-
-  const int grid_count = my_proj_coordoperation_get_grid_used_count(projParameters.proj_ctx, operation);
+  // Grids used by the actual operation
+  const int grid_count = my_proj_coordoperation_get_grid_used_count(projParameters.proj_ctx, used);
 
   if (grid_count < 0) {
-    LASMessage(LAS_WARNING, "Could not determine grids used by the PROJ coordinate operation.");
-  } else if (grid_count == 0) {
-    LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation uses no grids.");
+    LASMessage(LAS_VERY_VERBOSE, "PROJ could not retrieve grid information for the used operation");
   } else {
-    std::vector<std::string> missing_grids;
-    bool grid_information_incomplete = false;
+    if (grid_count == 0) {
+      LASMessage(LAS_VERY_VERBOSE, "PROJ used coordinate operation requires no grids");
+    }
 
     for (int i = 0; i < grid_count; ++i) {
       const char* short_name = nullptr;
@@ -9500,39 +9501,105 @@ void GeoProjectionConverter::check_proj_coordinate_operation() {
       int open_license = 0;
       int available = 0;
 
-      const int result = my_proj_coordoperation_get_grid_used(projParameters.proj_ctx, operation, i, &short_name, &full_name, &package_name, &url, &direct_download, &open_license, &available);
+      const int result = my_proj_coordoperation_get_grid_used(
+          projParameters.proj_ctx, used, i, &short_name, &full_name, &package_name, &url, &direct_download, &open_license, &available);
 
       if (!result) {
-        grid_information_incomplete = true;
+        LASMessage(LAS_VERY_VERBOSE, "PROJ could not retrieve information for grid %d", i + 1);
         continue;
       }
 
-      if (!available) {
-        missing_grids.emplace_back(short_name ? short_name : "(unknown)");
+      const char* grid_name = short_name ? short_name : "(unknown)";
+
+      if (available) {
+        LASMessage(LAS_VERY_VERBOSE, "PROJ used coordinate operation grid: '%s'", grid_name);
+      } else {
+        LASMessage(LAS_WARNING, "PROJ used coordinate operation grid unavailable: '%s'", grid_name);
       }
-    }
-
-    if (grid_information_incomplete) {
-      LASMessage(LAS_WARNING, "Could not retrieve information for one or more PROJ grids used by the coordinate operation.");
-    }
-
-    if (missing_grids.empty()) {
-      if (!grid_information_incomplete) {
-        LASMessage(LAS_VERY_VERBOSE, "PROJ coordinate operation uses '%d' grid(s); all are available.",  grid_count);
-      }
-    } else {
-      std::string missing;
-
-      for (size_t i = 0; i < missing_grids.size(); ++i) {
-        if (i > 0) missing += ", ";
-
-        missing += missing_grids[i];
-      }
-
-      LASMessage(LAS_WARNING, "PROJ coordinate operation uses '%d' grid(s), but '%d' grid(s) are missing.", grid_count, static_cast<int>(missing_grids.size()));
-      LASMessage(LAS_WARNING, "Missing PROJ grid(s): %s", missing.c_str());
     }
   }
+
+  // Check for potentially more accurate operations requiring unavailable grids
+  check_missing_proj_grids(used);
+
+  proj_destroy_ptr(used);
+}
+
+/// Checks whether potentially more accurate PROJ coordinate operations require unavailable grid files
+void GeoProjectionConverter::check_missing_proj_grids(const PJ* used) const {
+  if (!used || !proj_create_operation_factory_context_ptr || !proj_operation_factory_context_destroy_ptr ||
+      !proj_operation_factory_context_set_grid_availability_use_ptr || !proj_create_operations_ptr || !proj_list_get_count_ptr ||
+      !proj_list_get_ptr || !proj_list_destroy_ptr) {
+    return;
+  }
+
+  if (!projParameters.proj_source_crs || !projParameters.proj_target_crs) {
+    return;
+  }
+
+  const double used_accuracy = my_proj_coordoperation_get_accuracy(projParameters.proj_ctx, used);
+
+  // An unknown accuracy cannot be compared reliably
+  if (used_accuracy < 0.0) {
+    return;
+  }
+
+  PJ_OPERATION_FACTORY_CONTEXT* factory = proj_create_operation_factory_context_ptr(projParameters.proj_ctx, nullptr);
+
+  if (!factory) {
+    return;
+  }
+
+  // Include operations whose grids are currently missing
+  proj_operation_factory_context_set_grid_availability_use_ptr(projParameters.proj_ctx, factory, PROJ_GRID_AVAILABILITY_USED_FOR_SORTING);
+
+  PJ_OBJ_LIST* operations =
+      proj_create_operations_ptr(projParameters.proj_ctx, projParameters.proj_source_crs, projParameters.proj_target_crs, factory);
+
+  proj_operation_factory_context_destroy_ptr(factory);
+
+  if (!operations) {
+    return;
+  }
+
+  const int count = proj_list_get_count_ptr(operations);
+
+  for (int i = 0; i < count; ++i) {
+    PJ* candidate = proj_list_get_ptr(projParameters.proj_ctx, operations, i);
+
+    if (!candidate) {
+      continue;
+    }
+
+    const double candidate_accuracy = my_proj_coordoperation_get_accuracy(projParameters.proj_ctx, candidate);
+
+    // Only consider alternatives with a better stated accuracy
+    if (candidate_accuracy >= 0.0 && candidate_accuracy < used_accuracy) {
+      const int grid_count = my_proj_coordoperation_get_grid_used_count(projParameters.proj_ctx, candidate);
+
+      for (int j = 0; j < grid_count; ++j) {
+        const char* short_name = nullptr;
+        const char* full_name = nullptr;
+        const char* package_name = nullptr;
+        const char* url = nullptr;
+
+        int direct_download = 0;
+        int open_license = 0;
+        int available = 0;
+
+        const int result = my_proj_coordoperation_get_grid_used(projParameters.proj_ctx, candidate, j, &short_name, &full_name, &package_name, &url, &direct_download, &open_license, &available);
+
+        if (result && !available) {
+          LASMessage(LAS_VERBOSE, "Potentially more accurate PROJ operation (%.3f m vs. %.3f m) requires missing grid: '%s'",
+              candidate_accuracy, used_accuracy, short_name ? short_name : "(unknown)");
+        }
+      }
+    }
+
+    proj_destroy_ptr(candidate);
+  }
+
+  proj_list_destroy_ptr(operations);
 }
 
 /// IMPORTANT: The Proj lib must be installed and loaded to use this functionality.

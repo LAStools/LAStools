@@ -515,7 +515,9 @@ public:
   void set_proj_crs_with_file_header_wkt(const char* wktContent, bool source = true);
   bool is_proj_wkt_valid(const char* wktContent);
   std::string get_proj_crs_name_from_wkt(const char* wktContent);
-  void check_proj_coordinate_operation();
+  void validate_proj_transform_setup() const;
+  void check_last_used_proj_operation() const;
+  void check_missing_proj_grids(const PJ* used) const;
   void get_wkt_from_proj(CHAR*& ogc_wkt_out, GeoProjectionConverter& geoprojectionconverter, LASreader* lasreader);
    
   // helps us to find the 'pcs.csv' file
@@ -545,6 +547,7 @@ private:
   int spheroid_code;
 
   //PROJ options 
+  mutable bool proj_operation_checked;
   unsigned int proj_source_horizontal_epsg;
   unsigned int proj_target_horizontal_epsg;
   unsigned int proj_source_vertical_epsg;

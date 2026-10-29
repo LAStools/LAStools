@@ -47,6 +47,9 @@ extern "C" {
 /// ABI-safe transformation
 MyPJ_COORD transform_point(PJ* P, PJ_DIRECTION direction, double x, double y, double z, double t);
 
+/// Returns the coordinate operation used by the last proj_trans() call
+PJ* my_proj_trans_get_last_used_operation(PJ* transform);
+
 /// Create context
 PJ_CONTEXT* my_proj_context_create();
 
@@ -84,6 +87,21 @@ int my_proj_coordoperation_get_grid_used_count(PJ_CONTEXT* ctx, const PJ* operat
 
 int my_proj_coordoperation_get_grid_used( PJ_CONTEXT* ctx, const PJ* operation, int index, const char** short_name, const char** full_name, const char** package_name, const char** url,
     int* direct_download, int* open_license, int* available);
+
+PJ_OPERATION_FACTORY_CONTEXT* my_proj_create_operation_factory_context(PJ_CONTEXT* ctx, const char* authority);
+
+void my_proj_operation_factory_context_destroy(PJ_OPERATION_FACTORY_CONTEXT* ctx);
+
+void my_proj_operation_factory_context_set_grid_availability_use(
+    PJ_CONTEXT* ctx, PJ_OPERATION_FACTORY_CONTEXT* factory_ctx, PROJ_GRID_AVAILABILITY_USE use);
+
+PJ_OBJ_LIST* my_proj_create_operations(PJ_CONTEXT* ctx, const PJ* source, const PJ* target, const PJ_OPERATION_FACTORY_CONTEXT* operation_context);
+
+int my_proj_list_get_count(const PJ_OBJ_LIST* list);
+
+PJ* my_proj_list_get(PJ_CONTEXT* ctx, const PJ_OBJ_LIST* list, int index);
+
+void my_proj_list_destroy(PJ_OBJ_LIST* list);
 
 #ifdef __cplusplus
 }  // extern "C"

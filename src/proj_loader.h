@@ -86,6 +86,7 @@ using proj_context_errno_string_t = const char* (*)(PJ_CONTEXT*, int);
 
 using proj_coord_t = PROJ_COORD_OPAQUE (*)(double, double, double, double);
 using proj_trans_t = PROJ_COORD_OPAQUE (*)(PJ*, int, PROJ_COORD_OPAQUE);
+using proj_trans_get_last_used_operation_t = PJ* (*)(PJ*);
 using proj_get_type_t = int (*)(PJ*);
 using proj_is_crs_t = int (*)(const PJ*);
 using proj_log_func_t = void (*)(PJ_CONTEXT*, void*, void(*)(void*, int, const char*));
@@ -95,6 +96,14 @@ using proj_coordoperation_has_ballpark_transformation_t = int (*)(PJ_CONTEXT*, c
 using proj_coordoperation_get_accuracy_t = double (*)(PJ_CONTEXT*, const PJ*);
 using proj_coordoperation_get_grid_used_count_t = int (*)(PJ_CONTEXT*, const PJ*);
 using proj_coordoperation_get_grid_used_t =  int (*)(PJ_CONTEXT*, const PJ*, int, const char**, const char**, const char**, const char**, int*, int*, int*);
+
+using proj_create_operation_factory_context_t = PJ_OPERATION_FACTORY_CONTEXT* (*)(PJ_CONTEXT*, const char*);
+using proj_operation_factory_context_destroy_t = void (*)(PJ_OPERATION_FACTORY_CONTEXT*);
+using proj_operation_factory_context_set_grid_availability_use_t = void (*)(PJ_CONTEXT*, PJ_OPERATION_FACTORY_CONTEXT*, PROJ_GRID_AVAILABILITY_USE);
+using proj_create_operations_t = PJ_OBJ_LIST* (*)(PJ_CONTEXT*, const PJ*, const PJ*, const PJ_OPERATION_FACTORY_CONTEXT*);
+using proj_list_get_count_t = int (*)(const PJ_OBJ_LIST*);
+using proj_list_get_t = PJ* (*)(PJ_CONTEXT*, const PJ_OBJ_LIST*, int);
+using proj_list_destroy_t = void (*)(PJ_OBJ_LIST*);
 
 // MyPJ_INFO - own compatible type
 using proj_info_t = MyPJ_INFO (*)(void);
@@ -133,6 +142,7 @@ extern proj_context_errno_t proj_context_errno_ptr;
 extern proj_context_errno_string_t proj_context_errno_string_ptr;
 extern proj_coord_t proj_coord_ptr;
 extern proj_trans_t proj_trans_ptr;
+extern proj_trans_get_last_used_operation_t proj_trans_get_last_used_operation_ptr;
 extern proj_get_type_t proj_get_type_ptr;
 extern proj_info_t proj_info_ptr;
 extern proj_log_func_t proj_log_func_ptr;
@@ -141,6 +151,13 @@ extern proj_coordoperation_has_ballpark_transformation_t proj_coordoperation_has
 extern proj_coordoperation_get_accuracy_t proj_coordoperation_get_accuracy_ptr;
 extern proj_coordoperation_get_grid_used_count_t proj_coordoperation_get_grid_used_count_ptr;
 extern proj_coordoperation_get_grid_used_t proj_coordoperation_get_grid_used_ptr;
+extern proj_create_operation_factory_context_t proj_create_operation_factory_context_ptr;
+extern proj_operation_factory_context_destroy_t proj_operation_factory_context_destroy_ptr;
+extern proj_operation_factory_context_set_grid_availability_use_t proj_operation_factory_context_set_grid_availability_use_ptr;
+extern proj_create_operations_t proj_create_operations_ptr;
+extern proj_list_get_count_t proj_list_get_count_ptr;
+extern proj_list_get_t proj_list_get_ptr;
+extern proj_list_destroy_t proj_list_destroy_ptr;
 
 // ------------------------
 // Library loader
