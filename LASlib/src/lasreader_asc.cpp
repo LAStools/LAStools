@@ -274,6 +274,8 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
         if (!fgets(line, line_size, file))
         {
           LASMessage(LAS_WARNING, "end-of-file after %d of %d rows and %d of %d cols. read %lld points", row, nrows, col, ncols, p_cnt);
+          complete = FALSE;
+          break;
         }
 
         // special handling for European numbers
@@ -305,6 +307,7 @@ BOOL LASreaderASC::open(const CHAR* file_name, BOOL comma_not_point)
         if (header.min_z > elevation) header.min_z = elevation;
       }
     }
+    if (!complete) break;
   }
 
   // close the ASC file
