@@ -130,6 +130,16 @@ as the intensity, rasters the intensity values of each TIN facet onto
 a grid with step size 0.5, and stores the resulting DEM in BIL format
 with 16 bit precision.
 
+    las2dem_new64 -i lidar.laz -o dem.bil -step 0.5 -intensity_8bit
+
+Rasterizes intensity values at 0.5 m resolution, linearly scaling the 
+16-bit intensity range to 8-bit (0-255).  
+
+    las2dem_new64 -i lidar.laz -o dem.bil -step 0.5 -intensity_8bit -compute_min_max
+
+Rasterizes intensity values at 0.5 m resolution, automatically stretching the 
+intensity range of the generated raster to 8-bit (0-255) for improved contrast.  
+
     las2dem_new64 -lof lidar_files.txt -merged -o dem.bil -last_only
 
 creates a temporary TIN from all last returns of all files listed in
@@ -185,12 +195,13 @@ generated KML file:
 -grey                      : gray-scale based on elevation/intensity (used with PNG/TIF/JPG)  
 -rgb                       : use rgb values if available (only used with PNG/TIF/JPG)  
 -intensity                 : use intensity values  
+-intensity_8bit            : use intensity values linearly scaled from the full 16-bit range to 8-bit (0-255)  
 -slope                     : use slope as output color parameter  
 -attribute [n]             : use attribute [n] value as output color parameter  
 
 ### others
 -buffer [n]                : increase tile by a bounding box of size [n]  
--compute_min_max           : computes the range for -gray and -false  
+-compute_min_max           : computes the value range for -gray, -false and -intensity_8bit  
 -copy_attribute_into_z [n] : copy attribute [n] value into z  
 -creeks [fns]              : integrate hard breaklines listed in file [fns]{.shp or .txt}  
 -edge_longest              : rasterize the length of the longest edge around every vertex  
@@ -218,7 +229,7 @@ generated KML file:
 -pit_free                  : run spike-free algorithm with defaults freeze = 1.5, interval = 0.25, buffer = 0.5  
 -reversed                  : run spike-free in reverse (from bottom to top)  
 -scale [n]                 : multiply all elevation/intensity values by [n] before rastering  
--set_min_max               : sets min & max range for -gray and -false  
+-set_min_max               : sets min & max range for -gray, -false and -intensity_8bit  
 -smooth [n]                : do [n] smooth iterations (typical 2..20; default=0)  
 -smooth_short [m] [n]      : smooth "elevation" or "intensity" values by [m] passes and edge length > [n]  
 -spike_free                : run spike-free algorithm with defaults freeze = 1.5, interval = 0.25, buffer = 0.5  
