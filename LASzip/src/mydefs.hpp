@@ -395,6 +395,7 @@ inline BOOL is_inside_circle(F64 x, F64 y, const F64 circle[3]) {
 #if defined(_WIN32)
 wchar_t* UTF8toUTF16(const char* utf8);
 wchar_t* ANSItoUTF16(const char* ansi);
+// std::string UTF16toANSI(const std::wstring& w); - move to here if required global
 #endif
 
 /// <summary>
