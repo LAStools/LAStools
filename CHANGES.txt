@@ -1,5 +1,6 @@
 ﻿Note: Unless explicitly stated otherwise, all changes affect only the 64-bit versions
 
+12 November 2026 -- NEW: dem intensity output option "-intensity_8bit" to scale 16bit input to (0-255)
 29 October 2026 -- fix: PROJ integration is more flexible in terms of used grids. Use -vv to check.
 21 October 2026 -- NEW: add warning for potential 32 bit LAX index limitations during spatial queries
 20 October 2026 -- NEW: centralize exception handling across tools and file loop processing
