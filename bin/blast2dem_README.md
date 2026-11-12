@@ -71,6 +71,12 @@ step size 2.5 and stores the resulting DEM in PNG format and with
 it a KML file that geo-references each PNG in GE with UTM zone 17T.
 
 
+    blast2dem64 -i lidar.laz -o dem.bil -step 0.5 -intensity_8bit
+
+Rasterizes intensity values at 0.5 m resolution, linearly scaling the 
+16-bit intensity range to 8-bit (0-255).  
+
+
     blast2dem -i huge_lidar.las -o dem.asc -step 2 -keep_class 2
 
 creates a temporary TIN from all points in the LAS file 'lidar.las'
@@ -101,7 +107,6 @@ file that georeferences the PNG file in Google Earth
 ## blast2dem specific arguments
 
 -attribute [n]             : use attribute [n] value as output color parameter  
--compute_min_max           : computes the range for -gray and -false  
 -elevation                 : use elevation value as output color parameter  
 -elevation_feet            : use feet for elevation  
 -false                     : false-color based on elevation/intensity (used with PNG/TIF/JPG)  
@@ -116,6 +121,7 @@ file that georeferences the PNG file in Google Earth
 -ilay [n]                  : apply [n] or all LASlayers found in corresponding *.lay file on read  
 -ilaydir [n]               : look for corresponding *.lay file in directory [n]  
 -intensity                 : raster intensities instead of elevations  
+-intensity_8bit            : use intensity values linearly scaled from the full 16-bit range to 8-bit (0-255)  
 -invert_ramp               : invert color ramp for output  
 -kill [n]                  : do not raster triangles with edges longer than [n] units  
 -light [x] [y] [z]         : change the direction of the light vector to [x] [y] [z] for hillside shading  
@@ -126,7 +132,7 @@ file that georeferences the PNG file in Google Earth
 -nrows [n]                 : raster at most [n] rows  
 -rgb                       : use rgb values if available (only used with PNG/TIF/JPG)  
 -scale [n]                 : multiply all elevation values by [n] before rastering  
--set_min_max [min] [max]   : set range of [min] - [max] for -gray and -false  
+-set_min_max [min] [max]   : set range of [min] - [max] for -gray and -false and -intensity_8bit  
 -slope                     : use slope as output color parameter  
 -step [n]                  : raster with stepsize [n] (default=1)  
 -translate_xyz [x] [y] [z] : translate point coordinates by [x] [y] [z]  
