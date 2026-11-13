@@ -596,22 +596,26 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
   if (!fgets(line, 256, file))
   {
     LASMessage(LAS_WARNING, "corrupt world file");
+    fclose(file);
     return FALSE;
   }
   sscanf_las(line, "%f", &xdim);
   if (!fgets(line, 256, file))
   {
     LASMessage(LAS_WARNING, "corrupt world file");
+    fclose(file);
     return FALSE;
   }
   if (!fgets(line, 256, file))
   {
     LASMessage(LAS_WARNING, "corrupt world file");
+    fclose(file);
     return FALSE;
   }
   if (!fgets(line, 256, file))
   {
     LASMessage(LAS_WARNING, "corrupt world file");
+    fclose(file);
     return FALSE;
   }
   sscanf_las(line, "%f", &ydim);
@@ -619,12 +623,14 @@ BOOL LASreaderBIL::read_blw_file(const CHAR* file_name)
   if (!fgets(line, 256, file))
   {
     LASMessage(LAS_WARNING, "corrupt world file");
+    fclose(file);
     return FALSE;
   }
   sscanf_las(line, "%lf", &ulxcenter);
   if (!fgets(line, 256, file))
   {
     LASMessage(LAS_WARNING, "corrupt world file");
+    fclose(file);
     return FALSE;
   }
   sscanf_las(line, "%lf", &ulycenter);
