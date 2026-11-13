@@ -707,8 +707,7 @@ The formula features require a full licensed build of LAStools and are not avail
 -subdir         : enables recursive search in subdirectories. (Linux: enclose wildcard patterns like "*.laz" in quotes)  
 -unique         : remove duplicate files in a -lof list  
 -merged         : merge input files  
--buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer  
--stdin          : pipe from stdin  
+-buffered [n]   : use on-the-fly buffering of size [n] for tiles without implicit buffer   
 
 ### output
 -compatible      : write LAS/LAZ output in compatibility mode  
