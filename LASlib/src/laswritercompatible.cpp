@@ -388,7 +388,7 @@ BOOL LASwriterCompatibleDown::write_point(const LASpoint* point)
     pointCompatibleDown.set_attribute(start_NIR_band, pointCompatibleDown.rgb[3]);
   }
 
-  writer->write_point(&pointCompatibleDown);
+  if (!writer->write_point(&pointCompatibleDown)) return FALSE;
   p_count++;
   return TRUE;
 }
@@ -671,7 +671,7 @@ BOOL LASwriterCompatibleUp::write_point(const LASpoint* point)
   pointCompatibleUp.extended_scanner_channel = scanner_channel;
   pointCompatibleUp.extended_classification_flags = (overlap_bit << 3) | ((pointCompatibleUp.withheld_flag) << 2) | ((pointCompatibleUp.keypoint_flag) << 1) | (pointCompatibleUp.synthetic_flag);
 
-  writer->write_point(&pointCompatibleUp);
+  if (!writer->write_point(&pointCompatibleUp)) return FALSE;
   p_count++;
   return TRUE;
 }
